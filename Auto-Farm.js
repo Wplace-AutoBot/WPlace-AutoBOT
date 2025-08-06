@@ -1,5 +1,4 @@
 (async () => {
-  // Configurações globais
   const CONFIG = {
     START_X: 742,
     START_Y: 1148,
@@ -17,7 +16,6 @@
     }
   };
 
-  // Estado do aplicativo
   const state = {
     running: false,
     paintedCount: 0,
@@ -25,10 +23,10 @@
     userInfo: null,
     lastPixel: null,
     minimized: false,
-    menuOpen: false
+    menuOpen: false,
+    language: 'en'
   };
 
-  // Funções utilitárias
   const sleep = ms => new Promise(r => setTimeout(r, ms));
 
   const fetchAPI = async (url, options = {}) => {
@@ -39,12 +37,10 @@
       });
       return await res.json();
     } catch (e) {
-      console.error('Erro na requisição:', e);
       return null;
     }
   };
 
-  // Funções da API
   const getRandomPosition = () => ({
     x: Math.floor(Math.random() * CONFIG.PIXELS_PER_LINE),
     y: Math.floor(Math.random() * CONFIG.PIXELS_PER_LINE)
@@ -74,13 +70,28 @@
     return state.charges;
   };
 
-  // Lógica principal
+  const detectUserLocation = async () => {
+    try {
+      const response = await fetch('https://ipapi.co/json/');
+      const data = await response.json();
+      if (data.country === 'BR') {
+        state.language = 'pt';
+      } else if (data.country === 'US') {
+        state.language = 'en';
+      } else {
+        state.language = 'en';
+      }
+    } catch {
+      state.language = 'en';
+    }
+  };
+
   const paintLoop = async () => {
     while (state.running) {
       const { count, cooldownMs } = state.charges;
       
       if (count < 1) {
-        updateUI(`⌛ Sem cargas. Esperando ${Math.ceil(cooldownMs/1000)}s...`, 'status');
+        updateUI(state.language === 'pt' ? `⌛ Sem cargas. Esperando ${Math.ceil(cooldownMs/1000)}s...` : `⌛ No charges. Waiting ${Math.ceil(cooldownMs/1000)}s...`, 'status');
         await sleep(cooldownMs);
         await getCharge();
         continue;
@@ -98,15 +109,14 @@
         };
         state.charges.count--;
         
-        // Efeito visual
         document.getElementById('paintEffect').style.animation = 'pulse 0.5s';
         setTimeout(() => {
           document.getElementById('paintEffect').style.animation = '';
         }, 500);
         
-        updateUI(`✅ Pixel pintado!`, 'success');
+        updateUI(state.language === 'pt' ? '✅ Pixel pintado!' : '✅ Pixel painted!', 'success');
       } else {
-        updateUI(`❌ Falha ao pintar`, 'error');
+        updateUI(state.language === 'pt' ? '❌ Falha ao pintar' : '❌ Failed to paint', 'error');
       }
 
       await sleep(CONFIG.DELAY);
@@ -114,18 +124,15 @@
     }
   };
 
-  // Interface do usuário
   const createUI = () => {
     if (state.menuOpen) return;
     state.menuOpen = true;
 
-    // Adiciona Font Awesome
     const fontAwesome = document.createElement('link');
     fontAwesome.rel = 'stylesheet';
     fontAwesome.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
     document.head.appendChild(fontAwesome);
 
-    // Adiciona estilos
     const style = document.createElement('style');
     style.textContent = `
       @keyframes pulse {
@@ -265,7 +272,31 @@
     `;
     document.head.appendChild(style);
 
-    // Cria o painel
+    const translations = {
+      pt: {
+        title: "WPlace Auto-Farm",
+        start: "Iniciar",
+        stop: "Parar",
+        ready: "Pronto para começar",
+        user: "Usuário",
+        pixels: "Pixels",
+        charges: "Cargas",
+        level: "Level"
+      },
+      en: {
+        title: "WPlace Auto-Farm",
+        start: "Start",
+        stop: "Stop",
+        ready: "Ready to start",
+        user: "User",
+        pixels: "Pixels",
+        charges: "Charges",
+        level: "Level"
+      }
+    };
+
+    const t = translations[state.language] || translations.en;
+
     const panel = document.createElement('div');
     panel.className = 'wplace-bot-panel';
     panel.innerHTML = `
@@ -273,10 +304,10 @@
       <div class="wplace-header">
         <div class="wplace-header-title">
           <i class="fas fa-paint-brush"></i>
-          <span>WPlace Auto-Farm</span>
+          <span>${t.title}</span>
         </div>
         <div class="wplace-header-controls">
-          <button id="minimizeBtn" class="wplace-header-btn" title="Minimizar">
+          <button id="minimizeBtn" class="wplace-header-btn" title="${state.language === 'pt' ? 'Minimizar' : 'Minimize'}">
             <i class="fas fa-${state.minimized ? 'expand' : 'minus'}"></i>
           </button>
         </div>
@@ -285,27 +316,26 @@
         <div class="wplace-controls">
           <button id="toggleBtn" class="wplace-btn wplace-btn-primary">
             <i class="fas fa-play"></i>
-            <span>Iniciar</span>
+            <span>${t.start}</span>
           </button>
         </div>
         
         <div class="wplace-stats">
           <div id="statsArea">
             <div class="wplace-stat-item">
-              <div class="wplace-stat-label"><i class="fas fa-paint-brush"></i> Carregando...</div>
+              <div class="wplace-stat-label"><i class="fas fa-paint-brush"></i> ${state.language === 'pt' ? 'Carregando...' : 'Loading...'}</div>
             </div>
           </div>
         </div>
         
         <div id="statusText" class="wplace-status status-default">
-          Pronto para começar
+          ${t.ready}
         </div>
       </div>
     `;
     
     document.body.appendChild(panel);
     
-    // Tornar arrastável
     const header = panel.querySelector('.wplace-header');
     let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
     
@@ -338,7 +368,6 @@
       document.onmousemove = null;
     }
     
-    // Controles
     const toggleBtn = panel.querySelector('#toggleBtn');
     const minimizeBtn = panel.querySelector('#minimizeBtn');
     const statusText = panel.querySelector('#statusText');
@@ -349,16 +378,16 @@
       state.running = !state.running;
       
       if (state.running) {
-        toggleBtn.innerHTML = `<i class="fas fa-stop"></i> <span>Parar</span>`;
+        toggleBtn.innerHTML = `<i class="fas fa-stop"></i> <span>${t.stop}</span>`;
         toggleBtn.classList.remove('wplace-btn-primary');
         toggleBtn.classList.add('wplace-btn-stop');
-        updateUI('🚀 Pintura iniciada!', 'success');
+        updateUI(state.language === 'pt' ? '🚀 Pintura iniciada!' : '🚀 Painting started!', 'success');
         paintLoop();
       } else {
-        toggleBtn.innerHTML = `<i class="fas fa-play"></i> <span>Iniciar</span>`;
+        toggleBtn.innerHTML = `<i class="fas fa-play"></i> <span>${t.start}</span>`;
         toggleBtn.classList.add('wplace-btn-primary');
         toggleBtn.classList.remove('wplace-btn-stop');
-        updateUI('⏸️ Pintura pausada', 'default');
+        updateUI(state.language === 'pt' ? '⏸️ Pintura pausada' : '⏸️ Painting paused', 'default');
       }
     });
     
@@ -368,13 +397,11 @@
       minimizeBtn.innerHTML = `<i class="fas fa-${state.minimized ? 'expand' : 'minus'}"></i>`;
     });
     
-    // Fechar o painel quando a página for recarregada
     window.addEventListener('beforeunload', () => {
       state.menuOpen = false;
     });
   };
 
-  // Funções de atualização da UI
   window.updateUI = (message, type = 'default') => {
     const statusText = document.querySelector('#statusText');
     if (statusText) {
@@ -390,30 +417,49 @@
     await getCharge();
     const statsArea = document.querySelector('#statsArea');
     if (statsArea) {
+      const t = {
+        pt: {
+          user: "Usuário",
+          pixels: "Pixels",
+          charges: "Cargas",
+          level: "Level"
+        },
+        en: {
+          user: "User",
+          pixels: "Pixels",
+          charges: "Charges",
+          level: "Level"
+        }
+      }[state.language] || {
+        user: "User",
+        pixels: "Pixels",
+        charges: "Charges",
+        level: "Level"
+      };
+
       statsArea.innerHTML = `
         <div class="wplace-stat-item">
-          <div class="wplace-stat-label"><i class="fas fa-user"></i> Usuário</div>
+          <div class="wplace-stat-label"><i class="fas fa-user"></i> ${t.user}</div>
           <div>${state.userInfo.name}</div>
         </div>
         <div class="wplace-stat-item">
-          <div class="wplace-stat-label"><i class="fas fa-paint-brush"></i> Pixels</div>
+          <div class="wplace-stat-label"><i class="fas fa-paint-brush"></i> ${t.pixels}</div>
           <div>${state.paintedCount}</div>
         </div>
         <div class="wplace-stat-item">
-          <div class="wplace-stat-label"><i class="fas fa-bolt"></i> Cargas</div>
+          <div class="wplace-stat-label"><i class="fas fa-bolt"></i> ${t.charges}</div>
           <div>${Math.floor(state.charges.count)}/${Math.floor(state.charges.max)}</div>
         </div>
         <div class="wplace-stat-item">
-          <div class="wplace-stat-label"><i class="fas fa-star"></i> Level</div>
+          <div class="wplace-stat-label"><i class="fas fa-star"></i> ${t.level}</div>
           <div>${state.userInfo?.level || '0'}</div>
         </div>
       `;
     }
   };
 
-  // Inicialização
+  await detectUserLocation();
   createUI();
   await getCharge();
   updateStats();
-  console.log('WPlace Bot - Interface carregada com sucesso!');
 })();
