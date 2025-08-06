@@ -31,7 +31,7 @@ javascript:fetch("https://raw.githubusercontent.com/DarkModde/WPlace-AutoBOT/ref
 
 ---
 
-![Image](https://i.imgur.com/RRJ9QMv.png)
+![Image](https://i.imgur.com/dozee2w.png)
 
 ---
 
