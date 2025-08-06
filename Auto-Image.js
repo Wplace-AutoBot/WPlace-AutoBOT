@@ -1,5 +1,4 @@
 (async () => {
-  // Configurações
   const CONFIG = {
     COOLDOWN_DEFAULT: 31000,
     TRANSPARENCY_THRESHOLD: 100,
@@ -16,7 +15,6 @@
     }
   };
 
-  // Estado do aplicativo
   const state = {
     running: false,
     imageLoaded: false,
@@ -33,10 +31,10 @@
     selectingPosition: false,
     region: null,
     minimized: false,
-    lastPosition: { x: 0, y: 0 } // Armazena a última posição pintada
+    lastPosition: { x: 0, y: 0 },
+    language: 'en'
   };
 
-  // Funções utilitárias
   const Utils = {
     sleep: ms => new Promise(r => setTimeout(r, ms)),
     
@@ -114,7 +112,6 @@
     }
   };
 
-  // Serviço de comunicação com a API
   const WPlaceService = {
     async paintPixelInRegion(regionX, regionY, pixelX, pixelY, color) {
       try {
@@ -127,7 +124,6 @@
         const data = await res.json();
         return data?.painted === 1;
       } catch (error) {
-        console.error('Erro ao pintar pixel:', error);
         return false;
       }
     },
@@ -143,13 +139,11 @@
           cooldown: data.charges?.cooldownMs || CONFIG.COOLDOWN_DEFAULT 
         };
       } catch (error) {
-        console.error('Erro ao obter cargas:', error);
         return { charges: 0, cooldown: CONFIG.COOLDOWN_DEFAULT };
       }
     }
   };
 
-  // Processador de imagem
   class ImageProcessor {
     constructor(imageSrc) {
       this.imageSrc = imageSrc;
@@ -179,7 +173,6 @@
     }
   }
 
-  // Encontra a cor mais próxima
   function findClosestColor(rgb, palette) {
     let closestColor = palette[0];
     let minDistance = Utils.colorDistance(rgb, palette[0].rgb);
@@ -195,15 +188,81 @@
     return closestColor.id;
   }
 
-  // Cria a interface do usuário
+  async function detectUserLanguage() {
+    try {
+      const response = await fetch('https://ipapi.co/json/');
+      const data = await response.json();
+      if (data.country === 'BR') {
+        state.language = 'pt';
+      } else if (data.country === 'US') {
+        state.language = 'en';
+      } else {
+        state.language = 'en';
+      }
+    } catch {
+      state.language = 'en';
+    }
+  }
+
   function createUI() {
-    // Adiciona Font Awesome
+    const translations = {
+      pt: {
+        title: "WPlace Auto-Image",
+        initBot: "Iniciar Auto-BOT",
+        uploadImage: "Upload da Imagem",
+        selectPos: "Selecionar Posição",
+        startPaint: "Iniciar Pintura",
+        stopPaint: "Parar Pintura",
+        noPosition: "Nenhuma posição selecionada",
+        waiting: "Aguardando inicialização...",
+        checkingColors: "Verificando cores disponíveis...",
+        noColors: "Nenhuma cor disponível encontrada",
+        colorsFound: "cores disponíveis encontradas",
+        loadingImage: "Carregando imagem...",
+        imageLoaded: "Imagem carregada com sucesso!",
+        selectPosition: "Aguardando você pintar o pixel de referência...",
+        positionSet: "Posição definida com sucesso!",
+        startPainting: "Iniciando pintura na região",
+        paintingStopped: "Pintura interrompida pelo usuário",
+        paintingComplete: "Pintura concluída!",
+        progress: "Progresso",
+        pixels: "Pixels",
+        charges: "Cargas",
+        remaining: "Restantes"
+      },
+      en: {
+        title: "WPlace Auto-Image",
+        initBot: "Start Auto-BOT",
+        uploadImage: "Upload Image",
+        selectPos: "Select Position",
+        startPaint: "Start Painting",
+        stopPaint: "Stop Painting",
+        noPosition: "No position selected",
+        waiting: "Waiting for initialization...",
+        checkingColors: "Checking available colors...",
+        noColors: "No available colors found",
+        colorsFound: "available colors found",
+        loadingImage: "Loading image...",
+        imageLoaded: "Image loaded successfully!",
+        selectPosition: "Waiting for you to paint the reference pixel...",
+        positionSet: "Position set successfully!",
+        startPainting: "Starting painting in region",
+        paintingStopped: "Painting stopped by user",
+        paintingComplete: "Painting completed!",
+        progress: "Progress",
+        pixels: "Pixels",
+        charges: "Charges",
+        remaining: "Remaining"
+      }
+    };
+
+    const t = translations[state.language] || translations.en;
+
     const fontAwesome = document.createElement('link');
     fontAwesome.rel = 'stylesheet';
     fontAwesome.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
     document.head.appendChild(fontAwesome);
 
-    // Adiciona estilos
     const style = document.createElement('style');
     style.textContent = `
       @keyframes pulse {
@@ -388,7 +447,6 @@
     `;
     document.head.appendChild(style);
 
-    // Cria o container principal
     const container = document.createElement('div');
     container.id = 'wplace-image-bot-container';
     container.innerHTML = `
@@ -396,10 +454,10 @@
       <div class="wplace-header">
         <div class="wplace-header-title">
           <i class="fas fa-image"></i>
-          <span>WPlace Auto-Image</span>
+          <span>${t.title}</span>
         </div>
         <div class="wplace-header-controls">
-          <button id="minimizeBtn" class="wplace-header-btn" title="Minimizar">
+          <button id="minimizeBtn" class="wplace-header-btn" title="${state.language === 'pt' ? 'Minimizar' : 'Minimize'}">
             <i class="fas fa-minus"></i>
           </button>
         </div>
@@ -408,27 +466,27 @@
         <div class="wplace-controls">
           <button id="initBotBtn" class="wplace-btn wplace-btn-primary">
             <i class="fas fa-robot"></i>
-            <span>Iniciar Auto-BOT</span>
+            <span>${t.initBot}</span>
           </button>
           <button id="uploadBtn" class="wplace-btn wplace-btn-upload" disabled>
             <i class="fas fa-upload"></i>
-            <span>Upload da Imagem</span>
+            <span>${t.uploadImage}</span>
           </button>
           <button id="selectPosBtn" class="wplace-btn wplace-btn-select" disabled>
             <i class="fas fa-crosshairs"></i>
-            <span>Selecionar Posição</span>
+            <span>${t.selectPos}</span>
           </button>
           <button id="startBtn" class="wplace-btn wplace-btn-start" disabled>
             <i class="fas fa-play"></i>
-            <span>Iniciar Pintura</span>
+            <span>${t.startPaint}</span>
           </button>
           <button id="stopBtn" class="wplace-btn wplace-btn-stop" disabled>
             <i class="fas fa-stop"></i>
-            <span>Parar Pintura</span>
+            <span>${t.stopPaint}</span>
           </button>
           <div id="positionInfo" class="position-info" style="display: none;">
             <i class="fas fa-map-marker-alt"></i>
-            <span>Nenhuma posição selecionada</span>
+            <span>${t.noPosition}</span>
           </div>
         </div>
         
@@ -439,20 +497,19 @@
         <div class="wplace-stats">
           <div id="statsArea">
             <div class="wplace-stat-item">
-              <div class="wplace-stat-label"><i class="fas fa-info-circle"></i> Clique em "Iniciar Auto-BOT" para começar</div>
+              <div class="wplace-stat-label"><i class="fas fa-info-circle"></i> ${t.waiting}</div>
             </div>
           </div>
         </div>
         
         <div id="statusText" class="wplace-status status-default">
-          Aguardando inicialização...
+          ${t.waiting}
         </div>
       </div>
     `;
     
     document.body.appendChild(container);
     
-    // Tornar arrastável
     const header = container.querySelector('.wplace-header');
     let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
     
@@ -485,7 +542,6 @@
       document.onmousemove = null;
     }
     
-    // Elementos da UI
     const initBotBtn = container.querySelector('#initBotBtn');
     const uploadBtn = container.querySelector('#uploadBtn');
     const selectPosBtn = container.querySelector('#selectPosBtn');
@@ -498,7 +554,6 @@
     const positionInfo = container.querySelector('#positionInfo');
     const content = container.querySelector('.wplace-content');
     
-    // Minimizar/Maximizar
     minimizeBtn.addEventListener('click', () => {
       state.minimized = !state.minimized;
       if (state.minimized) {
@@ -510,7 +565,6 @@
       }
     });
     
-    // Atualiza a UI
     window.updateUI = (message, type = 'default') => {
       statusText.textContent = message;
       statusText.className = `wplace-status status-${type}`;
@@ -519,12 +573,11 @@
       statusText.style.animation = 'slideIn 0.3s ease-out';
     };
     
-    // Atualiza as estatísticas
     window.updateStats = async () => {
       if (!state.colorsChecked) return;
       
       const { charges, cooldown } = await WPlaceService.getCharges();
-      state.currentCharges = Math.floor(charges); // Arredonda para baixo
+      state.currentCharges = Math.floor(charges);
       state.cooldown = cooldown;
       
       const progress = state.totalPixels > 0 ? 
@@ -535,68 +588,64 @@
       
       statsArea.innerHTML = `
         <div class="wplace-stat-item">
-          <div class="wplace-stat-label"><i class="fas fa-image"></i> Progresso</div>
+          <div class="wplace-stat-label"><i class="fas fa-image"></i> ${t.progress}</div>
           <div>${progress}%</div>
         </div>
         <div class="wplace-stat-item">
-          <div class="wplace-stat-label"><i class="fas fa-paint-brush"></i> Pixels</div>
+          <div class="wplace-stat-label"><i class="fas fa-paint-brush"></i> ${t.pixels}</div>
           <div>${state.paintedPixels}/${state.totalPixels}</div>
         </div>
         <div class="wplace-stat-item">
-          <div class="wplace-stat-label"><i class="fas fa-bolt"></i> Cargas</div>
-          <div>${Math.floor(state.currentCharges)}</div> <!-- Exibe apenas a parte inteira -->
+          <div class="wplace-stat-label"><i class="fas fa-bolt"></i> ${t.charges}</div>
+          <div>${Math.floor(state.currentCharges)}</div>
         </div>
         <div class="wplace-stat-item">
-          <div class="wplace-stat-label"><i class="fas fa-clock"></i> Restantes</div>
-          <div>${remainingPixels} pixels</div>
+          <div class="wplace-stat-label"><i class="fas fa-clock"></i> ${t.remaining}</div>
+          <div>${remainingPixels} ${t.pixels.toLowerCase()}</div>
         </div>
       `;
     };
     
-    // Atualiza a informação da posição
     function updatePositionInfo() {
       if (state.startPosition && state.region) {
         positionInfo.style.display = 'block';
         positionInfo.innerHTML = `
           <i class="fas fa-map-marker-alt"></i>
-          <span>Posição: (${state.startPosition.x}, ${state.startPosition.y}) | Região: ${state.region.x}/${state.region.y}</span>
+          <span>${state.language === 'pt' ? 'Posição' : 'Position'}: (${state.startPosition.x}, ${state.startPosition.y}) | ${state.language === 'pt' ? 'Região' : 'Region'}: ${state.region.x}/${state.region.y}</span>
         `;
       } else {
         positionInfo.style.display = 'none';
       }
     }
     
-    // Evento do botão Iniciar Auto-BOT
     initBotBtn.addEventListener('click', async () => {
       try {
-        updateUI('🔍 Verificando cores disponíveis...', 'default');
+        updateUI(`🔍 ${t.checkingColors}`, 'default');
         
         state.availableColors = Utils.extractAvailableColors();
         
         if (state.availableColors.length === 0) {
-          Utils.showAlert('Abra a paleta de cores no site e tente novamente!', 'error');
-          updateUI('❌ Nenhuma cor disponível encontrada', 'error');
+          Utils.showAlert(state.language === 'pt' ? 'Abra a paleta de cores no site e tente novamente!' : 'Open the color palette on the site and try again!', 'error');
+          updateUI(`❌ ${t.noColors}`, 'error');
           return;
         }
         
         state.colorsChecked = true;
         uploadBtn.disabled = false;
         selectPosBtn.disabled = false;
-        initBotBtn.style.display = 'none'; // Esconde o botão após iniciar
+        initBotBtn.style.display = 'none';
         
-        updateUI(`✅ ${state.availableColors.length} cores disponíveis encontradas`, 'success');
+        updateUI(`✅ ${state.availableColors.length} ${t.colorsFound}`, 'success');
         updateStats();
         
       } catch (error) {
-        console.error('Erro ao verificar cores:', error);
-        updateUI('❌ Erro ao verificar cores', 'error');
+        updateUI('❌ ' + (state.language === 'pt' ? 'Erro ao verificar cores' : 'Error checking colors'), 'error');
       }
     });
     
-    // Evento do botão Upload da Imagem
     uploadBtn.addEventListener('click', async () => {
       try {
-        updateUI('🖼️ Carregando imagem...', 'default');
+        updateUI(`🖼️ ${t.loadingImage}`, 'default');
         const imageSrc = await Utils.createImageUploader();
         
         const processor = new ImageProcessor(imageSrc);
@@ -615,21 +664,19 @@
         state.totalPixels = state.imageData.totalPixels;
         state.paintedPixels = 0;
         state.imageLoaded = true;
-        state.lastPosition = { x: 0, y: 0 }; // Reseta a última posição
+        state.lastPosition = { x: 0, y: 0 };
         
         if (state.startPosition) {
           startBtn.disabled = false;
         }
         
         updateStats();
-        updateUI('✅ Imagem carregada com sucesso!', 'success');
+        updateUI(`✅ ${t.imageLoaded}`, 'success');
       } catch (error) {
-        console.error('Erro ao carregar imagem:', error);
-        updateUI('❌ Erro ao carregar imagem', 'error');
+        updateUI('❌ ' + (state.language === 'pt' ? 'Erro ao carregar imagem' : 'Error loading image'), 'error');
       }
     });
     
-    // Evento do botão Selecionar Posição
     selectPosBtn.addEventListener('click', async () => {
       if (state.selectingPosition) return;
       
@@ -639,8 +686,8 @@
       startBtn.disabled = true;
       updatePositionInfo();
       
-      Utils.showAlert('Pinte o primeiro pixel na localização onde deseja que a arte comece!', 'info');
-      updateUI('👆 Aguardando você pintar o pixel de referência...', 'default');
+      Utils.showAlert(state.language === 'pt' ? 'Pinte o primeiro pixel na localização onde deseja que a arte comece!' : 'Paint the first pixel at the location where you want the art to start!', 'info');
+      updateUI(`👆 ${t.selectPosition}`, 'default');
       
       const originalFetch = window.fetch;
       
@@ -669,11 +716,13 @@
                   x: payload.coords[0],
                   y: payload.coords[1]
                 };
-                state.lastPosition = { x: 0, y: 0 }; // Reseta a última posição
+                state.lastPosition = { x: 0, y: 0 };
                 
                 updatePositionInfo();
-                updateUI('✅ Posição definida com sucesso!', 'success');
-                Utils.showAlert(`Posição capturada na região ${state.region.x}/${state.region.y}!`, 'success');
+                updateUI(`✅ ${t.positionSet}`, 'success');
+                Utils.showAlert(state.language === 'pt' ? 
+                  `Posição capturada na região ${state.region.x}/${state.region.y}!` : 
+                  `Position captured in region ${state.region.x}/${state.region.y}!`, 'success');
                 
                 if (state.imageLoaded) {
                   startBtn.disabled = false;
@@ -686,7 +735,6 @@
             
             return response;
           } catch (error) {
-            console.error('Erro ao interceptar requisição:', error);
             return originalFetch(url, options);
           }
         }
@@ -697,16 +745,15 @@
         if (state.selectingPosition) {
           window.fetch = originalFetch;
           state.selectingPosition = false;
-          updateUI('❌ Tempo esgotado para selecionar posição', 'error');
-          Utils.showAlert('Tempo esgotado! Clique em "Selecionar Posição" novamente.', 'error');
+          updateUI('❌ ' + (state.language === 'pt' ? 'Tempo esgotado para selecionar posição' : 'Time expired to select position'), 'error');
+          Utils.showAlert(state.language === 'pt' ? 'Tempo esgotado! Clique em "Selecionar Posição" novamente.' : 'Time expired! Click "Select Position" again.', 'error');
         }
       }, 120000);
     });
     
-    // Evento do botão Iniciar Pintura
     startBtn.addEventListener('click', async () => {
       if (!state.imageLoaded || !state.startPosition || !state.region) {
-        updateUI('❌ Carregue uma imagem e selecione uma posição primeiro', 'error');
+        updateUI('❌ ' + (state.language === 'pt' ? 'Carregue uma imagem e selecione uma posição primeiro' : 'Load an image and select a position first'), 'error');
         return;
       }
       
@@ -717,13 +764,12 @@
       uploadBtn.disabled = true;
       selectPosBtn.disabled = true;
       
-      updateUI(`🎨 Iniciando pintura na região ${state.region.x}/${state.region.y}...`, 'success');
+      updateUI(`🎨 ${t.startPainting} ${state.region.x}/${state.region.y}...`, 'success');
       
       try {
         await processImage();
       } catch (error) {
-        console.error('Erro durante a pintura:', error);
-        updateUI('❌ Erro durante a pintura', 'error');
+        updateUI('❌ ' + (state.language === 'pt' ? 'Erro durante a pintura' : 'Error during painting'), 'error');
       } finally {
         state.running = false;
         stopBtn.disabled = true;
@@ -738,22 +784,19 @@
       }
     });
     
-    // Evento do botão Parar Pintura
     stopBtn.addEventListener('click', () => {
       state.stopFlag = true;
       state.running = false;
       stopBtn.disabled = true;
-      updateUI('⏹️ Pintura interrompida pelo usuário', 'warning');
+      updateUI(`⏹️ ${t.paintingStopped}`, 'warning');
     });
   }
 
-  // Processa a imagem
   async function processImage() {
     const { width, height, pixels } = state.imageData;
     const { x: startX, y: startY } = state.startPosition;
     const { x: regionX, y: regionY } = state.region;
     
-    // Começa da última posição ou do início
     let startRow = state.lastPosition.y || 0;
     let startCol = state.lastPosition.x || 0;
     
@@ -761,7 +804,6 @@
     for (let y = startRow; y < height; y++) {
       for (let x = (y === startRow ? startCol : 0); x < width; x++) {
         if (state.stopFlag) {
-          // Salva a última posição pintada
           state.lastPosition = { x, y };
           break outerLoop;
         }
@@ -775,7 +817,7 @@
         const colorId = findClosestColor(rgb, state.availableColors);
         
         if (state.currentCharges < 1) {
-          updateUI(`⌛ Sem cargas. Aguardando ${Utils.formatTime(state.cooldown)}...`, 'warning');
+          updateUI(`⌛ ${state.language === 'pt' ? 'Sem cargas. Aguardando' : 'No charges. Waiting'} ${Utils.formatTime(state.cooldown)}...`, 'warning');
           await Utils.sleep(state.cooldown);
           
           const chargeUpdate = await WPlaceService.getCharges();
@@ -800,23 +842,22 @@
           
           if (state.paintedPixels % CONFIG.LOG_INTERVAL === 0) {
             updateStats();
-            updateUI(`🧱 Progresso: ${state.paintedPixels}/${state.totalPixels} pixels...`, 'default');
+            updateUI(`🧱 ${state.language === 'pt' ? 'Progresso' : 'Progress'}: ${state.paintedPixels}/${state.totalPixels} ${state.language === 'pt' ? 'pixels...' : 'pixels...'}`, 'default');
           }
         }
       }
     }
     
     if (state.stopFlag) {
-      updateUI('⏹️ Pintura interrompida pelo usuário', 'warning');
+      updateUI(`⏹️ ${t.paintingStopped}`, 'warning');
     } else {
-      updateUI(`✅ Pintura concluída! ${state.paintedPixels} pixels pintados.`, 'success');
-      state.lastPosition = { x: 0, y: 0 }; // Reseta para próxima execução
+      updateUI(`✅ ${t.paintingComplete} ${state.paintedPixels} ${state.language === 'pt' ? 'pixels pintados.' : 'pixels painted.'}`, 'success');
+      state.lastPosition = { x: 0, y: 0 };
     }
     
     updateStats();
   }
 
-  // Inicialização
+  await detectUserLanguage();
   createUI();
-  console.log('WPlace Image Bot - Interface carregada com sucesso!');
 })();
