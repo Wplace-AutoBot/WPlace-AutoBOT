@@ -1,0 +1,1 @@
+# WPlace-AutoBOT
