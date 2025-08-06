@@ -9,7 +9,7 @@
       secondary: '#111111',
       accent: '#222222',
       text: '#ffffff',
-      highlight: '#4cc9f0',
+      highlight: '#775ce3',
       success: '#00ff00',
       error: '#ff0000',
       warning: '#ffaa00'
