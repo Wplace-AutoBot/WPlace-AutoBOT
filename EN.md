@@ -5,29 +5,36 @@
 
 <p align="center"><strong>WPlace AutoBOT</strong></p>
 
-<p align="center">Simple scripts with intuitive menus for those who want to level up in WPlace or create a giant pixel art but don’t have the time. With these scripts, you can do it all!</p>
+<p align="center">
+  Practical scripts with intuitive menus to make your life easier on <a href="https://wplace.live" target="_blank">WPlace</a>!<br>
+  Perfect for those who want to level up automatically or build massive pixel arts — without wasting time.
+</p>
 
 <br>
 
 <p align="center">
-  <sub><span style="color:gray"><strong>I wasn't the one who 'hacked' WPlace and placed the giant Herobrine there... And if you're curious: yes! These scripts were made by a Brazilian, HUEHUE!</strong></span></sub>
+  <sub><strong>It wasn't me who "hacked" WPlace and placed that giant Herobrine there...<br>
+  But if you're wondering: yes! These scripts were made by a Brazilian. HUEHUE!</strong></sub>
 </p>
 
 ---
 
-<p align="center"><strong>Instructions to use the scripts on WPlace:</strong></p>
+<p align="center"><strong>🚀┃How to use the scripts:</strong></p>
 
-<p align="center">How to use? It's very simple: just copy the code below, paste it into your bookmarks bar, and run it on wplace.live!</p>
+<p align="center">
+  It’s super easy: copy one of the codes below, paste it into your browser’s bookmarks bar,<br>
+  and run it while you're on <a href="https://wplace.live" target="_blank">wplace.live</a>.
+</p>
 
 <br>
 
-**Auto-Farm:**
+### 🎯┃Auto-Farm
 
 ```js
 javascript:fetch("https://raw.githubusercontent.com/DarkModde/WPlace-AutoBOT/refs/heads/main/Auto-Farm.js").then(t=>t.text()).then(eval);
 ```
 
-**Auto-Image:**
+### 🖼️┃Auto-Image
 
 ```js
 javascript:fetch("https://raw.githubusercontent.com/DarkModde/WPlace-AutoBOT/refs/heads/main/Auto-Image.js").then(t=>t.text()).then(eval);
@@ -35,8 +42,21 @@ javascript:fetch("https://raw.githubusercontent.com/DarkModde/WPlace-AutoBOT/ref
 
 ---
 
-![Image](https://i.imgur.com/dozee2w.png)
+<p align="center">
+  <img src="https://i.imgur.com/dozee2w.png" alt="Script Demonstration"/>
+</p>
 
 ---
 
-<p align="center"><a href="#"><img src="https://komarev.com/ghpvc/?username=WPlace-AutoBOT&style=for-the-badge&label=Views:&color=gray"/></a></p>
+### 📋┃To-do
+
+- [x] Translation [BR/EN]  
+- [ ] Merge both scripts into one  
+- [ ] Fix script bugs  
+- [ ] Add new options and menus  
+
+---
+
+<p align="center">
+  <a href="#"><img src="https://komarev.com/ghpvc/?username=WPlace-AutoBOT&style=for-the-badge&label=Views:&color=gray"/></a>
+</p>
