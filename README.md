@@ -1,3 +1,10 @@
+<p align="center">
+  English version ➜ 
+  <a href="README.en.md">
+    <img src="https://flagcdn.com/256x192/us.png" width="48" alt="USA Flag">
+  </a>
+</p>
+
 
 
 ---
@@ -18,12 +25,14 @@
 
 <p align="center">Como usar? É bem simples: basta copiar o código abaixo, colar na barra de favoritos e executar no wplace.live!</p>
 
-Auto-Farm:
+<br>
+
+**Auto-Farm:**
 
 ```js
 javascript:fetch("https://raw.githubusercontent.com/DarkModde/WPlace-AutoBOT/refs/heads/main/Auto-Farm.js").then(t=>t.text()).then(eval);
 ```
-Auto-Image:
+**Auto-Image:**
 
 ```js
 javascript:fetch("https://raw.githubusercontent.com/DarkModde/WPlace-AutoBOT/refs/heads/main/Auto-Image.js").then(t=>t.text()).then(eval);
