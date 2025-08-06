@@ -401,7 +401,7 @@
         </div>
         <div class="wplace-stat-item">
           <div class="wplace-stat-label"><i class="fas fa-bolt"></i> Cargas</div>
-          <div>${Math.floor(state.charges.count)}</div>
+          <div>${Math.floor(state.charges.count)}/${Math.floor(state.charges.max)}</div>
         </div>
         <div class="wplace-stat-item">
           <div class="wplace-stat-label"><i class="fas fa-star"></i> Level</div>
