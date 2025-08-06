@@ -1,6 +1,6 @@
 <p align="center">
   English version ➜ 
-  <a href="README.en.md">
+  <a href="EN.md">
     <img src="https://flagcdn.com/256x192/us.png" width="48" alt="USA Flag">
   </a>
 </p>
