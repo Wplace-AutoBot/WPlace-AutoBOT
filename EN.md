@@ -40,6 +40,24 @@ javascript:fetch("https://raw.githubusercontent.com/DarkModde/WPlace-AutoBOT/ref
 javascript:fetch("https://raw.githubusercontent.com/DarkModde/WPlace-AutoBOT/refs/heads/main/Auto-Image.js").then(t=>t.text()).then(eval);
 ```
 
+<details>
+  <summary><h2>📖┃Tutorials</h2></summary>
+
+---
+
+![Parte 1](https://i.imgur.com/yneG5if.png)
+
+---
+
+![Parte 2](https://i.imgur.com/ZRpU0wZ.png)
+
+---
+
+![Parte 3](https://i.imgur.com/lfjfcEw.png)
+
+</details>
+
+
 <br>
 
 > [!IMPORTANT]
