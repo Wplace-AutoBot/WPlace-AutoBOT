@@ -3,7 +3,6 @@
     START_X: 742,
     START_Y: 1148,
     PIXELS_PER_LINE: 100,
-    COLOR_ID: 1,
     DELAY: 1000,
     THEME: {
       primary: '#000000',
@@ -46,11 +45,12 @@
     y: Math.floor(Math.random() * CONFIG.PIXELS_PER_LINE)
   });
 
-  const paintPixel = async (x, y, color) => {
+  const paintPixel = async (x, y) => {
+    const randomColor = Math.floor(Math.random() * 31) + 1;
     return await fetchAPI(`https://backend.wplace.live/s0/pixel/${CONFIG.START_X}/${CONFIG.START_Y}`, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
-      body: JSON.stringify({ coords: [x, y], colors: [color] })
+      body: JSON.stringify({ coords: [x, y], colors: [randomColor] })
     });
   };
 
@@ -98,7 +98,7 @@
       }
 
       const randomPos = getRandomPosition();
-      const paintResult = await paintPixel(randomPos.x, randomPos.y, CONFIG.COLOR_ID);
+      const paintResult = await paintPixel(randomPos.x, randomPos.y);
       
       if (paintResult?.painted === 1) {
         state.paintedCount++;
