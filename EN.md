@@ -1,5 +1,5 @@
 > [!IMPORTANT]  
-> **If you're American or from another country, don't worry: the scripts detect your location and translate automatically.**
+> **If you're American or from another country, don't worry: the scripts detect your location and will translate automatically.**
 
 ---
 
