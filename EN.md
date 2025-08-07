@@ -23,7 +23,7 @@
 
 <p align="center">
   It’s super easy: copy one of the codes below, paste it into your browser’s bookmarks bar,<br>
-  and run it while you're on <a href="https://wplace.live" target="_blank">wplace.live</a>.
+  and run it while you're on wplace.live.
 </p>
 
 <br>
@@ -40,10 +40,19 @@ javascript:fetch("https://raw.githubusercontent.com/DarkModde/WPlace-AutoBOT/ref
 javascript:fetch("https://raw.githubusercontent.com/DarkModde/WPlace-AutoBOT/refs/heads/main/Auto-Image.js").then(t=>t.text()).then(eval);
 ```
 
+<br>
+
+> [!IMPORTANT]
+> <p><sub><strong>1.</strong> None of the scripts will work if you close the browser tab. You must keep the WPlace tab open, even if it's in the background.</sub></p>
+> <p><sub><strong>2.</strong> Never run both scripts on the same page — this can bug your WPlace. If it happens, just refresh the page!</sub></p>
+> <p><sub><strong>3.</strong> If the script doesn’t detect the available colors, just click the "Paint" button to show them — only then start the Auto-Imager.</sub></p>
+
+<br>
+
 ---
 
 <p align="center">
-  <img src="https://i.imgur.com/dozee2w.png" alt="Script Demonstration"/>
+  <img src="https://i.imgur.com/VbHh9jI.png" alt="Script Demonstration"/>
 </p>
 
 ---
@@ -52,8 +61,9 @@ javascript:fetch("https://raw.githubusercontent.com/DarkModde/WPlace-AutoBOT/ref
 
 - [x] Translation [BR/EN]  
 - [ ] Merge both scripts into one  
-- [ ] Fix script bugs  
-- [ ] Add new options and menus  
+- [x] Fix script bugs  
+- [x] Add new options
+- [ ] Tutorials
 
 ---
 
