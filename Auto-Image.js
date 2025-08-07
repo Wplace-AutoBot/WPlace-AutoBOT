@@ -2,6 +2,7 @@
   const CONFIG = {
     COOLDOWN_DEFAULT: 31000,
     TRANSPARENCY_THRESHOLD: 100,
+    WHITE_THRESHOLD: 250,
     LOG_INTERVAL: 10,
     THEME: {
       primary: '#000000',
@@ -12,6 +13,77 @@
       success: '#00ff00',
       error: '#ff0000',
       warning: '#ffaa00'
+    }
+  };
+
+  const TEXTS = {
+    pt: {
+      title: "WPlace Auto-Image",
+      initBot: "Iniciar Auto-BOT",
+      uploadImage: "Upload da Imagem",
+      resizeImage: "Redimensionar Imagem",
+      selectPosition: "Selecionar Posição",
+      startPainting: "Iniciar Pintura",
+      stopPainting: "Parar Pintura",
+      checkingColors: "🔍 Verificando cores disponíveis...",
+      noColorsFound: "❌ Abra a paleta de cores no site e tente novamente!",
+      colorsFound: "✅ {count} cores disponíveis encontradas",
+      loadingImage: "🖼️ Carregando imagem...",
+      imageLoaded: "✅ Imagem carregada com {count} pixels válidos",
+      imageError: "❌ Erro ao carregar imagem",
+      selectPositionAlert: "Pinte o primeiro pixel na localização onde deseja que a arte comece!",
+      waitingPosition: "👆 Aguardando você pintar o pixel de referência...",
+      positionSet: "✅ Posição definida com sucesso!",
+      positionTimeout: "❌ Tempo esgotado para selecionar posição",
+      startPaintingMsg: "🎨 Iniciando pintura...",
+      paintingProgress: "🧱 Progresso: {painted}/{total} pixels...",
+      noCharges: "⌛ Sem cargas. Aguardando {time}...",
+      paintingStopped: "⏹️ Pintura interrompida pelo usuário",
+      paintingComplete: "✅ Pintura concluída! {count} pixels pintados.",
+      paintingError: "❌ Erro durante a pintura",
+      missingRequirements: "❌ Carregue uma imagem e selecione uma posição primeiro",
+      progress: "Progresso",
+      pixels: "Pixels",
+      charges: "Cargas",
+      estimatedTime: "Tempo estimado",
+      initMessage: "Clique em 'Iniciar Auto-BOT' para começar",
+      waitingInit: "Aguardando inicialização...",
+      resizeSuccess: "✅ Imagem redimensionada para {width}x{height}",
+      paintingPaused: "⏸️ Pintura pausada na posição X: {x}, Y: {y}"
+    },
+    en: {
+      title: "WPlace Auto-Image",
+      initBot: "Start Auto-BOT",
+      uploadImage: "Upload Image",
+      resizeImage: "Resize Image",
+      selectPosition: "Select Position",
+      startPainting: "Start Painting",
+      stopPainting: "Stop Painting",
+      checkingColors: "🔍 Checking available colors...",
+      noColorsFound: "❌ Open the color palette on the site and try again!",
+      colorsFound: "✅ {count} available colors found",
+      loadingImage: "🖼️ Loading image...",
+      imageLoaded: "✅ Image loaded with {count} valid pixels",
+      imageError: "❌ Error loading image",
+      selectPositionAlert: "Paint the first pixel at the location where you want the art to start!",
+      waitingPosition: "👆 Waiting for you to paint the reference pixel...",
+      positionSet: "✅ Position set successfully!",
+      positionTimeout: "❌ Timeout for position selection",
+      startPaintingMsg: "🎨 Starting painting...",
+      paintingProgress: "🧱 Progress: {painted}/{total} pixels...",
+      noCharges: "⌛ No charges. Waiting {time}...",
+      paintingStopped: "⏹️ Painting stopped by user",
+      paintingComplete: "✅ Painting complete! {count} pixels painted.",
+      paintingError: "❌ Error during painting",
+      missingRequirements: "❌ Load an image and select a position first",
+      progress: "Progress",
+      pixels: "Pixels",
+      charges: "Charges",
+      estimatedTime: "Estimated time",
+      initMessage: "Click 'Start Auto-BOT' to begin",
+      waitingInit: "Waiting for initialization...",
+      resizeSuccess: "✅ Image resized to {width}x{height}",
+      paintingPaused: "⏸️ Painting paused at position X: {x}, Y: {y}"
     }
   };
 
@@ -32,8 +104,21 @@
     region: null,
     minimized: false,
     lastPosition: { x: 0, y: 0 },
+    estimatedTime: 0,
     language: 'en'
   };
+
+  async function detectLanguage() {
+    try {
+      const response = await fetch('https://ipapi.co/json/');
+      const data = await response.json();
+      state.language = data.country === 'BR' ? 'pt' : 'en';
+      return state.language;
+    } catch {
+      state.language = 'en';
+      return 'en';
+    }
+  }
 
   const Utils = {
     sleep: ms => new Promise(r => setTimeout(r, ms)),
@@ -58,24 +143,33 @@
     
     extractAvailableColors: () => {
       const colorElements = document.querySelectorAll('[id^="color-"]');
-      const availableColors = [];
-      
-      colorElements.forEach(el => {
-        if (!el.querySelector('svg')) {
+      return Array.from(colorElements)
+        .filter(el => !el.querySelector('svg'))
+        .filter(el => {
+          const id = parseInt(el.id.replace('color-', ''));
+          return id !== 0 && id !== 5;
+        })
+        .map(el => {
           const id = parseInt(el.id.replace('color-', ''));
           const rgbStr = el.style.backgroundColor.match(/\d+/g);
           const rgb = rgbStr ? rgbStr.map(Number) : [0, 0, 0];
-          availableColors.push({ id, rgb });
-        }
-      });
-      
-      return availableColors;
+          return { id, rgb };
+        });
     },
     
     formatTime: ms => {
       const seconds = Math.floor((ms / 1000) % 60);
       const minutes = Math.floor((ms / (1000 * 60)) % 60);
-      return `${minutes}m ${seconds}s`;
+      const hours = Math.floor((ms / (1000 * 60 * 60)) % 24);
+      const days = Math.floor(ms / (1000 * 60 * 60 * 24));
+      
+      let result = '';
+      if (days > 0) result += `${days}d `;
+      if (hours > 0 || days > 0) result += `${hours}h `;
+      if (minutes > 0 || hours > 0 || days > 0) result += `${minutes}m `;
+      result += `${seconds}s`;
+      
+      return result;
     },
     
     showAlert: (message, type = 'info') => {
@@ -85,9 +179,7 @@
       alert.style.left = '50%';
       alert.style.transform = 'translateX(-50%)';
       alert.style.padding = '15px 20px';
-      alert.style.background = type === 'error' ? CONFIG.THEME.error : 
-                             type === 'success' ? CONFIG.THEME.success : 
-                             type === 'warning' ? CONFIG.THEME.warning : CONFIG.THEME.accent;
+      alert.style.background = CONFIG.THEME[type] || CONFIG.THEME.accent;
       alert.style.color = CONFIG.THEME.text;
       alert.style.borderRadius = '5px';
       alert.style.zIndex = '10000';
@@ -95,10 +187,16 @@
       alert.style.display = 'flex';
       alert.style.alignItems = 'center';
       alert.style.gap = '10px';
+      
+      const icons = {
+        error: 'exclamation-circle',
+        success: 'check-circle',
+        warning: 'exclamation-triangle',
+        info: 'info-circle'
+      };
+      
       alert.innerHTML = `
-        <i class="fas fa-${type === 'error' ? 'exclamation-circle' : 
-                         type === 'success' ? 'check-circle' : 
-                         type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+        <i class="fas fa-${icons[type] || 'info-circle'}"></i>
         <span>${message}</span>
       `;
       
@@ -109,6 +207,26 @@
         alert.style.transition = 'opacity 0.5s';
         setTimeout(() => alert.remove(), 500);
       }, 3000);
+    },
+    
+    calculateEstimatedTime: (remainingPixels, currentCharges, cooldown) => {
+      const pixelsPerCharge = currentCharges > 0 ? currentCharges : 0;
+      const fullCycles = Math.ceil((remainingPixels - pixelsPerCharge) / Math.max(currentCharges, 1));
+      return (fullCycles * cooldown) + ((remainingPixels - 1) * 100);
+    },
+    
+    isWhitePixel: (r, g, b) => {
+      return r >= CONFIG.WHITE_THRESHOLD && 
+             g >= CONFIG.WHITE_THRESHOLD && 
+             b >= CONFIG.WHITE_THRESHOLD;
+    },
+    
+    t: (key, params = {}) => {
+      let text = TEXTS[state.language][key] || TEXTS.en[key] || key;
+      for (const [k, v] of Object.entries(params)) {
+        text = text.replace(`{${k}}`, v);
+      }
+      return text;
     }
   };
 
@@ -123,7 +241,7 @@
         });
         const data = await res.json();
         return data?.painted === 1;
-      } catch (error) {
+      } catch {
         return false;
       }
     },
@@ -138,7 +256,7 @@
           charges: data.charges?.count || 0, 
           cooldown: data.charges?.cooldownMs || CONFIG.COOLDOWN_DEFAULT 
         };
-      } catch (error) {
+      } catch {
         return { charges: 0, cooldown: CONFIG.COOLDOWN_DEFAULT };
       }
     }
@@ -150,16 +268,19 @@
       this.img = new Image();
       this.canvas = document.createElement('canvas');
       this.ctx = this.canvas.getContext('2d');
+      this.previewCanvas = document.createElement('canvas');
+      this.previewCtx = this.previewCanvas.getContext('2d');
     }
     
     async load() {
-      return new Promise(resolve => {
+      return new Promise((resolve, reject) => {
         this.img.onload = () => {
           this.canvas.width = this.img.width;
           this.canvas.height = this.img.height;
           this.ctx.drawImage(this.img, 0, 0);
           resolve();
         };
+        this.img.onerror = reject;
         this.img.src = this.imageSrc;
       });
     }
@@ -171,92 +292,42 @@
     getDimensions() {
       return { width: this.canvas.width, height: this.canvas.height };
     }
+    
+    resize(newWidth, newHeight) {
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = newWidth;
+      tempCanvas.height = newHeight;
+      const tempCtx = tempCanvas.getContext('2d');
+      
+      tempCtx.drawImage(this.img, 0, 0, newWidth, newHeight);
+      
+      this.canvas.width = newWidth;
+      this.canvas.height = newHeight;
+      this.ctx.drawImage(tempCanvas, 0, 0);
+      
+      return this.getPixelData();
+    }
+    
+    generatePreview(newWidth, newHeight) {
+      this.previewCanvas.width = newWidth;
+      this.previewCanvas.height = newHeight;
+      this.previewCtx.imageSmoothingEnabled = false;
+      this.previewCtx.drawImage(this.img, 0, 0, newWidth, newHeight);
+      return this.previewCanvas.toDataURL();
+    }
   }
 
   function findClosestColor(rgb, palette) {
-    let closestColor = palette[0];
-    let minDistance = Utils.colorDistance(rgb, palette[0].rgb);
-    
-    for (let i = 1; i < palette.length; i++) {
-      const distance = Utils.colorDistance(rgb, palette[i].rgb);
-      if (distance < minDistance) {
-        minDistance = distance;
-        closestColor = palette[i];
-      }
-    }
-    
-    return closestColor.id;
+    return palette.reduce((closest, current) => {
+      const currentDistance = Utils.colorDistance(rgb, current.rgb);
+      return currentDistance < closest.distance 
+        ? { color: current, distance: currentDistance } 
+        : closest;
+    }, { color: palette[0], distance: Utils.colorDistance(rgb, palette[0].rgb) }).color.id;
   }
 
-  async function detectUserLanguage() {
-    try {
-      const response = await fetch('https://ipapi.co/json/');
-      const data = await response.json();
-      if (data.country === 'BR') {
-        state.language = 'pt';
-      } else if (data.country === 'US') {
-        state.language = 'en';
-      } else {
-        state.language = 'en';
-      }
-    } catch {
-      state.language = 'en';
-    }
-  }
-
-  function createUI() {
-    const translations = {
-      pt: {
-        title: "WPlace Auto-Image",
-        initBot: "Iniciar Auto-BOT",
-        uploadImage: "Upload da Imagem",
-        selectPos: "Selecionar Posição",
-        startPaint: "Iniciar Pintura",
-        stopPaint: "Parar Pintura",
-        noPosition: "Nenhuma posição selecionada",
-        waiting: "Aguardando inicialização...",
-        checkingColors: "Verificando cores disponíveis...",
-        noColors: "Nenhuma cor disponível encontrada",
-        colorsFound: "cores disponíveis encontradas",
-        loadingImage: "Carregando imagem...",
-        imageLoaded: "Imagem carregada com sucesso!",
-        selectPosition: "Aguardando você pintar o pixel de referência...",
-        positionSet: "Posição definida com sucesso!",
-        startPainting: "Iniciando pintura na região",
-        paintingStopped: "Pintura interrompida pelo usuário",
-        paintingComplete: "Pintura concluída!",
-        progress: "Progresso",
-        pixels: "Pixels",
-        charges: "Cargas",
-        remaining: "Restantes"
-      },
-      en: {
-        title: "WPlace Auto-Image",
-        initBot: "Start Auto-BOT",
-        uploadImage: "Upload Image",
-        selectPos: "Select Position",
-        startPaint: "Start Painting",
-        stopPaint: "Stop Painting",
-        noPosition: "No position selected",
-        waiting: "Waiting for initialization...",
-        checkingColors: "Checking available colors...",
-        noColors: "No available colors found",
-        colorsFound: "available colors found",
-        loadingImage: "Loading image...",
-        imageLoaded: "Image loaded successfully!",
-        selectPosition: "Waiting for you to paint the reference pixel...",
-        positionSet: "Position set successfully!",
-        startPainting: "Starting painting in region",
-        paintingStopped: "Painting stopped by user",
-        paintingComplete: "Painting completed!",
-        progress: "Progress",
-        pixels: "Pixels",
-        charges: "Charges",
-        remaining: "Remaining"
-      }
-    };
-
-    const t = translations[state.language] || translations.en;
+  async function createUI() {
+    await detectLanguage();
 
     const fontAwesome = document.createElement('link');
     fontAwesome.rel = 'stylesheet';
@@ -444,20 +515,63 @@
       .wplace-minimized .wplace-content {
         display: none;
       }
+      .resize-container {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: ${CONFIG.THEME.primary};
+        padding: 20px;
+        border-radius: 8px;
+        z-index: 10000;
+        box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        max-width: 90%;
+        max-height: 90%;
+        overflow: auto;
+      }
+      .resize-preview {
+        max-width: 100%;
+        max-height: 300px;
+        margin: 10px 0;
+        border: 1px solid ${CONFIG.THEME.accent};
+      }
+      .resize-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 15px;
+      }
+      .resize-slider {
+        width: 100%;
+      }
+      .resize-buttons {
+        display: flex;
+        gap: 10px;
+      }
+      .resize-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.7);
+        z-index: 9999;
+        display: none;
+      }
     `;
     document.head.appendChild(style);
 
     const container = document.createElement('div');
     container.id = 'wplace-image-bot-container';
     container.innerHTML = `
-      <div id="paintEffect"></div>
       <div class="wplace-header">
         <div class="wplace-header-title">
           <i class="fas fa-image"></i>
-          <span>${t.title}</span>
+          <span>${Utils.t('title')}</span>
         </div>
         <div class="wplace-header-controls">
-          <button id="minimizeBtn" class="wplace-header-btn" title="${state.language === 'pt' ? 'Minimizar' : 'Minimize'}">
+          <button id="minimizeBtn" class="wplace-header-btn" title="${Utils.t('minimize')}">
             <i class="fas fa-minus"></i>
           </button>
         </div>
@@ -466,28 +580,28 @@
         <div class="wplace-controls">
           <button id="initBotBtn" class="wplace-btn wplace-btn-primary">
             <i class="fas fa-robot"></i>
-            <span>${t.initBot}</span>
+            <span>${Utils.t('initBot')}</span>
           </button>
           <button id="uploadBtn" class="wplace-btn wplace-btn-upload" disabled>
             <i class="fas fa-upload"></i>
-            <span>${t.uploadImage}</span>
+            <span>${Utils.t('uploadImage')}</span>
+          </button>
+          <button id="resizeBtn" class="wplace-btn wplace-btn-primary" disabled>
+            <i class="fas fa-expand"></i>
+            <span>${Utils.t('resizeImage')}</span>
           </button>
           <button id="selectPosBtn" class="wplace-btn wplace-btn-select" disabled>
             <i class="fas fa-crosshairs"></i>
-            <span>${t.selectPos}</span>
+            <span>${Utils.t('selectPosition')}</span>
           </button>
           <button id="startBtn" class="wplace-btn wplace-btn-start" disabled>
             <i class="fas fa-play"></i>
-            <span>${t.startPaint}</span>
+            <span>${Utils.t('startPainting')}</span>
           </button>
           <button id="stopBtn" class="wplace-btn wplace-btn-stop" disabled>
             <i class="fas fa-stop"></i>
-            <span>${t.stopPaint}</span>
+            <span>${Utils.t('stopPainting')}</span>
           </button>
-          <div id="positionInfo" class="position-info" style="display: none;">
-            <i class="fas fa-map-marker-alt"></i>
-            <span>${t.noPosition}</span>
-          </div>
         </div>
         
         <div class="wplace-progress">
@@ -497,18 +611,54 @@
         <div class="wplace-stats">
           <div id="statsArea">
             <div class="wplace-stat-item">
-              <div class="wplace-stat-label"><i class="fas fa-info-circle"></i> ${t.waiting}</div>
+              <div class="wplace-stat-label"><i class="fas fa-info-circle"></i> ${Utils.t('initMessage')}</div>
             </div>
           </div>
         </div>
         
         <div id="statusText" class="wplace-status status-default">
-          ${t.waiting}
+          ${Utils.t('waitingInit')}
         </div>
       </div>
     `;
     
+    const resizeContainer = document.createElement('div');
+    resizeContainer.className = 'resize-container';
+    resizeContainer.innerHTML = `
+      <h3 style="margin-top: 0; color: ${CONFIG.THEME.text}">${Utils.t('resizeImage')}</h3>
+      <div class="resize-controls">
+        <label style="color: ${CONFIG.THEME.text}">
+          ${Utils.t('width')}: <span id="widthValue">0</span>px
+          <input type="range" id="widthSlider" class="resize-slider" min="10" max="500" value="100">
+        </label>
+        <label style="color: ${CONFIG.THEME.text}">
+          ${Utils.t('height')}: <span id="heightValue">0</span>px
+          <input type="range" id="heightSlider" class="resize-slider" min="10" max="500" value="100">
+        </label>
+        <label style="color: ${CONFIG.THEME.text}">
+          <input type="checkbox" id="keepAspect" checked>
+          ${Utils.t('keepAspect')}
+        </label>
+        <img id="resizePreview" class="resize-preview" src="">
+        <div class="resize-buttons">
+          <button id="confirmResize" class="wplace-btn wplace-btn-primary">
+            <i class="fas fa-check"></i>
+            <span>${Utils.t('apply')}</span>
+          </button>
+          <button id="cancelResize" class="wplace-btn wplace-btn-stop">
+            <i class="fas fa-times"></i>
+            <span>${Utils.t('cancel')}</span>
+          </button>
+        </div>
+      </div>
+    `;
+    
+    const resizeOverlay = document.createElement('div');
+    resizeOverlay.className = 'resize-overlay';
+    
     document.body.appendChild(container);
+    document.body.appendChild(resizeOverlay);
+    document.body.appendChild(resizeContainer);
     
     const header = container.querySelector('.wplace-header');
     let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
@@ -518,7 +668,6 @@
     function dragMouseDown(e) {
       if (e.target.closest('.wplace-header-btn')) return;
       
-      e = e || window.event;
       e.preventDefault();
       pos3 = e.clientX;
       pos4 = e.clientY;
@@ -527,7 +676,6 @@
     }
     
     function elementDrag(e) {
-      e = e || window.event;
       e.preventDefault();
       pos1 = pos3 - e.clientX;
       pos2 = pos4 - e.clientY;
@@ -544,6 +692,7 @@
     
     const initBotBtn = container.querySelector('#initBotBtn');
     const uploadBtn = container.querySelector('#uploadBtn');
+    const resizeBtn = container.querySelector('#resizeBtn');
     const selectPosBtn = container.querySelector('#selectPosBtn');
     const startBtn = container.querySelector('#startBtn');
     const stopBtn = container.querySelector('#stopBtn');
@@ -551,8 +700,16 @@
     const statusText = container.querySelector('#statusText');
     const progressBar = container.querySelector('#progressBar');
     const statsArea = container.querySelector('#statsArea');
-    const positionInfo = container.querySelector('#positionInfo');
     const content = container.querySelector('.wplace-content');
+    
+    const widthSlider = resizeContainer.querySelector('#widthSlider');
+    const heightSlider = resizeContainer.querySelector('#heightSlider');
+    const widthValue = resizeContainer.querySelector('#widthValue');
+    const heightValue = resizeContainer.querySelector('#heightValue');
+    const keepAspect = resizeContainer.querySelector('#keepAspect');
+    const resizePreview = resizeContainer.querySelector('#resizePreview');
+    const confirmResize = resizeContainer.querySelector('#confirmResize');
+    const cancelResize = resizeContainer.querySelector('#cancelResize');
     
     minimizeBtn.addEventListener('click', () => {
       state.minimized = !state.minimized;
@@ -565,16 +722,17 @@
       }
     });
     
-    window.updateUI = (message, type = 'default') => {
+    window.updateUI = (messageKey, type = 'default', params = {}) => {
+      const message = Utils.t(messageKey, params);
       statusText.textContent = message;
       statusText.className = `wplace-status status-${type}`;
       statusText.style.animation = 'none';
       void statusText.offsetWidth;
       statusText.style.animation = 'slideIn 0.3s ease-out';
     };
-    
+
     window.updateStats = async () => {
-      if (!state.colorsChecked) return;
+      if (!state.colorsChecked || !state.imageLoaded) return;
       
       const { charges, cooldown } = await WPlaceService.getCharges();
       state.currentCharges = Math.floor(charges);
@@ -584,49 +742,129 @@
         Math.round((state.paintedPixels / state.totalPixels) * 100) : 0;
       const remainingPixels = state.totalPixels - state.paintedPixels;
       
+      state.estimatedTime = Utils.calculateEstimatedTime(
+        remainingPixels, 
+        state.currentCharges, 
+        state.cooldown
+      );
+      
       progressBar.style.width = `${progress}%`;
       
       statsArea.innerHTML = `
         <div class="wplace-stat-item">
-          <div class="wplace-stat-label"><i class="fas fa-image"></i> ${t.progress}</div>
+          <div class="wplace-stat-label"><i class="fas fa-image"></i> ${Utils.t('progress')}</div>
           <div>${progress}%</div>
         </div>
         <div class="wplace-stat-item">
-          <div class="wplace-stat-label"><i class="fas fa-paint-brush"></i> ${t.pixels}</div>
+          <div class="wplace-stat-label"><i class="fas fa-paint-brush"></i> ${Utils.t('pixels')}</div>
           <div>${state.paintedPixels}/${state.totalPixels}</div>
         </div>
         <div class="wplace-stat-item">
-          <div class="wplace-stat-label"><i class="fas fa-bolt"></i> ${t.charges}</div>
+          <div class="wplace-stat-label"><i class="fas fa-bolt"></i> ${Utils.t('charges')}</div>
           <div>${Math.floor(state.currentCharges)}</div>
         </div>
+        ${state.imageLoaded ? `
         <div class="wplace-stat-item">
-          <div class="wplace-stat-label"><i class="fas fa-clock"></i> ${t.remaining}</div>
-          <div>${remainingPixels} ${t.pixels.toLowerCase()}</div>
+          <div class="wplace-stat-label"><i class="fas fa-clock"></i> ${Utils.t('estimatedTime')}</div>
+          <div>${Utils.formatTime(state.estimatedTime)}</div>
         </div>
+        ` : ''}
       `;
     };
     
-    function updatePositionInfo() {
-      if (state.startPosition && state.region) {
-        positionInfo.style.display = 'block';
-        positionInfo.innerHTML = `
-          <i class="fas fa-map-marker-alt"></i>
-          <span>${state.language === 'pt' ? 'Posição' : 'Position'}: (${state.startPosition.x}, ${state.startPosition.y}) | ${state.language === 'pt' ? 'Região' : 'Region'}: ${state.region.x}/${state.region.y}</span>
-        `;
-      } else {
-        positionInfo.style.display = 'none';
-      }
+    function showResizeDialog(processor) {
+      const { width, height } = processor.getDimensions();
+      const aspectRatio = width / height;
+      
+      widthSlider.value = width;
+      heightSlider.value = height;
+      widthValue.textContent = width;
+      heightValue.textContent = height;
+      resizePreview.src = processor.img.src;
+      
+      resizeOverlay.style.display = 'block';
+      resizeContainer.style.display = 'block';
+      
+      const updatePreview = () => {
+        const newWidth = parseInt(widthSlider.value);
+        const newHeight = parseInt(heightSlider.value);
+        
+        widthValue.textContent = newWidth;
+        heightValue.textContent = newHeight;
+        
+        resizePreview.src = processor.generatePreview(newWidth, newHeight);
+      };
+      
+      widthSlider.addEventListener('input', () => {
+        if (keepAspect.checked) {
+          const newWidth = parseInt(widthSlider.value);
+          const newHeight = Math.round(newWidth / aspectRatio);
+          heightSlider.value = newHeight;
+        }
+        updatePreview();
+      });
+      
+      heightSlider.addEventListener('input', () => {
+        if (keepAspect.checked) {
+          const newHeight = parseInt(heightSlider.value);
+          const newWidth = Math.round(newHeight * aspectRatio);
+          widthSlider.value = newWidth;
+        }
+        updatePreview();
+      });
+      
+      confirmResize.onclick = () => {
+        const newWidth = parseInt(widthSlider.value);
+        const newHeight = parseInt(heightSlider.value);
+        
+        const newPixels = processor.resize(newWidth, newHeight);
+        
+        let totalValidPixels = 0;
+        for (let y = 0; y < newHeight; y++) {
+          for (let x = 0; x < newWidth; x++) {
+            const idx = (y * newWidth + x) * 4;
+            const r = newPixels[idx];
+            const g = newPixels[idx + 1];
+            const b = newPixels[idx + 2];
+            const alpha = newPixels[idx + 3];
+            
+            if (alpha < CONFIG.TRANSPARENCY_THRESHOLD) continue;
+            if (Utils.isWhitePixel(r, g, b)) continue;
+            
+            totalValidPixels++;
+          }
+        }
+        
+        state.imageData.pixels = newPixels;
+        state.imageData.width = newWidth;
+        state.imageData.height = newHeight;
+        state.imageData.totalPixels = totalValidPixels;
+        state.totalPixels = totalValidPixels;
+        state.paintedPixels = 0;
+        
+        updateStats();
+        updateUI('resizeSuccess', 'success', { width: newWidth, height: newHeight });
+        
+        closeResizeDialog();
+      };
+      
+      cancelResize.onclick = closeResizeDialog;
+    }
+    
+    function closeResizeDialog() {
+      resizeOverlay.style.display = 'none';
+      resizeContainer.style.display = 'none';
     }
     
     initBotBtn.addEventListener('click', async () => {
       try {
-        updateUI(`🔍 ${t.checkingColors}`, 'default');
+        updateUI('checkingColors', 'default');
         
         state.availableColors = Utils.extractAvailableColors();
         
         if (state.availableColors.length === 0) {
-          Utils.showAlert(state.language === 'pt' ? 'Abra a paleta de cores no site e tente novamente!' : 'Open the color palette on the site and try again!', 'error');
-          updateUI(`❌ ${t.noColors}`, 'error');
+          Utils.showAlert(Utils.t('noColorsFound'), 'error');
+          updateUI('noColorsFound', 'error');
           return;
         }
         
@@ -635,17 +873,17 @@
         selectPosBtn.disabled = false;
         initBotBtn.style.display = 'none';
         
-        updateUI(`✅ ${state.availableColors.length} ${t.colorsFound}`, 'success');
+        updateUI('colorsFound', 'success', { count: state.availableColors.length });
         updateStats();
         
-      } catch (error) {
-        updateUI('❌ ' + (state.language === 'pt' ? 'Erro ao verificar cores' : 'Error checking colors'), 'error');
+      } catch {
+        updateUI('imageError', 'error');
       }
     });
     
     uploadBtn.addEventListener('click', async () => {
       try {
-        updateUI(`🖼️ ${t.loadingImage}`, 'default');
+        updateUI('loadingImage', 'default');
         const imageSrc = await Utils.createImageUploader();
         
         const processor = new ImageProcessor(imageSrc);
@@ -654,26 +892,51 @@
         const { width, height } = processor.getDimensions();
         const pixels = processor.getPixelData();
         
+        let totalValidPixels = 0;
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            const idx = (y * width + x) * 4;
+            const r = pixels[idx];
+            const g = pixels[idx + 1];
+            const b = pixels[idx + 2];
+            const alpha = pixels[idx + 3];
+            
+            if (alpha < CONFIG.TRANSPARENCY_THRESHOLD) continue;
+            if (Utils.isWhitePixel(r, g, b)) continue;
+            
+            totalValidPixels++;
+          }
+        }
+        
         state.imageData = {
           width,
           height,
           pixels,
-          totalPixels: width * height
+          totalPixels: totalValidPixels,
+          processor
         };
         
-        state.totalPixels = state.imageData.totalPixels;
+        state.totalPixels = totalValidPixels;
         state.paintedPixels = 0;
         state.imageLoaded = true;
         state.lastPosition = { x: 0, y: 0 };
+        
+        resizeBtn.disabled = false;
         
         if (state.startPosition) {
           startBtn.disabled = false;
         }
         
         updateStats();
-        updateUI(`✅ ${t.imageLoaded}`, 'success');
-      } catch (error) {
-        updateUI('❌ ' + (state.language === 'pt' ? 'Erro ao carregar imagem' : 'Error loading image'), 'error');
+        updateUI('imageLoaded', 'success', { count: totalValidPixels });
+      } catch {
+        updateUI('imageError', 'error');
+      }
+    });
+    
+    resizeBtn.addEventListener('click', () => {
+      if (state.imageLoaded && state.imageData.processor) {
+        showResizeDialog(state.imageData.processor);
       }
     });
     
@@ -684,10 +947,9 @@
       state.startPosition = null;
       state.region = null;
       startBtn.disabled = true;
-      updatePositionInfo();
       
-      Utils.showAlert(state.language === 'pt' ? 'Pinte o primeiro pixel na localização onde deseja que a arte comece!' : 'Paint the first pixel at the location where you want the art to start!', 'info');
-      updateUI(`👆 ${t.selectPosition}`, 'default');
+      Utils.showAlert(Utils.t('selectPositionAlert'), 'info');
+      updateUI('waitingPosition', 'default');
       
       const originalFetch = window.fetch;
       
@@ -718,23 +980,18 @@
                 };
                 state.lastPosition = { x: 0, y: 0 };
                 
-                updatePositionInfo();
-                updateUI(`✅ ${t.positionSet}`, 'success');
-                Utils.showAlert(state.language === 'pt' ? 
-                  `Posição capturada na região ${state.region.x}/${state.region.y}!` : 
-                  `Position captured in region ${state.region.x}/${state.region.y}!`, 'success');
-                
                 if (state.imageLoaded) {
                   startBtn.disabled = false;
                 }
                 
                 window.fetch = originalFetch;
                 state.selectingPosition = false;
+                updateUI('positionSet', 'success');
               }
             }
             
             return response;
-          } catch (error) {
+          } catch {
             return originalFetch(url, options);
           }
         }
@@ -745,15 +1002,15 @@
         if (state.selectingPosition) {
           window.fetch = originalFetch;
           state.selectingPosition = false;
-          updateUI('❌ ' + (state.language === 'pt' ? 'Tempo esgotado para selecionar posição' : 'Time expired to select position'), 'error');
-          Utils.showAlert(state.language === 'pt' ? 'Tempo esgotado! Clique em "Selecionar Posição" novamente.' : 'Time expired! Click "Select Position" again.', 'error');
+          updateUI('positionTimeout', 'error');
+          Utils.showAlert(Utils.t('positionTimeout'), 'error');
         }
       }, 120000);
     });
     
     startBtn.addEventListener('click', async () => {
       if (!state.imageLoaded || !state.startPosition || !state.region) {
-        updateUI('❌ ' + (state.language === 'pt' ? 'Carregue uma imagem e selecione uma posição primeiro' : 'Load an image and select a position first'), 'error');
+        updateUI('missingRequirements', 'error');
         return;
       }
       
@@ -763,13 +1020,14 @@
       stopBtn.disabled = false;
       uploadBtn.disabled = true;
       selectPosBtn.disabled = true;
+      resizeBtn.disabled = true;
       
-      updateUI(`🎨 ${t.startPainting} ${state.region.x}/${state.region.y}...`, 'success');
+      updateUI('startPaintingMsg', 'success');
       
       try {
         await processImage();
-      } catch (error) {
-        updateUI('❌ ' + (state.language === 'pt' ? 'Erro durante a pintura' : 'Error during painting'), 'error');
+      } catch {
+        updateUI('paintingError', 'error');
       } finally {
         state.running = false;
         stopBtn.disabled = true;
@@ -778,6 +1036,7 @@
           startBtn.disabled = true;
           uploadBtn.disabled = false;
           selectPosBtn.disabled = false;
+          resizeBtn.disabled = false;
         } else {
           startBtn.disabled = false;
         }
@@ -788,7 +1047,7 @@
       state.stopFlag = true;
       state.running = false;
       stopBtn.disabled = true;
-      updateUI(`⏹️ ${t.paintingStopped}`, 'warning');
+      updateUI('paintingStopped', 'warning');
     });
   }
 
@@ -805,19 +1064,24 @@
       for (let x = (y === startRow ? startCol : 0); x < width; x++) {
         if (state.stopFlag) {
           state.lastPosition = { x, y };
+          updateUI('paintingPaused', 'warning', { x, y });
           break outerLoop;
         }
         
         const idx = (y * width + x) * 4;
-        const rgb = [pixels[idx], pixels[idx + 1], pixels[idx + 2]];
+        const r = pixels[idx];
+        const g = pixels[idx + 1];
+        const b = pixels[idx + 2];
         const alpha = pixels[idx + 3];
         
         if (alpha < CONFIG.TRANSPARENCY_THRESHOLD) continue;
+        if (Utils.isWhitePixel(r, g, b)) continue;
         
+        const rgb = [r, g, b];
         const colorId = findClosestColor(rgb, state.availableColors);
         
         if (state.currentCharges < 1) {
-          updateUI(`⌛ ${state.language === 'pt' ? 'Sem cargas. Aguardando' : 'No charges. Waiting'} ${Utils.formatTime(state.cooldown)}...`, 'warning');
+          updateUI('noCharges', 'warning', { time: Utils.formatTime(state.cooldown) });
           await Utils.sleep(state.cooldown);
           
           const chargeUpdate = await WPlaceService.getCharges();
@@ -840,24 +1104,32 @@
           state.paintedPixels++;
           state.currentCharges--;
           
+          state.estimatedTime = Utils.calculateEstimatedTime(
+            state.totalPixels - state.paintedPixels,
+            state.currentCharges,
+            state.cooldown
+          );
+          
           if (state.paintedPixels % CONFIG.LOG_INTERVAL === 0) {
             updateStats();
-            updateUI(`🧱 ${state.language === 'pt' ? 'Progresso' : 'Progress'}: ${state.paintedPixels}/${state.totalPixels} ${state.language === 'pt' ? 'pixels...' : 'pixels...'}`, 'default');
+            updateUI('paintingProgress', 'default', { 
+              painted: state.paintedPixels, 
+              total: state.totalPixels 
+            });
           }
         }
       }
     }
     
     if (state.stopFlag) {
-      updateUI(`⏹️ ${t.paintingStopped}`, 'warning');
+      updateUI('paintingStopped', 'warning');
     } else {
-      updateUI(`✅ ${t.paintingComplete} ${state.paintedPixels} ${state.language === 'pt' ? 'pixels pintados.' : 'pixels painted.'}`, 'success');
+      updateUI('paintingComplete', 'success', { count: state.paintedPixels });
       state.lastPosition = { x: 0, y: 0 };
     }
     
     updateStats();
   }
 
-  await detectUserLanguage();
   createUI();
 })();
