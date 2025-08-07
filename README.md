@@ -44,10 +44,19 @@ javascript:fetch("https://raw.githubusercontent.com/DarkModde/WPlace-AutoBOT/ref
 javascript:fetch("https://raw.githubusercontent.com/DarkModde/WPlace-AutoBOT/refs/heads/main/Auto-Image.js").then(t=>t.text()).then(eval);
 ```
 
+<br>
+
+> [!IMPORTANT]
+> <p><sub><strong>1.</strong> Nenhum dos scripts funciona se você fechar a aba do navegador. Você deve deixar a aba do WPlace aberta, mesmo que em segundo plano.</sub></p>
+> <p><sub><strong>2.</strong> Nunca execute os dois scripts na mesma página, isso pode acabar bugando o WPlace. Caso tenha feito isso, basta atualizar a página!</sub></p>
+> <p><sub><strong>3.</strong> Se o script não detectar as cores, clique no botão "Pintar" para exibir as cores. Só então inicie o Auto-Imager.</sub></p>
+
+<br>
+
 ---
 
 <p align="center">
-  <img src="https://i.imgur.com/dozee2w.png" alt="Demonstração dos Scripts"/>
+  <img src="https://i.imgur.com/VbHh9jI.png" alt="Demonstração dos Scripts"/>
 </p>
 
 ---
@@ -56,8 +65,9 @@ javascript:fetch("https://raw.githubusercontent.com/DarkModde/WPlace-AutoBOT/ref
 
 - [x] Tradução [BR/USA]  
 - [ ] Juntar os 2 scripts em 1  
-- [ ] Corrigir bugs dos scripts  
-- [ ] Adicionar novas opções e menus  
+- [x] Corrigir bugs dos scripts  
+- [x] Adicionar novas opções
+- [ ] Tutoriais
 
 ---
 
