@@ -1,5 +1,8 @@
-> [!IMPORTANT]  
-> **Si vous êtes Américain ou d’un autre pays, ne vous inquiétez pas : les scripts détectent votre localisation et traduiront automatiquement.**
+<!-- > [!IMPORTANT]  -->
+<!-- > **Si vous êtes Américain ou d’un autre pays, ne vous inquiétez pas : les scripts détectent votre localisation et traduiront automatiquement.**  -->
+
+> [!WARNING]
+> **Pour ceux qui utilisent le script, vous avez peut-être remarqué qu’il a cessé de fonctionner. C’est parce que wplace a été mis à jour et envoie maintenant un captcha toutes les 2 minutes, ce qui rend très difficile l’utilisation des bots. Mais j’ai déjà trouvé une solution et je travaille dessus aussi vite que possible pour vous. Un grand merci du fond du cœur à tous ceux qui aident ce projet <3**
 
 ---
 
