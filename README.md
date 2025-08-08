@@ -7,6 +7,11 @@
 
 ---
 
+> [!WARNING]
+> **Para quem usa o script, deve ter percebido que ele parou de funcionar. Isso acontece porque o wplace foi atualizado e agora envia um captcha a cada 2 minutos, o que torna muito difícil criar bots. Mas eu já encontrei uma solução e estou desenvolvendo o mais rápido possível para vocês. Obrigado de coração a todos que estão ajudando neste projeto <3**
+
+---
+
 <p align="center"><strong>WPlace AutoBOT</strong></p>
 
 <p align="center">
