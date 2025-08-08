@@ -45,15 +45,15 @@ javascript:fetch("https://raw.githubusercontent.com/DarkModde/WPlace-AutoBOT/ref
 
 ---
 
-![Partie 1](https://i.imgur.com/yneG5if.png)
+![Partie 1](https://i.imgur.com/XejdRSn.png)
 
 ---
 
-![Partie 2](https://i.imgur.com/ZRpU0wZ.png)
+![Partie 2](https://i.imgur.com/u9Zikqo.png)
 
 ---
 
-![Partie 3](https://i.imgur.com/lfjfcEw.png)
+![Partie 3](https://i.imgur.com/cjBi6oz.png)
 
 </details>
 
