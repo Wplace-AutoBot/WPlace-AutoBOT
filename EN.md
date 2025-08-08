@@ -2,7 +2,7 @@
 <!-- > **If you're American or from another country, don't worry: the scripts detect your location and will translate automatically.**  -->
 
 
-> [!IMPORTANT]
+> [!WARNING]
 > **For those who use the script, you might have noticed it stopped working. This is because wplace was updated and now it sends a captcha every 2 minutes, making it really hard to run bots. But I’ve already found a way, and I’m working on it as fast as I can for you. Big thanks from the heart to everyone who’s helping with this project <3**
 
 ---
