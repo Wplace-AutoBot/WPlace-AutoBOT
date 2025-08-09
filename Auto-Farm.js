@@ -26,33 +26,11 @@
     language: 'en'
   };
 
-  // Global variable to store the captured CAPTCHA token.
-  let capturedCaptchaToken = null;
-
-  // Intercept window.fetch to capture the 't' token from manual paints.
-  const originalFetch = window.fetch;
-  window.fetch = async (url, options) => {
-    if (typeof url === 'string' && url.includes('https://backend.wplace.live/s0/pixel/')) {
-      try {
-        const payload = JSON.parse(options.body);
-        if (payload.t) {
-          console.log("✅ CAPTCHA Token Captured:", payload.t);
-          capturedCaptchaToken = payload.t;
-          if (document.querySelector('#statusText')?.textContent.includes('CAPTCHA')) {
-            updateUI("Token captured! Ready to start.", "success");
-          }
-        }
-      } catch (e) { /* Ignore non-JSON bodies */ }
-    }
-    return originalFetch(url, options);
-  };
-
   const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-  // Modified the original fetchAPI to use the new overridden fetch
   const fetchAPI = async (url, options = {}) => {
     try {
-      const res = await fetch(url, { // 'fetch' here is now our overridden version
+      const res = await fetch(url, {
         credentials: 'include',
         ...options
       });
@@ -67,33 +45,13 @@
     y: Math.floor(Math.random() * CONFIG.PIXELS_PER_LINE)
   });
 
-  // [MODIFIED] The paintPixel function now includes the CAPTCHA token.
   const paintPixel = async (x, y) => {
     const randomColor = Math.floor(Math.random() * 31) + 1;
-    
-    // Construct the payload with the token
-    const payload = {
-      coords: [x, y],
-      colors: [randomColor],
-      t: capturedCaptchaToken
-    };
-
-    const res = await fetch(`https://backend.wplace.live/s0/pixel/${CONFIG.START_X}/${CONFIG.START_Y}`, {
+    return await fetchAPI(`https://backend.wplace.live/s0/pixel/${CONFIG.START_X}/${CONFIG.START_Y}`, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
-      credentials: 'include', 
-      body: JSON.stringify(payload)
+      body: JSON.stringify({ coords: [x, y], colors: [randomColor] })
     });
-    
-    // If we get a 403 Forbidden error, our token is likely expired.
-    if (res.status === 403) {
-      console.error("❌ 403 Forbidden. CAPTCHA token might be invalid or expired.");
-      capturedCaptchaToken = null; // Invalidate the token.
-      state.running = false; // Stop the bot.
-      return { painted: 'token_error' }; // Return a special status.
-    }
-
-    return await res.json();
   };
 
   const getCharge = async () => {
@@ -116,13 +74,18 @@
     try {
       const response = await fetch('https://ipapi.co/json/');
       const data = await response.json();
-      state.language = (data.country === 'BR') ? 'pt' : 'en';
+      if (data.country === 'BR') {
+        state.language = 'pt';
+      } else if (data.country === 'US') {
+        state.language = 'en';
+      } else {
+        state.language = 'en';
+      }
     } catch {
       state.language = 'en';
     }
   };
 
-  // [MODIFIED] The main loop now handles the token error case.
   const paintLoop = async () => {
     while (state.running) {
       const { count, cooldownMs } = state.charges;
@@ -137,16 +100,6 @@
       const randomPos = getRandomPosition();
       const paintResult = await paintPixel(randomPos.x, randomPos.y);
       
-      // Handle the special token error status
-      if (paintResult?.painted === 'token_error') {
-        updateUI(state.language === 'pt' ? '❗ Token CAPTCHA inválido. Por favor, pinte um pixel manualmente.' : '❗ Invalid CAPTCHA token. Please paint one pixel manually.', 'error');
-        const toggleBtn = document.getElementById('toggleBtn');
-        toggleBtn.innerHTML = `<i class="fas fa-play"></i> <span>${state.language === 'pt' ? 'Iniciar' : 'Start'}</span>`;
-        toggleBtn.classList.add('wplace-btn-primary');
-        toggleBtn.classList.remove('wplace-btn-stop');
-        break; // Exit the loop
-      }
-
       if (paintResult?.painted === 1) {
         state.paintedCount++;
         state.lastPixel = { 
@@ -417,17 +370,11 @@
     
     const toggleBtn = panel.querySelector('#toggleBtn');
     const minimizeBtn = panel.querySelector('#minimizeBtn');
+    const statusText = panel.querySelector('#statusText');
     const content = panel.querySelector('.wplace-content');
+    const statsArea = panel.querySelector('#statsArea');
     
-    // [MODIFIED] The start/stop button now checks for a token before starting.
     toggleBtn.addEventListener('click', () => {
-      if (!state.running) { // When trying to start
-        if (!capturedCaptchaToken) {
-          updateUI(state.language === 'pt' ? '❗ Pinte um pixel manualmente primeiro!' : '❗ Paint a pixel manually first!', 'error');
-          return; // Do not start
-        }
-      }
-
       state.running = !state.running;
       
       if (state.running) {

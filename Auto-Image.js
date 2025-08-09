@@ -5,9 +5,6 @@
     TRANSPARENCY_THRESHOLD: 100,
     WHITE_THRESHOLD: 250,
     LOG_INTERVAL: 10,
-    TOKEN_REFRESH_INTERVAL: 300000, // Refresh token every 5 minutes
-    MAX_RETRIES: 3,
-    RETRY_DELAY: 5000,
     THEME: {
       primary: '#000000',
       secondary: '#111111',
@@ -55,9 +52,7 @@
       waitingInit: "Aguardando inicialização...",
       resizeSuccess: "✅ Imagem redimensionada para {width}x{height}",
       paintingPaused: "⏸️ Pintura pausada na posição X: {x}, Y: {y}",
-      captchaNeeded: "❗ Token CAPTCHA necessário. Pinte um pixel manualmente para continuar.",
-      tokenRefreshed: "🔄 Token atualizado automaticamente",
-      retryingRequest: "🔄 Tentando novamente... ({retry}/{max})"
+      captchaNeeded: "❗ Token CAPTCHA necessário. Pinte um pixel manualmente para continuar."
     },
     en: {
       title: "WPlace Auto-Image",
@@ -92,9 +87,7 @@
       waitingInit: "Waiting for initialization...",
       resizeSuccess: "✅ Image resized to {width}x{height}",
       paintingPaused: "⏸️ Painting paused at position X: {x}, Y: {y}",
-      captchaNeeded: "❗ CAPTCHA token needed. Paint one pixel manually to continue.",
-      tokenRefreshed: "🔄 Token refreshed automatically",
-      retryingRequest: "🔄 Retrying... ({retry}/{max})"
+      captchaNeeded: "❗ CAPTCHA token needed. Paint one pixel manually to continue."
     }
   };
 
@@ -117,134 +110,36 @@
     minimized: false,
     lastPosition: { x: 0, y: 0 },
     estimatedTime: 0,
-    language: 'en',
-    tokenLastRefreshed: Date.now(),
-    failedAttempts: 0,
-    sessionHeaders: null
+    language: 'en'
   };
 
-  // Enhanced token management
+  // Global variable to store the captured CAPTCHA token.
   let capturedCaptchaToken = null;
-  let capturedHeaders = null;
-  let tokenRefreshTimer = null;
 
-  // Enhanced request interceptor with header capture
+  // Intercept the original window.fetch function to "listen" for network requests.
   const originalFetch = window.fetch;
-  const originalXHROpen = XMLHttpRequest.prototype.open;
-  const originalXHRSend = XMLHttpRequest.prototype.send;
-  const originalXHRSetRequestHeader = XMLHttpRequest.prototype.setRequestHeader;
-
-  // Intercept XMLHttpRequest for better header capture
-  XMLHttpRequest.prototype.open = function(method, url) {
-    this._url = url;
-    this._method = method;
-    this._requestHeaders = {};
-    return originalXHROpen.apply(this, arguments);
-  };
-
-  XMLHttpRequest.prototype.setRequestHeader = function(header, value) {
-    this._requestHeaders[header] = value;
-    return originalXHRSetRequestHeader.apply(this, arguments);
-  };
-
-  XMLHttpRequest.prototype.send = function(body) {
-    if (this._url && this._url.includes('backend.wplace.live/s0/pixel/')) {
-      try {
-        const payload = JSON.parse(body);
-        if (payload.t) {
-          console.log("✅ CAPTCHA Token Captured via XHR:", payload.t);
-          capturedCaptchaToken = payload.t;
-          capturedHeaders = {...this._requestHeaders};
-          state.tokenLastRefreshed = Date.now();
-          
-          if (document.querySelector('#statusText')?.textContent.includes('CAPTCHA')) {
-            Utils.showAlert("Token captured successfully! You can start the bot now.", "success");
-            updateUI('colorsFound', 'success', { count: state.availableColors.length });
-          }
-          
-          // Reset failed attempts counter
-          state.failedAttempts = 0;
-          
-          // Start token refresh timer
-          startTokenRefreshTimer();
-        }
-      } catch (e) {}
-    }
-    return originalXHRSend.apply(this, arguments);
-  };
-
-  // Enhanced fetch interceptor
   window.fetch = async (url, options) => {
-    if (typeof url === 'string' && url.includes('backend.wplace.live/s0/pixel/')) {
+    // Check if the request is for painting a pixel on wplace.
+    if (typeof url === 'string' && url.includes('https://backend.wplace.live/s0/pixel/')) {
       try {
         const payload = JSON.parse(options.body);
+        // If the request body contains the 't' field, it's our CAPTCHA token.
         if (payload.t) {
-          console.log("✅ CAPTCHA Token Captured via Fetch:", payload.t);
+          console.log("✅ CAPTCHA Token Captured:", payload.t);
+          // Store the token for our bot to use.
           capturedCaptchaToken = payload.t;
-          capturedHeaders = options.headers ? {...options.headers} : null;
-          state.tokenLastRefreshed = Date.now();
-          
-          if (document.querySelector('#statusText')?.textContent.includes('CAPTCHA')) {
-            Utils.showAlert("Token captured successfully! You can start the bot now.", "success");
-            updateUI('colorsFound', 'success', { count: state.availableColors.length });
+          // Notify the user that the token is captured and they can start the bot.
+          if(document.querySelector('#statusText')?.textContent.includes('CAPTCHA')){
+             Utils.showAlert("Token captured successfully! You can start the bot now.", "success");
+             updateUI('colorsFound', 'success', { count: state.availableColors.length });
           }
-          
-          state.failedAttempts = 0;
-          startTokenRefreshTimer();
         }
-      } catch (e) {}
+      } catch (e) { /* Ignore errors if the request body isn't valid JSON */ }
     }
+    // Finally, execute the original request, whether we inspected it or not.
     return originalFetch(url, options);
   };
 
-  // Token refresh mechanism
-  function startTokenRefreshTimer() {
-    if (tokenRefreshTimer) {
-      clearInterval(tokenRefreshTimer);
-    }
-    
-    tokenRefreshTimer = setInterval(async () => {
-      if (state.running && capturedCaptchaToken) {
-        const timeSinceRefresh = Date.now() - state.tokenLastRefreshed;
-        if (timeSinceRefresh >= CONFIG.TOKEN_REFRESH_INTERVAL) {
-          console.log("⏰ Token refresh time reached, requesting manual paint...");
-          updateUI('captchaNeeded', 'warning');
-          Utils.showAlert("Please paint a pixel manually to refresh the token", "warning");
-        }
-      }
-    }, 60000); // Check every minute
-  }
-
-  // Auto-recovery mechanism
-  async function attemptAutoRecovery() {
-    console.log("🔧 Attempting auto-recovery...");
-    
-    // Try to trigger a Cloudflare challenge solve
-    try {
-      // Method 1: Try to fetch the main page to trigger CF challenge
-      const mainPageResponse = await fetch('https://wplace.live/', {
-        credentials: 'include',
-        headers: {
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-          'User-Agent': navigator.userAgent
-        }
-      });
-      
-      // Method 2: Try to get user info which might refresh session
-      const meResponse = await fetch('https://backend.wplace.live/me', {
-        credentials: 'include'
-      });
-      
-      if (meResponse.ok) {
-        console.log("✅ Session appears to be valid");
-        return true;
-      }
-    } catch (e) {
-      console.error("Auto-recovery failed:", e);
-    }
-    
-    return false;
-  }
 
   async function detectLanguage() {
     try {
@@ -367,80 +262,36 @@
     }
   };
 
-  // Enhanced WPLACE API SERVICE with retry logic
+  // WPLACE API SERVICE
   const WPlaceService = {
-    async paintPixelInRegion(regionX, regionY, pixelX, pixelY, color, retryCount = 0) {
-      try {
-        const payload = {
-          coords: [pixelX, pixelY],
-          colors: [color],
-          t: capturedCaptchaToken
-        };
-        
-        // Build headers based on captured headers
-        const headers = {
-          'Content-Type': 'text/plain;charset=UTF-8',
-          ...(capturedHeaders || {})
-        };
-        
-        const res = await fetch(`https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`, {
-          method: 'POST',
-          headers: headers,
-          credentials: 'include',
-          body: JSON.stringify(payload)
-        });
-
-        // Handle different response codes
-        if (res.status === 403) {
-          console.error("❌ 403 Forbidden. Token expired or invalid.");
-          state.failedAttempts++;
-          
-          // Try auto-recovery first
-          if (retryCount < CONFIG.MAX_RETRIES) {
-            updateUI('retryingRequest', 'warning', { 
-              retry: retryCount + 1, 
-              max: CONFIG.MAX_RETRIES 
+    async paintPixelInRegion(regionX, regionY, pixelX, pixelY, color) {
+        try {
+            // Construct the payload including the captured 't' token.
+            const payload = {
+                coords: [pixelX, pixelY],
+                colors: [color],
+                t: capturedCaptchaToken
+            };
+            const res = await fetch(`https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+                credentials: 'include',
+                body: JSON.stringify(payload)
             });
-            
-            const recovered = await attemptAutoRecovery();
-            if (recovered) {
-              await Utils.sleep(CONFIG.RETRY_DELAY);
-              return await this.paintPixelInRegion(regionX, regionY, pixelX, pixelY, color, retryCount + 1);
-            }
-          }
-          
-          capturedCaptchaToken = null;
-          return 'token_error';
-        }
-        
-        if (res.status === 429) {
-          console.warn("⚠️ Rate limited. Waiting before retry...");
-          await Utils.sleep(CONFIG.RETRY_DELAY * 2);
-          if (retryCount < CONFIG.MAX_RETRIES) {
-            return await this.paintPixelInRegion(regionX, regionY, pixelX, pixelY, color, retryCount + 1);
-          }
-          return false;
-        }
 
-        const data = await res.json();
-        
-        // Reset failed attempts on success
-        if (data?.painted === 1) {
-          state.failedAttempts = 0;
+            // If we get a 403 Forbidden error, our token is likely expired.
+            if (res.status === 403) {
+                console.error("❌ 403 Forbidden. CAPTCHA token might be invalid or expired.");
+                capturedCaptchaToken = null; // Invalidate our stored token.
+                return 'token_error'; // Return a special status to stop the bot.
+            }
+
+            const data = await res.json();
+            return data?.painted === 1;
+        } catch(e) {
+            console.error("Paint request failed:", e);
+            return false;
         }
-        
-        return data?.painted === 1;
-      } catch(e) {
-        console.error("Paint request failed:", e);
-        
-        // Retry on network errors
-        if (retryCount < CONFIG.MAX_RETRIES) {
-          await Utils.sleep(CONFIG.RETRY_DELAY);
-          return await this.paintPixelInRegion(regionX, regionY, pixelX, pixelY, color, retryCount + 1);
-        }
-        
-        return false;
-      }
     },
     
     async getCharges() {
@@ -523,7 +374,6 @@
     }, { color: palette[0], distance: Utils.colorDistance(rgb, palette[0].rgb) }).color.id;
   }
 
-  // Create UI function with enhanced token status display
   async function createUI() {
     await detectLanguage();
 
@@ -547,7 +397,7 @@
         position: fixed;
         top: 20px;
         right: 20px;
-        width: 320px;
+        width: 300px;
         background: ${CONFIG.THEME.primary};
         border: 1px solid ${CONFIG.THEME.accent};
         border-radius: 8px;
@@ -693,25 +543,22 @@
         background: rgba(255, 165, 0, 0.1);
         color: orange;
       }
-      .token-status {
-        display: flex;
-        align-items: center;
-        gap: 5px;
+      #paintEffect {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        border-radius: 8px;
+      }
+      .position-info {
+        font-size: 13px;
+        margin-top: 5px;
         padding: 5px;
         background: ${CONFIG.THEME.secondary};
         border-radius: 4px;
-        margin-top: 10px;
-        font-size: 12px;
-      }
-      .token-status-indicator {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: ${CONFIG.THEME.error};
-      }
-      .token-status-indicator.active {
-        background: ${CONFIG.THEME.success};
-        animation: pulse 2s infinite;
+        text-align: center;
       }
       .wplace-minimized .wplace-content {
         display: none;
@@ -820,11 +667,6 @@
         <div id="statusText" class="wplace-status status-default">
           ${Utils.t('waitingInit')}
         </div>
-        
-        <div class="token-status">
-          <div id="tokenIndicator" class="token-status-indicator"></div>
-          <span id="tokenStatusText">Token: Not captured</span>
-        </div>
       </div>
     `;
     
@@ -834,26 +676,26 @@
       <h3 style="margin-top: 0; color: ${CONFIG.THEME.text}">${Utils.t('resizeImage')}</h3>
       <div class="resize-controls">
         <label style="color: ${CONFIG.THEME.text}">
-          Width: <span id="widthValue">0</span>px
+          ${Utils.t('width')}: <span id="widthValue">0</span>px
           <input type="range" id="widthSlider" class="resize-slider" min="10" max="500" value="100">
         </label>
         <label style="color: ${CONFIG.THEME.text}">
-          Height: <span id="heightValue">0</span>px
+          ${Utils.t('height')}: <span id="heightValue">0</span>px
           <input type="range" id="heightSlider" class="resize-slider" min="10" max="500" value="100">
         </label>
         <label style="color: ${CONFIG.THEME.text}">
           <input type="checkbox" id="keepAspect" checked>
-          Keep Aspect Ratio
+          ${Utils.t('keepAspect')}
         </label>
         <img id="resizePreview" class="resize-preview" src="">
         <div class="resize-buttons">
           <button id="confirmResize" class="wplace-btn wplace-btn-primary">
             <i class="fas fa-check"></i>
-            <span>Apply</span>
+            <span>${Utils.t('apply')}</span>
           </button>
           <button id="cancelResize" class="wplace-btn wplace-btn-stop">
             <i class="fas fa-times"></i>
-            <span>Cancel</span>
+            <span>${Utils.t('cancel')}</span>
           </button>
         </div>
       </div>
@@ -866,7 +708,6 @@
     document.body.appendChild(resizeOverlay);
     document.body.appendChild(resizeContainer);
     
-    // Drag functionality
     const header = container.querySelector('.wplace-header');
     let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
     
@@ -897,7 +738,6 @@
       document.onmousemove = null;
     }
     
-    // Get UI elements
     const initBotBtn = container.querySelector('#initBotBtn');
     const uploadBtn = container.querySelector('#uploadBtn');
     const resizeBtn = container.querySelector('#resizeBtn');
@@ -908,8 +748,7 @@
     const statusText = container.querySelector('#statusText');
     const progressBar = container.querySelector('#progressBar');
     const statsArea = container.querySelector('#statsArea');
-    const tokenIndicator = container.querySelector('#tokenIndicator');
-    const tokenStatusText = container.querySelector('#tokenStatusText');
+    const content = container.querySelector('.wplace-content');
     
     const widthSlider = resizeContainer.querySelector('#widthSlider');
     const heightSlider = resizeContainer.querySelector('#heightSlider');
@@ -919,22 +758,6 @@
     const resizePreview = resizeContainer.querySelector('#resizePreview');
     const confirmResize = resizeContainer.querySelector('#confirmResize');
     const cancelResize = resizeContainer.querySelector('#cancelResize');
-    
-    // Update token status display
-    const updateTokenStatus = () => {
-      if (capturedCaptchaToken) {
-        tokenIndicator.classList.add('active');
-        const timeElapsed = Date.now() - state.tokenLastRefreshed;
-        const timeRemaining = Math.max(0, CONFIG.TOKEN_REFRESH_INTERVAL - timeElapsed);
-        tokenStatusText.textContent = `Token: Active (${Utils.formatTime(timeRemaining)} left)`;
-      } else {
-        tokenIndicator.classList.remove('active');
-        tokenStatusText.textContent = 'Token: Not captured';
-      }
-    };
-    
-    // Update token status every second
-    setInterval(updateTokenStatus, 1000);
     
     minimizeBtn.addEventListener('click', () => {
       state.minimized = !state.minimized;
@@ -1081,7 +904,6 @@
       resizeContainer.style.display = 'none';
     }
     
-    // Event listeners
     initBotBtn.addEventListener('click', async () => {
       try {
         updateUI('checkingColors', 'default');
@@ -1235,6 +1057,7 @@
     });
     
     startBtn.addEventListener('click', async () => {
+      // Before starting, check for all requirements, including the token.
       if (!state.imageLoaded || !state.startPosition || !state.region) {
         updateUI('missingRequirements', 'error');
         return;
@@ -1331,14 +1154,12 @@
           colorId
         );
         
+        // Check for the special 'token_error' status.
         if (success === 'token_error') {
-            state.stopFlag = true;
+            state.stopFlag = true; // Stop the process.
             updateUI('captchaNeeded', 'error');
             Utils.showAlert(Utils.t('captchaNeeded'), 'error');
-            
-            // Wait for manual token refresh
-            capturedCaptchaToken = null;
-            break outerLoop;
+            break outerLoop; // Exit the loop immediately.
         }
         
         if (success) {
@@ -1358,14 +1179,6 @@
               total: state.totalPixels 
             });
           }
-        }
-        
-        // Check if token needs refresh
-        const timeSinceRefresh = Date.now() - state.tokenLastRefreshed;
-        if (timeSinceRefresh >= CONFIG.TOKEN_REFRESH_INTERVAL - 30000) {
-          // Token is about to expire in 30 seconds
-          updateUI('captchaNeeded', 'warning');
-          Utils.showAlert("Token expiring soon. Please paint manually to refresh.", "warning");
         }
       }
     }
