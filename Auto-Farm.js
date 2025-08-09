@@ -26,10 +26,10 @@
     language: 'en'
   };
 
-  // [NEW CODE] Global variable to store the captured CAPTCHA token.
+  // Global variable to store the captured CAPTCHA token.
   let capturedCaptchaToken = null;
 
-  // [NEW CODE] Intercept window.fetch to capture the 't' token from manual paints.
+  // Intercept window.fetch to capture the 't' token from manual paints.
   const originalFetch = window.fetch;
   window.fetch = async (url, options) => {
     if (typeof url === 'string' && url.includes('https://backend.wplace.live/s0/pixel/')) {
@@ -80,7 +80,8 @@
 
     const res = await fetch(`https://backend.wplace.live/s0/pixel/${CONFIG.START_X}/${CONFIG.START_Y}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=UTF-8', 'credentials': 'include' },
+      headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+      credentials: 'include', 
       body: JSON.stringify(payload)
     });
     
