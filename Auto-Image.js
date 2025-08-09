@@ -1,4 +1,5 @@
 (async () => {
+  // CONFIGURATION CONSTANTS
   const CONFIG = {
     COOLDOWN_DEFAULT: 31000,
     TRANSPARENCY_THRESHOLD: 100,
@@ -16,6 +17,7 @@
     }
   };
 
+  // BILINGUAL TEXT STRINGS
   const TEXTS = {
     pt: {
       title: "WPlace Auto-Image",
@@ -49,7 +51,8 @@
       initMessage: "Clique em 'Iniciar Auto-BOT' para começar",
       waitingInit: "Aguardando inicialização...",
       resizeSuccess: "✅ Imagem redimensionada para {width}x{height}",
-      paintingPaused: "⏸️ Pintura pausada na posição X: {x}, Y: {y}"
+      paintingPaused: "⏸️ Pintura pausada na posição X: {x}, Y: {y}",
+      captchaNeeded: "❗ Token CAPTCHA necessário. Pinte um pixel manualmente para continuar."
     },
     en: {
       title: "WPlace Auto-Image",
@@ -83,10 +86,12 @@
       initMessage: "Click 'Start Auto-BOT' to begin",
       waitingInit: "Waiting for initialization...",
       resizeSuccess: "✅ Image resized to {width}x{height}",
-      paintingPaused: "⏸️ Painting paused at position X: {x}, Y: {y}"
+      paintingPaused: "⏸️ Painting paused at position X: {x}, Y: {y}",
+      captchaNeeded: "❗ CAPTCHA token needed. Paint one pixel manually to continue."
     }
   };
 
+  // GLOBAL STATE
   const state = {
     running: false,
     imageLoaded: false,
@@ -108,18 +113,45 @@
     language: 'en'
   };
 
+  // Global variable to store the captured CAPTCHA token.
+  let capturedCaptchaToken = null;
+
+  // Intercept the original window.fetch function to "listen" for network requests.
+  const originalFetch = window.fetch;
+  window.fetch = async (url, options) => {
+    // Check if the request is for painting a pixel on wplace.
+    if (typeof url === 'string' && url.includes('https://backend.wplace.live/s0/pixel/')) {
+      try {
+        const payload = JSON.parse(options.body);
+        // If the request body contains the 't' field, it's our CAPTCHA token.
+        if (payload.t) {
+          console.log("✅ CAPTCHA Token Captured:", payload.t);
+          // Store the token for our bot to use.
+          capturedCaptchaToken = payload.t;
+          // Notify the user that the token is captured and they can start the bot.
+          if(document.querySelector('#statusText')?.textContent.includes('CAPTCHA')){
+             Utils.showAlert("Token captured successfully! You can start the bot now.", "success");
+             updateUI('colorsFound', 'success', { count: state.availableColors.length });
+          }
+        }
+      } catch (e) { /* Ignore errors if the request body isn't valid JSON */ }
+    }
+    // Finally, execute the original request, whether we inspected it or not.
+    return originalFetch(url, options);
+  };
+
+
   async function detectLanguage() {
     try {
       const response = await fetch('https://ipapi.co/json/');
       const data = await response.json();
       state.language = data.country === 'BR' ? 'pt' : 'en';
-      return state.language;
     } catch {
       state.language = 'en';
-      return 'en';
     }
   }
 
+  // UTILITY FUNCTIONS
   const Utils = {
     sleep: ms => new Promise(r => setTimeout(r, ms)),
     
@@ -230,20 +262,36 @@
     }
   };
 
+  // WPLACE API SERVICE
   const WPlaceService = {
     async paintPixelInRegion(regionX, regionY, pixelX, pixelY, color) {
-      try {
-        const res = await fetch(`https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
-          credentials: 'include',
-          body: JSON.stringify({ coords: [pixelX, pixelY], colors: [color] })
-        });
-        const data = await res.json();
-        return data?.painted === 1;
-      } catch {
-        return false;
-      }
+        try {
+            // Construct the payload including the captured 't' token.
+            const payload = {
+                coords: [pixelX, pixelY],
+                colors: [color],
+                t: capturedCaptchaToken
+            };
+            const res = await fetch(`https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+                credentials: 'include',
+                body: JSON.stringify(payload)
+            });
+
+            // If we get a 403 Forbidden error, our token is likely expired.
+            if (res.status === 403) {
+                console.error("❌ 403 Forbidden. CAPTCHA token might be invalid or expired.");
+                capturedCaptchaToken = null; // Invalidate our stored token.
+                return 'token_error'; // Return a special status to stop the bot.
+            }
+
+            const data = await res.json();
+            return data?.painted === 1;
+        } catch(e) {
+            console.error("Paint request failed:", e);
+            return false;
+        }
     },
     
     async getCharges() {
@@ -1009,8 +1057,14 @@
     });
     
     startBtn.addEventListener('click', async () => {
+      // Before starting, check for all requirements, including the token.
       if (!state.imageLoaded || !state.startPosition || !state.region) {
         updateUI('missingRequirements', 'error');
+        return;
+      }
+      if (!capturedCaptchaToken) {
+        updateUI('captchaNeeded', 'error');
+        Utils.showAlert(Utils.t('captchaNeeded'), 'error');
         return;
       }
       
@@ -1099,6 +1153,14 @@
           pixelY,
           colorId
         );
+        
+        // Check for the special 'token_error' status.
+        if (success === 'token_error') {
+            state.stopFlag = true; // Stop the process.
+            updateUI('captchaNeeded', 'error');
+            Utils.showAlert(Utils.t('captchaNeeded'), 'error');
+            break outerLoop; // Exit the loop immediately.
+        }
         
         if (success) {
           state.paintedPixels++;
