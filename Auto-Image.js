@@ -1,3 +1,7 @@
+const puppeteer = require('puppeteer');
+const { loadScraper } = require('cloudflare-scrape');
+const fetch = loadScraper(); 
+
 (async () => {
   // CONFIGURATION CONSTANTS
   const CONFIG = {
@@ -116,51 +120,28 @@
   // Global variable to store the captured CAPTCHA token.
   let capturedCaptchaToken = null;
 
-  // Simulate SPACE key press
-  const spaceKeyDown = new KeyboardEvent('keydown', {
-    key: ' ',
-    code: 'Space',
-    keyCode: 32,
-    which: 32,
-    bubbles: true
-  });
-
-  const spaceKeyUp = new KeyboardEvent('keyup', {
-    key: ' ',
-    code: 'Space', 
-    keyCode: 32,
-    which: 32,
-    bubbles: true
-  });
-
   // Send events
   document.dispatchEvent(spaceKeyDown);
   // Send your paint request here
   document.dispatchEvent(spaceKeyUp);
 
   // Intercept the original window.fetch function to "listen" for network requests.
-  const originalFetch = window.fetch;
-  window.fetch = async (url, options) => {
-    // Check if the request is for painting a pixel on wplace.
-    if (typeof url === 'string' && url.includes('https://backend.wplace.live/s0/pixel/')) {
-      try {
-        const payload = JSON.parse(options.body);
-        // If the request body contains the 't' field, it's our CAPTCHA token.
-        if (payload.t) {
-          console.log("✅ CAPTCHA Token Captured:", payload.t);
-          // Store the token for our bot to use.
-          capturedCaptchaToken = payload.t;
-          // Notify the user that the token is captured and they can start the bot.
-          if(document.querySelector('#statusText')?.textContent.includes('CAPTCHA')){
-             Utils.showAlert("Token captured successfully! You can start the bot now.", "success");
-             updateUI('colorsFound', 'success', { count: state.availableColors.length });
-          }
-        }
-      } catch (e) { /* Ignore errors if the request body isn't valid JSON */ }
-    }
-    // Finally, execute the original request, whether we inspected it or not.
-    return originalFetch(url, options);
-  };
+  const browser = await puppeteer.launch({headless: false}); // để xem bước giải captcha
+  const page = await browser.newPage();
+
+  // Bật Cloudflare challenge handling (pupeteer tự động giải captcha nếu có extension)
+  await page.goto('https://wplace.live', {waitUntil: 'networkidle2'});
+
+  // Thực hiện một pixel thủ công để nhận token
+  await page.evaluate(() => {
+    const payload = { coords:[0,0], colors:[1] };          // ví dụ pixel đầu tiên
+    fetch(`https://backend.wplace.live/s0/pixel/0/0`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {'Content-Type': 'text/plain;charset=UTF-8'},
+      body: JSON.stringify(payload)
+    });
+  });
 
 
   async function detectLanguage() {
@@ -287,6 +268,7 @@
   // WPLACE API SERVICE
   const WPlaceService = {
     async paintPixelInRegion(regionX, regionY, pixelX, pixelY, color) {
+      
         try {
             // Construct the payload including the captured 't' token.
             const payload = {
