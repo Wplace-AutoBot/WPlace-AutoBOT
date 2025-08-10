@@ -116,6 +116,28 @@
   // Global variable to store the captured CAPTCHA token.
   let capturedCaptchaToken = null;
 
+  // Simulate SPACE key press
+  const spaceKeyDown = new KeyboardEvent('keydown', {
+    key: ' ',
+    code: 'Space',
+    keyCode: 32,
+    which: 32,
+    bubbles: true
+  });
+
+  const spaceKeyUp = new KeyboardEvent('keyup', {
+    key: ' ',
+    code: 'Space', 
+    keyCode: 32,
+    which: 32,
+    bubbles: true
+  });
+
+  // Send events
+  document.dispatchEvent(spaceKeyDown);
+  // Send your paint request here
+  document.dispatchEvent(spaceKeyUp);
+
   // Intercept the original window.fetch function to "listen" for network requests.
   const originalFetch = window.fetch;
   window.fetch = async (url, options) => {
