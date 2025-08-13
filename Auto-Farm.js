@@ -30,7 +30,7 @@
 
   const originalFetch = window.fetch;
   let capturedCaptchaToken = null;
-  let stoppedForToken = false; // flag for auto-resume
+  let stoppedForToken = false; 
   window.fetch = async (url, options = {}) => {
     if (typeof url === 'string' && url.includes('https://backend.wplace.live/s0/pixel/')) {
       try {
@@ -38,8 +38,7 @@
         if (payload.t) {
           console.log('✅ CAPTCHA Token Captured:', payload.t);
           capturedCaptchaToken = payload.t;
-          stoppedForToken = false; // Clear stopped flag on new token capture
-          // Auto-resume if stopped due to token expiry
+          stoppedForToken = false; 
           if (stoppedForToken) {
             stoppedForToken = false;
             state.running = true;
@@ -49,7 +48,6 @@
             );
             paintLoop();
           }
-          // new token captured
         }
       } catch (e) {
       }
@@ -87,9 +85,9 @@
       });
       if (res.status === 403) {
         console.error('❌ 403 Forbidden. CAPTCHA token might be invalid or expired.');
-        capturedCaptchaToken = null; // Invalidate our stored token.
+        capturedCaptchaToken = null; 
         stoppedForToken = true;
-        return 'token_error'; // Return a special status to stop the bot.
+        return 'token_error';
       }
       const data = await res.json();
       return data;
@@ -143,16 +141,13 @@
 
       const randomPos = getRandomPosition();
       const paintResult = await paintPixel(randomPos.x, randomPos.y);
-      // If token expired or invalid, stop the loop
       if (paintResult === 'token_error') {
-        // Prompt user to manually capture a new CAPTCHA token
         updateUI(
           state.language === 'pt'
             ? '❌ Token expirado. Clique em qualquer pixel para obter novo token.'
             : '❌ CAPTCHA token expired. Click any pixel to obtain a new token.',
           'error'
         );
-        // Pause loop until a new token is captured
         while (!capturedCaptchaToken && state.running) {
           await sleep(500);
         }
@@ -459,7 +454,8 @@
         toggleBtn.innerHTML = `<i class="fas fa-play"></i> <span>${t.start}</span>`;
         toggleBtn.classList.add('wplace-btn-primary');
         toggleBtn.classList.remove('wplace-btn-stop');
-        updateUI(state.language === 'pt' ? '⏸️ Pintura pausada' : '⏸️ Painting paused', 'default');
+        statsArea.innerHTML = '';
+        updateUI(state.language === 'pt' ? '⏹️ Parado' : '⏹️ Stopped', 'default');
       }
     });
     
