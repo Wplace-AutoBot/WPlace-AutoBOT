@@ -1,68 +1,56 @@
-<p align="center">
-  Translations ➜&nbsp;
-    <a href="EN.md"><img src="https://flagcdn.com/256x192/us.png" width="48" alt="USA Flag"></a>
-  &nbsp;
-    <a href="FR.md"><img src="https://flagcdn.com/256x192/fr.png" width="48" alt="Franch Flag"></a>
-</p>
-
----
-
-> [!WARNING]
-> **Para quem usa o script, deve ter percebido que ele parou de funcionar. Isso acontece porque o wplace foi atualizado e agora envia um captcha a cada 2 minutos, o que torna muito difícil criar bots. Mas eu já encontrei uma solução e estou desenvolvendo o mais rápido possível para vocês. Obrigado de coração a todos que estão ajudando neste projeto <3**
-
----
-
 <p align="center"><strong>WPlace AutoBOT</strong></p>
-
 <p align="center">
-  Scripts práticos com menus intuitivos para facilitar sua vida no <a href="https://wplace.live" target="_blank">WPlace</a>!<br>
-  Ideal para quem quer upar de nível automaticamente ou fazer pixel arts gigantescas — sem perder tempo.
+This project was fork from https://github.com/DarkModde/WPlace-AutoBOT
+</p>
+<p align="center">
+  Practical scripts with intuitive menus to make your life easier on <a href="https://wplace.live" target="_blank">WPlace</a>!<br>
+  Perfect for those who want to level up automatically or build massive pixel arts — without wasting time.
 </p>
 
 <br>
 
 <p align="center">
-  <sub><strong>Não fui eu que 'hackeei' o WPlace e coloquei o Herobrine gigantesco lá...<br>
-  E se você está curioso: sim! Esses scripts foram feitos por um brasileiro, HUEHUE!</strong></sub>
+  <sub><strong>It wasn't me who "hacked" WPlace and placed that giant Herobrine there...<br>
+  But if you're wondering: yes! These scripts were made by a Brazilian. HUEHUE!</strong></sub>
 </p>
 
 ---
 
-<p align="center"><strong>🚀┃Como usar os scripts:</strong></p>
+<p align="center"><strong>🚀┃How to use the scripts:</strong></p>
 
 <p align="center">
-  É muito simples: copie um dos códigos abaixo, cole na barra de favoritos do navegador<br>
-  e execute enquanto estiver no site wplace.live
+  It’s super easy: copy one of the codes below, paste it into your browser’s bookmarks bar,<br>
+  and run it while you're on wplace.live.
 </p>
 
 <br>
 
-### 🎯┃Auto-Farm
+### 🎯┃Auto-Farm (NOT WORKING 🚫)
 
 ```js
-javascript:fetch("https://raw.githubusercontent.com/DarkModde/WPlace-AutoBOT/refs/heads/main/Auto-Farm.js").then(t=>t.text()).then(eval);
+javascript:fetch("https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/Auto-Farm.js").then(t=>t.text()).then(eval);
 ```
 
 ### 🖼️┃Auto-Image
 
 ```js
-javascript:fetch("https://raw.githubusercontent.com/DarkModde/WPlace-AutoBOT/refs/heads/main/Auto-Image.js").then(t=>t.text()).then(eval);
+javascript:fetch("https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/Auto-Image.js").then(t=>t.text()).then(eval);
 ```
 
 <details>
-  <summary><h2>📖┃Tutorial</h2></summary>
+  <summary><h2>📖┃Tutorials</h2></summary>
 
 ---
 
-![Parte 1](https://i.imgur.com/wpo8kbW.png)
+![Parte 1](https://i.imgur.com/yneG5if.png)
 
 ---
 
-![Parte 2](https://i.imgur.com/wv5gP2t.png)
+![Parte 2](https://i.imgur.com/ZRpU0wZ.png)
 
 ---
 
-![Parte 3](https://i.imgur.com/SgyvFQU.png)
+![Parte 3](https://i.imgur.com/lfjfcEw.png)
 
 </details>
 
@@ -70,27 +58,27 @@ javascript:fetch("https://raw.githubusercontent.com/DarkModde/WPlace-AutoBOT/ref
 <br>
 
 > [!IMPORTANT]
-> <p><sub><strong>1.</strong> Nenhum dos scripts funciona se você fechar a aba do navegador. Você deve deixar a aba do WPlace aberta, mesmo que em segundo plano.</sub></p>
-> <p><sub><strong>2.</strong> Nunca execute os dois scripts na mesma página, isso pode acabar bugando o WPlace. Caso tenha feito isso, basta atualizar a página!</sub></p>
-> <p><sub><strong>3.</strong> Se o script não detectar as cores, clique no botão "Pintar" para exibir as cores. Só então inicie o Auto-Imager.</sub></p>
+> <p><sub><strong>1.</strong> None of the scripts will work if you close the browser tab. You must keep the WPlace tab open, even if it's in the background.</sub></p>
+> <p><sub><strong>2.</strong> Never run both scripts on the same page — this can bug your WPlace. If it happens, just refresh the page!</sub></p>
+> <p><sub><strong>3.</strong> If the script doesn’t detect the available colors, just click the "Paint" button to show them — only then start the Auto-Imager.</sub></p>
 
 <br>
 
 ---
 
 <p align="center">
-  <img src="https://i.imgur.com/VbHh9jI.png" alt="Demonstração dos Scripts"/>
+  <img src="https://i.imgur.com/VbHh9jI.png" alt="Script Demonstration"/>
 </p>
 
 ---
 
 ### 📋┃To-do
 
-- [x] Tradução [BR/USA]  
-- [ ] Juntar os 2 scripts em 1  
-- [x] Corrigir bugs dos scripts  
-- [x] Adicionar novas opções
-- [ ] Tutoriais
+- [x] Making AutoFarm working
+- [ ] Merge both scripts into one  
+- [x] Fix script bugs  
+- [] Add new options
+- [ ] Tutorials
 
 ---
 
