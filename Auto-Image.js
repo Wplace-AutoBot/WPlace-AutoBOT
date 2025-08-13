@@ -1524,7 +1524,8 @@ async function autoRefreshSequence() {
             const success = await sendPixelBatch(pixelBatch, regionX, regionY);
 
             if (success === "token_error") {
-              if (state.autoRefresh) {
+              // Only auto-refresh if enabled and more than 1 charge available
+              if (state.autoRefresh && state.currentCharges > 1) {
                 // CAPTCHA expired: keep trying refresh and retry until token works
                 updateUI("captchaNeeded", "error");
                 Utils.showAlert(Utils.t("captchaNeeded"), "error");
