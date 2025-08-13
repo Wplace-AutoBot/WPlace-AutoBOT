@@ -1525,25 +1525,30 @@ async function autoRefreshSequence() {
 
             if (success === "token_error") {
               if (state.autoRefresh) {
-                // CAPTCHA expired: wait until enough charges, then refresh
+                // CAPTCHA expired: keep trying refresh and retry until token works
                 updateUI("captchaNeeded", "error");
                 Utils.showAlert(Utils.t("captchaNeeded"), "error");
-                while (state.currentCharges <= 1) {
-                  updateUI(
-                    state.language === 'pt'
-                      ? `⌛ Sem cargas. Esperando ${Math.ceil(state.cooldown/1000)}s...`
-                      : `⌛ No charges. Waiting ${Math.ceil(state.cooldown/1000)}s...`,
-                    'status'
-                  );
-                  await Utils.sleep(state.cooldown);
-                  const info = await WPlaceService.getCharges();
-                  state.currentCharges = Math.floor(info.charges);
-                  state.cooldown = info.cooldown;
-                }
-                await autoRefreshSequence();
-                // retry this batch
-                const retry = await sendPixelBatch(pixelBatch, regionX, regionY);
+                let retry;
+                do {
+                  // wait until enough charges available
+                  while (state.currentCharges <= 1) {
+                    updateUI(
+                      state.language === 'pt'
+                        ? `⌛ Sem cargas. Esperando ${Math.ceil(state.cooldown/1000)}s...`
+                        : `⌛ No charges. Waiting ${Math.ceil(state.cooldown/1000)}s...`,
+                      'status'
+                    );
+                    await Utils.sleep(state.cooldown);
+                    const info = await WPlaceService.getCharges();
+                    state.currentCharges = Math.floor(info.charges);
+                    state.cooldown = info.cooldown;
+                  }
+                  await autoRefreshSequence();
+                  // retry this batch after refresh
+                  retry = await sendPixelBatch(pixelBatch, regionX, regionY);
+                } while (retry === "token_error");
                 if (retry === true) {
+                  // successful retry: mark pixels and continue
                   pixelBatch.forEach(p => {
                     state.paintedMap[p.localY][p.localX] = true;
                     state.paintedPixels++;
@@ -1554,6 +1559,7 @@ async function autoRefreshSequence() {
                   pixelBatch = [];
                   continue;
                 }
+                // if retry is false (non-token error), fall through to fallback
               }
               // fallback: halt on token error
               state.stopFlag = true;
