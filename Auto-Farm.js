@@ -190,8 +190,12 @@
           state.language === 'pt' ? 'Confirmando pintura...' : 'Confirming paint...',
           'status'
         );
-        const confirmBtn = await waitForSelector('div.absolute.bottom-0.left-1\\/2 button.btn.btn-primary.btn-lg, div.absolute.bottom-0.left-1\\/2 button.btn.btn-primary.sm\\:btn-xl');
-        if (confirmBtn) confirmBtn.click();
+        // Try clicking the confirm Paint button inside its container
+        const confirmContainer = await waitForSelector('div.absolute.bottom-0.left-1\\/2');
+        if (confirmContainer) {
+          const confirmBtn = confirmContainer.querySelector('button.btn-primary.btn-lg, button.btn-primary.sm\\:btn-xl');
+          confirmBtn?.click();
+        }
         await sleep(1000);
         continue;
       }
