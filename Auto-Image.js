@@ -1110,42 +1110,54 @@
     const { x: startX, y: startY } = state.startPosition;
     const { x: regionX, y: regionY } = state.region;
     
+    // If resuming, start from the last stopped position
     let startRow = state.lastPosition.y || 0;
     let startCol = state.lastPosition.x || 0;
-    
+
+    // Track painted pixels to avoid repainting
+    if (!state.paintedMap) {
+      // Create a 2D array to mark painted pixels
+      state.paintedMap = Array(height).fill().map(() => Array(width).fill(false));
+    }
+
     outerLoop:
     for (let y = startRow; y < height; y++) {
       for (let x = (y === startRow ? startCol : 0); x < width; x++) {
+        // If stop is requested, save the last position and exit
         if (state.stopFlag) {
           state.lastPosition = { x, y };
           updateUI('paintingPaused', 'warning', { x, y });
           break outerLoop;
         }
-        
+
+        // Skip pixel if already painted (for resume)
+        if (state.paintedMap[y][x]) continue;
+
         const idx = (y * width + x) * 4;
         const r = pixels[idx];
         const g = pixels[idx + 1];
         const b = pixels[idx + 2];
         const alpha = pixels[idx + 3];
-        
+
+        // Skip transparent or white pixels
         if (alpha < CONFIG.TRANSPARENCY_THRESHOLD) continue;
         if (Utils.isWhitePixel(r, g, b)) continue;
-        
+
         const rgb = [r, g, b];
         const colorId = findClosestColor(rgb, state.availableColors);
-        
+
         if (state.currentCharges < 1) {
           updateUI('noCharges', 'warning', { time: Utils.formatTime(state.cooldown) });
           await Utils.sleep(state.cooldown);
-          
+
           const chargeUpdate = await WPlaceService.getCharges();
           state.currentCharges = chargeUpdate.charges;
           state.cooldown = chargeUpdate.cooldown;
         }
-        
+
         const pixelX = startX + x;
         const pixelY = startY + y;
-        
+
         const success = await WPlaceService.paintPixelInRegion(
           regionX,
           regionY,
@@ -1153,43 +1165,46 @@
           pixelY,
           colorId
         );
-        
-        // Check for the special 'token_error' status.
+
+        // If CAPTCHA/token error, stop and notify
         if (success === 'token_error') {
-            state.stopFlag = true; // Stop the process.
+            state.stopFlag = true;
             updateUI('captchaNeeded', 'error');
             Utils.showAlert(Utils.t('captchaNeeded'), 'error');
-            break outerLoop; // Exit the loop immediately.
+            break outerLoop;
         }
-        
+
         if (success) {
           state.paintedPixels++;
           state.currentCharges--;
-          
+          state.paintedMap[y][x] = true; // Mark pixel as painted
+
           state.estimatedTime = Utils.calculateEstimatedTime(
             state.totalPixels - state.paintedPixels,
             state.currentCharges,
             state.cooldown
           );
-          
+
           if (state.paintedPixels % CONFIG.LOG_INTERVAL === 0) {
             updateStats();
-            updateUI('paintingProgress', 'default', { 
-              painted: state.paintedPixels, 
-              total: state.totalPixels 
+            updateUI('paintingProgress', 'default', {
+              painted: state.paintedPixels,
+              total: state.totalPixels
             });
           }
         }
       }
     }
-    
+
+    // If stopped, keep last position for resume; if finished, reset lastPosition and paintedMap
     if (state.stopFlag) {
       updateUI('paintingStopped', 'warning');
     } else {
       updateUI('paintingComplete', 'success', { count: state.paintedPixels });
       state.lastPosition = { x: 0, y: 0 };
+      state.paintedMap = null; // Reset painted map for next image
     }
-    
+
     updateStats();
   }
 
