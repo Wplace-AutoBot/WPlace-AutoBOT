@@ -132,8 +132,6 @@
     lastPosition: { x: 0, y: 0 },
     estimatedTime: 0,
     language: "en",
-    autoRefresh: true,
-    pausedForManual: false
   };
 
   // Global variable to store the captured CAPTCHA token.
@@ -566,43 +564,6 @@
       },
       { color: palette[0], distance: Utils.colorDistance(rgb, palette[0].rgb) }
     ).color.id;
-  }
-
-  // Auto-refresh sequence: mimics UI clicks to refresh CAPTCHA
-  async function autoRefreshSequence() {
-    const sleep = Utils.sleep;
-    const waitForSelector = async (selector, interval = 200, timeout = 5000) => {
-      const start = Date.now();
-      while (Date.now() - start < timeout) {
-        const el = document.querySelector(selector);
-        if (el) return el;
-        await sleep(interval);
-      }
-      return null;
-    };
-    // Paint button
-    const paintBtn = await waitForSelector('button.btn.btn-primary.btn-lg, button.btn-primary.sm\\:btn-xl');
-    paintBtn?.click();
-    await sleep(500);
-    // Transparent
-    const trans = await waitForSelector('button#color-0'); trans?.click();
-    await sleep(500);
-    // Canvas center + space
-    const canvas = await waitForSelector('canvas');
-    if (canvas) {
-      canvas.setAttribute('tabindex','0'); canvas.focus();
-      const r = canvas.getBoundingClientRect();
-      const cx = Math.round(r.left + r.width/2);
-      const cy = Math.round(r.top + r.height/2);
-      canvas.dispatchEvent(new MouseEvent('mousemove',{clientX:cx,clientY:cy,bubbles:true}));
-      canvas.dispatchEvent(new KeyboardEvent('keydown',{key:' ',code:'Space',bubbles:true}));
-      canvas.dispatchEvent(new KeyboardEvent('keyup',{key:' ',code:'Space',bubbles:true}));
-    }
-    await sleep(500);
-    // Confirm
-    let cbtn = await waitForSelector('button.btn.btn-primary.btn-lg, button.btn.btn-primary.sm\\:btn-xl');
-    if (!cbtn) { const all = Array.from(document.querySelectorAll('button.btn-primary')); cbtn = all[all.length-1]; }
-    cbtn?.click();
   }
 
   async function createUI() {
@@ -1454,14 +1415,6 @@
     
     // Check for saved progress after a short delay to let UI settle
     setTimeout(checkSavedProgress, 1000);
-
-    // add Auto Refresh checkbox
-    const autoChk = document.createElement('label');
-    autoChk.style = 'margin-left:10px;display:flex;align-items:center;';
-    autoChk.innerHTML = `<input type="checkbox" id="autoRefreshChk" ${state.autoRefresh? 'checked':''}/> <span style="margin-left:4px;font-size:14px;">Auto Refresh</span>`;
-    container.querySelector('.wplace-controls').appendChild(autoChk);
-    const chk = container.querySelector('#autoRefreshChk');
-    chk.addEventListener('change', ()=>{ state.autoRefresh = chk.checked; });
   }
 
   async function processImage() {
@@ -1520,18 +1473,10 @@
             const success = await sendPixelBatch(pixelBatch, regionX, regionY);
 
             if (success === "token_error") {
-              // CAPTCHA expired
-              if (state.autoRefresh) {
-                updateUI("captchaNeeded", "error");
-                // perform auto refresh and retry
-                await autoRefreshSequence();
-                continue outerLoop;
-              } else {
-                state.stopFlag = true;
-                updateUI("captchaNeeded", "error");
-                Utils.showAlert(Utils.t("captchaNeeded"), "error");
-                break outerLoop;
-              }
+              state.stopFlag = true;
+              updateUI("captchaNeeded", "error");
+              Utils.showAlert(Utils.t("captchaNeeded"), "error");
+              break outerLoop;
             }
 
             if (success) {
