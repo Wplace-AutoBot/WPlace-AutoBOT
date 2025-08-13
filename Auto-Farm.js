@@ -183,11 +183,16 @@
           state.language === 'pt' ? 'Confirmando pintura...' : 'Confirming paint...',
           'status'
         );
-        const confirmContainer = await waitForSelector('div.absolute.bottom-0.left-1\\/2');
-        if (confirmContainer) {
-          const confirmBtn = confirmContainer.querySelector('button.btn-primary.btn-lg, button.btn-primary.sm\\:btn-xl');
-          confirmBtn?.click();
+        let confirmBtn = await waitForSelector(
+          'button.btn.btn-primary.btn-lg, button.btn.btn-primary.sm\\:btn-xl'
+        );
+        if (!confirmBtn) {
+          const allPrimary = Array.from(
+            document.querySelectorAll('button.btn-primary')
+          );
+          confirmBtn = allPrimary.length ? allPrimary[allPrimary.length - 1] : null;
         }
+        confirmBtn?.click();
         await sleep(1000);
         continue;
       }
