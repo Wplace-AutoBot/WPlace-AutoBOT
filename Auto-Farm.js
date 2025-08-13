@@ -27,6 +27,16 @@
   };
 
   const sleep = ms => new Promise(r => setTimeout(r, ms));
+  // Utility to wait for a selector to appear in the DOM
+  const waitForSelector = async (selector, interval = 200, timeout = 5000) => {
+    const start = Date.now();
+    while (Date.now() - start < timeout) {
+      const el = document.querySelector(selector);
+      if (el) return el;
+      await sleep(interval);
+    }
+    return null;
+  };
 
   const originalFetch = window.fetch;
   let capturedCaptchaToken = null;
@@ -152,15 +162,19 @@
           'error'
         );
         // Auto-click sequence to trigger CAPTCHA refresh
-        document.querySelector('div.flex.items-center.gap-2')?.click();
-        document.querySelector('#color-0')?.click();
-        // Click center of viewport
-        const cx = window.innerWidth / 2;
-        const cy = window.innerHeight / 2;
-        document.elementFromPoint(cx, cy)?.click();
-        // Click confirm paint button
-        document.querySelector('div.absolute.bottom-0.left-1\\/2 button.btn.btn-primary')?.click();
-        continue;
+  // Auto-click sequence with waits for element availability
+  const paintBtn = await waitForSelector('div.flex.items-center.gap-2');
+  paintBtn?.click();
+  const transBtn = await waitForSelector('#color-0');
+  transBtn?.click();
+  await sleep(500);
+  const cx = window.innerWidth / 2;
+  const cy = window.innerHeight / 2;
+  const centerEl = document.elementFromPoint(cx, cy);
+  centerEl?.click();
+  const confirmBtn = await waitForSelector('div.absolute.bottom-0.left-1\\/2 button.btn.btn-primary');
+  confirmBtn?.click();
+  continue;
       }
       
       if (paintResult?.painted === 1) {
