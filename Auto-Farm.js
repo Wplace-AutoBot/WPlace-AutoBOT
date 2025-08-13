@@ -30,7 +30,7 @@
 
   const originalFetch = window.fetch;
   let capturedCaptchaToken = null;
-  let stoppedForToken = false; 
+  let stoppedForToken = false; // flag for auto-resume
   window.fetch = async (url, options = {}) => {
     if (typeof url === 'string' && url.includes('https://backend.wplace.live/s0/pixel/')) {
       try {
@@ -38,7 +38,8 @@
         if (payload.t) {
           console.log('✅ CAPTCHA Token Captured:', payload.t);
           capturedCaptchaToken = payload.t;
-          stoppedForToken = false; 
+          stoppedForToken = false; // Clear stopped flag on new token capture
+          // Auto-resume if stopped due to token expiry
           if (stoppedForToken) {
             stoppedForToken = false;
             state.running = true;
@@ -48,6 +49,7 @@
             );
             paintLoop();
           }
+          // new token captured
         }
       } catch (e) {
       }
@@ -85,9 +87,9 @@
       });
       if (res.status === 403) {
         console.error('❌ 403 Forbidden. CAPTCHA token might be invalid or expired.');
-        capturedCaptchaToken = null; 
+        capturedCaptchaToken = null; // Invalidate our stored token.
         stoppedForToken = true;
-        return 'token_error';
+        return 'token_error'; // Return a special status to stop the bot.
       }
       const data = await res.json();
       return data;
@@ -141,23 +143,23 @@
 
       const randomPos = getRandomPosition();
       const paintResult = await paintPixel(randomPos.x, randomPos.y);
+      // If token expired or invalid, stop the loop
       if (paintResult === 'token_error') {
         updateUI(
           state.language === 'pt'
-            ? '❌ Token expirado. Clique em qualquer pixel para obter novo token.'
-            : '❌ CAPTCHA token expired. Click any pixel to obtain a new token.',
+            ? '❌ Token expirado! Tentando recapturar automaticamente...'
+            : '❌ CAPTCHA token expired! Attempting auto-refresh...',
           'error'
         );
-        while (!capturedCaptchaToken && state.running) {
-          await sleep(500);
-        }
-        // Resume painting
-        updateUI(
-          state.language === 'pt'
-            ? '🚀 Token capturado! Reiniciando auto-farm...' 
-            : '🚀 Token captured! Resuming auto-farm...',
-          'success'
-        );
+        // Auto-click sequence to trigger CAPTCHA refresh
+        document.querySelector('div.flex.items-center.gap-2')?.click();
+        document.querySelector('#color-0')?.click();
+        // Click center of viewport
+        const cx = window.innerWidth / 2;
+        const cy = window.innerHeight / 2;
+        document.elementFromPoint(cx, cy)?.click();
+        // Click confirm paint button
+        document.querySelector('div.absolute.bottom-0.left-1\\/2 button.btn.btn-primary')?.click();
         continue;
       }
       
@@ -454,6 +456,7 @@
         toggleBtn.innerHTML = `<i class="fas fa-play"></i> <span>${t.start}</span>`;
         toggleBtn.classList.add('wplace-btn-primary');
         toggleBtn.classList.remove('wplace-btn-stop');
+        // Clear previous stats and show stopped message
         statsArea.innerHTML = '';
         updateUI(state.language === 'pt' ? '⏹️ Parado' : '⏹️ Stopped', 'default');
       }
