@@ -152,13 +152,29 @@
       const paintResult = await paintPixel(randomPos.x, randomPos.y);
       if (paintResult === 'token_error') {
         if (state.autoRefresh) {
+          // ensure enough charges for auto-refresh
+          if (state.charges.count < 2) {
+            if (!state.pausedForManual) {
+              updateUI(
+                state.language === 'pt'
+                  ? '⚡ Aguardando pelo menos 2 cargas para auto-refresh...'
+                  : 'Waiting for at least 2 charges for auto-refresh...',
+                'status'
+              );
+              state.pausedForManual = true;
+            }
+            while (state.charges.count < 2) {
+              await sleep(30000);
+              await getCharge();
+            }
+            state.pausedForManual = false;
+          }
           updateUI(
             state.language === 'pt'
               ? '❌ Token expirado. Aguardando elemento Paint...'
               : '❌ CAPTCHA token expired. Waiting for Paint button...',
             'error'
           );
-          // automatic refresh sequence
           const mainPaintBtn = await waitForSelector('button.btn.btn-primary.btn-lg, button.btn-primary.sm\\:btn-xl');
           if (mainPaintBtn) mainPaintBtn.click();
           await sleep(500);
@@ -201,7 +217,15 @@
           }
           confirmBtn?.click();
         } else {
-          // manual pause, show message only once
+          // insufficient charges or auto-refresh disabled
+          if (state.autoRefresh && state.charges.count < 2) {
+            updateUI(
+              state.language === 'pt'
+                ? '⚡ Cargas insuficientes para auto-refresh. Por favor, clique manualmente.'
+                : 'Insufficient charges for auto-refresh. Please click manually.',
+              'error'
+            );
+          }
           if (!state.pausedForManual) {
             updateUI(
               state.language === 'pt'
