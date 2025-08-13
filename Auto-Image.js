@@ -1531,12 +1531,12 @@ async function autoRefreshSequence() {
                 Utils.showAlert(Utils.t("captchaNeeded"), "error");
                 let retry;
                 do {
-                  // wait until enough charges available
-                  while (state.currentCharges <= 1) {
+                  // wait until enough charges to paint this batch
+                  while (state.currentCharges < pixelBatch.length) {
                     updateUI(
                       state.language === 'pt'
-                        ? `⌛ Sem cargas. Esperando ${Math.ceil(state.cooldown/1000)}s...`
-                        : `⌛ No charges. Waiting ${Math.ceil(state.cooldown/1000)}s...`,
+                        ? `⌛ Sem cargas suficientes (${state.currentCharges}/${pixelBatch.length}). Esperando ${Math.ceil(state.cooldown/1000)}s...`
+                        : `⌛ Insufficient charges (${state.currentCharges}/${pixelBatch.length}). Waiting ${Math.ceil(state.cooldown/1000)}s...`,
                       'status'
                     );
                     await Utils.sleep(state.cooldown);
@@ -1544,8 +1544,8 @@ async function autoRefreshSequence() {
                     state.currentCharges = Math.floor(info.charges);
                     state.cooldown = info.cooldown;
                   }
+                  // now attempt captcha refresh (if token expired)
                   await autoRefreshSequence();
-                  // retry this batch after refresh
                   retry = await sendPixelBatch(pixelBatch, regionX, regionY);
                 } while (retry === "token_error");
                 if (retry === true) {
