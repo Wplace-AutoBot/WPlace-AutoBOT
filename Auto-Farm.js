@@ -63,16 +63,30 @@
 
   const paintPixel = async (x, y) => {
     const randomColor = Math.floor(Math.random() * 31) + 1;
-    // Include CAPTCHA token if captured
-    return await fetchAPI(`https://backend.wplace.live/s0/pixel/${CONFIG.START_X}/${CONFIG.START_Y}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
-      body: JSON.stringify({
-        coords: [x, y],
-        colors: [randomColor],
-        t: capturedCaptchaToken
-      })
-    });
+    const url = `https://backend.wplace.live/s0/pixel/${CONFIG.START_X}/${CONFIG.START_Y}`;
+    const payload = JSON.stringify({ coords: [x, y], colors: [randomColor], t: capturedCaptchaToken });
+    try {
+      const res = await originalFetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+        credentials: 'include',
+        body: payload
+      });
+      if (res.status === 403) {
+        updateUI(
+          state.language === 'pt'
+            ? '❌ Token expirado. Por favor, pinte manualmente um pixel para capturar novo token.'
+            : '❌ CAPTCHA token expired. Please paint a pixel manually to capture a new token.',
+          'error'
+        );
+        state.running = false;
+        return { painted: 0 };
+      }
+      const data = await res.json();
+      return data;
+    } catch (e) {
+      return null;
+    }
   };
 
   const getCharge = async () => {
