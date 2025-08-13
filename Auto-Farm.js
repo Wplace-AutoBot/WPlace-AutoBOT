@@ -131,6 +131,13 @@
       const paintResult = await paintPixel(randomPos.x, randomPos.y);
       // If token expired or invalid, stop the loop
       if (paintResult === 'token_error') {
+        // Show prompt to manually capture a new token
+        updateUI(
+          state.language === 'pt'
+            ? '❌ Token expirado. Clique manualmente em qualquer pixel para capturar novo token.'
+            : '❌ CAPTCHA token expired. Please click any pixel manually to capture a new token.',
+          'error'
+        );
         state.running = false;
         return;
       }
