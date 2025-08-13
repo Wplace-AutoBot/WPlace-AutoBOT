@@ -30,7 +30,7 @@
 
   const originalFetch = window.fetch;
   let capturedCaptchaToken = null;
-  let stoppedForToken = false; // flag to auto-restart after manual token capture
+  let stoppedForToken = false; // flag for auto-resume
   window.fetch = async (url, options = {}) => {
     if (typeof url === 'string' && url.includes('https://backend.wplace.live/s0/pixel/')) {
       try {
@@ -38,12 +38,18 @@
         if (payload.t) {
           console.log('✅ CAPTCHA Token Captured:', payload.t);
           capturedCaptchaToken = payload.t;
-          // auto-restart if was stopped due to token expiry
+          stoppedForToken = false; // Clear stopped flag on new token capture
+          // Auto-resume if stopped due to token expiry
           if (stoppedForToken) {
             stoppedForToken = false;
-            const btn = document.getElementById('toggleBtn');
-            if (btn) btn.click();
+            state.running = true;
+            updateUI(
+              state.language === 'pt' ? '🚀 Pintura reiniciada!' : '🚀 Painting resumed!',
+              'success'
+            );
+            paintLoop();
           }
+          // new token captured
         }
       } catch (e) {
       }
@@ -139,15 +145,25 @@
       const paintResult = await paintPixel(randomPos.x, randomPos.y);
       // If token expired or invalid, stop the loop
       if (paintResult === 'token_error') {
-        // Show prompt to manually capture a new token
+        // Prompt user to manually capture a new CAPTCHA token
         updateUI(
           state.language === 'pt'
-            ? '❌ Token expirado. Clique manualmente em qualquer pixel para capturar novo token.'
-            : '❌ CAPTCHA token expired. Please click any pixel manually to capture a new token.',
+            ? '❌ Token expirado. Clique em qualquer pixel para obter novo token.'
+            : '❌ CAPTCHA token expired. Click any pixel to obtain a new token.',
           'error'
         );
-        state.running = false;
-        return;
+        // Pause loop until a new token is captured
+        while (!capturedCaptchaToken && state.running) {
+          await sleep(500);
+        }
+        // Resume painting
+        updateUI(
+          state.language === 'pt'
+            ? '🚀 Token capturado! Reiniciando auto-farm...' 
+            : '🚀 Token captured! Resuming auto-farm...',
+          'success'
+        );
+        continue;
       }
       
       if (paintResult?.painted === 1) {
