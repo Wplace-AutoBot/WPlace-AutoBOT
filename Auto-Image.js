@@ -1525,9 +1525,21 @@ async function autoRefreshSequence() {
 
             if (success === "token_error") {
               if (state.autoRefresh) {
-                // CAPTCHA expired: auto-refresh and retry
+                // CAPTCHA expired: wait until enough charges, then refresh
                 updateUI("captchaNeeded", "error");
                 Utils.showAlert(Utils.t("captchaNeeded"), "error");
+                while (state.currentCharges <= 1) {
+                  updateUI(
+                    state.language === 'pt'
+                      ? `⌛ Sem cargas. Esperando ${Math.ceil(state.cooldown/1000)}s...`
+                      : `⌛ No charges. Waiting ${Math.ceil(state.cooldown/1000)}s...`,
+                    'status'
+                  );
+                  await Utils.sleep(state.cooldown);
+                  const info = await WPlaceService.getCharges();
+                  state.currentCharges = Math.floor(info.charges);
+                  state.cooldown = info.cooldown;
+                }
                 await autoRefreshSequence();
                 // retry this batch
                 const retry = await sendPixelBatch(pixelBatch, regionX, regionY);
@@ -1538,14 +1550,12 @@ async function autoRefreshSequence() {
                   });
                   state.currentCharges -= pixelBatch.length;
                   updateStats();
-                  updateUI("paintingProgress", "default", { painted: state.paintedPixels, total: state.totalPixels });
+                  updateUI('paintingProgress', 'default', { painted: state.paintedPixels, total: state.totalPixels });
                   pixelBatch = [];
-                  // continue painting
                   continue;
                 }
-                // if retry fails, stop
               }
-              // manual or retry failure
+              // fallback: halt on token error
               state.stopFlag = true;
               updateUI("captchaNeeded", "error");
               Utils.showAlert(Utils.t("captchaNeeded"), "error");
