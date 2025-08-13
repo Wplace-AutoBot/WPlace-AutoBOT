@@ -164,8 +164,9 @@
               state.pausedForManual = true;
             }
             while (state.charges.count < 2) {
-              await sleep(30000);
+              await sleep(60000);
               await getCharge();
+              updateStats();
             }
             state.pausedForManual = false;
           }
