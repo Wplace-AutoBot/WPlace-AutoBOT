@@ -5,6 +5,7 @@ This project was fork from https://github.com/DarkModde/WPlace-AutoBOT
 <p align="center">
   Practical scripts with intuitive menus to make your life easier on <a href="https://wplace.live" target="_blank">WPlace</a>!<br>
   Perfect for those who want to level up automatically or build massive pixel arts — without wasting time.
+  
   Warning: This is a purely educational script to demonstrate what can be done on wplace.live, it is not our responsibility of what happens if you use the script.
 </p>
 
