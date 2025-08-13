@@ -23,7 +23,8 @@
     lastPixel: null,
     minimized: false,
     menuOpen: false,
-    language: 'en'
+    language: 'en',
+    autoRefresh: true
   };
 
   const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -158,41 +159,52 @@
             : '❌ CAPTCHA token expired. Waiting for Paint button...',
           'error'
         );
-        const mainPaintBtn = await waitForSelector('button.btn.btn-primary.btn-lg, button.btn-primary.sm\\:btn-xl');
-        if (mainPaintBtn) mainPaintBtn.click();
-        await sleep(500);
-        updateUI(
-          state.language === 'pt' ? 'Selecionando transparente...' : 'Selecting transparent...',
-          'status'
-        );
-        const transBtn = await waitForSelector('button#color-0');
-        if (transBtn) transBtn.click();
-        await sleep(500);
-        const canvas = await waitForSelector('canvas');
-        if (canvas) {
-          const rect = canvas.getBoundingClientRect();
-          const evt = new MouseEvent('click', {
-            clientX: rect.left + rect.width/2,
-            clientY: rect.top + rect.height/2,
-            bubbles: true
-          });
-          canvas.dispatchEvent(evt);
-        }
-        await sleep(500);
-        updateUI(
-          state.language === 'pt' ? 'Confirmando pintura...' : 'Confirming paint...',
-          'status'
-        );
-        let confirmBtn = await waitForSelector(
-          'button.btn.btn-primary.btn-lg, button.btn.btn-primary.sm\\:btn-xl'
-        );
-        if (!confirmBtn) {
-          const allPrimary = Array.from(
-            document.querySelectorAll('button.btn-primary')
+
+        if (state.autoRefresh) {
+          const mainPaintBtn = await waitForSelector('button.btn.btn-primary.btn-lg, button.btn-primary.sm\\:btn-xl');
+          if (mainPaintBtn) mainPaintBtn.click();
+          await sleep(500);
+          updateUI(
+            state.language === 'pt' ? 'Selecionando transparente...' : 'Selecting transparent...',
+            'status'
           );
-          confirmBtn = allPrimary.length ? allPrimary[allPrimary.length - 1] : null;
+          const transBtn = await waitForSelector('button#color-0');
+          if (transBtn) transBtn.click();
+          await sleep(500);
+          const canvas = await waitForSelector('canvas');
+          if (canvas) {
+            const rect = canvas.getBoundingClientRect();
+            const evt = new MouseEvent('click', {
+              clientX: rect.left + rect.width/2,
+              clientY: rect.top + rect.height/2,
+              bubbles: true
+            });
+            canvas.dispatchEvent(evt);
+          }
+          await sleep(500);
+          updateUI(
+            state.language === 'pt' ? 'Confirmando pintura...' : 'Confirming paint...',
+            'status'
+          );
+          let confirmBtn = await waitForSelector(
+            'button.btn.btn-primary.btn-lg, button.btn.btn-primary.sm\\:btn-xl'
+          );
+          if (!confirmBtn) {
+            const allPrimary = Array.from(
+              document.querySelectorAll('button.btn-primary')
+            );
+            confirmBtn = allPrimary.length ? allPrimary[allPrimary.length - 1] : null;
+          }
+          confirmBtn?.click();
+        } else {
+          updateUI(
+            state.language === 'pt'
+              ? 'Auto-refresh desativado. Por favor, clique no botão pintura manualmente.'
+              : 'Auto-refresh disabled. Please click the Paint button manually.',
+            'status'
+          );
         }
-        confirmBtn?.click();
+
         await sleep(1000);
         continue;
       }
@@ -415,6 +427,10 @@
             <i class="fas fa-play"></i>
             <span>${t.start}</span>
           </button>
+          <label style="display:flex; align-items:center; margin-left:10px;">
+            <input type="checkbox" id="autoRefreshCheckbox" ${state.autoRefresh ? 'checked' : ''}/>
+            <span style="margin-left:4px; font-size:14px;">Auto Refresh</span>
+          </label>
         </div>
         
         <div class="wplace-stats">
@@ -499,6 +515,12 @@
       state.minimized = !state.minimized;
       content.style.display = state.minimized ? 'none' : 'block';
       minimizeBtn.innerHTML = `<i class="fas fa-${state.minimized ? 'expand' : 'minus'}"></i>`;
+    });
+    
+    // add listener for auto-refresh setting
+    const autoRefreshCheckbox = panel.querySelector('#autoRefreshCheckbox');
+    autoRefreshCheckbox.addEventListener('change', () => {
+      state.autoRefresh = autoRefreshCheckbox.checked;
     });
     
     window.addEventListener('beforeunload', () => {
