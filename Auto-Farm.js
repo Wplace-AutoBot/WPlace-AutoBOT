@@ -27,6 +27,15 @@
   };
 
   const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const waitForSelector = async (selector, interval = 200, timeout = 5000) => {
+    const start = Date.now();
+    while (Date.now() - start < timeout) {
+      const el = document.querySelector(selector);
+      if (el) return el;
+      await sleep(interval);
+    }
+    return null;
+  };
 
   const originalFetch = window.fetch;
   let capturedCaptchaToken = null;
@@ -38,7 +47,7 @@
         if (payload.t) {
           console.log('✅ CAPTCHA Token Captured:', payload.t);
           capturedCaptchaToken = payload.t;
-          stoppedForToken = false; 
+          stoppedForToken = false;
           if (stoppedForToken) {
             stoppedForToken = false;
             state.running = true;
@@ -48,6 +57,7 @@
             );
             paintLoop();
           }
+          
         }
       } catch (e) {
       }
@@ -85,7 +95,7 @@
       });
       if (res.status === 403) {
         console.error('❌ 403 Forbidden. CAPTCHA token might be invalid or expired.');
-        capturedCaptchaToken = null; 
+        capturedCaptchaToken = null;
         stoppedForToken = true;
         return 'token_error';
       }
@@ -144,20 +154,46 @@
       if (paintResult === 'token_error') {
         updateUI(
           state.language === 'pt'
-            ? '❌ Token expirado. Clique em qualquer pixel para obter novo token.'
-            : '❌ CAPTCHA token expired. Click any pixel to obtain a new token.',
+            ? '❌ Token expirado. Aguardando elemento Paint...'
+            : '❌ CAPTCHA token expired. Waiting for Paint button...',
           'error'
         );
-        while (!capturedCaptchaToken && state.running) {
-          await sleep(500);
-        }
-        // Resume painting
+        const mainPaintBtn = await waitForSelector('button.btn.btn-primary.btn-lg, button.btn-primary.sm\\:btn-xl');
+        if (mainPaintBtn) mainPaintBtn.click();
+        await sleep(500);
         updateUI(
-          state.language === 'pt'
-            ? '🚀 Token capturado! Reiniciando auto-farm...' 
-            : '🚀 Token captured! Resuming auto-farm...',
-          'success'
+          state.language === 'pt' ? 'Selecionando transparente...' : 'Selecting transparent...',
+          'status'
         );
+        const transBtn = await waitForSelector('button#color-0');
+        if (transBtn) transBtn.click();
+        await sleep(500);
+        const canvas = await waitForSelector('canvas');
+        if (canvas) {
+          const rect = canvas.getBoundingClientRect();
+          const evt = new MouseEvent('click', {
+            clientX: rect.left + rect.width/2,
+            clientY: rect.top + rect.height/2,
+            bubbles: true
+          });
+          canvas.dispatchEvent(evt);
+        }
+        await sleep(500);
+        updateUI(
+          state.language === 'pt' ? 'Confirmando pintura...' : 'Confirming paint...',
+          'status'
+        );
+        let confirmBtn = await waitForSelector(
+          'button.btn.btn-primary.btn-lg, button.btn.btn-primary.sm\\:btn-xl'
+        );
+        if (!confirmBtn) {
+          const allPrimary = Array.from(
+            document.querySelectorAll('button.btn-primary')
+          );
+          confirmBtn = allPrimary.length ? allPrimary[allPrimary.length - 1] : null;
+        }
+        confirmBtn?.click();
+        await sleep(1000);
         continue;
       }
       

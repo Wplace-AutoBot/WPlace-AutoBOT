@@ -25,7 +25,7 @@ This project was fork from https://github.com/DarkModde/WPlace-AutoBOT
 
 <br>
 
-### 🎯┃Auto-Farm (NOT WORKING 🚫)
+### 🎯┃Auto-Farm
 
 ```js
 javascript:fetch("https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/Auto-Farm.js").then(t=>t.text()).then(eval);
