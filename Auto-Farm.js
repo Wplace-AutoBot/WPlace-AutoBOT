@@ -161,9 +161,9 @@
             : '❌ CAPTCHA token expired. Waiting for Paint button...',
           'error'
         );
-        // Click the Paint div to trigger CAPTCHA
-        const paintDiv = await waitForSelector('div.flex.items-center.gap-2');
-        if (paintDiv) paintDiv.click();
+        // Click the main Paint button to trigger CAPTCHA
+        const mainPaintBtn = await waitForSelector('button.btn.btn-primary.btn-lg, button.btn-primary.sm\\:btn-xl');
+        if (mainPaintBtn) mainPaintBtn.click();
         await sleep(500);
         // Click transparent color button
         updateUI(
