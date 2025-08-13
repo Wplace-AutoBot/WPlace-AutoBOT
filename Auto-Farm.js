@@ -30,6 +30,7 @@
 
   const originalFetch = window.fetch;
   let capturedCaptchaToken = null;
+  let stoppedForToken = false; // flag to auto-restart after manual token capture
   window.fetch = async (url, options = {}) => {
     if (typeof url === 'string' && url.includes('https://backend.wplace.live/s0/pixel/')) {
       try {
@@ -37,6 +38,12 @@
         if (payload.t) {
           console.log('✅ CAPTCHA Token Captured:', payload.t);
           capturedCaptchaToken = payload.t;
+          // auto-restart if was stopped due to token expiry
+          if (stoppedForToken) {
+            stoppedForToken = false;
+            const btn = document.getElementById('toggleBtn');
+            if (btn) btn.click();
+          }
         }
       } catch (e) {
       }
@@ -74,8 +81,9 @@
       });
       if (res.status === 403) {
         console.error('❌ 403 Forbidden. CAPTCHA token might be invalid or expired.');
-        capturedCaptchaToken = null; 
-        return 'token_error'; 
+        capturedCaptchaToken = null; // Invalidate our stored token.
+        stoppedForToken = true;
+        return 'token_error'; // Return a special status to stop the bot.
       }
       const data = await res.json();
       return data;
