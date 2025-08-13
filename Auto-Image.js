@@ -1218,7 +1218,7 @@
             localY: y,
           });
 
-          if (pixelBatch.length >= 60) {
+          if (pixelBatch.length >= Math.floor(state.currentCharges)) {
             const success = await sendPixelBatch(pixelBatch, regionX, regionY);
 
             if (success === "token_error") {
@@ -1244,7 +1244,7 @@
 
             pixelBatch = [];
 
-            if (state.currentCharges < 60) {
+            if (state.currentCharges < 1) {
               updateUI("noCharges", "warning", {
                 time: Utils.formatTime(state.cooldown),
               });
