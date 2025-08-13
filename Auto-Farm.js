@@ -157,24 +157,43 @@
       if (paintResult === 'token_error') {
         updateUI(
           state.language === 'pt'
-            ? '❌ Token expirado! Tentando recapturar automaticamente...'
-            : '❌ CAPTCHA token expired! Attempting auto-refresh...',
+            ? '❌ Token expirado. Aguardando elemento Paint...'
+            : '❌ CAPTCHA token expired. Waiting for Paint button...',
           'error'
         );
-        // Auto-click sequence to trigger CAPTCHA refresh
-  // Auto-click sequence with waits for element availability
-  const paintBtn = await waitForSelector('div.flex.items-center.gap-2');
-  paintBtn?.click();
-  const transBtn = await waitForSelector('#color-0');
-  transBtn?.click();
-  await sleep(500);
-  const cx = window.innerWidth / 2;
-  const cy = window.innerHeight / 2;
-  const centerEl = document.elementFromPoint(cx, cy);
-  centerEl?.click();
-  const confirmBtn = await waitForSelector('div.absolute.bottom-0.left-1\\/2 button.btn.btn-primary');
-  confirmBtn?.click();
-  continue;
+        // Click the Paint div to trigger CAPTCHA
+        const paintDiv = await waitForSelector('div.flex.items-center.gap-2');
+        if (paintDiv) paintDiv.click();
+        await sleep(500);
+        // Click transparent color button
+        updateUI(
+          state.language === 'pt' ? 'Selecionando transparente...' : 'Selecting transparent...',
+          'status'
+        );
+        const transBtn = await waitForSelector('button#color-0');
+        if (transBtn) transBtn.click();
+        await sleep(500);
+        // Click center pixel on canvas
+        const canvas = await waitForSelector('canvas');
+        if (canvas) {
+          const rect = canvas.getBoundingClientRect();
+          const evt = new MouseEvent('click', {
+            clientX: rect.left + rect.width/2,
+            clientY: rect.top + rect.height/2,
+            bubbles: true
+          });
+          canvas.dispatchEvent(evt);
+        }
+        await sleep(500);
+        // Click confirm Paint button
+        updateUI(
+          state.language === 'pt' ? 'Confirmando pintura...' : 'Confirming paint...',
+          'status'
+        );
+        const confirmBtn = await waitForSelector('div.absolute.bottom-0.left-1\\/2 button.btn.btn-primary.btn-lg, div.absolute.bottom-0.left-1\\/2 button.btn.btn-primary.sm\\:btn-xl');
+        if (confirmBtn) confirmBtn.click();
+        await sleep(1000);
+        continue;
       }
       
       if (paintResult?.painted === 1) {
