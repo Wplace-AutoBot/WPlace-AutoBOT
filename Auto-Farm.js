@@ -28,6 +28,22 @@
 
   const sleep = ms => new Promise(r => setTimeout(r, ms));
 
+  const originalFetch = window.fetch;
+  let capturedCaptchaToken = null;
+  window.fetch = async (url, options = {}) => {
+    if (typeof url === 'string' && url.includes('https://backend.wplace.live/s0/pixel/')) {
+      try {
+        const payload = JSON.parse(options.body || '{}');
+        if (payload.t) {
+          console.log('✅ CAPTCHA Token Captured:', payload.t);
+          capturedCaptchaToken = payload.t;
+        }
+      } catch (e) {
+      }
+    }
+    return originalFetch(url, options);
+  };
+
   const fetchAPI = async (url, options = {}) => {
     try {
       const res = await fetch(url, {
@@ -47,10 +63,15 @@
 
   const paintPixel = async (x, y) => {
     const randomColor = Math.floor(Math.random() * 31) + 1;
+    // Include CAPTCHA token if captured
     return await fetchAPI(`https://backend.wplace.live/s0/pixel/${CONFIG.START_X}/${CONFIG.START_Y}`, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
-      body: JSON.stringify({ coords: [x, y], colors: [randomColor] })
+      body: JSON.stringify({
+        coords: [x, y],
+        colors: [randomColor],
+        t: capturedCaptchaToken
+      })
     });
   };
 
@@ -377,6 +398,12 @@
     toggleBtn.addEventListener('click', () => {
       state.running = !state.running;
       
+      if (state.running && !capturedCaptchaToken) {
+        updateUI(state.language === 'pt' ? '❌ Token não capturado. Clique em qualquer pixel primeiro.' : '❌ CAPTCHA token not captured. Please click any pixel manually first.', 'error');
+        state.running = false;
+        return;
+      }
+  
       if (state.running) {
         toggleBtn.innerHTML = `<i class="fas fa-stop"></i> <span>${t.stop}</span>`;
         toggleBtn.classList.remove('wplace-btn-primary');
