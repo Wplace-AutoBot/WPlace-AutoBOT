@@ -173,17 +173,29 @@
           await sleep(500);
           const canvas = await waitForSelector('canvas');
           if (canvas) {
+            canvas.setAttribute('tabindex', '0');
+            canvas.focus();
             const rect = canvas.getBoundingClientRect();
             const centerX = Math.round(rect.left + rect.width / 2);
             const centerY = Math.round(rect.top + rect.height / 2);
-            ['mouseover', 'mousemove', 'mousedown', 'mouseup', 'click'].forEach(type => {
-              const evt = new MouseEvent(type, {
-                clientX: centerX,
-                clientY: centerY,
-                bubbles: true
-              });
-              canvas.dispatchEvent(evt);
+            const moveEvt = new MouseEvent('mousemove', {
+              clientX: centerX,
+              clientY: centerY,
+              bubbles: true
             });
+            canvas.dispatchEvent(moveEvt);
+            const keyDown = new KeyboardEvent('keydown', {
+              key: ' ',
+              code: 'Space',
+              bubbles: true
+            });
+            const keyUp = new KeyboardEvent('keyup', {
+              key: ' ',
+              code: 'Space',
+              bubbles: true
+            });
+            canvas.dispatchEvent(keyDown);
+            canvas.dispatchEvent(keyUp);
           }
           await sleep(500);
           updateUI(
