@@ -1120,80 +1120,96 @@
       state.paintedMap = Array(height).fill().map(() => Array(width).fill(false));
     }
 
-    outerLoop:
-    for (let y = startRow; y < height; y++) {
-      for (let x = (y === startRow ? startCol : 0); x < width; x++) {
-        // If stop is requested, save the last position and exit
-        if (state.stopFlag) {
-          state.lastPosition = { x, y };
-          updateUI('paintingPaused', 'warning', { x, y });
-          break outerLoop;
-        }
+    // Set up interval to refresh charges every 30 seconds while painting
+    let chargesInterval = setInterval(async () => {
+      // Only update if still running
+      if (state.running && !state.stopFlag) {
+        const chargeUpdate = await WPlaceService.getCharges();
+        state.currentCharges = chargeUpdate.charges;
+        state.cooldown = chargeUpdate.cooldown;
+        updateStats();
+      }
+    }, 30000);
 
-        // Skip pixel if already painted (for resume)
-        if (state.paintedMap[y][x]) continue;
-
-        const idx = (y * width + x) * 4;
-        const r = pixels[idx];
-        const g = pixels[idx + 1];
-        const b = pixels[idx + 2];
-        const alpha = pixels[idx + 3];
-
-        // Skip transparent or white pixels
-        if (alpha < CONFIG.TRANSPARENCY_THRESHOLD) continue;
-        if (Utils.isWhitePixel(r, g, b)) continue;
-
-        const rgb = [r, g, b];
-        const colorId = findClosestColor(rgb, state.availableColors);
-
-        if (state.currentCharges < 1) {
-          updateUI('noCharges', 'warning', { time: Utils.formatTime(state.cooldown) });
-          await Utils.sleep(state.cooldown);
-
-          const chargeUpdate = await WPlaceService.getCharges();
-          state.currentCharges = chargeUpdate.charges;
-          state.cooldown = chargeUpdate.cooldown;
-        }
-
-        const pixelX = startX + x;
-        const pixelY = startY + y;
-
-        const success = await WPlaceService.paintPixelInRegion(
-          regionX,
-          regionY,
-          pixelX,
-          pixelY,
-          colorId
-        );
-
-        // If CAPTCHA/token error, stop and notify
-        if (success === 'token_error') {
-            state.stopFlag = true;
-            updateUI('captchaNeeded', 'error');
-            Utils.showAlert(Utils.t('captchaNeeded'), 'error');
+    try {
+      outerLoop:
+      for (let y = startRow; y < height; y++) {
+        for (let x = (y === startRow ? startCol : 0); x < width; x++) {
+          // If stop is requested, save the last position and exit
+          if (state.stopFlag) {
+            state.lastPosition = { x, y };
+            updateUI('paintingPaused', 'warning', { x, y });
             break outerLoop;
-        }
+          }
 
-        if (success) {
-          state.paintedPixels++;
-          state.currentCharges--;
-          state.paintedMap[y][x] = true; // Mark pixel as painted
+          // Skip pixel if already painted (for resume)
+          if (state.paintedMap[y][x]) continue;
 
-          state.estimatedTime = Utils.calculateEstimatedTime(
-            state.totalPixels - state.paintedPixels,
-            state.currentCharges,
-            state.cooldown
+          const idx = (y * width + x) * 4;
+          const r = pixels[idx];
+          const g = pixels[idx + 1];
+          const b = pixels[idx + 2];
+          const alpha = pixels[idx + 3];
+
+          // Skip transparent or white pixels
+          if (alpha < CONFIG.TRANSPARENCY_THRESHOLD) continue;
+          if (Utils.isWhitePixel(r, g, b)) continue;
+
+          const rgb = [r, g, b];
+          const colorId = findClosestColor(rgb, state.availableColors);
+
+          if (state.currentCharges < 1) {
+            updateUI('noCharges', 'warning', { time: Utils.formatTime(state.cooldown) });
+            await Utils.sleep(state.cooldown);
+
+            const chargeUpdate = await WPlaceService.getCharges();
+            state.currentCharges = chargeUpdate.charges;
+            state.cooldown = chargeUpdate.cooldown;
+          }
+
+          const pixelX = startX + x;
+          const pixelY = startY + y;
+
+          const success = await WPlaceService.paintPixelInRegion(
+            regionX,
+            regionY,
+            pixelX,
+            pixelY,
+            colorId
           );
 
-          if (state.paintedPixels % CONFIG.LOG_INTERVAL === 0) {
-            updateStats();
-            updateUI('paintingProgress', 'default', {
-              painted: state.paintedPixels,
-              total: state.totalPixels
-            });
+          // If CAPTCHA/token error, stop and notify
+          if (success === 'token_error') {
+              state.stopFlag = true;
+              updateUI('captchaNeeded', 'error');
+              Utils.showAlert(Utils.t('captchaNeeded'), 'error');
+              break outerLoop;
+          }
+
+          if (success) {
+            state.paintedPixels++;
+            state.currentCharges--;
+            state.paintedMap[y][x] = true; // Mark pixel as painted
+
+            state.estimatedTime = Utils.calculateEstimatedTime(
+              state.totalPixels - state.paintedPixels,
+              state.currentCharges,
+              state.cooldown
+            );
+
+            if (state.paintedPixels % CONFIG.LOG_INTERVAL === 0) {
+              updateStats();
+              updateUI('paintingProgress', 'default', {
+                painted: state.paintedPixels,
+                total: state.totalPixels
+              });
+            }
           }
         }
       }
+    } finally {
+      // Always clear the interval when painting stops or finishes
+      clearInterval(chargesInterval);
     }
 
     // If stopped, keep last position for resume; if finished, reset lastPosition and paintedMap
