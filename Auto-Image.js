@@ -1524,45 +1524,28 @@ async function autoRefreshSequence() {
             const success = await sendPixelBatch(pixelBatch, regionX, regionY);
 
             if (success === "token_error") {
-              // Only auto-refresh if enabled and more than 1 charge available
-              if (state.autoRefresh && state.currentCharges > 1) {
-                // CAPTCHA expired: keep trying refresh and retry until token works
+              if (state.autoRefresh) {
+                // CAPTCHA expired: auto-refresh and retry
                 updateUI("captchaNeeded", "error");
                 Utils.showAlert(Utils.t("captchaNeeded"), "error");
-                let retry;
-                do {
-                  // wait until enough charges to paint this batch
-                  while (state.currentCharges < pixelBatch.length) {
-                    updateUI(
-                      state.language === 'pt'
-                        ? `⌛ Sem cargas suficientes (${state.currentCharges}/${pixelBatch.length}). Esperando ${Math.ceil(state.cooldown/1000)}s...`
-                        : `⌛ Insufficient charges (${state.currentCharges}/${pixelBatch.length}). Waiting ${Math.ceil(state.cooldown/1000)}s...`,
-                      'status'
-                    );
-                    await Utils.sleep(state.cooldown);
-                    const info = await WPlaceService.getCharges();
-                    state.currentCharges = Math.floor(info.charges);
-                    state.cooldown = info.cooldown;
-                  }
-                  // now attempt captcha refresh (if token expired)
-                  await autoRefreshSequence();
-                  retry = await sendPixelBatch(pixelBatch, regionX, regionY);
-                } while (retry === "token_error");
+                await autoRefreshSequence();
+                // retry this batch
+                const retry = await sendPixelBatch(pixelBatch, regionX, regionY);
                 if (retry === true) {
-                  // successful retry: mark pixels and continue
                   pixelBatch.forEach(p => {
                     state.paintedMap[p.localY][p.localX] = true;
                     state.paintedPixels++;
                   });
                   state.currentCharges -= pixelBatch.length;
                   updateStats();
-                  updateUI('paintingProgress', 'default', { painted: state.paintedPixels, total: state.totalPixels });
+                  updateUI("paintingProgress", "default", { painted: state.paintedPixels, total: state.totalPixels });
                   pixelBatch = [];
+                  // continue painting
                   continue;
                 }
-                // if retry is false (non-token error), fall through to fallback
+                // if retry fails, stop
               }
-              // fallback: halt on token error
+              // manual or retry failure
               state.stopFlag = true;
               updateUI("captchaNeeded", "error");
               Utils.showAlert(Utils.t("captchaNeeded"), "error");
@@ -1635,6 +1618,9 @@ async function autoRefreshSequence() {
   }
 
   async function sendPixelBatch(pixelBatch, regionX, regionY) {
+    if (!capturedCaptchaToken) {
+      return "token_error";
+    }
 
     const coords = [];
     const colors = [];
