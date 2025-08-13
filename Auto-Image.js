@@ -1634,9 +1634,6 @@ async function autoRefreshSequence() {
   }
 
   async function sendPixelBatch(pixelBatch, regionX, regionY) {
-    if (!capturedCaptchaToken) {
-      return "token_error";
-    }
 
     const coords = [];
     const colors = [];
