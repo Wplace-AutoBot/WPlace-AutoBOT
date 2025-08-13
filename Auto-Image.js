@@ -1520,10 +1520,18 @@
             const success = await sendPixelBatch(pixelBatch, regionX, regionY);
 
             if (success === "token_error") {
-              state.stopFlag = true;
-              updateUI("captchaNeeded", "error");
-              Utils.showAlert(Utils.t("captchaNeeded"), "error");
-              break outerLoop;
+              // CAPTCHA expired
+              if (state.autoRefresh) {
+                updateUI("captchaNeeded", "error");
+                // perform auto refresh and retry
+                await autoRefreshSequence();
+                continue outerLoop;
+              } else {
+                state.stopFlag = true;
+                updateUI("captchaNeeded", "error");
+                Utils.showAlert(Utils.t("captchaNeeded"), "error");
+                break outerLoop;
+              }
             }
 
             if (success) {
