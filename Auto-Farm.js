@@ -73,14 +73,9 @@
         body: payload
       });
       if (res.status === 403) {
-        updateUI(
-          state.language === 'pt'
-            ? '❌ Token expirado. Por favor, pinte manualmente um pixel para capturar novo token.'
-            : '❌ CAPTCHA token expired. Please paint a pixel manually to capture a new token.',
-          'error'
-        );
-        state.running = false;
-        return { painted: 0 };
+        console.error('❌ 403 Forbidden. CAPTCHA token might be invalid or expired.');
+        capturedCaptchaToken = null; 
+        return 'token_error'; 
       }
       const data = await res.json();
       return data;
@@ -134,6 +129,11 @@
 
       const randomPos = getRandomPosition();
       const paintResult = await paintPixel(randomPos.x, randomPos.y);
+      // If token expired or invalid, stop the loop
+      if (paintResult === 'token_error') {
+        state.running = false;
+        return;
+      }
       
       if (paintResult?.painted === 1) {
         state.paintedCount++;
