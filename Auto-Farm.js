@@ -152,7 +152,7 @@
       const paintResult = await paintPixel(randomPos.x, randomPos.y);
       if (paintResult === 'token_error') {
         if (state.autoRefresh) {
-          // ensure enough charges for auto-refresh
+          await getCharge();
           if (state.charges.count < 2) {
             if (!state.pausedForManual) {
               updateUI(
