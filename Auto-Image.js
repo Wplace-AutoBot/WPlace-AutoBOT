@@ -56,6 +56,14 @@
       paintingPaused: "⏸️ Pintura pausada na posição X: {x}, Y: {y}",
       captchaNeeded:
         "❗ Token CAPTCHA necessário. Pinte um pixel manualmente para continuar.",
+      saveData: "Salvar Progresso",
+      loadData: "Carregar Progresso", 
+      autoSaved: "✅ Progresso salvo automaticamente",
+      dataLoaded: "✅ Progresso carregado com sucesso",
+      noSavedData: "❌ Nenhum progresso salvo encontrado",
+      savedDataFound: "✅ Progresso salvo encontrado! Carregar para continuar?",
+      savedDate: "Salvo em: {date}",
+      clickLoadToContinue: "Clique em 'Carregar Progresso' para continuar.",
     },
     en: {
       title: "WPlace Auto-Image",
@@ -93,6 +101,14 @@
       paintingPaused: "⏸️ Painting paused at position X: {x}, Y: {y}",
       captchaNeeded:
         "❗ CAPTCHA token needed. Paint one pixel manually to continue.",
+      saveData: "Save Progress",
+      loadData: "Load Progress",
+      autoSaved: "✅ Progress saved automatically", 
+      dataLoaded: "✅ Progress loaded successfully",
+      noSavedData: "❌ No saved progress found",
+      savedDataFound: "✅ Saved progress found! Load to continue?",
+      savedDate: "Saved on: {date}",
+      clickLoadToContinue: "Click 'Load Progress' to continue.",
     },
   };
 
@@ -222,6 +238,149 @@
       result += `${seconds}s`;
 
       return result;
+    },
+
+    // Save/Load Progress Functions
+    saveProgress: () => {
+      try {
+        const progressData = {
+          version: "1.0",
+          timestamp: Date.now(),
+          state: {
+            imageLoaded: state.imageLoaded,
+            totalPixels: state.totalPixels,
+            paintedPixels: state.paintedPixels,
+            lastPosition: state.lastPosition,
+            startPosition: state.startPosition,
+            region: state.region,
+            paintedMap: state.paintedMap,
+            imageData: state.imageData,
+            availableColors: state.availableColors,
+            colorsChecked: state.colorsChecked,
+            language: state.language
+          }
+        };
+        
+        localStorage.setItem('wplace-auto-image-progress', JSON.stringify(progressData));
+        console.log('✅ Progress saved successfully');
+        return true;
+      } catch (error) {
+        console.error('❌ Error saving progress:', error);
+        return false;
+      }
+    },
+
+    loadProgress: () => {
+      try {
+        const savedData = localStorage.getItem('wplace-auto-image-progress');
+        if (!savedData) {
+          return null;
+        }
+        
+        const progressData = JSON.parse(savedData);
+        
+        // Validate data structure
+        if (!progressData.version || !progressData.state) {
+          return null;
+        }
+        
+        return progressData;
+      } catch (error) {
+        console.error('❌ Error loading progress:', error);
+        return null;
+      }
+    },
+
+    restoreProgress: (progressData) => {
+      try {
+        const savedState = progressData.state;
+        
+        // Restore state
+        state.imageLoaded = savedState.imageLoaded;
+        state.totalPixels = savedState.totalPixels;
+        state.paintedPixels = savedState.paintedPixels;
+        state.lastPosition = savedState.lastPosition || { x: 0, y: 0 };
+        state.startPosition = savedState.startPosition;
+        state.region = savedState.region;
+        state.paintedMap = savedState.paintedMap;
+        state.imageData = savedState.imageData;
+        state.availableColors = savedState.availableColors;
+        state.language = savedState.language;
+        state.colorsChecked = savedState.availableColors && savedState.availableColors.length > 0;
+        
+        // Update UI to reflect restored state
+        if (state.imageLoaded) {
+          const initBotBtn = document.querySelector("#initBotBtn");
+          const uploadBtn = document.querySelector("#uploadBtn");
+          const resizeBtn = document.querySelector("#resizeBtn");
+          const selectPosBtn = document.querySelector("#selectPosBtn");
+          const startBtn = document.querySelector("#startBtn");
+          const saveBtn = document.querySelector("#saveBtn");
+          const progressBar = document.querySelector("#progressBar");
+          
+          // Show/hide appropriate buttons based on state
+          if (state.colorsChecked) {
+            initBotBtn.style.display = "none";
+            uploadBtn.disabled = false;
+            selectPosBtn.disabled = false;
+          } else {
+            initBotBtn.style.display = "block";
+            uploadBtn.disabled = true;
+            selectPosBtn.disabled = true;
+          }
+          
+          resizeBtn.disabled = false;
+          saveBtn.disabled = false;
+          
+          if (state.startPosition && state.region) {
+            selectPosBtn.disabled = false;
+            startBtn.disabled = false;
+          }
+          
+          // Update progress bar
+          const progress = state.totalPixels > 0 ? Math.round((state.paintedPixels / state.totalPixels) * 100) : 0;
+          progressBar.style.width = `${progress}%`;
+          
+          // Update status message based on progress
+          if (state.paintedPixels > 0) {
+            if (state.lastPosition.x > 0 || state.lastPosition.y > 0) {
+              updateUI("paintingPaused", "warning", { 
+                x: state.lastPosition.x, 
+                y: state.lastPosition.y 
+              });
+            } else {
+              updateUI("paintingProgress", "default", {
+                painted: state.paintedPixels,
+                total: state.totalPixels,
+              });
+            }
+          } else {
+            updateUI("imageLoaded", "success", { count: state.totalPixels });
+          }
+        }
+        
+        // Update stats to show current progress
+        updateStats();
+        return true;
+      } catch (error) {
+        console.error('❌ Error restoring progress:', error);
+        return false;
+      }
+    },
+
+    clearProgress: () => {
+      try {
+        localStorage.removeItem('wplace-auto-image-progress');
+        console.log('✅ Progress data cleared');
+        return true;
+      } catch (error) {
+        console.error('❌ Error clearing progress:', error);
+        return false;
+      }
+    },
+
+    hasSavedProgress: () => {
+      return localStorage.getItem('wplace-auto-image-progress') !== null;
     },
 
     showAlert: (message, type = "info") => {
@@ -686,6 +845,14 @@
             <i class="fas fa-stop"></i>
             <span>${Utils.t("stopPainting")}</span>
           </button>
+          <button id="saveBtn" class="wplace-btn wplace-btn-primary" disabled>
+            <i class="fas fa-save"></i>
+            <span>${Utils.t("saveData")}</span>
+          </button>
+          <button id="loadBtn" class="wplace-btn wplace-btn-primary">
+            <i class="fas fa-folder-open"></i>
+            <span>${Utils.t("loadData")}</span>
+          </button>
         </div>
         
         <div class="wplace-progress">
@@ -787,6 +954,8 @@
     const selectPosBtn = container.querySelector("#selectPosBtn");
     const startBtn = container.querySelector("#startBtn");
     const stopBtn = container.querySelector("#stopBtn");
+    const saveBtn = container.querySelector("#saveBtn");
+    const loadBtn = container.querySelector("#loadBtn");
     const minimizeBtn = container.querySelector("#minimizeBtn");
     const statusText = container.querySelector("#statusText");
     const progressBar = container.querySelector("#progressBar");
@@ -1031,6 +1200,7 @@
         state.lastPosition = { x: 0, y: 0 };
 
         resizeBtn.disabled = false;
+        saveBtn.disabled = false;
 
         if (state.startPosition) {
           startBtn.disabled = false;
@@ -1136,6 +1306,7 @@
       uploadBtn.disabled = true;
       selectPosBtn.disabled = true;
       resizeBtn.disabled = true;
+      saveBtn.disabled = true;
 
       updateUI("startPaintingMsg", "success");
 
@@ -1146,6 +1317,7 @@
       } finally {
         state.running = false;
         stopBtn.disabled = true;
+        saveBtn.disabled = false;
 
         if (!state.stopFlag) {
           startBtn.disabled = true;
@@ -1163,7 +1335,86 @@
       state.running = false;
       stopBtn.disabled = true;
       updateUI("paintingStopped", "warning");
+      
+      // Auto save when stopping
+      if (state.imageLoaded && state.paintedPixels > 0) {
+        Utils.saveProgress();
+        Utils.showAlert(Utils.t("autoSaved"), "success");
+      }
     });
+
+    saveBtn.addEventListener("click", () => {
+      if (!state.imageLoaded) {
+        Utils.showAlert(Utils.t("missingRequirements"), "error");
+        return;
+      }
+      
+      const success = Utils.saveProgress();
+      if (success) {
+        updateUI("autoSaved", "success");
+        Utils.showAlert(Utils.t("autoSaved"), "success");
+      } else {
+        Utils.showAlert("❌ Erro ao salvar progresso", "error");
+      }
+    });
+
+    loadBtn.addEventListener("click", () => {
+      const savedData = Utils.loadProgress();
+      if (!savedData) {
+        updateUI("noSavedData", "warning");
+        Utils.showAlert(Utils.t("noSavedData"), "warning");
+        return;
+      }
+      
+      // Show confirmation dialog
+      const confirmLoad = confirm(
+        `${Utils.t("savedDataFound")}\n\n` +
+        `Saved: ${new Date(savedData.timestamp).toLocaleString()}\n` +
+        `Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels`
+      );
+      
+      if (confirmLoad) {
+        const success = Utils.restoreProgress(savedData);
+        if (success) {
+          updateUI("dataLoaded", "success");
+          Utils.showAlert(Utils.t("dataLoaded"), "success");
+          
+          // Enable appropriate buttons
+          saveBtn.disabled = false;
+          
+          // Show init button if colors not checked yet
+          if (!state.colorsChecked) {
+            initBotBtn.style.display = "block";
+          }
+          
+          if (state.imageLoaded && state.startPosition && state.region && state.colorsChecked) {
+            startBtn.disabled = false;
+          }
+        } else {
+          Utils.showAlert("❌ Erro ao carregar progresso", "error");
+        }
+      }
+    });
+    
+    // Check for saved progress on startup
+    const checkSavedProgress = () => {
+      const savedData = Utils.loadProgress();
+      if (savedData && savedData.state.paintedPixels > 0) {
+        const savedDate = new Date(savedData.timestamp).toLocaleString();
+        const progress = Math.round((savedData.state.paintedPixels / savedData.state.totalPixels) * 100);
+        
+        Utils.showAlert(
+          `${Utils.t("savedDataFound")}\n\n` +
+          `Saved: ${savedDate}\n` +
+          `Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels (${progress}%)\n` +
+          `${Utils.t("clickLoadToContinue")}`,
+          "info"
+        );
+      }
+    };
+    
+    // Check for saved progress after a short delay to let UI settle
+    setTimeout(checkSavedProgress, 1000);
   }
 
   async function processImage() {
@@ -1240,6 +1491,11 @@
                 painted: state.paintedPixels,
                 total: state.totalPixels,
               });
+              
+              // Auto-save progress every 50 pixels
+              if (state.paintedPixels % 50 === 0) {
+                Utils.saveProgress();
+              }
             }
 
             pixelBatch = [];
@@ -1275,10 +1531,14 @@
 
     if (state.stopFlag) {
       updateUI("paintingStopped", "warning");
+      // Save progress when stopped
+      Utils.saveProgress();
     } else {
       updateUI("paintingComplete", "success", { count: state.paintedPixels });
       state.lastPosition = { x: 0, y: 0 };
       state.paintedMap = null;
+      // Clear saved data when completed
+      Utils.clearProgress();
     }
 
     updateStats();
