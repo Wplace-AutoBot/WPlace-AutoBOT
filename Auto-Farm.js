@@ -174,12 +174,16 @@
           const canvas = await waitForSelector('canvas');
           if (canvas) {
             const rect = canvas.getBoundingClientRect();
-            const evt = new MouseEvent('click', {
-              clientX: rect.left + rect.width/2,
-              clientY: rect.top + rect.height/2,
-              bubbles: true
+            const centerX = Math.round(rect.left + rect.width / 2);
+            const centerY = Math.round(rect.top + rect.height / 2);
+            ['mouseover', 'mousemove', 'mousedown', 'mouseup', 'click'].forEach(type => {
+              const evt = new MouseEvent(type, {
+                clientX: centerX,
+                clientY: centerY,
+                bubbles: true
+              });
+              canvas.dispatchEvent(evt);
             });
-            canvas.dispatchEvent(evt);
           }
           await sleep(500);
           updateUI(
@@ -245,7 +249,7 @@
     const style = document.createElement('style');
     style.textContent = `
       @keyframes pulse {
-        0% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.7); }
+        0% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.7); }n
         70% { box-shadow: 0 0 0 10px rgba(0, 255, 0, 0); }
         100% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0); }
       }
@@ -517,7 +521,6 @@
       minimizeBtn.innerHTML = `<i class="fas fa-${state.minimized ? 'expand' : 'minus'}"></i>`;
     });
     
-    // add listener for auto-refresh setting
     const autoRefreshCheckbox = panel.querySelector('#autoRefreshCheckbox');
     autoRefreshCheckbox.addEventListener('change', () => {
       state.autoRefresh = autoRefreshCheckbox.checked;
