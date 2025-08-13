@@ -24,7 +24,8 @@
     minimized: false,
     menuOpen: false,
     language: 'en',
-    autoRefresh: true
+    autoRefresh: true,
+    pausedForManual: false
   };
 
   const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -40,7 +41,6 @@
 
   const originalFetch = window.fetch;
   let capturedCaptchaToken = null;
-  let stoppedForToken = false; 
   window.fetch = async (url, options = {}) => {
     if (typeof url === 'string' && url.includes('https://backend.wplace.live/s0/pixel/')) {
       try {
@@ -48,9 +48,8 @@
         if (payload.t) {
           console.log('✅ CAPTCHA Token Captured:', payload.t);
           capturedCaptchaToken = payload.t;
-          stoppedForToken = false;
-          if (stoppedForToken) {
-            stoppedForToken = false;
+          if (state.pausedForManual) {
+            state.pausedForManual = false;
             state.running = true;
             updateUI(
               state.language === 'pt' ? '🚀 Pintura reiniciada!' : '🚀 Painting resumed!',
@@ -58,7 +57,6 @@
             );
             paintLoop();
           }
-          
         }
       } catch (e) {
       }
@@ -153,14 +151,14 @@
       const randomPos = getRandomPosition();
       const paintResult = await paintPixel(randomPos.x, randomPos.y);
       if (paintResult === 'token_error') {
-        updateUI(
-          state.language === 'pt'
-            ? '❌ Token expirado. Aguardando elemento Paint...'
-            : '❌ CAPTCHA token expired. Waiting for Paint button...',
-          'error'
-        );
-
         if (state.autoRefresh) {
+          updateUI(
+            state.language === 'pt'
+              ? '❌ Token expirado. Aguardando elemento Paint...'
+              : '❌ CAPTCHA token expired. Waiting for Paint button...',
+            'error'
+          );
+          // automatic refresh sequence
           const mainPaintBtn = await waitForSelector('button.btn.btn-primary.btn-lg, button.btn-primary.sm\\:btn-xl');
           if (mainPaintBtn) mainPaintBtn.click();
           await sleep(500);
@@ -184,16 +182,8 @@
               bubbles: true
             });
             canvas.dispatchEvent(moveEvt);
-            const keyDown = new KeyboardEvent('keydown', {
-              key: ' ',
-              code: 'Space',
-              bubbles: true
-            });
-            const keyUp = new KeyboardEvent('keyup', {
-              key: ' ',
-              code: 'Space',
-              bubbles: true
-            });
+            const keyDown = new KeyboardEvent('keydown', { key: ' ', code: 'Space', bubbles: true });
+            const keyUp = new KeyboardEvent('keyup', { key: ' ', code: 'Space', bubbles: true });
             canvas.dispatchEvent(keyDown);
             canvas.dispatchEvent(keyUp);
           }
@@ -206,21 +196,24 @@
             'button.btn.btn-primary.btn-lg, button.btn.btn-primary.sm\\:btn-xl'
           );
           if (!confirmBtn) {
-            const allPrimary = Array.from(
-              document.querySelectorAll('button.btn-primary')
-            );
+            const allPrimary = Array.from(document.querySelectorAll('button.btn-primary'));
             confirmBtn = allPrimary.length ? allPrimary[allPrimary.length - 1] : null;
           }
           confirmBtn?.click();
         } else {
-          updateUI(
-            state.language === 'pt'
-              ? 'Auto-refresh desativado. Por favor, clique no botão pintura manualmente.'
-              : 'Auto-refresh disabled. Please click the Paint button manually.',
-            'status'
-          );
+          // manual pause, show message only once
+          if (!state.pausedForManual) {
+            updateUI(
+              state.language === 'pt'
+                ? 'Auto-refresh desativado. Por favor, clique no botão pintura manualmente.'
+                : 'Auto-refresh disabled. Please click the Paint button manually.',
+              'status'
+            );
+            state.pausedForManual = true;
+          }
+          state.running = false;
+          return;
         }
-
         await sleep(1000);
         continue;
       }
