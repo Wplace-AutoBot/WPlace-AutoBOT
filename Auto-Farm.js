@@ -27,7 +27,6 @@
   };
 
   const sleep = ms => new Promise(r => setTimeout(r, ms));
-  // Utility to wait for a selector to appear in the DOM
   const waitForSelector = async (selector, interval = 200, timeout = 5000) => {
     const start = Date.now();
     while (Date.now() - start < timeout) {
@@ -40,7 +39,7 @@
 
   const originalFetch = window.fetch;
   let capturedCaptchaToken = null;
-  let stoppedForToken = false; // flag for auto-resume
+  let stoppedForToken = false; 
   window.fetch = async (url, options = {}) => {
     if (typeof url === 'string' && url.includes('https://backend.wplace.live/s0/pixel/')) {
       try {
@@ -48,8 +47,7 @@
         if (payload.t) {
           console.log('✅ CAPTCHA Token Captured:', payload.t);
           capturedCaptchaToken = payload.t;
-          stoppedForToken = false; // Clear stopped flag on new token capture
-          // Auto-resume if stopped due to token expiry
+          stoppedForToken = false;
           if (stoppedForToken) {
             stoppedForToken = false;
             state.running = true;
@@ -59,7 +57,7 @@
             );
             paintLoop();
           }
-          // new token captured
+          
         }
       } catch (e) {
       }
@@ -97,9 +95,9 @@
       });
       if (res.status === 403) {
         console.error('❌ 403 Forbidden. CAPTCHA token might be invalid or expired.');
-        capturedCaptchaToken = null; // Invalidate our stored token.
+        capturedCaptchaToken = null;
         stoppedForToken = true;
-        return 'token_error'; // Return a special status to stop the bot.
+        return 'token_error';
       }
       const data = await res.json();
       return data;
@@ -153,7 +151,6 @@
 
       const randomPos = getRandomPosition();
       const paintResult = await paintPixel(randomPos.x, randomPos.y);
-      // If token expired or invalid, stop the loop
       if (paintResult === 'token_error') {
         updateUI(
           state.language === 'pt'
@@ -161,11 +158,9 @@
             : '❌ CAPTCHA token expired. Waiting for Paint button...',
           'error'
         );
-        // Click the main Paint button to trigger CAPTCHA
         const mainPaintBtn = await waitForSelector('button.btn.btn-primary.btn-lg, button.btn-primary.sm\\:btn-xl');
         if (mainPaintBtn) mainPaintBtn.click();
         await sleep(500);
-        // Click transparent color button
         updateUI(
           state.language === 'pt' ? 'Selecionando transparente...' : 'Selecting transparent...',
           'status'
@@ -173,7 +168,6 @@
         const transBtn = await waitForSelector('button#color-0');
         if (transBtn) transBtn.click();
         await sleep(500);
-        // Click center pixel on canvas
         const canvas = await waitForSelector('canvas');
         if (canvas) {
           const rect = canvas.getBoundingClientRect();
@@ -185,12 +179,10 @@
           canvas.dispatchEvent(evt);
         }
         await sleep(500);
-        // Click confirm Paint button
         updateUI(
           state.language === 'pt' ? 'Confirmando pintura...' : 'Confirming paint...',
           'status'
         );
-        // Try clicking the confirm Paint button inside its container
         const confirmContainer = await waitForSelector('div.absolute.bottom-0.left-1\\/2');
         if (confirmContainer) {
           const confirmBtn = confirmContainer.querySelector('button.btn-primary.btn-lg, button.btn-primary.sm\\:btn-xl');
@@ -493,7 +485,6 @@
         toggleBtn.innerHTML = `<i class="fas fa-play"></i> <span>${t.start}</span>`;
         toggleBtn.classList.add('wplace-btn-primary');
         toggleBtn.classList.remove('wplace-btn-stop');
-        // Clear previous stats and show stopped message
         statsArea.innerHTML = '';
         updateUI(state.language === 'pt' ? '⏹️ Parado' : '⏹️ Stopped', 'default');
       }
