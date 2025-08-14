@@ -5,7 +5,7 @@
     TRANSPARENCY_THRESHOLD: 100,
     WHITE_THRESHOLD: 250,
     LOG_INTERVAL: 10,
-    THEMES: {
+    THEMES: { 
       "Classic Autobot": {
         primary: "#000000",
         secondary: "#111111",
