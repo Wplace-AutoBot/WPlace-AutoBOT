@@ -1328,7 +1328,7 @@
         ${theme.animations.pixelBlink ? "animation: pixelBlink 0.5s infinite;" : ""}
       }
       .status-warning {
-        background: ${CONFIG.currentTheme === "Classic Autobot" ? "rgba(255, 165, 0, 0.1)" : theme.warning};
+        background: ${CONFIG.currentTheme === "Classic Autobot" ? "rgba(255,165,0,0.1)" : theme.warning};
         border-color: ${theme.warning};
         color: ${CONFIG.currentTheme === "Classic Autobot" ? "orange" : theme.primary};
         box-shadow: 0 0 15px ${theme.warning};
@@ -2422,10 +2422,12 @@
           if (pixelBatch.length >= Math.floor(state.currentCharges)) {
             const success = await sendPixelBatch(pixelBatch, regionX, regionY)
 
-            // On CAPTCHA token error: keep auto-refreshing until success or user stops
             if (success === "token_error" && state.autoRefresh) {
               while (!state.stopFlag) {
                 await autoRefresh()
+                const paintBtn = await waitForSelector('button.btn.btn-primary.btn-lg, button.btn-primary.sm\\:btn-xl')
+                paintBtn?.click()
+                await Utils.sleep(500)
                 const retry = await sendPixelBatch(pixelBatch, regionX, regionY)
                 if (retry === true) {
                   success = retry
@@ -2498,15 +2500,12 @@
         }
         state.currentCharges = Math.floor(chargeData.charges);
         state.cooldown = chargeData.cooldown;
-        // 2) Click the Paint button
         updateUI('🍳 Auto-refreshing CAPTCHA…', 'status');
         (await waitForSelector('button.btn.btn-primary.btn-lg, button.btn-primary.sm\\:btn-xl'))?.click();
         await Utils.sleep(500);
-        // 3) Select transparent
         updateUI('Selecting transparent…', 'status');
         (await waitForSelector('button#color-0'))?.click();
         await Utils.sleep(500);
-        // 4) Click center of canvas via spacebar
         const canvas = await waitForSelector('canvas');
         if (canvas) {
           canvas.setAttribute('tabindex','0'); canvas.focus();
@@ -2517,7 +2516,6 @@
           canvas.dispatchEvent(new KeyboardEvent('keyup',{ key:' ', code:'Space', bubbles:true }));
         }
         await Utils.sleep(500);
-        // 5) Confirm paint
         updateUI('Confirming paint…', 'status');
         let btn = await waitForSelector('button.btn.btn-primary.btn-lg, button.btn-primary.sm\\:btn-xl');
         if (!btn) {
