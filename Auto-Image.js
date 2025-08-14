@@ -2423,19 +2423,13 @@
             const success = await sendPixelBatch(pixelBatch, regionX, regionY)
 
             if (success === "token_error" && state.autoRefresh) {
-              while (!state.stopFlag) {
+              while (!capturedCaptchaToken && !state.stopFlag) {
                 await autoRefresh()
                 const paintBtn = await waitForSelector('button.btn.btn-primary.btn-lg, button.btn-primary.sm\\:btn-xl')
                 paintBtn?.click()
                 await Utils.sleep(500)
-                const retry = await sendPixelBatch(pixelBatch, regionX, regionY)
-                if (retry === true) {
-                  success = retry
-                  break
-                }
               }
             }
-            // If still error after retries, stop loop
             if (success === "token_error") {
               state.stopFlag = true
               updateUI("captchaNeeded", "error")
