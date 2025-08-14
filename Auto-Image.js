@@ -100,7 +100,7 @@
   // BILINGUAL TEXT STRINGS
   const TEXT = {
     en: {
-      title: "WPlace Image Botz",
+      title: "WPlace Image Bot",
       initBot: "Initialize Bot",
       uploadImage: "Upload Image",
       resizeImage: "Resize Image",
