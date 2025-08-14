@@ -2,6 +2,7 @@
 <p align="center"><strong>WPlace AutoBOT</strong></p>
 <p align="center">
 Ce projet est un fork de https://github.com/DarkModde/WPlace-AutoBOT
+Join our discord: https://discord.gg/CBB4abRmGM
 </p>
 <p align="center">
   Des scripts pratiques avec des menus intuitifs pour vous faciliter la vie sur <a href="https://wplace.live" target="_blank">WPlace</a> !<br>
