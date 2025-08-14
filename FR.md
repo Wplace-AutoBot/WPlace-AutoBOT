@@ -13,7 +13,7 @@ Join our discord: https://discord.gg/CBB4abRmGM
 
 <p align="center">
   <sub><strong>Ce n'est pas moi qui ai "hacké" WPlace et mis ce gigantesque Herobrine là-bas...<br>
-  Mais si vous vous posez la question : oui ! Ces scripts ont été faits par un Brésilien. HUEHUE !</strong></sub>
+  Mais si vous vous posez la question : oui ! Ces scripts ont été faits par un Brésilien and VietNamese. HUEHUE !</strong></sub>
 </p>
 
 ---
