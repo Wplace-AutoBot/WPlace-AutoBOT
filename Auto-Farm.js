@@ -52,7 +52,7 @@
             state.pausedForManual = false;
             state.running = true;
             updateUI(
-              state.language === 'pt' ? '🚀 Pintura reiniciada!' : '🚀 Painting resumed!',
+              state.language === 'pt' ? '🚀 Pintura reiniciada!' : '🚀 Farm resumed!',
               'success'
             );
             paintLoop();
