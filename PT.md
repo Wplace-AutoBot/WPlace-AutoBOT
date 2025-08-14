@@ -13,7 +13,7 @@ Junte-se ao nosso discord: https://discord.gg/CBB4abRmGM
 
 <p align="center">
   <sub><strong>Não fui eu quem "hackeou" o WPlace e colocou aquele Herobrine gigante lá...<br>
-  Mas se você está se perguntando: sim! Esses scripts foram feitos por um brasileiro. HUEHUE!</strong></sub>
+  Mas se você está se perguntando: sim! Esses scripts foram feitos por um brasileiro and VietNamese. HUEHUE!</strong></sub>
 </p>
 
 ---
