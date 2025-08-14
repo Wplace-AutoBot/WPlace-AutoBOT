@@ -3,6 +3,9 @@
 This project was fork from https://github.com/DarkModde/WPlace-AutoBOT
 </p>
 <p align="center">
+  Consider checking out our discord: https://discord.gg/knkNRYyQcm
+</p>
+<p align="center">
   Practical scripts with intuitive menus to make your life easier on <a href="https://wplace.live" target="_blank">WPlace</a>!<br>
   Perfect for those who want to level up automatically or build massive pixel arts — without wasting time.
   
