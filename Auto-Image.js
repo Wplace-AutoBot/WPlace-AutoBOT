@@ -2422,26 +2422,23 @@
           if (pixelBatch.length >= Math.floor(state.currentCharges)) {
             const success = await sendPixelBatch(pixelBatch, regionX, regionY)
 
-            if (success === "token_error") {
-              if (state.autoRefresh) {
-                // Auto-refresh CAPTCHA and retry batch
+            // On CAPTCHA token error: keep auto-refreshing until success or user stops
+            if (success === "token_error" && state.autoRefresh) {
+              while (!state.stopFlag) {
                 await autoRefresh()
                 const retry = await sendPixelBatch(pixelBatch, regionX, regionY)
-                if (retry !== true) {
-                  state.stopFlag = true
-                  updateUI("captchaNeeded", "error")
-                  Utils.showAlert(Utils.t("captchaNeeded"), "error")
-                  break outerLoop
+                if (retry === true) {
+                  success = retry
+                  break
                 }
-                success = retry
-                } else {
-                  // Pause for manual CAPTCHA
-                  state.stopFlag = true
-                  state.pausedForManual = true
-                  updateUI("captchaNeeded", "error")
-                  Utils.showAlert(Utils.t("captchaNeeded"), "error")
-                  break outerLoop
               }
+            }
+            // If still error after retries, stop loop
+            if (success === "token_error") {
+              state.stopFlag = true
+              updateUI("captchaNeeded", "error")
+              Utils.showAlert(Utils.t("captchaNeeded"), "error")
+              break outerLoop
             }
 
             if (success) {
