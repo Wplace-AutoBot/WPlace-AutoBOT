@@ -221,6 +221,8 @@
     lastPosition: { x: 0, y: 0 },
     estimatedTime: 0,
     language: "en",
+    autoRefresh: true,
+    pausedForManual: false,
   }
 
   // Global variable to store the captured CAPTCHA token.
@@ -228,30 +230,27 @@
 
   // Intercept the original window.fetch function to "listen" for network requests.
   const originalFetch = window.fetch
-  window.fetch = async (url, options) => {
-    // Check if the request is for painting a pixel on wplace.
-    if (typeof url === "string" && url.includes("https://backend.wplace.live/s0/pixel/")) {
+  window.fetch = async (url, options = {}) => {
+    if (typeof url === "string" && url.includes("/s0/pixel/")) {
       try {
-        const payload = JSON.parse(options.body)
-        // If the request body contains the 't' field, it's our CAPTCHA token.
+        const payload = JSON.parse(options.body || '{}')
         if (payload.t) {
           console.log("✅ CAPTCHA Token Captured:", payload.t)
-          // Store the token for our bot to use.
           capturedCaptchaToken = payload.t
-
-          // Notify the user that the token is captured and they can start the bot.
+          if (state.pausedForManual) {
+            state.pausedForManual = false
+            state.running = true
+            updateUI("paintingProgress", "success", { painted: state.paintedPixels, total: state.totalPixels })
+            Utils.showAlert("🚀 Painting resumed!", "success")
+            startPainting()
+          }
           if (document.querySelector("#statusText")?.textContent.includes("CAPTCHA")) {
             Utils.showAlert("Token captured successfully! You can start the bot now.", "success")
-            updateUI("colorsFound", "success", {
-              count: state.availableColors.length,
-            })
+            updateUI("colorsFound", "success", { count: state.availableColors.length })
           }
         }
-      } catch (e) {
-        /* Ignore errors if the request body isn't valid JSON */
-      }
+      } catch {}
     }
-    // Finally, execute the original request, whether we inspected it or not.
     return originalFetch(url, options)
   }
 
@@ -2424,10 +2423,25 @@
             const success = await sendPixelBatch(pixelBatch, regionX, regionY)
 
             if (success === "token_error") {
-              state.stopFlag = true
-              updateUI("captchaNeeded", "error")
-              Utils.showAlert(Utils.t("captchaNeeded"), "error")
-              break outerLoop
+              if (state.autoRefresh) {
+                // Auto-refresh CAPTCHA and retry batch
+                await autoRefresh()
+                const retry = await sendPixelBatch(pixelBatch, regionX, regionY)
+                if (retry !== true) {
+                  state.stopFlag = true
+                  updateUI("captchaNeeded", "error")
+                  Utils.showAlert(Utils.t("captchaNeeded"), "error")
+                  break outerLoop
+                }
+                success = retry
+                } else {
+                  // Pause for manual CAPTCHA
+                  state.stopFlag = true
+                  state.pausedForManual = true
+                  updateUI("captchaNeeded", "error")
+                  Utils.showAlert(Utils.t("captchaNeeded"), "error")
+                  break outerLoop
+              }
             }
 
             if (success) {
@@ -2463,6 +2477,56 @@
             }
           }
         }
+      }
+      // Utility to wait for DOM selector
+      async function waitForSelector(selector, timeout = 10000) {
+        const start = Date.now();
+        while (Date.now() - start < timeout) {
+          const el = document.querySelector(selector);
+          if (el) return el;
+          await Utils.sleep(500);
+        }
+        return null;
+      }
+      // Auto-refresh CAPTCHA workflow
+      async function autoRefresh() {
+        // 1) Ensure at least 2 charges before proceeding
+        let chargeData = await WPlaceService.getCharges();
+        if (chargeData.charges < 2) {
+          updateUI('Waiting for at least 2 charges for auto-refresh...', 'status');
+          while ((chargeData = await WPlaceService.getCharges()).charges < 2) {
+            await Utils.sleep(60000);
+            updateStats();
+          }
+        }
+        state.currentCharges = Math.floor(chargeData.charges);
+        state.cooldown = chargeData.cooldown;
+        // 2) Click the Paint button
+        updateUI('🍳 Auto-refreshing CAPTCHA…', 'status');
+        (await waitForSelector('button.btn.btn-primary.btn-lg, button.btn-primary.sm\\:btn-xl'))?.click();
+        await Utils.sleep(500);
+        // 3) Select transparent
+        updateUI('Selecting transparent…', 'status');
+        (await waitForSelector('button#color-0'))?.click();
+        await Utils.sleep(500);
+        // 4) Click center of canvas via spacebar
+        const canvas = await waitForSelector('canvas');
+        if (canvas) {
+          canvas.setAttribute('tabindex','0'); canvas.focus();
+          const { left, top, width, height } = canvas.getBoundingClientRect();
+          const x = Math.round(left + width/2), y = Math.round(top + height/2);
+          canvas.dispatchEvent(new MouseEvent('mousemove',{ clientX:x, clientY:y, bubbles:true }));
+          canvas.dispatchEvent(new KeyboardEvent('keydown',{ key:' ', code:'Space', bubbles:true }));
+          canvas.dispatchEvent(new KeyboardEvent('keyup',{ key:' ', code:'Space', bubbles:true }));
+        }
+        await Utils.sleep(500);
+        // 5) Confirm paint
+        updateUI('Confirming paint…', 'status');
+        let btn = await waitForSelector('button.btn.btn-primary.btn-lg, button.btn-primary.sm\\:btn-xl');
+        if (!btn) {
+          const all = [...document.querySelectorAll('button.btn-primary')]; btn = all.pop();
+        }
+        btn?.click();
       }
 
       if (pixelBatch.length > 0 && !state.stopFlag) {
