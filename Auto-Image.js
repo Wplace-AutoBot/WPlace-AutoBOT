@@ -5,12 +5,12 @@
     TRANSPARENCY_THRESHOLD: 100,
     WHITE_THRESHOLD: 250,
     LOG_INTERVAL: 10,
-    PAINTING_SPEED: {
+  PAINTING_SPEED: {
       MIN: 1,          // Minimum 1 pixel per second
       MAX: 1000,       // Maximum 1000 pixels per second
       DEFAULT: 5,      // Default 5 pixels per second
-    },
-    SKIP_CORRECT_PIXELS: true,  // Skip pixels that already have correct color
+  },
+    PAINTING_SPEED_ENABLED: false,
     // Optimized CSS Classes for reuse
     CSS_CLASSES: {
       BUTTON_PRIMARY: `
@@ -133,17 +133,6 @@
     }
   }
 
-  const loadSkipPixelsPreference = () => {
-    try {
-      const saved = localStorage.getItem("wplace_skip_correct_pixels")
-      if (saved !== null) {
-        CONFIG.SKIP_CORRECT_PIXELS = saved === 'true'
-      }
-    } catch (e) {
-      console.warn("Could not load skip correct pixels preference:", e)
-    }
-  }
-
   // BILINGUAL TEXT STRINGS
   const TEXT = {
     en: {
@@ -173,14 +162,13 @@
     missingRequirements: "❌ Load an image and select a position first",
     progress: "Progress",
     pixels: "Pixels",
-    painted: "Painted",
     charges: "Charges",
     estimatedTime: "Estimated time",
     initMessage: "Click 'Start Auto-BOT' to begin",
     waitingInit: "Waiting for initialization...",
     resizeSuccess: "✅ Image resized to {width}x{height}",
     paintingPaused: "⏸️ Painting paused at position X: {x}, Y: {y}",
-    captchaNeeded: "❗ CAPTCHA token needed. Paint one pixel manually to continue,Then Open color palette again before start painting!.",
+    captchaNeeded: "❗ CAPTCHA token needed. Paint one pixel manually to continue.",
     saveData: "Save Progress",
     loadData: "Load Progress",
     saveToFile: "Save to File",
@@ -197,7 +185,6 @@
     fileError: "❌ Error processing file",
     invalidFileFormat: "❌ Invalid file format",
     paintingSpeed: "Painting Speed",
-    enableSpeedControl: "Enable Speed Control",
     pixelsPerSecond: "pixels/second",
     speedSetting: "Speed: {speed} pixels/sec",
     settings: "Settings",
@@ -206,11 +193,7 @@
     language: "Language",
     themeSettings: "Theme Settings",
     themeSettingsDesc: "Choose your preferred color theme for the interface.",
-    languageSelectDesc: "Select your preferred language. Changes will take effect immediately.",
-    skipCorrectPixels: "Skip Correct Pixels",
-    skipCorrectPixelsDesc: "Skip pixels that already have the correct color and count them as painted. Note: May not work due to canvas security restrictions.",
-    pixelsSkipped: "Pixels skipped: {count}",
-    speedSettingDesc: "Adjust the painting speed from {min} to {max} pixels per second. Higher speeds may result in longer update times on the WPlace server."
+    languageSelectDesc: "Select your preferred language. Changes will take effect immediately.",  
   },
   pt: {
     title: "WPlace Auto-Image",
@@ -239,7 +222,6 @@
     missingRequirements: "❌ Carregue uma imagem e selecione uma posição primeiro",
     progress: "Progresso",
     pixels: "Pixels",
-    painted: "Pintados",
     charges: "Cargas",
     estimatedTime: "Tempo estimado",
     initMessage: "Clique em 'Iniciar Auto-BOT' para começar",
@@ -263,7 +245,6 @@
     fileError: "❌ Erro ao processar arquivo",
     invalidFileFormat: "❌ Formato de arquivo inválido",
     paintingSpeed: "Velocidade de Pintura",
-    enableSpeedControl: "Ativar Controle de Velocidade",
     pixelsPerSecond: "pixels/segundo",
     speedSetting: "Velocidade: {speed} pixels/seg",
     settings: "Configurações",
@@ -272,11 +253,7 @@
     language: "Idioma",
     themeSettings: "Configurações de Tema",
     themeSettingsDesc: "Escolha seu tema de cores preferido para a interface.",
-    languageSelectDesc: "Selecione seu idioma preferido. As alterações terão efeito imediatamente.",
-    skipCorrectPixels: "Pular Pixels Corretos",
-    skipCorrectPixelsDesc: "Pular pixels que já têm a cor correta e contá-los como pintados. Nota: Pode não funcionar devido a restrições de segurança do canvas.",
-    pixelsSkipped: "Pixels pulados: {count}",
-    speedSettingDesc: "Ajuste a velocidade de pintura de {min} a {max} pixels por segundo. Velocidades mais altas podem resultar em tempos de atualização mais longos no servidor WPlace."
+    languageSelectDesc: "Selecione seu idioma preferido. As alterações terão efeito imediatamente.",  
   },
   vi: {
     title: "WPlace Auto-Image",
@@ -305,7 +282,6 @@
     missingRequirements: "❌ Hãy tải lên hình ảnh và chọn vị trí trước",
     progress: "Tiến trình",
     pixels: "Pixel",
-    painted: "Đã vẽ",
     charges: "Điện tích",
     estimatedTime: "Thời gian ước tính",
     initMessage: "Nhấp 'Khởi động Auto-BOT' để bắt đầu",
@@ -329,7 +305,6 @@
     fileError: "❌ Lỗi khi xử lý tệp",
     invalidFileFormat: "❌ Định dạng tệp không hợp lệ",
     paintingSpeed: "Tốc độ vẽ",
-    enableSpeedControl: "Bật điều khiển tốc độ",
     pixelsPerSecond: "pixel/giây",
     speedSetting: "Tốc độ: {speed} pixel/giây",
     settings: "Cài đặt",
@@ -339,10 +314,6 @@
     themeSettings: "Cài đặt Giao diện",
     themeSettingsDesc: "Chọn chủ đề màu sắc yêu thích cho giao diện.",
     languageSelectDesc: "Chọn ngôn ngữ ưa thích. Thay đổi sẽ có hiệu lực ngay lập tức.",
-    skipCorrectPixels: "Bỏ qua Pixel đúng màu",
-    skipCorrectPixelsDesc: "Bỏ qua các pixel đã có màu đúng và tính chúng là đã vẽ. Lưu ý: Có thể không hoạt động do hạn chế bảo mật canvas.",
-    pixelsSkipped: "Pixel đã bỏ qua: {count}",
-    speedSettingDesc: "Điều chỉnh tốc độ vẽ từ {min} đến {max} pixel mỗi giây. Tốc độ cao có thể làm trong wplace server update mất thời gian hơn."
     },
   fr: {
     title: "WPlace Auto-Image",
@@ -371,7 +342,6 @@
     missingRequirements: "❌ Veuillez charger une image et sélectionner une position d'abord",
     progress: "Progrès",
     pixels: "Pixels",
-    painted: "Peints",
     charges: "Charges",
     estimatedTime: "Temps estimé",
     initMessage: "Cliquez sur 'Démarrer Auto-BOT' pour commencer",
@@ -395,7 +365,6 @@
     fileError: "❌ Erreur lors du traitement du fichier",
     invalidFileFormat: "❌ Format de fichier invalide",
     paintingSpeed: "Vitesse de peinture",
-    enableSpeedControl: "Activer le contrôle de vitesse",
     pixelsPerSecond: "pixels/seconde",
     speedSetting: "Vitesse: {speed} pixels/sec",
     settings: "Paramètres",
@@ -405,10 +374,6 @@
     themeSettings: "Paramètres de Thème",
     themeSettingsDesc: "Choisissez votre thème de couleurs préféré pour l'interface.",
     languageSelectDesc: "Sélectionnez votre langue préférée. Les changements prendront effet immédiatement.",
-    skipCorrectPixels: "Ignorer les Pixels Corrects",
-    skipCorrectPixelsDesc: "Ignorer les pixels qui ont déjà la bonne couleur et les compter comme peints. Note: Peut ne pas fonctionner en raison de restrictions de sécurité du canvas.",
-    pixelsSkipped: "Pixels ignorés: {count}",
-    speedSettingDesc: "Ajustez la vitesse de peinture de {min} à {max} pixels par seconde. Des vitesses plus élevées peuvent entraîner des temps de mise à jour plus longs sur le serveur WPlace."
     },
   }
 
@@ -419,7 +384,6 @@
     processing: false,
     totalPixels: 0,
     paintedPixels: 0,
-    skippedPixels: 0,  // Track skipped pixels
     availableColors: [],
     currentCharges: 0,
     cooldown: CONFIG.COOLDOWN_DEFAULT,
@@ -436,35 +400,44 @@
     paintingSpeed: CONFIG.PAINTING_SPEED.DEFAULT, // pixels per second
   }
 
-  // Global variable to store the captured CAPTCHA token.
-  let capturedCaptchaToken = null
+  // Turnstile token handling (promise-based) inspired by external logic
+  let turnstileToken = null
+  let _resolveToken = null
+  let tokenPromise = new Promise((resolve) => { _resolveToken = resolve })
 
-  // Intercept the original window.fetch function to "listen" for network requests.
+  function setTurnstileToken(t) {
+    if (_resolveToken) {
+      _resolveToken(t)
+      _resolveToken = null
+    }
+    turnstileToken = t
+  }
+
+  async function ensureToken() {
+    if (!turnstileToken) {
+      updateUI("captchaNeeded", "error")
+      Utils.showAlert(Utils.t("captchaNeeded"), "error")
+      try { await tokenPromise } catch (_) {}
+    }
+    return turnstileToken
+  }
+
+  // Intercept fetch to capture Turnstile token from pixel placement requests
   const originalFetch = window.fetch
   window.fetch = async (url, options) => {
-    // Check if the request is for painting a pixel on wplace.
     if (typeof url === "string" && url.includes("https://backend.wplace.live/s0/pixel/")) {
       try {
         const payload = JSON.parse(options.body)
-        // If the request body contains the 't' field, it's our CAPTCHA token.
         if (payload.t) {
-          console.log("✅ CAPTCHA Token Captured:", payload.t)
-          // Store the token for our bot to use.
-          capturedCaptchaToken = payload.t
-
-          // Notify the user that the token is captured and they can start the bot.
+          console.log("✅ Turnstile Token Captured:", payload.t)
+          setTurnstileToken(payload.t)
           if (document.querySelector("#statusText")?.textContent.includes("CAPTCHA")) {
-            Utils.showAlert("Token captured successfully! Make sure you open the COLOR PALETTE FIRST before start painting.", "success")
-            updateUI("colorsFound", "success", {
-              count: state.availableColors.length,
-            })
+            Utils.showAlert("Token captured successfully! You can start the bot now.", "success")
+            updateUI("colorsFound", "success", { count: state.availableColors.length })
           }
         }
-      } catch (e) {
-        /* Ignore errors if the request body isn't valid JSON */
-      }
+      } catch (_) { /* ignore */ }
     }
-    // Finally, execute the original request, whether we inspected it or not.
     return originalFetch(url, options)
   }
 
@@ -587,154 +560,6 @@
     },
 
     colorDistance: (a, b) => Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2) + Math.pow(a[2] - b[2], 2)),
-
-    // Debug function to test canvas access
-    testCanvasAccess: () => {
-      console.log("=== Canvas Access Debug ===")
-      
-      const canvases = document.querySelectorAll('canvas')
-      console.log(`Found ${canvases.length} canvas elements`)
-      
-      canvases.forEach((canvas, index) => {
-        console.log(`Canvas ${index}:`, {
-          width: canvas.width,
-          height: canvas.height,
-          id: canvas.id,
-          className: canvas.className,
-          style: canvas.style.cssText
-        })
-        
-        try {
-          const ctx = canvas.getContext('2d')
-          if (ctx) {
-            // Try to read a pixel from center
-            const x = Math.floor(canvas.width / 2)
-            const y = Math.floor(canvas.height / 2)
-            const imageData = ctx.getImageData(x, y, 1, 1)
-            const data = imageData.data
-            console.log(`  Pixel at (${x},${y}): RGB(${data[0]}, ${data[1]}, ${data[2]})`)
-          }
-        } catch (error) {
-          console.log(`  Error reading canvas ${index}:`, error.message)
-        }
-      })
-      
-      console.log("=== End Debug ===")
-    },
-
-    // Simplified canvas pixel reading for WPlace
-    getWPlacePixelColor: (x, y) => {
-      try {
-        console.log(`Attempting to read pixel at (${x},${y})...`)
-        
-        // Find the main WPlace canvas - try different approaches
-        let canvas = null
-        
-        // Method 1: Look for canvas in main container
-        const containers = ['#app', '[data-testid="canvas-container"]', '.canvas-container', 'main', 'body']
-        for (const selector of containers) {
-          const container = document.querySelector(selector)
-          if (container) {
-            const foundCanvas = container.querySelector('canvas')
-            if (foundCanvas && foundCanvas.width > 100 && foundCanvas.height > 100) {
-              canvas = foundCanvas
-              console.log(`Found canvas via container ${selector}: ${canvas.width}x${canvas.height}`)
-              break
-            }
-          }
-        }
-        
-        // Method 2: Direct canvas selectors
-        if (!canvas) {
-          const selectors = [
-            'canvas[width][height]',
-            'canvas.pixelcanvas', 
-            'canvas.canvas',
-            'canvas[data-testid="canvas"]',
-            'canvas'
-          ]
-          
-          for (const selector of selectors) {
-            const canvases = document.querySelectorAll(selector)
-            for (const c of canvases) {
-              // Check if canvas has reasonable dimensions and is visible
-              if (c.width > 100 && c.height > 100 && 
-                  c.offsetWidth > 0 && c.offsetHeight > 0) {
-                canvas = c
-                console.log(`Found canvas via selector ${selector}: ${canvas.width}x${canvas.height}`)
-                break
-              }
-            }
-            if (canvas) break
-          }
-        }
-        
-        // Method 3: Find the largest canvas
-        if (!canvas) {
-          const allCanvases = document.querySelectorAll('canvas')
-          let largest = null
-          let maxSize = 0
-          
-          for (const c of allCanvases) {
-            const size = c.width * c.height
-            if (size > maxSize && c.offsetWidth > 0 && c.offsetHeight > 0) {
-              maxSize = size
-              largest = c
-            }
-          }
-          
-          if (largest) {
-            canvas = largest
-            console.log(`Found largest canvas: ${canvas.width}x${canvas.height}`)
-          }
-        }
-        
-        if (!canvas) {
-          console.warn("No suitable canvas found")
-          return null
-        }
-        
-        // Check if coordinates are within canvas bounds
-        if (x < 0 || y < 0 || x >= canvas.width || y >= canvas.height) {
-          console.warn(`Coordinates (${x},${y}) outside canvas bounds ${canvas.width}x${canvas.height}`)
-          return null
-        }
-        
-        const ctx = canvas.getContext('2d')
-        if (!ctx) {
-          console.warn("Could not get canvas context")
-          return null
-        }
-        
-        // Get pixel data
-        const imageData = ctx.getImageData(x, y, 1, 1)
-        const data = imageData.data
-        
-        const color = [data[0], data[1], data[2]]
-        console.log(`Successfully read pixel at (${x},${y}): RGB(${color.join(',')})`)
-        return color
-        
-      } catch (error) {
-        console.warn(`Failed to read pixel at (${x},${y}):`, error.message)
-        return null
-      }
-    },
-
-    // Check if current pixel matches target color
-    pixelMatches: (currentColor, targetColor, tolerance = 10) => {
-      if (!currentColor || !targetColor) return false
-      
-      const [cr, cg, cb] = currentColor
-      const [tr, tg, tb] = targetColor
-      
-      const distance = Math.sqrt(
-        Math.pow(cr - tr, 2) + 
-        Math.pow(cg - tg, 2) + 
-        Math.pow(cb - tb, 2)
-      )
-      
-      return distance <= tolerance
-    },
 
     isWhitePixel: (r, g, b) =>
       r >= CONFIG.WHITE_THRESHOLD && g >= CONFIG.WHITE_THRESHOLD && b >= CONFIG.WHITE_THRESHOLD,
@@ -1040,26 +865,21 @@
   const WPlaceService = {
     async paintPixelInRegion(regionX, regionY, pixelX, pixelY, color) {
       try {
-        // Construct the payload including the captured 't' token.
-        const payload = {
-          coords: [pixelX, pixelY],
-          colors: [color],
-          t: capturedCaptchaToken,
-        }
+        await ensureToken()
+        if (!turnstileToken) return "token_error"
+        const payload = { coords: [pixelX, pixelY], colors: [color], t: turnstileToken }
         const res = await fetch(`https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`, {
           method: "POST",
           headers: { "Content-Type": "text/plain;charset=UTF-8" },
           credentials: "include",
           body: JSON.stringify(payload),
         })
-
-        // If we get a 403 Forbidden error, our token is likely expired.
         if (res.status === 403) {
-          console.error("❌ 403 Forbidden. CAPTCHA token might be invalid or expired.")
-          capturedCaptchaToken = null // Invalidate our stored token.
-          return "token_error" // Return a special status to stop the bot.
+          console.error("❌ 403 Forbidden. Turnstile token might be invalid or expired.")
+          turnstileToken = null
+          tokenPromise = new Promise((resolve) => { _resolveToken = resolve })
+          return "token_error"
         }
-
         const data = await res.json()
         return data?.painted === 1
       } catch (e) {
@@ -1151,7 +971,6 @@
 
     loadThemePreference()
     loadLanguagePreference()
-    loadSkipPixelsPreference()
 
     const theme = getCurrentTheme()
 
@@ -1239,8 +1058,6 @@
         color: ${theme.text};
         animation: slideIn 0.4s ease-out;
         overflow: hidden;
-        display: flex;
-        flex-direction: column;
         ${theme.backdropFilter ? `backdrop-filter: ${theme.backdropFilter};` : ""}
         transition: all 0.3s ease;
         user-select: none;
@@ -1294,12 +1111,6 @@
         box-shadow: 0 12px 40px rgba(0,0,0,0.8), 0 0 0 2px rgba(255,255,255,0.2);
         transform: scale(1.02);
         z-index: 9999;
-      }
-      #wplace-stats-container.wplace-dragging {
-        transition: none !important;
-      }
-      #wplace-settings-container.wplace-dragging {
-        transition: none !important;
       }
       #wplace-image-bot-container.wplace-minimized {
         width: 200px;
@@ -1399,8 +1210,6 @@
         display: block;
         position: relative;
         z-index: 2;
-        overflow-y: auto;
-        flex-grow: 1;
       }
       .wplace-content.wplace-hidden {
         display: none;
@@ -2337,9 +2146,8 @@
       padding: 0;
       z-index: 10002;
       display: none;
-      width: 720px;
-      max-width: 90vw;
-      max-height: 85vh;
+      min-width: 380px;
+      max-width: 420px;
       color: white;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1);
@@ -2373,224 +2181,206 @@
         </div>
       </div>
       
-      <div style="padding: 20px; overflow-y: auto; max-height: calc(85vh - 80px);">
-        <!-- Grid Layout for Settings -->
-        <div class="grid-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
-          
-          <!-- Left Column -->
-          <div>
-            <!-- Speed Control Section -->
-            <div style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 8px; color: white; font-weight: 500; font-size: 14px; display: flex; align-items: center; gap: 6px;">
-                <i class="fas fa-tachometer-alt" style="color: #4facfe; font-size: 14px;"></i>
-                ${Utils.t("paintingSpeed")}
-              </label>
-              <div style="background: rgba(255,255,255,0.1); border-radius: 10px; padding: 12px; border: 1px solid rgba(255,255,255,0.1);">
-                <!-- Enable/Disable Toggle -->
-                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                  <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none;">
-                    <input type="checkbox" id="enableSpeedToggle" ${CONFIG.PAINTING_SPEED_ENABLED ? 'checked' : ''} style="
-                      width: 16px; 
-                      height: 16px; 
-                      accent-color: #4facfe;
-                      cursor: pointer;
-                    ">
-                    <span style="color: white; font-size: 13px; font-weight: 500;">
-                      ${Utils.t("enableSpeedControl")}
-                    </span>
-                  </label>
-                </div>
-                
-                <!-- Speed Slider -->
-                <div id="speedControls" style="opacity: ${CONFIG.PAINTING_SPEED_ENABLED ? '1' : '0.5'}; pointer-events: ${CONFIG.PAINTING_SPEED_ENABLED ? 'auto' : 'none'}; transition: all 0.3s ease;">
-                  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-                    <input type="range" id="speedSlider" min="${CONFIG.PAINTING_SPEED.MIN}" max="${CONFIG.PAINTING_SPEED.MAX}" value="${CONFIG.PAINTING_SPEED.DEFAULT}" 
-                      style="flex: 1; height: 4px; background: rgba(255,255,255,0.2); outline: none; border-radius: 2px; accent-color: #4facfe;">
-                    <span id="speedValue" style="color: #4facfe; font-weight: 600; min-width: 40px; text-align: right; font-size: 14px;">${CONFIG.PAINTING_SPEED.DEFAULT}</span>
-                  </div>
-                </div>
-                
-                <div style="color: rgba(255,255,255,0.7); font-size: 11px; line-height: 1.3;">
-                  ${Utils.t("speedSettingDesc", {min: CONFIG.PAINTING_SPEED.MIN, max: CONFIG.PAINTING_SPEED.MAX})}
-                </div>
-              </div>
-            </div>
-
-            <!-- Language Section -->
-            <div style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 8px; color: white; font-weight: 500; font-size: 14px; display: flex; align-items: center; gap: 6px;">
-                <i class="fas fa-globe" style="color: #00cec9; font-size: 14px;"></i>
-                ${Utils.t("language")}
-              </label>
-              <div style="background: rgba(255,255,255,0.1); border-radius: 10px; padding: 12px; border: 1px solid rgba(255,255,255,0.1);">
-                <select id="languageSelect" style="
-                  width: 100%;
-                  padding: 8px 12px;
-                  border: 1px solid rgba(255,255,255,0.2);
-                  border-radius: 8px;
-                  background: rgba(255,255,255,0.1);
-                  color: white;
-                  font-size: 13px;
-                  font-family: inherit;
-                  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      <div style="padding: 25px;">
+        <!-- Speed Control Section -->
+        <div style="margin-bottom: 25px;">
+          <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-tachometer-alt" style="color: #4facfe; font-size: 16px;"></i>
+            ${Utils.t("paintingSpeed")}
+          </label>
+          <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1);">
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+              <input type="range" id="speedSlider" min="${CONFIG.PAINTING_SPEED.MIN}" max="${CONFIG.PAINTING_SPEED.MAX}" value="${CONFIG.PAINTING_SPEED.DEFAULT}" 
+                style="
+                  flex: 1; 
+                  height: 8px;
+                  background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+                  border-radius: 4px;
+                  outline: none;
+                  -webkit-appearance: none;
+                  cursor: pointer;
                 ">
-                  <option value="en" ${state.language === 'en' ? 'selected' : ''} style="background: #2d3748; color: white;">🇺🇸 English</option>
-                  <option value="vi" ${state.language === 'vi' ? 'selected' : ''} style="background: #2d3748; color: white;">🇻🇳 Tiếng Việt</option>
-                  <option value="pt" ${state.language === 'pt' ? 'selected' : ''} style="background: #2d3748; color: white;">🇧🇷 Português</option>
-                  <option value="fr" ${state.language === 'fr' ? 'selected' : ''} style="background: #2d3748; color: white;">🇫🇷 Français</option>
-                </select>
-                <div style="color: rgba(255,255,255,0.7); font-size: 11px; line-height: 1.3; margin-top: 6px;">
-                  ${Utils.t("languageSelectDesc")}
-                </div>
-              </div>
+              <div id="speedValue" style="
+                min-width: 70px; 
+                text-align: center; 
+                background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); 
+                padding: 8px 12px; 
+                border-radius: 8px; 
+                color: white;
+                font-weight: bold;
+                font-size: 13px;
+                box-shadow: 0 3px 10px rgba(79, 172, 254, 0.3);
+                border: 1px solid rgba(255,255,255,0.2);
+              ">${CONFIG.PAINTING_SPEED.DEFAULT} px/s</div>
             </div>
-          </div>
-
-          <!-- Right Column -->
-          <div>
-            <!-- Theme Settings Section -->
-            <div style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 8px; color: white; font-weight: 500; font-size: 14px; display: flex; align-items: center; gap: 6px;">
-                <i class="fas fa-palette" style="color: #a29bfe; font-size: 14px;"></i>
-                ${Utils.t("themeSettings")}
-              </label>
-              <div style="background: rgba(255,255,255,0.1); border-radius: 10px; padding: 12px; border: 1px solid rgba(255,255,255,0.1);">
-                <select id="themeSelect" style="
-                  width: 100%;
-                  padding: 8px 12px;
-                  border: 1px solid rgba(255,255,255,0.2);
-                  border-radius: 8px;
-                  background: rgba(255,255,255,0.1);
-                  color: white;
-                  font-size: 13px;
-                  font-family: inherit;
-                  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-                ">
-                  ${Object.keys(CONFIG.THEMES).map(themeName => 
-                    `<option value="${themeName}" ${CONFIG.currentTheme === themeName ? 'selected' : ''} style="background: #2d3748; color: white;">${themeName}</option>`
-                  ).join('')}
-                </select>
-                <div style="color: rgba(255,255,255,0.7); font-size: 11px; line-height: 1.3; margin-top: 6px;">
-                  ${Utils.t("themeSettingsDesc")}
-                </div>
-              </div>
-            </div>
-
-            <!-- Skip Correct Pixels Section -->
-            <div style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 8px; color: white; font-weight: 500; font-size: 14px; display: flex; align-items: center; gap: 6px;">
-                <i class="fas fa-eye-slash" style="color: #fd79a8; font-size: 14px;"></i>
-                ${Utils.t("skipCorrectPixels")}
-              </label>
-              <div style="background: rgba(255,255,255,0.1); border-radius: 10px; padding: 12px; border: 1px solid rgba(255,255,255,0.1);">
-                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-                  <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; flex: 1;">
-                    <input type="checkbox" id="skipCorrectPixelsToggle" ${CONFIG.SKIP_CORRECT_PIXELS ? 'checked' : ''} style="
-                      width: 16px; 
-                      height: 16px; 
-                      accent-color: #fd79a8;
-                      cursor: pointer;
-                    ">
-                    <span style="color: white; font-size: 13px; font-weight: 500;">
-                      ${Utils.t("skipCorrectPixels")}
-                    </span>
-                  </label>
-                  <button id="testCanvasBtn" style="
-                    padding: 4px 8px;
-                    background: linear-gradient(45deg, #fd79a8, #fdcb6e);
-                    border: none;
-                    border-radius: 6px;
-                    color: white;
-                    font-size: 10px;
-                    cursor: pointer;
-                    font-weight: 500;
-                  ">Test</button>
-                </div>
-                <div style="color: rgba(255,255,255,0.7); font-size: 11px; line-height: 1.3;">
-                  ${Utils.t("skipCorrectPixelsDesc")}
-                </div>
-              </div>
+            <div style="display: flex; justify-content: space-between; color: rgba(255,255,255,0.7); font-size: 11px; margin-top: 8px;">
+              <span><i class="fas fa-turtle"></i> ${CONFIG.PAINTING_SPEED.MIN}</span>
+              <span><i class="fas fa-rabbit"></i> ${CONFIG.PAINTING_SPEED.MAX}</span>
             </div>
           </div>
         </div>
+        
+        <!-- Painting Speed Enable Toggle -->
+        <div style="margin-bottom: 25px;">
+          <label style="display: flex; align-items: center; gap: 8px; color: white;">
+            <input type="checkbox" id="enableSpeedToggle" ${CONFIG.PAINTING_SPEED_ENABLED ? 'checked' : ''} style="cursor: pointer;"/>
+            <span>Enable painting speed</span>
+          </label>
+        </div>
+        
+        <!-- Theme Selection Section -->
+        <div style="margin-bottom: 25px;">
+          <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-palette" style="color: #f093fb; font-size: 16px;"></i>
+            ${Utils.t("themeSettings")}
+          </label>
+          <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1);">
+            <select id="themeSelect" style="
+              width: 100%; 
+              padding: 12px 16px; 
+              background: rgba(255,255,255,0.15); 
+              color: white; 
+              border: 1px solid rgba(255,255,255,0.2); 
+              border-radius: 8px;
+              font-size: 14px;
+              outline: none;
+              cursor: pointer;
+              transition: all 0.3s ease;
+              font-family: inherit;
+              box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            ">
+              ${Object.keys(CONFIG.THEMES).map(themeName => 
+                `<option value="${themeName}" ${CONFIG.currentTheme === themeName ? 'selected' : ''} style="background: #2d3748; color: white; padding: 10px;">${themeName}</option>`
+              ).join('')}
+            </select>
+          </div>
+        </div>
+        
+        <!-- Language Selection Section -->
+        <div style="margin-bottom: 15px;">
+          <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-globe" style="color: #ffeaa7; font-size: 16px;"></i>
+            ${Utils.t("language")}
+          </label>
+          <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1);">
+            <select id="languageSelect" style="
+              width: 100%; 
+              padding: 12px 16px; 
+              background: rgba(255,255,255,0.15); 
+              color: white; 
+              border: 1px solid rgba(255,255,255,0.2); 
+              border-radius: 8px;
+              font-size: 14px;
+              outline: none;
+              cursor: pointer;
+              transition: all 0.3s ease;
+              font-family: inherit;
+              box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            ">
+              <option value="vi" ${state.language === 'vi' ? 'selected' : ''} style="background: #2d3748; color: white;">🇻🇳 Tiếng Việt</option>
+              <option value="en" ${state.language === 'en' ? 'selected' : ''} style="background: #2d3748; color: white;">🇺🇸 English</option>
+              <option value="pt" ${state.language === 'pt' ? 'selected' : ''} style="background: #2d3748; color: white;">🇧🇷 Português</option>
+              <option value="fr" ${state.language === 'fr' ? 'selected' : ''} style="background: #2d3748; color: white;">🇫🇷 Français</option>
+            </select>
+          </div>
+        </div>
       </div>
-    `
-
-    // Add responsive CSS styles for settings
-    const settingsStyles = document.createElement('style')
-    settingsStyles.textContent = `
-      @keyframes settingsSlideIn {
-        from { 
-          opacity: 0; 
-          transform: translate(-50%, -50%) scale(0.9);
-        }
-        to { 
-          opacity: 1; 
-          transform: translate(-50%, -50%) scale(1);
-        }
-      }
       
-      @keyframes settingsFadeOut {
-        from { 
-          opacity: 1; 
-          transform: translate(-50%, -50%) scale(1);
-        }
-        to { 
-          opacity: 0; 
-          transform: translate(-50%, -50%) scale(0.9);
-        }
-      }
-
-      /* Responsive settings */
-      @media (max-width: 768px) {
-        #wplace-settings-container {
-          width: 95vw !important;
-          max-width: none !important;
+      <style>
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
         }
         
-        #wplace-settings-container .grid-container {
-          grid-template-columns: 1fr !important;
-          gap: 15px !important;
+        @keyframes settingsSlideIn {
+          from { 
+            opacity: 0; 
+            transform: translate(-50%, -50%) scale(0.9);
+          }
+          to { 
+            opacity: 1; 
+            transform: translate(-50%, -50%) scale(1);
+          }
         }
-      }
-
-      /* Settings hover effects */
-      #wplace-settings-container input[type="range"]::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        width: 16px;
-        height: 16px;
-        border-radius: 50%;
-        background: white;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.3), 0 0 0 2px #4facfe;
-        cursor: pointer;
-        transition: all 0.2s ease;
-      }
-      
-      #wplace-settings-container input[type="range"]::-webkit-slider-thumb:hover {
-        transform: scale(1.1);
-        box-shadow: 0 3px 6px rgba(0,0,0,0.4), 0 0 0 3px #4facfe;
-      }
-
-      #wplace-settings-container select:hover {
-        border-color: rgba(255,255,255,0.4);
-        background: rgba(255,255,255,0.2);
-        transform: translateY(-1px);
-        box-shadow: 0 3px 8px rgba(0,0,0,0.15);
-      }
-
-      #wplace-settings-container select:focus {
-        border-color: #4facfe;
-        box-shadow: 0 0 0 2px rgba(79, 172, 254, 0.3);
-        outline: none;
-      }
-
-      .wplace-settings-header:hover {
-        background: rgba(255,255,255,0.15) !important;
-      }
+        
+        @keyframes settingsFadeOut {
+          from { 
+            opacity: 1; 
+            transform: translate(-50%, -50%) scale(1);
+          }
+          to { 
+            opacity: 0; 
+            transform: translate(-50%, -50%) scale(0.9);
+          }
+        }
+        
+        #speedSlider::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          width: 18px;
+          height: 18px;
+          border-radius: 50%;
+          background: white;
+          box-shadow: 0 3px 6px rgba(0,0,0,0.3), 0 0 0 2px #4facfe;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        
+        #speedSlider::-webkit-slider-thumb:hover {
+          transform: scale(1.2);
+          box-shadow: 0 4px 8px rgba(0,0,0,0.4), 0 0 0 3px #4facfe;
+        }
+        
+        #speedSlider::-moz-range-thumb {
+          width: 18px;
+          height: 18px;
+          border-radius: 50%;
+          background: white;
+          box-shadow: 0 3px 6px rgba(0,0,0,0.3), 0 0 0 2px #4facfe;
+          cursor: pointer;
+          border: none;
+          transition: all 0.2s ease;
+        }
+        
+        #themeSelect:hover, #languageSelect:hover {
+          border-color: rgba(255,255,255,0.4);
+          background: rgba(255,255,255,0.2);
+          transform: translateY(-1px);
+          box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        }
+        
+        #themeSelect:focus, #languageSelect:focus {
+          border-color: #4facfe;
+          box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.3);
+        }
+        
+        #themeSelect option, #languageSelect option {
+          background: #2d3748;
+          color: white;
+          padding: 10px;
+          border-radius: 6px;
+        }
+        
+        #themeSelect option:hover, #languageSelect option:hover {
+          background: #4a5568;
+        }
+        
+        /* Dragging state styles */
+        .wplace-dragging {
+          opacity: 0.9;
+          box-shadow: 0 30px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.2);
+          transition: none;
+        }
+        
+        .wplace-settings-header:hover {
+          background: rgba(255,255,255,0.15) !important;
+        }
+        
+        .wplace-settings-header:active {
+          background: rgba(255,255,255,0.2) !important;
+        }
+      </style>
     `
-    document.head.appendChild(settingsStyles)
 
-    // Resize Dialog Container
     const resizeContainer = document.createElement("div")
     resizeContainer.className = "resize-container"
     resizeContainer.innerHTML = `
@@ -2749,7 +2539,8 @@
       }
     }
 
-    
+    // Make stats container draggable
+    makeDraggable(statsContainer)
 
     // Make main container draggable
     makeDraggable(container)
@@ -2764,10 +2555,6 @@
           statsBtn.title = "Show Stats"
         } else {
           statsContainer.style.display = "block"
-          if (!statsContainer.dataset.draggable) {
-            makeDraggable(statsContainer)
-            statsContainer.dataset.draggable = "true"
-          }
           statsBtn.innerHTML = '<i class="fas fa-chart-line"></i>'
           statsBtn.title = "Hide Stats"
         }
@@ -2836,28 +2623,6 @@
       
       // Make settings window draggable
       makeDraggable(settingsContainer)
-      
-      // Skip Correct Pixels toggle event listener
-      const skipToggle = settingsContainer.querySelector("#skipCorrectPixelsToggle")
-      if (skipToggle) {
-        skipToggle.addEventListener("change", (e) => {
-          CONFIG.SKIP_CORRECT_PIXELS = e.target.checked
-          // Save preference to localStorage
-          try {
-            localStorage.setItem('wplace_skip_correct_pixels', CONFIG.SKIP_CORRECT_PIXELS.toString())
-          } catch (error) {
-            console.warn("Could not save skip correct pixels preference:", error)
-          }
-        })
-      }
-      
-      // Test Canvas button event listener
-      const testCanvasBtn = settingsContainer.querySelector("#testCanvasBtn")
-      if (testCanvasBtn) {
-        testCanvasBtn.addEventListener("click", () => {
-          Utils.testCanvasAccess()
-        })
-      }
       
       // Language selector event listener
       const languageSelect = settingsContainer.querySelector("#languageSelect")
@@ -3155,8 +2920,8 @@
       state.currentCharges = Math.floor(charges)
       state.cooldown = cooldown
 
-      const progress = state.totalPixels > 0 ? Math.round(((state.paintedPixels + state.skippedPixels) / state.totalPixels) * 100) : 0
-      const remainingPixels = state.totalPixels - state.paintedPixels - state.skippedPixels
+      const progress = state.totalPixels > 0 ? Math.round((state.paintedPixels / state.totalPixels) * 100) : 0
+      const remainingPixels = state.totalPixels - state.paintedPixels
 
       state.estimatedTime = Utils.calculateEstimatedTime(remainingPixels, state.currentCharges, state.cooldown)
 
@@ -3169,18 +2934,8 @@
         </div>
         <div class="wplace-stat-item">
           <div class="wplace-stat-label"><i class="fas fa-paint-brush"></i> ${Utils.t("pixels")}</div>
-          <div class="wplace-stat-value">${state.paintedPixels + state.skippedPixels}/${state.totalPixels}</div>
+          <div class="wplace-stat-value">${state.paintedPixels}/${state.totalPixels}</div>
         </div>
-        <div class="wplace-stat-item">
-          <div class="wplace-stat-label"><i class="fas fa-palette"></i> ${Utils.t("painted")}</div>
-          <div class="wplace-stat-value">${state.paintedPixels}</div>
-        </div>
-        ${state.skippedPixels > 0 ? `
-        <div class="wplace-stat-item">
-          <div class="wplace-stat-label"><i class="fas fa-eye-slash"></i> ${Utils.t("pixelsSkipped", {count: state.skippedPixels})}</div>
-          <div class="wplace-stat-value">${state.skippedPixels}</div>
-        </div>
-        ` : ''}
         <div class="wplace-stat-item">
           <div class="wplace-stat-label"><i class="fas fa-bolt"></i> ${Utils.t("charges")}</div>
           <div class="wplace-stat-value">${Math.floor(state.currentCharges)}</div>
@@ -3465,11 +3220,9 @@
         updateUI("missingRequirements", "error")
         return false
       }
-      if (!capturedCaptchaToken) {
-        updateUI("captchaNeeded", "error")
-        Utils.showAlert(Utils.t("captchaNeeded"), "error")
-        return false
-      }
+  // Ensure we have a valid token before starting
+  await ensureToken()
+  if (!turnstileToken) return false
 
       state.running = true
       state.stopFlag = false
@@ -3578,24 +3331,15 @@
 
     // Painting speed toggle
     const enableSpeedToggle = settingsContainer.querySelector("#enableSpeedToggle")
-    const speedControls = settingsContainer.querySelector("#speedControls")
     if (enableSpeedToggle) {
-      // Initialize visual state
+      // Initialize speed slider disabled state
+      const speedSliderToggle = settingsContainer.querySelector("#speedSlider")
+      if (speedSliderToggle) speedSliderToggle.disabled = !CONFIG.PAINTING_SPEED_ENABLED
       enableSpeedToggle.checked = CONFIG.PAINTING_SPEED_ENABLED
-      if (speedControls) {
-        speedControls.style.opacity = CONFIG.PAINTING_SPEED_ENABLED ? '1' : '0.5'
-        speedControls.style.pointerEvents = CONFIG.PAINTING_SPEED_ENABLED ? 'auto' : 'none'
-      }
-      
       enableSpeedToggle.addEventListener("change", (e) => {
         CONFIG.PAINTING_SPEED_ENABLED = e.target.checked
-        
-        // Update visual state
-        if (speedControls) {
-          speedControls.style.opacity = CONFIG.PAINTING_SPEED_ENABLED ? '1' : '0.5'
-          speedControls.style.pointerEvents = CONFIG.PAINTING_SPEED_ENABLED ? 'auto' : 'none'
-        }
-        
+        // Toggle speed slider
+        if (speedSliderToggle) speedSliderToggle.disabled = !CONFIG.PAINTING_SPEED_ENABLED
         // Save preference to localStorage
         try {
           localStorage.setItem("wplace-painting-speed-enabled", CONFIG.PAINTING_SPEED_ENABLED.toString())
@@ -3603,17 +3347,13 @@
           console.warn("Could not save painting speed enabled preference:", error)
         }
       })
-      
       // Load saved preference
       try {
         const savedEnabled = localStorage.getItem("wplace-painting-speed-enabled")
         if (savedEnabled !== null) {
           CONFIG.PAINTING_SPEED_ENABLED = savedEnabled === "true"
           enableSpeedToggle.checked = CONFIG.PAINTING_SPEED_ENABLED
-          if (speedControls) {
-            speedControls.style.opacity = CONFIG.PAINTING_SPEED_ENABLED ? '1' : '0.5'
-            speedControls.style.pointerEvents = CONFIG.PAINTING_SPEED_ENABLED ? 'auto' : 'none'
-          }
+          if (speedSliderToggle) speedSliderToggle.disabled = !CONFIG.PAINTING_SPEED_ENABLED
         }
       } catch (error) {
         console.warn("Could not load painting speed enabled preference:", error)
@@ -3664,34 +3404,6 @@
           const colorId = findClosestColor(rgb, state.availableColors)
           const pixelX = startX + x
           const pixelY = startY + y
-
-          // Skip pixel if it already has the correct color
-          if (CONFIG.SKIP_CORRECT_PIXELS) {
-            console.log(`Checking pixel at (${pixelX},${pixelY}) for skip possibility...`)
-            
-            // Get current pixel color from canvas
-            const currentPixelColor = Utils.getWPlacePixelColor(pixelX, pixelY)
-            
-            if (currentPixelColor) {
-              // Get target color RGB
-              const targetColor = state.availableColors[colorId]
-              if (targetColor) {
-                const matches = Utils.pixelMatches(currentPixelColor, targetColor.rgb)
-                console.log(`Pixel (${pixelX},${pixelY}): Current RGB(${currentPixelColor.join(',')}) vs Target RGB(${targetColor.rgb.join(',')}) - Matches: ${matches}`)
-                
-                if (matches) {
-                  console.log(`✓ Skipping pixel at (${pixelX},${pixelY}) - already correct color`)
-                  state.paintedMap[y][x] = true
-                  state.skippedPixels++
-                  continue
-                } else {
-                  console.log(`✗ Pixel (${pixelX},${pixelY}) needs painting`)
-                }
-              }
-            } else {
-              console.log(`⚠ Could not read pixel color at (${pixelX},${pixelY})`)
-            }
-          }
 
           pixelBatch.push({
             x: pixelX,
@@ -3790,9 +3502,7 @@
   }
 
   async function sendPixelBatch(pixelBatch, regionX, regionY) {
-    if (!capturedCaptchaToken) {
-      return "token_error"
-    }
+  if (!turnstileToken) return "token_error"
 
     // Pre-allocate arrays for performance
     const coords = new Array(pixelBatch.length * 2)
@@ -3805,11 +3515,7 @@
     }
 
     try {
-      const payload = {
-        coords: coords,
-        colors: colors,
-        t: capturedCaptchaToken,
-      }
+  const payload = { coords, colors, t: turnstileToken }
 
       const res = await fetch(`https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`, {
         method: "POST",
@@ -3819,11 +3525,15 @@
       })
 
       if (res.status === 403) {
-        console.error("❌ 403 Forbidden. CAPTCHA token might be invalid or expired.")
-        capturedCaptchaToken = null
+        let data = null
+        try { data = await res.json() } catch (_) {}
+        console.error("❌ 403 Forbidden. Turnstile token might be invalid or expired.")
+        // Reset token & create new promise to await fresh token
+        turnstileToken = null
+        tokenPromise = new Promise((resolve) => { _resolveToken = resolve })
+        Utils.showAlert(Utils.t("captchaNeeded"), "error")
         return "token_error"
       }
-
       const data = await res.json()
       return data?.painted === pixelBatch.length
     } catch (e) {
