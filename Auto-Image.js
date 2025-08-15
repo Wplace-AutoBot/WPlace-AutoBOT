@@ -2442,21 +2442,24 @@
           })
 
           if (pixelBatch.length >= Math.floor(state.currentCharges)) {
-            const success = await sendPixelBatch(pixelBatch, regionX, regionY)
-
+            let success = await sendPixelBatch(pixelBatch, regionX, regionY)
             if (success === "token_error" && state.autoRefresh) {
-              while (!capturedCaptchaToken && !state.stopFlag) {
+              let retry
+              do {
+                let chargeData = await WPlaceService.getCharges()
+                if (chargeData.charges <= 1) {
+                  updateUI('Waiting for at least 2 charges for auto-refresh...', 'status')
+                  while ((chargeData = await WPlaceService.getCharges()).charges <= 1) {
+                    await Utils.sleep(60000)
+                    updateStats()
+                  }
+                  state.currentCharges = Math.floor(chargeData.charges)
+                  state.cooldown = chargeData.cooldown
+                }
                 await autoRefresh()
-                const paintBtn = await waitForSelector('button.btn.btn-primary.btn-lg, button.btn-primary.sm\\:btn-xl')
-                paintBtn?.click()
-                await Utils.sleep(500)
-              }
-            }
-            if (success === "token_error") {
-              state.stopFlag = true
-              updateUI("captchaNeeded", "error")
-              Utils.showAlert(Utils.t("captchaNeeded"), "error")
-              break outerLoop
+                retry = await sendPixelBatch(pixelBatch, regionX, regionY)
+              } while (retry === "token_error" && !state.stopFlag)
+              success = retry === true
             }
 
             if (success) {
@@ -2505,7 +2508,6 @@
       }
       // Auto-refresh CAPTCHA workflow
       async function autoRefresh() {
-        // 1) Ensure at least 2 charges before proceeding
         let chargeData = await WPlaceService.getCharges();
         if (chargeData.charges < 2) {
           updateUI('Waiting for at least 2 charges for auto-refresh...', 'status');
@@ -2524,9 +2526,10 @@
         await Utils.sleep(500);
         const canvas = await waitForSelector('canvas');
         if (canvas) {
-          canvas.setAttribute('tabindex','0'); canvas.focus();
-          const { left, top, width, height } = canvas.getBoundingClientRect();
-          const x = Math.round(left + width/2), y = Math.round(top + height/2);
+          canvas.setAttribute('tabindex','0');
+          canvas.focus();
+          const { left, top } = canvas.getBoundingClientRect();
+          const x = Math.round(left + 1), y = Math.round(top + 1);
           canvas.dispatchEvent(new MouseEvent('mousemove',{ clientX:x, clientY:y, bubbles:true }));
           canvas.dispatchEvent(new KeyboardEvent('keydown',{ key:' ', code:'Space', bubbles:true }));
           canvas.dispatchEvent(new KeyboardEvent('keyup',{ key:' ', code:'Space', bubbles:true }));
