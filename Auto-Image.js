@@ -5,11 +5,12 @@
     TRANSPARENCY_THRESHOLD: 100,
     WHITE_THRESHOLD: 250,
     LOG_INTERVAL: 10,
-    PAINTING_SPEED: {
+  PAINTING_SPEED: {
       MIN: 1,          // Minimum 1 pixel per second
       MAX: 1000,       // Maximum 1000 pixels per second
       DEFAULT: 5,      // Default 5 pixels per second
-    },
+  },
+    PAINTING_SPEED_ENABLED: false,
     // Optimized CSS Classes for reuse
     CSS_CLASSES: {
       BUTTON_PRIMARY: `
@@ -2215,6 +2216,14 @@
           </div>
         </div>
         
+        <!-- Painting Speed Enable Toggle -->
+        <div style="margin-bottom: 25px;">
+          <label style="display: flex; align-items: center; gap: 8px; color: white;">
+            <input type="checkbox" id="enableSpeedToggle" ${CONFIG.PAINTING_SPEED_ENABLED ? 'checked' : ''} style="cursor: pointer;"/>
+            <span>Enable painting speed</span>
+          </label>
+        </div>
+        
         <!-- Theme Selection Section -->
         <div style="margin-bottom: 25px;">
           <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
@@ -3317,6 +3326,37 @@
         console.warn("Could not load painting speed preference:", error)
       }
     }
+
+    // Painting speed toggle
+    const enableSpeedToggle = settingsContainer.querySelector("#enableSpeedToggle")
+    if (enableSpeedToggle) {
+      // Initialize speed slider disabled state
+      const speedSliderToggle = settingsContainer.querySelector("#speedSlider")
+      if (speedSliderToggle) speedSliderToggle.disabled = !CONFIG.PAINTING_SPEED_ENABLED
+      enableSpeedToggle.checked = CONFIG.PAINTING_SPEED_ENABLED
+      enableSpeedToggle.addEventListener("change", (e) => {
+        CONFIG.PAINTING_SPEED_ENABLED = e.target.checked
+        // Toggle speed slider
+        if (speedSliderToggle) speedSliderToggle.disabled = !CONFIG.PAINTING_SPEED_ENABLED
+        // Save preference to localStorage
+        try {
+          localStorage.setItem("wplace-painting-speed-enabled", CONFIG.PAINTING_SPEED_ENABLED.toString())
+        } catch (error) {
+          console.warn("Could not save painting speed enabled preference:", error)
+        }
+      })
+      // Load saved preference
+      try {
+        const savedEnabled = localStorage.getItem("wplace-painting-speed-enabled")
+        if (savedEnabled !== null) {
+          CONFIG.PAINTING_SPEED_ENABLED = savedEnabled === "true"
+          enableSpeedToggle.checked = CONFIG.PAINTING_SPEED_ENABLED
+          if (speedSliderToggle) speedSliderToggle.disabled = !CONFIG.PAINTING_SPEED_ENABLED
+        }
+      } catch (error) {
+        console.warn("Could not load painting speed enabled preference:", error)
+      }
+    }
   }
 
   async function processImage() {
@@ -3399,8 +3439,8 @@
                 Utils.saveProgress()
               }
 
-              // Apply painting speed delay
-              if (state.paintingSpeed > 0 && pixelBatch.length > 0) {
+              // Apply painting speed delay if enabled
+              if (CONFIG.PAINTING_SPEED_ENABLED && state.paintingSpeed > 0 && pixelBatch.length > 0) {
                 const delayPerPixel = 1000 / state.paintingSpeed // ms per pixel
                 const totalDelay = Math.max(100, delayPerPixel * pixelBatch.length) // minimum 100ms
                 await Utils.sleep(totalDelay)
@@ -3431,9 +3471,8 @@
             state.paintedPixels++
           })
           state.currentCharges -= pixelBatch.length
-
-          // Apply painting speed delay for remaining pixels
-          if (state.paintingSpeed > 0 && pixelBatch.length > 0) {
+          // Apply painting speed delay for remaining pixels if enabled
+          if (CONFIG.PAINTING_SPEED_ENABLED && state.paintingSpeed > 0 && pixelBatch.length > 0) {
             const delayPerPixel = 1000 / state.paintingSpeed // ms per pixel
             const totalDelay = Math.max(100, delayPerPixel * pixelBatch.length) // minimum 100ms
             await Utils.sleep(totalDelay)
@@ -3465,11 +3504,9 @@
       return "token_error"
     }
 
-    // Pre-allocate arrays for better performance
+    // Pre-allocate arrays for performance
     const coords = new Array(pixelBatch.length * 2)
     const colors = new Array(pixelBatch.length)
-
-    // Optimized loop with direct indexing
     for (let i = 0; i < pixelBatch.length; i++) {
       const pixel = pixelBatch[i]
       coords[i * 2] = pixel.x
