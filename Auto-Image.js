@@ -2374,10 +2374,10 @@
       const theme = getCurrentTheme()
       if (state.autoRefresh) {
         refreshToggleBtn.style.color = theme.success
-        refreshToggleBtn.title = 'Auto-refresh: ON'
+        refreshToggleBtn.title = 'Auto-refresh enabled!'
       } else {
         refreshToggleBtn.style.color = theme.text
-        refreshToggleBtn.title = 'Auto-refresh: OFF'
+        refreshToggleBtn.title = 'Auto-refresh disabled!'
       }
     }
     updateRefreshBtn()
