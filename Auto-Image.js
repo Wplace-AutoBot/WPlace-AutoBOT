@@ -1239,6 +1239,8 @@
         color: ${theme.text};
         animation: slideIn 0.4s ease-out;
         overflow: hidden;
+        display: flex;
+        flex-direction: column;
         ${theme.backdropFilter ? `backdrop-filter: ${theme.backdropFilter};` : ""}
         transition: all 0.3s ease;
         user-select: none;
@@ -1292,6 +1294,12 @@
         box-shadow: 0 12px 40px rgba(0,0,0,0.8), 0 0 0 2px rgba(255,255,255,0.2);
         transform: scale(1.02);
         z-index: 9999;
+      }
+      #wplace-stats-container.wplace-dragging {
+        transition: none !important;
+      }
+      #wplace-settings-container.wplace-dragging {
+        transition: none !important;
       }
       #wplace-image-bot-container.wplace-minimized {
         width: 200px;
@@ -1391,6 +1399,8 @@
         display: block;
         position: relative;
         z-index: 2;
+        overflow-y: auto;
+        flex-grow: 1;
       }
       .wplace-content.wplace-hidden {
         display: none;
@@ -2739,8 +2749,7 @@
       }
     }
 
-    // Make stats container draggable
-    makeDraggable(statsContainer)
+    
 
     // Make main container draggable
     makeDraggable(container)
@@ -2755,6 +2764,10 @@
           statsBtn.title = "Show Stats"
         } else {
           statsContainer.style.display = "block"
+          if (!statsContainer.dataset.draggable) {
+            makeDraggable(statsContainer)
+            statsContainer.dataset.draggable = "true"
+          }
           statsBtn.innerHTML = '<i class="fas fa-chart-line"></i>'
           statsBtn.title = "Hide Stats"
         }
