@@ -1490,10 +1490,6 @@
           <button id="minimizeBtn" class="wplace-header-btn" title="${Utils.t("minimize")}">
             <i class="fas fa-minus"></i>
           </button>
-          <!-- Auto-refresh toggle -->
-          <button id="refreshToggleBtn" class="wplace-header-btn" title="Auto-refresh">
-            <i class="fas fa-sync-alt"></i>
-          </button>
           <button id="refreshToggleBtn" class="wplace-header-btn" title="Auto-refresh">
             <i class="fas fa-sync-alt"></i>
           </button>
