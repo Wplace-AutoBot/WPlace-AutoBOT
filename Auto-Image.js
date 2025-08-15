@@ -180,7 +180,7 @@
     waitingInit: "Waiting for initialization...",
     resizeSuccess: "✅ Image resized to {width}x{height}",
     paintingPaused: "⏸️ Painting paused at position X: {x}, Y: {y}",
-    captchaNeeded: "❗ CAPTCHA token needed. Paint one pixel manually to continue.",
+    captchaNeeded: "❗ CAPTCHA token needed. Paint one pixel manually to continue,Then Open color palette again before start painting!.",
     saveData: "Save Progress",
     loadData: "Load Progress",
     saveToFile: "Save to File",
@@ -450,7 +450,7 @@
 
           // Notify the user that the token is captured and they can start the bot.
           if (document.querySelector("#statusText")?.textContent.includes("CAPTCHA")) {
-            Utils.showAlert("Token captured successfully! You can start the bot now.", "success")
+            Utils.showAlert("Token captured successfully! Make sure you open the COLOR PALETTE FIRST before start painting.", "success")
             updateUI("colorsFound", "success", {
               count: state.availableColors.length,
             })
