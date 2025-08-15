@@ -1490,6 +1490,9 @@
           <button id="minimizeBtn" class="wplace-header-btn" title="${Utils.t("minimize")}">
             <i class="fas fa-minus"></i>
           </button>
+          <button id="refreshToggleBtn" class="wplace-header-btn" title="Auto-refresh">
+            <i class="fas fa-sync-alt"></i>
+          </button>
         </div>
       </div>
       <div class="wplace-content">
@@ -1668,6 +1671,7 @@
     const statsArea = statsContainer.querySelector("#statsArea")
     const content = container.querySelector(".wplace-content")
     const closeStatsBtn = statsContainer.querySelector("#closeStatsBtn")
+    const refreshToggleBtn = container.querySelector("#refreshToggleBtn")
 
     // Check if all elements are found
     if (!initBotBtn || !uploadBtn || !selectPosBtn || !startBtn || !stopBtn) {
@@ -2365,6 +2369,24 @@
         createThemePopup()
       })
     }
+
+    const updateRefreshBtn = () => {
+      const theme = getCurrentTheme()
+      if (state.autoRefresh) {
+        refreshToggleBtn.style.color = theme.success
+        refreshToggleBtn.title = 'Auto-refresh: ON'
+      } else {
+        refreshToggleBtn.style.color = theme.text
+        refreshToggleBtn.title = 'Auto-refresh: OFF'
+      }
+    }
+    updateRefreshBtn()
+    refreshToggleBtn.addEventListener('click', () => {
+      state.autoRefresh = !state.autoRefresh
+      updateRefreshBtn()
+      statusText.textContent = state.autoRefresh ? 'Auto-refresh: ON' : 'Auto-refresh: OFF'
+      statusText.className = 'wplace-status status-info'
+    })
   }
 
   async function processImage() {
