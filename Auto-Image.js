@@ -197,6 +197,7 @@
     fileError: "❌ Error processing file",
     invalidFileFormat: "❌ Invalid file format",
     paintingSpeed: "Painting Speed",
+    enableSpeedControl: "Enable Speed Control",
     pixelsPerSecond: "pixels/second",
     speedSetting: "Speed: {speed} pixels/sec",
     settings: "Settings",
@@ -262,6 +263,7 @@
     fileError: "❌ Erro ao processar arquivo",
     invalidFileFormat: "❌ Formato de arquivo inválido",
     paintingSpeed: "Velocidade de Pintura",
+    enableSpeedControl: "Ativar Controle de Velocidade",
     pixelsPerSecond: "pixels/segundo",
     speedSetting: "Velocidade: {speed} pixels/seg",
     settings: "Configurações",
@@ -327,6 +329,7 @@
     fileError: "❌ Lỗi khi xử lý tệp",
     invalidFileFormat: "❌ Định dạng tệp không hợp lệ",
     paintingSpeed: "Tốc độ vẽ",
+    enableSpeedControl: "Bật điều khiển tốc độ",
     pixelsPerSecond: "pixel/giây",
     speedSetting: "Tốc độ: {speed} pixel/giây",
     settings: "Cài đặt",
@@ -392,6 +395,7 @@
     fileError: "❌ Erreur lors du traitement du fichier",
     invalidFileFormat: "❌ Format de fichier invalide",
     paintingSpeed: "Vitesse de peinture",
+    enableSpeedControl: "Activer le contrôle de vitesse",
     pixelsPerSecond: "pixels/seconde",
     speedSetting: "Vitesse: {speed} pixels/sec",
     settings: "Paramètres",
@@ -2372,11 +2376,30 @@
                 ${Utils.t("paintingSpeed")}
               </label>
               <div style="background: rgba(255,255,255,0.1); border-radius: 10px; padding: 12px; border: 1px solid rgba(255,255,255,0.1);">
-                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-                  <input type="range" id="speedSlider" min="${CONFIG.PAINTING_SPEED.MIN}" max="${CONFIG.PAINTING_SPEED.MAX}" value="${CONFIG.PAINTING_SPEED.DEFAULT}" 
-                    style="flex: 1; height: 4px; background: rgba(255,255,255,0.2); outline: none; border-radius: 2px; accent-color: #4facfe;">
-                  <span id="speedValue" style="color: #4facfe; font-weight: 600; min-width: 40px; text-align: right; font-size: 14px;">${CONFIG.PAINTING_SPEED.DEFAULT}</span>
+                <!-- Enable/Disable Toggle -->
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                  <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none;">
+                    <input type="checkbox" id="enableSpeedToggle" ${CONFIG.PAINTING_SPEED_ENABLED ? 'checked' : ''} style="
+                      width: 16px; 
+                      height: 16px; 
+                      accent-color: #4facfe;
+                      cursor: pointer;
+                    ">
+                    <span style="color: white; font-size: 13px; font-weight: 500;">
+                      ${Utils.t("enableSpeedControl")}
+                    </span>
+                  </label>
                 </div>
+                
+                <!-- Speed Slider -->
+                <div id="speedControls" style="opacity: ${CONFIG.PAINTING_SPEED_ENABLED ? '1' : '0.5'}; pointer-events: ${CONFIG.PAINTING_SPEED_ENABLED ? 'auto' : 'none'}; transition: all 0.3s ease;">
+                  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                    <input type="range" id="speedSlider" min="${CONFIG.PAINTING_SPEED.MIN}" max="${CONFIG.PAINTING_SPEED.MAX}" value="${CONFIG.PAINTING_SPEED.DEFAULT}" 
+                      style="flex: 1; height: 4px; background: rgba(255,255,255,0.2); outline: none; border-radius: 2px; accent-color: #4facfe;">
+                    <span id="speedValue" style="color: #4facfe; font-weight: 600; min-width: 40px; text-align: right; font-size: 14px;">${CONFIG.PAINTING_SPEED.DEFAULT}</span>
+                  </div>
+                </div>
+                
                 <div style="color: rgba(255,255,255,0.7); font-size: 11px; line-height: 1.3;">
                   ${Utils.t("speedSettingDesc", {min: CONFIG.PAINTING_SPEED.MIN, max: CONFIG.PAINTING_SPEED.MAX})}
                 </div>
@@ -3542,15 +3565,24 @@
 
     // Painting speed toggle
     const enableSpeedToggle = settingsContainer.querySelector("#enableSpeedToggle")
+    const speedControls = settingsContainer.querySelector("#speedControls")
     if (enableSpeedToggle) {
-      // Initialize speed slider disabled state
-      const speedSliderToggle = settingsContainer.querySelector("#speedSlider")
-      if (speedSliderToggle) speedSliderToggle.disabled = !CONFIG.PAINTING_SPEED_ENABLED
+      // Initialize visual state
       enableSpeedToggle.checked = CONFIG.PAINTING_SPEED_ENABLED
+      if (speedControls) {
+        speedControls.style.opacity = CONFIG.PAINTING_SPEED_ENABLED ? '1' : '0.5'
+        speedControls.style.pointerEvents = CONFIG.PAINTING_SPEED_ENABLED ? 'auto' : 'none'
+      }
+      
       enableSpeedToggle.addEventListener("change", (e) => {
         CONFIG.PAINTING_SPEED_ENABLED = e.target.checked
-        // Toggle speed slider
-        if (speedSliderToggle) speedSliderToggle.disabled = !CONFIG.PAINTING_SPEED_ENABLED
+        
+        // Update visual state
+        if (speedControls) {
+          speedControls.style.opacity = CONFIG.PAINTING_SPEED_ENABLED ? '1' : '0.5'
+          speedControls.style.pointerEvents = CONFIG.PAINTING_SPEED_ENABLED ? 'auto' : 'none'
+        }
+        
         // Save preference to localStorage
         try {
           localStorage.setItem("wplace-painting-speed-enabled", CONFIG.PAINTING_SPEED_ENABLED.toString())
@@ -3558,13 +3590,17 @@
           console.warn("Could not save painting speed enabled preference:", error)
         }
       })
+      
       // Load saved preference
       try {
         const savedEnabled = localStorage.getItem("wplace-painting-speed-enabled")
         if (savedEnabled !== null) {
           CONFIG.PAINTING_SPEED_ENABLED = savedEnabled === "true"
           enableSpeedToggle.checked = CONFIG.PAINTING_SPEED_ENABLED
-          if (speedSliderToggle) speedSliderToggle.disabled = !CONFIG.PAINTING_SPEED_ENABLED
+          if (speedControls) {
+            speedControls.style.opacity = CONFIG.PAINTING_SPEED_ENABLED ? '1' : '0.5'
+            speedControls.style.pointerEvents = CONFIG.PAINTING_SPEED_ENABLED ? 'auto' : 'none'
+          }
         }
       } catch (error) {
         console.warn("Could not load painting speed enabled preference:", error)
