@@ -5,6 +5,35 @@
     TRANSPARENCY_THRESHOLD: 100,
     WHITE_THRESHOLD: 250,
     LOG_INTERVAL: 10,
+    PAINTING_SPEED: {
+      MIN: 1,          // Minimum 1 pixel per second
+      MAX: 1000,       // Maximum 1000 pixels per second
+      DEFAULT: 5,      // Default 5 pixels per second
+    },
+    // Optimized CSS Classes for reuse
+    CSS_CLASSES: {
+      BUTTON_PRIMARY: `
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: white; border: none; border-radius: 8px; padding: 10px 16px;
+        cursor: pointer; font-weight: 500; transition: all 0.3s ease;
+        display: flex; align-items: center; gap: 8px;
+      `,
+      BUTTON_SECONDARY: `
+        background: rgba(255,255,255,0.1); color: white; 
+        border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; 
+        padding: 8px 12px; cursor: pointer; transition: all 0.3s ease;
+      `,
+      MODERN_CARD: `
+        background: rgba(255,255,255,0.1); border-radius: 12px; 
+        padding: 18px; border: 1px solid rgba(255,255,255,0.1);
+        backdrop-filter: blur(5px);
+      `,
+      GRADIENT_TEXT: `
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        background-clip: text; font-weight: bold;
+      `
+    },
     THEMES: {  
       "Classic Autobot": {
         primary: "#000000",
@@ -68,12 +97,7 @@
         existingStyle.remove()
       }
 
-      // Recreate UI with new theme
-      const existingContainer = document.getElementById("wplace-image-bot-container")
-      const existingStats = document.getElementById("wplace-stats-container")
-      if (existingContainer) existingContainer.remove()
-      if (existingStats) existingStats.remove()
-
+      // Recreate UI with new theme (cleanup is handled in createUI)
       createUI()
     }
   }
@@ -94,6 +118,17 @@
       }
     } catch (e) {
       console.warn("Could not load theme preference:", e)
+    }
+  }
+
+  const loadLanguagePreference = () => {
+    try {
+      const saved = localStorage.getItem("wplace_language")
+      if (saved && TEXT[saved]) {
+        state.language = saved
+      }
+    } catch (e) {
+      console.warn("Could not load language preference:", e)
     }
   }
 
@@ -148,6 +183,16 @@
     clickLoadToContinue: "Click 'Load Progress' to continue.",
     fileError: "❌ Error processing file",
     invalidFileFormat: "❌ Invalid file format",
+    paintingSpeed: "Painting Speed",
+    pixelsPerSecond: "pixels/second",
+    speedSetting: "Speed: {speed} pixels/sec",
+    settings: "Settings",
+    botSettings: "Bot Settings",
+    close: "Close",
+    language: "Language",
+    themeSettings: "Theme Settings",
+    themeSettingsDesc: "Choose your preferred color theme for the interface.",
+    languageSelectDesc: "Select your preferred language. Changes will take effect immediately.",  
   },
   pt: {
     title: "WPlace Auto-Image",
@@ -198,6 +243,136 @@
     clickLoadToContinue: "Clique em 'Carregar Progresso' para continuar.",
     fileError: "❌ Erro ao processar arquivo",
     invalidFileFormat: "❌ Formato de arquivo inválido",
+    paintingSpeed: "Velocidade de Pintura",
+    pixelsPerSecond: "pixels/segundo",
+    speedSetting: "Velocidade: {speed} pixels/seg",
+    settings: "Configurações",
+    botSettings: "Configurações do Bot",
+    close: "Fechar",
+    language: "Idioma",
+    themeSettings: "Configurações de Tema",
+    themeSettingsDesc: "Escolha seu tema de cores preferido para a interface.",
+    languageSelectDesc: "Selecione seu idioma preferido. As alterações terão efeito imediatamente.",  
+  },
+  vi: {
+    title: "WPlace Auto-Image",
+    initBot: "Khởi động Auto-BOT",
+    uploadImage: "Tải lên hình ảnh",
+    resizeImage: "Thay đổi kích thước",
+    selectPosition: "Chọn vị trí",
+    startPainting: "Bắt đầu vẽ",
+    stopPainting: "Dừng vẽ",
+    checkingColors: "🔍 Đang kiểm tra màu sắc có sẵn...",
+    noColorsFound: "❌ Hãy mở bảng màu trên trang web và thử lại!",
+    colorsFound: "✅ Tìm thấy {count} màu sắc có sẵn",
+    loadingImage: "🖼️ Đang tải hình ảnh...",
+    imageLoaded: "✅ Đã tải hình ảnh với {count} pixel hợp lệ",
+    imageError: "❌ Lỗi khi tải hình ảnh",
+    selectPositionAlert: "Vẽ pixel đầu tiên tại vị trí bạn muốn tác phẩm nghệ thuật bắt đầu!",
+    waitingPosition: "👆 Đang chờ bạn vẽ pixel tham chiếu...",
+    positionSet: "✅ Đã đặt vị trí thành công!",
+    positionTimeout: "❌ Hết thời gian chọn vị trí",
+    startPaintingMsg: "🎨 Bắt đầu vẽ...",
+    paintingProgress: "🧱 Tiến trình: {painted}/{total} pixel...",
+    noCharges: "⌛ Không có điện tích. Đang chờ {time}...",
+    paintingStopped: "⏹️ Người dùng đã dừng vẽ",
+    paintingComplete: "✅ Hoàn thành vẽ! Đã vẽ {count} pixel.",
+    paintingError: "❌ Lỗi trong quá trình vẽ",
+    missingRequirements: "❌ Hãy tải lên hình ảnh và chọn vị trí trước",
+    progress: "Tiến trình",
+    pixels: "Pixel",
+    charges: "Điện tích",
+    estimatedTime: "Thời gian ước tính",
+    initMessage: "Nhấp 'Khởi động Auto-BOT' để bắt đầu",
+    waitingInit: "Đang chờ khởi tạo...",
+    resizeSuccess: "✅ Đã thay đổi kích thước hình ảnh thành {width}x{height}",
+    paintingPaused: "⏸️ Tạm dừng vẽ tại vị trí X: {x}, Y: {y}",
+    captchaNeeded: "❗ Cần token CAPTCHA. Vẽ một pixel thủ công để tiếp tục.",
+    saveData: "Lưu tiến trình",
+    loadData: "Tải tiến trình",
+    saveToFile: "Lưu vào tệp",
+    loadFromFile: "Tải từ tệp",
+    dataManager: "Dữ liệu",
+    autoSaved: "✅ Đã tự động lưu tiến trình",
+    dataLoaded: "✅ Đã tải tiến trình thành công",
+    fileSaved: "✅ Đã lưu vào tệp thành công",
+    fileLoaded: "✅ Đã tải từ tệp thành công",
+    noSavedData: "❌ Không tìm thấy tiến trình đã lưu",
+    savedDataFound: "✅ Tìm thấy tiến trình đã lưu! Tải để tiếp tục?",
+    savedDate: "Đã lưu vào: {date}",
+    clickLoadToContinue: "Nhấp 'Tải tiến trình' để tiếp tục.",
+    fileError: "❌ Lỗi khi xử lý tệp",
+    invalidFileFormat: "❌ Định dạng tệp không hợp lệ",
+    paintingSpeed: "Tốc độ vẽ",
+    pixelsPerSecond: "pixel/giây",
+    speedSetting: "Tốc độ: {speed} pixel/giây",
+    settings: "Cài đặt",
+    botSettings: "Cài đặt Bot",
+    close: "Đóng",
+    language: "Ngôn ngữ",
+    themeSettings: "Cài đặt Giao diện",
+    themeSettingsDesc: "Chọn chủ đề màu sắc yêu thích cho giao diện.",
+    languageSelectDesc: "Chọn ngôn ngữ ưa thích. Thay đổi sẽ có hiệu lực ngay lập tức.",
+    },
+  fr: {
+    title: "WPlace Auto-Image",
+    initBot: "Démarrer Auto-BOT",
+    uploadImage: "Télécharger l'image",
+    resizeImage: "Redimensionner l'image",
+    selectPosition: "Sélectionner la position",
+    startPainting: "Commencer à peindre",
+    stopPainting: "Arrêter de peindre",
+    checkingColors: "🔍 Vérification des couleurs disponibles...",
+    noColorsFound: "❌ Ouvrez la palette de couleurs sur le site et réessayez!",
+    colorsFound: "✅ {count} couleurs disponibles trouvées",
+    loadingImage: "🖼️ Chargement de l'image...",
+    imageLoaded: "✅ Image chargée avec {count} pixels valides",
+    imageError: "❌ Erreur lors du chargement de l'image",
+    selectPositionAlert: "Peignez le premier pixel à l'endroit où vous voulez que l'art commence!",
+    waitingPosition: "👆 En attente que vous peigniez le pixel de référence...",
+    positionSet: "✅ Position définie avec succès!",
+    positionTimeout: "❌ Délai d'attente pour la sélection de position",
+    startPaintingMsg: "🎨 Début de la peinture...",
+    paintingProgress: "🧱 Progrès: {painted}/{total} pixels...",
+    noCharges: "⌛ Aucune charge. En attente {time}...",
+    paintingStopped: "⏹️ Peinture arrêtée par l'utilisateur",
+    paintingComplete: "✅ Peinture terminée! {count} pixels peints.",
+    paintingError: "❌ Erreur pendant la peinture",
+    missingRequirements: "❌ Veuillez charger une image et sélectionner une position d'abord",
+    progress: "Progrès",
+    pixels: "Pixels",
+    charges: "Charges",
+    estimatedTime: "Temps estimé",
+    initMessage: "Cliquez sur 'Démarrer Auto-BOT' pour commencer",
+    waitingInit: "En attente d'initialisation...",
+    resizeSuccess: "✅ Image redimensionnée en {width}x{height}",
+    paintingPaused: "⏸️ Peinture en pause à la position X: {x}, Y: {y}",
+    captchaNeeded: "❗ Token CAPTCHA nécessaire. Peignez un pixel manuellement pour continuer.",
+    saveData: "Sauvegarder le progrès",
+    loadData: "Charger le progrès",
+    saveToFile: "Sauvegarder dans un fichier",
+    loadFromFile: "Charger depuis un fichier",
+    dataManager: "Données",
+    autoSaved: "✅ Progrès sauvegardé automatiquement",
+    dataLoaded: "✅ Progrès chargé avec succès",
+    fileSaved: "✅ Sauvegardé dans un fichier avec succès",
+    fileLoaded: "✅ Chargé depuis un fichier avec succès",
+    noSavedData: "❌ Aucun progrès sauvegardé trouvé",
+    savedDataFound: "✅ Progrès sauvegardé trouvé! Charger pour continuer?",
+    savedDate: "Sauvegardé le: {date}",
+    clickLoadToContinue: "Cliquez sur 'Charger le progrès' pour continuer.",
+    fileError: "❌ Erreur lors du traitement du fichier",
+    invalidFileFormat: "❌ Format de fichier invalide",
+    paintingSpeed: "Vitesse de peinture",
+    pixelsPerSecond: "pixels/seconde",
+    speedSetting: "Vitesse: {speed} pixels/sec",
+    settings: "Paramètres",
+    botSettings: "Paramètres du Bot",
+    close: "Fermer",
+    language: "Langue",
+    themeSettings: "Paramètres de Thème",
+    themeSettingsDesc: "Choisissez votre thème de couleurs préféré pour l'interface.",
+    languageSelectDesc: "Sélectionnez votre langue préférée. Les changements prendront effet immédiatement.",
     },
   }
 
@@ -221,6 +396,7 @@
     lastPosition: { x: 0, y: 0 },
     estimatedTime: 0,
     language: "en",
+    paintingSpeed: CONFIG.PAINTING_SPEED.DEFAULT, // pixels per second
   }
 
   // Global variable to store the captured CAPTCHA token.
@@ -271,6 +447,50 @@
   // UTILITY FUNCTIONS
   const Utils = {
     sleep: (ms) => new Promise((r) => setTimeout(r, ms)),
+
+    // Optimized DOM creation helpers
+    createElement: (tag, props = {}, children = []) => {
+      const element = document.createElement(tag)
+      
+      // Set properties efficiently
+      Object.entries(props).forEach(([key, value]) => {
+        if (key === 'style' && typeof value === 'object') {
+          Object.assign(element.style, value)
+        } else if (key === 'className') {
+          element.className = value
+        } else if (key === 'innerHTML') {
+          element.innerHTML = value
+        } else {
+          element.setAttribute(key, value)
+        }
+      })
+      
+      // Append children efficiently
+      if (typeof children === 'string') {
+        element.textContent = children
+      } else if (Array.isArray(children)) {
+        children.forEach(child => {
+          if (typeof child === 'string') {
+            element.appendChild(document.createTextNode(child))
+          } else {
+            element.appendChild(child)
+          }
+        })
+      }
+      
+      return element
+    },
+
+    // Create button with common styling
+    createButton: (id, text, icon, onClick, style = CONFIG.CSS_CLASSES.BUTTON_PRIMARY) => {
+      const button = Utils.createElement('button', {
+        id: id,
+        style: style,
+        innerHTML: `${icon ? `<i class="${icon}"></i>` : ''}<span>${text}</span>`
+      })
+      if (onClick) button.addEventListener('click', onClick)
+      return button
+    },
 
     t: (key, params = {}) => {
       let text = TEXT[state.language]?.[key] || TEXT.en[key] || key
@@ -418,8 +638,17 @@
 
     calculateEstimatedTime: (remainingPixels, charges, cooldown) => {
       if (remainingPixels <= 0) return 0
+      
+      // Calculate time based on painting speed (pixels per second)
+      const paintingSpeedDelay = state.paintingSpeed > 0 ? (1000 / state.paintingSpeed) : 1000
+      const timeFromSpeed = remainingPixels * paintingSpeedDelay // ms
+      
+      // Calculate time based on charges and cooldown
       const cyclesNeeded = Math.ceil(remainingPixels / Math.max(charges, 1))
-      return cyclesNeeded * cooldown
+      const timeFromCharges = cyclesNeeded * cooldown // ms
+      
+      // Return the maximum of both calculations (the limiting factor)
+      return Math.max(timeFromSpeed, timeFromCharges)
     },
 
     // Save/Load Progress Functions
@@ -674,17 +903,41 @@
     },
   }
 
-  // COLOR MATCHING FUNCTION
+  // COLOR MATCHING FUNCTION - Optimized with caching
+  const colorCache = new Map()
+  
   function findClosestColor(targetRgb, availableColors) {
+    // Create cache key from RGB values
+    const cacheKey = `${targetRgb[0]},${targetRgb[1]},${targetRgb[2]}`
+    
+    // Check cache first
+    if (colorCache.has(cacheKey)) {
+      return colorCache.get(cacheKey)
+    }
+
     let minDistance = Number.POSITIVE_INFINITY
     let closestColorId = availableColors[0]?.id || 1
 
-    for (const color of availableColors) {
+    // Use optimized loop for better performance
+    for (let i = 0; i < availableColors.length; i++) {
+      const color = availableColors[i]
       const distance = Utils.colorDistance(targetRgb, color.rgb)
       if (distance < minDistance) {
         minDistance = distance
         closestColorId = color.id
+        
+        // If perfect match, break early
+        if (distance === 0) break
       }
+    }
+
+    // Cache the result for future use
+    colorCache.set(cacheKey, closestColorId)
+    
+    // Limit cache size to prevent memory leaks
+    if (colorCache.size > 10000) {
+      const firstKey = colorCache.keys().next().value
+      colorCache.delete(firstKey)
     }
 
     return closestColorId
@@ -695,84 +948,24 @@
   let updateStats = () => {}
   let updateDataButtons = () => {}
 
-  const createThemePopup = () => {
-    // Remove existing popup if it exists
-    const existingPopup = document.getElementById("theme-popup")
-    if (existingPopup) {
-      existingPopup.remove()
-      return
-    }
-
-    const popup = document.createElement("div")
-    popup.id = "theme-popup"
-    popup.style.cssText = `
-      position: fixed;
-      top: 60px;
-      right: 20px;
-      background: ${getCurrentTheme().secondary};
-      border: ${getCurrentTheme().borderWidth} ${getCurrentTheme().borderStyle} ${getCurrentTheme().accent};
-      border-radius: ${getCurrentTheme().borderRadius};
-      box-shadow: ${getCurrentTheme().boxShadow};
-      backdrop-filter: ${getCurrentTheme().backdropFilter};
-      z-index: 10001;
-      min-width: 200px;
-      padding: 10px 0;
-      font-family: ${getCurrentTheme().fontFamily};
-    `
-
-    Object.keys(CONFIG.THEMES).forEach((themeName) => {
-      const themeOption = document.createElement("div")
-      themeOption.style.cssText = `
-        padding: 10px 20px;
-        color: ${themeName === CONFIG.currentTheme ? getCurrentTheme().highlight : getCurrentTheme().text};
-        cursor: pointer;
-        font-size: 12px;
-        transition: all 0.2s ease;
-        background: ${themeName === CONFIG.currentTheme ? getCurrentTheme().accent : "transparent"};
-      `
-      themeOption.textContent = themeName
-
-      themeOption.addEventListener("mouseenter", () => {
-        if (themeName !== CONFIG.currentTheme) {
-          themeOption.style.background = getCurrentTheme().accent
-          themeOption.style.color = getCurrentTheme().highlight
-        }
-      })
-
-      themeOption.addEventListener("mouseleave", () => {
-        if (themeName !== CONFIG.currentTheme) {
-          themeOption.style.background = "transparent"
-          themeOption.style.color = getCurrentTheme().text
-        }
-      })
-
-      themeOption.addEventListener("click", () => {
-        switchTheme(themeName)
-        popup.remove()
-      })
-
-      popup.appendChild(themeOption)
-    })
-
-    document.body.appendChild(popup)
-
-    // Close popup when clicking outside
-    const closePopup = (e) => {
-      if (!popup.contains(e.target) && !e.target.closest("#themeBtn")) {
-        popup.remove()
-        document.removeEventListener("click", closePopup)
-      }
-    }
-
-    setTimeout(() => {
-      document.addEventListener("click", closePopup)
-    }, 100)
-  }
-
   async function createUI() {
     await detectLanguage()
 
+    // Clean up existing UI elements to prevent duplicates
+    const existingContainer = document.getElementById("wplace-image-bot-container")
+    const existingStats = document.getElementById("wplace-stats-container")
+    const existingSettings = document.getElementById("wplace-settings-container")
+    const existingResizeContainer = document.querySelector(".resize-container")
+    const existingResizeOverlay = document.querySelector(".resize-overlay")
+    
+    if (existingContainer) existingContainer.remove()
+    if (existingStats) existingStats.remove()
+    if (existingSettings) existingSettings.remove()
+    if (existingResizeContainer) existingResizeContainer.remove()
+    if (existingResizeOverlay) existingResizeOverlay.remove()
+
     loadThemePreference()
+    loadLanguagePreference()
 
     const theme = getCurrentTheme()
 
@@ -844,7 +1037,7 @@
         position: fixed;
         top: 20px;
         right: 20px;
-        width: ${CONFIG.currentTheme === "Neon Retro" ? "320px" : "280px"};
+        width: ${CONFIG.currentTheme === "Neon Retro" ? "280px" : "280px"};
         max-height: calc(100vh - 40px);
         background: ${
           CONFIG.currentTheme === "Classic Autobot"
@@ -927,7 +1120,7 @@
         position: fixed;
         top: 20px;
         left: 20px;
-        width: ${CONFIG.currentTheme === "Neon Retro" ? "320px" : "280px"};
+        width: ${CONFIG.currentTheme === "Neon Retro" ? "280px" : "280px"};
         max-height: calc(100vh - 40px);
         background: ${
           CONFIG.currentTheme === "Classic Autobot"
@@ -950,14 +1143,14 @@
       }
       
       .wplace-header {
-        padding: ${CONFIG.currentTheme === "Neon Retro" ? "12px 15px" : "8px 12px"};
+        padding: ${CONFIG.currentTheme === "Neon Retro" ? "8px 12px" : "8px 12px"};
         background: ${
           CONFIG.currentTheme === "Classic Autobot"
             ? `linear-gradient(135deg, ${theme.secondary} 0%, #2a2a2a 100%)`
             : theme.secondary
         };
         color: ${theme.highlight};
-        font-size: ${CONFIG.currentTheme === "Neon Retro" ? "10px" : "13px"};
+        font-size: ${CONFIG.currentTheme === "Neon Retro" ? "11px" : "13px"};
         font-weight: ${CONFIG.currentTheme === "Neon Retro" ? "normal" : "700"};
         display: flex;
         justify-content: space-between;
@@ -975,12 +1168,12 @@
       .wplace-header-title {
         display: flex;
         align-items: center;
-        gap: ${CONFIG.currentTheme === "Neon Retro" ? "8px" : "6px"};
+        gap: ${CONFIG.currentTheme === "Neon Retro" ? "6px" : "6px"};
       }
       
       .wplace-header-controls {
         display: flex;
-        gap: ${CONFIG.currentTheme === "Neon Retro" ? "10px" : "6px"};
+        gap: ${CONFIG.currentTheme === "Neon Retro" ? "6px" : "6px"};
       }
       
       .wplace-header-btn {
@@ -1008,7 +1201,7 @@
       }
       
       .wplace-content {
-        padding: ${CONFIG.currentTheme === "Neon Retro" ? "15px" : "12px"};
+        padding: ${CONFIG.currentTheme === "Neon Retro" ? "12px" : "12px"};
         display: block;
         position: relative;
         z-index: 2;
@@ -1026,7 +1219,7 @@
       }
       
       .wplace-section {
-        margin-bottom: ${CONFIG.currentTheme === "Neon Retro" ? "15px" : "12px"};
+        margin-bottom: ${CONFIG.currentTheme === "Neon Retro" ? "12px" : "12px"};
         padding: 12px;
         background: rgba(255,255,255,0.03);
         border-radius: ${theme.borderRadius};
@@ -1464,6 +1657,326 @@
       /* Icon styling for retro feel */
       .fas, .fa {
         filter: drop-shadow(0 0 3px currentColor);
+      }
+      
+      /* Speed Control Styles */
+      .wplace-speed-control {
+        margin-top: 12px;
+        padding: 12px;
+        background: ${theme.secondary};
+        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.accent};
+        border-radius: ${theme.borderRadius};
+        backdrop-filter: ${theme.backdropFilter};
+      }
+      
+      .wplace-speed-label {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+        color: ${theme.text};
+        font-size: 13px;
+        font-weight: 600;
+      }
+      
+      .wplace-speed-label i {
+        margin-right: 6px;
+        color: ${theme.highlight};
+      }
+      
+      .wplace-speed-slider-container {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      
+      .wplace-speed-slider {
+        flex: 1;
+        height: 6px;
+        border-radius: 3px;
+        background: ${theme.primary};
+        outline: none;
+        cursor: pointer;
+        -webkit-appearance: none;
+        appearance: none;
+      }
+      
+      .wplace-speed-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: ${theme.highlight};
+        cursor: pointer;
+        border: 2px solid ${theme.text};
+        box-shadow: ${theme.boxShadow};
+      }
+      
+      .wplace-speed-slider::-moz-range-thumb {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: ${theme.highlight};
+        cursor: pointer;
+        border: 2px solid ${theme.text};
+        box-shadow: ${theme.boxShadow};
+      }
+      
+      .wplace-speed-display {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        min-width: 90px;
+        justify-content: flex-end;
+      }
+      
+      #speedValue {
+        color: ${theme.highlight};
+        font-weight: 600;
+        font-size: 14px;
+      }
+      
+      .wplace-speed-unit {
+        color: ${theme.text};
+        font-size: 11px;
+        opacity: 0.8;
+      }
+      
+      /* Settings Window Styles */
+      #wplace-settings-container {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10001;
+        min-width: 400px;
+        max-width: 500px;
+        background: ${theme.primary};
+        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.accent};
+        border-radius: ${theme.borderRadius};
+        box-shadow: ${theme.boxShadow};
+        backdrop-filter: ${theme.backdropFilter};
+      }
+      
+      .wplace-settings {
+        padding: 16px;
+        max-height: 400px;
+        overflow-y: auto;
+      }
+      
+      .wplace-setting-section {
+        margin-bottom: 20px;
+        padding: 12px;
+        background: ${theme.secondary};
+        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.accent};
+        border-radius: ${theme.borderRadius};
+      }
+      
+      .wplace-setting-title {
+        display: flex;
+        align-items: center;
+        margin-bottom: 12px;
+        color: ${theme.text};
+        font-size: 14px;
+        font-weight: 600;
+      }
+      
+      .wplace-setting-title i {
+        margin-right: 8px;
+        color: ${theme.highlight};
+      }
+      
+      .wplace-setting-content {
+        color: ${theme.text};
+      }
+      
+      .wplace-section {
+        margin-bottom: 20px;
+        padding: 15px;
+        background: ${theme.secondary};
+        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.accent};
+        border-radius: ${theme.borderRadius};
+      }
+      
+      .wplace-section-title {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+        color: ${theme.text};
+        font-size: 14px;
+        font-weight: 600;
+      }
+      
+      .wplace-section-title i {
+        margin-right: 8px;
+        color: ${theme.highlight};
+      }
+      
+      .wplace-speed-container {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 10px;
+      }
+      
+      .wplace-slider {
+        flex: 1;
+        height: 6px;
+        background: ${theme.accent};
+        border-radius: 3px;
+        outline: none;
+        -webkit-appearance: none;
+      }
+      
+      .wplace-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        background: ${theme.highlight};
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid ${theme.primary};
+      }
+      
+      .wplace-speed-display {
+        background: ${theme.accent};
+        padding: 5px 10px;
+        border-radius: 4px;
+        color: ${theme.text};
+        font-weight: 600;
+        min-width: 80px;
+        text-align: center;
+        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.highlight};
+      }
+      
+      .wplace-select {
+        width: 100%;
+        padding: 8px 12px;
+        background: ${theme.secondary};
+        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.accent};
+        border-radius: ${theme.borderRadius};
+        color: ${theme.text};
+        font-size: 14px;
+        margin-bottom: 10px;
+      }
+      
+      .wplace-select:focus {
+        outline: none;
+        border-color: ${theme.highlight};
+      }
+      
+      .wplace-description {
+        color: ${theme.text};
+        font-size: 12px;
+        opacity: 0.8;
+        line-height: 1.4;
+      }
+      
+      .wplace-theme-custom {
+        margin-top: 15px;
+        padding: 15px;
+        background: ${theme.accent};
+        border-radius: ${theme.borderRadius};
+        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.highlight};
+      }
+      
+      .wplace-custom-group {
+        margin-bottom: 15px;
+      }
+      
+      .wplace-custom-label {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+        color: ${theme.text};
+        font-size: 13px;
+        font-weight: 600;
+      }
+      
+      .wplace-custom-label i {
+        margin-right: 8px;
+        color: ${theme.highlight};
+        width: 16px;
+      }
+      
+      .wplace-color-input-group {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      
+      .wplace-color-input {
+        width: 50px;
+        height: 30px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        background: transparent;
+      }
+      
+      .wplace-color-text {
+        flex: 1;
+        padding: 6px 10px;
+        background: ${theme.secondary};
+        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.accent};
+        border-radius: 4px;
+        color: ${theme.text};
+        font-size: 12px;
+        font-family: monospace;
+      }
+      
+      .wplace-animation-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      
+      .wplace-checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: ${theme.text};
+        font-size: 12px;
+        cursor: pointer;
+      }
+      
+      .wplace-checkbox-label input[type="checkbox"] {
+        accent-color: ${theme.highlight};
+      }
+      
+      .wplace-slider-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      
+      .wplace-slider-container .wplace-slider {
+        flex: 1;
+      }
+      
+      .wplace-slider-container span {
+        color: ${theme.text};
+        font-size: 12px;
+        font-weight: 600;
+        min-width: 40px;
+      }
+      
+      .wplace-custom-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+        border-top: 1px solid ${theme.accent};
+        padding-top: 15px;
+      }
+      
+      .wplace-btn-secondary {
+        background: ${theme.accent};
+        color: ${theme.text};
+        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.highlight};
+      }
+      
+      .wplace-btn-secondary:hover {
+        background: ${theme.secondary};
       }`
           : ""
       }
@@ -1479,8 +1992,8 @@
           <span>${Utils.t("title")}</span>
         </div>
         <div class="wplace-header-controls">
-          <button id="themeBtn" class="wplace-header-btn" title="Switch Theme">
-            <i class="fas fa-palette"></i>
+          <button id="settingsBtn" class="wplace-header-btn" title="${Utils.t("settings")}">
+            <i class="fas fa-cog"></i>
           </button>
           <button id="statsBtn" class="wplace-header-btn" title="Show Stats">
             <i class="fas fa-chart-bar"></i>
@@ -1595,6 +2108,9 @@
           <span>Painting Stats</span>
         </div>
         <div class="wplace-header-controls">
+          <button id="refreshChargesBtn" class="wplace-header-btn" title="Refresh Charges">
+            <i class="fas fa-sync"></i>
+          </button>
           <button id="closeStatsBtn" class="wplace-header-btn" title="Close Stats">
             <i class="fas fa-times"></i>
           </button>
@@ -1609,6 +2125,247 @@
           </div>
         </div>
       </div>
+    `
+
+    // Modern Settings Container
+    const settingsContainer = document.createElement("div")
+    settingsContainer.id = "wplace-settings-container"
+    settingsContainer.style.cssText = `
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      border-radius: 16px;
+      padding: 0;
+      z-index: 10002;
+      display: none;
+      min-width: 380px;
+      max-width: 420px;
+      color: white;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      overflow: hidden;
+      animation: settingsSlideIn 0.4s ease-out;
+    `
+
+    settingsContainer.innerHTML = `
+      <div class="wplace-settings-header" style="background: rgba(255,255,255,0.1); padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); cursor: move;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h3 style="margin: 0; color: white; font-size: 20px; font-weight: 300; display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-cog" style="font-size: 18px; animation: spin 2s linear infinite;"></i>
+            ${Utils.t("settings")}
+          </h3>
+          <button id="closeSettingsBtn" style="
+            background: rgba(255,255,255,0.1); 
+            color: white; 
+            border: 1px solid rgba(255,255,255,0.2); 
+            border-radius: 50%; 
+            width: 32px; 
+            height: 32px; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 300;
+          " onmouseover="this.style.background='rgba(255,255,255,0.2)'; this.style.transform='scale(1.1)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'; this.style.transform='scale(1)'">✕</button>
+        </div>
+      </div>
+      
+      <div style="padding: 25px;">
+        <!-- Speed Control Section -->
+        <div style="margin-bottom: 25px;">
+          <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-tachometer-alt" style="color: #4facfe; font-size: 16px;"></i>
+            ${Utils.t("paintingSpeed")}
+          </label>
+          <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1);">
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+              <input type="range" id="speedSlider" min="${CONFIG.PAINTING_SPEED.MIN}" max="${CONFIG.PAINTING_SPEED.MAX}" value="${CONFIG.PAINTING_SPEED.DEFAULT}" 
+                style="
+                  flex: 1; 
+                  height: 8px;
+                  background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+                  border-radius: 4px;
+                  outline: none;
+                  -webkit-appearance: none;
+                  cursor: pointer;
+                ">
+              <div id="speedValue" style="
+                min-width: 70px; 
+                text-align: center; 
+                background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); 
+                padding: 8px 12px; 
+                border-radius: 8px; 
+                color: white;
+                font-weight: bold;
+                font-size: 13px;
+                box-shadow: 0 3px 10px rgba(79, 172, 254, 0.3);
+                border: 1px solid rgba(255,255,255,0.2);
+              ">${CONFIG.PAINTING_SPEED.DEFAULT} px/s</div>
+            </div>
+            <div style="display: flex; justify-content: space-between; color: rgba(255,255,255,0.7); font-size: 11px; margin-top: 8px;">
+              <span><i class="fas fa-turtle"></i> ${CONFIG.PAINTING_SPEED.MIN}</span>
+              <span><i class="fas fa-rabbit"></i> ${CONFIG.PAINTING_SPEED.MAX}</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Theme Selection Section -->
+        <div style="margin-bottom: 25px;">
+          <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-palette" style="color: #f093fb; font-size: 16px;"></i>
+            ${Utils.t("themeSettings")}
+          </label>
+          <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1);">
+            <select id="themeSelect" style="
+              width: 100%; 
+              padding: 12px 16px; 
+              background: rgba(255,255,255,0.15); 
+              color: white; 
+              border: 1px solid rgba(255,255,255,0.2); 
+              border-radius: 8px;
+              font-size: 14px;
+              outline: none;
+              cursor: pointer;
+              transition: all 0.3s ease;
+              font-family: inherit;
+              box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            ">
+              ${Object.keys(CONFIG.THEMES).map(themeName => 
+                `<option value="${themeName}" ${CONFIG.currentTheme === themeName ? 'selected' : ''} style="background: #2d3748; color: white; padding: 10px;">${themeName}</option>`
+              ).join('')}
+            </select>
+          </div>
+        </div>
+        
+        <!-- Language Selection Section -->
+        <div style="margin-bottom: 15px;">
+          <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-globe" style="color: #ffeaa7; font-size: 16px;"></i>
+            ${Utils.t("language")}
+          </label>
+          <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1);">
+            <select id="languageSelect" style="
+              width: 100%; 
+              padding: 12px 16px; 
+              background: rgba(255,255,255,0.15); 
+              color: white; 
+              border: 1px solid rgba(255,255,255,0.2); 
+              border-radius: 8px;
+              font-size: 14px;
+              outline: none;
+              cursor: pointer;
+              transition: all 0.3s ease;
+              font-family: inherit;
+              box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            ">
+              <option value="vi" ${state.language === 'vi' ? 'selected' : ''} style="background: #2d3748; color: white;">🇻🇳 Tiếng Việt</option>
+              <option value="en" ${state.language === 'en' ? 'selected' : ''} style="background: #2d3748; color: white;">🇺🇸 English</option>
+              <option value="pt" ${state.language === 'pt' ? 'selected' : ''} style="background: #2d3748; color: white;">🇧🇷 Português</option>
+              <option value="fr" ${state.language === 'fr' ? 'selected' : ''} style="background: #2d3748; color: white;">🇫🇷 Français</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      
+      <style>
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        
+        @keyframes settingsSlideIn {
+          from { 
+            opacity: 0; 
+            transform: translate(-50%, -50%) scale(0.9);
+          }
+          to { 
+            opacity: 1; 
+            transform: translate(-50%, -50%) scale(1);
+          }
+        }
+        
+        @keyframes settingsFadeOut {
+          from { 
+            opacity: 1; 
+            transform: translate(-50%, -50%) scale(1);
+          }
+          to { 
+            opacity: 0; 
+            transform: translate(-50%, -50%) scale(0.9);
+          }
+        }
+        
+        #speedSlider::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          width: 18px;
+          height: 18px;
+          border-radius: 50%;
+          background: white;
+          box-shadow: 0 3px 6px rgba(0,0,0,0.3), 0 0 0 2px #4facfe;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        
+        #speedSlider::-webkit-slider-thumb:hover {
+          transform: scale(1.2);
+          box-shadow: 0 4px 8px rgba(0,0,0,0.4), 0 0 0 3px #4facfe;
+        }
+        
+        #speedSlider::-moz-range-thumb {
+          width: 18px;
+          height: 18px;
+          border-radius: 50%;
+          background: white;
+          box-shadow: 0 3px 6px rgba(0,0,0,0.3), 0 0 0 2px #4facfe;
+          cursor: pointer;
+          border: none;
+          transition: all 0.2s ease;
+        }
+        
+        #themeSelect:hover, #languageSelect:hover {
+          border-color: rgba(255,255,255,0.4);
+          background: rgba(255,255,255,0.2);
+          transform: translateY(-1px);
+          box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        }
+        
+        #themeSelect:focus, #languageSelect:focus {
+          border-color: #4facfe;
+          box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.3);
+        }
+        
+        #themeSelect option, #languageSelect option {
+          background: #2d3748;
+          color: white;
+          padding: 10px;
+          border-radius: 6px;
+        }
+        
+        #themeSelect option:hover, #languageSelect option:hover {
+          background: #4a5568;
+        }
+        
+        /* Dragging state styles */
+        .wplace-dragging {
+          opacity: 0.9;
+          box-shadow: 0 30px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.2);
+          transition: none;
+        }
+        
+        .wplace-settings-header:hover {
+          background: rgba(255,255,255,0.15) !important;
+        }
+        
+        .wplace-settings-header:active {
+          background: rgba(255,255,255,0.2) !important;
+        }
+      </style>
     `
 
     const resizeContainer = document.createElement("div")
@@ -1649,6 +2406,7 @@
     document.body.appendChild(resizeOverlay)
     document.body.appendChild(resizeContainer)
     document.body.appendChild(statsContainer)
+    document.body.appendChild(settingsContainer)
 
     // Query all UI elements after appending to DOM
     const initBotBtn = container.querySelector("#initBotBtn")
@@ -1669,6 +2427,7 @@
     const statsArea = statsContainer.querySelector("#statsArea")
     const content = container.querySelector(".wplace-content")
     const closeStatsBtn = statsContainer.querySelector("#closeStatsBtn")
+    const refreshChargesBtn = statsContainer.querySelector("#refreshChargesBtn")
 
     // Check if all elements are found
     if (!initBotBtn || !uploadBtn || !selectPosBtn || !startBtn || !stopBtn) {
@@ -1690,68 +2449,40 @@
     }
 
     const header = container.querySelector(".wplace-header")
-    let pos1 = 0,
-      pos2 = 0,
-      pos3 = 0,
-      pos4 = 0
 
-    header.onmousedown = dragMouseDown
-
-    function dragMouseDown(e) {
-      if (e.target.closest(".wplace-header-btn")) return
-
-      e.preventDefault()
-      pos3 = e.clientX
-      pos4 = e.clientY
-      container.classList.add("wplace-dragging")
-      document.onmouseup = closeDragElement
-      document.onmousemove = elementDrag
-
-      // Prevent text selection during drag
-      document.body.style.userSelect = "none"
-    }
-
-    function elementDrag(e) {
-      e.preventDefault()
-      pos1 = pos3 - e.clientX
-      pos2 = pos4 - e.clientY
-      pos3 = e.clientX
-      pos4 = e.clientY
-
-      let newTop = container.offsetTop - pos2
-      let newLeft = container.offsetLeft - pos1
-
-      // Boundary checking to keep UI within viewport
-      const rect = container.getBoundingClientRect()
-      const maxTop = window.innerHeight - rect.height
-      const maxLeft = window.innerWidth - rect.width
-
-      newTop = Math.max(0, Math.min(newTop, maxTop))
-      newLeft = Math.max(0, Math.min(newLeft, maxLeft))
-
-      container.style.top = newTop + "px"
-      container.style.left = newLeft + "px"
-    }
-
-    function closeDragElement() {
-      container.classList.remove("wplace-dragging")
-      document.onmouseup = null
-      document.onmousemove = null
-      document.body.style.userSelect = ""
-    }
+    // Use the shared makeDraggable function for consistency
+    makeDraggable(container)
 
     function makeDraggable(element) {
       let pos1 = 0,
         pos2 = 0,
         pos3 = 0,
         pos4 = 0
-      const header = element.querySelector(".wplace-header")
+      let isDragging = false
+      const header = element.querySelector(".wplace-header") || element.querySelector(".wplace-settings-header")
+      
+      // Check if header exists to prevent null error
+      if (!header) {
+        console.warn("No draggable header found for element:", element)
+        return
+      }
+      
       header.onmousedown = dragMouseDown
 
       function dragMouseDown(e) {
-        if (e.target.closest(".wplace-header-btn")) return
+        if (e.target.closest(".wplace-header-btn") || e.target.closest("button")) return
 
         e.preventDefault()
+        isDragging = true
+        
+        // Get current position
+        const rect = element.getBoundingClientRect()
+        
+        // Remove transform and set absolute position
+        element.style.transform = "none"
+        element.style.top = rect.top + "px"
+        element.style.left = rect.left + "px"
+        
         pos3 = e.clientX
         pos4 = e.clientY
         element.classList.add("wplace-dragging")
@@ -1763,6 +2494,8 @@
       }
 
       function elementDrag(e) {
+        if (!isDragging) return
+        
         e.preventDefault()
         pos1 = pos3 - e.clientX
         pos2 = pos4 - e.clientY
@@ -1785,6 +2518,7 @@
       }
 
       function closeDragElement() {
+        isDragging = false
         element.classList.remove("wplace-dragging")
         document.onmouseup = null
         document.onmousemove = null
@@ -1818,6 +2552,191 @@
         statsBtn.innerHTML = '<i class="fas fa-chart-bar"></i>'
         statsBtn.title = "Show Stats"
       })
+
+      // Refresh charges button
+      if (refreshChargesBtn) {
+        refreshChargesBtn.addEventListener("click", async () => {
+          refreshChargesBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'
+          refreshChargesBtn.disabled = true
+          
+          try {
+            await updateStats()
+          } catch (error) {
+            console.error("Error refreshing charges:", error)
+          } finally {
+            refreshChargesBtn.innerHTML = '<i class="fas fa-sync"></i>'
+            refreshChargesBtn.disabled = false
+          }
+        })
+      }
+    }
+
+    // Settings window functionality
+    const settingsBtn = container.querySelector("#settingsBtn")
+    const closeSettingsBtn = settingsContainer.querySelector("#closeSettingsBtn")
+    
+    if (settingsBtn && closeSettingsBtn) {
+      settingsBtn.addEventListener("click", () => {
+        const isVisible = settingsContainer.style.display !== "none"
+        if (isVisible) {
+          // Add fade out animation
+          settingsContainer.style.animation = "settingsFadeOut 0.3s ease-out forwards"
+          setTimeout(() => {
+            settingsContainer.style.display = "none"
+            settingsContainer.style.animation = ""
+          }, 300)
+        } else {
+          // Reset position to center before showing
+          settingsContainer.style.top = "50%"
+          settingsContainer.style.left = "50%"
+          settingsContainer.style.transform = "translate(-50%, -50%)"
+          settingsContainer.style.display = "block"
+          settingsContainer.style.animation = "settingsSlideIn 0.4s ease-out"
+        }
+      })
+
+      closeSettingsBtn.addEventListener("click", () => {
+        // Add fade out animation
+        settingsContainer.style.animation = "settingsFadeOut 0.3s ease-out forwards"
+        setTimeout(() => {
+          settingsContainer.style.display = "none"
+          settingsContainer.style.animation = ""
+          // Reset position for next time
+          settingsContainer.style.top = "50%"
+          settingsContainer.style.left = "50%"
+          settingsContainer.style.transform = "translate(-50%, -50%)"
+        }, 300)
+      })
+      
+      // Make settings window draggable
+      makeDraggable(settingsContainer)
+      
+      // Language selector event listener
+      const languageSelect = settingsContainer.querySelector("#languageSelect")
+      if (languageSelect) {
+        languageSelect.addEventListener("change", (e) => {
+          const newLanguage = e.target.value
+          state.language = newLanguage
+          localStorage.setItem('wplace_language', newLanguage)
+          
+          // Refresh the UI to apply new language
+          setTimeout(() => {
+            // Hide settings first
+            settingsContainer.style.display = "none"
+            
+            // Recreate UI with new language (cleanup is handled in createUI)
+            createUI()
+          }, 100)
+        })
+      }
+      
+      // Theme selector event listener
+      const themeSelect = settingsContainer.querySelector("#themeSelect")
+      if (themeSelect) {
+        themeSelect.addEventListener("change", (e) => {
+          const newTheme = e.target.value
+          switchTheme(newTheme)
+        })
+      }
+      
+      // Theme customization event listeners
+      const primaryColor = settingsContainer.querySelector("#primaryColor")
+      const primaryColorText = settingsContainer.querySelector("#primaryColorText")
+      const secondaryColor = settingsContainer.querySelector("#secondaryColor")
+      const secondaryColorText = settingsContainer.querySelector("#secondaryColorText")
+      const highlightColor = settingsContainer.querySelector("#highlightColor")
+      const highlightColorText = settingsContainer.querySelector("#highlightColorText")
+      const borderRadiusSlider = settingsContainer.querySelector("#borderRadiusSlider")
+      const borderRadiusValue = settingsContainer.querySelector("#borderRadiusValue")
+      const applyChangesBtn = settingsContainer.querySelector("#applyThemeChanges")
+      const resetDefaultsBtn = settingsContainer.querySelector("#resetThemeDefaults")
+      
+      // Color input synchronization
+      if (primaryColor && primaryColorText) {
+        primaryColor.addEventListener("input", (e) => {
+          primaryColorText.value = e.target.value
+        })
+        primaryColorText.addEventListener("input", (e) => {
+          if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
+            primaryColor.value = e.target.value
+          }
+        })
+      }
+      
+      if (secondaryColor && secondaryColorText) {
+        secondaryColor.addEventListener("input", (e) => {
+          secondaryColorText.value = e.target.value
+        })
+        secondaryColorText.addEventListener("input", (e) => {
+          if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
+            secondaryColor.value = e.target.value
+          }
+        })
+      }
+      
+      if (highlightColor && highlightColorText) {
+        highlightColor.addEventListener("input", (e) => {
+          highlightColorText.value = e.target.value
+        })
+        highlightColorText.addEventListener("input", (e) => {
+          if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
+            highlightColor.value = e.target.value
+          }
+        })
+      }
+      
+      // Border radius slider
+      if (borderRadiusSlider && borderRadiusValue) {
+        borderRadiusSlider.addEventListener("input", (e) => {
+          borderRadiusValue.textContent = e.target.value + "px"
+        })
+      }
+      
+      // Apply theme changes
+      if (applyChangesBtn) {
+        applyChangesBtn.addEventListener("click", () => {
+          const currentTheme = getCurrentTheme()
+          const currentThemeName = CONFIG.currentTheme
+          
+          // Get all values
+          const newValues = {
+            primary: primaryColorText?.value || currentTheme.primary,
+            secondary: secondaryColorText?.value || currentTheme.secondary,
+            highlight: highlightColorText?.value || currentTheme.highlight,
+            borderRadius: (borderRadiusSlider?.value || 0) + "px",
+            animations: {
+              glow: settingsContainer.querySelector("#glowAnimation")?.checked || false,
+              scanline: settingsContainer.querySelector("#scanlineAnimation")?.checked || false,
+              pixelBlink: settingsContainer.querySelector("#pixelBlinkAnimation")?.checked || false
+            }
+          }
+          
+          // Update theme
+          CONFIG.THEMES[currentThemeName] = {
+            ...currentTheme,
+            ...newValues
+          }
+          
+          // Save and apply
+          saveThemePreference()
+          setTimeout(() => {
+            settingsContainer.style.display = "none"
+            createUI()
+          }, 100)
+        })
+      }
+      
+      // Reset to defaults
+      if (resetDefaultsBtn) {
+        resetDefaultsBtn.addEventListener("click", () => {
+          // Reset to original theme values (you'll need to store defaults)
+          const confirmReset = confirm("Reset theme to default settings?")
+          if (confirmReset) {
+            // Reload original theme (this is a simplified approach)
+            location.reload()
+          }
+        })
+      }
     }
 
     const widthSlider = resizeContainer.querySelector("#widthSlider")
@@ -1905,6 +2824,9 @@
             Utils.showAlert(Utils.t("dataLoaded"), "success")
             updateDataButtons()
 
+            // Check charges immediately after loading auto-save
+            updateStats()
+
             if (!state.colorsChecked) {
               initBotBtn.style.display = "block"
             }
@@ -1941,6 +2863,9 @@
             updateUI("fileLoaded", "success")
             Utils.showAlert(Utils.t("fileLoaded"), "success")
             updateDataButtons()
+
+            // Check charges immediately after loading file
+            await updateStats()
 
             // Auto-enable buttons after loading from file
             if (state.colorsChecked) {
@@ -2360,11 +3285,37 @@
     // Check for saved progress after a short delay to let UI settle
     setTimeout(checkSavedProgress, 1000)
 
-    const themeBtn = container.querySelector("#themeBtn")
-    if (themeBtn) {
-      themeBtn.addEventListener("click", () => {
-        createThemePopup()
+    // Speed Slider Event Listener (in settings window)
+    const speedSlider = settingsContainer.querySelector("#speedSlider")
+    const speedValue = settingsContainer.querySelector("#speedValue")
+    if (speedSlider && speedValue) {
+      speedSlider.addEventListener("input", (e) => {
+        const speed = parseInt(e.target.value) // Use integer instead of float
+        state.paintingSpeed = speed
+        speedValue.textContent = speed + " px/s" // Add px/s unit
+        
+        // Save speed preference to localStorage
+        try {
+          localStorage.setItem("wplace-painting-speed", speed.toString())
+        } catch (error) {
+          console.warn("Could not save painting speed preference:", error)
+        }
       })
+      
+      // Load saved speed preference
+      try {
+        const savedSpeed = localStorage.getItem("wplace-painting-speed")
+        if (savedSpeed) {
+          const speed = parseInt(savedSpeed)
+          if (speed >= CONFIG.PAINTING_SPEED.MIN && speed <= CONFIG.PAINTING_SPEED.MAX) {
+            state.paintingSpeed = speed
+            speedSlider.value = speed
+            speedValue.textContent = speed.toString()
+          }
+        }
+      } catch (error) {
+        console.warn("Could not load painting speed preference:", error)
+      }
     }
   }
 
@@ -2447,6 +3398,13 @@
               if (state.paintedPixels % 50 === 0) {
                 Utils.saveProgress()
               }
+
+              // Apply painting speed delay
+              if (state.paintingSpeed > 0 && pixelBatch.length > 0) {
+                const delayPerPixel = 1000 / state.paintingSpeed // ms per pixel
+                const totalDelay = Math.max(100, delayPerPixel * pixelBatch.length) // minimum 100ms
+                await Utils.sleep(totalDelay)
+              }
             }
 
             pixelBatch = []
@@ -2473,6 +3431,13 @@
             state.paintedPixels++
           })
           state.currentCharges -= pixelBatch.length
+
+          // Apply painting speed delay for remaining pixels
+          if (state.paintingSpeed > 0 && pixelBatch.length > 0) {
+            const delayPerPixel = 1000 / state.paintingSpeed // ms per pixel
+            const totalDelay = Math.max(100, delayPerPixel * pixelBatch.length) // minimum 100ms
+            await Utils.sleep(totalDelay)
+          }
         }
       }
     } finally {
@@ -2500,13 +3465,17 @@
       return "token_error"
     }
 
-    const coords = []
-    const colors = []
+    // Pre-allocate arrays for better performance
+    const coords = new Array(pixelBatch.length * 2)
+    const colors = new Array(pixelBatch.length)
 
-    pixelBatch.forEach((pixel) => {
-      coords.push(pixel.x, pixel.y)
-      colors.push(pixel.color)
-    })
+    // Optimized loop with direct indexing
+    for (let i = 0; i < pixelBatch.length; i++) {
+      const pixel = pixelBatch[i]
+      coords[i * 2] = pixel.x
+      coords[i * 2 + 1] = pixel.y
+      colors[i] = pixel.color
+    }
 
     try {
       const payload = {
