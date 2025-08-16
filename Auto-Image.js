@@ -173,7 +173,7 @@
   // BILINGUAL TEXT STRINGS
   const TEXT = {
     en: {
-    title: "WPlace Auto-Image",
+    title: "WPlace TEST DEV",
     initBot: "Start Auto-BOT",
     uploadImage: "Upload Image",
     resizeImage: "Resize Image",
@@ -3339,6 +3339,7 @@
                 data[i] = nr;
                 data[i + 1] = ng;
                 data[i + 2] = nb;
+                data[i + 3] = 255; // ** THE FIX IS HERE **
             }
             tempCtx.putImageData(imgData, 0, 0);
             resizePreview.src = tempCanvas.toDataURL();
