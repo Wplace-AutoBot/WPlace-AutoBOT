@@ -1,4 +1,3 @@
-javascript
 ;(async () => {
   // CONFIGURATION CONSTANTS
   const CONFIG = {
