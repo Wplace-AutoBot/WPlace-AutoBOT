@@ -1,3 +1,4 @@
+javascript
 ;(async () => {
   // CONFIGURATION CONSTANTS
   const CONFIG = {
@@ -483,7 +484,7 @@
     paintedPixels: 0,
     availableColors: [],
     activeColorPalette: [], // User-selected colors for conversion
-    paintWhitePixels: false, // New state for controlling white pixel painting
+    paintWhitePixels: true, // Default to ON
     currentCharges: 0,
     cooldown: CONFIG.COOLDOWN_DEFAULT,
     imageData: null,
@@ -1118,13 +1119,16 @@
           const key = rgb.join(',');
           const name = CONFIG.COLOR_NAMES[key] || `rgb(${key})`;
           const isPaid = CONFIG.PAID_COLORS.has(key);
-
+          
+          const colorItem = Utils.createElement('div', { className: 'wplace-color-item' });
           const swatch = Utils.createElement('button', {
               className: `wplace-color-swatch ${isPaid ? 'paid' : ''}`,
               title: name,
               'data-rgb': key,
           });
           swatch.style.backgroundColor = `rgb(${key})`;
+
+          const nameLabel = Utils.createElement('span', { className: 'wplace-color-item-name' }, name);
 
           // Default state: free are active, paid are not
           if (!isPaid) {
@@ -1135,11 +1139,14 @@
               swatch.classList.toggle('active');
               updateActiveColorPalette();
           });
+          
+          colorItem.appendChild(swatch);
+          colorItem.appendChild(nameLabel);
 
           if (isPaid) {
-              paidContainer.appendChild(swatch);
+              paidContainer.appendChild(colorItem);
           } else {
-              freeContainer.appendChild(swatch);
+              freeContainer.appendChild(colorItem);
           }
       });
 
@@ -1757,7 +1764,7 @@
         overflow: auto;
         font-family: ${theme.fontFamily};
       }
-      
+
       .resize-preview-wrapper {
         display: flex;
         justify-content: center;
@@ -1773,7 +1780,7 @@
         max-width: none; /* Allow image to exceed wrapper for zoom */
         transition: transform 0.1s ease;
       }
-      
+
       .resize-controls {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -1851,11 +1858,24 @@
       /* --- START: Color Palette Styles --- */
       .wplace-color-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(22px, 1fr));
-        gap: 5px;
+        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); /* Wider columns for name */
+        gap: 10px;
         padding-top: 8px;
-        max-height: 150px;
-        overflow-y: auto;
+      }
+      .wplace-color-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+      }
+      .wplace-color-item-name {
+        font-size: 9px;
+        color: #ccc;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100%;
       }
       .wplace-color-swatch {
         width: 22px;
@@ -1865,6 +1885,7 @@
         cursor: pointer;
         transition: transform 0.1s ease, box-shadow 0.2s ease;
         position: relative;
+        margin: 0 auto;
       }
       .wplace-color-swatch.paid {
         border-color: gold;
@@ -2668,8 +2689,8 @@
           Keep Aspect Ratio
         </label>
         <label style="display: flex; align-items: center;">
-          <input type="checkbox" id="paintWhiteToggle">
-          Paint White Pixels
+            <input type="checkbox" id="paintWhiteToggle" checked>
+            Paint White Pixels
         </label>
         <div class="resize-zoom-controls">
           <i class="fas fa-search-minus"></i>
@@ -3284,6 +3305,7 @@
         widthValue.textContent = width;
         heightValue.textContent = height;
         zoomSlider.value = 1;
+        paintWhiteToggle.checked = state.paintWhitePixels;
 
         _updateResizePreview = () => {
             const newWidth = parseInt(widthSlider.value, 10);
