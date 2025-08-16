@@ -194,7 +194,6 @@
     positionTimeout: "❌ Timeout for position selection",
     startPaintingMsg: "🎨 Starting painting...",
     paintingProgress: "🧱 Progress: {painted}/{total} pixels...",
-  skipSummary: "ℹ️ {skipped} pixels already correct. {toPaint} will be painted.",
     noCharges: "⌛ No charges. Waiting {time}...",
     paintingStopped: "⏹️ Painting stopped by user",
     paintingComplete: "✅ Painting complete! {count} pixels painted.",
@@ -265,7 +264,6 @@
     positionTimeout: "❌ Время ожидания выбора позиции истекло",
     startPaintingMsg: "🎨 Начинаем рисование...",
     paintingProgress: "🧱 Прогресс: {painted}/{total} пикселей...",
-  skipSummary: "ℹ️ {skipped} пикселей уже правильные. {toPaint} будет нарисовано.",
     noCharges: "⌛ Нет зарядов. Ожидание {time}...",
     paintingStopped: "⏹️ Рисование остановлено пользователем",
     paintingComplete: "✅ Рисование завершено! Нарисовано пикселей: {count}.",
@@ -336,7 +334,6 @@
     positionTimeout: "❌ Tempo esgotado para selecionar posição",
     startPaintingMsg: "🎨 Iniciando pintura...",
     paintingProgress: "🧱 Progresso: {painted}/{total} pixels...",
-  skipSummary: "ℹ️ {skipped} pixels já corretos. {toPaint} serão pintados.",
     noCharges: "⌛ Sem cargas. Aguardando {time}...",
     paintingStopped: "⏹️ Pintura interromпида pelo usuário",
     paintingComplete: "✅ Pintura concluída! {count} pixels pintados.",
@@ -407,7 +404,6 @@
     positionTimeout: "❌ Hết thời gian chọn vị trí",
     startPaintingMsg: "🎨 Bắt đầu vẽ...",
     paintingProgress: "🧱 Tiến trình: {painted}/{total} pixel...",
-  skipSummary: "ℹ️ {skipped} pixel đã đúng. {toPaint} sẽ được vẽ.",
     noCharges: "⌛ Không có điện tích. Đang chờ {time}...",
     paintingStopped: "⏹️ Người dùng đã dừng vẽ",
     paintingComplete: "✅ Hoàn thành vẽ! Đã vẽ {count} pixel.",
@@ -478,7 +474,6 @@
     positionTimeout: "❌ Délai d'attente pour la sélection de position",
     startPaintingMsg: "🎨 Début de la peinture...",
     paintingProgress: "🧱 Progrès: {painted}/{total} pixels...",
-  skipSummary: "ℹ️ {skipped} pixels déjà corrects. {toPaint} seront peints.",
     noCharges: "⌛ Aucune charge. En attente {time}...",
     paintingStopped: "⏹️ Peinture arrêtée par l'utilisateur",
     paintingComplete: "✅ Peinture terminée! {count} pixels peints.",
@@ -556,12 +551,12 @@
     language: "en",
     paintingSpeed: CONFIG.PAINTING_SPEED.DEFAULT, // pixels per second
     cooldownChargeThreshold: CONFIG.COOLDOWN_CHARGE_THRESHOLD,
-    existingColorIds: null,
-    skipSummaryShown: false,
   }
 
+  // Placeholder for the resize preview update function
   let _updateResizePreview = () => {};
 
+  // Turnstile token handling (promise-based) inspired by external logic
   let turnstileToken = null
   let _resolveToken = null
   let tokenPromise = new Promise((resolve) => { _resolveToken = resolve })
@@ -1100,55 +1095,6 @@
         }
       }
     },
-
-    // Fetch raw tile image for a region (similar to external script logic) and build a color id grid
-    async loadExistingTile(regionX, regionY) {
-      try {
-        const imgUrl = `https://backend.wplace.live/files/s0/tiles/${regionX}/${regionY}.png`;
-        const img = await new Promise((resolve, reject) => {
-          const image = new Image();
-          image.crossOrigin = 'anonymous';
-          image.onload = () => resolve(image);
-          image.onerror = reject;
-          image.src = imgUrl;
-        });
-        const canvas = document.createElement('canvas');
-        canvas.width = img.width; canvas.height = img.height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-        const data = ctx.getImageData(0,0,canvas.width, canvas.height).data;
-        const map = Array(canvas.height).fill(null).map(()=>Array(canvas.width).fill(0));
-        // Build reverse lookup for available color ids (palette) by rgb string
-        const colorIdByRgb = new Map();
-        (state.availableColors||[]).forEach(c=>{ colorIdByRgb.set(c.rgb.join(','), c.id); });
-        // Fallback: compute nearest if exact not found
-        for (let y=0; y<canvas.height; y++) {
-          for (let x=0; x<canvas.width; x++) {
-            const i = (y*canvas.width + x)*4;
-            const r = data[i], g=data[i+1], b=data[i+2], a=data[i+3];
-            if (a < CONFIG.TRANSPARENCY_THRESHOLD) { map[y][x]=0; continue; }
-            const key = `${r},${g},${b}`;
-            let id = colorIdByRgb.get(key);
-            if (!id) {
-              // find closest among availableColors
-              let minD = Infinity, best = 0;
-              for (let k=0;k<state.availableColors.length;k++) {
-                const c = state.availableColors[k];
-                const dr = c.rgb[0]-r, dg=c.rgb[1]-g, db=c.rgb[2]-b;
-                const dist = dr*dr+dg*dg+db*db;
-                if (dist<minD) { minD=dist; best=c.id; if (dist===0) break; }
-              }
-              id = best;
-            }
-            map[y][x]=id;
-          }
-        }
-        return map; // [y][x] => colorId
-      } catch (e) {
-        console.warn('Could not load existing tile for skip logic', e);
-        return null;
-      }
-    }
   }
 
   // COLOR MATCHING FUNCTION - Optimized with caching
@@ -3998,38 +3944,6 @@
 
     let pixelBatch = []
 
-    // Pre-scan to determine how many pixels are already correct (skip) vs to paint
-    if (!state.skipSummaryShown) {
-      try {
-        if (!state.existingColorIds) {
-          state.existingColorIds = await WPlaceService.loadExistingTile(regionX, regionY);
-        }
-        if (state.existingColorIds) {
-          let skipped = 0; let toPaint = 0;
-          for (let y=0; y<height; y++) {
-            for (let x=0; x<width; x++) {
-              const idx2 = (y*width + x)*4;
-              const a = pixels[idx2+3];
-              if (a < CONFIG.TRANSPARENCY_THRESHOLD) continue;
-              const r2 = pixels[idx2], g2 = pixels[idx2+1], b2 = pixels[idx2+2];
-              if (!state.paintWhitePixels && Utils.isWhitePixel(r2,g2,b2)) continue;
-              // Quantize and map
-              let qRgb = Utils.isWhitePixel(r2,g2,b2) ? [255,255,255] : Utils.findClosestPaletteColor(r2,g2,b2,state.activeColorPalette);
-              const neededId = findClosestColor(qRgb, state.availableColors);
-              const boardId = state.existingColorIds[(startY + y) - startY]?.[(startX + x) - startX];
-              if (boardId === neededId) skipped++; else toPaint++;
-            }
-          }
-          state.skipSummaryShown = true;
-          const msgParams = { skipped, toPaint };
-          Utils.showAlert(Utils.t('skipSummary', msgParams), 'info');
-          updateUI('skipSummary', 'success', msgParams);
-        }
-      } catch (e) {
-        console.warn('Skip summary pre-scan failed', e);
-      }
-    }
-
     try {
       outerLoop: for (let y = startRow; y < height; y++) {
         for (let x = y === startRow ? startCol : 0; x < width; x++) {
@@ -4065,17 +3979,6 @@
 
           // Step 2: Find the closest available in-game color to the quantized color
           const colorId = findClosestColor(targetRgb, state.availableColors);
-
-          // Lazy-load existing board colors map (once) using region tile
-          if (!state.existingColorIds) {
-            state.existingColorIds = await WPlaceService.loadExistingTile(regionX, regionY);
-          }
-
-          // Skip if existing pixel already has same target color id
-          if (state.existingColorIds && state.existingColorIds[pixelY - startY]?.[pixelX - startX] === colorId) {
-            state.paintedMap[y][x] = true; // mark as done to avoid revisiting
-            continue;
-          }
 
           const pixelX = startX + x
           const pixelY = startY + y
@@ -4121,9 +4024,6 @@
                 state.paintedMap[pixel.localY][pixel.localX] = true
                 state.paintedPixels++
               })
-
-              // Invalidate existing board cache so future comparisons reload fresh tile
-              state.existingColorIds = null;
 
               state.currentCharges -= pixelBatch.length
               updateStats()
@@ -4180,7 +4080,6 @@
             state.paintedPixels++
           })
           state.currentCharges -= pixelBatch.length
-          state.existingColorIds = null;
           // Apply painting speed delay for remaining pixels if enabled
           if (CONFIG.PAINTING_SPEED_ENABLED && state.paintingSpeed > 0 && pixelBatch.length > 0) {
             const delayPerPixel = 1000 / state.paintingSpeed // ms per pixel
