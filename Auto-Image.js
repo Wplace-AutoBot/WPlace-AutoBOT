@@ -808,7 +808,7 @@
         .filter((el) => !el.querySelector("svg"))
         .filter((el) => {
           const id = Number.parseInt(el.id.replace("color-", ""))
-          return id !== 0 && id !== 5
+          return id !== 0
         })
         .map((el) => {
           const id = Number.parseInt(el.id.replace("color-", ""))
@@ -1107,6 +1107,15 @@
     // Check cache first
     if (colorCache.has(cacheKey)) {
       return colorCache.get(cacheKey)
+    }
+
+    const isNearWhite = targetRgb[0] >= 250 && targetRgb[1] >= 250 && targetRgb[2] >= 250
+    if (isNearWhite) {
+      const whiteEntry = availableColors.find(c => c.rgb[0] >= 250 && c.rgb[1] >= 250 && c.rgb[2] >= 250)
+      if (whiteEntry) {
+        colorCache.set(cacheKey, whiteEntry.id)
+        return whiteEntry.id
+      }
     }
 
     let minDistance = Number.POSITIVE_INFINITY
@@ -3959,8 +3968,14 @@
               continue;
           }
 
-          // Step 1: Quantize source pixel to the user's selected palette
-          const targetRgb = Utils.findClosestPaletteColor(r, g, b, state.activeColorPalette);
+      // Step 1: Quantize source pixel to the user's selected palette (with white bias)
+      let targetRgb;
+      if (Utils.isWhitePixel(r, g, b)) {
+        // Force pure white for white-ish pixels to avoid drifting to yellowish tones
+        targetRgb = [255, 255, 255];
+      } else {
+        targetRgb = Utils.findClosestPaletteColor(r, g, b, state.activeColorPalette);
+      }
 
           // Step 2: Find the closest available in-game color to the quantized color
           const colorId = findClosestColor(targetRgb, state.availableColors);
