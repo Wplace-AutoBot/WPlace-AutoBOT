@@ -174,7 +174,7 @@
   const TEXT = {
     en: {
     title: "WPlace Auto-Image",
-    initBot: "Start Auto-BOT",
+    scanColors: "Scan Colors",
     uploadImage: "Upload Image",
     resizeImage: "Resize Image",
     selectPosition: "Select Position",
@@ -182,7 +182,7 @@
     stopPainting: "Stop Painting",
     checkingColors: "🔍 Checking available colors...",
     noColorsFound: "❌ Open the color palette on the site and try again!",
-    colorsFound: "✅ {count} available colors found",
+    colorsFound: "✅ {count} available colors found. Ready to upload.",
     loadingImage: "🖼️ Loading image...",
     imageLoaded: "✅ Image loaded with {count} valid pixels",
     imageError: "❌ Error loading image",
@@ -234,7 +234,7 @@
   },
   ru: {
     title: "WPlace Авто-Изображение",
-    initBot: "Запустить Авто-БОТ",
+    scanColors: "Сканировать цвета",
     uploadImage: "Загрузить изображение",
     resizeImage: "Изменить размер изображения",
     selectPosition: "Выбрать позицию",
@@ -242,7 +242,7 @@
     stopPainting: "Остановить рисование",
     checkingColors: "🔍 Проверка доступных цветов...",
     noColorsFound: "❌ Откройте палитру цветов на сайте и попробуйте снова!",
-    colorsFound: "✅ Найдено доступных цветов: {count}",
+    colorsFound: "✅ Найдено доступных цветов: {count}. Готово к загрузке.",
     loadingImage: "🖼️ Загрузка изображения...",
     imageLoaded: "✅ Изображение загружено, валидных пикселей: {count}",
     imageError: "❌ Ошибка при загрузке изображения",
@@ -294,7 +294,7 @@
 },
   pt: {
     title: "WPlace Auto-Image",
-    initBot: "Iniciar Auto-BOT",
+    scanColors: "Escanear Cores",
     uploadImage: "Upload da Imagem",
     resizeImage: "Redimensionar Imagem",
     selectPosition: "Selecionar Posição",
@@ -302,7 +302,7 @@
     stopPainting: "Parar Pintura",
     checkingColors: "🔍 Verificando cores disponíveis...",
     noColorsFound: "❌ Abra a paleta de cores no site e tente novamente!",
-    colorsFound: "✅ {count} cores disponíveis encontradas",
+    colorsFound: "✅ {count} cores encontradas. Pronto para upload.",
     loadingImage: "🖼️ Carregando imagem...",
     imageLoaded: "✅ Imagem carregada com {count} pixels válidos",
     imageError: "❌ Erro ao carregar imagem",
@@ -323,7 +323,7 @@
     estimatedTime: "Tempo estimado",
     initMessage: "Clique em 'Upload da Imagem' para começar",
     waitingInit: "Aguardando inicialização...",
-    resizeSuccess: "✅ Imagem redimensionada para {width}x{height}",
+    resizeSuccess: "✅ Imagem redimensionada для {width}x{height}",
     paintingPaused: "⏸️ Pintura pausada na posição X: {x}, Y: {y}",
     captchaNeeded: "❗ Token CAPTCHA necessário. Pinte um pixel manualmente para continuar.",
     saveData: "Salvar Progresso",
@@ -354,7 +354,7 @@
   },
   vi: {
     title: "WPlace Auto-Image",
-    initBot: "Khởi động Auto-BOT",
+    scanColors: "Quét màu",
     uploadImage: "Tải lên hình ảnh",
     resizeImage: "Thay đổi kích thước",
     selectPosition: "Chọn vị trí",
@@ -362,7 +362,7 @@
     stopPainting: "Dừng vẽ",
     checkingColors: "🔍 Đang kiểm tra màu sắc có sẵn...",
     noColorsFound: "❌ Hãy mở bảng màu trên trang web và thử lại!",
-    colorsFound: "✅ Tìm thấy {count} màu sắc có sẵn",
+    colorsFound: "✅ Tìm thấy {count} màu. Sẵn sàng để tải lên.",
     loadingImage: "🖼️ Đang tải hình ảnh...",
     imageLoaded: "✅ Đã tải hình ảnh với {count} pixel hợp lệ",
     imageError: "❌ Lỗi khi tải hình ảnh",
@@ -414,7 +414,7 @@
     },
   fr: {
     title: "WPlace Auto-Image",
-    initBot: "Démarrer Auto-BOT",
+    scanColors: "Scanner les couleurs",
     uploadImage: "Télécharger l'image",
     resizeImage: "Redimensionner l'image",
     selectPosition: "Sélectionner la position",
@@ -422,7 +422,7 @@
     stopPainting: "Arrêter de peindre",
     checkingColors: "🔍 Vérification des couleurs disponibles...",
     noColorsFound: "❌ Ouvrez la palette de couleurs sur le site et réessayez!",
-    colorsFound: "✅ {count} couleurs disponibles trouvées",
+    colorsFound: "✅ {count} couleurs trouvées. Prêt à télécharger.",
     loadingImage: "🖼️ Chargement de l'image...",
     imageLoaded: "✅ Image chargée avec {count} pixels valides",
     imageError: "❌ Erreur lors du chargement de l'image",
@@ -1160,40 +1160,6 @@
   }
   // --- END: Color Palette Functions ---
 
-  // Refactored function to handle color checking
-  async function checkAndSetColors() {
-    // If colors are already checked, no need to do it again.
-    if (state.colorsChecked) return true;
-
-    try {
-        updateUI("checkingColors", "default");
-        state.availableColors = Utils.extractAvailableColors();
-
-        if (state.availableColors.length === 0) {
-            Utils.showAlert(Utils.t("noColorsFound"), "error");
-            updateUI("noColorsFound", "error");
-            return false; // Indicate failure
-        }
-
-        state.colorsChecked = true;
-
-        // Enable other buttons now that we're initialized
-        const selectPosBtn = document.getElementById('selectPosBtn');
-        if(selectPosBtn) selectPosBtn.disabled = false;
-
-        updateUI("colorsFound", "success", {
-            count: state.availableColors.length,
-        });
-        updateStats();
-        return true; // Indicate success
-    } catch (e) {
-        console.error("Error checking colors:", e);
-        updateUI("imageError", "error");
-        return false; // Indicate failure
-    }
-  }
-
-
   async function createUI() {
     await detectLanguage()
 
@@ -1383,7 +1349,7 @@
         font-family: ${theme.fontFamily};
         color: ${theme.text};
         animation: slideIn 0.4s ease-out;
-        overflow: hidden;
+        overflow-y: auto; /* Make stats panel scrollable */
         ${theme.backdropFilter ? `backdrop-filter: ${theme.backdropFilter};` : ""}
         transition: all 0.3s ease;
         user-select: none;
@@ -3227,7 +3193,10 @@
 
             if (!state.colorsChecked) {
               // Re-run color check automatically if loaded data is missing it
-              checkAndSetColors();
+                uploadBtn.disabled = false;
+            } else {
+                uploadBtn.disabled = false;
+                selectPosBtn.disabled = false;
             }
 
             if (state.imageLoaded && state.startPosition && state.region && state.colorsChecked) {
@@ -3272,8 +3241,7 @@
               selectPosBtn.disabled = false
               resizeBtn.disabled = false
             } else {
-                // If loaded file is missing color data, check for it
-                await checkAndSetColors();
+                uploadBtn.disabled = false;
             }
 
             if (state.imageLoaded && state.startPosition && state.region && state.colorsChecked) {
@@ -3351,7 +3319,7 @@
           <div class="wplace-stat-value">${Math.floor(state.currentCharges)}</div>
         </div>
         <div class="wplace-colors-section">
-            <div class="wplace-stat-label"><i class="fas fa-palette"></i> Available Colors</div>
+            <div class="wplace-stat-label"><i class="fas fa-palette"></i> Available Colors (${state.availableColors.length})</div>
             <div class="wplace-stat-colors-grid">
                 ${colorSwatchesHTML}
             </div>
@@ -3487,21 +3455,33 @@
         resizeContainer.style.display = "none";
         _updateResizePreview = () => {}; // Clear the function to prevent memory leaks
     }
-
+    
     if (uploadBtn) {
       uploadBtn.addEventListener("click", async () => {
-        // First, automatically run the color check if it hasn't been done.
-        const colorsReady = await checkAndSetColors();
-        if (!colorsReady) {
-            // Stop if colors were not found. The error message is already shown.
-            return;
+        // --- NEW LOGIC: Check for colors FIRST ---
+        const availableColors = Utils.extractAvailableColors();
+        if (availableColors.length < 10) {
+            updateUI("noColorsFound", "error");
+            Utils.showAlert(Utils.t("noColorsFound"), "error");
+            return; // Stop the function here
         }
 
-        // If colors are ready, proceed with the original upload logic.
+        // --- If check passes, run the rest of the logic ---
+        if (!state.colorsChecked) {
+            state.availableColors = availableColors;
+            state.colorsChecked = true;
+            updateUI("colorsFound", "success", { count: availableColors.length });
+            updateStats();
+            selectPosBtn.disabled = false;
+        }
+
         try {
           updateUI("loadingImage", "default")
           const imageSrc = await Utils.createImageUploader()
-          if (!imageSrc) return; // User cancelled the file dialog
+          if (!imageSrc) { // User cancelled the file dialog
+              updateUI("colorsFound", "success", { count: state.availableColors.length });
+              return; 
+          }
 
           const processor = new ImageProcessor(imageSrc)
           await processor.load()
