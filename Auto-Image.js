@@ -1673,6 +1673,33 @@
         color: ${theme.highlight};
       }
 
+      /* Styles for the new color display in stats */
+      .wplace-colors-section {
+        margin-top: 10px;
+        padding-top: 8px;
+        border-top: 1px solid rgba(255,255,255,0.05);
+      }
+
+      .wplace-stat-colors-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(16px, 1fr));
+        gap: 4px;
+        margin-top: 8px;
+        padding: 4px;
+        background: rgba(0,0,0,0.2);
+        border-radius: 4px;
+        max-height: 80px; /* Limit height and allow scrolling */
+        overflow-y: auto;
+      }
+      
+      .wplace-stat-color-swatch {
+        width: 16px;
+        height: 16px;
+        border-radius: 3px;
+        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: inset 0 0 2px rgba(0,0,0,0.5);
+      }
+
       .wplace-progress {
         width: 100%;
         background: ${CONFIG.currentTheme === "Classic Autobot" ? "rgba(0,0,0,0.3)" : theme.secondary};
@@ -2344,7 +2371,7 @@
         <!-- Status Section - Always visible -->
         <div class="wplace-status-section">
           <div id="statusText" class="wplace-status status-default">
-            ${Utils.t("waitingInit")}
+            ${Utils.t("initMessage")}
           </div>
           <div class="wplace-progress">
             <div id="progressBar" class="wplace-progress-bar" style="width: 0%"></div>
@@ -3273,43 +3300,63 @@
     }
 
     updateStats = async () => {
-      if (!state.imageLoaded) return; // Only show stats if image is loaded
+      // Check if the bot has been initialized by checking for colors
+      if (!state.colorsChecked) {
+          statsArea.innerHTML = `
+            <div class="wplace-stat-item">
+              <div class="wplace-stat-label"><i class="fas fa-info-circle"></i> ${Utils.t("initMessage")}</div>
+            </div>`;
+          return;
+      }
 
-      const { charges, cooldown } = await WPlaceService.getCharges()
-      state.currentCharges = Math.floor(charges)
-      state.cooldown = cooldown
+      const { charges, cooldown } = await WPlaceService.getCharges();
+      state.currentCharges = Math.floor(charges);
+      state.cooldown = cooldown;
 
-      const progress = state.totalPixels > 0 ? Math.round((state.paintedPixels / state.totalPixels) * 100) : 0
-      const remainingPixels = state.totalPixels - state.paintedPixels
+      // --- Generate HTML for Image-Specific Stats ---
+      let imageStatsHTML = '';
+      if (state.imageLoaded) {
+          const progress = state.totalPixels > 0 ? Math.round((state.paintedPixels / state.totalPixels) * 100) : 0;
+          const remainingPixels = state.totalPixels - state.paintedPixels;
+          state.estimatedTime = Utils.calculateEstimatedTime(remainingPixels, state.currentCharges, state.cooldown);
+          progressBar.style.width = `${progress}%`;
 
-      state.estimatedTime = Utils.calculateEstimatedTime(remainingPixels, state.currentCharges, state.cooldown)
+          imageStatsHTML = `
+            <div class="wplace-stat-item">
+              <div class="wplace-stat-label"><i class="fas fa-image"></i> ${Utils.t("progress")}</div>
+              <div class="wplace-stat-value">${progress}%</div>
+            </div>
+            <div class="wplace-stat-item">
+              <div class="wplace-stat-label"><i class="fas fa-paint-brush"></i> ${Utils.t("pixels")}</div>
+              <div class="wplace-stat-value">${state.paintedPixels}/${state.totalPixels}</div>
+            </div>
+            <div class="wplace-stat-item">
+              <div class="wplace-stat-label"><i class="fas fa-clock"></i> ${Utils.t("estimatedTime")}</div>
+              <div class="wplace-stat-value">${Utils.formatTime(state.estimatedTime)}</div>
+            </div>
+          `;
+      }
 
-      progressBar.style.width = `${progress}%`
+      // --- Generate HTML for Available Colors ---
+      const colorSwatchesHTML = state.availableColors.map(color => {
+          const rgbString = `rgb(${color.rgb.join(',')})`;
+          return `<div class="wplace-stat-color-swatch" style="background-color: ${rgbString};" title="ID: ${color.id}\nRGB: ${color.rgb.join(', ')}"></div>`;
+      }).join('');
 
+      // --- Combine all stats and update the panel ---
       statsArea.innerHTML = `
-        <div class="wplace-stat-item">
-          <div class="wplace-stat-label"><i class="fas fa-image"></i> ${Utils.t("progress")}</div>
-          <div class="wplace-stat-value">${progress}%</div>
-        </div>
-        <div class="wplace-stat-item">
-          <div class="wplace-stat-label"><i class="fas fa-paint-brush"></i> ${Utils.t("pixels")}</div>
-          <div class="wplace-stat-value">${state.paintedPixels}/${state.totalPixels}</div>
-        </div>
+        ${imageStatsHTML}
         <div class="wplace-stat-item">
           <div class="wplace-stat-label"><i class="fas fa-bolt"></i> ${Utils.t("charges")}</div>
           <div class="wplace-stat-value">${Math.floor(state.currentCharges)}</div>
         </div>
-        ${
-          state.imageLoaded
-            ? `
-        <div class="wplace-stat-item">
-          <div class="wplace-stat-label"><i class="fas fa-clock"></i> ${Utils.t("estimatedTime")}</div>
-          <div class="wplace-stat-value">${Utils.formatTime(state.estimatedTime)}</div>
+        <div class="wplace-colors-section">
+            <div class="wplace-stat-label"><i class="fas fa-palette"></i> Available Colors</div>
+            <div class="wplace-stat-colors-grid">
+                ${colorSwatchesHTML}
+            </div>
         </div>
-        `
-            : ""
-        }
-      `
+      `;
     }
 
     // Helper function to update data management buttons
