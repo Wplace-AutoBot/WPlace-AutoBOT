@@ -11,6 +11,8 @@
       DEFAULT: 5,      // Default 5 pixels per second
   },
     PAINTING_SPEED_ENABLED: false,
+    AUTO_CAPTCHA_ENABLED: false, // Disabled by default
+    COOLDOWN_CHARGE_THRESHOLD: 1, // Default wait threshold
     // --- START: Color data from colour-converter.js ---
     COLOR_PALETTE: [
       [0,0,0],[60,60,60],[120,120,120],[170,170,170],[210,210,210],[255,255,255],
@@ -231,6 +233,16 @@
     themeSettings: "Theme Settings",
     themeSettingsDesc: "Choose your preferred color theme for the interface.",
     languageSelectDesc: "Select your preferred language. Changes will take effect immediately.",
+    autoCaptcha: "Auto-CAPTCHA Solver",
+    autoCaptchaDesc: "Automatically attempts to solve the CAPTCHA by simulating a manual pixel placement when the token expires.",
+    applySettings: "Apply Settings",
+    settingsSaved: "✅ Settings saved successfully!",
+    cooldownSettings: "Cooldown Settings",
+    waitCharges: "Wait until charges reach",
+    captchaSolving: "🤖 Attempting to solve CAPTCHA...",
+    captchaFailed: "❌ Auto-CAPTCHA failed. Paint a pixel manually.",
+    automation: "Automation",
+    noChargesThreshold: "⌛ Waiting for charges to reach {threshold}. Currently {current}. Next in {time}...",
   },
   ru: {
     title: "WPlace Авто-Изображение",
@@ -290,7 +302,17 @@
     language: "Язык",
     themeSettings: "Настройки темы",
     themeSettingsDesc: "Выберите предпочтительную цветовую тему интерфейса.",
-    languageSelectDesc: "Выберите предпочтительный язык. Изменения вступят в силу немедленно."
+    languageSelectDesc: "Выберите предпочтительный язык. Изменения вступят в силу немедленно.",
+    autoCaptcha: "Авто-решение CAPTCHA",
+    autoCaptchaDesc: "Автоматически пытается решить CAPTCHA, симулируя ручное размещение пикселя, когда токен истекает.",
+    applySettings: "Применить настройки",
+    settingsSaved: "✅ Настройки успешно сохранены!",
+    cooldownSettings: "Настройки перезарядки",
+    waitCharges: "Ждать до накопления зарядов",
+    captchaSolving: "🤖 Пытаюсь решить CAPTCHA...",
+    captchaFailed: "❌ Не удалось решить CAPTCHA. Нарисуйте пиксель вручную.",
+    automation: "Автоматизация",
+    noChargesThreshold: "⌛ Ожидание зарядов до {threshold}. Сейчас {current}. Следующий через {time}...",
 },
   pt: {
     title: "WPlace Auto-Image",
@@ -351,6 +373,16 @@
     themeSettings: "Configurações de Tema",
     themeSettingsDesc: "Escolha seu tema de cores preferido para a interface.",
     languageSelectDesc: "Selecione seu idioma preferido. As alterações terão efeito imediatamente.",
+    autoCaptcha: "Resolvedor de CAPTCHA Automático",
+    autoCaptchaDesc: "Tenta resolver o CAPTCHA automaticamente simulando a colocação manual de um pixel quando o token expira.",
+    applySettings: "Aplicar Configurações",
+    settingsSaved: "✅ Configurações salvas com sucesso!",
+    cooldownSettings: "Configurações de Cooldown",
+    waitCharges: "Aguardar até as cargas atingirem",
+    captchaSolving: "🤖 Tentando resolver o CAPTCHA...",
+    captchaFailed: "❌ Falha ao resolver CAPTCHA. Pinte um pixel manualmente.",
+    automation: "Automação",
+    noChargesThreshold: "⌛ Aguardando cargas atingirem {threshold}. Atual: {current}. Próxima em {time}...",
   },
   vi: {
     title: "WPlace Auto-Image",
@@ -411,6 +443,16 @@
     themeSettings: "Cài đặt Giao diện",
     themeSettingsDesc: "Chọn chủ đề màu sắc yêu thích cho giao diện.",
     languageSelectDesc: "Chọn ngôn ngữ ưa thích. Thay đổi sẽ có hiệu lực ngay lập tức.",
+    autoCaptcha: "Tự động giải CAPTCHA",
+    autoCaptchaDesc: "Tự động cố gắng giải CAPTCHA bằng cách mô phỏng việc đặt pixel thủ công khi token hết hạn.",
+    applySettings: "Áp dụng cài đặt",
+    settingsSaved: "✅ Đã lưu cài đặt thành công!",
+    cooldownSettings: "Cài đặt thời gian chờ",
+    waitCharges: "Chờ cho đến khi số lần sạc đạt",
+    captchaSolving: "🤖 Đang cố gắng giải CAPTCHA...",
+    captchaFailed: "❌ Giải CAPTCHA tự động thất bại. Vui lòng vẽ một pixel thủ công.",
+    automation: "Tự động hóa",
+    noChargesThreshold: "⌛ Đang chờ số lần sạc đạt {threshold}. Hiện tại {current}. Lần tiếp theo trong {time}...",
     },
   fr: {
     title: "WPlace Auto-Image",
@@ -471,6 +513,16 @@
     themeSettings: "Paramètres de Thème",
     themeSettingsDesc: "Choisissez votre thème de couleurs préféré pour l'interface.",
     languageSelectDesc: "Sélectionnez votre langue préférée. Les changements prendront effet immédiatement.",
+    autoCaptcha: "Résolveur de CAPTCHA automatique",
+    autoCaptchaDesc: "Tente automatiquement de résoudre le CAPTCHA en simulant un placement manuel de pixel lorsque le jeton expire.",
+    applySettings: "Appliquer les paramètres",
+    settingsSaved: "✅ Paramètres enregistrés avec succès !",
+    cooldownSettings: "Paramètres de recharge",
+    waitCharges: "Attendre que les charges atteignent",
+    captchaSolving: "🤖 Tentative de résolution du CAPTCHA...",
+    captchaFailed: "❌ Échec de l'Auto-CAPTCHA. Peignez un pixel manuellement.",
+    automation: "Automatisation",
+    noChargesThreshold: "⌛ En attente que les charges atteignent {threshold}. Actuel: {current}. Prochaine dans {time}...",
     },
   }
 
@@ -485,6 +537,7 @@
     activeColorPalette: [], // User-selected colors for conversion
     paintWhitePixels: true, // Default to ON
     currentCharges: 0,
+    maxCharges: 1, // Default max charges
     cooldown: CONFIG.COOLDOWN_DEFAULT,
     imageData: null,
     stopFlag: false,
@@ -497,6 +550,7 @@
     estimatedTime: 0,
     language: "en",
     paintingSpeed: CONFIG.PAINTING_SPEED.DEFAULT, // pixels per second
+    cooldownChargeThreshold: CONFIG.COOLDOWN_CHARGE_THRESHOLD,
   }
 
   // Placeholder for the resize preview update function
@@ -559,6 +613,16 @@
   // UTILITY FUNCTIONS
   const Utils = {
     sleep: (ms) => new Promise((r) => setTimeout(r, ms)),
+
+    waitForSelector: async (selector, interval = 200, timeout = 5000) => {
+        const start = Date.now();
+        while (Date.now() - start < timeout) {
+            const el = document.querySelector(selector);
+            if (el) return el;
+            await Utils.sleep(interval);
+        }
+        return null;
+    },
 
     // Optimized DOM creation helpers
     createElement: (tag, props = {}, children = []) => {
@@ -1019,12 +1083,14 @@
         const data = await res.json()
         return {
           charges: data.charges?.count || 0,
+          max: data.charges?.max || 1,
           cooldown: data.charges?.next || CONFIG.COOLDOWN_DEFAULT,
         }
       } catch (e) {
         console.error("Failed to get charges:", e)
         return {
           charges: 0,
+          max: 1,
           cooldown: CONFIG.COOLDOWN_DEFAULT,
         }
       }
@@ -1159,6 +1225,71 @@
       updateActiveColorPalette();
   }
   // --- END: Color Palette Functions ---
+
+    // --- START: Auto-CAPTCHA Solver ---
+    async function handleCaptcha() {
+        return new Promise(async (resolve, reject) => {
+            if (!CONFIG.AUTO_CAPTCHA_ENABLED) {
+                return reject(new Error("Auto-CAPTCHA is disabled."));
+            }
+
+            try {
+                // Set a timeout for the entire operation
+                const timeoutPromise = Utils.sleep(20000).then(() => reject(new Error("Auto-CAPTCHA timed out.")));
+
+                const solvePromise = (async () => {
+                    // 1. Find and click the main "Paint" button on the screen
+                    const mainPaintBtn = await Utils.waitForSelector('button.btn.btn-primary.btn-lg, button.btn-primary.sm\\:btn-xl', 200, 10000);
+                    if (!mainPaintBtn) throw new Error("Could not find the main paint button.");
+                    mainPaintBtn.click();
+                    await Utils.sleep(500);
+
+                    // 2. Select the transparent color to avoid wasting a real color
+                    const transBtn = await Utils.waitForSelector('button#color-0', 200, 5000);
+                    if (!transBtn) throw new Error("Could not find the transparent color button.");
+                    transBtn.click();
+                    await Utils.sleep(500);
+
+                    // 3. Find the canvas and simulate a click
+                    const canvas = await Utils.waitForSelector('canvas', 200, 5000);
+                    if (!canvas) throw new Error("Could not find the canvas element.");
+
+                    canvas.setAttribute('tabindex', '0');
+                    canvas.focus();
+                    const rect = canvas.getBoundingClientRect();
+                    const centerX = Math.round(rect.left + rect.width / 2);
+                    const centerY = Math.round(rect.top + rect.height / 2);
+
+                    canvas.dispatchEvent(new MouseEvent('mousemove', { clientX: centerX, clientY: centerY, bubbles: true }));
+                    canvas.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', code: 'Space', bubbles: true }));
+                    await Utils.sleep(50);
+                    canvas.dispatchEvent(new KeyboardEvent('keyup', { key: ' ', code: 'Space', bubbles: true }));
+                    await Utils.sleep(500);
+
+                    // 4. Find and click the confirmation button
+                    let confirmBtn = await Utils.waitForSelector('button.btn.btn-primary.btn-lg, button.btn.btn-primary.sm\\:btn-xl');
+                    if (!confirmBtn) {
+                        const allPrimary = Array.from(document.querySelectorAll('button.btn-primary'));
+                        confirmBtn = allPrimary.length ? allPrimary[allPrimary.length - 1] : null;
+                    }
+                    if (!confirmBtn) throw new Error("Could not find the confirmation button.");
+                    confirmBtn.click();
+
+                    // The fetch interceptor will capture the token. We wait for it.
+                    await tokenPromise;
+                    resolve();
+                })();
+
+                await Promise.race([solvePromise, timeoutPromise]);
+
+            } catch (error) {
+                console.error("Auto-CAPTCHA process failed:", error);
+                reject(error);
+            }
+        });
+    }
+    // --- END: Auto-CAPTCHA Solver ---
+
 
   async function createUI() {
     await detectLanguage()
@@ -1950,6 +2081,39 @@
       }
       /* --- END: Color Palette Styles --- */
 
+        /* Cooldown slider styles */
+        .wplace-cooldown-control {
+            margin-top: 8px;
+        }
+        .wplace-cooldown-control label {
+            font-size: 11px;
+            margin-bottom: 4px;
+            display: block;
+        }
+        .wplace-slider-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .wplace-slider {
+            flex: 1;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 4px;
+            background: #444;
+            border-radius: 2px;
+            outline: none;
+        }
+        .wplace-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            background: ${theme.highlight};
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+
       ${
         CONFIG.currentTheme === "Neon Retro"
           ? `
@@ -2384,6 +2548,18 @@
           </div>
         </div>
 
+        <!-- Cooldown Section -->
+        <div class="wplace-section">
+            <div class="wplace-section-title">⏱️ ${Utils.t("cooldownSettings")}</div>
+            <div class="wplace-cooldown-control">
+                <label id="cooldownLabel">${Utils.t("waitCharges")}:</label>
+                <div class="wplace-slider-container">
+                    <input type="range" id="cooldownSlider" class="wplace-slider" min="1" max="1" value="${state.cooldownChargeThreshold}">
+                    <span id="cooldownValue" style="font-weight:bold; min-width: 20px; text-align: center;">${state.cooldownChargeThreshold}</span>
+                </div>
+            </div>
+        </div>
+
         <!-- Data Section -->
         <div class="wplace-section">
           <div class="wplace-section-title">💾 Data Management</div>
@@ -2457,8 +2633,8 @@
       padding: 0;
       z-index: 10002;
       display: none;
-      min-width: 380px;
-      max-width: 420px;
+      min-width: 420px;
+      max-width: 480px;
       color: white;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1);
@@ -2492,7 +2668,25 @@
         </div>
       </div>
 
-      <div style="padding: 25px;">
+      <div style="padding: 25px; max-height: 70vh; overflow-y: auto;">
+        
+        <!-- Automation Section -->
+        <div style="margin-bottom: 25px;">
+          <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-robot" style="color: #4facfe; font-size: 16px;"></i>
+            ${Utils.t("automation")}
+          </label>
+          <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1);">
+              <label for="enableAutoCaptchaToggle" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+                  <div>
+                      <span style="font-weight: 500;">${Utils.t("autoCaptcha")}</span>
+                      <p style="font-size: 12px; color: rgba(255,255,255,0.7); margin: 4px 0 0 0;">${Utils.t("autoCaptchaDesc")}</p>
+                  </div>
+                  <input type="checkbox" id="enableAutoCaptchaToggle" ${CONFIG.AUTO_CAPTCHA_ENABLED ? 'checked' : ''} style="cursor: pointer; width: 20px; height: 20px;"/>
+              </label>
+          </div>
+        </div>
+
         <!-- Speed Control Section -->
         <div style="margin-bottom: 25px;">
           <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
@@ -2529,13 +2723,9 @@
               <span><i class="fas fa-rabbit"></i> ${CONFIG.PAINTING_SPEED.MAX}</span>
             </div>
           </div>
-        </div>
-
-        <!-- Painting Speed Enable Toggle -->
-        <div style="margin-bottom: 25px;">
-          <label style="display: flex; align-items: center; gap: 8px; color: white;">
+           <label style="display: flex; align-items: center; gap: 8px; color: white; margin-top: 10px;">
             <input type="checkbox" id="enableSpeedToggle" ${CONFIG.PAINTING_SPEED_ENABLED ? 'checked' : ''} style="cursor: pointer;"/>
-            <span>Enable painting speed</span>
+            <span>Enable painting speed limit</span>
           </label>
         </div>
 
@@ -2568,7 +2758,7 @@
         </div>
 
         <!-- Language Selection Section -->
-        <div style="margin-bottom: 15px;">
+        <div style="margin-bottom: 25px;">
           <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
             <i class="fas fa-globe" style="color: #ffeaa7; font-size: 16px;"></i>
             ${Utils.t("language")}
@@ -2596,6 +2786,16 @@
             </select>
           </div>
         </div>
+
+        <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; margin-top: 10px;">
+             <button id="applySettingsBtn" style="
+                width: 100%;
+                ${CONFIG.CSS_CLASSES.BUTTON_PRIMARY}
+             ">
+                 <i class="fas fa-check"></i> ${Utils.t("applySettings")}
+             </button>
+        </div>
+
       </div>
 
       <style>
@@ -2790,6 +2990,8 @@
     const content = container.querySelector(".wplace-content")
     const closeStatsBtn = statsContainer.querySelector("#closeStatsBtn")
     const refreshChargesBtn = statsContainer.querySelector("#refreshChargesBtn")
+    const cooldownSlider = container.querySelector("#cooldownSlider");
+    const cooldownValue = container.querySelector("#cooldownValue");
 
     // Check if all elements are found
     if (!uploadBtn || !selectPosBtn || !startBtn || !stopBtn) {
@@ -2935,8 +3137,10 @@
     // Settings window functionality
     const settingsBtn = container.querySelector("#settingsBtn")
     const closeSettingsBtn = settingsContainer.querySelector("#closeSettingsBtn")
+    const applySettingsBtn = settingsContainer.querySelector("#applySettingsBtn");
 
-    if (settingsBtn && closeSettingsBtn) {
+
+    if (settingsBtn && closeSettingsBtn && applySettingsBtn) {
       settingsBtn.addEventListener("click", () => {
         const isVisible = settingsContainer.style.display !== "none"
         if (isVisible) {
@@ -2968,6 +3172,13 @@
           settingsContainer.style.transform = "translate(-50%, -50%)"
         }, 300)
       })
+
+      applySettingsBtn.addEventListener("click", () => {
+        saveBotSettings();
+        Utils.showAlert(Utils.t("settingsSaved"), "success");
+        // Close settings window after applying
+        closeSettingsBtn.click();
+      });
 
       // Make settings window draggable
       makeDraggable(settingsContainer)
@@ -3139,7 +3350,7 @@
           minimizeBtn.title = "Restore"
         } else {
           container.classList.remove("wplace-minimized")
-          content.classList.remove("wplace-hidden")
+          content.classList.add("wplace-hidden")
           minimizeBtn.innerHTML = '<i class="fas fa-minus"></i>'
           minimizeBtn.title = "Minimize"
         }
@@ -3268,63 +3479,65 @@
     }
 
     updateStats = async () => {
-      // Check if the bot has been initialized by checking for colors
-      if (!state.colorsChecked) {
-          statsArea.innerHTML = `
+        const { charges, cooldown, max } = await WPlaceService.getCharges();
+        state.currentCharges = Math.floor(charges);
+        state.cooldown = cooldown;
+        state.maxCharges = Math.floor(max) > 1 ? Math.floor(max) : state.maxCharges; // Update max charges if we get a valid number
+
+        // Update cooldown slider max value if it has changed
+        if (cooldownSlider.max != state.maxCharges) {
+            cooldownSlider.max = state.maxCharges;
+        }
+
+        // --- Generate HTML for Image-Specific Stats ---
+        let imageStatsHTML = '';
+        if (state.imageLoaded) {
+            const progress = state.totalPixels > 0 ? Math.round((state.paintedPixels / state.totalPixels) * 100) : 0;
+            const remainingPixels = state.totalPixels - state.paintedPixels;
+            state.estimatedTime = Utils.calculateEstimatedTime(remainingPixels, state.currentCharges, state.cooldown);
+            progressBar.style.width = `${progress}%`;
+
+            imageStatsHTML = `
+                <div class="wplace-stat-item">
+                <div class="wplace-stat-label"><i class="fas fa-image"></i> ${Utils.t("progress")}</div>
+                <div class="wplace-stat-value">${progress}%</div>
+                </div>
+                <div class="wplace-stat-item">
+                <div class="wplace-stat-label"><i class="fas fa-paint-brush"></i> ${Utils.t("pixels")}</div>
+                <div class="wplace-stat-value">${state.paintedPixels}/${state.totalPixels}</div>
+                </div>
+                <div class="wplace-stat-item">
+                <div class="wplace-stat-label"><i class="fas fa-clock"></i> ${Utils.t("estimatedTime")}</div>
+                <div class="wplace-stat-value">${Utils.formatTime(state.estimatedTime)}</div>
+                </div>
+            `;
+        }
+
+        // --- Generate HTML for Available Colors ---
+        let colorSwatchesHTML = '';
+        if (state.colorsChecked) {
+            colorSwatchesHTML = state.availableColors.map(color => {
+                const rgbString = `rgb(${color.rgb.join(',')})`;
+                return `<div class="wplace-stat-color-swatch" style="background-color: ${rgbString};" title="ID: ${color.id}\nRGB: ${color.rgb.join(', ')}"></div>`;
+            }).join('');
+        }
+
+        // --- Combine all stats and update the panel ---
+        statsArea.innerHTML = `
+            ${imageStatsHTML}
             <div class="wplace-stat-item">
-              <div class="wplace-stat-label"><i class="fas fa-info-circle"></i> ${Utils.t("initMessage")}</div>
-            </div>`;
-          return;
-      }
-
-      const { charges, cooldown } = await WPlaceService.getCharges();
-      state.currentCharges = Math.floor(charges);
-      state.cooldown = cooldown;
-
-      // --- Generate HTML for Image-Specific Stats ---
-      let imageStatsHTML = '';
-      if (state.imageLoaded) {
-          const progress = state.totalPixels > 0 ? Math.round((state.paintedPixels / state.totalPixels) * 100) : 0;
-          const remainingPixels = state.totalPixels - state.paintedPixels;
-          state.estimatedTime = Utils.calculateEstimatedTime(remainingPixels, state.currentCharges, state.cooldown);
-          progressBar.style.width = `${progress}%`;
-
-          imageStatsHTML = `
-            <div class="wplace-stat-item">
-              <div class="wplace-stat-label"><i class="fas fa-image"></i> ${Utils.t("progress")}</div>
-              <div class="wplace-stat-value">${progress}%</div>
+            <div class="wplace-stat-label"><i class="fas fa-bolt"></i> ${Utils.t("charges")}</div>
+            <div class="wplace-stat-value">${Math.floor(state.currentCharges)} / ${state.maxCharges}</div>
             </div>
-            <div class="wplace-stat-item">
-              <div class="wplace-stat-label"><i class="fas fa-paint-brush"></i> ${Utils.t("pixels")}</div>
-              <div class="wplace-stat-value">${state.paintedPixels}/${state.totalPixels}</div>
+            ${state.colorsChecked ? `
+            <div class="wplace-colors-section">
+                <div class="wplace-stat-label"><i class="fas fa-palette"></i> Available Colors (${state.availableColors.length})</div>
+                <div class="wplace-stat-colors-grid">
+                    ${colorSwatchesHTML}
+                </div>
             </div>
-            <div class="wplace-stat-item">
-              <div class="wplace-stat-label"><i class="fas fa-clock"></i> ${Utils.t("estimatedTime")}</div>
-              <div class="wplace-stat-value">${Utils.formatTime(state.estimatedTime)}</div>
-            </div>
-          `;
-      }
-
-      // --- Generate HTML for Available Colors ---
-      const colorSwatchesHTML = state.availableColors.map(color => {
-          const rgbString = `rgb(${color.rgb.join(',')})`;
-          return `<div class="wplace-stat-color-swatch" style="background-color: ${rgbString};" title="ID: ${color.id}\nRGB: ${color.rgb.join(', ')}"></div>`;
-      }).join('');
-
-      // --- Combine all stats and update the panel ---
-      statsArea.innerHTML = `
-        ${imageStatsHTML}
-        <div class="wplace-stat-item">
-          <div class="wplace-stat-label"><i class="fas fa-bolt"></i> ${Utils.t("charges")}</div>
-          <div class="wplace-stat-value">${Math.floor(state.currentCharges)}</div>
-        </div>
-        <div class="wplace-colors-section">
-            <div class="wplace-stat-label"><i class="fas fa-palette"></i> Available Colors (${state.availableColors.length})</div>
-            <div class="wplace-stat-colors-grid">
-                ${colorSwatchesHTML}
-            </div>
-        </div>
-      `;
+            ` : ''}
+        `;
     }
 
     // Helper function to update data management buttons
@@ -3380,7 +3593,7 @@
                 data[i] = nr;
                 data[i + 1] = ng;
                 data[i + 2] = nb;
-                data[i + 3] = 255; 
+                data[i + 3] = 255;
             }
             tempCtx.putImageData(imgData, 0, 0);
             resizePreview.src = tempCanvas.toDataURL();
@@ -3400,12 +3613,12 @@
             }
             _updateResizePreview();
         };
-        
+
         paintWhiteToggle.onchange = (e) => {
             state.paintWhitePixels = e.target.checked;
             _updateResizePreview();
         };
-        
+
         zoomSlider.addEventListener('input', _updateResizePreview);
         widthSlider.addEventListener("input", onWidthInput);
         heightSlider.addEventListener("input", onHeightInput);
@@ -3455,7 +3668,7 @@
         resizeContainer.style.display = "none";
         _updateResizePreview = () => {}; // Clear the function to prevent memory leaks
     }
-    
+
     if (uploadBtn) {
       uploadBtn.addEventListener("click", async () => {
         // --- NEW LOGIC: Check for colors FIRST ---
@@ -3480,7 +3693,7 @@
           const imageSrc = await Utils.createImageUploader()
           if (!imageSrc) { // User cancelled the file dialog
               updateUI("colorsFound", "success", { count: state.availableColors.length });
-              return; 
+              return;
           }
 
           const processor = new ImageProcessor(imageSrc)
@@ -3688,69 +3901,20 @@
     // Check for saved progress after a short delay to let UI settle
     setTimeout(checkSavedProgress, 1000)
 
-    // Speed Slider Event Listener (in settings window)
-    const speedSlider = settingsContainer.querySelector("#speedSlider")
-    const speedValue = settingsContainer.querySelector("#speedValue")
-    if (speedSlider && speedValue) {
-      speedSlider.addEventListener("input", (e) => {
-        const speed = parseInt(e.target.value) // Use integer instead of float
-        state.paintingSpeed = speed
-        speedValue.textContent = speed + " px/s" // Add px/s unit
-
-        // Save speed preference to localStorage
-        try {
-          localStorage.setItem("wplace-painting-speed", speed.toString())
-        } catch (error) {
-          console.warn("Could not save painting speed preference:", error)
-        }
-      })
-
-      // Load saved speed preference
-      try {
-        const savedSpeed = localStorage.getItem("wplace-painting-speed")
-        if (savedSpeed) {
-          const speed = parseInt(savedSpeed)
-          if (speed >= CONFIG.PAINTING_SPEED.MIN && speed <= CONFIG.PAINTING_SPEED.MAX) {
-            state.paintingSpeed = speed
-            speedSlider.value = speed
-            speedValue.textContent = speed.toString()
-          }
-        }
-      } catch (error) {
-        console.warn("Could not load painting speed preference:", error)
-      }
+    // Cooldown slider event listener
+    if (cooldownSlider && cooldownValue) {
+        cooldownSlider.addEventListener("input", (e) => {
+            const threshold = parseInt(e.target.value);
+            state.cooldownChargeThreshold = threshold;
+            cooldownValue.textContent = threshold;
+            saveBotSettings(); // Save immediately on change for convenience
+        });
     }
 
-    // Painting speed toggle
-    const enableSpeedToggle = settingsContainer.querySelector("#enableSpeedToggle")
-    if (enableSpeedToggle) {
-      // Initialize speed slider disabled state
-      const speedSliderToggle = settingsContainer.querySelector("#speedSlider")
-      if (speedSliderToggle) speedSliderToggle.disabled = !CONFIG.PAINTING_SPEED_ENABLED
-      enableSpeedToggle.checked = CONFIG.PAINTING_SPEED_ENABLED
-      enableSpeedToggle.addEventListener("change", (e) => {
-        CONFIG.PAINTING_SPEED_ENABLED = e.target.checked
-        // Toggle speed slider
-        if (speedSliderToggle) speedSliderToggle.disabled = !CONFIG.PAINTING_SPEED_ENABLED
-        // Save preference to localStorage
-        try {
-          localStorage.setItem("wplace-painting-speed-enabled", CONFIG.PAINTING_SPEED_ENABLED.toString())
-        } catch (error) {
-          console.warn("Could not save painting speed enabled preference:", error)
-        }
-      })
-      // Load saved preference
-      try {
-        const savedEnabled = localStorage.getItem("wplace-painting-speed-enabled")
-        if (savedEnabled !== null) {
-          CONFIG.PAINTING_SPEED_ENABLED = savedEnabled === "true"
-          enableSpeedToggle.checked = CONFIG.PAINTING_SPEED_ENABLED
-          if (speedSliderToggle) speedSliderToggle.disabled = !CONFIG.PAINTING_SPEED_ENABLED
-        }
-      } catch (error) {
-        console.warn("Could not load painting speed enabled preference:", error)
-      }
-    }
+    // Settings listeners are inside the settings button block...
+    // Let's call loadBotSettings here to apply saved settings.
+    loadBotSettings();
+    
     // --- Initialize Color Palette UI ---
     initializeColorPalette(resizeContainer);
   }
@@ -3813,13 +3977,31 @@
           })
 
           if (pixelBatch.length >= Math.floor(state.currentCharges)) {
-            const success = await sendPixelBatch(pixelBatch, regionX, regionY)
+            let success = await sendPixelBatch(pixelBatch, regionX, regionY)
 
             if (success === "token_error") {
-              state.stopFlag = true
-              updateUI("captchaNeeded", "error")
-              Utils.showAlert(Utils.t("captchaNeeded"), "error")
-              break outerLoop
+                if (CONFIG.AUTO_CAPTCHA_ENABLED) {
+                    updateUI("captchaSolving", "warning");
+                    try {
+                        await handleCaptcha();
+                        // Retry the batch with the new token
+                        success = await sendPixelBatch(pixelBatch, regionX, regionY);
+                        if (success === "token_error") {
+                           updateUI("captchaFailed", "error");
+                           state.stopFlag = true;
+                           break outerLoop;
+                        }
+                    } catch (e) {
+                        updateUI("captchaFailed", "error");
+                        state.stopFlag = true;
+                        break outerLoop;
+                    }
+                } else {
+                    updateUI("captchaNeeded", "error");
+                    Utils.showAlert(Utils.t("captchaNeeded"), "error");
+                    state.stopFlag = true;
+                    break outerLoop;
+                }
             }
 
             if (success) {
@@ -3849,18 +4031,29 @@
             }
 
             pixelBatch = []
-
-            if (state.currentCharges < 1) {
-              updateUI("noCharges", "warning", {
-                time: Utils.formatTime(state.cooldown),
-              })
-              await Utils.sleep(state.cooldown)
-
-              const chargeUpdate = await WPlaceService.getCharges()
-              state.currentCharges = chargeUpdate.charges
-              state.cooldown = chargeUpdate.cooldown
-            }
           }
+
+            // New Cooldown Logic - check if we need to wait for more charges
+            while (state.currentCharges < state.cooldownChargeThreshold && !state.stopFlag) {
+                const { charges, cooldown } = await WPlaceService.getCharges();
+                state.currentCharges = Math.floor(charges);
+                state.cooldown = cooldown;
+
+                if (state.currentCharges >= state.cooldownChargeThreshold) {
+                    updateStats();
+                    break;
+                }
+
+                updateUI("noChargesThreshold", "warning", {
+                    time: Utils.formatTime(state.cooldown),
+                    threshold: state.cooldownChargeThreshold,
+                    current: state.currentCharges
+                });
+                await updateStats();
+                await Utils.sleep(state.cooldown);
+            }
+            if (state.stopFlag) break outerLoop;
+
         }
       }
 
@@ -3901,7 +4094,10 @@
   }
 
   async function sendPixelBatch(pixelBatch, regionX, regionY) {
-  if (!turnstileToken) return "token_error"
+  if (!turnstileToken) {
+    tokenPromise = new Promise((resolve) => { _resolveToken = resolve });
+    return "token_error"
+  }
 
     // Pre-allocate arrays for performance
     const coords = new Array(pixelBatch.length * 2)
@@ -3930,7 +4126,6 @@
         // Reset token & create new promise to await fresh token
         turnstileToken = null
         tokenPromise = new Promise((resolve) => { _resolveToken = resolve })
-        Utils.showAlert(Utils.t("captchaNeeded"), "error")
         return "token_error"
       }
       const data = await res.json()
@@ -3940,6 +4135,58 @@
       return false
     }
   }
+
+    function saveBotSettings() {
+        try {
+            const settings = {
+                paintingSpeed: state.paintingSpeed,
+                paintingSpeedEnabled: document.getElementById('enableSpeedToggle')?.checked,
+                autoCaptchaEnabled: document.getElementById('enableAutoCaptchaToggle')?.checked,
+                cooldownChargeThreshold: state.cooldownChargeThreshold,
+            };
+            // Update global config from UI elements before saving
+            CONFIG.PAINTING_SPEED_ENABLED = settings.paintingSpeedEnabled;
+            CONFIG.AUTO_CAPTCHA_ENABLED = settings.autoCaptchaEnabled;
+
+            localStorage.setItem("wplace-bot-settings", JSON.stringify(settings));
+        } catch (e) {
+            console.warn("Could not save bot settings:", e);
+        }
+    }
+
+    function loadBotSettings() {
+        try {
+            const saved = localStorage.getItem("wplace-bot-settings");
+            if (!saved) return;
+            const settings = JSON.parse(saved);
+
+            // Apply settings
+            state.paintingSpeed = settings.paintingSpeed || CONFIG.PAINTING_SPEED.DEFAULT;
+            state.cooldownChargeThreshold = settings.cooldownChargeThreshold || CONFIG.COOLDOWN_CHARGE_THRESHOLD;
+            CONFIG.PAINTING_SPEED_ENABLED = settings.paintingSpeedEnabled ?? false;
+            CONFIG.AUTO_CAPTCHA_ENABLED = settings.autoCaptchaEnabled ?? false;
+
+            // Update UI elements after they are created
+            const speedSlider = document.getElementById('speedSlider');
+            if (speedSlider) speedSlider.value = state.paintingSpeed;
+            const speedValue = document.getElementById('speedValue');
+            if (speedValue) speedValue.textContent = `${state.paintingSpeed} px/s`;
+
+            const enableSpeedToggle = document.getElementById('enableSpeedToggle');
+            if (enableSpeedToggle) enableSpeedToggle.checked = CONFIG.PAINTING_SPEED_ENABLED;
+            
+            const enableAutoCaptchaToggle = document.getElementById('enableAutoCaptchaToggle');
+            if (enableAutoCaptchaToggle) enableAutoCaptchaToggle.checked = CONFIG.AUTO_CAPTCHA_ENABLED;
+            
+            const cooldownSlider = document.getElementById('cooldownSlider');
+            if (cooldownSlider) cooldownSlider.value = state.cooldownChargeThreshold;
+            const cooldownValue = document.getElementById('cooldownValue');
+            if (cooldownValue) cooldownValue.textContent = state.cooldownChargeThreshold;
+
+        } catch (e) {
+            console.warn("Could not load bot settings:", e);
+        }
+    }
 
   createUI()
 })()
