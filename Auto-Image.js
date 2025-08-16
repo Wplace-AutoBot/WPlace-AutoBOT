@@ -1118,7 +1118,7 @@
           const key = rgb.join(',');
           const name = CONFIG.COLOR_NAMES[key] || `rgb(${key})`;
           const isPaid = CONFIG.PAID_COLORS.has(key);
-          
+
           const colorItem = Utils.createElement('div', { className: 'wplace-color-item' });
           const swatch = Utils.createElement('button', {
               className: `wplace-color-swatch ${isPaid ? 'paid' : ''}`,
@@ -1138,7 +1138,7 @@
               swatch.classList.toggle('active');
               updateActiveColorPalette();
           });
-          
+
           colorItem.appendChild(swatch);
           colorItem.appendChild(nameLabel);
 
@@ -1778,6 +1778,9 @@
       .resize-preview {
         max-width: none; /* Allow image to exceed wrapper for zoom */
         transition: transform 0.1s ease;
+        image-rendering: pixelated;
+        image-rendering: -moz-crisp-edges;
+        image-rendering: crisp-edges;
       }
 
       .resize-controls {
