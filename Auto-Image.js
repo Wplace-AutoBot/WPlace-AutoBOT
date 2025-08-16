@@ -201,7 +201,7 @@
     pixels: "Pixels",
     charges: "Charges",
     estimatedTime: "Estimated time",
-    initMessage: "Open the site's color palette, then click 'Scan Colors'",
+    initMessage: "Click 'Upload Image' to begin",
     waitingInit: "Waiting for initialization...",
     resizeSuccess: "✅ Image resized to {width}x{height}",
     paintingPaused: "⏸️ Painting paused at position X: {x}, Y: {y}",
@@ -261,7 +261,7 @@
     pixels: "Пиксели",
     charges: "Заряды",
     estimatedTime: "Примерное время",
-    initMessage: "Откройте палитру на сайте, затем нажмите 'Сканировать цвета'",
+    initMessage: "Нажмите 'Загрузить изображение', чтобы начать",
     waitingInit: "Ожидание инициализации...",
     resizeSuccess: "✅ Изображение изменено до {width}x{height}",
     paintingPaused: "⏸️ Рисование приостановлено на позиции X: {x}, Y: {y}",
@@ -321,9 +321,9 @@
     pixels: "Pixels",
     charges: "Cargas",
     estimatedTime: "Tempo estimado",
-    initMessage: "Abra a paleta de cores do site e clique em 'Escanear Cores'",
+    initMessage: "Clique em 'Upload da Imagem' para começar",
     waitingInit: "Aguardando inicialização...",
-    resizeSuccess: "✅ Imagem redimensionada para {width}x{height}",
+    resizeSuccess: "✅ Imagem redimensionada для {width}x{height}",
     paintingPaused: "⏸️ Pintura pausada na posição X: {x}, Y: {y}",
     captchaNeeded: "❗ Token CAPTCHA necessário. Pinte um pixel manualmente para continuar.",
     saveData: "Salvar Progresso",
@@ -381,7 +381,7 @@
     pixels: "Pixel",
     charges: "Điện tích",
     estimatedTime: "Thời gian ước tính",
-    initMessage: "Mở bảng màu của trang web, sau đó nhấp vào 'Quét màu'",
+    initMessage: "Nhấp 'Tải lên hình ảnh' để bắt đầu",
     waitingInit: "Đang chờ khởi tạo...",
     resizeSuccess: "✅ Đã thay đổi kích thước hình ảnh thành {width}x{height}",
     paintingPaused: "⏸️ Tạm dừng vẽ tại vị trí X: {x}, Y: {y}",
@@ -441,7 +441,7 @@
     pixels: "Pixels",
     charges: "Charges",
     estimatedTime: "Temps estimé",
-    initMessage: "Ouvrez la palette de couleurs du site, puis cliquez sur 'Scanner les couleurs'",
+    initMessage: "Cliquez sur 'Télécharger l'image' pour commencer",
     waitingInit: "En attente d'initialisation...",
     resizeSuccess: "✅ Image redimensionnée en {width}x{height}",
     paintingPaused: "⏸️ Peinture en pause à la position X: {x}, Y: {y}",
@@ -1159,43 +1159,6 @@
       updateActiveColorPalette();
   }
   // --- END: Color Palette Functions ---
-
-  // Refactored function to handle color checking
-  async function checkAndSetColors() {
-    try {
-        updateUI("checkingColors", "default");
-        state.availableColors = Utils.extractAvailableColors();
-
-        if (state.availableColors.length === 0) {
-            Utils.showAlert(Utils.t("noColorsFound"), "error");
-            updateUI("noColorsFound", "error");
-            return false; // Indicate failure
-        }
-
-        state.colorsChecked = true;
-
-        // Enable next steps
-        const uploadBtn = document.getElementById('uploadBtn');
-        const selectPosBtn = document.getElementById('selectPosBtn');
-        if(uploadBtn) uploadBtn.disabled = false;
-        if(selectPosBtn) selectPosBtn.disabled = false;
-
-        // Hide the init button's section
-        const setupSection = document.getElementById('setupSection');
-        if (setupSection) setupSection.style.display = 'none';
-
-        updateUI("colorsFound", "success", {
-            count: state.availableColors.length,
-        });
-        updateStats();
-        return true; // Indicate success
-    } catch (e) {
-        console.error("Error checking colors:", e);
-        updateUI("imageError", "error");
-        return false;
-    }
-  }
-
 
   async function createUI() {
     await detectLanguage()
@@ -2381,23 +2344,12 @@
           </div>
         </div>
 
-        <!-- Setup Section -->
-        <div id="setupSection" class="wplace-section">
-          <div class="wplace-section-title">➡️ Step 1: Initialize</div>
-          <div class="wplace-controls">
-            <button id="initBotBtn" class="wplace-btn wplace-btn-primary">
-              <i class="fas fa-palette"></i>
-              <span>${Utils.t("scanColors")}</span>
-            </button>
-          </div>
-        </div>
-
         <!-- Image Section -->
         <div class="wplace-section">
-          <div class="wplace-section-title">🖼️ Step 2: Image Management</div>
+          <div class="wplace-section-title">🖼️ Image Management</div>
           <div class="wplace-controls">
             <div class="wplace-row">
-              <button id="uploadBtn" class="wplace-btn wplace-btn-upload" disabled>
+              <button id="uploadBtn" class="wplace-btn wplace-btn-upload">
                 <i class="fas fa-upload"></i>
                 <span>${Utils.t("uploadImage")}</span>
               </button>
@@ -2417,7 +2369,7 @@
 
         <!-- Control Section -->
         <div class="wplace-section">
-          <div class="wplace-section-title">🎮 Step 3: Painting Control</div>
+          <div class="wplace-section-title">🎮 Painting Control</div>
           <div class="wplace-controls">
             <div class="wplace-row">
               <button id="startBtn" class="wplace-btn wplace-btn-start" disabled>
@@ -2820,7 +2772,6 @@
     document.body.appendChild(settingsContainer)
 
     // Query all UI elements after appending to DOM
-    const initBotBtn = container.querySelector("#initBotBtn");
     const uploadBtn = container.querySelector("#uploadBtn")
     const resizeBtn = container.querySelector("#resizeBtn")
     const selectPosBtn = container.querySelector("#selectPosBtn")
@@ -3242,7 +3193,10 @@
 
             if (!state.colorsChecked) {
               // Re-run color check automatically if loaded data is missing it
-              checkAndSetColors();
+                uploadBtn.disabled = false;
+            } else {
+                uploadBtn.disabled = false;
+                selectPosBtn.disabled = false;
             }
 
             if (state.imageLoaded && state.startPosition && state.region && state.colorsChecked) {
@@ -3287,8 +3241,7 @@
               selectPosBtn.disabled = false
               resizeBtn.disabled = false
             } else {
-                // If loaded file is missing color data, check for it
-                await checkAndSetColors();
+                uploadBtn.disabled = false;
             }
 
             if (state.imageLoaded && state.startPosition && state.region && state.colorsChecked) {
@@ -3502,19 +3455,33 @@
         resizeContainer.style.display = "none";
         _updateResizePreview = () => {}; // Clear the function to prevent memory leaks
     }
-
-    if (initBotBtn) {
-        initBotBtn.addEventListener("click", async () => {
-            await checkAndSetColors();
-        });
-    }
-
+    
     if (uploadBtn) {
       uploadBtn.addEventListener("click", async () => {
+        // --- NEW LOGIC: Check for colors FIRST ---
+        const availableColors = Utils.extractAvailableColors();
+        if (availableColors.length < 10) {
+            updateUI("noColorsFound", "error");
+            Utils.showAlert(Utils.t("noColorsFound"), "error");
+            return; // Stop the function here
+        }
+
+        // --- If check passes, run the rest of the logic ---
+        if (!state.colorsChecked) {
+            state.availableColors = availableColors;
+            state.colorsChecked = true;
+            updateUI("colorsFound", "success", { count: availableColors.length });
+            updateStats();
+            selectPosBtn.disabled = false;
+        }
+
         try {
           updateUI("loadingImage", "default")
           const imageSrc = await Utils.createImageUploader()
-          if (!imageSrc) return; // User cancelled the file dialog
+          if (!imageSrc) { // User cancelled the file dialog
+              updateUI("colorsFound", "success", { count: state.availableColors.length });
+              return; 
+          }
 
           const processor = new ImageProcessor(imageSrc)
           await processor.load()
