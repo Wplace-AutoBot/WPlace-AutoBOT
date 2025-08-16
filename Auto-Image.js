@@ -201,7 +201,7 @@
     pixels: "Pixels",
     charges: "Charges",
     estimatedTime: "Estimated time",
-    initMessage: "Click 'Start Auto-BOT' to begin",
+    initMessage: "Click 'Upload Image' to begin",
     waitingInit: "Waiting for initialization...",
     resizeSuccess: "✅ Image resized to {width}x{height}",
     paintingPaused: "⏸️ Painting paused at position X: {x}, Y: {y}",
@@ -261,7 +261,7 @@
     pixels: "Пиксели",
     charges: "Заряды",
     estimatedTime: "Примерное время",
-    initMessage: "Нажмите 'Запустить Авто-БОТ', чтобы начать",
+    initMessage: "Нажмите 'Загрузить изображение', чтобы начать",
     waitingInit: "Ожидание инициализации...",
     resizeSuccess: "✅ Изображение изменено до {width}x{height}",
     paintingPaused: "⏸️ Рисование приостановлено на позиции X: {x}, Y: {y}",
@@ -321,7 +321,7 @@
     pixels: "Pixels",
     charges: "Cargas",
     estimatedTime: "Tempo estimado",
-    initMessage: "Clique em 'Iniciar Auto-BOT' para começar",
+    initMessage: "Clique em 'Upload da Imagem' para começar",
     waitingInit: "Aguardando inicialização...",
     resizeSuccess: "✅ Imagem redimensionada para {width}x{height}",
     paintingPaused: "⏸️ Pintura pausada na posição X: {x}, Y: {y}",
@@ -381,7 +381,7 @@
     pixels: "Pixel",
     charges: "Điện tích",
     estimatedTime: "Thời gian ước tính",
-    initMessage: "Nhấp 'Khởi động Auto-BOT' để bắt đầu",
+    initMessage: "Nhấp 'Tải lên hình ảnh' để bắt đầu",
     waitingInit: "Đang chờ khởi tạo...",
     resizeSuccess: "✅ Đã thay đổi kích thước hình ảnh thành {width}x{height}",
     paintingPaused: "⏸️ Tạm dừng vẽ tại vị trí X: {x}, Y: {y}",
@@ -441,7 +441,7 @@
     pixels: "Pixels",
     charges: "Charges",
     estimatedTime: "Temps estimé",
-    initMessage: "Cliquez sur 'Démarrer Auto-BOT' pour commencer",
+    initMessage: "Cliquez sur 'Télécharger l'image' pour commencer",
     waitingInit: "En attente d'initialisation...",
     resizeSuccess: "✅ Image redimensionnée en {width}x{height}",
     paintingPaused: "⏸️ Peinture en pause à la position X: {x}, Y: {y}",
@@ -1159,6 +1159,39 @@
       updateActiveColorPalette();
   }
   // --- END: Color Palette Functions ---
+
+  // Refactored function to handle color checking
+  async function checkAndSetColors() {
+    // If colors are already checked, no need to do it again.
+    if (state.colorsChecked) return true;
+
+    try {
+        updateUI("checkingColors", "default");
+        state.availableColors = Utils.extractAvailableColors();
+
+        if (state.availableColors.length === 0) {
+            Utils.showAlert(Utils.t("noColorsFound"), "error");
+            updateUI("noColorsFound", "error");
+            return false; // Indicate failure
+        }
+
+        state.colorsChecked = true;
+
+        // Enable other buttons now that we're initialized
+        const selectPosBtn = document.getElementById('selectPosBtn');
+        if(selectPosBtn) selectPosBtn.disabled = false;
+
+        updateUI("colorsFound", "success", {
+            count: state.availableColors.length,
+        });
+        updateStats();
+        return true; // Indicate success
+    } catch (e) {
+        console.error("Error checking colors:", e);
+        updateUI("imageError", "error");
+        return false; // Indicate failure
+    }
+  }
 
 
   async function createUI() {
@@ -2318,23 +2351,12 @@
           </div>
         </div>
 
-        <!-- Setup Section -->
-        <div class="wplace-section">
-          <div class="wplace-section-title">🤖 Bot Setup</div>
-          <div class="wplace-controls">
-            <button id="initBotBtn" class="wplace-btn wplace-btn-primary">
-              <i class="fas fa-robot"></i>
-              <span>${Utils.t("initBot")}</span>
-            </button>
-          </div>
-        </div>
-
         <!-- Image Section -->
         <div class="wplace-section">
           <div class="wplace-section-title">🖼️ Image Management</div>
           <div class="wplace-controls">
             <div class="wplace-row">
-              <button id="uploadBtn" class="wplace-btn wplace-btn-upload" disabled>
+              <button id="uploadBtn" class="wplace-btn wplace-btn-upload">
                 <i class="fas fa-upload"></i>
                 <span>${Utils.t("uploadImage")}</span>
               </button>
@@ -2757,7 +2779,6 @@
     document.body.appendChild(settingsContainer)
 
     // Query all UI elements after appending to DOM
-    const initBotBtn = container.querySelector("#initBotBtn")
     const uploadBtn = container.querySelector("#uploadBtn")
     const resizeBtn = container.querySelector("#resizeBtn")
     const selectPosBtn = container.querySelector("#selectPosBtn")
@@ -2778,9 +2799,8 @@
     const refreshChargesBtn = statsContainer.querySelector("#refreshChargesBtn")
 
     // Check if all elements are found
-    if (!initBotBtn || !uploadBtn || !selectPosBtn || !startBtn || !stopBtn) {
+    if (!uploadBtn || !selectPosBtn || !startBtn || !stopBtn) {
       console.error("Some UI elements not found:", {
-        initBotBtn: !!initBotBtn,
         uploadBtn: !!uploadBtn,
         selectPosBtn: !!selectPosBtn,
         startBtn: !!startBtn,
@@ -3179,7 +3199,8 @@
             updateStats()
 
             if (!state.colorsChecked) {
-              initBotBtn.style.display = "block"
+              // Re-run color check automatically if loaded data is missing it
+              checkAndSetColors();
             }
 
             if (state.imageLoaded && state.startPosition && state.region && state.colorsChecked) {
@@ -3223,9 +3244,9 @@
               uploadBtn.disabled = false
               selectPosBtn.disabled = false
               resizeBtn.disabled = false
-              initBotBtn.style.display = "none"
             } else {
-              initBotBtn.style.display = "block"
+                // If loaded file is missing color data, check for it
+                await checkAndSetColors();
             }
 
             if (state.imageLoaded && state.startPosition && state.region && state.colorsChecked) {
@@ -3252,7 +3273,7 @@
     }
 
     updateStats = async () => {
-      if (!state.colorsChecked || !state.imageLoaded) return
+      if (!state.imageLoaded) return; // Only show stats if image is loaded
 
       const { charges, cooldown } = await WPlaceService.getCharges()
       state.currentCharges = Math.floor(charges)
@@ -3344,7 +3365,7 @@
                 data[i] = nr;
                 data[i + 1] = ng;
                 data[i + 2] = nb;
-                data[i + 3] = 255; // ** THE FIX IS HERE **
+                data[i + 3] = 255; 
             }
             tempCtx.putImageData(imgData, 0, 0);
             resizePreview.src = tempCanvas.toDataURL();
@@ -3420,39 +3441,20 @@
         _updateResizePreview = () => {}; // Clear the function to prevent memory leaks
     }
 
-    if (initBotBtn) {
-      initBotBtn.addEventListener("click", async () => {
-        try {
-          updateUI("checkingColors", "default")
-
-          state.availableColors = Utils.extractAvailableColors()
-
-          if (state.availableColors.length === 0) {
-            Utils.showAlert(Utils.t("noColorsFound"), "error")
-            updateUI("noColorsFound", "error")
-            return
-          }
-
-          state.colorsChecked = true
-          uploadBtn.disabled = false
-          selectPosBtn.disabled = false
-          initBotBtn.style.display = "none"
-
-          updateUI("colorsFound", "success", {
-            count: state.availableColors.length,
-          })
-          updateStats()
-        } catch {
-          updateUI("imageError", "error")
-        }
-      })
-    }
-
     if (uploadBtn) {
       uploadBtn.addEventListener("click", async () => {
+        // First, automatically run the color check if it hasn't been done.
+        const colorsReady = await checkAndSetColors();
+        if (!colorsReady) {
+            // Stop if colors were not found. The error message is already shown.
+            return;
+        }
+
+        // If colors are ready, proceed with the original upload logic.
         try {
           updateUI("loadingImage", "default")
           const imageSrc = await Utils.createImageUploader()
+          if (!imageSrc) return; // User cancelled the file dialog
 
           const processor = new ImageProcessor(imageSrc)
           await processor.load()
