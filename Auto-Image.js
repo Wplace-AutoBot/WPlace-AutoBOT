@@ -194,6 +194,7 @@
     positionTimeout: "❌ Timeout for position selection",
     startPaintingMsg: "🎨 Starting painting...",
     paintingProgress: "🧱 Progress: {painted}/{total} pixels...",
+  skipSummary: "ℹ️ {skipped} pixels already correct. {toPaint} will be painted.",
     noCharges: "⌛ No charges. Waiting {time}...",
     paintingStopped: "⏹️ Painting stopped by user",
     paintingComplete: "✅ Painting complete! {count} pixels painted.",
@@ -264,6 +265,7 @@
     positionTimeout: "❌ Время ожидания выбора позиции истекло",
     startPaintingMsg: "🎨 Начинаем рисование...",
     paintingProgress: "🧱 Прогресс: {painted}/{total} пикселей...",
+  skipSummary: "ℹ️ {skipped} пикселей уже правильные. {toPaint} будет нарисовано.",
     noCharges: "⌛ Нет зарядов. Ожидание {time}...",
     paintingStopped: "⏹️ Рисование остановлено пользователем",
     paintingComplete: "✅ Рисование завершено! Нарисовано пикселей: {count}.",
@@ -334,6 +336,7 @@
     positionTimeout: "❌ Tempo esgotado para selecionar posição",
     startPaintingMsg: "🎨 Iniciando pintura...",
     paintingProgress: "🧱 Progresso: {painted}/{total} pixels...",
+  skipSummary: "ℹ️ {skipped} pixels já corretos. {toPaint} serão pintados.",
     noCharges: "⌛ Sem cargas. Aguardando {time}...",
     paintingStopped: "⏹️ Pintura interromпида pelo usuário",
     paintingComplete: "✅ Pintura concluída! {count} pixels pintados.",
@@ -404,6 +407,7 @@
     positionTimeout: "❌ Hết thời gian chọn vị trí",
     startPaintingMsg: "🎨 Bắt đầu vẽ...",
     paintingProgress: "🧱 Tiến trình: {painted}/{total} pixel...",
+  skipSummary: "ℹ️ {skipped} pixel đã đúng. {toPaint} sẽ được vẽ.",
     noCharges: "⌛ Không có điện tích. Đang chờ {time}...",
     paintingStopped: "⏹️ Người dùng đã dừng vẽ",
     paintingComplete: "✅ Hoàn thành vẽ! Đã vẽ {count} pixel.",
@@ -474,6 +478,7 @@
     positionTimeout: "❌ Délai d'attente pour la sélection de position",
     startPaintingMsg: "🎨 Début de la peinture...",
     paintingProgress: "🧱 Progrès: {painted}/{total} pixels...",
+  skipSummary: "ℹ️ {skipped} pixels déjà corrects. {toPaint} seront peints.",
     noCharges: "⌛ Aucune charge. En attente {time}...",
     paintingStopped: "⏹️ Peinture arrêtée par l'utilisateur",
     paintingComplete: "✅ Peinture terminée! {count} pixels peints.",
@@ -551,7 +556,8 @@
     language: "en",
     paintingSpeed: CONFIG.PAINTING_SPEED.DEFAULT, // pixels per second
     cooldownChargeThreshold: CONFIG.COOLDOWN_CHARGE_THRESHOLD,
-    existingColorIds: null, 
+    existingColorIds: null,
+    skipSummaryShown: false,
   }
 
   let _updateResizePreview = () => {};
@@ -3991,6 +3997,38 @@
     }
 
     let pixelBatch = []
+
+    // Pre-scan to determine how many pixels are already correct (skip) vs to paint
+    if (!state.skipSummaryShown) {
+      try {
+        if (!state.existingColorIds) {
+          state.existingColorIds = await WPlaceService.loadExistingTile(regionX, regionY);
+        }
+        if (state.existingColorIds) {
+          let skipped = 0; let toPaint = 0;
+          for (let y=0; y<height; y++) {
+            for (let x=0; x<width; x++) {
+              const idx2 = (y*width + x)*4;
+              const a = pixels[idx2+3];
+              if (a < CONFIG.TRANSPARENCY_THRESHOLD) continue;
+              const r2 = pixels[idx2], g2 = pixels[idx2+1], b2 = pixels[idx2+2];
+              if (!state.paintWhitePixels && Utils.isWhitePixel(r2,g2,b2)) continue;
+              // Quantize and map
+              let qRgb = Utils.isWhitePixel(r2,g2,b2) ? [255,255,255] : Utils.findClosestPaletteColor(r2,g2,b2,state.activeColorPalette);
+              const neededId = findClosestColor(qRgb, state.availableColors);
+              const boardId = state.existingColorIds[(startY + y) - startY]?.[(startX + x) - startX];
+              if (boardId === neededId) skipped++; else toPaint++;
+            }
+          }
+          state.skipSummaryShown = true;
+          const msgParams = { skipped, toPaint };
+          Utils.showAlert(Utils.t('skipSummary', msgParams), 'info');
+          updateUI('skipSummary', 'success', msgParams);
+        }
+      } catch (e) {
+        console.warn('Skip summary pre-scan failed', e);
+      }
+    }
 
     try {
       outerLoop: for (let y = startRow; y < height; y++) {
