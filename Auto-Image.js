@@ -1357,6 +1357,11 @@
         ${CONFIG.currentTheme === "Neon Retro" ? "image-rendering: pixelated;" : ""}
       }
 
+      /* FIX: Disable transition during drag to prevent lag */
+      #wplace-stats-container.wplace-dragging {
+        transition: none;
+      }
+
       .wplace-header {
         padding: ${CONFIG.currentTheme === "Neon Retro" ? "8px 12px" : "8px 12px"};
         background: ${
@@ -3909,3 +3914,5 @@
 
   createUI()
 })()
+```
+314.1s
