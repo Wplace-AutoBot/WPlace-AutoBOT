@@ -313,7 +313,7 @@
     startPaintingMsg: "🎨 Iniciando pintura...",
     paintingProgress: "🧱 Progresso: {painted}/{total} pixels...",
     noCharges: "⌛ Sem cargas. Aguardando {time}...",
-    paintingStopped: "⏹️ Pintura interrompida pelo usuário",
+    paintingStopped: "⏹️ Pintura interromпида pelo usuário",
     paintingComplete: "✅ Pintura concluída! {count} pixels pintados.",
     paintingError: "❌ Erro durante a pintura",
     missingRequirements: "❌ Carregue uma imagem e selecione uma posição primeiro",
@@ -483,6 +483,7 @@
     paintedPixels: 0,
     availableColors: [],
     activeColorPalette: [], // User-selected colors for conversion
+    paintWhitePixels: false, // New state for controlling white pixel painting
     currentCharges: 0,
     cooldown: CONFIG.COOLDOWN_DEFAULT,
     imageData: null,
@@ -1115,9 +1116,6 @@
 
       uniqueColors.forEach(rgb => {
           const key = rgb.join(',');
-          // Skip pure white as it's not a paintable color
-          if (key === "255,255,255") return;
-
           const name = CONFIG.COLOR_NAMES[key] || `rgb(${key})`;
           const isPaid = CONFIG.PAID_COLORS.has(key);
 
@@ -1759,27 +1757,28 @@
         overflow: auto;
         font-family: ${theme.fontFamily};
       }
-
-      .resize-preview-container {
+      
+      .resize-preview-wrapper {
         display: flex;
         justify-content: center;
-        margin-bottom: 15px;
+        align-items: center;
+        border: 1px solid ${theme.accent};
+        background: rgba(0,0,0,0.2);
+        margin: 15px 0;
+        height: 300px;
+        overflow: auto;
       }
 
       .resize-preview {
-        max-width: 100%;
-        max-height: 300px;
-        border: ${
-          CONFIG.currentTheme === "Classic Autobot" ? `1px solid ${theme.accent}` : `2px solid ${theme.accent}`
-        };
-        ${CONFIG.currentTheme === "Neon Retro" ? "image-rendering: pixelated;" : ""}
+        max-width: none; /* Allow image to exceed wrapper for zoom */
+        transition: transform 0.1s ease;
       }
-
+      
       .resize-controls {
-        display: flex;
-        flex-direction: column;
-        gap: ${CONFIG.currentTheme === "Neon Retro" ? "15px" : "10px"};
-        margin-top: 15px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        align-items: center;
       }
 
       .resize-controls label {
@@ -1822,6 +1821,14 @@
         box-shadow: 0 0 5px ${theme.highlight};
       }`
           : ""
+      }
+      
+      .resize-zoom-controls {
+        grid-column: 1 / -1; /* Span full width */
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 15px;
       }
 
       .resize-buttons {
@@ -2648,21 +2655,30 @@
     resizeContainer.innerHTML = `
       <h3 style="margin-top: 0; color: ${theme.text}">${Utils.t("resizeImage")}</h3>
       <div class="resize-controls">
-        <label style="color: ${theme.text}">
+        <label>
           ${Utils.t("width")}: <span id="widthValue">0</span>px
           <input type="range" id="widthSlider" class="resize-slider" min="10" max="500" value="100">
         </label>
-        <label style="color: ${theme.text}">
+        <label>
           ${Utils.t("height")}: <span id="heightValue">0</span>px
           <input type="range" id="heightSlider" class="resize-slider" min="10" max="500" value="100">
         </label>
-        <label style="color: ${theme.text}; display: flex; align-items: center;">
+        <label style="display: flex; align-items: center;">
           <input type="checkbox" id="keepAspect" checked>
           Keep Aspect Ratio
         </label>
+        <label style="display: flex; align-items: center;">
+          <input type="checkbox" id="paintWhiteToggle">
+          Paint White Pixels
+        </label>
+        <div class="resize-zoom-controls">
+          <i class="fas fa-search-minus"></i>
+          <input type="range" id="zoomSlider" class="resize-slider" min="1" max="10" value="1" step="0.1">
+          <i class="fas fa-search-plus"></i>
+        </div>
       </div>
 
-      <div class="resize-preview-container">
+      <div class="resize-preview-wrapper">
           <img id="resizePreview" class="resize-preview" src="" alt="Resized image preview will appear here.">
       </div>
 
@@ -3048,6 +3064,8 @@
     const widthValue = resizeContainer.querySelector("#widthValue")
     const heightValue = resizeContainer.querySelector("#heightValue")
     const keepAspect = resizeContainer.querySelector("#keepAspect")
+    const paintWhiteToggle = resizeContainer.querySelector("#paintWhiteToggle");
+    const zoomSlider = resizeContainer.querySelector("#zoomSlider");
     const resizePreview = resizeContainer.querySelector("#resizePreview")
     const confirmResize = resizeContainer.querySelector("#confirmResize")
     const cancelResize = resizeContainer.querySelector("#cancelResize")
@@ -3265,10 +3283,12 @@
         heightSlider.max = height * 2; // Set a reasonable max
         widthValue.textContent = width;
         heightValue.textContent = height;
+        zoomSlider.value = 1;
 
         _updateResizePreview = () => {
             const newWidth = parseInt(widthSlider.value, 10);
             const newHeight = parseInt(heightSlider.value, 10);
+            const zoomLevel = parseFloat(zoomSlider.value);
 
             widthValue.textContent = newWidth;
             heightValue.textContent = newHeight;
@@ -3286,7 +3306,7 @@
             for (let i = 0; i < data.length; i += 4) {
                 const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
 
-                if (a < CONFIG.TRANSPARENCY_THRESHOLD || Utils.isWhitePixel(r, g, b)) {
+                if (a < CONFIG.TRANSPARENCY_THRESHOLD || (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b))) {
                     data[i + 3] = 0; // Make transparent
                     continue;
                 }
@@ -3298,6 +3318,7 @@
             }
             tempCtx.putImageData(imgData, 0, 0);
             resizePreview.src = tempCanvas.toDataURL();
+            resizePreview.style.transform = `scale(${zoomLevel})`;
         };
 
         const onWidthInput = () => {
@@ -3313,7 +3334,13 @@
             }
             _updateResizePreview();
         };
-
+        
+        paintWhiteToggle.onchange = (e) => {
+            state.paintWhitePixels = e.target.checked;
+            _updateResizePreview();
+        };
+        
+        zoomSlider.addEventListener('input', _updateResizePreview);
         widthSlider.addEventListener("input", onWidthInput);
         heightSlider.addEventListener("input", onHeightInput);
 
@@ -3324,7 +3351,9 @@
 
             let totalValidPixels = 0;
             for (let i = 0; i < newPixels.length; i += 4) {
-                if (newPixels[i + 3] >= CONFIG.TRANSPARENCY_THRESHOLD && !Utils.isWhitePixel(newPixels[i], newPixels[i+1], newPixels[i+2])) {
+                const isTransparent = newPixels[i + 3] < CONFIG.TRANSPARENCY_THRESHOLD;
+                const isWhiteAndSkipped = !state.paintWhitePixels && Utils.isWhitePixel(newPixels[i], newPixels[i+1], newPixels[i+2]);
+                if (!isTransparent && !isWhiteAndSkipped) {
                     totalValidPixels++;
                 }
             }
@@ -3401,20 +3430,13 @@
           const { width, height } = processor.getDimensions()
           const pixels = processor.getPixelData()
 
-          let totalValidPixels = 0
-          for (let y = 0; y < height; y++) {
-            for (let x = 0; x < width; x++) {
-              const idx = (y * width + x) * 4
-              const r = pixels[idx]
-              const g = pixels[idx + 1]
-              const b = pixels[idx + 2]
-              const alpha = pixels[idx + 3]
-
-              if (alpha < CONFIG.TRANSPARENCY_THRESHOLD) continue
-              if (Utils.isWhitePixel(r, g, b)) continue
-
-              totalValidPixels++
-            }
+          let totalValidPixels = 0;
+          for (let i = 0; i < pixels.length; i += 4) {
+              const isTransparent = pixels[i + 3] < CONFIG.TRANSPARENCY_THRESHOLD;
+              const isWhiteAndSkipped = !state.paintWhitePixels && Utils.isWhitePixel(pixels[i], pixels[i+1], pixels[i+2]);
+              if (!isTransparent && !isWhiteAndSkipped) {
+                  totalValidPixels++;
+              }
           }
 
           state.imageData = {
@@ -3710,8 +3732,9 @@
           const b = pixels[idx + 2]
           const alpha = pixels[idx + 3]
 
-          if (alpha < CONFIG.TRANSPARENCY_THRESHOLD) continue
-          if (Utils.isWhitePixel(r, g, b)) continue
+          if (alpha < CONFIG.TRANSPARENCY_THRESHOLD || (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b))) {
+              continue;
+          }
 
           // Step 1: Quantize source pixel to the user's selected palette
           const targetRgb = Utils.findClosestPaletteColor(r, g, b, state.activeColorPalette);
