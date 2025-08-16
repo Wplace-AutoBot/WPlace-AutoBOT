@@ -11,6 +11,43 @@
       DEFAULT: 5,      // Default 5 pixels per second
   },
     PAINTING_SPEED_ENABLED: false,
+    // --- START: Color data from colour-converter.js ---
+    COLOR_PALETTE: [
+      [0,0,0],[60,60,60],[120,120,120],[170,170,170],[210,210,210],[255,255,255],
+      [96,0,24],[165,14,30],[237,28,36],[250,128,114],[228,92,26],[255,127,39],[246,170,9],
+      [249,221,59],[255,250,188],[156,132,49],[197,173,49],[232,212,95],[74,107,58],[90,148,74],[132,197,115],
+      [14,185,104],[19,230,123],[135,255,94],[12,129,110],[16,174,166],[19,225,190],[15,121,159],[96,247,242],
+      [187,250,242],[40,80,158],[64,147,228],[125,199,255],[77,49,184],[107,80,246],[153,177,251],
+      [74,66,132],[122,113,196],[181,174,241],[170,56,185],[224,159,249],
+      [203,0,122],[236,31,128],[243,141,169],[155,82,73],[209,128,120],[250,182,164],
+      [104,70,52],[149,104,42],[219,164,99],[123,99,82],[156,132,107],[214,181,148],
+      [209,128,81],[248,178,119],[255,197,165],[109,100,63],[148,140,107],[205,197,158],
+      [51,57,65],[109,117,141],[179,185,209]
+    ],
+    COLOR_NAMES: {
+      "0,0,0": "Black", "60,60,60": "Dark Gray", "120,120,120": "Gray", "210,210,210": "Light Gray", "255,255,255": "White",
+      "96,0,24": "Deep Red", "237,28,36": "Red", "255,127,39": "Orange", "246,170,9": "Gold", "249,221,59": "Yellow",
+      "255,250,188": "Light Yellow", "14,185,104": "Dark Green", "19,230,123": "Green", "135,255,94": "Light Green",
+      "12,129,110": "Dark Teal", "16,174,166": "Teal", "19,225,190": "Light Teal", "96,247,242": "Cyan", "40,80,158": "Dark Blue",
+      "64,147,228": "Blue", "107,80,246": "Indigo", "153,177,251": "Light Indigo", "120,12,153": "Dark Purple",
+      "170,56,185": "Purple", "224,159,249": "Light Purple", "203,0,122": "Dark Pink", "236,31,128": "Pink",
+      "243,141,169": "Light Pink", "104,70,52": "Dark Brown", "149,104,42": "Brown", "248,178,119": "Beige",
+      "170,170,170": "Medium Gray", "165,14,30": "Dark Red", "250,128,114": "Light Red", "228,92,26": "Dark Orange",
+      "156,132,49": "Dark Goldenrod", "197,173,49": "Goldenrod", "232,212,95": "Light Goldenrod", "74,107,58": "Dark Olive",
+      "90,148,74": "Olive", "132,197,115": "Light Olive", "15,121,159": "Dark Cyan", "187,250,242": "Light Cyan",
+      "125,199,255": "Light Blue", "77,49,184": "Dark Indigo", "74,66,132": "Dark Slate Blue", "122,113,196": "Slate Blue",
+      "181,174,241": "Light Slate Blue", "155,82,73": "Dark Peach", "209,128,120": "Peach", "250,182,164": "Light Peach",
+      "219,164,99": "Light Brown", "123,99,82": "Dark Tan", "156,132,107": "Tan", "214,181,148": "Light Tan",
+      "209,128,81": "Dark Beige", "255,197,165": "Light Beige", "109,100,63": "Dark Stone", "148,140,107": "Stone",
+      "205,197,158": "Light Stone", "51,57,65": "Dark Slate", "109,117,141": "Slate", "179,185,209": "Light Slate",
+    },
+    PAID_COLORS: new Set([
+      "170,170,170", "165,14,30", "250,128,114", "228,92,26", "156,132,49", "197,173,49", "232,212,95", "74,107,58",
+      "90,148,74", "132,197,115", "15,121,159", "187,250,242", "125,199,255", "77,49,184", "74,66,132", "122,113,196",
+      "181,174,241", "155,82,73", "209,128,120", "250,182,164", "219,164,99", "123,99,82", "156,132,107", "214,181,148",
+      "209,128,81", "255,197,165", "109,100,63", "148,140,107", "205,197,158", "51,57,65", "109,117,141", "179,185,209",
+    ]),
+    // --- END: Color data ---
     // Optimized CSS Classes for reuse
     CSS_CLASSES: {
       BUTTON_PRIMARY: `
@@ -20,12 +57,12 @@
         display: flex; align-items: center; gap: 8px;
       `,
       BUTTON_SECONDARY: `
-        background: rgba(255,255,255,0.1); color: white; 
-        border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; 
+        background: rgba(255,255,255,0.1); color: white;
+        border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;
         padding: 8px 12px; cursor: pointer; transition: all 0.3s ease;
       `,
       MODERN_CARD: `
-        background: rgba(255,255,255,0.1); border-radius: 12px; 
+        background: rgba(255,255,255,0.1); border-radius: 12px;
         padding: 18px; border: 1px solid rgba(255,255,255,0.1);
         backdrop-filter: blur(5px);
       `,
@@ -35,7 +72,7 @@
         background-clip: text; font-weight: bold;
       `
     },
-    THEMES: {  
+    THEMES: {
       "Classic Autobot": {
         primary: "#000000",
         secondary: "#111111",
@@ -164,7 +201,7 @@
     pixels: "Pixels",
     charges: "Charges",
     estimatedTime: "Estimated time",
-    initMessage: "Click 'Start Auto-BOT' to begin",
+    initMessage: "Click 'Upload Image' to begin",
     waitingInit: "Waiting for initialization...",
     resizeSuccess: "✅ Image resized to {width}x{height}",
     paintingPaused: "⏸️ Painting paused at position X: {x}, Y: {y}",
@@ -174,7 +211,7 @@
     saveToFile: "Save to File",
     loadFromFile: "Load from File",
     dataManager: "Data Manager",
-    autoSaved: "✅ Progress saved automatically", 
+    autoSaved: "✅ Progress saved automatically",
     dataLoaded: "✅ Progress loaded successfully",
     fileSaved: "✅ Progress saved to file successfully",
     fileLoaded: "✅ Progress loaded from file successfully",
@@ -193,7 +230,7 @@
     language: "Language",
     themeSettings: "Theme Settings",
     themeSettingsDesc: "Choose your preferred color theme for the interface.",
-    languageSelectDesc: "Select your preferred language. Changes will take effect immediately.",  
+    languageSelectDesc: "Select your preferred language. Changes will take effect immediately.",
   },
   ru: {
     title: "WPlace Авто-Изображение",
@@ -224,7 +261,7 @@
     pixels: "Пиксели",
     charges: "Заряды",
     estimatedTime: "Примерное время",
-    initMessage: "Нажмите 'Запустить Авто-БОТ', чтобы начать",
+    initMessage: "Нажмите 'Загрузить изображение', чтобы начать",
     waitingInit: "Ожидание инициализации...",
     resizeSuccess: "✅ Изображение изменено до {width}x{height}",
     paintingPaused: "⏸️ Рисование приостановлено на позиции X: {x}, Y: {y}",
@@ -234,7 +271,7 @@
     saveToFile: "Сохранить в файл",
     loadFromFile: "Загрузить из файла",
     dataManager: "Менеджер данных",
-    autoSaved: "✅ Прогресс сохранён автоматически", 
+    autoSaved: "✅ Прогресс сохранён автоматически",
     dataLoaded: "✅ Прогресс успешно загружен",
     fileSaved: "✅ Прогресс успешно сохранён в файл",
     fileLoaded: "✅ Прогресс успешно загружен из файла",
@@ -269,14 +306,14 @@
     loadingImage: "🖼️ Carregando imagem...",
     imageLoaded: "✅ Imagem carregada com {count} pixels válidos",
     imageError: "❌ Erro ao carregar imagem",
-    selectPositionAlert: "Pinte o primeiro pixel na localização onde deseja que a arte comece!",
+    selectPositionAlert: "Pinte o primeiro pixel на localização onde deseja que a arte comece!",
     waitingPosition: "👆 Aguardando você pintar o pixel de referência...",
     positionSet: "✅ Posição definida com sucesso!",
     positionTimeout: "❌ Tempo esgotado para selecionar posição",
     startPaintingMsg: "🎨 Iniciando pintura...",
     paintingProgress: "🧱 Progresso: {painted}/{total} pixels...",
     noCharges: "⌛ Sem cargas. Aguardando {time}...",
-    paintingStopped: "⏹️ Pintura interrompida pelo usuário",
+    paintingStopped: "⏹️ Pintura interromпида pelo usuário",
     paintingComplete: "✅ Pintura concluída! {count} pixels pintados.",
     paintingError: "❌ Erro durante a pintura",
     missingRequirements: "❌ Carregue uma imagem e selecione uma posição primeiro",
@@ -284,7 +321,7 @@
     pixels: "Pixels",
     charges: "Cargas",
     estimatedTime: "Tempo estimado",
-    initMessage: "Clique em 'Iniciar Auto-BOT' para começar",
+    initMessage: "Clique em 'Upload da Imagem' para começar",
     waitingInit: "Aguardando inicialização...",
     resizeSuccess: "✅ Imagem redimensionada para {width}x{height}",
     paintingPaused: "⏸️ Pintura pausada na posição X: {x}, Y: {y}",
@@ -292,7 +329,7 @@
     saveData: "Salvar Progresso",
     loadData: "Carregar Progresso",
     saveToFile: "Salvar em Arquivo",
-    loadFromFile: "Carregar de Arquivo", 
+    loadFromFile: "Carregar de Arquivo",
     dataManager: "Dados",
     autoSaved: "✅ Progresso salvo automaticamente",
     dataLoaded: "✅ Progresso carregado com sucesso",
@@ -313,7 +350,7 @@
     language: "Idioma",
     themeSettings: "Configurações de Tema",
     themeSettingsDesc: "Escolha seu tema de cores preferido para a interface.",
-    languageSelectDesc: "Selecione seu idioma preferido. As alterações terão efeito imediatamente.",  
+    languageSelectDesc: "Selecione seu idioma preferido. As alterações terão efeito imediatamente.",
   },
   vi: {
     title: "WPlace Auto-Image",
@@ -344,7 +381,7 @@
     pixels: "Pixel",
     charges: "Điện tích",
     estimatedTime: "Thời gian ước tính",
-    initMessage: "Nhấp 'Khởi động Auto-BOT' để bắt đầu",
+    initMessage: "Nhấp 'Tải lên hình ảnh' để bắt đầu",
     waitingInit: "Đang chờ khởi tạo...",
     resizeSuccess: "✅ Đã thay đổi kích thước hình ảnh thành {width}x{height}",
     paintingPaused: "⏸️ Tạm dừng vẽ tại vị trí X: {x}, Y: {y}",
@@ -404,7 +441,7 @@
     pixels: "Pixels",
     charges: "Charges",
     estimatedTime: "Temps estimé",
-    initMessage: "Cliquez sur 'Démarrer Auto-BOT' pour commencer",
+    initMessage: "Cliquez sur 'Télécharger l'image' pour commencer",
     waitingInit: "En attente d'initialisation...",
     resizeSuccess: "✅ Image redimensionnée en {width}x{height}",
     paintingPaused: "⏸️ Peinture en pause à la position X: {x}, Y: {y}",
@@ -445,6 +482,8 @@
     totalPixels: 0,
     paintedPixels: 0,
     availableColors: [],
+    activeColorPalette: [], // User-selected colors for conversion
+    paintWhitePixels: true, // Default to ON
     currentCharges: 0,
     cooldown: CONFIG.COOLDOWN_DEFAULT,
     imageData: null,
@@ -459,6 +498,9 @@
     language: "en",
     paintingSpeed: CONFIG.PAINTING_SPEED.DEFAULT, // pixels per second
   }
+
+  // Placeholder for the resize preview update function
+  let _updateResizePreview = () => {};
 
   // Turnstile token handling (promise-based) inspired by external logic
   let turnstileToken = null
@@ -521,7 +563,7 @@
     // Optimized DOM creation helpers
     createElement: (tag, props = {}, children = []) => {
       const element = document.createElement(tag)
-      
+
       // Set properties efficiently
       Object.entries(props).forEach(([key, value]) => {
         if (key === 'style' && typeof value === 'object') {
@@ -534,7 +576,7 @@
           element.setAttribute(key, value)
         }
       })
-      
+
       // Append children efficiently
       if (typeof children === 'string') {
         element.textContent = children
@@ -547,7 +589,7 @@
           }
         })
       }
-      
+
       return element
     },
 
@@ -620,6 +662,27 @@
     },
 
     colorDistance: (a, b) => Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2) + Math.pow(a[2] - b[2], 2)),
+
+    // The color metric from colour-converter.js for higher accuracy
+    findClosestPaletteColor: (r, g, b, palette) => {
+        let menorDist = Infinity;
+        let cor = [0, 0, 0];
+        if (!palette || palette.length === 0) return cor;
+
+        for (let i = 0; i < palette.length; i++) {
+            const [pr, pg, pb] = palette[i];
+            const rmean = (pr + r) / 2;
+            const rdiff = pr - r;
+            const gdiff = pg - g;
+            const bdiff = pb - b;
+            const dist = Math.sqrt(((512 + rmean) * rdiff * rdiff >> 8) + 4 * gdiff * gdiff + ((767 - rmean) * bdiff * bdiff >> 8));
+            if (dist < menorDist) {
+                menorDist = dist;
+                cor = [pr, pg, pb];
+            }
+        }
+        return cor;
+    },
 
     isWhitePixel: (r, g, b) =>
       r >= CONFIG.WHITE_THRESHOLD && g >= CONFIG.WHITE_THRESHOLD && b >= CONFIG.WHITE_THRESHOLD,
@@ -708,15 +771,15 @@
 
     calculateEstimatedTime: (remainingPixels, charges, cooldown) => {
       if (remainingPixels <= 0) return 0
-      
+
       // Calculate time based on painting speed (pixels per second)
       const paintingSpeedDelay = state.paintingSpeed > 0 ? (1000 / state.paintingSpeed) : 1000
       const timeFromSpeed = remainingPixels * paintingSpeedDelay // ms
-      
+
       // Calculate time based on charges and cooldown
       const cyclesNeeded = Math.ceil(remainingPixels / Math.max(charges, 1))
       const timeFromCharges = cyclesNeeded * cooldown // ms
-      
+
       // Return the maximum of both calculations (the limiting factor)
       return Math.max(timeFromSpeed, timeFromCharges)
     },
@@ -970,11 +1033,11 @@
 
   // COLOR MATCHING FUNCTION - Optimized with caching
   const colorCache = new Map()
-  
+
   function findClosestColor(targetRgb, availableColors) {
     // Create cache key from RGB values
     const cacheKey = `${targetRgb[0]},${targetRgb[1]},${targetRgb[2]}`
-    
+
     // Check cache first
     if (colorCache.has(cacheKey)) {
       return colorCache.get(cacheKey)
@@ -990,7 +1053,7 @@
       if (distance < minDistance) {
         minDistance = distance
         closestColorId = color.id
-        
+
         // If perfect match, break early
         if (distance === 0) break
       }
@@ -998,7 +1061,7 @@
 
     // Cache the result for future use
     colorCache.set(cacheKey, closestColorId)
-    
+
     // Limit cache size to prevent memory leaks
     if (colorCache.size > 10000) {
       const firstKey = colorCache.keys().next().value
@@ -1013,6 +1076,124 @@
   let updateStats = () => {}
   let updateDataButtons = () => {}
 
+  // --- START: Color Palette Functions ---
+  function updateActiveColorPalette() {
+      state.activeColorPalette = [];
+      const activeSwatches = document.querySelectorAll('.wplace-color-swatch.active');
+      if (activeSwatches) {
+          activeSwatches.forEach(swatch => {
+              const rgb = swatch.getAttribute('data-rgb').split(',').map(Number);
+              state.activeColorPalette.push(rgb);
+          });
+      }
+      // If the resize dialog is open, update its preview
+      if (document.querySelector('.resize-container')?.style.display === 'block') {
+          _updateResizePreview();
+      }
+  }
+
+  function toggleAllColors(select, isPaid) {
+      const selector = isPaid ? '.wplace-color-swatch.paid' : '.wplace-color-swatch:not(.paid)';
+      const swatches = document.querySelectorAll(selector);
+      if (swatches) {
+          swatches.forEach(swatch => {
+              swatch.classList.toggle('active', select);
+          });
+      }
+      updateActiveColorPalette();
+  }
+
+  function initializeColorPalette(container) {
+      const freeContainer = container.querySelector('#colors-free');
+      const paidContainer = container.querySelector('#colors-paid');
+      if (!freeContainer || !paidContainer) return;
+
+      freeContainer.innerHTML = '';
+      paidContainer.innerHTML = '';
+
+      // Create a unique set of colors to avoid duplicates
+      const uniqueColors = [...new Set(CONFIG.COLOR_PALETTE.map(JSON.stringify))].map(JSON.parse);
+
+      uniqueColors.forEach(rgb => {
+          const key = rgb.join(',');
+          const name = CONFIG.COLOR_NAMES[key] || `rgb(${key})`;
+          const isPaid = CONFIG.PAID_COLORS.has(key);
+
+          const colorItem = Utils.createElement('div', { className: 'wplace-color-item' });
+          const swatch = Utils.createElement('button', {
+              className: `wplace-color-swatch ${isPaid ? 'paid' : ''}`,
+              title: name,
+              'data-rgb': key,
+          });
+          swatch.style.backgroundColor = `rgb(${key})`;
+
+          const nameLabel = Utils.createElement('span', { className: 'wplace-color-item-name' }, name);
+
+          // Default state: free are active, paid are not
+          if (!isPaid) {
+              swatch.classList.add('active');
+          }
+
+          swatch.addEventListener('click', () => {
+              swatch.classList.toggle('active');
+              updateActiveColorPalette();
+          });
+
+          colorItem.appendChild(swatch);
+          colorItem.appendChild(nameLabel);
+
+          if (isPaid) {
+              paidContainer.appendChild(colorItem);
+          } else {
+              freeContainer.appendChild(colorItem);
+          }
+      });
+
+      // Add event listeners for master buttons
+      container.querySelector('#selectAllFreeBtn')?.addEventListener('click', () => toggleAllColors(true, false));
+      container.querySelector('#unselectAllFreeBtn')?.addEventListener('click', () => toggleAllColors(false, false));
+      container.querySelector('#selectAllPaidBtn')?.addEventListener('click', () => toggleAllColors(true, true));
+      container.querySelector('#unselectAllPaidBtn')?.addEventListener('click', () => toggleAllColors(false, true));
+
+      // Set the initial state
+      updateActiveColorPalette();
+  }
+  // --- END: Color Palette Functions ---
+
+  // Refactored function to handle color checking
+  async function checkAndSetColors() {
+    // If colors are already checked, no need to do it again.
+    if (state.colorsChecked) return true;
+
+    try {
+        updateUI("checkingColors", "default");
+        state.availableColors = Utils.extractAvailableColors();
+
+        if (state.availableColors.length === 0) {
+            Utils.showAlert(Utils.t("noColorsFound"), "error");
+            updateUI("noColorsFound", "error");
+            return false; // Indicate failure
+        }
+
+        state.colorsChecked = true;
+
+        // Enable other buttons now that we're initialized
+        const selectPosBtn = document.getElementById('selectPosBtn');
+        if(selectPosBtn) selectPosBtn.disabled = false;
+
+        updateUI("colorsFound", "success", {
+            count: state.availableColors.length,
+        });
+        updateStats();
+        return true; // Indicate success
+    } catch (e) {
+        console.error("Error checking colors:", e);
+        updateUI("imageError", "error");
+        return false; // Indicate failure
+    }
+  }
+
+
   async function createUI() {
     await detectLanguage()
 
@@ -1022,7 +1203,7 @@
     const existingSettings = document.getElementById("wplace-settings-container")
     const existingResizeContainer = document.querySelector(".resize-container")
     const existingResizeOverlay = document.querySelector(".resize-overlay")
-    
+
     if (existingContainer) existingContainer.remove()
     if (existingStats) existingStats.remove()
     if (existingSettings) existingSettings.remove()
@@ -1054,16 +1235,16 @@
         theme.animations.glow
           ? `
       @keyframes neonGlow {
-        0%, 100% { 
+        0%, 100% {
           text-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor;
         }
-        50% { 
+        50% {
           text-shadow: 0 0 2px currentColor, 0 0 5px currentColor, 0 0 8px currentColor;
         }
       }`
           : ""
       }
-      
+
       ${
         theme.animations.pixelBlink
           ? `
@@ -1073,7 +1254,7 @@
       }`
           : ""
       }
-      
+
       ${
         theme.animations.scanline
           ? `
@@ -1083,7 +1264,7 @@
       }`
           : ""
       }
-      
+
       @keyframes pulse {
         0% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.7); }
         70% { box-shadow: 0 0 0 10px rgba(0, 255, 0, 0); }
@@ -1097,7 +1278,7 @@
         0% { transform: translateX(-100%); }
         100% { transform: translateX(100%); }
       }
-      
+
       #wplace-image-bot-container {
         position: fixed;
         top: 20px;
@@ -1117,13 +1298,14 @@
         font-family: ${theme.fontFamily};
         color: ${theme.text};
         animation: slideIn 0.4s ease-out;
-        overflow: hidden;
+        overflow-y: auto; /* Allow scrolling for main panel */
+        overflow-x: hidden;
         ${theme.backdropFilter ? `backdrop-filter: ${theme.backdropFilter};` : ""}
         transition: all 0.3s ease;
         user-select: none;
         ${CONFIG.currentTheme === "Neon Retro" ? "image-rendering: pixelated;" : ""}
       }
-      
+
       ${
         theme.animations.scanline
           ? `
@@ -1141,7 +1323,7 @@
       }`
           : ""
       }
-      
+
       ${
         CONFIG.currentTheme === "Neon Retro"
           ? `
@@ -1152,7 +1334,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: 
+        background:
           repeating-linear-gradient(
             0deg,
             transparent,
@@ -1165,7 +1347,7 @@
       }`
           : ""
       }
-      
+
       #wplace-image-bot-container.wplace-dragging {
         transition: none;
         box-shadow: 0 12px 40px rgba(0,0,0,0.8), 0 0 0 2px rgba(255,255,255,0.2);
@@ -1175,11 +1357,12 @@
       #wplace-image-bot-container.wplace-minimized {
         width: 200px;
         height: auto;
+        overflow: hidden;
       }
       #wplace-image-bot-container.wplace-compact {
         width: 240px;
       }
-      
+
       /* Stats Container */
       #wplace-stats-container {
         position: fixed;
@@ -1206,7 +1389,12 @@
         user-select: none;
         ${CONFIG.currentTheme === "Neon Retro" ? "image-rendering: pixelated;" : ""}
       }
-      
+
+      /* FIX: Disable transition during drag to prevent lag */
+      #wplace-stats-container.wplace-dragging {
+        transition: none;
+      }
+
       .wplace-header {
         padding: ${CONFIG.currentTheme === "Neon Retro" ? "8px 12px" : "8px 12px"};
         background: ${
@@ -1229,18 +1417,18 @@
         z-index: 2;
         ${theme.animations.glow ? "animation: neonGlow 2s ease-in-out infinite alternate;" : ""}
       }
-      
+
       .wplace-header-title {
         display: flex;
         align-items: center;
         gap: ${CONFIG.currentTheme === "Neon Retro" ? "6px" : "6px"};
       }
-      
+
       .wplace-header-controls {
         display: flex;
         gap: ${CONFIG.currentTheme === "Neon Retro" ? "6px" : "6px"};
       }
-      
+
       .wplace-header-btn {
         background: ${CONFIG.currentTheme === "Classic Autobot" ? "rgba(255,255,255,0.1)" : theme.accent};
         border: ${CONFIG.currentTheme === "Neon Retro" ? `2px solid ${theme.text}` : "none"};
@@ -1264,7 +1452,7 @@
         transform: ${CONFIG.currentTheme === "Classic Autobot" ? "scale(1.1)" : "none"};
         ${CONFIG.currentTheme === "Neon Retro" ? `box-shadow: 0 0 10px ${theme.text};` : ""}
       }
-      
+
       .wplace-content {
         padding: ${CONFIG.currentTheme === "Neon Retro" ? "12px" : "12px"};
         display: block;
@@ -1274,7 +1462,7 @@
       .wplace-content.wplace-hidden {
         display: none;
       }
-      
+
       .wplace-status-section {
         margin-bottom: 12px;
         padding: 8px;
@@ -1282,7 +1470,7 @@
         border-radius: ${theme.borderRadius};
         border: 1px solid rgba(255,255,255,0.1);
       }
-      
+
       .wplace-section {
         margin-bottom: ${CONFIG.currentTheme === "Neon Retro" ? "12px" : "12px"};
         padding: 12px;
@@ -1290,7 +1478,7 @@
         border-radius: ${theme.borderRadius};
         border: 1px solid rgba(255,255,255,0.1);
       }
-      
+
       .wplace-section-title {
         font-size: 11px;
         font-weight: 600;
@@ -1302,7 +1490,7 @@
         text-transform: uppercase;
         letter-spacing: 0.5px;
       }
-      
+
       .wplace-controls {
         display: flex;
         flex-direction: column;
@@ -1316,7 +1504,7 @@
       .wplace-row.single {
         grid-template-columns: 1fr;
       }
-      
+
       .wplace-btn {
         padding: ${CONFIG.currentTheme === "Neon Retro" ? "12px 8px" : "8px 12px"};
         border: ${CONFIG.currentTheme === "Neon Retro" ? "2px solid" : "none"};
@@ -1340,7 +1528,7 @@
         };
         ${CONFIG.currentTheme === "Classic Autobot" ? "border: 1px solid rgba(255,255,255,0.1);" : ""}
       }
-      
+
       ${
         CONFIG.currentTheme === "Classic Autobot"
           ? `
@@ -1372,7 +1560,7 @@
         left: 100%;
       }`
       }
-      
+
       .wplace-btn:hover:not(:disabled) {
         transform: ${CONFIG.currentTheme === "Classic Autobot" ? "translateY(-1px)" : "none"};
         box-shadow: ${
@@ -1383,7 +1571,7 @@
       .wplace-btn:active:not(:disabled) {
         transform: translateY(0);
       }
-      
+
       .wplace-btn-primary {
         background: ${
           CONFIG.currentTheme === "Classic Autobot"
@@ -1452,7 +1640,7 @@
       .wplace-btn:disabled::before {
         display: none;
       }
-      
+
       .wplace-stats {
         background: ${CONFIG.currentTheme === "Classic Autobot" ? "rgba(255,255,255,0.03)" : theme.secondary};
         padding: ${CONFIG.currentTheme === "Neon Retro" ? "12px" : "8px"};
@@ -1461,7 +1649,7 @@
         margin-bottom: ${CONFIG.currentTheme === "Neon Retro" ? "15px" : "8px"};
         ${CONFIG.currentTheme === "Neon Retro" ? "box-shadow: inset 0 0 10px rgba(0, 255, 65, 0.1);" : ""}
       }
-      
+
       .wplace-stat-item {
         display: flex;
         justify-content: space-between;
@@ -1484,7 +1672,34 @@
         font-weight: 600;
         color: ${theme.highlight};
       }
+
+      /* Styles for the new color display in stats */
+      .wplace-colors-section {
+        margin-top: 10px;
+        padding-top: 8px;
+        border-top: 1px solid rgba(255,255,255,0.05);
+      }
+
+      .wplace-stat-colors-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(16px, 1fr));
+        gap: 4px;
+        margin-top: 8px;
+        padding: 4px;
+        background: rgba(0,0,0,0.2);
+        border-radius: 4px;
+        max-height: 80px; /* Limit height and allow scrolling */
+        overflow-y: auto;
+      }
       
+      .wplace-stat-color-swatch {
+        width: 16px;
+        height: 16px;
+        border-radius: 3px;
+        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: inset 0 0 2px rgba(0,0,0,0.5);
+      }
+
       .wplace-progress {
         width: 100%;
         background: ${CONFIG.currentTheme === "Classic Autobot" ? "rgba(0,0,0,0.3)" : theme.secondary};
@@ -1495,7 +1710,7 @@
         height: ${CONFIG.currentTheme === "Neon Retro" ? "16px" : "6px"};
         position: relative;
       }
-      
+
       ${
         CONFIG.currentTheme === "Neon Retro"
           ? `
@@ -1506,7 +1721,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: 
+        background:
           repeating-linear-gradient(
             45deg,
             transparent,
@@ -1518,7 +1733,7 @@
       }`
           : ""
       }
-      
+
       .wplace-progress-bar {
         height: ${CONFIG.currentTheme === "Neon Retro" ? "100%" : "6px"};
         background: ${
@@ -1530,7 +1745,7 @@
         position: relative;
         ${CONFIG.currentTheme === "Neon Retro" ? `box-shadow: 0 0 10px ${theme.success};` : ""}
       }
-      
+
       ${
         CONFIG.currentTheme === "Classic Autobot"
           ? `
@@ -1556,7 +1771,7 @@
         animation: pixelBlink 1s infinite;
       }`
       }
-      
+
       .wplace-status {
         padding: ${CONFIG.currentTheme === "Neon Retro" ? "10px" : "6px"};
         border: ${CONFIG.currentTheme === "Neon Retro" ? "2px solid" : "1px solid"};
@@ -1567,7 +1782,7 @@
         position: relative;
         overflow: hidden;
       }
-      
+
       .status-default {
         background: ${CONFIG.currentTheme === "Classic Autobot" ? "rgba(255,255,255,0.1)" : theme.accent};
         border-color: ${theme.text};
@@ -1592,7 +1807,7 @@
         color: ${CONFIG.currentTheme === "Classic Autobot" ? "orange" : theme.primary};
         box-shadow: 0 0 15px ${theme.warning};
       }
-      
+
       .resize-container {
         display: none;
         position: fixed;
@@ -1607,35 +1822,45 @@
         box-shadow: ${
           CONFIG.currentTheme === "Classic Autobot" ? "0 0 20px rgba(0,0,0,0.5)" : "0 0 30px rgba(0, 255, 65, 0.5)"
         };
-        max-width: 90%;
+        width: 90%;
+        max-width: 700px; /* Increased width */
         max-height: 90%;
         overflow: auto;
         font-family: ${theme.fontFamily};
       }
-      
-      .resize-preview {
-        max-width: 100%;
-        max-height: 300px;
-        margin: 10px 0;
-        border: ${
-          CONFIG.currentTheme === "Classic Autobot" ? `1px solid ${theme.accent}` : `2px solid ${theme.accent}`
-        };
-        ${CONFIG.currentTheme === "Neon Retro" ? "image-rendering: pixelated;" : ""}
-      }
-      
-      .resize-controls {
+
+      .resize-preview-wrapper {
         display: flex;
-        flex-direction: column;
-        gap: ${CONFIG.currentTheme === "Neon Retro" ? "15px" : "10px"};
-        margin-top: 15px;
+        justify-content: center;
+        align-items: center;
+        border: 1px solid ${theme.accent};
+        background: rgba(0,0,0,0.2);
+        margin: 15px 0;
+        height: 300px;
+        overflow: auto;
       }
-      
+
+      .resize-preview {
+        max-width: none; /* Allow image to exceed wrapper for zoom */
+        transition: transform 0.1s ease;
+        image-rendering: pixelated;
+        image-rendering: -moz-crisp-edges;
+        image-rendering: crisp-edges;
+      }
+
+      .resize-controls {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        align-items: center;
+      }
+
       .resize-controls label {
         font-size: ${CONFIG.currentTheme === "Neon Retro" ? "8px" : "12px"};
         ${CONFIG.currentTheme === "Neon Retro" ? "text-transform: uppercase; letter-spacing: 1px;" : ""}
         color: ${theme.text};
       }
-      
+
       .resize-slider {
         width: 100%;
         height: ${CONFIG.currentTheme === "Neon Retro" ? "8px" : "4px"};
@@ -1645,7 +1870,7 @@
         outline: none;
         -webkit-appearance: none;
       }
-      
+
       ${
         CONFIG.currentTheme === "Neon Retro"
           ? `
@@ -1659,7 +1884,7 @@
         cursor: pointer;
         box-shadow: 0 0 5px ${theme.highlight};
       }
-      
+
       .resize-slider::-moz-range-thumb {
         width: 16px;
         height: 16px;
@@ -1672,11 +1897,21 @@
           : ""
       }
       
+      .resize-zoom-controls {
+        grid-column: 1 / -1; /* Span full width */
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 15px;
+      }
+
       .resize-buttons {
         display: flex;
         gap: 10px;
+        justify-content: center;
+        margin-top: 20px;
       }
-      
+
       .resize-overlay {
         position: fixed;
         top: 0;
@@ -1687,7 +1922,68 @@
         z-index: 9999;
         display: none;
       }
-      
+      /* --- START: Color Palette Styles --- */
+      .wplace-color-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); /* Wider columns for name */
+        gap: 10px;
+        padding-top: 8px;
+      }
+      .wplace-color-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+      }
+      .wplace-color-item-name {
+        font-size: 9px;
+        color: #ccc;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100%;
+      }
+      .wplace-color-swatch {
+        width: 22px;
+        height: 22px;
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 4px;
+        cursor: pointer;
+        transition: transform 0.1s ease, box-shadow 0.2s ease;
+        position: relative;
+        margin: 0 auto;
+      }
+      .wplace-color-swatch.paid {
+        border-color: gold;
+      }
+      .wplace-color-swatch:hover {
+        transform: scale(1.1);
+        z-index: 1;
+      }
+      .wplace-color-swatch:not(.active) {
+        opacity: 0.3;
+        filter: grayscale(80%);
+      }
+      .wplace-color-swatch.active::after {
+        content: '✔';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-size: 12px;
+        font-weight: bold;
+        text-shadow: 0 0 3px black;
+      }
+      .wplace-color-divider {
+        border: none;
+        height: 1px;
+        background: rgba(255,255,255,0.1);
+        margin: 8px 0;
+      }
+      /* --- END: Color Palette Styles --- */
+
       ${
         CONFIG.currentTheme === "Neon Retro"
           ? `
@@ -1704,11 +2000,11 @@
         position: relative;
         cursor: pointer;
       }
-      
+
       input[type="checkbox"]:checked {
         background: ${theme.success};
       }
-      
+
       input[type="checkbox"]:checked::after {
         content: '✓';
         position: absolute;
@@ -1718,12 +2014,12 @@
         font-size: 12px;
         font-weight: bold;
       }
-      
+
       /* Icon styling for retro feel */
       .fas, .fa {
         filter: drop-shadow(0 0 3px currentColor);
       }
-      
+
       /* Speed Control Styles */
       .wplace-speed-control {
         margin-top: 12px;
@@ -1733,7 +2029,7 @@
         border-radius: ${theme.borderRadius};
         backdrop-filter: ${theme.backdropFilter};
       }
-      
+
       .wplace-speed-label {
         display: flex;
         align-items: center;
@@ -1742,18 +2038,18 @@
         font-size: 13px;
         font-weight: 600;
       }
-      
+
       .wplace-speed-label i {
         margin-right: 6px;
         color: ${theme.highlight};
       }
-      
+
       .wplace-speed-slider-container {
         display: flex;
         align-items: center;
         gap: 12px;
       }
-      
+
       .wplace-speed-slider {
         flex: 1;
         height: 6px;
@@ -1764,7 +2060,7 @@
         -webkit-appearance: none;
         appearance: none;
       }
-      
+
       .wplace-speed-slider::-webkit-slider-thumb {
         -webkit-appearance: none;
         appearance: none;
@@ -1776,7 +2072,7 @@
         border: 2px solid ${theme.text};
         box-shadow: ${theme.boxShadow};
       }
-      
+
       .wplace-speed-slider::-moz-range-thumb {
         width: 18px;
         height: 18px;
@@ -1786,7 +2082,7 @@
         border: 2px solid ${theme.text};
         box-shadow: ${theme.boxShadow};
       }
-      
+
       .wplace-speed-display {
         display: flex;
         align-items: center;
@@ -1794,19 +2090,19 @@
         min-width: 90px;
         justify-content: flex-end;
       }
-      
+
       #speedValue {
         color: ${theme.highlight};
         font-weight: 600;
         font-size: 14px;
       }
-      
+
       .wplace-speed-unit {
         color: ${theme.text};
         font-size: 11px;
         opacity: 0.8;
       }
-      
+
       /* Settings Window Styles */
       #wplace-settings-container {
         position: fixed;
@@ -1822,13 +2118,13 @@
         box-shadow: ${theme.boxShadow};
         backdrop-filter: ${theme.backdropFilter};
       }
-      
+
       .wplace-settings {
         padding: 16px;
         max-height: 400px;
         overflow-y: auto;
       }
-      
+
       .wplace-setting-section {
         margin-bottom: 20px;
         padding: 12px;
@@ -1836,7 +2132,7 @@
         border: ${theme.borderWidth} ${theme.borderStyle} ${theme.accent};
         border-radius: ${theme.borderRadius};
       }
-      
+
       .wplace-setting-title {
         display: flex;
         align-items: center;
@@ -1845,16 +2141,16 @@
         font-size: 14px;
         font-weight: 600;
       }
-      
+
       .wplace-setting-title i {
         margin-right: 8px;
         color: ${theme.highlight};
       }
-      
+
       .wplace-setting-content {
         color: ${theme.text};
       }
-      
+
       .wplace-section {
         margin-bottom: 20px;
         padding: 15px;
@@ -1862,7 +2158,7 @@
         border: ${theme.borderWidth} ${theme.borderStyle} ${theme.accent};
         border-radius: ${theme.borderRadius};
       }
-      
+
       .wplace-section-title {
         display: flex;
         align-items: center;
@@ -1871,19 +2167,19 @@
         font-size: 14px;
         font-weight: 600;
       }
-      
+
       .wplace-section-title i {
         margin-right: 8px;
         color: ${theme.highlight};
       }
-      
+
       .wplace-speed-container {
         display: flex;
         align-items: center;
         gap: 15px;
         margin-bottom: 10px;
       }
-      
+
       .wplace-slider {
         flex: 1;
         height: 6px;
@@ -1892,7 +2188,7 @@
         outline: none;
         -webkit-appearance: none;
       }
-      
+
       .wplace-slider::-webkit-slider-thumb {
         -webkit-appearance: none;
         width: 18px;
@@ -1902,7 +2198,7 @@
         cursor: pointer;
         border: 2px solid ${theme.primary};
       }
-      
+
       .wplace-speed-display {
         background: ${theme.accent};
         padding: 5px 10px;
@@ -1913,7 +2209,7 @@
         text-align: center;
         border: ${theme.borderWidth} ${theme.borderStyle} ${theme.highlight};
       }
-      
+
       .wplace-select {
         width: 100%;
         padding: 8px 12px;
@@ -1924,19 +2220,19 @@
         font-size: 14px;
         margin-bottom: 10px;
       }
-      
+
       .wplace-select:focus {
         outline: none;
         border-color: ${theme.highlight};
       }
-      
+
       .wplace-description {
         color: ${theme.text};
         font-size: 12px;
         opacity: 0.8;
         line-height: 1.4;
       }
-      
+
       .wplace-theme-custom {
         margin-top: 15px;
         padding: 15px;
@@ -1944,11 +2240,11 @@
         border-radius: ${theme.borderRadius};
         border: ${theme.borderWidth} ${theme.borderStyle} ${theme.highlight};
       }
-      
+
       .wplace-custom-group {
         margin-bottom: 15px;
       }
-      
+
       .wplace-custom-label {
         display: flex;
         align-items: center;
@@ -1957,19 +2253,19 @@
         font-size: 13px;
         font-weight: 600;
       }
-      
+
       .wplace-custom-label i {
         margin-right: 8px;
         color: ${theme.highlight};
         width: 16px;
       }
-      
+
       .wplace-color-input-group {
         display: flex;
         gap: 8px;
         align-items: center;
       }
-      
+
       .wplace-color-input {
         width: 50px;
         height: 30px;
@@ -1978,7 +2274,7 @@
         cursor: pointer;
         background: transparent;
       }
-      
+
       .wplace-color-text {
         flex: 1;
         padding: 6px 10px;
@@ -1989,13 +2285,13 @@
         font-size: 12px;
         font-family: monospace;
       }
-      
+
       .wplace-animation-controls {
         display: flex;
         flex-direction: column;
         gap: 8px;
       }
-      
+
       .wplace-checkbox-label {
         display: flex;
         align-items: center;
@@ -2004,28 +2300,28 @@
         font-size: 12px;
         cursor: pointer;
       }
-      
+
       .wplace-checkbox-label input[type="checkbox"] {
         accent-color: ${theme.highlight};
       }
-      
+
       .wplace-slider-container {
         display: flex;
         align-items: center;
         gap: 10px;
       }
-      
+
       .wplace-slider-container .wplace-slider {
         flex: 1;
       }
-      
+
       .wplace-slider-container span {
         color: ${theme.text};
         font-size: 12px;
         font-weight: 600;
         min-width: 40px;
       }
-      
+
       .wplace-custom-actions {
         display: flex;
         gap: 10px;
@@ -2033,13 +2329,13 @@
         border-top: 1px solid ${theme.accent};
         padding-top: 15px;
       }
-      
+
       .wplace-btn-secondary {
         background: ${theme.accent};
         color: ${theme.text};
         border: ${theme.borderWidth} ${theme.borderStyle} ${theme.highlight};
       }
-      
+
       .wplace-btn-secondary:hover {
         background: ${theme.secondary};
       }`
@@ -2075,21 +2371,10 @@
         <!-- Status Section - Always visible -->
         <div class="wplace-status-section">
           <div id="statusText" class="wplace-status status-default">
-            ${Utils.t("waitingInit")}
+            ${Utils.t("initMessage")}
           </div>
           <div class="wplace-progress">
             <div id="progressBar" class="wplace-progress-bar" style="width: 0%"></div>
-          </div>
-        </div>
-
-        <!-- Setup Section -->
-        <div class="wplace-section">
-          <div class="wplace-section-title">🤖 Bot Setup</div>
-          <div class="wplace-controls">
-            <button id="initBotBtn" class="wplace-btn wplace-btn-primary">
-              <i class="fas fa-robot"></i>
-              <span>${Utils.t("initBot")}</span>
-            </button>
           </div>
         </div>
 
@@ -2098,7 +2383,7 @@
           <div class="wplace-section-title">🖼️ Image Management</div>
           <div class="wplace-controls">
             <div class="wplace-row">
-              <button id="uploadBtn" class="wplace-btn wplace-btn-upload" disabled>
+              <button id="uploadBtn" class="wplace-btn wplace-btn-upload">
                 <i class="fas fa-upload"></i>
                 <span>${Utils.t("uploadImage")}</span>
               </button>
@@ -2224,15 +2509,15 @@
             ${Utils.t("settings")}
           </h3>
           <button id="closeSettingsBtn" style="
-            background: rgba(255,255,255,0.1); 
-            color: white; 
-            border: 1px solid rgba(255,255,255,0.2); 
-            border-radius: 50%; 
-            width: 32px; 
-            height: 32px; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
             justify-content: center;
             transition: all 0.3s ease;
             font-size: 14px;
@@ -2240,7 +2525,7 @@
           " onmouseover="this.style.background='rgba(255,255,255,0.2)'; this.style.transform='scale(1.1)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'; this.style.transform='scale(1)'">✕</button>
         </div>
       </div>
-      
+
       <div style="padding: 25px;">
         <!-- Speed Control Section -->
         <div style="margin-bottom: 25px;">
@@ -2250,9 +2535,9 @@
           </label>
           <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1);">
             <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
-              <input type="range" id="speedSlider" min="${CONFIG.PAINTING_SPEED.MIN}" max="${CONFIG.PAINTING_SPEED.MAX}" value="${CONFIG.PAINTING_SPEED.DEFAULT}" 
+              <input type="range" id="speedSlider" min="${CONFIG.PAINTING_SPEED.MIN}" max="${CONFIG.PAINTING_SPEED.MAX}" value="${CONFIG.PAINTING_SPEED.DEFAULT}"
                 style="
-                  flex: 1; 
+                  flex: 1;
                   height: 8px;
                   background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
                   border-radius: 4px;
@@ -2261,11 +2546,11 @@
                   cursor: pointer;
                 ">
               <div id="speedValue" style="
-                min-width: 70px; 
-                text-align: center; 
-                background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); 
-                padding: 8px 12px; 
-                border-radius: 8px; 
+                min-width: 70px;
+                text-align: center;
+                background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+                padding: 8px 12px;
+                border-radius: 8px;
                 color: white;
                 font-weight: bold;
                 font-size: 13px;
@@ -2279,7 +2564,7 @@
             </div>
           </div>
         </div>
-        
+
         <!-- Painting Speed Enable Toggle -->
         <div style="margin-bottom: 25px;">
           <label style="display: flex; align-items: center; gap: 8px; color: white;">
@@ -2287,7 +2572,7 @@
             <span>Enable painting speed</span>
           </label>
         </div>
-        
+
         <!-- Theme Selection Section -->
         <div style="margin-bottom: 25px;">
           <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
@@ -2296,11 +2581,11 @@
           </label>
           <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1);">
             <select id="themeSelect" style="
-              width: 100%; 
-              padding: 12px 16px; 
-              background: rgba(255,255,255,0.15); 
-              color: white; 
-              border: 1px solid rgba(255,255,255,0.2); 
+              width: 100%;
+              padding: 12px 16px;
+              background: rgba(255,255,255,0.15);
+              color: white;
+              border: 1px solid rgba(255,255,255,0.2);
               border-radius: 8px;
               font-size: 14px;
               outline: none;
@@ -2309,13 +2594,13 @@
               font-family: inherit;
               box-shadow: 0 3px 10px rgba(0,0,0,0.1);
             ">
-              ${Object.keys(CONFIG.THEMES).map(themeName => 
+              ${Object.keys(CONFIG.THEMES).map(themeName =>
                 `<option value="${themeName}" ${CONFIG.currentTheme === themeName ? 'selected' : ''} style="background: #2d3748; color: white; padding: 10px;">${themeName}</option>`
               ).join('')}
             </select>
           </div>
         </div>
-        
+
         <!-- Language Selection Section -->
         <div style="margin-bottom: 15px;">
           <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
@@ -2324,11 +2609,11 @@
           </label>
           <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1);">
             <select id="languageSelect" style="
-              width: 100%; 
-              padding: 12px 16px; 
-              background: rgba(255,255,255,0.15); 
-              color: white; 
-              border: 1px solid rgba(255,255,255,0.2); 
+              width: 100%;
+              padding: 12px 16px;
+              background: rgba(255,255,255,0.15);
+              color: white;
+              border: 1px solid rgba(255,255,255,0.2);
               border-radius: 8px;
               font-size: 14px;
               outline: none;
@@ -2346,35 +2631,35 @@
           </div>
         </div>
       </div>
-      
+
       <style>
         @keyframes spin {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
         }
-        
+
         @keyframes settingsSlideIn {
-          from { 
-            opacity: 0; 
+          from {
+            opacity: 0;
             transform: translate(-50%, -50%) scale(0.9);
           }
-          to { 
-            opacity: 1; 
+          to {
+            opacity: 1;
             transform: translate(-50%, -50%) scale(1);
           }
         }
-        
+
         @keyframes settingsFadeOut {
-          from { 
-            opacity: 1; 
+          from {
+            opacity: 1;
             transform: translate(-50%, -50%) scale(1);
           }
-          to { 
-            opacity: 0; 
+          to {
+            opacity: 0;
             transform: translate(-50%, -50%) scale(0.9);
           }
         }
-        
+
         #speedSlider::-webkit-slider-thumb {
           -webkit-appearance: none;
           width: 18px;
@@ -2385,12 +2670,12 @@
           cursor: pointer;
           transition: all 0.2s ease;
         }
-        
+
         #speedSlider::-webkit-slider-thumb:hover {
           transform: scale(1.2);
           box-shadow: 0 4px 8px rgba(0,0,0,0.4), 0 0 0 3px #4facfe;
         }
-        
+
         #speedSlider::-moz-range-thumb {
           width: 18px;
           height: 18px;
@@ -2401,41 +2686,41 @@
           border: none;
           transition: all 0.2s ease;
         }
-        
+
         #themeSelect:hover, #languageSelect:hover {
           border-color: rgba(255,255,255,0.4);
           background: rgba(255,255,255,0.2);
           transform: translateY(-1px);
           box-shadow: 0 5px 15px rgba(0,0,0,0.15);
         }
-        
+
         #themeSelect:focus, #languageSelect:focus {
           border-color: #4facfe;
           box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.3);
         }
-        
+
         #themeSelect option, #languageSelect option {
           background: #2d3748;
           color: white;
           padding: 10px;
           border-radius: 6px;
         }
-        
+
         #themeSelect option:hover, #languageSelect option:hover {
           background: #4a5568;
         }
-        
+
         /* Dragging state styles */
         .wplace-dragging {
           opacity: 0.9;
           box-shadow: 0 30px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.2);
           transition: none;
         }
-        
+
         .wplace-settings-header:hover {
           background: rgba(255,255,255,0.15) !important;
         }
-        
+
         .wplace-settings-header:active {
           background: rgba(255,255,255,0.2) !important;
         }
@@ -2447,29 +2732,67 @@
     resizeContainer.innerHTML = `
       <h3 style="margin-top: 0; color: ${theme.text}">${Utils.t("resizeImage")}</h3>
       <div class="resize-controls">
-        <label style="color: ${theme.text}">
+        <label>
           ${Utils.t("width")}: <span id="widthValue">0</span>px
           <input type="range" id="widthSlider" class="resize-slider" min="10" max="500" value="100">
         </label>
-        <label style="color: ${theme.text}">
+        <label>
           ${Utils.t("height")}: <span id="heightValue">0</span>px
           <input type="range" id="heightSlider" class="resize-slider" min="10" max="500" value="100">
         </label>
-        <label style="color: ${theme.text}">
+        <label style="display: flex; align-items: center;">
           <input type="checkbox" id="keepAspect" checked>
-          ${Utils.t("keepAspect")}
+          Keep Aspect Ratio
         </label>
-        <img id="resizePreview" class="resize-preview" src="/placeholder.svg">
-        <div class="resize-buttons">
-          <button id="confirmResize" class="wplace-btn wplace-btn-primary">
-            <i class="fas fa-check"></i>
-            <span>${Utils.t("apply")}</span>
-          </button>
-          <button id="cancelResize" class="wplace-btn wplace-btn-stop">
-            <i class="fas fa-times"></i>
-            <span>${Utils.t("cancel")}</span>
-          </button>
+        <label style="display: flex; align-items: center;">
+            <input type="checkbox" id="paintWhiteToggle" checked>
+            Paint White Pixels
+        </label>
+        <div class="resize-zoom-controls">
+          <i class="fas fa-search-minus"></i>
+          <input type="range" id="zoomSlider" class="resize-slider" min="1" max="10" value="1" step="0.1">
+          <i class="fas fa-search-plus"></i>
         </div>
+      </div>
+
+      <div class="resize-preview-wrapper">
+          <img id="resizePreview" class="resize-preview" src="" alt="Resized image preview will appear here.">
+      </div>
+
+      <!-- START: Moved Color Palette -->
+      <div class="wplace-section" id="color-palette-section" style="margin-top: 15px;">
+          <div class="wplace-section-title">
+              <i class="fas fa-palette"></i>&nbsp;Color Palette
+          </div>
+          <div class="wplace-controls">
+              <div class="wplace-row">
+                  <button id="selectAllFreeBtn" class="wplace-btn">All Free</button>
+                  <button id="unselectAllFreeBtn" class="wplace-btn">None Free</button>
+              </div>
+              <div id="colors-free" class="wplace-color-grid"></div>
+              <hr class="wplace-color-divider">
+              <div class="wplace-row">
+                  <button id="selectAllPaidBtn" class="wplace-btn">All Paid</button>
+                  <button id="unselectAllPaidBtn" class="wplace-btn">None Paid</button>
+              </div>
+              <div id="colors-paid" class="wplace-color-grid"></div>
+          </div>
+      </div>
+      <!-- END: Moved Color Palette -->
+
+      <div class="resize-buttons">
+        <button id="downloadPreviewBtn" class="wplace-btn wplace-btn-primary">
+          <i class="fas fa-download"></i>
+          <span>Download Preview</span>
+        </button>
+        <button id="confirmResize" class="wplace-btn wplace-btn-start">
+          <i class="fas fa-check"></i>
+          <span>Apply</span>
+        </button>
+        <button id="cancelResize" class="wplace-btn wplace-btn-stop">
+          <i class="fas fa-times"></i>
+          <span>Cancel</span>
+        </button>
       </div>
     `
 
@@ -2483,7 +2806,6 @@
     document.body.appendChild(settingsContainer)
 
     // Query all UI elements after appending to DOM
-    const initBotBtn = container.querySelector("#initBotBtn")
     const uploadBtn = container.querySelector("#uploadBtn")
     const resizeBtn = container.querySelector("#resizeBtn")
     const selectPosBtn = container.querySelector("#selectPosBtn")
@@ -2504,9 +2826,8 @@
     const refreshChargesBtn = statsContainer.querySelector("#refreshChargesBtn")
 
     // Check if all elements are found
-    if (!initBotBtn || !uploadBtn || !selectPosBtn || !startBtn || !stopBtn) {
+    if (!uploadBtn || !selectPosBtn || !startBtn || !stopBtn) {
       console.error("Some UI elements not found:", {
-        initBotBtn: !!initBotBtn,
         uploadBtn: !!uploadBtn,
         selectPosBtn: !!selectPosBtn,
         startBtn: !!startBtn,
@@ -2534,13 +2855,13 @@
         pos4 = 0
       let isDragging = false
       const header = element.querySelector(".wplace-header") || element.querySelector(".wplace-settings-header")
-      
+
       // Check if header exists to prevent null error
       if (!header) {
         console.warn("No draggable header found for element:", element)
         return
       }
-      
+
       header.onmousedown = dragMouseDown
 
       function dragMouseDown(e) {
@@ -2548,15 +2869,15 @@
 
         e.preventDefault()
         isDragging = true
-        
+
         // Get current position
         const rect = element.getBoundingClientRect()
-        
+
         // Remove transform and set absolute position
         element.style.transform = "none"
         element.style.top = rect.top + "px"
         element.style.left = rect.left + "px"
-        
+
         pos3 = e.clientX
         pos4 = e.clientY
         element.classList.add("wplace-dragging")
@@ -2569,7 +2890,7 @@
 
       function elementDrag(e) {
         if (!isDragging) return
-        
+
         e.preventDefault()
         pos1 = pos3 - e.clientX
         pos2 = pos4 - e.clientY
@@ -2632,7 +2953,7 @@
         refreshChargesBtn.addEventListener("click", async () => {
           refreshChargesBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'
           refreshChargesBtn.disabled = true
-          
+
           try {
             await updateStats()
           } catch (error) {
@@ -2648,7 +2969,7 @@
     // Settings window functionality
     const settingsBtn = container.querySelector("#settingsBtn")
     const closeSettingsBtn = settingsContainer.querySelector("#closeSettingsBtn")
-    
+
     if (settingsBtn && closeSettingsBtn) {
       settingsBtn.addEventListener("click", () => {
         const isVisible = settingsContainer.style.display !== "none"
@@ -2681,10 +3002,10 @@
           settingsContainer.style.transform = "translate(-50%, -50%)"
         }, 300)
       })
-      
+
       // Make settings window draggable
       makeDraggable(settingsContainer)
-      
+
       // Language selector event listener
       const languageSelect = settingsContainer.querySelector("#languageSelect")
       if (languageSelect) {
@@ -2692,18 +3013,18 @@
           const newLanguage = e.target.value
           state.language = newLanguage
           localStorage.setItem('wplace_language', newLanguage)
-          
+
           // Refresh the UI to apply new language
           setTimeout(() => {
             // Hide settings first
             settingsContainer.style.display = "none"
-            
+
             // Recreate UI with new language (cleanup is handled in createUI)
             createUI()
           }, 100)
         })
       }
-      
+
       // Theme selector event listener
       const themeSelect = settingsContainer.querySelector("#themeSelect")
       if (themeSelect) {
@@ -2712,7 +3033,7 @@
           switchTheme(newTheme)
         })
       }
-      
+
       // Theme customization event listeners
       const primaryColor = settingsContainer.querySelector("#primaryColor")
       const primaryColorText = settingsContainer.querySelector("#primaryColorText")
@@ -2724,7 +3045,7 @@
       const borderRadiusValue = settingsContainer.querySelector("#borderRadiusValue")
       const applyChangesBtn = settingsContainer.querySelector("#applyThemeChanges")
       const resetDefaultsBtn = settingsContainer.querySelector("#resetThemeDefaults")
-      
+
       // Color input synchronization
       if (primaryColor && primaryColorText) {
         primaryColor.addEventListener("input", (e) => {
@@ -2736,7 +3057,7 @@
           }
         })
       }
-      
+
       if (secondaryColor && secondaryColorText) {
         secondaryColor.addEventListener("input", (e) => {
           secondaryColorText.value = e.target.value
@@ -2747,7 +3068,7 @@
           }
         })
       }
-      
+
       if (highlightColor && highlightColorText) {
         highlightColor.addEventListener("input", (e) => {
           highlightColorText.value = e.target.value
@@ -2758,20 +3079,20 @@
           }
         })
       }
-      
+
       // Border radius slider
       if (borderRadiusSlider && borderRadiusValue) {
         borderRadiusSlider.addEventListener("input", (e) => {
           borderRadiusValue.textContent = e.target.value + "px"
         })
       }
-      
+
       // Apply theme changes
       if (applyChangesBtn) {
         applyChangesBtn.addEventListener("click", () => {
           const currentTheme = getCurrentTheme()
           const currentThemeName = CONFIG.currentTheme
-          
+
           // Get all values
           const newValues = {
             primary: primaryColorText?.value || currentTheme.primary,
@@ -2784,13 +3105,13 @@
               pixelBlink: settingsContainer.querySelector("#pixelBlinkAnimation")?.checked || false
             }
           }
-          
+
           // Update theme
           CONFIG.THEMES[currentThemeName] = {
             ...currentTheme,
             ...newValues
           }
-          
+
           // Save and apply
           saveThemePreference()
           setTimeout(() => {
@@ -2799,7 +3120,7 @@
           }, 100)
         })
       }
-      
+
       // Reset to defaults
       if (resetDefaultsBtn) {
         resetDefaultsBtn.addEventListener("click", () => {
@@ -2818,9 +3139,12 @@
     const widthValue = resizeContainer.querySelector("#widthValue")
     const heightValue = resizeContainer.querySelector("#heightValue")
     const keepAspect = resizeContainer.querySelector("#keepAspect")
+    const paintWhiteToggle = resizeContainer.querySelector("#paintWhiteToggle");
+    const zoomSlider = resizeContainer.querySelector("#zoomSlider");
     const resizePreview = resizeContainer.querySelector("#resizePreview")
     const confirmResize = resizeContainer.querySelector("#confirmResize")
     const cancelResize = resizeContainer.querySelector("#cancelResize")
+    const downloadPreviewBtn = resizeContainer.querySelector("#downloadPreviewBtn");
 
     // Compact mode functionality
     if (compactBtn) {
@@ -2902,7 +3226,8 @@
             updateStats()
 
             if (!state.colorsChecked) {
-              initBotBtn.style.display = "block"
+              // Re-run color check automatically if loaded data is missing it
+              checkAndSetColors();
             }
 
             if (state.imageLoaded && state.startPosition && state.region && state.colorsChecked) {
@@ -2946,9 +3271,9 @@
               uploadBtn.disabled = false
               selectPosBtn.disabled = false
               resizeBtn.disabled = false
-              initBotBtn.style.display = "none"
             } else {
-              initBotBtn.style.display = "block"
+                // If loaded file is missing color data, check for it
+                await checkAndSetColors();
             }
 
             if (state.imageLoaded && state.startPosition && state.region && state.colorsChecked) {
@@ -2975,43 +3300,63 @@
     }
 
     updateStats = async () => {
-      if (!state.colorsChecked || !state.imageLoaded) return
+      // Check if the bot has been initialized by checking for colors
+      if (!state.colorsChecked) {
+          statsArea.innerHTML = `
+            <div class="wplace-stat-item">
+              <div class="wplace-stat-label"><i class="fas fa-info-circle"></i> ${Utils.t("initMessage")}</div>
+            </div>`;
+          return;
+      }
 
-      const { charges, cooldown } = await WPlaceService.getCharges()
-      state.currentCharges = Math.floor(charges)
-      state.cooldown = cooldown
+      const { charges, cooldown } = await WPlaceService.getCharges();
+      state.currentCharges = Math.floor(charges);
+      state.cooldown = cooldown;
 
-      const progress = state.totalPixels > 0 ? Math.round((state.paintedPixels / state.totalPixels) * 100) : 0
-      const remainingPixels = state.totalPixels - state.paintedPixels
+      // --- Generate HTML for Image-Specific Stats ---
+      let imageStatsHTML = '';
+      if (state.imageLoaded) {
+          const progress = state.totalPixels > 0 ? Math.round((state.paintedPixels / state.totalPixels) * 100) : 0;
+          const remainingPixels = state.totalPixels - state.paintedPixels;
+          state.estimatedTime = Utils.calculateEstimatedTime(remainingPixels, state.currentCharges, state.cooldown);
+          progressBar.style.width = `${progress}%`;
 
-      state.estimatedTime = Utils.calculateEstimatedTime(remainingPixels, state.currentCharges, state.cooldown)
+          imageStatsHTML = `
+            <div class="wplace-stat-item">
+              <div class="wplace-stat-label"><i class="fas fa-image"></i> ${Utils.t("progress")}</div>
+              <div class="wplace-stat-value">${progress}%</div>
+            </div>
+            <div class="wplace-stat-item">
+              <div class="wplace-stat-label"><i class="fas fa-paint-brush"></i> ${Utils.t("pixels")}</div>
+              <div class="wplace-stat-value">${state.paintedPixels}/${state.totalPixels}</div>
+            </div>
+            <div class="wplace-stat-item">
+              <div class="wplace-stat-label"><i class="fas fa-clock"></i> ${Utils.t("estimatedTime")}</div>
+              <div class="wplace-stat-value">${Utils.formatTime(state.estimatedTime)}</div>
+            </div>
+          `;
+      }
 
-      progressBar.style.width = `${progress}%`
+      // --- Generate HTML for Available Colors ---
+      const colorSwatchesHTML = state.availableColors.map(color => {
+          const rgbString = `rgb(${color.rgb.join(',')})`;
+          return `<div class="wplace-stat-color-swatch" style="background-color: ${rgbString};" title="ID: ${color.id}\nRGB: ${color.rgb.join(', ')}"></div>`;
+      }).join('');
 
+      // --- Combine all stats and update the panel ---
       statsArea.innerHTML = `
-        <div class="wplace-stat-item">
-          <div class="wplace-stat-label"><i class="fas fa-image"></i> ${Utils.t("progress")}</div>
-          <div class="wplace-stat-value">${progress}%</div>
-        </div>
-        <div class="wplace-stat-item">
-          <div class="wplace-stat-label"><i class="fas fa-paint-brush"></i> ${Utils.t("pixels")}</div>
-          <div class="wplace-stat-value">${state.paintedPixels}/${state.totalPixels}</div>
-        </div>
+        ${imageStatsHTML}
         <div class="wplace-stat-item">
           <div class="wplace-stat-label"><i class="fas fa-bolt"></i> ${Utils.t("charges")}</div>
           <div class="wplace-stat-value">${Math.floor(state.currentCharges)}</div>
         </div>
-        ${
-          state.imageLoaded
-            ? `
-        <div class="wplace-stat-item">
-          <div class="wplace-stat-label"><i class="fas fa-clock"></i> ${Utils.t("estimatedTime")}</div>
-          <div class="wplace-stat-value">${Utils.formatTime(state.estimatedTime)}</div>
+        <div class="wplace-colors-section">
+            <div class="wplace-stat-label"><i class="fas fa-palette"></i> Available Colors</div>
+            <div class="wplace-stat-colors-grid">
+                ${colorSwatchesHTML}
+            </div>
         </div>
-        `
-            : ""
-        }
-      `
+      `;
     }
 
     // Helper function to update data management buttons
@@ -3025,125 +3370,138 @@
     updateDataButtons()
 
     function showResizeDialog(processor) {
-      const { width, height } = processor.getDimensions()
-      const aspectRatio = width / height
+        const { width, height } = processor.getDimensions();
+        const aspectRatio = width / height;
 
-      widthSlider.value = width
-      heightSlider.value = height
-      widthValue.textContent = width
-      heightValue.textContent = height
-      resizePreview.src = processor.img.src
+        widthSlider.value = width;
+        heightSlider.value = height;
+        widthSlider.max = width * 2; // Set a reasonable max
+        heightSlider.max = height * 2; // Set a reasonable max
+        widthValue.textContent = width;
+        heightValue.textContent = height;
+        zoomSlider.value = 1;
+        paintWhiteToggle.checked = state.paintWhitePixels;
 
-      resizeOverlay.style.display = "block"
-      resizeContainer.style.display = "block"
+        _updateResizePreview = () => {
+            const newWidth = parseInt(widthSlider.value, 10);
+            const newHeight = parseInt(heightSlider.value, 10);
+            const zoomLevel = parseFloat(zoomSlider.value);
 
-      const updatePreview = () => {
-        const newWidth = Number.parseInt(widthSlider.value)
-        const newHeight = Number.parseInt(heightSlider.value)
+            widthValue.textContent = newWidth;
+            heightValue.textContent = newHeight;
 
-        widthValue.textContent = newWidth
-        heightValue.textContent = newHeight
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = newWidth;
+            tempCanvas.height = newHeight;
+            tempCtx.imageSmoothingEnabled = false;
+            tempCtx.drawImage(processor.img, 0, 0, newWidth, newHeight);
 
-        resizePreview.src = processor.generatePreview(newWidth, newHeight)
-      }
+            const imgData = tempCtx.getImageData(0, 0, newWidth, newHeight);
+            const data = imgData.data;
 
-      widthSlider.addEventListener("input", () => {
-        if (keepAspect.checked) {
-          const newWidth = Number.parseInt(widthSlider.value)
-          const newHeight = Math.round(newWidth / aspectRatio)
-          heightSlider.value = newHeight
-        }
-        updatePreview()
-      })
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
 
-      heightSlider.addEventListener("input", () => {
-        if (keepAspect.checked) {
-          const newHeight = Number.parseInt(heightSlider.value)
-          const newWidth = Math.round(newHeight * aspectRatio)
-          widthSlider.value = newWidth
-        }
-        updatePreview()
-      })
+                if (a < CONFIG.TRANSPARENCY_THRESHOLD || (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b))) {
+                    data[i + 3] = 0; // Make transparent
+                    continue;
+                }
 
-      confirmResize.onclick = () => {
-        const newWidth = Number.parseInt(widthSlider.value)
-        const newHeight = Number.parseInt(heightSlider.value)
+                const [nr, ng, nb] = Utils.findClosestPaletteColor(r, g, b, state.activeColorPalette);
+                data[i] = nr;
+                data[i + 1] = ng;
+                data[i + 2] = nb;
+                data[i + 3] = 255; 
+            }
+            tempCtx.putImageData(imgData, 0, 0);
+            resizePreview.src = tempCanvas.toDataURL();
+            resizePreview.style.transform = `scale(${zoomLevel})`;
+        };
 
-        const newPixels = processor.resize(newWidth, newHeight)
+        const onWidthInput = () => {
+            if (keepAspect.checked) {
+                heightSlider.value = Math.round(parseInt(widthSlider.value, 10) / aspectRatio);
+            }
+            _updateResizePreview();
+        };
 
-        let totalValidPixels = 0
-        for (let y = 0; y < newHeight; y++) {
-          for (let x = 0; x < newWidth; x++) {
-            const idx = (y * newWidth + x) * 4
-            const r = newPixels[idx]
-            const g = newPixels[idx + 1]
-            const b = newPixels[idx + 2]
-            const alpha = newPixels[idx + 3]
+        const onHeightInput = () => {
+            if (keepAspect.checked) {
+                widthSlider.value = Math.round(parseInt(heightSlider.value, 10) * aspectRatio);
+            }
+            _updateResizePreview();
+        };
+        
+        paintWhiteToggle.onchange = (e) => {
+            state.paintWhitePixels = e.target.checked;
+            _updateResizePreview();
+        };
+        
+        zoomSlider.addEventListener('input', _updateResizePreview);
+        widthSlider.addEventListener("input", onWidthInput);
+        heightSlider.addEventListener("input", onHeightInput);
 
-            if (alpha < CONFIG.TRANSPARENCY_THRESHOLD) continue
-            if (Utils.isWhitePixel(r, g, b)) continue
+        confirmResize.onclick = () => {
+            const newWidth = parseInt(widthSlider.value, 10);
+            const newHeight = parseInt(heightSlider.value, 10);
+            const newPixels = processor.resize(newWidth, newHeight);
 
-            totalValidPixels++
-          }
-        }
+            let totalValidPixels = 0;
+            for (let i = 0; i < newPixels.length; i += 4) {
+                const isTransparent = newPixels[i + 3] < CONFIG.TRANSPARENCY_THRESHOLD;
+                const isWhiteAndSkipped = !state.paintWhitePixels && Utils.isWhitePixel(newPixels[i], newPixels[i+1], newPixels[i+2]);
+                if (!isTransparent && !isWhiteAndSkipped) {
+                    totalValidPixels++;
+                }
+            }
 
-        state.imageData.pixels = newPixels
-        state.imageData.width = newWidth
-        state.imageData.height = newHeight
-        state.imageData.totalPixels = totalValidPixels
-        state.totalPixels = totalValidPixels
-        state.paintedPixels = 0
+            state.imageData.pixels = newPixels;
+            state.imageData.width = newWidth;
+            state.imageData.height = newHeight;
+            state.imageData.totalPixels = totalValidPixels;
+            state.totalPixels = totalValidPixels;
+            state.paintedPixels = 0;
 
-        updateStats()
-        updateUI("resizeSuccess", "success", {
-          width: newWidth,
-          height: newHeight,
-        })
+            updateStats();
+            updateUI("resizeSuccess", "success", { width: newWidth, height: newHeight });
+            closeResizeDialog();
+        };
 
-        closeResizeDialog()
-      }
+        downloadPreviewBtn.onclick = () => {
+            const link = document.createElement('a');
+            link.download = 'wplace-preview.png';
+            link.href = resizePreview.src;
+            link.click();
+        };
 
-      cancelResize.onclick = closeResizeDialog
+        cancelResize.onclick = closeResizeDialog;
+
+        resizeOverlay.style.display = "block";
+        resizeContainer.style.display = "block";
+        _updateResizePreview(); // Initial preview
     }
 
     function closeResizeDialog() {
-      resizeOverlay.style.display = "none"
-      resizeContainer.style.display = "none"
-    }
-
-    if (initBotBtn) {
-      initBotBtn.addEventListener("click", async () => {
-        try {
-          updateUI("checkingColors", "default")
-
-          state.availableColors = Utils.extractAvailableColors()
-
-          if (state.availableColors.length === 0) {
-            Utils.showAlert(Utils.t("noColorsFound"), "error")
-            updateUI("noColorsFound", "error")
-            return
-          }
-
-          state.colorsChecked = true
-          uploadBtn.disabled = false
-          selectPosBtn.disabled = false
-          initBotBtn.style.display = "none"
-
-          updateUI("colorsFound", "success", {
-            count: state.availableColors.length,
-          })
-          updateStats()
-        } catch {
-          updateUI("imageError", "error")
-        }
-      })
+        resizeOverlay.style.display = "none";
+        resizeContainer.style.display = "none";
+        _updateResizePreview = () => {}; // Clear the function to prevent memory leaks
     }
 
     if (uploadBtn) {
       uploadBtn.addEventListener("click", async () => {
+        // First, automatically run the color check if it hasn't been done.
+        const colorsReady = await checkAndSetColors();
+        if (!colorsReady) {
+            // Stop if colors were not found. The error message is already shown.
+            return;
+        }
+
+        // If colors are ready, proceed with the original upload logic.
         try {
           updateUI("loadingImage", "default")
           const imageSrc = await Utils.createImageUploader()
+          if (!imageSrc) return; // User cancelled the file dialog
 
           const processor = new ImageProcessor(imageSrc)
           await processor.load()
@@ -3151,20 +3509,13 @@
           const { width, height } = processor.getDimensions()
           const pixels = processor.getPixelData()
 
-          let totalValidPixels = 0
-          for (let y = 0; y < height; y++) {
-            for (let x = 0; x < width; x++) {
-              const idx = (y * width + x) * 4
-              const r = pixels[idx]
-              const g = pixels[idx + 1]
-              const b = pixels[idx + 2]
-              const alpha = pixels[idx + 3]
-
-              if (alpha < CONFIG.TRANSPARENCY_THRESHOLD) continue
-              if (Utils.isWhitePixel(r, g, b)) continue
-
-              totalValidPixels++
-            }
+          let totalValidPixels = 0;
+          for (let i = 0; i < pixels.length; i += 4) {
+              const isTransparent = pixels[i + 3] < CONFIG.TRANSPARENCY_THRESHOLD;
+              const isWhiteAndSkipped = !state.paintWhitePixels && Utils.isWhitePixel(pixels[i], pixels[i+1], pixels[i+2]);
+              if (!isTransparent && !isWhiteAndSkipped) {
+                  totalValidPixels++;
+              }
           }
 
           state.imageData = {
@@ -3365,7 +3716,7 @@
         const speed = parseInt(e.target.value) // Use integer instead of float
         state.paintingSpeed = speed
         speedValue.textContent = speed + " px/s" // Add px/s unit
-        
+
         // Save speed preference to localStorage
         try {
           localStorage.setItem("wplace-painting-speed", speed.toString())
@@ -3373,7 +3724,7 @@
           console.warn("Could not save painting speed preference:", error)
         }
       })
-      
+
       // Load saved speed preference
       try {
         const savedSpeed = localStorage.getItem("wplace-painting-speed")
@@ -3420,6 +3771,8 @@
         console.warn("Could not load painting speed enabled preference:", error)
       }
     }
+    // --- Initialize Color Palette UI ---
+    initializeColorPalette(resizeContainer);
   }
 
   async function processImage() {
@@ -3458,11 +3811,16 @@
           const b = pixels[idx + 2]
           const alpha = pixels[idx + 3]
 
-          if (alpha < CONFIG.TRANSPARENCY_THRESHOLD) continue
-          if (Utils.isWhitePixel(r, g, b)) continue
+          if (alpha < CONFIG.TRANSPARENCY_THRESHOLD || (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b))) {
+              continue;
+          }
 
-          const rgb = [r, g, b]
-          const colorId = findClosestColor(rgb, state.availableColors)
+          // Step 1: Quantize source pixel to the user's selected palette
+          const targetRgb = Utils.findClosestPaletteColor(r, g, b, state.activeColorPalette);
+
+          // Step 2: Find the closest available in-game color to the quantized color
+          const colorId = findClosestColor(targetRgb, state.availableColors);
+
           const pixelX = startX + x
           const pixelY = startY + y
 
