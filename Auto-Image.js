@@ -174,7 +174,7 @@
   const TEXT = {
     en: {
     title: "WPlace Auto-Image",
-    initBot: "Start Auto-BOT",
+    scanColors: "Scan Colors",
     uploadImage: "Upload Image",
     resizeImage: "Resize Image",
     selectPosition: "Select Position",
@@ -182,7 +182,7 @@
     stopPainting: "Stop Painting",
     checkingColors: "🔍 Checking available colors...",
     noColorsFound: "❌ Open the color palette on the site and try again!",
-    colorsFound: "✅ {count} available colors found",
+    colorsFound: "✅ {count} available colors found. Ready to upload.",
     loadingImage: "🖼️ Loading image...",
     imageLoaded: "✅ Image loaded with {count} valid pixels",
     imageError: "❌ Error loading image",
@@ -201,7 +201,7 @@
     pixels: "Pixels",
     charges: "Charges",
     estimatedTime: "Estimated time",
-    initMessage: "Click 'Upload Image' to begin",
+    initMessage: "Open the site's color palette, then click 'Scan Colors'",
     waitingInit: "Waiting for initialization...",
     resizeSuccess: "✅ Image resized to {width}x{height}",
     paintingPaused: "⏸️ Painting paused at position X: {x}, Y: {y}",
@@ -234,7 +234,7 @@
   },
   ru: {
     title: "WPlace Авто-Изображение",
-    initBot: "Запустить Авто-БОТ",
+    scanColors: "Сканировать цвета",
     uploadImage: "Загрузить изображение",
     resizeImage: "Изменить размер изображения",
     selectPosition: "Выбрать позицию",
@@ -242,7 +242,7 @@
     stopPainting: "Остановить рисование",
     checkingColors: "🔍 Проверка доступных цветов...",
     noColorsFound: "❌ Откройте палитру цветов на сайте и попробуйте снова!",
-    colorsFound: "✅ Найдено доступных цветов: {count}",
+    colorsFound: "✅ Найдено доступных цветов: {count}. Готово к загрузке.",
     loadingImage: "🖼️ Загрузка изображения...",
     imageLoaded: "✅ Изображение загружено, валидных пикселей: {count}",
     imageError: "❌ Ошибка при загрузке изображения",
@@ -261,7 +261,7 @@
     pixels: "Пиксели",
     charges: "Заряды",
     estimatedTime: "Примерное время",
-    initMessage: "Нажмите 'Загрузить изображение', чтобы начать",
+    initMessage: "Откройте палитру на сайте, затем нажмите 'Сканировать цвета'",
     waitingInit: "Ожидание инициализации...",
     resizeSuccess: "✅ Изображение изменено до {width}x{height}",
     paintingPaused: "⏸️ Рисование приостановлено на позиции X: {x}, Y: {y}",
@@ -294,7 +294,7 @@
 },
   pt: {
     title: "WPlace Auto-Image",
-    initBot: "Iniciar Auto-BOT",
+    scanColors: "Escanear Cores",
     uploadImage: "Upload da Imagem",
     resizeImage: "Redimensionar Imagem",
     selectPosition: "Selecionar Posição",
@@ -302,7 +302,7 @@
     stopPainting: "Parar Pintura",
     checkingColors: "🔍 Verificando cores disponíveis...",
     noColorsFound: "❌ Abra a paleta de cores no site e tente novamente!",
-    colorsFound: "✅ {count} cores disponíveis encontradas",
+    colorsFound: "✅ {count} cores encontradas. Pronto para upload.",
     loadingImage: "🖼️ Carregando imagem...",
     imageLoaded: "✅ Imagem carregada com {count} pixels válidos",
     imageError: "❌ Erro ao carregar imagem",
@@ -321,7 +321,7 @@
     pixels: "Pixels",
     charges: "Cargas",
     estimatedTime: "Tempo estimado",
-    initMessage: "Clique em 'Upload da Imagem' para começar",
+    initMessage: "Abra a paleta de cores do site e clique em 'Escanear Cores'",
     waitingInit: "Aguardando inicialização...",
     resizeSuccess: "✅ Imagem redimensionada para {width}x{height}",
     paintingPaused: "⏸️ Pintura pausada na posição X: {x}, Y: {y}",
@@ -354,7 +354,7 @@
   },
   vi: {
     title: "WPlace Auto-Image",
-    initBot: "Khởi động Auto-BOT",
+    scanColors: "Quét màu",
     uploadImage: "Tải lên hình ảnh",
     resizeImage: "Thay đổi kích thước",
     selectPosition: "Chọn vị trí",
@@ -362,7 +362,7 @@
     stopPainting: "Dừng vẽ",
     checkingColors: "🔍 Đang kiểm tra màu sắc có sẵn...",
     noColorsFound: "❌ Hãy mở bảng màu trên trang web và thử lại!",
-    colorsFound: "✅ Tìm thấy {count} màu sắc có sẵn",
+    colorsFound: "✅ Tìm thấy {count} màu. Sẵn sàng để tải lên.",
     loadingImage: "🖼️ Đang tải hình ảnh...",
     imageLoaded: "✅ Đã tải hình ảnh với {count} pixel hợp lệ",
     imageError: "❌ Lỗi khi tải hình ảnh",
@@ -381,7 +381,7 @@
     pixels: "Pixel",
     charges: "Điện tích",
     estimatedTime: "Thời gian ước tính",
-    initMessage: "Nhấp 'Tải lên hình ảnh' để bắt đầu",
+    initMessage: "Mở bảng màu của trang web, sau đó nhấp vào 'Quét màu'",
     waitingInit: "Đang chờ khởi tạo...",
     resizeSuccess: "✅ Đã thay đổi kích thước hình ảnh thành {width}x{height}",
     paintingPaused: "⏸️ Tạm dừng vẽ tại vị trí X: {x}, Y: {y}",
@@ -414,7 +414,7 @@
     },
   fr: {
     title: "WPlace Auto-Image",
-    initBot: "Démarrer Auto-BOT",
+    scanColors: "Scanner les couleurs",
     uploadImage: "Télécharger l'image",
     resizeImage: "Redimensionner l'image",
     selectPosition: "Sélectionner la position",
@@ -422,7 +422,7 @@
     stopPainting: "Arrêter de peindre",
     checkingColors: "🔍 Vérification des couleurs disponibles...",
     noColorsFound: "❌ Ouvrez la palette de couleurs sur le site et réessayez!",
-    colorsFound: "✅ {count} couleurs disponibles trouvées",
+    colorsFound: "✅ {count} couleurs trouvées. Prêt à télécharger.",
     loadingImage: "🖼️ Chargement de l'image...",
     imageLoaded: "✅ Image chargée avec {count} pixels valides",
     imageError: "❌ Erreur lors du chargement de l'image",
@@ -441,7 +441,7 @@
     pixels: "Pixels",
     charges: "Charges",
     estimatedTime: "Temps estimé",
-    initMessage: "Cliquez sur 'Télécharger l'image' pour commencer",
+    initMessage: "Ouvrez la palette de couleurs du site, puis cliquez sur 'Scanner les couleurs'",
     waitingInit: "En attente d'initialisation...",
     resizeSuccess: "✅ Image redimensionnée en {width}x{height}",
     paintingPaused: "⏸️ Peinture en pause à la position X: {x}, Y: {y}",
@@ -1162,9 +1162,6 @@
 
   // Refactored function to handle color checking
   async function checkAndSetColors() {
-    // If colors are already checked, no need to do it again.
-    if (state.colorsChecked) return true;
-
     try {
         updateUI("checkingColors", "default");
         state.availableColors = Utils.extractAvailableColors();
@@ -1177,9 +1174,15 @@
 
         state.colorsChecked = true;
 
-        // Enable other buttons now that we're initialized
+        // Enable next steps
+        const uploadBtn = document.getElementById('uploadBtn');
         const selectPosBtn = document.getElementById('selectPosBtn');
+        if(uploadBtn) uploadBtn.disabled = false;
         if(selectPosBtn) selectPosBtn.disabled = false;
+
+        // Hide the init button's section
+        const setupSection = document.getElementById('setupSection');
+        if (setupSection) setupSection.style.display = 'none';
 
         updateUI("colorsFound", "success", {
             count: state.availableColors.length,
@@ -1189,7 +1192,7 @@
     } catch (e) {
         console.error("Error checking colors:", e);
         updateUI("imageError", "error");
-        return false; // Indicate failure
+        return false;
     }
   }
 
@@ -1383,7 +1386,7 @@
         font-family: ${theme.fontFamily};
         color: ${theme.text};
         animation: slideIn 0.4s ease-out;
-        overflow: hidden;
+        overflow-y: auto; /* Make stats panel scrollable */
         ${theme.backdropFilter ? `backdrop-filter: ${theme.backdropFilter};` : ""}
         transition: all 0.3s ease;
         user-select: none;
@@ -2378,12 +2381,23 @@
           </div>
         </div>
 
+        <!-- Setup Section -->
+        <div id="setupSection" class="wplace-section">
+          <div class="wplace-section-title">➡️ Step 1: Initialize</div>
+          <div class="wplace-controls">
+            <button id="initBotBtn" class="wplace-btn wplace-btn-primary">
+              <i class="fas fa-palette"></i>
+              <span>${Utils.t("scanColors")}</span>
+            </button>
+          </div>
+        </div>
+
         <!-- Image Section -->
         <div class="wplace-section">
-          <div class="wplace-section-title">🖼️ Image Management</div>
+          <div class="wplace-section-title">🖼️ Step 2: Image Management</div>
           <div class="wplace-controls">
             <div class="wplace-row">
-              <button id="uploadBtn" class="wplace-btn wplace-btn-upload">
+              <button id="uploadBtn" class="wplace-btn wplace-btn-upload" disabled>
                 <i class="fas fa-upload"></i>
                 <span>${Utils.t("uploadImage")}</span>
               </button>
@@ -2403,7 +2417,7 @@
 
         <!-- Control Section -->
         <div class="wplace-section">
-          <div class="wplace-section-title">🎮 Painting Control</div>
+          <div class="wplace-section-title">🎮 Step 3: Painting Control</div>
           <div class="wplace-controls">
             <div class="wplace-row">
               <button id="startBtn" class="wplace-btn wplace-btn-start" disabled>
@@ -2806,6 +2820,7 @@
     document.body.appendChild(settingsContainer)
 
     // Query all UI elements after appending to DOM
+    const initBotBtn = container.querySelector("#initBotBtn");
     const uploadBtn = container.querySelector("#uploadBtn")
     const resizeBtn = container.querySelector("#resizeBtn")
     const selectPosBtn = container.querySelector("#selectPosBtn")
@@ -3351,7 +3366,7 @@
           <div class="wplace-stat-value">${Math.floor(state.currentCharges)}</div>
         </div>
         <div class="wplace-colors-section">
-            <div class="wplace-stat-label"><i class="fas fa-palette"></i> Available Colors</div>
+            <div class="wplace-stat-label"><i class="fas fa-palette"></i> Available Colors (${state.availableColors.length})</div>
             <div class="wplace-stat-colors-grid">
                 ${colorSwatchesHTML}
             </div>
@@ -3488,16 +3503,14 @@
         _updateResizePreview = () => {}; // Clear the function to prevent memory leaks
     }
 
+    if (initBotBtn) {
+        initBotBtn.addEventListener("click", async () => {
+            await checkAndSetColors();
+        });
+    }
+
     if (uploadBtn) {
       uploadBtn.addEventListener("click", async () => {
-        // First, automatically run the color check if it hasn't been done.
-        const colorsReady = await checkAndSetColors();
-        if (!colorsReady) {
-            // Stop if colors were not found. The error message is already shown.
-            return;
-        }
-
-        // If colors are ready, proceed with the original upload logic.
         try {
           updateUI("loadingImage", "default")
           const imageSrc = await Utils.createImageUploader()
