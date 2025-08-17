@@ -3359,11 +3359,29 @@
           minimizeBtn.title = "Restore"
         } else {
           container.classList.remove("wplace-minimized")
-          content.classList.add("wplace-hidden")
+          content.classList.remove("wplace-hidden")
           minimizeBtn.innerHTML = '<i class="fas fa-minus"></i>'
           minimizeBtn.title = "Minimize"
         }
+        saveBotSettings() // Save minimize state
       })
+    }
+
+    // Initialize UI state based on current state
+    if (state.minimized) {
+      container.classList.add("wplace-minimized")
+      content.classList.add("wplace-hidden")
+      if (minimizeBtn) {
+        minimizeBtn.innerHTML = '<i class="fas fa-expand"></i>'
+        minimizeBtn.title = "Restore"
+      }
+    } else {
+      container.classList.remove("wplace-minimized")
+      content.classList.remove("wplace-hidden")
+      if (minimizeBtn) {
+        minimizeBtn.innerHTML = '<i class="fas fa-minus"></i>'
+        minimizeBtn.title = "Minimize"
+      }
     }
 
     // Save progress functionality
@@ -4158,6 +4176,7 @@
                 paintingSpeedEnabled: document.getElementById('enableSpeedToggle')?.checked,
                 autoCaptchaEnabled: document.getElementById('enableAutoCaptchaToggle')?.checked,
                 cooldownChargeThreshold: state.cooldownChargeThreshold,
+                minimized: state.minimized,
             };
             // Update global config from UI elements before saving
             CONFIG.PAINTING_SPEED_ENABLED = settings.paintingSpeedEnabled;
@@ -4178,6 +4197,7 @@
             // Apply settings
             state.paintingSpeed = settings.paintingSpeed || CONFIG.PAINTING_SPEED.DEFAULT;
             state.cooldownChargeThreshold = settings.cooldownChargeThreshold || CONFIG.COOLDOWN_CHARGE_THRESHOLD;
+            state.minimized = settings.minimized ?? false;
             CONFIG.PAINTING_SPEED_ENABLED = settings.paintingSpeedEnabled ?? false;
             CONFIG.AUTO_CAPTCHA_ENABLED = settings.autoCaptchaEnabled ?? false;
 
