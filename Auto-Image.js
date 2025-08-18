@@ -176,7 +176,6 @@
   const TEXT = {
     en: {
     title: "WPlace Auto-Image",
-    // --- INTEGRATION: New language string for the overlay toggle button
     toggleOverlay: "Toggle Overlay",
     scanColors: "Scan Colors",
     uploadImage: "Upload Image",
@@ -247,7 +246,6 @@
     noChargesThreshold: "⌛ Waiting for charges to reach {threshold}. Currently {current}. Next in {time}...",
   },
   ru: {
-    // NOTE: For brevity, I will only add the new string to the 'en' block. You can translate this as needed.
     title: "WPlace Авто-Изображение",
     scanColors: "Сканировать цвета",
     uploadImage: "Загрузить изображение",
@@ -358,23 +356,19 @@
   // Placeholder for the resize preview update function
   let _updateResizePreview = () => {};
 
-  // --- INTEGRATION: New OverlayManager class to handle all overlay logic ---
+  // --- OVERLAY UPDATE: New OverlayManager class to handle all overlay logic ---
   class OverlayManager {
     constructor() {
         this.isEnabled = false;
         this.startCoords = null; // { region: {x, y}, pixel: {x, y} }
         this.imageBitmap = null;
-        this.chunkedTiles = new Map(); // Map<"tileX,tileY", { bitmap: ImageBitmap, px: number, py: number }>
+        this.chunkedTiles = new Map(); // Map<"tileX,tileY", ImageBitmap>
         this.tileSize = 1000;
-        this.drawMult = 3; // Must be odd
     }
 
-    // Toggles the overlay visibility
     toggle() {
         this.isEnabled = !this.isEnabled;
         console.log(`Overlay ${this.isEnabled ? 'enabled' : 'disabled'}.`);
-        // We can't force a redraw directly, but changing a URL param on the map can trigger it.
-        // For now, the user moving the map will refresh the tiles with the new state.
         return this.isEnabled;
     }
 
@@ -386,7 +380,6 @@
         this.chunkedTiles.clear();
     }
 
-    // Sets the image and processes it into chunks for efficient rendering
     async setImage(imageBitmap) {
         this.imageBitmap = imageBitmap;
         if (this.imageBitmap && this.startCoords) {
@@ -394,7 +387,6 @@
         }
     }
 
-    // Sets the top-left position for the overlay
     async setPosition(startPosition, region) {
         if (!startPosition || !region) {
             this.startCoords = null;
@@ -407,78 +399,58 @@
         }
     }
 
-    // The core processing logic, adapted from Blue Marble's Template.js
+    // --- OVERLAY UPDATE: Simplified chunking logic for solid, semi-transparent overlay ---
     async processImageIntoChunks() {
         if (!this.imageBitmap || !this.startCoords) return;
 
         this.chunkedTiles.clear();
         const { width: imageWidth, height: imageHeight } = this.imageBitmap;
         const { x: startPixelX, y: startPixelY } = this.startCoords.pixel;
+        const { x: startRegionX, y: startRegionY } = this.startCoords.region;
 
-        const canvas = new OffscreenCanvas(this.tileSize, this.tileSize);
-        const context = canvas.getContext('2d', { willReadFrequently: true });
+        const endPixelX = startPixelX + imageWidth;
+        const endPixelY = startPixelY + imageHeight;
 
-        // Iterate through the image and create a chunk for each tile it overlaps
-        for (let y = 0; y < imageHeight; y++) {
-            for (let x = 0; x < imageWidth; x++) {
-                const globalPixelX = startPixelX + x;
-                const globalPixelY = startPixelY + y;
+        const startTileX = startRegionX + Math.floor(startPixelX / this.tileSize);
+        const startTileY = startRegionY + Math.floor(startPixelY / this.tileSize);
+        const endTileX = startRegionX + Math.floor(endPixelX / this.tileSize);
+        const endTileY = startRegionY + Math.floor(endPixelY / this.tileSize);
+        
+        for (let ty = startTileY; ty <= endTileY; ty++) {
+            for (let tx = startTileX; tx <= endTileX; tx++) {
+                const tileKey = `${tx},${ty}`;
 
-                const tileX = this.startCoords.region.x + Math.floor(globalPixelX / this.tileSize);
-                const tileY = this.startCoords.region.y + Math.floor(globalPixelY / this.tileSize);
-                const tileKey = `${tileX},${tileY}`;
+                // Calculate the portion of the image that overlaps with this tile
+                const imgStartX = (tx - startRegionX) * this.tileSize - startPixelX;
+                const imgStartY = (ty - startRegionY) * this.tileSize - startPixelY;
 
-                // If we haven't started a chunk for this tile, create it
-                if (!this.chunkedTiles.has(tileKey)) {
-                    this.chunkedTiles.set(tileKey, {
-                        canvas: new OffscreenCanvas(this.tileSize * this.drawMult, this.tileSize * this.drawMult),
-                        hasData: false
-                    });
-                }
+                // Crop coordinates within the source image
+                const sX = Math.max(0, imgStartX);
+                const sY = Math.max(0, imgStartY);
+                const sW = Math.min(imageWidth - sX, this.tileSize - (sX - imgStartX));
+                const sH = Math.min(imageHeight - sY, this.tileSize - (sY - imgStartY));
+                
+                if (sW <= 0 || sH <= 0) continue;
+
+                // Destination coordinates on the new chunk canvas
+                const dX = Math.max(0, -imgStartX);
+                const dY = Math.max(0, -imgStartY);
+
+                const chunkCanvas = new OffscreenCanvas(this.tileSize, this.tileSize);
+                const chunkCtx = chunkCanvas.getContext('2d');
+                chunkCtx.imageSmoothingEnabled = false;
+
+                chunkCtx.drawImage(this.imageBitmap, sX, sY, sW, sH, dX, dY, sW, sH);
+                
+                const chunkBitmap = await chunkCanvas.transferToImageBitmap();
+                this.chunkedTiles.set(tileKey, chunkBitmap);
             }
         }
         
-        // Now draw the shreaded image onto the chunk canvases
-        for (const [tileKey, chunk] of this.chunkedTiles.entries()) {
-             const [tileX, tileY] = tileKey.split(',').map(Number);
-             const chunkCtx = chunk.canvas.getContext('2d');
-             chunkCtx.imageSmoothingEnabled = false;
-
-             const offsetX = (tileX - this.startCoords.region.x) * this.tileSize - startPixelX;
-             const offsetY = (tileY - this.startCoords.region.y) * this.tileSize - startPixelY;
-             
-             chunkCtx.drawImage(this.imageBitmap, -offsetX, -offsetY);
-
-             const imageData = chunkCtx.getImageData(0, 0, chunk.canvas.width, chunk.canvas.height);
-             const data = imageData.data;
-
-             for (let i = 0; i < data.length; i += 4) {
-                 const pixelIndex = i / 4;
-                 const px = pixelIndex % chunk.canvas.width;
-                 const py = Math.floor(pixelIndex / chunk.canvas.width);
-
-                 if (data[i + 3] > 0) { // If pixel is not transparent
-                     chunk.hasData = true;
-                     if (px % this.drawMult !== 1 || py % this.drawMult !== 1) {
-                         data[i + 3] = 0; // Make non-center pixels transparent
-                     }
-                 }
-             }
-             chunkCtx.putImageData(imageData, 0, 0);
-        }
-        
-        // Convert canvases to bitmaps for performance
-        for (const [tileKey, chunk] of this.chunkedTiles.entries()) {
-            if (chunk.hasData) {
-                chunk.bitmap = await chunk.canvas.transferToImageBitmap();
-            }
-            delete chunk.canvas; // Free up memory
-        }
-
         console.log(`Overlay processed into ${this.chunkedTiles.size} chunks.`);
     }
 
-    // This is called when a tile is intercepted. It draws the overlay chunk on top.
+    // --- OVERLAY UPDATE: Simplified compositing logic for solid, semi-transparent overlay ---
     async processAndRespondToTileRequest(eventData) {
         const { endpoint, blobID, blobData } = eventData;
         
@@ -491,8 +463,8 @@
                 const tileY = parseInt(tileMatch[2], 10);
                 const tileKey = `${tileX},${tileY}`;
 
-                const chunk = this.chunkedTiles.get(tileKey);
-                if (chunk && chunk.hasData) {
+                const chunkBitmap = this.chunkedTiles.get(tileKey);
+                if (chunkBitmap) {
                     try {
                         const originalTileBitmap = await createImageBitmap(blobData);
                         const canvas = new OffscreenCanvas(originalTileBitmap.width, originalTileBitmap.height);
@@ -502,8 +474,9 @@
                         // Draw original tile first
                         ctx.drawImage(originalTileBitmap, 0, 0);
                         
-                        // Draw our shreaded overlay on top
-                        ctx.drawImage(chunk.bitmap, 0, 0);
+                        // Set opacity and draw our solid overlay chunk on top
+                        ctx.globalAlpha = 0.6;
+                        ctx.drawImage(chunkBitmap, 0, 0);
 
                         finalBlob = await canvas.convertToBlob({ type: 'image/png' });
                     } catch (e) {
@@ -522,7 +495,6 @@
     }
 }
 
-// --- INTEGRATION: Instantiate the manager ---
 const overlayManager = new OverlayManager();
 
 // Turnstile token handling (promise-based) inspired by external logic
@@ -547,7 +519,6 @@ async function ensureToken() {
   return turnstileToken
 }
 
-// --- INTEGRATION: New inject function and fetch override from Blue Marble ---
 function inject(callback) {
     const script = document.createElement('script');
     script.textContent = `(${callback})();`;
@@ -558,7 +529,6 @@ function inject(callback) {
 inject(() => {
     const fetchedBlobQueue = new Map();
 
-    // Listener for processed blobs coming back from the main script
     window.addEventListener('message', (event) => {
         const { source, blobID, blobData } = event.data;
         if (source === 'auto-image-overlay' && blobID && blobData) {
@@ -575,21 +545,17 @@ inject(() => {
         const response = await originalFetch.apply(this, args);
         const url = (args[0] instanceof Request) ? args[0].url : args[0];
 
-        // --- MERGED LOGIC: Handle both overlay and turnstile token capture ---
         if (typeof url === "string") {
-            // Your original Turnstile token capture
             if (url.includes("https://backend.wplace.live/s0/pixel/")) {
                 try {
                     const payload = JSON.parse(args[1].body);
                     if (payload.t) {
                         console.log("✅ Turnstile Token Captured:", payload.t);
-                        // Post message so the main script can also get the token
                          window.postMessage({ source: 'turnstile-capture', token: payload.t }, '*');
                     }
                 } catch (_) { /* ignore */ }
             }
             
-            // Blue Marble's map tile interception for the overlay
             const contentType = response.headers.get('content-type') || '';
             if (contentType.includes('image/png') && url.includes('.png')) {
                  const cloned = response.clone();
@@ -619,16 +585,13 @@ inject(() => {
     };
 });
 
-// --- INTEGRATION: Listener in main script to handle messages from injected script ---
 window.addEventListener('message', (event) => {
     const { source, endpoint, blobID, blobData, token } = event.data;
 
-    // Handle intercepted map tiles for the overlay
     if (source === 'auto-image-tile' && endpoint && blobID && blobData) {
         overlayManager.processAndRespondToTileRequest(event.data);
     }
 
-    // Handle captured turnstile token
     if (source === 'turnstile-capture' && token) {
         setTurnstileToken(token);
         if (document.querySelector("#statusText")?.textContent.includes("CAPTCHA")) {
@@ -638,15 +601,6 @@ window.addEventListener('message', (event) => {
     }
 });
 
-
-// Intercept fetch to capture Turnstile token from pixel placement requests
-// --- INTEGRATION: THIS IS NOW HANDLED BY THE INJECTED SCRIPT ABOVE ---
-/*
-const originalFetch = window.fetch
-window.fetch = async (url, options) => { ... } // This block is removed
-*/
-
-  // LANGUAGE DETECTION
   async function detectLanguage() {
     try {
       const response = await fetch("https://backend.wplace.live/me", {
@@ -673,11 +627,9 @@ window.fetch = async (url, options) => { ... } // This block is removed
         return null;
     },
 
-    // Optimized DOM creation helpers
     createElement: (tag, props = {}, children = []) => {
       const element = document.createElement(tag)
 
-      // Set properties efficiently
       Object.entries(props).forEach(([key, value]) => {
         if (key === 'style' && typeof value === 'object') {
           Object.assign(element.style, value)
@@ -690,7 +642,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
         }
       })
 
-      // Append children efficiently
       if (typeof children === 'string') {
         element.textContent = children
       } else if (Array.isArray(children)) {
@@ -706,7 +657,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
       return element
     },
 
-    // Create button with common styling
     createButton: (id, text, icon, onClick, style = CONFIG.CSS_CLASSES.BUTTON_PRIMARY) => {
       const button = Utils.createElement('button', {
         id: id,
@@ -776,7 +726,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
 
     colorDistance: (a, b) => Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2) + Math.pow(a[2] - b[2], 2)),
 
-    // The color metric from colour-converter.js for higher accuracy
     findClosestPaletteColor: (r, g, b, palette) => {
         let menorDist = Infinity;
         let cor = [0, 0, 0];
@@ -885,19 +834,15 @@ window.fetch = async (url, options) => { ... } // This block is removed
     calculateEstimatedTime: (remainingPixels, charges, cooldown) => {
       if (remainingPixels <= 0) return 0
 
-      // Calculate time based on painting speed (pixels per second)
       const paintingSpeedDelay = state.paintingSpeed > 0 ? (1000 / state.paintingSpeed) : 1000
-      const timeFromSpeed = remainingPixels * paintingSpeedDelay // ms
+      const timeFromSpeed = remainingPixels * paintingSpeedDelay
 
-      // Calculate time based on charges and cooldown
       const cyclesNeeded = Math.ceil(remainingPixels / Math.max(charges, 1))
-      const timeFromCharges = cyclesNeeded * cooldown // ms
+      const timeFromCharges = cyclesNeeded * cooldown
 
-      // Return the maximum of both calculations (the limiting factor)
       return Math.max(timeFromSpeed, timeFromCharges)
     },
 
-    // Save/Load Progress Functions
     saveProgress: () => {
       try {
         const progressData = {
@@ -953,10 +898,8 @@ window.fetch = async (url, options) => { ... } // This block is removed
 
     restoreProgress: (savedData) => {
       try {
-        // Restore state
         Object.assign(state, savedData.state)
 
-        // Restore image data
         if (savedData.imageData) {
           state.imageData = {
             ...savedData.imageData,
@@ -964,7 +907,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
           }
         }
 
-        // Restore painted map
         if (savedData.paintedMap) {
           state.paintedMap = savedData.paintedMap.map((row) => Array.from(row))
         }
@@ -1150,10 +1092,8 @@ window.fetch = async (url, options) => { ... } // This block is removed
   const colorCache = new Map()
 
   function findClosestColor(targetRgb, availableColors) {
-    // Create cache key from RGB values
     const cacheKey = `${targetRgb[0]},${targetRgb[1]},${targetRgb[2]}`
 
-    // Check cache first
     if (colorCache.has(cacheKey)) {
       return colorCache.get(cacheKey)
     }
@@ -1170,23 +1110,18 @@ window.fetch = async (url, options) => { ... } // This block is removed
     let minDistance = Number.POSITIVE_INFINITY
     let closestColorId = availableColors[0]?.id || 1
 
-    // Use optimized loop for better performance
     for (let i = 0; i < availableColors.length; i++) {
       const color = availableColors[i]
       const distance = Utils.colorDistance(targetRgb, color.rgb)
       if (distance < minDistance) {
         minDistance = distance
         closestColorId = color.id
-
-        // If perfect match, break early
         if (distance === 0) break
       }
     }
 
-    // Cache the result for future use
     colorCache.set(cacheKey, closestColorId)
 
-    // Limit cache size to prevent memory leaks
     if (colorCache.size > 10000) {
       const firstKey = colorCache.keys().next().value
       colorCache.delete(firstKey)
@@ -1200,7 +1135,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
   let updateStats = () => {}
   let updateDataButtons = () => {}
 
-  // --- START: Color Palette Functions ---
   function updateActiveColorPalette() {
       state.activeColorPalette = [];
       const activeSwatches = document.querySelectorAll('.wplace-color-swatch.active');
@@ -1210,7 +1144,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
               state.activeColorPalette.push(rgb);
           });
       }
-      // If the resize dialog is open, update its preview
       if (document.querySelector('.resize-container')?.style.display === 'block') {
           _updateResizePreview();
       }
@@ -1235,7 +1168,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
       freeContainer.innerHTML = '';
       paidContainer.innerHTML = '';
 
-      // Create a unique set of colors to avoid duplicates
       const uniqueColors = [...new Set(CONFIG.COLOR_PALETTE.map(JSON.stringify))].map(JSON.parse);
 
       uniqueColors.forEach(rgb => {
@@ -1253,7 +1185,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
 
           const nameLabel = Utils.createElement('span', { className: 'wplace-color-item-name' }, name);
 
-          // Default state: free are active, paid are not
           if (!isPaid) {
               swatch.classList.add('active');
           }
@@ -1273,18 +1204,13 @@ window.fetch = async (url, options) => { ... } // This block is removed
           }
       });
 
-      // Add event listeners for master buttons
       container.querySelector('#selectAllFreeBtn')?.addEventListener('click', () => toggleAllColors(true, false));
       container.querySelector('#unselectAllFreeBtn')?.addEventListener('click', () => toggleAllColors(false, false));
       container.querySelector('#selectAllPaidBtn')?.addEventListener('click', () => toggleAllColors(true, true));
       container.querySelector('#unselectAllPaidBtn')?.addEventListener('click', () => toggleAllColors(false, true));
 
-      // Set the initial state
       updateActiveColorPalette();
   }
-  // --- END: Color Palette Functions ---
-
-    // --- START: Auto-CAPTCHA Solver ---
     async function handleCaptcha() {
         return new Promise(async (resolve, reject) => {
             if (!CONFIG.AUTO_CAPTCHA_ENABLED) {
@@ -1292,23 +1218,19 @@ window.fetch = async (url, options) => { ... } // This block is removed
             }
 
             try {
-                // Set a timeout for the entire operation
                 const timeoutPromise = Utils.sleep(20000).then(() => reject(new Error("Auto-CAPTCHA timed out.")));
 
                 const solvePromise = (async () => {
-                    // 1. Find and click the main "Paint" button on the screen
                     const mainPaintBtn = await Utils.waitForSelector('button.btn.btn-primary.btn-lg, button.btn-primary.sm\\:btn-xl', 200, 10000);
                     if (!mainPaintBtn) throw new Error("Could not find the main paint button.");
                     mainPaintBtn.click();
                     await Utils.sleep(500);
 
-                    // 2. Select the transparent color to avoid wasting a real color
                     const transBtn = await Utils.waitForSelector('button#color-0', 200, 5000);
                     if (!transBtn) throw new Error("Could not find the transparent color button.");
                     transBtn.click();
                     await Utils.sleep(500);
 
-                    // 3. Find the canvas and simulate a click
                     const canvas = await Utils.waitForSelector('canvas', 200, 5000);
                     if (!canvas) throw new Error("Could not find the canvas element.");
 
@@ -1324,7 +1246,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
                     canvas.dispatchEvent(new KeyboardEvent('keyup', { key: ' ', code: 'Space', bubbles: true }));
                     await Utils.sleep(500);
 
-                    // 4. Find and click the confirmation button
                     let confirmBtn = await Utils.waitForSelector('button.btn.btn-primary.btn-lg, button.btn.btn-primary.sm\\:btn-xl');
                     if (!confirmBtn) {
                         const allPrimary = Array.from(document.querySelectorAll('button.btn-primary'));
@@ -1333,7 +1254,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
                     if (!confirmBtn) throw new Error("Could not find the confirmation button.");
                     confirmBtn.click();
 
-                    // The fetch interceptor will capture the token. We wait for it.
                     await tokenPromise;
                     resolve();
                 })();
@@ -1346,13 +1266,11 @@ window.fetch = async (url, options) => { ... } // This block is removed
             }
         });
     }
-    // --- END: Auto-CAPTCHA Solver ---
 
 
   async function createUI() {
     await detectLanguage()
 
-    // Clean up existing UI elements to prevent duplicates
     const existingContainer = document.getElementById("wplace-image-bot-container")
     const existingStats = document.getElementById("wplace-stats-container")
     const existingSettings = document.getElementById("wplace-settings-container")
@@ -1796,7 +1714,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
         display: none;
       }
       
-      /* --- INTEGRATION: Style for the new overlay toggle button --- */
       .wplace-btn-overlay.active {
         background: linear-gradient(135deg, #29b6f6 0%, #8e2de2 100%);
         box-shadow: 0 0 15px #8e2de2;
@@ -1834,7 +1751,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
         color: ${theme.highlight};
       }
 
-      /* Styles for the new color display in stats */
       .wplace-colors-section {
         margin-top: 10px;
         padding-top: 8px;
@@ -1984,7 +1900,7 @@ window.fetch = async (url, options) => { ... } // This block is removed
           CONFIG.currentTheme === "Classic Autobot" ? "0 0 20px rgba(0,0,0,0.5)" : "0 0 30px rgba(0, 255, 65, 0.5)"
         };
         width: 90%;
-        max-width: 700px; /* Increased width */
+        max-width: 700px;
         max-height: 90%;
         overflow: auto;
         font-family: ${theme.fontFamily};
@@ -2002,7 +1918,7 @@ window.fetch = async (url, options) => { ... } // This block is removed
       }
 
       .resize-preview {
-        max-width: none; /* Allow image to exceed wrapper for zoom */
+        max-width: none;
         transition: transform 0.1s ease;
         image-rendering: pixelated;
         image-rendering: -moz-crisp-edges;
@@ -2059,7 +1975,7 @@ window.fetch = async (url, options) => { ... } // This block is removed
       }
       
       .resize-zoom-controls {
-        grid-column: 1 / -1; /* Span full width */
+        grid-column: 1 / -1;
         display: flex;
         align-items: center;
         gap: 10px;
@@ -2083,10 +1999,9 @@ window.fetch = async (url, options) => { ... } // This block is removed
         z-index: 9999;
         display: none;
       }
-      /* --- START: Color Palette Styles --- */
       .wplace-color-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); /* Wider columns for name */
+        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
         gap: 10px;
         padding-top: 8px;
       }
@@ -2143,9 +2058,7 @@ window.fetch = async (url, options) => { ... } // This block is removed
         background: rgba(255,255,255,0.1);
         margin: 8px 0;
       }
-      /* --- END: Color Palette Styles --- */
 
-        /* Cooldown slider styles */
         .wplace-cooldown-control {
             margin-top: 8px;
         }
@@ -2181,7 +2094,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
       ${
         CONFIG.currentTheme === "Neon Retro"
           ? `
-      /* Retro checkbox styling */
       input[type="checkbox"] {
         -webkit-appearance: none;
         -moz-appearance: none;
@@ -2209,12 +2121,10 @@ window.fetch = async (url, options) => { ... } // This block is removed
         font-weight: bold;
       }
 
-      /* Icon styling for retro feel */
       .fas, .fa {
         filter: drop-shadow(0 0 3px currentColor);
       }
 
-      /* Speed Control Styles */
       .wplace-speed-control {
         margin-top: 12px;
         padding: 12px;
@@ -2297,7 +2207,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
         opacity: 0.8;
       }
 
-      /* Settings Window Styles */
       #wplace-settings-container {
         position: fixed;
         top: 50%;
@@ -2609,7 +2518,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
                 <span>${Utils.t("stopPainting")}</span>
               </button>
             </div>
-            <!-- --- INTEGRATION: New row for the overlay toggle button --- -->
             <div class="wplace-row single">
                 <button id="toggleOverlayBtn" class="wplace-btn wplace-btn-overlay" disabled>
                     <i class="fas fa-eye"></i>
@@ -2695,7 +2603,7 @@ window.fetch = async (url, options) => { ... } // This block is removed
     settingsContainer.id = "wplace-settings-container"
     settingsContainer.style.cssText = `
       position: fixed;
-      top       50%;
+      top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -2947,7 +2855,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
           background: #4a5568;
         }
 
-        /* Dragging state styles */
         .wplace-dragging {
           opacity: 0.9;
           box-shadow: 0 30px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.2);
@@ -2996,7 +2903,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
           <img id="resizePreview" class="resize-preview" src="" alt="Resized image preview will appear here.">
       </div>
 
-      <!-- START: Moved Color Palette -->
       <div class="wplace-section" id="color-palette-section" style="margin-top: 15px;">
           <div class="wplace-section-title">
               <i class="fas fa-palette"></i>&nbsp;Color Palette
@@ -3015,7 +2921,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
               <div id="colors-paid" class="wplace-color-grid"></div>
           </div>
       </div>
-      <!-- END: Moved Color Palette -->
 
       <div class="resize-buttons">
         <button id="downloadPreviewBtn" class="wplace-btn wplace-btn-primary">
@@ -3042,7 +2947,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
     document.body.appendChild(statsContainer)
     document.body.appendChild(settingsContainer)
 
-    // Query all UI elements after appending to DOM
     const uploadBtn = container.querySelector("#uploadBtn")
     const resizeBtn = container.querySelector("#resizeBtn")
     const selectPosBtn = container.querySelector("#selectPosBtn")
@@ -3055,7 +2959,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
     const minimizeBtn = container.querySelector("#minimizeBtn")
     const compactBtn = container.querySelector("#compactBtn")
     const statsBtn = container.querySelector("#statsBtn")
-    // --- INTEGRATION: Get the new overlay button
     const toggleOverlayBtn = container.querySelector("#toggleOverlayBtn");
     const statusText = container.querySelector("#statusText")
     const progressBar = container.querySelector("#progressBar")
@@ -3066,7 +2969,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
     const cooldownSlider = container.querySelector("#cooldownSlider");
     const cooldownValue = container.querySelector("#cooldownValue");
 
-    // Check if all elements are found
     if (!uploadBtn || !selectPosBtn || !startBtn || !stopBtn) {
       console.error("Some UI elements not found:", {
         uploadBtn: !!uploadBtn,
@@ -3086,7 +2988,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
 
     const header = container.querySelector(".wplace-header")
 
-    // Use the shared makeDraggable function for consistency
     makeDraggable(container)
 
     function makeDraggable(element) {
@@ -3097,7 +2998,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
       let isDragging = false
       const header = element.querySelector(".wplace-header") || element.querySelector(".wplace-settings-header")
 
-      // Check if header exists to prevent null error
       if (!header) {
         console.warn("No draggable header found for element:", element)
         return
@@ -3111,10 +3011,8 @@ window.fetch = async (url, options) => { ... } // This block is removed
         e.preventDefault()
         isDragging = true
 
-        // Get current position
         const rect = element.getBoundingClientRect()
 
-        // Remove transform and set absolute position
         element.style.transform = "none"
         element.style.top = rect.top + "px"
         element.style.left = rect.left + "px"
@@ -3125,7 +3023,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
         document.onmouseup = closeDragElement
         document.onmousemove = elementDrag
 
-        // Prevent text selection during drag
         document.body.style.userSelect = "none"
       }
 
@@ -3141,7 +3038,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
         let newTop = element.offsetTop - pos2
         let newLeft = element.offsetLeft - pos1
 
-        // Boundary checking to keep UI within viewport
         const rect = element.getBoundingClientRect()
         const maxTop = window.innerHeight - rect.height
         const maxLeft = window.innerWidth - rect.width
@@ -3162,13 +3058,9 @@ window.fetch = async (url, options) => { ... } // This block is removed
       }
     }
 
-    // Make stats container draggable
     makeDraggable(statsContainer)
-
-    // Make main container draggable
     makeDraggable(container)
 
-    // Stats window functionality
     if (statsBtn && closeStatsBtn) {
       statsBtn.addEventListener("click", () => {
         const isVisible = statsContainer.style.display !== "none"
@@ -3189,7 +3081,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
         statsBtn.title = "Show Stats"
       })
 
-      // Refresh charges button
       if (refreshChargesBtn) {
         refreshChargesBtn.addEventListener("click", async () => {
           refreshChargesBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'
@@ -3207,7 +3098,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
       }
     }
 
-    // Settings window functionality
     const settingsBtn = container.querySelector("#settingsBtn")
     const closeSettingsBtn = settingsContainer.querySelector("#closeSettingsBtn")
     const applySettingsBtn = settingsContainer.querySelector("#applySettingsBtn");
@@ -3217,14 +3107,12 @@ window.fetch = async (url, options) => { ... } // This block is removed
       settingsBtn.addEventListener("click", () => {
         const isVisible = settingsContainer.style.display !== "none"
         if (isVisible) {
-          // Add fade out animation
           settingsContainer.style.animation = "settingsFadeOut 0.3s ease-out forwards"
           setTimeout(() => {
             settingsContainer.style.display = "none"
             settingsContainer.style.animation = ""
           }, 300)
         } else {
-          // Reset position to center before showing
           settingsContainer.style.top = "50%"
           settingsContainer.style.left = "50%"
           settingsContainer.style.transform = "translate(-50%, -50%)"
@@ -3234,12 +3122,10 @@ window.fetch = async (url, options) => { ... } // This block is removed
       })
 
       closeSettingsBtn.addEventListener("click", () => {
-        // Add fade out animation
         settingsContainer.style.animation = "settingsFadeOut 0.3s ease-out forwards"
         setTimeout(() => {
           settingsContainer.style.display = "none"
           settingsContainer.style.animation = ""
-          // Reset position for next time
           settingsContainer.style.top = "50%"
           settingsContainer.style.left = "50%"
           settingsContainer.style.transform = "translate(-50%, -50%)"
@@ -3249,14 +3135,11 @@ window.fetch = async (url, options) => { ... } // This block is removed
       applySettingsBtn.addEventListener("click", () => {
         saveBotSettings();
         Utils.showAlert(Utils.t("settingsSaved"), "success");
-        // Close settings window after applying
         closeSettingsBtn.click();
       });
 
-      // Make settings window draggable
       makeDraggable(settingsContainer)
 
-      // Language selector event listener
       const languageSelect = settingsContainer.querySelector("#languageSelect")
       if (languageSelect) {
         languageSelect.addEventListener("change", (e) => {
@@ -3264,18 +3147,13 @@ window.fetch = async (url, options) => { ... } // This block is removed
           state.language = newLanguage
           localStorage.setItem('wplace_language', newLanguage)
 
-          // Refresh the UI to apply new language
           setTimeout(() => {
-            // Hide settings first
             settingsContainer.style.display = "none"
-
-            // Recreate UI with new language (cleanup is handled in createUI)
             createUI()
           }, 100)
         })
       }
 
-      // Theme selector event listener
       const themeSelect = settingsContainer.querySelector("#themeSelect")
       if (themeSelect) {
         themeSelect.addEventListener("change", (e) => {
@@ -3284,7 +3162,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
         })
       }
 
-      // Theme customization event listeners
       const primaryColor = settingsContainer.querySelector("#primaryColor")
       const primaryColorText = settingsContainer.querySelector("#primaryColorText")
       const secondaryColor = settingsContainer.querySelector("#secondaryColor")
@@ -3296,7 +3173,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
       const applyChangesBtn = settingsContainer.querySelector("#applyThemeChanges")
       const resetDefaultsBtn = settingsContainer.querySelector("#resetThemeDefaults")
 
-      // Color input synchronization
       if (primaryColor && primaryColorText) {
         primaryColor.addEventListener("input", (e) => {
           primaryColorText.value = e.target.value
@@ -3330,20 +3206,17 @@ window.fetch = async (url, options) => { ... } // This block is removed
         })
       }
 
-      // Border radius slider
       if (borderRadiusSlider && borderRadiusValue) {
         borderRadiusSlider.addEventListener("input", (e) => {
           borderRadiusValue.textContent = e.target.value + "px"
         })
       }
 
-      // Apply theme changes
       if (applyChangesBtn) {
         applyChangesBtn.addEventListener("click", () => {
           const currentTheme = getCurrentTheme()
           const currentThemeName = CONFIG.currentTheme
 
-          // Get all values
           const newValues = {
             primary: primaryColorText?.value || currentTheme.primary,
             secondary: secondaryColorText?.value || currentTheme.secondary,
@@ -3356,13 +3229,11 @@ window.fetch = async (url, options) => { ... } // This block is removed
             }
           }
 
-          // Update theme
           CONFIG.THEMES[currentThemeName] = {
             ...currentTheme,
             ...newValues
           }
 
-          // Save and apply
           saveThemePreference()
           setTimeout(() => {
             settingsContainer.style.display = "none"
@@ -3371,13 +3242,10 @@ window.fetch = async (url, options) => { ... } // This block is removed
         })
       }
 
-      // Reset to defaults
       if (resetDefaultsBtn) {
         resetDefaultsBtn.addEventListener("click", () => {
-          // Reset to original theme values (you'll need to store defaults)
           const confirmReset = confirm("Reset theme to default settings?")
           if (confirmReset) {
-            // Reload original theme (this is a simplified approach)
             location.reload()
           }
         })
@@ -3396,7 +3264,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
     const cancelResize = resizeContainer.querySelector("#cancelResize")
     const downloadPreviewBtn = resizeContainer.querySelector("#downloadPreviewBtn");
 
-    // Compact mode functionality
     if (compactBtn) {
       compactBtn.addEventListener("click", () => {
         container.classList.toggle("wplace-compact")
@@ -3412,7 +3279,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
       })
     }
 
-    // Minimize functionality
     if (minimizeBtn) {
       minimizeBtn.addEventListener("click", () => {
         state.minimized = !state.minimized
@@ -3427,11 +3293,10 @@ window.fetch = async (url, options) => { ... } // This block is removed
           minimizeBtn.innerHTML = '<i class="fas fa-minus"></i>'
           minimizeBtn.title = "Minimize"
         }
-        saveBotSettings() // Save minimize state
+        saveBotSettings()
       })
     }
     
-    // --- INTEGRATION: Add event listener for the overlay toggle button
     if (toggleOverlayBtn) {
         toggleOverlayBtn.addEventListener('click', () => {
             const isEnabled = overlayManager.toggle();
@@ -3440,7 +3305,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
         });
     }
 
-    // Initialize UI state based on current state
     if (state.minimized) {
       container.classList.add("wplace-minimized")
       content.classList.add("wplace-hidden")
@@ -3457,7 +3321,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
       }
     }
 
-    // Save progress functionality
     if (saveBtn) {
       saveBtn.addEventListener("click", () => {
         if (!state.imageLoaded) {
@@ -3475,7 +3338,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
       })
     }
 
-    // Load progress functionality
     if (loadBtn) {
       loadBtn.addEventListener("click", () => {
         const savedData = Utils.loadProgress()
@@ -3485,7 +3347,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
           return
         }
 
-        // Show confirmation dialog
         const confirmLoad = confirm(
           `${Utils.t("savedDataFound")}\n\n` +
             `Saved: ${new Date(savedData.timestamp).toLocaleString()}\n` +
@@ -3499,11 +3360,9 @@ window.fetch = async (url, options) => { ... } // This block is removed
             Utils.showAlert(Utils.t("dataLoaded"), "success")
             updateDataButtons()
 
-            // Check charges immediately after loading auto-save
             updateStats()
 
             if (!state.colorsChecked) {
-              // Re-run color check automatically if loaded data is missing it
                 uploadBtn.disabled = false;
             } else {
                 uploadBtn.disabled = false;
@@ -3520,7 +3379,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
       })
     }
 
-    // Save to file functionality
     if (saveToFileBtn) {
       saveToFileBtn.addEventListener("click", () => {
         const success = Utils.saveProgressToFile()
@@ -3533,7 +3391,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
       })
     }
 
-    // Load from file functionality
     if (loadFromFileBtn) {
       loadFromFileBtn.addEventListener("click", async () => {
         try {
@@ -3543,10 +3400,8 @@ window.fetch = async (url, options) => { ... } // This block is removed
             Utils.showAlert(Utils.t("fileLoaded"), "success")
             updateDataButtons()
 
-            // Check charges immediately after loading file
             await updateStats()
 
-            // Auto-enable buttons after loading from file
             if (state.colorsChecked) {
               uploadBtn.disabled = false
               selectPosBtn.disabled = false
@@ -3582,14 +3437,12 @@ window.fetch = async (url, options) => { ... } // This block is removed
         const { charges, cooldown, max } = await WPlaceService.getCharges();
         state.currentCharges = Math.floor(charges);
         state.cooldown = cooldown;
-        state.maxCharges = Math.floor(max) > 1 ? Math.floor(max) : state.maxCharges; // Update max charges if we get a valid number
+        state.maxCharges = Math.floor(max) > 1 ? Math.floor(max) : state.maxCharges;
 
-        // Update cooldown slider max value if it has changed
         if (cooldownSlider.max != state.maxCharges) {
             cooldownSlider.max = state.maxCharges;
         }
 
-        // --- Generate HTML for Image-Specific Stats ---
         let imageStatsHTML = '';
         if (state.imageLoaded) {
             const progress = state.totalPixels > 0 ? Math.round((state.paintedPixels / state.totalPixels) * 100) : 0;
@@ -3613,7 +3466,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
             `;
         }
 
-        // --- Generate HTML for Available Colors ---
         let colorSwatchesHTML = '';
         if (state.colorsChecked) {
             colorSwatchesHTML = state.availableColors.map(color => {
@@ -3622,7 +3474,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
             }).join('');
         }
 
-        // --- Combine all stats and update the panel ---
         statsArea.innerHTML = `
             ${imageStatsHTML}
             <div class="wplace-stat-item">
@@ -3640,14 +3491,12 @@ window.fetch = async (url, options) => { ... } // This block is removed
         `;
     }
 
-    // Helper function to update data management buttons
     updateDataButtons = () => {
       const hasImageData = state.imageLoaded && state.imageData
       saveBtn.disabled = !hasImageData
       saveToFileBtn.disabled = !hasImageData
     }
 
-    // Initialize data buttons state
     updateDataButtons()
 
     function showResizeDialog(processor) {
@@ -3656,8 +3505,8 @@ window.fetch = async (url, options) => { ... } // This block is removed
 
         widthSlider.value = width;
         heightSlider.value = height;
-        widthSlider.max = width * 2; // Set a reasonable max
-        heightSlider.max = height * 2; // Set a reasonable max
+        widthSlider.max = width * 2;
+        heightSlider.max = height * 2;
         widthValue.textContent = width;
         heightValue.textContent = height;
         zoomSlider.value = 1;
@@ -3685,7 +3534,7 @@ window.fetch = async (url, options) => { ... } // This block is removed
                 const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
 
                 if (a < CONFIG.TRANSPARENCY_THRESHOLD || (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b))) {
-                    data[i + 3] = 0; // Make transparent
+                    data[i + 3] = 0;
                     continue;
                 }
 
@@ -3699,7 +3548,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
             resizePreview.src = tempCanvas.toDataURL();
             resizePreview.style.transform = `scale(${zoomLevel})`;
             
-            // --- INTEGRATION: Update the overlay in real-time ---
             const finalImageBitmap = await createImageBitmap(tempCanvas);
             await overlayManager.setImage(finalImageBitmap);
         };
@@ -3748,7 +3596,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
             state.totalPixels = totalValidPixels;
             state.paintedPixels = 0;
 
-            // --- INTEGRATION: Update overlay with final resized image and enable it
             const finalImageBitmap = await createImageBitmap(processor.canvas);
             await overlayManager.setImage(finalImageBitmap);
             overlayManager.enable();
@@ -3770,13 +3617,13 @@ window.fetch = async (url, options) => { ... } // This block is removed
 
         resizeOverlay.style.display = "block";
         resizeContainer.style.display = "block";
-        _updateResizePreview(); // Initial preview
+        _updateResizePreview();
     }
 
     function closeResizeDialog() {
         resizeOverlay.style.display = "none";
         resizeContainer.style.display = "none";
-        _updateResizePreview = () => {}; // Clear the function to prevent memory leaks
+        _updateResizePreview = () => {};
     }
 
     if (uploadBtn) {
@@ -3832,7 +3679,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
           state.imageLoaded = true
           state.lastPosition = { x: 0, y: 0 }
 
-          // --- INTEGRATION: Set image for overlay and enable it ---
           const imageBitmap = await createImageBitmap(processor.img);
           await overlayManager.setImage(imageBitmap);
           overlayManager.enable();
@@ -3903,7 +3749,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
                   }
                   state.lastPosition = { x: 0, y: 0 }
 
-                  // --- INTEGRATION: Update overlay position ---
                   await overlayManager.setPosition(state.startPosition, state.region);
 
                   if (state.imageLoaded) {
@@ -3924,7 +3769,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
           return originalFetch(url, options)
         }
 
-        // Temporarily override the fetch that the injected script uses
         const originalFetch = window.fetch;
         window.fetch = tempFetch;
 
@@ -3939,7 +3783,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
       })
     }
 
-    // Function to start painting (can be called programmatically)
     async function startPainting() {
       if (!state.imageLoaded || !state.startPosition || !state.region) {
         updateUI("missingRequirements", "error")
@@ -3956,7 +3799,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
       selectPosBtn.disabled = true
       resizeBtn.disabled = true
       saveBtn.disabled = true
-      // --- INTEGRATION: Disable overlay controls during painting
       toggleOverlayBtn.disabled = true;
 
       updateUI("startPaintingMsg", "success")
@@ -3980,7 +3822,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
         } else {
           startBtn.disabled = false
         }
-        // --- INTEGRATION: Re-enable overlay controls after painting
         toggleOverlayBtn.disabled = false;
       }
     }
@@ -3996,7 +3837,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
         stopBtn.disabled = true
         updateUI("paintingStopped", "warning")
 
-        // Auto save when stopping
         if (state.imageLoaded && state.paintedPixels > 0) {
           Utils.saveProgress()
           Utils.showAlert(Utils.t("autoSaved"), "success")
@@ -4004,7 +3844,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
       })
     }
 
-    // Check for saved progress on startup
     const checkSavedProgress = () => {
       const savedData = Utils.loadProgress()
       if (savedData && savedData.state.paintedPixels > 0) {
@@ -4021,16 +3860,14 @@ window.fetch = async (url, options) => { ... } // This block is removed
       }
     }
 
-    // Check for saved progress after a short delay to let UI settle
     setTimeout(checkSavedProgress, 1000)
 
-    // Cooldown slider event listener
     if (cooldownSlider && cooldownValue) {
         cooldownSlider.addEventListener("input", (e) => {
             const threshold = parseInt(e.target.value);
             state.cooldownChargeThreshold = threshold;
             cooldownValue.textContent = threshold;
-            saveBotSettings(); // Save immediately on change for convenience
+            saveBotSettings();
         });
     }
 
@@ -4107,7 +3944,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
                     updateUI("captchaSolving", "warning");
                     try {
                         await handleCaptcha();
-                        // Retry the batch with the new token
                         success = await sendPixelBatch(pixelBatch, regionX, regionY);
                         if (success === "token_error") {
                            updateUI("captchaFailed", "error");
@@ -4205,7 +4041,6 @@ window.fetch = async (url, options) => { ... } // This block is removed
       state.lastPosition = { x: 0, y: 0 }
       state.paintedMap = null
       Utils.clearProgress()
-      // --- INTEGRATION: Clear overlay when painting is complete
       overlayManager.clear();
       const toggleOverlayBtn = document.getElementById('toggleOverlayBtn');
       if (toggleOverlayBtn) {
