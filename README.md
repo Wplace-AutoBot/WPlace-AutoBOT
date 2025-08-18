@@ -87,7 +87,7 @@ javascript:fetch("https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBO
 
 ---
 
-- Contributors avatars (auto-generated):  
+- Contributors:  
   <img src="https://contrib.rocks/image?repo=Wplace-AutoBot/WPlace-AutoBOT" alt="Contributors" />
 
 
