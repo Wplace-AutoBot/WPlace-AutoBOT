@@ -211,7 +211,7 @@
   // BILINGUAL TEXT STRINGS
   const TEXT = {
     en: {
-    title: "WPlace Auto-Image",
+    title: "WPlace Auto-draw",
     toggleOverlay: "Toggle Overlay",
     scanColors: "Scan Colors",
     uploadImage: "Upload Image",
