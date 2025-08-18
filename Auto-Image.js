@@ -13,6 +13,10 @@
     PAINTING_SPEED_ENABLED: false,
     AUTO_CAPTCHA_ENABLED: false, // Disabled by default
     COOLDOWN_CHARGE_THRESHOLD: 1, // Default wait threshold
+    OVERLAY: {
+      OPACITY_DEFAULT: 0.6,
+      BLUE_MARBLE_DEFAULT: false,
+    },
     // --- START: Color data from colour-converter.js ---
     COLOR_PALETTE: [
       [0,0,0],[60,60,60],[120,120,120],[170,170,170],[210,210,210],[255,255,255],
@@ -351,6 +355,8 @@
     language: "en",
     paintingSpeed: CONFIG.PAINTING_SPEED.DEFAULT, // pixels per second
     cooldownChargeThreshold: CONFIG.COOLDOWN_CHARGE_THRESHOLD,
+    overlayOpacity: CONFIG.OVERLAY.OPACITY_DEFAULT,
+    blueMarbleEnabled: CONFIG.OVERLAY.BLUE_MARBLE_DEFAULT,
   }
 
   // Placeholder for the resize preview update function
@@ -442,6 +448,28 @@
 
                 chunkCtx.drawImage(this.imageBitmap, sX, sY, sW, sH, dX, dY, sW, sH);
                 
+                // --- NEW: BLUE MARBLE EFFECT ---
+                if (state.blueMarbleEnabled) {
+                    const imageData = chunkCtx.getImageData(0, 0, this.tileSize, this.tileSize);
+                    const data = imageData.data;
+                    for (let pixelY = 0; pixelY < this.tileSize; pixelY++) {
+                        for (let pixelX = 0; pixelX < this.tileSize; pixelX++) {
+                            const canvasX = pixelX;
+                            const canvasY = pixelY;
+                            const imageX = canvasX - dX;
+                            const imageY = canvasY - dY;
+
+                            if ((imageX + imageY) % 2 === 0) {
+                                const index = (canvasY * this.tileSize + canvasX) * 4;
+                                if (data[index + 3] > 0) {
+                                    data[index + 3] = 0;
+                                }
+                            }
+                        }
+                    }
+                    chunkCtx.putImageData(imageData, 0, 0);
+                }
+
                 const chunkBitmap = await chunkCanvas.transferToImageBitmap();
                 this.chunkedTiles.set(tileKey, chunkBitmap);
             }
@@ -475,7 +503,7 @@
                         ctx.drawImage(originalTileBitmap, 0, 0);
                         
                         // Set opacity and draw our solid overlay chunk on top
-                        ctx.globalAlpha = 0.6;
+                        ctx.globalAlpha = state.overlayOpacity;
                         ctx.drawImage(chunkBitmap, 0, 0);
 
                         finalBlob = await canvas.convertToBlob({ type: 'image/png' });
@@ -2666,6 +2694,32 @@ window.addEventListener('message', (event) => {
           </div>
         </div>
 
+        <!-- Overlay Settings Section -->
+        <div style="margin-bottom: 25px;">
+          <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-eye" style="color: #48dbfb; font-size: 16px;"></i>
+            Overlay Settings
+          </label>
+          <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1);">
+              <!-- Opacity Slider -->
+              <div style="margin-bottom: 15px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                   <span style="font-weight: 500; font-size: 13px;">Overlay Opacity</span>
+                   <div id="overlayOpacityValue" style="min-width: 40px; text-align: center; background: rgba(0,0,0,0.2); padding: 4px 8px; border-radius: 6px; font-size: 12px;">${Math.round(state.overlayOpacity * 100)}%</div>
+                </div>
+                <input type="range" id="overlayOpacitySlider" min="0.1" max="1" step="0.05" value="${state.overlayOpacity}" style="width: 100%; -webkit-appearance: none; height: 8px; background: linear-gradient(to right, #48dbfb 0%, #d3a4ff 100%); border-radius: 4px; outline: none; cursor: pointer;">
+              </div>
+              <!-- Blue Marble Toggle -->
+              <label for="enableBlueMarbleToggle" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+                  <div>
+                      <span style="font-weight: 500;">Blue Marble Effect</span>
+                      <p style="font-size: 12px; color: rgba(255,255,255,0.7); margin: 4px 0 0 0;">Renders a dithered "shredded" overlay.</p>
+                  </div>
+                  <input type="checkbox" id="enableBlueMarbleToggle" ${state.blueMarbleEnabled ? 'checked' : ''} style="cursor: pointer; width: 20px; height: 20px;"/>
+              </label>
+          </div>
+        </div>
+
         <!-- Speed Control Section -->
         <div style="margin-bottom: 25px;">
           <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
@@ -2805,7 +2859,7 @@ window.addEventListener('message', (event) => {
           }
         }
 
-        #speedSlider::-webkit-slider-thumb {
+        #speedSlider::-webkit-slider-thumb, #overlayOpacitySlider::-webkit-slider-thumb {
           -webkit-appearance: none;
           width: 18px;
           height: 18px;
@@ -2816,12 +2870,12 @@ window.addEventListener('message', (event) => {
           transition: all 0.2s ease;
         }
 
-        #speedSlider::-webkit-slider-thumb:hover {
+        #speedSlider::-webkit-slider-thumb:hover, #overlayOpacitySlider::-webkit-slider-thumb:hover {
           transform: scale(1.2);
           box-shadow: 0 4px 8px rgba(0,0,0,0.4), 0 0 0 3px #4facfe;
         }
 
-        #speedSlider::-moz-range-thumb {
+        #speedSlider::-moz-range-thumb, #overlayOpacitySlider::-moz-range-thumb {
           width: 18px;
           height: 18px;
           border-radius: 50%;
@@ -3162,94 +3216,29 @@ window.addEventListener('message', (event) => {
         })
       }
 
-      const primaryColor = settingsContainer.querySelector("#primaryColor")
-      const primaryColorText = settingsContainer.querySelector("#primaryColorText")
-      const secondaryColor = settingsContainer.querySelector("#secondaryColor")
-      const secondaryColorText = settingsContainer.querySelector("#secondaryColorText")
-      const highlightColor = settingsContainer.querySelector("#highlightColor")
-      const highlightColorText = settingsContainer.querySelector("#highlightColorText")
-      const borderRadiusSlider = settingsContainer.querySelector("#borderRadiusSlider")
-      const borderRadiusValue = settingsContainer.querySelector("#borderRadiusValue")
-      const applyChangesBtn = settingsContainer.querySelector("#applyThemeChanges")
-      const resetDefaultsBtn = settingsContainer.querySelector("#resetThemeDefaults")
+    const overlayOpacitySlider = settingsContainer.querySelector("#overlayOpacitySlider");
+    const overlayOpacityValue = settingsContainer.querySelector("#overlayOpacityValue");
+    const enableBlueMarbleToggle = settingsContainer.querySelector("#enableBlueMarbleToggle");
 
-      if (primaryColor && primaryColorText) {
-        primaryColor.addEventListener("input", (e) => {
-          primaryColorText.value = e.target.value
-        })
-        primaryColorText.addEventListener("input", (e) => {
-          if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
-            primaryColor.value = e.target.value
-          }
-        })
-      }
+    if (overlayOpacitySlider && overlayOpacityValue) {
+        overlayOpacitySlider.addEventListener('input', (e) => {
+            const opacity = parseFloat(e.target.value);
+            state.overlayOpacity = opacity;
+            overlayOpacityValue.textContent = `${Math.round(opacity * 100)}%`;
+        });
+    }
 
-      if (secondaryColor && secondaryColorText) {
-        secondaryColor.addEventListener("input", (e) => {
-          secondaryColorText.value = e.target.value
-        })
-        secondaryColorText.addEventListener("input", (e) => {
-          if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
-            secondaryColor.value = e.target.value
-          }
-        })
-      }
-
-      if (highlightColor && highlightColorText) {
-        highlightColor.addEventListener("input", (e) => {
-          highlightColorText.value = e.target.value
-        })
-        highlightColorText.addEventListener("input", (e) => {
-          if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
-            highlightColor.value = e.target.value
-          }
-        })
-      }
-
-      if (borderRadiusSlider && borderRadiusValue) {
-        borderRadiusSlider.addEventListener("input", (e) => {
-          borderRadiusValue.textContent = e.target.value + "px"
-        })
-      }
-
-      if (applyChangesBtn) {
-        applyChangesBtn.addEventListener("click", () => {
-          const currentTheme = getCurrentTheme()
-          const currentThemeName = CONFIG.currentTheme
-
-          const newValues = {
-            primary: primaryColorText?.value || currentTheme.primary,
-            secondary: secondaryColorText?.value || currentTheme.secondary,
-            highlight: highlightColorText?.value || currentTheme.highlight,
-            borderRadius: (borderRadiusSlider?.value || 0) + "px",
-            animations: {
-              glow: settingsContainer.querySelector("#glowAnimation")?.checked || false,
-              scanline: settingsContainer.querySelector("#scanlineAnimation")?.checked || false,
-              pixelBlink: settingsContainer.querySelector("#pixelBlinkAnimation")?.checked || false
+    if (enableBlueMarbleToggle) {
+        enableBlueMarbleToggle.addEventListener('click', async () => {
+            state.blueMarbleEnabled = enableBlueMarbleToggle.checked;
+            if (state.imageLoaded && overlayManager.imageBitmap) {
+                Utils.showAlert("Re-processing overlay...", "info");
+                await overlayManager.processImageIntoChunks();
+                Utils.showAlert("Overlay updated!", "success");
             }
-          }
+        });
+    }
 
-          CONFIG.THEMES[currentThemeName] = {
-            ...currentTheme,
-            ...newValues
-          }
-
-          saveThemePreference()
-          setTimeout(() => {
-            settingsContainer.style.display = "none"
-            createUI()
-          }, 100)
-        })
-      }
-
-      if (resetDefaultsBtn) {
-        resetDefaultsBtn.addEventListener("click", () => {
-          const confirmReset = confirm("Reset theme to default settings?")
-          if (confirmReset) {
-            location.reload()
-          }
-        })
-      }
     }
 
     const widthSlider = resizeContainer.querySelector("#widthSlider")
@@ -3547,9 +3536,6 @@ window.addEventListener('message', (event) => {
             tempCtx.putImageData(imgData, 0, 0);
             resizePreview.src = tempCanvas.toDataURL();
             resizePreview.style.transform = `scale(${zoomLevel})`;
-            
-            const finalImageBitmap = await createImageBitmap(tempCanvas);
-            await overlayManager.setImage(finalImageBitmap);
         };
 
         const onWidthInput = () => {
@@ -3578,25 +3564,48 @@ window.addEventListener('message', (event) => {
         confirmResize.onclick = async () => {
             const newWidth = parseInt(widthSlider.value, 10);
             const newHeight = parseInt(heightSlider.value, 10);
-            const newPixels = processor.resize(newWidth, newHeight);
-
+            
+            // Generate the final paletted image data
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = newWidth;
+            tempCanvas.height = newHeight;
+            tempCtx.imageSmoothingEnabled = false;
+            tempCtx.drawImage(processor.img, 0, 0, newWidth, newHeight);
+            const imgData = tempCtx.getImageData(0, 0, newWidth, newHeight);
+            const data = imgData.data;
             let totalValidPixels = 0;
-            for (let i = 0; i < newPixels.length; i += 4) {
-                const isTransparent = newPixels[i + 3] < CONFIG.TRANSPARENCY_THRESHOLD;
-                const isWhiteAndSkipped = !state.paintWhitePixels && Utils.isWhitePixel(newPixels[i], newPixels[i+1], newPixels[i+2]);
-                if (!isTransparent && !isWhiteAndSkipped) {
-                    totalValidPixels++;
-                }
-            }
 
-            state.imageData.pixels = newPixels;
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
+                const isTransparent = a < CONFIG.TRANSPARENCY_THRESHOLD;
+                const isWhiteAndSkipped = !state.paintWhitePixels && Utils.isWhitePixel(r, g, b);
+
+                if (isTransparent || isWhiteAndSkipped) {
+                    data[i+3] = 0; // Make it fully transparent for the overlay
+                    continue;
+                }
+                
+                totalValidPixels++;
+                const [nr, ng, nb] = Utils.findClosestPaletteColor(r, g, b, state.activeColorPalette);
+                data[i] = nr;
+                data[i + 1] = ng;
+                data[i + 2] = nb;
+                data[i + 3] = 255;
+            }
+            tempCtx.putImageData(imgData, 0, 0);
+
+            // Save the final pixel data for painting
+            const finalPixelsForPainting = processor.resize(newWidth, newHeight);
+            state.imageData.pixels = finalPixelsForPainting;
             state.imageData.width = newWidth;
             state.imageData.height = newHeight;
             state.imageData.totalPixels = totalValidPixels;
             state.totalPixels = totalValidPixels;
             state.paintedPixels = 0;
 
-            const finalImageBitmap = await createImageBitmap(processor.canvas);
+            // Use the paletted canvas for the overlay
+            const finalImageBitmap = await createImageBitmap(tempCanvas);
             await overlayManager.setImage(finalImageBitmap);
             overlayManager.enable();
             toggleOverlayBtn.classList.add('active');
@@ -3679,6 +3688,7 @@ window.addEventListener('message', (event) => {
           state.imageLoaded = true
           state.lastPosition = { x: 0, y: 0 }
 
+          // Use the original image for the overlay initially
           const imageBitmap = await createImageBitmap(processor.img);
           await overlayManager.setImage(imageBitmap);
           overlayManager.enable();
@@ -3923,7 +3933,7 @@ window.addEventListener('message', (event) => {
         targetRgb = Utils.findClosestPaletteColor(r, g, b, state.activeColorPalette);
       }
 
-          const colorId = findClosestColor(targetRgb, state.availableColors);
+          const colorId = findClosestColor([r, g, b], state.availableColors);
 
           const pixelX = startX + x
           const pixelY = startY + y
@@ -4101,6 +4111,8 @@ window.addEventListener('message', (event) => {
                 autoCaptchaEnabled: document.getElementById('enableAutoCaptchaToggle')?.checked,
                 cooldownChargeThreshold: state.cooldownChargeThreshold,
                 minimized: state.minimized,
+                overlayOpacity: state.overlayOpacity,
+                blueMarbleEnabled: document.getElementById('enableBlueMarbleToggle')?.checked,
             };
             CONFIG.PAINTING_SPEED_ENABLED = settings.paintingSpeedEnabled;
             CONFIG.AUTO_CAPTCHA_ENABLED = settings.autoCaptchaEnabled;
@@ -4122,6 +4134,8 @@ window.addEventListener('message', (event) => {
             state.minimized = settings.minimized ?? false;
             CONFIG.PAINTING_SPEED_ENABLED = settings.paintingSpeedEnabled ?? false;
             CONFIG.AUTO_CAPTCHA_ENABLED = settings.autoCaptchaEnabled ?? false;
+            state.overlayOpacity = settings.overlayOpacity ?? CONFIG.OVERLAY.OPACITY_DEFAULT;
+            state.blueMarbleEnabled = settings.blueMarbleEnabled ?? CONFIG.OVERLAY.BLUE_MARBLE_DEFAULT;
 
             const speedSlider = document.getElementById('speedSlider');
             if (speedSlider) speedSlider.value = state.paintingSpeed;
@@ -4138,6 +4152,13 @@ window.addEventListener('message', (event) => {
             if (cooldownSlider) cooldownSlider.value = state.cooldownChargeThreshold;
             const cooldownValue = document.getElementById('cooldownValue');
             if (cooldownValue) cooldownValue.textContent = state.cooldownChargeThreshold;
+            
+            const overlayOpacitySlider = document.getElementById('overlayOpacitySlider');
+            if (overlayOpacitySlider) overlayOpacitySlider.value = state.overlayOpacity;
+            const overlayOpacityValue = document.getElementById('overlayOpacityValue');
+            if (overlayOpacityValue) overlayOpacityValue.textContent = `${Math.round(state.overlayOpacity * 100)}%`;
+            const enableBlueMarbleToggle = document.getElementById('enableBlueMarbleToggle');
+            if (enableBlueMarbleToggle) enableBlueMarbleToggle.checked = state.blueMarbleEnabled;
 
         } catch (e) {
             console.warn("Could not load bot settings:", e);
