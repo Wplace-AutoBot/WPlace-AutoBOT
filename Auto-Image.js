@@ -1240,10 +1240,12 @@ window.addEventListener('message', (event) => {
       const showAllToggle = container.querySelector('#showAllColorsToggle');
       if (!colorsContainer) return;
 
-      // Sync with currently available colors when panel opens
-      const currentAvailableColors = Utils.extractAvailableColors();
-      if (currentAvailableColors.length > 0) {
-          state.availableColors = currentAvailableColors;
+      // Use already captured colors from state (captured during upload)
+      // Don't re-fetch colors here, use what was captured when user clicked upload
+      if (!state.availableColors || state.availableColors.length === 0) {
+          // If no colors have been captured yet, show message
+          colorsContainer.innerHTML = '<div style="text-align: center; color: #888; padding: 20px;">Upload an image first to capture available colors</div>';
+          return;
       }
 
       function populateColors(showUnavailable = false) {
@@ -3742,6 +3744,10 @@ window.addEventListener('message', (event) => {
             updateUI("colorsFound", "success", { count: availableColors.length });
             updateStats();
             selectPosBtn.disabled = false;
+            // Only enable resize button if image is also loaded
+            if (state.imageLoaded) {
+                resizeBtn.disabled = false;
+            }
         }
 
         try {
@@ -3787,7 +3793,10 @@ window.addEventListener('message', (event) => {
           toggleOverlayBtn.disabled = false;
           toggleOverlayBtn.classList.add('active');
 
-          resizeBtn.disabled = false
+          // Only enable resize button if colors have also been captured
+          if (state.colorsChecked) {
+              resizeBtn.disabled = false;
+          }
           saveBtn.disabled = false
 
           if (state.startPosition) {
@@ -3805,8 +3814,10 @@ window.addEventListener('message', (event) => {
 
     if (resizeBtn) {
       resizeBtn.addEventListener("click", () => {
-        if (state.imageLoaded && state.imageData.processor) {
+        if (state.imageLoaded && state.imageData.processor && state.colorsChecked) {
           showResizeDialog(state.imageData.processor)
+        } else if (!state.colorsChecked) {
+          Utils.showAlert("Please upload an image first to capture available colors", "warning")
         }
       })
     }
@@ -3974,8 +3985,6 @@ window.addEventListener('message', (event) => {
     }
 
     loadBotSettings();
-    
-    initializeColorPalette(resizeContainer);
   }
 
   async function processImage() {
