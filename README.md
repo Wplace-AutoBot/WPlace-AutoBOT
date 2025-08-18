@@ -15,8 +15,7 @@ This project was fork from https://github.com/DarkModde/WPlace-AutoBOT
 <br>
 
 <p align="center">
-  <sub><strong>It wasn't me who "hacked" WPlace and placed that giant Herobrine there...<br>
-  But if you're wondering: yes! These scripts were made by a Brazilian and VietNamese. HUEHUE!</strong></sub>
+  If you're wondering—yes! These scripts were created by a team consisting of Brazilians, Vietnamese, and Indonesians. HUEHUE!</strong></sub>
 </p>
 
 ---
