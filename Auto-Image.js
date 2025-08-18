@@ -1,15 +1,15 @@
-;(async () => {
+(async () => {
   // CONFIGURATION CONSTANTS
   const CONFIG = {
     COOLDOWN_DEFAULT: 31000,
     TRANSPARENCY_THRESHOLD: 100,
     WHITE_THRESHOLD: 250,
     LOG_INTERVAL: 10,
-  PAINTING_SPEED: {
+    PAINTING_SPEED: {
       MIN: 1,          // Minimum 1 pixel per second
       MAX: 1000,       // Maximum 1000 pixels per second
       DEFAULT: 5,      // Default 5 pixels per second
-  },
+    },
     PAINTING_SPEED_ENABLED: false,
     AUTO_CAPTCHA_ENABLED: false, // Disabled by default
     COOLDOWN_CHARGE_THRESHOLD: 1, // Default wait threshold
@@ -20,70 +20,70 @@
     // --- START: Color data from colour-converter.js ---
     // New color structure with proper ID mapping
     COLOR_MAP: {
-      0: {id: 1, name: 'Black', rgb: {r: 0, g: 0, b: 0}},
-      1: {id: 2, name: 'Dark Gray', rgb: {r: 60, g: 60, b: 60}},
-      2: {id: 3, name: 'Gray', rgb: {r: 120, g: 120, b: 120}},
-      3: {id: 4, name: 'Light Gray', rgb: {r: 210, g: 210, b: 210}},
-      4: {id: 5, name: 'White', rgb: {r: 255, g: 255, b: 255}},
-      5: {id: 6, name: 'Deep Red', rgb: {r: 96, g: 0, b: 24}},
-      6: {id: 7, name: 'Red', rgb: {r: 237, g: 28, b: 36}},
-      7: {id: 8, name: 'Orange', rgb: {r: 255, g: 127, b: 39}},
-      8: {id: 9, name: 'Gold', rgb: {r: 246, g: 170, b: 9}},
-      9: {id: 10, name: 'Yellow', rgb: {r: 249, g: 221, b: 59}},
-      10: {id: 11, name: 'Light Yellow', rgb: {r: 255, g: 250, b: 188}},
-      11: {id: 12, name: 'Dark Green', rgb: {r: 14, g: 185, b: 104}},
-      12: {id: 13, name: 'Green', rgb: {r: 19, g: 230, b: 123}},
-      13: {id: 14, name: 'Light Green', rgb: {r: 135, g: 255, b: 94}},
-      14: {id: 15, name: 'Dark Teal', rgb: {r: 12, g: 129, b: 110}},
-      15: {id: 16, name: 'Teal', rgb: {r: 16, g: 174, b: 166}},
-      16: {id: 17, name: 'Light Teal', rgb: {r: 19, g: 225, b: 190}},
-      17: {id: 20, name: 'Cyan', rgb: {r: 96, g: 247, b: 242}},
-      18: {id: 44, name: 'Light Cyan', rgb: {r: 187, g: 250, b: 242}},
-      19: {id: 18, name: 'Dark Blue', rgb: {r: 40, g: 80, b: 158}},
-      20: {id: 19, name: 'Blue', rgb: {r: 64, g: 147, b: 228}},
-      21: {id: 21, name: 'Indigo', rgb: {r: 107, g: 80, b: 246}},
-      22: {id: 22, name: 'Light Indigo', rgb: {r: 153, g: 177, b: 251}},
-      23: {id: 23, name: 'Dark Purple', rgb: {r: 120, g: 12, b: 153}},
-      24: {id: 24, name: 'Purple', rgb: {r: 170, g: 56, b: 185}},
-      25: {id: 25, name: 'Light Purple', rgb: {r: 224, g: 159, b: 249}},
-      26: {id: 26, name: 'Dark Pink', rgb: {r: 203, g: 0, b: 122}},
-      27: {id: 27, name: 'Pink', rgb: {r: 236, g: 31, b: 128}},
-      28: {id: 28, name: 'Light Pink', rgb: {r: 243, g: 141, b: 169}},
-      29: {id: 29, name: 'Dark Brown', rgb: {r: 104, g: 70, b: 52}},
-      30: {id: 30, name: 'Brown', rgb: {r: 149, g: 104, b: 42}},
-      31: {id: 31, name: 'Beige', rgb: {r: 248, g: 178, b: 119}},
-      32: {id: 52, name: 'Light Beige', rgb: {r: 255, g: 197, b: 165}},
-      33: {id: 32, name: 'Medium Gray', rgb: {r: 170, g: 170, b: 170}},
-      34: {id: 33, name: 'Dark Red', rgb: {r: 165, g: 14, b: 30}},
-      35: {id: 34, name: 'Light Red', rgb: {r: 250, g: 128, b: 114}},
-      36: {id: 35, name: 'Dark Orange', rgb: {r: 228, g: 92, b: 26}},
-      37: {id: 37, name: 'Dark Goldenrod', rgb: {r: 156, g: 132, b: 49}},
-      38: {id: 38, name: 'Goldenrod', rgb: {r: 197, g: 173, b: 49}},
-      39: {id: 39, name: 'Light Goldenrod', rgb: {r: 232, g: 212, b: 95}},
-      40: {id: 40, name: 'Dark Olive', rgb: {r: 74, g: 107, b: 58}},
-      41: {id: 41, name: 'Olive', rgb: {r: 90, g: 148, b: 74}},
-      42: {id: 42, name: 'Light Olive', rgb: {r: 132, g: 197, b: 115}},
-      43: {id: 43, name: 'Dark Cyan', rgb: {r: 15, g: 121, b: 159}},
-      44: {id: 45, name: 'Light Blue', rgb: {r: 125, g: 199, b: 255}},
-      45: {id: 46, name: 'Dark Indigo', rgb: {r: 77, g: 49, b: 184}},
-      46: {id: 47, name: 'Dark Slate Blue', rgb: {r: 74, g: 66, b: 132}},
-      47: {id: 48, name: 'Slate Blue', rgb: {r: 122, g: 113, b: 196}},
-      48: {id: 49, name: 'Light Slate Blue', rgb: {r: 181, g: 174, b: 241}},
-      49: {id: 53, name: 'Dark Peach', rgb: {r: 155, g: 82, b: 73}},
-      50: {id: 54, name: 'Peach', rgb: {r: 209, g: 128, b: 120}},
-      51: {id: 55, name: 'Light Peach', rgb: {r: 250, g: 182, b: 164}},
-      52: {id: 50, name: 'Light Brown', rgb: {r: 219, g: 164, b: 99}},
-      53: {id: 56, name: 'Dark Tan', rgb: {r: 123, g: 99, b: 82}},
-      54: {id: 57, name: 'Tan', rgb: {r: 156, g: 132, b: 107}},
-      55: {id: 36, name: 'Light Tan', rgb: {r: 214, g: 181, b: 148}},
-      56: {id: 51, name: 'Dark Beige', rgb: {r: 209, g: 128, b: 81}},
-      57: {id: 61, name: 'Dark Stone', rgb: {r: 109, g: 100, b: 63}},
-      58: {id: 62, name: 'Stone', rgb: {r: 148, g: 140, b: 107}},
-      59: {id: 63, name: 'Light Stone', rgb: {r: 205, g: 197, b: 158}},
-      60: {id: 58, name: 'Dark Slate', rgb: {r: 51, g: 57, b: 65}},
-      61: {id: 59, name: 'Slate', rgb: {r: 109, g: 117, b: 141}},
-      62: {id: 60, name: 'Light Slate', rgb: {r: 179, g: 185, b: 209}},
-      63: {id: 0, name: 'Transparent', rgb: null}
+      0: { id: 1, name: 'Black', rgb: { r: 0, g: 0, b: 0 } },
+      1: { id: 2, name: 'Dark Gray', rgb: { r: 60, g: 60, b: 60 } },
+      2: { id: 3, name: 'Gray', rgb: { r: 120, g: 120, b: 120 } },
+      3: { id: 4, name: 'Light Gray', rgb: { r: 210, g: 210, b: 210 } },
+      4: { id: 5, name: 'White', rgb: { r: 255, g: 255, b: 255 } },
+      5: { id: 6, name: 'Deep Red', rgb: { r: 96, g: 0, b: 24 } },
+      6: { id: 7, name: 'Red', rgb: { r: 237, g: 28, b: 36 } },
+      7: { id: 8, name: 'Orange', rgb: { r: 255, g: 127, b: 39 } },
+      8: { id: 9, name: 'Gold', rgb: { r: 246, g: 170, b: 9 } },
+      9: { id: 10, name: 'Yellow', rgb: { r: 249, g: 221, b: 59 } },
+      10: { id: 11, name: 'Light Yellow', rgb: { r: 255, g: 250, b: 188 } },
+      11: { id: 12, name: 'Dark Green', rgb: { r: 14, g: 185, b: 104 } },
+      12: { id: 13, name: 'Green', rgb: { r: 19, g: 230, b: 123 } },
+      13: { id: 14, name: 'Light Green', rgb: { r: 135, g: 255, b: 94 } },
+      14: { id: 15, name: 'Dark Teal', rgb: { r: 12, g: 129, b: 110 } },
+      15: { id: 16, name: 'Teal', rgb: { r: 16, g: 174, b: 166 } },
+      16: { id: 17, name: 'Light Teal', rgb: { r: 19, g: 225, b: 190 } },
+      17: { id: 20, name: 'Cyan', rgb: { r: 96, g: 247, b: 242 } },
+      18: { id: 44, name: 'Light Cyan', rgb: { r: 187, g: 250, b: 242 } },
+      19: { id: 18, name: 'Dark Blue', rgb: { r: 40, g: 80, b: 158 } },
+      20: { id: 19, name: 'Blue', rgb: { r: 64, g: 147, b: 228 } },
+      21: { id: 21, name: 'Indigo', rgb: { r: 107, g: 80, b: 246 } },
+      22: { id: 22, name: 'Light Indigo', rgb: { r: 153, g: 177, b: 251 } },
+      23: { id: 23, name: 'Dark Purple', rgb: { r: 120, g: 12, b: 153 } },
+      24: { id: 24, name: 'Purple', rgb: { r: 170, g: 56, b: 185 } },
+      25: { id: 25, name: 'Light Purple', rgb: { r: 224, g: 159, b: 249 } },
+      26: { id: 26, name: 'Dark Pink', rgb: { r: 203, g: 0, b: 122 } },
+      27: { id: 27, name: 'Pink', rgb: { r: 236, g: 31, b: 128 } },
+      28: { id: 28, name: 'Light Pink', rgb: { r: 243, g: 141, b: 169 } },
+      29: { id: 29, name: 'Dark Brown', rgb: { r: 104, g: 70, b: 52 } },
+      30: { id: 30, name: 'Brown', rgb: { r: 149, g: 104, b: 42 } },
+      31: { id: 31, name: 'Beige', rgb: { r: 248, g: 178, b: 119 } },
+      32: { id: 52, name: 'Light Beige', rgb: { r: 255, g: 197, b: 165 } },
+      33: { id: 32, name: 'Medium Gray', rgb: { r: 170, g: 170, b: 170 } },
+      34: { id: 33, name: 'Dark Red', rgb: { r: 165, g: 14, b: 30 } },
+      35: { id: 34, name: 'Light Red', rgb: { r: 250, g: 128, b: 114 } },
+      36: { id: 35, name: 'Dark Orange', rgb: { r: 228, g: 92, b: 26 } },
+      37: { id: 37, name: 'Dark Goldenrod', rgb: { r: 156, g: 132, b: 49 } },
+      38: { id: 38, name: 'Goldenrod', rgb: { r: 197, g: 173, b: 49 } },
+      39: { id: 39, name: 'Light Goldenrod', rgb: { r: 232, g: 212, b: 95 } },
+      40: { id: 40, name: 'Dark Olive', rgb: { r: 74, g: 107, b: 58 } },
+      41: { id: 41, name: 'Olive', rgb: { r: 90, g: 148, b: 74 } },
+      42: { id: 42, name: 'Light Olive', rgb: { r: 132, g: 197, b: 115 } },
+      43: { id: 43, name: 'Dark Cyan', rgb: { r: 15, g: 121, b: 159 } },
+      44: { id: 45, name: 'Light Blue', rgb: { r: 125, g: 199, b: 255 } },
+      45: { id: 46, name: 'Dark Indigo', rgb: { r: 77, g: 49, b: 184 } },
+      46: { id: 47, name: 'Dark Slate Blue', rgb: { r: 74, g: 66, b: 132 } },
+      47: { id: 48, name: 'Slate Blue', rgb: { r: 122, g: 113, b: 196 } },
+      48: { id: 49, name: 'Light Slate Blue', rgb: { r: 181, g: 174, b: 241 } },
+      49: { id: 53, name: 'Dark Peach', rgb: { r: 155, g: 82, b: 73 } },
+      50: { id: 54, name: 'Peach', rgb: { r: 209, g: 128, b: 120 } },
+      51: { id: 55, name: 'Light Peach', rgb: { r: 250, g: 182, b: 164 } },
+      52: { id: 50, name: 'Light Brown', rgb: { r: 219, g: 164, b: 99 } },
+      53: { id: 56, name: 'Dark Tan', rgb: { r: 123, g: 99, b: 82 } },
+      54: { id: 57, name: 'Tan', rgb: { r: 156, g: 132, b: 107 } },
+      55: { id: 36, name: 'Light Tan', rgb: { r: 214, g: 181, b: 148 } },
+      56: { id: 51, name: 'Dark Beige', rgb: { r: 209, g: 128, b: 81 } },
+      57: { id: 61, name: 'Dark Stone', rgb: { r: 109, g: 100, b: 63 } },
+      58: { id: 62, name: 'Stone', rgb: { r: 148, g: 140, b: 107 } },
+      59: { id: 63, name: 'Light Stone', rgb: { r: 205, g: 197, b: 158 } },
+      60: { id: 58, name: 'Dark Slate', rgb: { r: 51, g: 57, b: 65 } },
+      61: { id: 59, name: 'Slate', rgb: { r: 109, g: 117, b: 141 } },
+      62: { id: 60, name: 'Light Slate', rgb: { r: 179, g: 185, b: 209 } },
+      63: { id: 0, name: 'Transparent', rgb: null }
     },
     // --- END: Color data ---
     // Optimized CSS Classes for reuse
@@ -211,425 +211,425 @@
   // BILINGUAL TEXT STRINGS
   const TEXT = {
     en: {
-    title: "WPlace Auto-Image",
-    toggleOverlay: "Toggle Overlay",
-    scanColors: "Scan Colors",
-    uploadImage: "Upload Image",
-    resizeImage: "Resize Image",
-    selectPosition: "Select Position",
-    startPainting: "Start Painting",
-    stopPainting: "Stop Painting",
-    checkingColors: "🔍 Checking available colors...",
-    noColorsFound: "❌ Open the color palette on the site and try again!",
-    colorsFound: "✅ {count} available colors found. Ready to upload.",
-    loadingImage: "🖼️ Loading image...",
-    imageLoaded: "✅ Image loaded with {count} valid pixels",
-    imageError: "❌ Error loading image",
-    selectPositionAlert: "Paint the first pixel at the location where you want the art to start!",
-    waitingPosition: "👆 Waiting for you to paint the reference pixel...",
-    positionSet: "✅ Position set successfully!",
-    positionTimeout: "❌ Timeout for position selection",
-    startPaintingMsg: "🎨 Starting painting...",
-    paintingProgress: "🧱 Progress: {painted}/{total} pixels...",
-    noCharges: "⌛ No charges. Waiting {time}...",
-    paintingStopped: "⏹️ Painting stopped by user",
-    paintingComplete: "✅ Painting complete! {count} pixels painted.",
-    paintingError: "❌ Error during painting",
-    missingRequirements: "❌ Load an image and select a position first",
-    progress: "Progress",
-    pixels: "Pixels",
-    charges: "Charges",
-    estimatedTime: "Estimated time",
-    initMessage: "Click 'Upload Image' to begin",
-    waitingInit: "Waiting for initialization...",
-    resizeSuccess: "✅ Image resized to {width}x{height}",
-    paintingPaused: "⏸️ Painting paused at position X: {x}, Y: {y}",
-    captchaNeeded: "❗ CAPTCHA token needed. Paint one pixel manually to continue.",
-    saveData: "Save Progress",
-    loadData: "Load Progress",
-    saveToFile: "Save to File",
-    loadFromFile: "Load from File",
-    dataManager: "Data Manager",
-    autoSaved: "✅ Progress saved automatically",
-    dataLoaded: "✅ Progress loaded successfully",
-    fileSaved: "✅ Progress saved to file successfully",
-    fileLoaded: "✅ Progress loaded from file successfully",
-    noSavedData: "❌ No saved progress found",
-    savedDataFound: "✅ Saved progress found! Load to continue?",
-    savedDate: "Saved on: {date}",
-    clickLoadToContinue: "Click 'Load Progress' to continue.",
-    fileError: "❌ Error processing file",
-    invalidFileFormat: "❌ Invalid file format",
-    paintingSpeed: "Painting Speed",
-    pixelsPerSecond: "pixels/second",
-    speedSetting: "Speed: {speed} pixels/sec",
-    settings: "Settings",
-    botSettings: "Bot Settings",
-    close: "Close",
-    language: "Language",
-    themeSettings: "Theme Settings",
-    themeSettingsDesc: "Choose your preferred color theme for the interface.",
-    languageSelectDesc: "Select your preferred language. Changes will take effect immediately.",
-    autoCaptcha: "Auto-CAPTCHA Solver",
-    autoCaptchaDesc: "Automatically attempts to solve the CAPTCHA by simulating a manual pixel placement when the token expires.",
-    applySettings: "Apply Settings",
-    settingsSaved: "✅ Settings saved successfully!",
-    cooldownSettings: "Cooldown Settings",
-    waitCharges: "Wait until charges reach",
-    captchaSolving: "🤖 Attempting to solve CAPTCHA...",
-    captchaFailed: "❌ Auto-CAPTCHA failed. Paint a pixel manually.",
-    automation: "Automation",
-    noChargesThreshold: "⌛ Waiting for charges to reach {threshold}. Currently {current}. Next in {time}...",
-  },
-  ru: {
-    title: "WPlace Авто-Изображение",
-    scanColors: "Сканировать цвета",
-    uploadImage: "Загрузить изображение",
-    resizeImage: "Изменить размер изображения",
-    selectPosition: "Выбрать позицию",
-    startPainting: "Начать рисование",
-    stopPainting: "Остановить рисование",
-    checkingColors: "🔍 Проверка доступных цветов...",
-    noColorsFound: "❌ Откройте палитру цветов на сайте и попробуйте снова!",
-    colorsFound: "✅ Найдено доступных цветов: {count}. Готово к загрузке.",
-    loadingImage: "🖼️ Загрузка изображения...",
-    imageLoaded: "✅ Изображение загружено, валидных пикселей: {count}",
-    imageError: "❌ Ошибка при загрузке изображения",
-    selectPositionAlert: "Нарисуйте первый пиксель в месте, откуда начнётся рисунок!",
-    waitingPosition: "👆 Ожидание, пока вы нарисуете опорный пиксель...",
-    positionSet: "✅ Позиция успешно установлена!",
-    positionTimeout: "❌ Время ожидания выбора позиции истекло",
-    startPaintingMsg: "🎨 Начинаем рисование...",
-    paintingProgress: "🧱 Прогресс: {painted}/{total} пикселей...",
-    noCharges: "⌛ Нет зарядов. Ожидание {time}...",
-    paintingStopped: "⏹️ Рисование остановлено пользователем",
-    paintingComplete: "✅ Рисование завершено! Нарисовано пикселей: {count}.",
-    paintingError: "❌ Ошибка во время рисования",
-    missingRequirements: "❌ Сначала загрузите изображение и выберите позицию",
-    progress: "Прогресс",
-    pixels: "Пиксели",
-    charges: "Заряды",
-    estimatedTime: "Примерное время",
-    initMessage: "Нажмите 'Загрузить изображение', чтобы начать",
-    waitingInit: "Ожидание инициализации...",
-    resizeSuccess: "✅ Изображение изменено до {width}x{height}",
-    paintingPaused: "⏸️ Рисование приостановлено на позиции X: {x}, Y: {y}",
-    captchaNeeded: "❗ Требуется токен CAPTCHA. Нарисуйте один пиксель вручную, чтобы продолжить.",
-    saveData: "Сохранить прогресс",
-    loadData: "Загрузить прогресс",
-    saveToFile: "Сохранить в файл",
-    loadFromFile: "Загрузить из файла",
-    dataManager: "Менеджер данных",
-    autoSaved: "✅ Прогресс сохранён автоматически",
-    dataLoaded: "✅ Прогресс успешно загружен",
-    fileSaved: "✅ Прогресс успешно сохранён в файл",
-    fileLoaded: "✅ Прогресс успешно загружен из файла",
-    noSavedData: "❌ Сохранённый прогресс не найден",
-    savedDataFound: "✅ Найден сохранённый прогресс! Загрузить, чтобы продолжить?",
-    savedDate: "Сохранено: {date}",
-    clickLoadToContinue: "Нажмите 'Загрузить прогресс', чтобы продолжить.",
-    fileError: "❌ Ошибка при обработке файла",
-    invalidFileFormat: "❌ Неверный формат файла",
-    paintingSpeed: "Скорость рисования",
-    pixelsPerSecond: "пикселей/сек",
-    speedSetting: "Скорость: {speed} пикс./сек",
-    settings: "Настройки",
-    botSettings: "Настройки бота",
-    close: "Закрыть",
-    language: "Язык",
-    themeSettings: "Настройки темы",
-    themeSettingsDesc: "Выберите предпочтительную цветовую тему интерфейса.",
-    languageSelectDesc: "Выберите предпочтительный язык. Изменения вступят в силу немедленно.",
-    autoCaptcha: "Авто-решение CAPTCHA",
-    autoCaptchaDesc: "Автоматически пытается решить CAPTCHA, симулируя ручное размещение пикселя, когда токен истекает.",
-    applySettings: "Применить настройки",
-    settingsSaved: "✅ Настройки успешно сохранены!",
-    cooldownSettings: "Настройки перезарядки",
-    waitCharges: "Ждать до накопления зарядов",
-    captchaSolving: "🤖 Пытаюсь решить CAPTCHA...",
-    captchaFailed: "❌ Не удалось решить CAPTCHA. Нарисуйте пиксель вручную.",
-    automation: "Автоматизация",
-    noChargesThreshold: "⌛ Ожидание зарядов до {threshold}. Сейчас {current}. Следующий через {time}...",
-},
-  pt: {
-    title: "WPlace Auto-Image",
-    scanColors: "Escanear Cores",
-    uploadImage: "Upload da Imagem",
-    resizeImage: "Redimensionar Imagem",
-    selectPosition: "Selecionar Posição",
-    startPainting: "Iniciar Pintura",
-    stopPainting: "Parar Pintura",
-    checkingColors: "🔍 Verificando cores disponíveis...",
-    noColorsFound: "❌ Abra a paleta de cores no site e tente novamente!",
-    colorsFound: "✅ {count} cores encontradas. Pronto para upload.",
-    loadingImage: "🖼️ Carregando imagem...",
-    imageLoaded: "✅ Imagem carregada com {count} pixels válidos",
-    imageError: "❌ Erro ao carregar imagem",
-    selectPositionAlert: "Pinte o primeiro pixel на localização onde deseja que a arte comece!",
-    waitingPosition: "👆 Aguardando você pintar o pixel de referência...",
-    positionSet: "✅ Posição definida com sucesso!",
-    positionTimeout: "❌ Tempo esgotado para selecionar posição",
-    startPaintingMsg: "🎨 Iniciando pintura...",
-    paintingProgress: "🧱 Progresso: {painted}/{total} pixels...",
-    noCharges: "⌛ Sem cargas. Aguardando {time}...",
-    paintingStopped: "⏹️ Pintura interromпида pelo usuário",
-    paintingComplete: "✅ Pintura concluída! {count} pixels pintados.",
-    paintingError: "❌ Erro durante a pintura",
-    missingRequirements: "❌ Carregue uma imagem e selecione uma posição primeiro",
-    progress: "Progresso",
-    pixels: "Pixels",
-    charges: "Cargas",
-    estimatedTime: "Tempo estimado",
-    initMessage: "Clique em 'Upload da Imagem' para começar",
-    waitingInit: "Aguardando inicialização...",
-    resizeSuccess: "✅ Imagem redimensionada для {width}x{height}",
-    paintingPaused: "⏸️ Pintura pausada na posição X: {x}, Y: {y}",
-    captchaNeeded: "❗ Token CAPTCHA necessário. Pinte um pixel manualmente para continuar.",
-    saveData: "Salvar Progresso",
-    loadData: "Carregar Progresso",
-    saveToFile: "Salvar em Arquivo",
-    loadFromFile: "Carregar de Arquivo",
-    dataManager: "Dados",
-    autoSaved: "✅ Progresso salvo automaticamente",
-    dataLoaded: "✅ Progresso carregado com sucesso",
-    fileSaved: "✅ Salvo em arquivo com sucesso",
-    fileLoaded: "✅ Carregado de arquivo com sucesso",
-    noSavedData: "❌ Nenhum progresso salvo encontrado",
-    savedDataFound: "✅ Progresso salvo encontrado! Carregar para continuar?",
-    savedDate: "Salvo em: {date}",
-    clickLoadToContinue: "Clique em 'Carregar Progresso' para continuar.",
-    fileError: "❌ Erro ao processar arquivo",
-    invalidFileFormat: "❌ Formato de arquivo inválido",
-    paintingSpeed: "Velocidade de Pintura",
-    pixelsPerSecond: "pixels/segundo",
-    speedSetting: "Velocidade: {speed} pixels/seg",
-    settings: "Configurações",
-    botSettings: "Configurações do Bot",
-    close: "Fechar",
-    language: "Idioma",
-    themeSettings: "Configurações de Tema",
-    themeSettingsDesc: "Escolha seu tema de cores preferido para a interface.",
-    languageSelectDesc: "Selecione seu idioma preferido. As alterações terão efeito imediatamente.",
-    autoCaptcha: "Resolvedor de CAPTCHA Automático",
-    autoCaptchaDesc: "Tenta resolver o CAPTCHA automaticamente simulando a colocação manual de um pixel quando o token expira.",
-    applySettings: "Aplicar Configurações",
-    settingsSaved: "✅ Configurações salvas com sucesso!",
-    cooldownSettings: "Configurações de Cooldown",
-    waitCharges: "Aguardar até as cargas atingirem",
-    captchaSolving: "🤖 Tentando resolver o CAPTCHA...",
-    captchaFailed: "❌ Falha ao resolver CAPTCHA. Pinte um pixel manualmente.",
-    automation: "Automação",
-    noChargesThreshold: "⌛ Aguardando cargas atingirem {threshold}. Atual: {current}. Próxima em {time}...",
-  },
-  vi: {
-    title: "WPlace Auto-Image",
-    scanColors: "Quét màu",
-    uploadImage: "Tải lên hình ảnh",
-    resizeImage: "Thay đổi kích thước",
-    selectPosition: "Chọn vị trí",
-    startPainting: "Bắt đầu vẽ",
-    stopPainting: "Dừng vẽ",
-    checkingColors: "🔍 Đang kiểm tra màu sắc có sẵn...",
-    noColorsFound: "❌ Hãy mở bảng màu trên trang web và thử lại!",
-    colorsFound: "✅ Tìm thấy {count} màu. Sẵn sàng để tải lên.",
-    loadingImage: "🖼️ Đang tải hình ảnh...",
-    imageLoaded: "✅ Đã tải hình ảnh với {count} pixel hợp lệ",
-    imageError: "❌ Lỗi khi tải hình ảnh",
-    selectPositionAlert: "Vẽ pixel đầu tiên tại vị trí bạn muốn tác phẩm nghệ thuật bắt đầu!",
-    waitingPosition: "👆 Đang chờ bạn vẽ pixel tham chiếu...",
-    positionSet: "✅ Đã đặt vị trí thành công!",
-    positionTimeout: "❌ Hết thời gian chọn vị trí",
-    startPaintingMsg: "🎨 Bắt đầu vẽ...",
-    paintingProgress: "🧱 Tiến trình: {painted}/{total} pixel...",
-    noCharges: "⌛ Không có điện tích. Đang chờ {time}...",
-    paintingStopped: "⏹️ Người dùng đã dừng vẽ",
-    paintingComplete: "✅ Hoàn thành vẽ! Đã vẽ {count} pixel.",
-    paintingError: "❌ Lỗi trong quá trình vẽ",
-    missingRequirements: "❌ Hãy tải lên hình ảnh và chọn vị trí trước",
-    progress: "Tiến trình",
-    pixels: "Pixel",
-    charges: "Điện tích",
-    estimatedTime: "Thời gian ước tính",
-    initMessage: "Nhấp 'Tải lên hình ảnh' để bắt đầu",
-    waitingInit: "Đang chờ khởi tạo...",
-    resizeSuccess: "✅ Đã thay đổi kích thước hình ảnh thành {width}x{height}",
-    paintingPaused: "⏸️ Tạm dừng vẽ tại vị trí X: {x}, Y: {y}",
-    captchaNeeded: "❗ Cần token CAPTCHA. Vẽ một pixel thủ công để tiếp tục.",
-    saveData: "Lưu tiến trình",
-    loadData: "Tải tiến trình",
-    saveToFile: "Lưu vào tệp",
-    loadFromFile: "Tải từ tệp",
-    dataManager: "Dữ liệu",
-    autoSaved: "✅ Đã tự động lưu tiến trình",
-    dataLoaded: "✅ Đã tải tiến trình thành công",
-    fileSaved: "✅ Đã lưu vào tệp thành công",
-    fileLoaded: "✅ Đã tải từ tệp thành công",
-    noSavedData: "❌ Không tìm thấy tiến trình đã lưu",
-    savedDataFound: "✅ Tìm thấy tiến trình đã lưu! Tải để tiếp tục?",
-    savedDate: "Đã lưu vào: {date}",
-    clickLoadToContinue: "Nhấp 'Tải tiến trình' để tiếp tục.",
-    fileError: "❌ Lỗi khi xử lý tệp",
-    invalidFileFormat: "❌ Định dạng tệp không hợp lệ",
-    paintingSpeed: "Tốc độ vẽ",
-    pixelsPerSecond: "pixel/giây",
-    speedSetting: "Tốc độ: {speed} pixel/giây",
-    settings: "Cài đặt",
-    botSettings: "Cài đặt Bot",
-    close: "Đóng",
-    language: "Ngôn ngữ",
-    themeSettings: "Cài đặt Giao diện",
-    themeSettingsDesc: "Chọn chủ đề màu sắc yêu thích cho giao diện.",
-    languageSelectDesc: "Chọn ngôn ngữ ưa thích. Thay đổi sẽ có hiệu lực ngay lập tức.",
-    autoCaptcha: "Tự động giải CAPTCHA",
-    autoCaptchaDesc: "Tự động cố gắng giải CAPTCHA bằng cách mô phỏng việc đặt pixel thủ công khi token hết hạn.",
-    applySettings: "Áp dụng cài đặt",
-    settingsSaved: "✅ Đã lưu cài đặt thành công!",
-    cooldownSettings: "Cài đặt thời gian chờ",
-    waitCharges: "Chờ cho đến khi số lần sạc đạt",
-    captchaSolving: "🤖 Đang cố gắng giải CAPTCHA...",
-    captchaFailed: "❌ Giải CAPTCHA tự động thất bại. Vui lòng vẽ một pixel thủ công.",
-    automation: "Tự động hóa",
-    noChargesThreshold: "⌛ Đang chờ số lần sạc đạt {threshold}. Hiện tại {current}. Lần tiếp theo trong {time}...",
+      title: "WPlace Auto-Image",
+      toggleOverlay: "Toggle Overlay",
+      scanColors: "Scan Colors",
+      uploadImage: "Upload Image",
+      resizeImage: "Resize Image",
+      selectPosition: "Select Position",
+      startPainting: "Start Painting",
+      stopPainting: "Stop Painting",
+      checkingColors: "🔍 Checking available colors...",
+      noColorsFound: "❌ Open the color palette on the site and try again!",
+      colorsFound: "✅ {count} available colors found. Ready to upload.",
+      loadingImage: "🖼️ Loading image...",
+      imageLoaded: "✅ Image loaded with {count} valid pixels",
+      imageError: "❌ Error loading image",
+      selectPositionAlert: "Paint the first pixel at the location where you want the art to start!",
+      waitingPosition: "👆 Waiting for you to paint the reference pixel...",
+      positionSet: "✅ Position set successfully!",
+      positionTimeout: "❌ Timeout for position selection",
+      startPaintingMsg: "🎨 Starting painting...",
+      paintingProgress: "🧱 Progress: {painted}/{total} pixels...",
+      noCharges: "⌛ No charges. Waiting {time}...",
+      paintingStopped: "⏹️ Painting stopped by user",
+      paintingComplete: "✅ Painting complete! {count} pixels painted.",
+      paintingError: "❌ Error during painting",
+      missingRequirements: "❌ Load an image and select a position first",
+      progress: "Progress",
+      pixels: "Pixels",
+      charges: "Charges",
+      estimatedTime: "Estimated time",
+      initMessage: "Click 'Upload Image' to begin",
+      waitingInit: "Waiting for initialization...",
+      resizeSuccess: "✅ Image resized to {width}x{height}",
+      paintingPaused: "⏸️ Painting paused at position X: {x}, Y: {y}",
+      captchaNeeded: "❗ CAPTCHA token needed. Paint one pixel manually to continue.",
+      saveData: "Save Progress",
+      loadData: "Load Progress",
+      saveToFile: "Save to File",
+      loadFromFile: "Load from File",
+      dataManager: "Data Manager",
+      autoSaved: "✅ Progress saved automatically",
+      dataLoaded: "✅ Progress loaded successfully",
+      fileSaved: "✅ Progress saved to file successfully",
+      fileLoaded: "✅ Progress loaded from file successfully",
+      noSavedData: "❌ No saved progress found",
+      savedDataFound: "✅ Saved progress found! Load to continue?",
+      savedDate: "Saved on: {date}",
+      clickLoadToContinue: "Click 'Load Progress' to continue.",
+      fileError: "❌ Error processing file",
+      invalidFileFormat: "❌ Invalid file format",
+      paintingSpeed: "Painting Speed",
+      pixelsPerSecond: "pixels/second",
+      speedSetting: "Speed: {speed} pixels/sec",
+      settings: "Settings",
+      botSettings: "Bot Settings",
+      close: "Close",
+      language: "Language",
+      themeSettings: "Theme Settings",
+      themeSettingsDesc: "Choose your preferred color theme for the interface.",
+      languageSelectDesc: "Select your preferred language. Changes will take effect immediately.",
+      autoCaptcha: "Auto-CAPTCHA Solver",
+      autoCaptchaDesc: "Automatically attempts to solve the CAPTCHA by simulating a manual pixel placement when the token expires.",
+      applySettings: "Apply Settings",
+      settingsSaved: "✅ Settings saved successfully!",
+      cooldownSettings: "Cooldown Settings",
+      waitCharges: "Wait until charges reach",
+      captchaSolving: "🤖 Attempting to solve CAPTCHA...",
+      captchaFailed: "❌ Auto-CAPTCHA failed. Paint a pixel manually.",
+      automation: "Automation",
+      noChargesThreshold: "⌛ Waiting for charges to reach {threshold}. Currently {current}. Next in {time}...",
     },
-  fr: {
-    title: "WPlace Auto-Image",
-    scanColors: "Scanner les couleurs",
-    uploadImage: "Télécharger l'image",
-    resizeImage: "Redimensionner l'image",
-    selectPosition: "Sélectionner la position",
-    startPainting: "Commencer à peindre",
-    stopPainting: "Arrêter de peindre",
-    checkingColors: "🔍 Vérification des couleurs disponibles...",
-    noColorsFound: "❌ Ouvrez la palette de couleurs sur le site et réessayez!",
-    colorsFound: "✅ {count} couleurs trouvées. Prêt à télécharger.",
-    loadingImage: "🖼️ Chargement de l'image...",
-    imageLoaded: "✅ Image chargée avec {count} pixels valides",
-    imageError: "❌ Erreur lors du chargement de l'image",
-    selectPositionAlert: "Peignez le premier pixel à l'endroit où vous voulez que l'art commence!",
-    waitingPosition: "👆 En attente que vous peigniez le pixel de référence...",
-    positionSet: "✅ Position définie avec succès!",
-    positionTimeout: "❌ Délai d'attente pour la sélection de position",
-    startPaintingMsg: "🎨 Début de la peinture...",
-    paintingProgress: "🧱 Progrès: {painted}/{total} pixels...",
-    noCharges: "⌛ Aucune charge. En attente {time}...",
-    paintingStopped: "⏹️ Peinture arrêtée par l'utilisateur",
-    paintingComplete: "✅ Peinture terminée! {count} pixels peints.",
-    paintingError: "❌ Erreur pendant la peinture",
-    missingRequirements: "❌ Veuillez charger une image et sélectionner une position d'abord",
-    progress: "Progrès",
-    pixels: "Pixels",
-    charges: "Charges",
-    estimatedTime: "Temps estimé",
-    initMessage: "Cliquez sur 'Télécharger l'image' pour commencer",
-    waitingInit: "En attente d'initialisation...",
-    resizeSuccess: "✅ Image redimensionnée en {width}x{height}",
-    paintingPaused: "⏸️ Peinture en pause à la position X: {x}, Y: {y}",
-    captchaNeeded: "❗ Token CAPTCHA nécessaire. Peignez un pixel manuellement pour continuer.",
-    saveData: "Sauvegarder le progrès",
-    loadData: "Charger le progrès",
-    saveToFile: "Sauvegarder dans un fichier",
-    loadFromFile: "Charger depuis un fichier",
-    dataManager: "Données",
-    autoSaved: "✅ Progrès sauvegardé automatiquement",
-    dataLoaded: "✅ Progrès chargé avec succès",
-    fileSaved: "✅ Sauvegardé dans un fichier avec succès",
-    fileLoaded: "✅ Chargé depuis un fichier avec succès",
-    noSavedData: "❌ Aucun progrès sauvegardé trouvé",
-    savedDataFound: "✅ Progrès sauvegardé trouvé! Charger pour continuer?",
-    savedDate: "Sauvegardé le: {date}",
-    clickLoadToContinue: "Cliquez sur 'Charger le progrès' pour continuer.",
-    fileError: "❌ Erreur lors du traitement du fichier",
-    invalidFileFormat: "❌ Format de fichier invalide",
-    paintingSpeed: "Vitesse de peinture",
-    pixelsPerSecond: "pixels/seconde",
-    speedSetting: "Vitesse: {speed} pixels/sec",
-    settings: "Paramètres",
-    botSettings: "Paramètres du Bot",
-    close: "Fermer",
-    language: "Langue",
-    themeSettings: "Paramètres de Thème",
-    themeSettingsDesc: "Choisissez votre thème de couleurs préféré pour l'interface.",
-    languageSelectDesc: "Sélectionnez votre langue préférée. Les changements prendront effet immédiatement.",
-    autoCaptcha: "Résolveur de CAPTCHA automatique",
-    autoCaptchaDesc: "Tente automatiquement de résoudre le CAPTCHA en simulant un placement manuel de pixel lorsque le jeton expire.",
-    applySettings: "Appliquer les paramètres",
-    settingsSaved: "✅ Paramètres enregistrés avec succès !",
-    cooldownSettings: "Paramètres de recharge",
-    waitCharges: "Attendre que les charges atteignent",
-    captchaSolving: "🤖 Tentative de résolution du CAPTCHA...",
-    captchaFailed: "❌ Échec de l'Auto-CAPTCHA. Peignez un pixel manuellement.",
-    automation: "Automatisation",
-    noChargesThreshold: "⌛ En attente que les charges atteignent {threshold}. Actuel: {current}. Prochaine dans {time}...",
+    ru: {
+      title: "WPlace Авто-Изображение",
+      scanColors: "Сканировать цвета",
+      uploadImage: "Загрузить изображение",
+      resizeImage: "Изменить размер изображения",
+      selectPosition: "Выбрать позицию",
+      startPainting: "Начать рисование",
+      stopPainting: "Остановить рисование",
+      checkingColors: "🔍 Проверка доступных цветов...",
+      noColorsFound: "❌ Откройте палитру цветов на сайте и попробуйте снова!",
+      colorsFound: "✅ Найдено доступных цветов: {count}. Готово к загрузке.",
+      loadingImage: "🖼️ Загрузка изображения...",
+      imageLoaded: "✅ Изображение загружено, валидных пикселей: {count}",
+      imageError: "❌ Ошибка при загрузке изображения",
+      selectPositionAlert: "Нарисуйте первый пиксель в месте, откуда начнётся рисунок!",
+      waitingPosition: "👆 Ожидание, пока вы нарисуете опорный пиксель...",
+      positionSet: "✅ Позиция успешно установлена!",
+      positionTimeout: "❌ Время ожидания выбора позиции истекло",
+      startPaintingMsg: "🎨 Начинаем рисование...",
+      paintingProgress: "🧱 Прогресс: {painted}/{total} пикселей...",
+      noCharges: "⌛ Нет зарядов. Ожидание {time}...",
+      paintingStopped: "⏹️ Рисование остановлено пользователем",
+      paintingComplete: "✅ Рисование завершено! Нарисовано пикселей: {count}.",
+      paintingError: "❌ Ошибка во время рисования",
+      missingRequirements: "❌ Сначала загрузите изображение и выберите позицию",
+      progress: "Прогресс",
+      pixels: "Пиксели",
+      charges: "Заряды",
+      estimatedTime: "Примерное время",
+      initMessage: "Нажмите 'Загрузить изображение', чтобы начать",
+      waitingInit: "Ожидание инициализации...",
+      resizeSuccess: "✅ Изображение изменено до {width}x{height}",
+      paintingPaused: "⏸️ Рисование приостановлено на позиции X: {x}, Y: {y}",
+      captchaNeeded: "❗ Требуется токен CAPTCHA. Нарисуйте один пиксель вручную, чтобы продолжить.",
+      saveData: "Сохранить прогресс",
+      loadData: "Загрузить прогресс",
+      saveToFile: "Сохранить в файл",
+      loadFromFile: "Загрузить из файла",
+      dataManager: "Менеджер данных",
+      autoSaved: "✅ Прогресс сохранён автоматически",
+      dataLoaded: "✅ Прогресс успешно загружен",
+      fileSaved: "✅ Прогресс успешно сохранён в файл",
+      fileLoaded: "✅ Прогресс успешно загружен из файла",
+      noSavedData: "❌ Сохранённый прогресс не найден",
+      savedDataFound: "✅ Найден сохранённый прогресс! Загрузить, чтобы продолжить?",
+      savedDate: "Сохранено: {date}",
+      clickLoadToContinue: "Нажмите 'Загрузить прогресс', чтобы продолжить.",
+      fileError: "❌ Ошибка при обработке файла",
+      invalidFileFormat: "❌ Неверный формат файла",
+      paintingSpeed: "Скорость рисования",
+      pixelsPerSecond: "пикселей/сек",
+      speedSetting: "Скорость: {speed} пикс./сек",
+      settings: "Настройки",
+      botSettings: "Настройки бота",
+      close: "Закрыть",
+      language: "Язык",
+      themeSettings: "Настройки темы",
+      themeSettingsDesc: "Выберите предпочтительную цветовую тему интерфейса.",
+      languageSelectDesc: "Выберите предпочтительный язык. Изменения вступят в силу немедленно.",
+      autoCaptcha: "Авто-решение CAPTCHA",
+      autoCaptchaDesc: "Автоматически пытается решить CAPTCHA, симулируя ручное размещение пикселя, когда токен истекает.",
+      applySettings: "Применить настройки",
+      settingsSaved: "✅ Настройки успешно сохранены!",
+      cooldownSettings: "Настройки перезарядки",
+      waitCharges: "Ждать до накопления зарядов",
+      captchaSolving: "🤖 Пытаюсь решить CAPTCHA...",
+      captchaFailed: "❌ Не удалось решить CAPTCHA. Нарисуйте пиксель вручную.",
+      automation: "Автоматизация",
+      noChargesThreshold: "⌛ Ожидание зарядов до {threshold}. Сейчас {current}. Следующий через {time}...",
     },
-  id: {
-    title: "WPlace Auto-Image",
-    scanColors: "Pindai Warna",
-    uploadImage: "Unggah Gambar",
-    resizeImage: "Ubah Ukuran Gambar",
-    selectPosition: "Pilih Posisi",
-    startPainting: "Mulai Melukis",
-    stopPainting: "Berhenti Melukis",
-    checkingColors: "🔍 Memeriksa warna yang tersedia...",
-    noColorsFound: "❌ Buka palet warna di situs dan coba lagi!",
-    colorsFound: "✅ {count} warna ditemukan. Siap untuk diunggah.",
-    loadingImage: "🖼️ Memuat gambar...",
-    imageLoaded: "✅ Gambar dimuat dengan {count} piksel valid",
-    imageError: "❌ Kesalahan saat memuat gambar",
-    selectPositionAlert: "Lukis piksel pertama di lokasi tempat karya seni akan dimulai!",
-    waitingPosition: "👆 Menunggu Anda melukis piksel referensi...",
-    positionSet: "✅ Posisi berhasil diatur!",
-    positionTimeout: "❌ Waktu habis untuk memilih posisi",
-    startPaintingMsg: "🎨 Mulai melukis...",
-    paintingProgress: "🧱 Progres: {painted}/{total} piksel...",
-    noCharges: "⌛ Tidak ada muatan. Menunggu {time}...",
-    paintingStopped: "⏹️ Melukis dihentikan oleh pengguna",
-    paintingComplete: "✅ Melukis selesai! {count} piksel telah dilukis.",
-    paintingError: "❌ Kesalahan selama melukis",
-    missingRequirements: "❌ Unggah gambar dan pilih posisi terlebih dahulu",
-    progress: "Progres",
-    pixels: "Piksel",
-    charges: "Muatan",
-    estimatedTime: "Perkiraan waktu",
-    initMessage: "Klik 'Unggah Gambar' untuk memulai",
-    waitingInit: "Menunggu inisialisasi...",
-    resizeSuccess: "✅ Gambar berhasil diubah ukurannya menjadi {width}x{height}",
-    paintingPaused: "⏸️ Melukis dijeda di posisi X: {x}, Y: {y}",
-    captchaNeeded: "❗ Token CAPTCHA diperlukan. Lukis satu piksel secara manual untuk melanjutkan.",
-    saveData: "Simpan Progres",
-    loadData: "Muat Progres",
-    saveToFile: "Simpan ke File",
-    loadFromFile: "Muat dari File",
-    dataManager: "Data",
-    autoSaved: "✅ Progres disimpan secara otomatis",
-    dataLoaded: "✅ Progres berhasil dimuat",
-    fileSaved: "✅ Berhasil disimpan ke file",
-    fileLoaded: "✅ Berhasil dimuat dari file",
-    noSavedData: "❌ Tidak ditemukan progres yang disimpan",
-    savedDataFound: "✅ Progres yang disimpan ditemukan! Muat untuk melanjutkan?",
-    savedDate: "Disimpan pada: {date}",
-    clickLoadToContinue: "Klik 'Muat Progres' untuk melanjutkan.",
-    fileError: "❌ Kesalahan saat memproses file",
-    invalidFileFormat: "❌ Format file tidak valid",
-    paintingSpeed: "Kecepatan Melukis",
-    pixelsPerSecond: "piksel/detik",
-    speedSetting: "Kecepatan: {speed} piksel/detik",
-    settings: "Pengaturan",
-    botSettings: "Pengaturan Bot",
-    close: "Tutup",
-    language: "Bahasa",
-    themeSettings: "Pengaturan Tema",
-    themeSettingsDesc: "Pilih tema warna favorit Anda untuk antarmuka.",
-    languageSelectDesc: "Pilih bahasa yang Anda inginkan. Perubahan akan berlaku segera.",
-    autoCaptcha: "Penyelesai CAPTCHA Otomatis",
-    autoCaptchaDesc: "Mencoba menyelesaikan CAPTCHA secara otomatis dengan mensimulasikan penempatan piksel manual saat token kedaluwarsa.",
-    applySettings: "Terapkan Pengaturan",
-    settingsSaved: "✅ Pengaturan berhasil disimpan!",
-    cooldownSettings: "Pengaturan Cooldown",
-    waitCharges: "Tunggu hingga muatan mencapai",
-    captchaSolving: "🤖 Mencoba menyelesaikan CAPTCHA...",
-    captchaFailed: "❌ Gagal menyelesaikan CAPTCHA. Lukis satu piksel secara manual.",
-    automation: "Automasi",
-    noChargesThreshold: "⌛ Menunggu muatan mencapai {threshold}. Saat ini: {current}. Berikutnya dalam {time}...",
+    pt: {
+      title: "WPlace Auto-Image",
+      scanColors: "Escanear Cores",
+      uploadImage: "Upload da Imagem",
+      resizeImage: "Redimensionar Imagem",
+      selectPosition: "Selecionar Posição",
+      startPainting: "Iniciar Pintura",
+      stopPainting: "Parar Pintura",
+      checkingColors: "🔍 Verificando cores disponíveis...",
+      noColorsFound: "❌ Abra a paleta de cores no site e tente novamente!",
+      colorsFound: "✅ {count} cores encontradas. Pronto para upload.",
+      loadingImage: "🖼️ Carregando imagem...",
+      imageLoaded: "✅ Imagem carregada com {count} pixels válidos",
+      imageError: "❌ Erro ao carregar imagem",
+      selectPositionAlert: "Pinte o primeiro pixel на localização onde deseja que a arte comece!",
+      waitingPosition: "👆 Aguardando você pintar o pixel de referência...",
+      positionSet: "✅ Posição definida com sucesso!",
+      positionTimeout: "❌ Tempo esgotado para selecionar posição",
+      startPaintingMsg: "🎨 Iniciando pintura...",
+      paintingProgress: "🧱 Progresso: {painted}/{total} pixels...",
+      noCharges: "⌛ Sem cargas. Aguardando {time}...",
+      paintingStopped: "⏹️ Pintura interromпида pelo usuário",
+      paintingComplete: "✅ Pintura concluída! {count} pixels pintados.",
+      paintingError: "❌ Erro durante a pintura",
+      missingRequirements: "❌ Carregue uma imagem e selecione uma posição primeiro",
+      progress: "Progresso",
+      pixels: "Pixels",
+      charges: "Cargas",
+      estimatedTime: "Tempo estimado",
+      initMessage: "Clique em 'Upload da Imagem' para começar",
+      waitingInit: "Aguardando inicialização...",
+      resizeSuccess: "✅ Imagem redimensionada для {width}x{height}",
+      paintingPaused: "⏸️ Pintura pausada na posição X: {x}, Y: {y}",
+      captchaNeeded: "❗ Token CAPTCHA necessário. Pinte um pixel manualmente para continuar.",
+      saveData: "Salvar Progresso",
+      loadData: "Carregar Progresso",
+      saveToFile: "Salvar em Arquivo",
+      loadFromFile: "Carregar de Arquivo",
+      dataManager: "Dados",
+      autoSaved: "✅ Progresso salvo automaticamente",
+      dataLoaded: "✅ Progresso carregado com sucesso",
+      fileSaved: "✅ Salvo em arquivo com sucesso",
+      fileLoaded: "✅ Carregado de arquivo com sucesso",
+      noSavedData: "❌ Nenhum progresso salvo encontrado",
+      savedDataFound: "✅ Progresso salvo encontrado! Carregar para continuar?",
+      savedDate: "Salvo em: {date}",
+      clickLoadToContinue: "Clique em 'Carregar Progresso' para continuar.",
+      fileError: "❌ Erro ao processar arquivo",
+      invalidFileFormat: "❌ Formato de arquivo inválido",
+      paintingSpeed: "Velocidade de Pintura",
+      pixelsPerSecond: "pixels/segundo",
+      speedSetting: "Velocidade: {speed} pixels/seg",
+      settings: "Configurações",
+      botSettings: "Configurações do Bot",
+      close: "Fechar",
+      language: "Idioma",
+      themeSettings: "Configurações de Tema",
+      themeSettingsDesc: "Escolha seu tema de cores preferido para a interface.",
+      languageSelectDesc: "Selecione seu idioma preferido. As alterações terão efeito imediatamente.",
+      autoCaptcha: "Resolvedor de CAPTCHA Automático",
+      autoCaptchaDesc: "Tenta resolver o CAPTCHA automaticamente simulando a colocação manual de um pixel quando o token expira.",
+      applySettings: "Aplicar Configurações",
+      settingsSaved: "✅ Configurações salvas com sucesso!",
+      cooldownSettings: "Configurações de Cooldown",
+      waitCharges: "Aguardar até as cargas atingirem",
+      captchaSolving: "🤖 Tentando resolver o CAPTCHA...",
+      captchaFailed: "❌ Falha ao resolver CAPTCHA. Pinte um pixel manualmente.",
+      automation: "Automação",
+      noChargesThreshold: "⌛ Aguardando cargas atingirem {threshold}. Atual: {current}. Próxima em {time}...",
+    },
+    vi: {
+      title: "WPlace Auto-Image",
+      scanColors: "Quét màu",
+      uploadImage: "Tải lên hình ảnh",
+      resizeImage: "Thay đổi kích thước",
+      selectPosition: "Chọn vị trí",
+      startPainting: "Bắt đầu vẽ",
+      stopPainting: "Dừng vẽ",
+      checkingColors: "🔍 Đang kiểm tra màu sắc có sẵn...",
+      noColorsFound: "❌ Hãy mở bảng màu trên trang web và thử lại!",
+      colorsFound: "✅ Tìm thấy {count} màu. Sẵn sàng để tải lên.",
+      loadingImage: "🖼️ Đang tải hình ảnh...",
+      imageLoaded: "✅ Đã tải hình ảnh với {count} pixel hợp lệ",
+      imageError: "❌ Lỗi khi tải hình ảnh",
+      selectPositionAlert: "Vẽ pixel đầu tiên tại vị trí bạn muốn tác phẩm nghệ thuật bắt đầu!",
+      waitingPosition: "👆 Đang chờ bạn vẽ pixel tham chiếu...",
+      positionSet: "✅ Đã đặt vị trí thành công!",
+      positionTimeout: "❌ Hết thời gian chọn vị trí",
+      startPaintingMsg: "🎨 Bắt đầu vẽ...",
+      paintingProgress: "🧱 Tiến trình: {painted}/{total} pixel...",
+      noCharges: "⌛ Không có điện tích. Đang chờ {time}...",
+      paintingStopped: "⏹️ Người dùng đã dừng vẽ",
+      paintingComplete: "✅ Hoàn thành vẽ! Đã vẽ {count} pixel.",
+      paintingError: "❌ Lỗi trong quá trình vẽ",
+      missingRequirements: "❌ Hãy tải lên hình ảnh và chọn vị trí trước",
+      progress: "Tiến trình",
+      pixels: "Pixel",
+      charges: "Điện tích",
+      estimatedTime: "Thời gian ước tính",
+      initMessage: "Nhấp 'Tải lên hình ảnh' để bắt đầu",
+      waitingInit: "Đang chờ khởi tạo...",
+      resizeSuccess: "✅ Đã thay đổi kích thước hình ảnh thành {width}x{height}",
+      paintingPaused: "⏸️ Tạm dừng vẽ tại vị trí X: {x}, Y: {y}",
+      captchaNeeded: "❗ Cần token CAPTCHA. Vẽ một pixel thủ công để tiếp tục.",
+      saveData: "Lưu tiến trình",
+      loadData: "Tải tiến trình",
+      saveToFile: "Lưu vào tệp",
+      loadFromFile: "Tải từ tệp",
+      dataManager: "Dữ liệu",
+      autoSaved: "✅ Đã tự động lưu tiến trình",
+      dataLoaded: "✅ Đã tải tiến trình thành công",
+      fileSaved: "✅ Đã lưu vào tệp thành công",
+      fileLoaded: "✅ Đã tải từ tệp thành công",
+      noSavedData: "❌ Không tìm thấy tiến trình đã lưu",
+      savedDataFound: "✅ Tìm thấy tiến trình đã lưu! Tải để tiếp tục?",
+      savedDate: "Đã lưu vào: {date}",
+      clickLoadToContinue: "Nhấp 'Tải tiến trình' để tiếp tục.",
+      fileError: "❌ Lỗi khi xử lý tệp",
+      invalidFileFormat: "❌ Định dạng tệp không hợp lệ",
+      paintingSpeed: "Tốc độ vẽ",
+      pixelsPerSecond: "pixel/giây",
+      speedSetting: "Tốc độ: {speed} pixel/giây",
+      settings: "Cài đặt",
+      botSettings: "Cài đặt Bot",
+      close: "Đóng",
+      language: "Ngôn ngữ",
+      themeSettings: "Cài đặt Giao diện",
+      themeSettingsDesc: "Chọn chủ đề màu sắc yêu thích cho giao diện.",
+      languageSelectDesc: "Chọn ngôn ngữ ưa thích. Thay đổi sẽ có hiệu lực ngay lập tức.",
+      autoCaptcha: "Tự động giải CAPTCHA",
+      autoCaptchaDesc: "Tự động cố gắng giải CAPTCHA bằng cách mô phỏng việc đặt pixel thủ công khi token hết hạn.",
+      applySettings: "Áp dụng cài đặt",
+      settingsSaved: "✅ Đã lưu cài đặt thành công!",
+      cooldownSettings: "Cài đặt thời gian chờ",
+      waitCharges: "Chờ cho đến khi số lần sạc đạt",
+      captchaSolving: "🤖 Đang cố gắng giải CAPTCHA...",
+      captchaFailed: "❌ Giải CAPTCHA tự động thất bại. Vui lòng vẽ một pixel thủ công.",
+      automation: "Tự động hóa",
+      noChargesThreshold: "⌛ Đang chờ số lần sạc đạt {threshold}. Hiện tại {current}. Lần tiếp theo trong {time}...",
+    },
+    fr: {
+      title: "WPlace Auto-Image",
+      scanColors: "Scanner les couleurs",
+      uploadImage: "Télécharger l'image",
+      resizeImage: "Redimensionner l'image",
+      selectPosition: "Sélectionner la position",
+      startPainting: "Commencer à peindre",
+      stopPainting: "Arrêter de peindre",
+      checkingColors: "🔍 Vérification des couleurs disponibles...",
+      noColorsFound: "❌ Ouvrez la palette de couleurs sur le site et réessayez!",
+      colorsFound: "✅ {count} couleurs trouvées. Prêt à télécharger.",
+      loadingImage: "🖼️ Chargement de l'image...",
+      imageLoaded: "✅ Image chargée avec {count} pixels valides",
+      imageError: "❌ Erreur lors du chargement de l'image",
+      selectPositionAlert: "Peignez le premier pixel à l'endroit où vous voulez que l'art commence!",
+      waitingPosition: "👆 En attente que vous peigniez le pixel de référence...",
+      positionSet: "✅ Position définie avec succès!",
+      positionTimeout: "❌ Délai d'attente pour la sélection de position",
+      startPaintingMsg: "🎨 Début de la peinture...",
+      paintingProgress: "🧱 Progrès: {painted}/{total} pixels...",
+      noCharges: "⌛ Aucune charge. En attente {time}...",
+      paintingStopped: "⏹️ Peinture arrêtée par l'utilisateur",
+      paintingComplete: "✅ Peinture terminée! {count} pixels peints.",
+      paintingError: "❌ Erreur pendant la peinture",
+      missingRequirements: "❌ Veuillez charger une image et sélectionner une position d'abord",
+      progress: "Progrès",
+      pixels: "Pixels",
+      charges: "Charges",
+      estimatedTime: "Temps estimé",
+      initMessage: "Cliquez sur 'Télécharger l'image' pour commencer",
+      waitingInit: "En attente d'initialisation...",
+      resizeSuccess: "✅ Image redimensionnée en {width}x{height}",
+      paintingPaused: "⏸️ Peinture en pause à la position X: {x}, Y: {y}",
+      captchaNeeded: "❗ Token CAPTCHA nécessaire. Peignez un pixel manuellement pour continuer.",
+      saveData: "Sauvegarder le progrès",
+      loadData: "Charger le progrès",
+      saveToFile: "Sauvegarder dans un fichier",
+      loadFromFile: "Charger depuis un fichier",
+      dataManager: "Données",
+      autoSaved: "✅ Progrès sauvegardé automatiquement",
+      dataLoaded: "✅ Progrès chargé avec succès",
+      fileSaved: "✅ Sauvegardé dans un fichier avec succès",
+      fileLoaded: "✅ Chargé depuis un fichier avec succès",
+      noSavedData: "❌ Aucun progrès sauvegardé trouvé",
+      savedDataFound: "✅ Progrès sauvegardé trouvé! Charger pour continuer?",
+      savedDate: "Sauvegardé le: {date}",
+      clickLoadToContinue: "Cliquez sur 'Charger le progrès' pour continuer.",
+      fileError: "❌ Erreur lors du traitement du fichier",
+      invalidFileFormat: "❌ Format de fichier invalide",
+      paintingSpeed: "Vitesse de peinture",
+      pixelsPerSecond: "pixels/seconde",
+      speedSetting: "Vitesse: {speed} pixels/sec",
+      settings: "Paramètres",
+      botSettings: "Paramètres du Bot",
+      close: "Fermer",
+      language: "Langue",
+      themeSettings: "Paramètres de Thème",
+      themeSettingsDesc: "Choisissez votre thème de couleurs préféré pour l'interface.",
+      languageSelectDesc: "Sélectionnez votre langue préférée. Les changements prendront effet immédiatement.",
+      autoCaptcha: "Résolveur de CAPTCHA automatique",
+      autoCaptchaDesc: "Tente automatiquement de résoudre le CAPTCHA en simulant un placement manuel de pixel lorsque le jeton expire.",
+      applySettings: "Appliquer les paramètres",
+      settingsSaved: "✅ Paramètres enregistrés avec succès !",
+      cooldownSettings: "Paramètres de recharge",
+      waitCharges: "Attendre que les charges atteignent",
+      captchaSolving: "🤖 Tentative de résolution du CAPTCHA...",
+      captchaFailed: "❌ Échec de l'Auto-CAPTCHA. Peignez un pixel manuellement.",
+      automation: "Automatisation",
+      noChargesThreshold: "⌛ En attente que les charges atteignent {threshold}. Actuel: {current}. Prochaine dans {time}...",
+    },
+    id: {
+      title: "WPlace Auto-Image",
+      scanColors: "Pindai Warna",
+      uploadImage: "Unggah Gambar",
+      resizeImage: "Ubah Ukuran Gambar",
+      selectPosition: "Pilih Posisi",
+      startPainting: "Mulai Melukis",
+      stopPainting: "Berhenti Melukis",
+      checkingColors: "🔍 Memeriksa warna yang tersedia...",
+      noColorsFound: "❌ Buka palet warna di situs dan coba lagi!",
+      colorsFound: "✅ {count} warna ditemukan. Siap untuk diunggah.",
+      loadingImage: "🖼️ Memuat gambar...",
+      imageLoaded: "✅ Gambar dimuat dengan {count} piksel valid",
+      imageError: "❌ Kesalahan saat memuat gambar",
+      selectPositionAlert: "Lukis piksel pertama di lokasi tempat karya seni akan dimulai!",
+      waitingPosition: "👆 Menunggu Anda melukis piksel referensi...",
+      positionSet: "✅ Posisi berhasil diatur!",
+      positionTimeout: "❌ Waktu habis untuk memilih posisi",
+      startPaintingMsg: "🎨 Mulai melukis...",
+      paintingProgress: "🧱 Progres: {painted}/{total} piksel...",
+      noCharges: "⌛ Tidak ada muatan. Menunggu {time}...",
+      paintingStopped: "⏹️ Melukis dihentikan oleh pengguna",
+      paintingComplete: "✅ Melukis selesai! {count} piksel telah dilukis.",
+      paintingError: "❌ Kesalahan selama melukis",
+      missingRequirements: "❌ Unggah gambar dan pilih posisi terlebih dahulu",
+      progress: "Progres",
+      pixels: "Piksel",
+      charges: "Muatan",
+      estimatedTime: "Perkiraan waktu",
+      initMessage: "Klik 'Unggah Gambar' untuk memulai",
+      waitingInit: "Menunggu inisialisasi...",
+      resizeSuccess: "✅ Gambar berhasil diubah ukurannya menjadi {width}x{height}",
+      paintingPaused: "⏸️ Melukis dijeda di posisi X: {x}, Y: {y}",
+      captchaNeeded: "❗ Token CAPTCHA diperlukan. Lukis satu piksel secara manual untuk melanjutkan.",
+      saveData: "Simpan Progres",
+      loadData: "Muat Progres",
+      saveToFile: "Simpan ke File",
+      loadFromFile: "Muat dari File",
+      dataManager: "Data",
+      autoSaved: "✅ Progres disimpan secara otomatis",
+      dataLoaded: "✅ Progres berhasil dimuat",
+      fileSaved: "✅ Berhasil disimpan ke file",
+      fileLoaded: "✅ Berhasil dimuat dari file",
+      noSavedData: "❌ Tidak ditemukan progres yang disimpan",
+      savedDataFound: "✅ Progres yang disimpan ditemukan! Muat untuk melanjutkan?",
+      savedDate: "Disimpan pada: {date}",
+      clickLoadToContinue: "Klik 'Muat Progres' untuk melanjutkan.",
+      fileError: "❌ Kesalahan saat memproses file",
+      invalidFileFormat: "❌ Format file tidak valid",
+      paintingSpeed: "Kecepatan Melukis",
+      pixelsPerSecond: "piksel/detik",
+      speedSetting: "Kecepatan: {speed} piksel/detik",
+      settings: "Pengaturan",
+      botSettings: "Pengaturan Bot",
+      close: "Tutup",
+      language: "Bahasa",
+      themeSettings: "Pengaturan Tema",
+      themeSettingsDesc: "Pilih tema warna favorit Anda untuk antarmuka.",
+      languageSelectDesc: "Pilih bahasa yang Anda inginkan. Perubahan akan berlaku segera.",
+      autoCaptcha: "Penyelesai CAPTCHA Otomatis",
+      autoCaptchaDesc: "Mencoba menyelesaikan CAPTCHA secara otomatis dengan mensimulasikan penempatan piksel manual saat token kedaluwarsa.",
+      applySettings: "Terapkan Pengaturan",
+      settingsSaved: "✅ Pengaturan berhasil disimpan!",
+      cooldownSettings: "Pengaturan Cooldown",
+      waitCharges: "Tunggu hingga muatan mencapai",
+      captchaSolving: "🤖 Mencoba menyelesaikan CAPTCHA...",
+      captchaFailed: "❌ Gagal menyelesaikan CAPTCHA. Lukis satu piksel secara manual.",
+      automation: "Automasi",
+      noChargesThreshold: "⌛ Menunggu muatan mencapai {threshold}. Saat ini: {current}. Berikutnya dalam {time}...",
     },
   }
 
@@ -663,274 +663,274 @@
   }
 
   // Placeholder for the resize preview update function
-  let _updateResizePreview = () => {};
+  let _updateResizePreview = () => { };
 
   // --- OVERLAY UPDATE: New OverlayManager class to handle all overlay logic ---
   class OverlayManager {
     constructor() {
-        this.isEnabled = false;
-        this.startCoords = null; // { region: {x, y}, pixel: {x, y} }
-        this.imageBitmap = null;
-        this.chunkedTiles = new Map(); // Map<"tileX,tileY", ImageBitmap>
-        this.tileSize = 1000;
+      this.isEnabled = false;
+      this.startCoords = null; // { region: {x, y}, pixel: {x, y} }
+      this.imageBitmap = null;
+      this.chunkedTiles = new Map(); // Map<"tileX,tileY", ImageBitmap>
+      this.tileSize = 1000;
     }
 
     toggle() {
-        this.isEnabled = !this.isEnabled;
-        console.log(`Overlay ${this.isEnabled ? 'enabled' : 'disabled'}.`);
-        return this.isEnabled;
+      this.isEnabled = !this.isEnabled;
+      console.log(`Overlay ${this.isEnabled ? 'enabled' : 'disabled'}.`);
+      return this.isEnabled;
     }
 
     enable() { this.isEnabled = true; }
     disable() { this.isEnabled = false; }
     clear() {
-        this.disable();
-        this.imageBitmap = null;
-        this.chunkedTiles.clear();
+      this.disable();
+      this.imageBitmap = null;
+      this.chunkedTiles.clear();
     }
 
     async setImage(imageBitmap) {
-        this.imageBitmap = imageBitmap;
-        if (this.imageBitmap && this.startCoords) {
-            await this.processImageIntoChunks();
-        }
+      this.imageBitmap = imageBitmap;
+      if (this.imageBitmap && this.startCoords) {
+        await this.processImageIntoChunks();
+      }
     }
 
     async setPosition(startPosition, region) {
-        if (!startPosition || !region) {
-            this.startCoords = null;
-            this.chunkedTiles.clear();
-            return;
-        }
-        this.startCoords = { region, pixel: startPosition };
-        if (this.imageBitmap) {
-            await this.processImageIntoChunks();
-        }
+      if (!startPosition || !region) {
+        this.startCoords = null;
+        this.chunkedTiles.clear();
+        return;
+      }
+      this.startCoords = { region, pixel: startPosition };
+      if (this.imageBitmap) {
+        await this.processImageIntoChunks();
+      }
     }
 
     // --- OVERLAY UPDATE: Simplified chunking logic for solid, semi-transparent overlay ---
     async processImageIntoChunks() {
-        if (!this.imageBitmap || !this.startCoords) return;
+      if (!this.imageBitmap || !this.startCoords) return;
 
-        this.chunkedTiles.clear();
-        const { width: imageWidth, height: imageHeight } = this.imageBitmap;
-        const { x: startPixelX, y: startPixelY } = this.startCoords.pixel;
-        const { x: startRegionX, y: startRegionY } = this.startCoords.region;
+      this.chunkedTiles.clear();
+      const { width: imageWidth, height: imageHeight } = this.imageBitmap;
+      const { x: startPixelX, y: startPixelY } = this.startCoords.pixel;
+      const { x: startRegionX, y: startRegionY } = this.startCoords.region;
 
-        const endPixelX = startPixelX + imageWidth;
-        const endPixelY = startPixelY + imageHeight;
+      const endPixelX = startPixelX + imageWidth;
+      const endPixelY = startPixelY + imageHeight;
 
-        const startTileX = startRegionX + Math.floor(startPixelX / this.tileSize);
-        const startTileY = startRegionY + Math.floor(startPixelY / this.tileSize);
-        const endTileX = startRegionX + Math.floor(endPixelX / this.tileSize);
-        const endTileY = startRegionY + Math.floor(endPixelY / this.tileSize);
-        
-        for (let ty = startTileY; ty <= endTileY; ty++) {
-            for (let tx = startTileX; tx <= endTileX; tx++) {
-                const tileKey = `${tx},${ty}`;
+      const startTileX = startRegionX + Math.floor(startPixelX / this.tileSize);
+      const startTileY = startRegionY + Math.floor(startPixelY / this.tileSize);
+      const endTileX = startRegionX + Math.floor(endPixelX / this.tileSize);
+      const endTileY = startRegionY + Math.floor(endPixelY / this.tileSize);
 
-                // Calculate the portion of the image that overlaps with this tile
-                const imgStartX = (tx - startRegionX) * this.tileSize - startPixelX;
-                const imgStartY = (ty - startRegionY) * this.tileSize - startPixelY;
+      for (let ty = startTileY; ty <= endTileY; ty++) {
+        for (let tx = startTileX; tx <= endTileX; tx++) {
+          const tileKey = `${tx},${ty}`;
 
-                // Crop coordinates within the source image
-                const sX = Math.max(0, imgStartX);
-                const sY = Math.max(0, imgStartY);
-                const sW = Math.min(imageWidth - sX, this.tileSize - (sX - imgStartX));
-                const sH = Math.min(imageHeight - sY, this.tileSize - (sY - imgStartY));
-                
-                if (sW <= 0 || sH <= 0) continue;
+          // Calculate the portion of the image that overlaps with this tile
+          const imgStartX = (tx - startRegionX) * this.tileSize - startPixelX;
+          const imgStartY = (ty - startRegionY) * this.tileSize - startPixelY;
 
-                // Destination coordinates on the new chunk canvas
-                const dX = Math.max(0, -imgStartX);
-                const dY = Math.max(0, -imgStartY);
+          // Crop coordinates within the source image
+          const sX = Math.max(0, imgStartX);
+          const sY = Math.max(0, imgStartY);
+          const sW = Math.min(imageWidth - sX, this.tileSize - (sX - imgStartX));
+          const sH = Math.min(imageHeight - sY, this.tileSize - (sY - imgStartY));
 
-                const chunkCanvas = new OffscreenCanvas(this.tileSize, this.tileSize);
-                const chunkCtx = chunkCanvas.getContext('2d');
-                chunkCtx.imageSmoothingEnabled = false;
+          if (sW <= 0 || sH <= 0) continue;
 
-                chunkCtx.drawImage(this.imageBitmap, sX, sY, sW, sH, dX, dY, sW, sH);
-                
-                // --- NEW: BLUE MARBLE EFFECT ---
-                if (state.blueMarbleEnabled) {
-                    const imageData = chunkCtx.getImageData(0, 0, this.tileSize, this.tileSize);
-                    const data = imageData.data;
-                    for (let pixelY = 0; pixelY < this.tileSize; pixelY++) {
-                        for (let pixelX = 0; pixelX < this.tileSize; pixelX++) {
-                            const canvasX = pixelX;
-                            const canvasY = pixelY;
-                            const imageX = canvasX - dX;
-                            const imageY = canvasY - dY;
+          // Destination coordinates on the new chunk canvas
+          const dX = Math.max(0, -imgStartX);
+          const dY = Math.max(0, -imgStartY);
 
-                            if ((imageX + imageY) % 2 === 0) {
-                                const index = (canvasY * this.tileSize + canvasX) * 4;
-                                if (data[index + 3] > 0) {
-                                    data[index + 3] = 0;
-                                }
-                            }
-                        }
-                    }
-                    chunkCtx.putImageData(imageData, 0, 0);
+          const chunkCanvas = new OffscreenCanvas(this.tileSize, this.tileSize);
+          const chunkCtx = chunkCanvas.getContext('2d');
+          chunkCtx.imageSmoothingEnabled = false;
+
+          chunkCtx.drawImage(this.imageBitmap, sX, sY, sW, sH, dX, dY, sW, sH);
+
+          // --- NEW: BLUE MARBLE EFFECT ---
+          if (state.blueMarbleEnabled) {
+            const imageData = chunkCtx.getImageData(0, 0, this.tileSize, this.tileSize);
+            const data = imageData.data;
+            for (let pixelY = 0; pixelY < this.tileSize; pixelY++) {
+              for (let pixelX = 0; pixelX < this.tileSize; pixelX++) {
+                const canvasX = pixelX;
+                const canvasY = pixelY;
+                const imageX = canvasX - dX;
+                const imageY = canvasY - dY;
+
+                if ((imageX + imageY) % 2 === 0) {
+                  const index = (canvasY * this.tileSize + canvasX) * 4;
+                  if (data[index + 3] > 0) {
+                    data[index + 3] = 0;
+                  }
                 }
-
-                const chunkBitmap = await chunkCanvas.transferToImageBitmap();
-                this.chunkedTiles.set(tileKey, chunkBitmap);
+              }
             }
+            chunkCtx.putImageData(imageData, 0, 0);
+          }
+
+          const chunkBitmap = await chunkCanvas.transferToImageBitmap();
+          this.chunkedTiles.set(tileKey, chunkBitmap);
         }
-        
-        console.log(`Overlay processed into ${this.chunkedTiles.size} chunks.`);
+      }
+
+      console.log(`Overlay processed into ${this.chunkedTiles.size} chunks.`);
     }
 
     // --- OVERLAY UPDATE: Simplified compositing logic for solid, semi-transparent overlay ---
     async processAndRespondToTileRequest(eventData) {
-        const { endpoint, blobID, blobData } = eventData;
-        
-        let finalBlob = blobData;
+      const { endpoint, blobID, blobData } = eventData;
 
-        if (this.isEnabled && this.chunkedTiles.size > 0) {
-            const tileMatch = endpoint.match(/(\d+)\/(\d+)\.png/);
-            if (tileMatch) {
-                const tileX = parseInt(tileMatch[1], 10);
-                const tileY = parseInt(tileMatch[2], 10);
-                const tileKey = `${tileX},${tileY}`;
+      let finalBlob = blobData;
 
-                const chunkBitmap = this.chunkedTiles.get(tileKey);
-                if (chunkBitmap) {
-                    try {
-                        const originalTileBitmap = await createImageBitmap(blobData);
-                        const canvas = new OffscreenCanvas(originalTileBitmap.width, originalTileBitmap.height);
-                        const ctx = canvas.getContext('2d');
-                        ctx.imageSmoothingEnabled = false;
+      if (this.isEnabled && this.chunkedTiles.size > 0) {
+        const tileMatch = endpoint.match(/(\d+)\/(\d+)\.png/);
+        if (tileMatch) {
+          const tileX = parseInt(tileMatch[1], 10);
+          const tileY = parseInt(tileMatch[2], 10);
+          const tileKey = `${tileX},${tileY}`;
 
-                        // Draw original tile first
-                        ctx.drawImage(originalTileBitmap, 0, 0);
-                        
-                        // Set opacity and draw our solid overlay chunk on top
-                        ctx.globalAlpha = state.overlayOpacity;
-                        ctx.drawImage(chunkBitmap, 0, 0);
+          const chunkBitmap = this.chunkedTiles.get(tileKey);
+          if (chunkBitmap) {
+            try {
+              const originalTileBitmap = await createImageBitmap(blobData);
+              const canvas = new OffscreenCanvas(originalTileBitmap.width, originalTileBitmap.height);
+              const ctx = canvas.getContext('2d');
+              ctx.imageSmoothingEnabled = false;
 
-                        finalBlob = await canvas.convertToBlob({ type: 'image/png' });
-                    } catch (e) {
-                        console.error("Error compositing overlay:", e);
-                    }
-                }
+              // Draw original tile first
+              ctx.drawImage(originalTileBitmap, 0, 0);
+
+              // Set opacity and draw our solid overlay chunk on top
+              ctx.globalAlpha = state.overlayOpacity;
+              ctx.drawImage(chunkBitmap, 0, 0);
+
+              finalBlob = await canvas.convertToBlob({ type: 'image/png' });
+            } catch (e) {
+              console.error("Error compositing overlay:", e);
             }
+          }
         }
+      }
 
-        // Send the (possibly modified) blob back to the injected script
-        window.postMessage({
-            source: 'auto-image-overlay',
-            blobID: blobID,
-            blobData: finalBlob
-        }, '*');
+      // Send the (possibly modified) blob back to the injected script
+      window.postMessage({
+        source: 'auto-image-overlay',
+        blobID: blobID,
+        blobData: finalBlob
+      }, '*');
     }
-}
-
-const overlayManager = new OverlayManager();
-
-// Turnstile token handling (promise-based) inspired by external logic
-let turnstileToken = null
-let _resolveToken = null
-let tokenPromise = new Promise((resolve) => { _resolveToken = resolve })
-
-function setTurnstileToken(t) {
-  if (_resolveToken) {
-    _resolveToken(t)
-    _resolveToken = null
   }
-  turnstileToken = t
-}
 
-async function ensureToken() {
-  if (!turnstileToken) {
-    updateUI("captchaNeeded", "error")
-    Utils.showAlert(Utils.t("captchaNeeded"), "error")
-    try { await tokenPromise } catch (_) {}
+  const overlayManager = new OverlayManager();
+
+  // Turnstile token handling (promise-based) inspired by external logic
+  let turnstileToken = null
+  let _resolveToken = null
+  let tokenPromise = new Promise((resolve) => { _resolveToken = resolve })
+
+  function setTurnstileToken(t) {
+    if (_resolveToken) {
+      _resolveToken(t)
+      _resolveToken = null
+    }
+    turnstileToken = t
   }
-  return turnstileToken
-}
 
-function inject(callback) {
+  async function ensureToken() {
+    if (!turnstileToken) {
+      updateUI("captchaNeeded", "error")
+      Utils.showAlert(Utils.t("captchaNeeded"), "error")
+      try { await tokenPromise } catch (_) { }
+    }
+    return turnstileToken
+  }
+
+  function inject(callback) {
     const script = document.createElement('script');
     script.textContent = `(${callback})();`;
     document.documentElement?.appendChild(script);
     script.remove();
-}
+  }
 
-inject(() => {
+  inject(() => {
     const fetchedBlobQueue = new Map();
 
     window.addEventListener('message', (event) => {
-        const { source, blobID, blobData } = event.data;
-        if (source === 'auto-image-overlay' && blobID && blobData) {
-            const callback = fetchedBlobQueue.get(blobID);
-            if (typeof callback === 'function') {
-                callback(blobData);
-            }
-            fetchedBlobQueue.delete(blobID);
+      const { source, blobID, blobData } = event.data;
+      if (source === 'auto-image-overlay' && blobID && blobData) {
+        const callback = fetchedBlobQueue.get(blobID);
+        if (typeof callback === 'function') {
+          callback(blobData);
         }
+        fetchedBlobQueue.delete(blobID);
+      }
     });
 
     const originalFetch = window.fetch;
-    window.fetch = async function(...args) {
-        const response = await originalFetch.apply(this, args);
-        const url = (args[0] instanceof Request) ? args[0].url : args[0];
+    window.fetch = async function (...args) {
+      const response = await originalFetch.apply(this, args);
+      const url = (args[0] instanceof Request) ? args[0].url : args[0];
 
-        if (typeof url === "string") {
-            if (url.includes("https://backend.wplace.live/s0/pixel/")) {
-                try {
-                    const payload = JSON.parse(args[1].body);
-                    if (payload.t) {
-                        console.log("✅ Turnstile Token Captured:", payload.t);
-                         window.postMessage({ source: 'turnstile-capture', token: payload.t }, '*');
-                    }
-                } catch (_) { /* ignore */ }
+      if (typeof url === "string") {
+        if (url.includes("https://backend.wplace.live/s0/pixel/")) {
+          try {
+            const payload = JSON.parse(args[1].body);
+            if (payload.t) {
+              console.log("✅ Turnstile Token Captured:", payload.t);
+              window.postMessage({ source: 'turnstile-capture', token: payload.t }, '*');
             }
-            
-            const contentType = response.headers.get('content-type') || '';
-            if (contentType.includes('image/png') && url.includes('.png')) {
-                 const cloned = response.clone();
-                 return new Promise(async (resolve) => {
-                     const blobUUID = crypto.randomUUID();
-                     const originalBlob = await cloned.blob();
-                     
-                     fetchedBlobQueue.set(blobUUID, (processedBlob) => {
-                         resolve(new Response(processedBlob, {
-                             headers: cloned.headers,
-                             status: cloned.status,
-                             statusText: cloned.statusText
-                         }));
-                     });
-
-                     window.postMessage({
-                         source: 'auto-image-tile',
-                         endpoint: url,
-                         blobID: blobUUID,
-                         blobData: originalBlob,
-                     }, '*');
-                 });
-            }
+          } catch (_) { /* ignore */ }
         }
-        
-        return response;
-    };
-});
 
-window.addEventListener('message', (event) => {
+        const contentType = response.headers.get('content-type') || '';
+        if (contentType.includes('image/png') && url.includes('.png')) {
+          const cloned = response.clone();
+          return new Promise(async (resolve) => {
+            const blobUUID = crypto.randomUUID();
+            const originalBlob = await cloned.blob();
+
+            fetchedBlobQueue.set(blobUUID, (processedBlob) => {
+              resolve(new Response(processedBlob, {
+                headers: cloned.headers,
+                status: cloned.status,
+                statusText: cloned.statusText
+              }));
+            });
+
+            window.postMessage({
+              source: 'auto-image-tile',
+              endpoint: url,
+              blobID: blobUUID,
+              blobData: originalBlob,
+            }, '*');
+          });
+        }
+      }
+
+      return response;
+    };
+  });
+
+  window.addEventListener('message', (event) => {
     const { source, endpoint, blobID, blobData, token } = event.data;
 
     if (source === 'auto-image-tile' && endpoint && blobID && blobData) {
-        overlayManager.processAndRespondToTileRequest(event.data);
+      overlayManager.processAndRespondToTileRequest(event.data);
     }
 
     if (source === 'turnstile-capture' && token) {
-        setTurnstileToken(token);
-        if (document.querySelector("#statusText")?.textContent.includes("CAPTCHA")) {
-            Utils.showAlert("Token captured successfully! You can start the bot now.", "success");
-            updateUI("colorsFound", "success", { count: state.availableColors.length });
-        }
+      setTurnstileToken(token);
+      if (document.querySelector("#statusText")?.textContent.includes("CAPTCHA")) {
+        Utils.showAlert("Token captured successfully! You can start the bot now.", "success");
+        updateUI("colorsFound", "success", { count: state.availableColors.length });
+      }
     }
-});
+  });
 
   async function detectLanguage() {
     try {
@@ -949,13 +949,13 @@ window.addEventListener('message', (event) => {
     sleep: (ms) => new Promise((r) => setTimeout(r, ms)),
 
     waitForSelector: async (selector, interval = 200, timeout = 5000) => {
-        const start = Date.now();
-        while (Date.now() - start < timeout) {
-            const el = document.querySelector(selector);
-            if (el) return el;
-            await Utils.sleep(interval);
-        }
-        return null;
+      const start = Date.now();
+      while (Date.now() - start < timeout) {
+        const el = document.querySelector(selector);
+        if (el) return el;
+        await Utils.sleep(interval);
+      }
+      return null;
     },
 
     createElement: (tag, props = {}, children = []) => {
@@ -1058,29 +1058,29 @@ window.addEventListener('message', (event) => {
     colorDistance: (a, b) => Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2) + Math.pow(a[2] - b[2], 2)),
 
     findClosestPaletteColor: (r, g, b, palette) => {
-        let menorDist = Infinity;
-        let cor = [0, 0, 0];
-        if (!palette || palette.length === 0) {
-            // If no palette provided, use all available colors from COLOR_MAP
-            const availableColors = Object.values(CONFIG.COLOR_MAP)
-                .filter(color => color.rgb !== null)
-                .map(color => [color.rgb.r, color.rgb.g, color.rgb.b]);
-            palette = availableColors;
-        }
+      let menorDist = Infinity;
+      let cor = [0, 0, 0];
+      if (!palette || palette.length === 0) {
+        // If no palette provided, use all available colors from COLOR_MAP
+        const availableColors = Object.values(CONFIG.COLOR_MAP)
+          .filter(color => color.rgb !== null)
+          .map(color => [color.rgb.r, color.rgb.g, color.rgb.b]);
+        palette = availableColors;
+      }
 
-        for (let i = 0; i < palette.length; i++) {
-            const [pr, pg, pb] = palette[i];
-            const rmean = (pr + r) / 2;
-            const rdiff = pr - r;
-            const gdiff = pg - g;
-            const bdiff = pb - b;
-            const dist = Math.sqrt(((512 + rmean) * rdiff * rdiff >> 8) + 4 * gdiff * gdiff + ((767 - rmean) * bdiff * bdiff >> 8));
-            if (dist < menorDist) {
-                menorDist = dist;
-                cor = [pr, pg, pb];
-            }
+      for (let i = 0; i < palette.length; i++) {
+        const [pr, pg, pb] = palette[i];
+        const rmean = (pr + r) / 2;
+        const rdiff = pr - r;
+        const gdiff = pg - g;
+        const bdiff = pb - b;
+        const dist = Math.sqrt(((512 + rmean) * rdiff * rdiff >> 8) + 4 * gdiff * gdiff + ((767 - rmean) * bdiff * bdiff >> 8));
+        if (dist < menorDist) {
+          menorDist = dist;
+          cor = [pr, pg, pb];
         }
-        return cor;
+      }
+      return cor;
     },
 
     isWhitePixel: (r, g, b) =>
@@ -1139,24 +1139,24 @@ window.addEventListener('message', (event) => {
 
     extractAvailableColors: () => {
       const colorElements = document.querySelectorAll('[id^="color-"]')
-      
+
       // Separate available and unavailable colors
       const availableColors = []
       const unavailableColors = []
-      
+
       Array.from(colorElements).forEach((el) => {
         const id = Number.parseInt(el.id.replace("color-", ""))
         if (id === 0) return // Skip transparent color
-        
+
         const rgbStr = el.style.backgroundColor.match(/\d+/g)
         const rgb = rgbStr ? rgbStr.map(Number) : [0, 0, 0]
-        
+
         // Find color name from COLOR_MAP
         const colorInfo = Object.values(CONFIG.COLOR_MAP).find(color => color.id === id)
         const name = colorInfo ? colorInfo.name : `Unknown Color ${id}`
-        
+
         const colorData = { id, name, rgb }
-        
+
         // Check if color is available (no SVG overlay means available)
         if (!el.querySelector("svg")) {
           availableColors.push(colorData)
@@ -1164,29 +1164,29 @@ window.addEventListener('message', (event) => {
           unavailableColors.push(colorData)
         }
       })
-      
+
       // Console log detailed color information
       console.log("=== CAPTURED COLORS STATUS ===")
       console.log(`Total available colors: ${availableColors.length}`)
       console.log(`Total unavailable colors: ${unavailableColors.length}`)
       console.log(`Total colors scanned: ${availableColors.length + unavailableColors.length}`)
-      
+
       if (availableColors.length > 0) {
         console.log("\n--- AVAILABLE COLORS ---")
         availableColors.forEach((color, index) => {
           console.log(`${index + 1}. ID: ${color.id}, Name: "${color.name}", RGB: (${color.rgb[0]}, ${color.rgb[1]}, ${color.rgb[2]})`)
         })
       }
-      
+
       if (unavailableColors.length > 0) {
         console.log("\n--- UNAVAILABLE COLORS ---")
         unavailableColors.forEach((color, index) => {
           console.log(`${index + 1}. ID: ${color.id}, Name: "${color.name}", RGB: (${color.rgb[0]}, ${color.rgb[1]}, ${color.rgb[2]}) [LOCKED]`)
         })
       }
-      
+
       console.log("=== END COLOR STATUS ===")
-      
+
       return availableColors
     },
 
@@ -1233,11 +1233,11 @@ window.addEventListener('message', (event) => {
           },
           imageData: state.imageData
             ? {
-                width: state.imageData.width,
-                height: state.imageData.height,
-                pixels: Array.from(state.imageData.pixels),
-                totalPixels: state.imageData.totalPixels,
-              }
+              width: state.imageData.width,
+              height: state.imageData.height,
+              pixels: Array.from(state.imageData.pixels),
+              totalPixels: state.imageData.totalPixels,
+            }
             : null,
           paintedMap: state.paintedMap ? state.paintedMap.map((row) => Array.from(row)) : null,
         }
@@ -1309,11 +1309,11 @@ window.addEventListener('message', (event) => {
           },
           imageData: state.imageData
             ? {
-                width: state.imageData.width,
-                height: state.imageData.height,
-                pixels: Array.from(state.imageData.pixels),
-                totalPixels: state.imageData.totalPixels,
-              }
+              width: state.imageData.width,
+              height: state.imageData.height,
+              pixels: Array.from(state.imageData.pixels),
+              totalPixels: state.imageData.totalPixels,
+            }
             : null,
           paintedMap: state.paintedMap ? state.paintedMap.map((row) => Array.from(row)) : null,
         }
@@ -1356,24 +1356,24 @@ window.addEventListener('message', (event) => {
           state.imageData.width,
           state.imageData.height
         );
-        
+
         const canvas = new OffscreenCanvas(state.imageData.width, state.imageData.height);
         const ctx = canvas.getContext('2d');
         ctx.putImageData(imageData, 0, 0);
         const imageBitmap = await canvas.transferToImageBitmap();
-        
+
         // Set up overlay with restored data
         await overlayManager.setImage(imageBitmap);
         await overlayManager.setPosition(state.startPosition, state.region);
         overlayManager.enable();
-        
+
         // Update overlay button state
         const toggleOverlayBtn = document.getElementById('toggleOverlayBtn');
         if (toggleOverlayBtn) {
           toggleOverlayBtn.disabled = false;
           toggleOverlayBtn.classList.add('active');
         }
-        
+
         console.log('Overlay restored from data');
         return true;
       } catch (error) {
@@ -1544,190 +1544,190 @@ window.addEventListener('message', (event) => {
   }
 
   // UI UPDATE FUNCTIONS (declared early to avoid reference errors)
-  let updateUI = () => {}
-  let updateStats = () => {}
-  let updateDataButtons = () => {}
+  let updateUI = () => { }
+  let updateStats = () => { }
+  let updateDataButtons = () => { }
 
   function updateActiveColorPalette() {
-      state.activeColorPalette = [];
-      const activeSwatches = document.querySelectorAll('.wplace-color-swatch.active');
-      if (activeSwatches) {
-          activeSwatches.forEach(swatch => {
-              const rgbStr = swatch.getAttribute('data-rgb');
-              if (rgbStr) {
-                  const rgb = rgbStr.split(',').map(Number);
-                  state.activeColorPalette.push(rgb);
-              }
-          });
-      }
-      if (document.querySelector('.resize-container')?.style.display === 'block') {
-          _updateResizePreview();
-      }
+    state.activeColorPalette = [];
+    const activeSwatches = document.querySelectorAll('.wplace-color-swatch.active');
+    if (activeSwatches) {
+      activeSwatches.forEach(swatch => {
+        const rgbStr = swatch.getAttribute('data-rgb');
+        if (rgbStr) {
+          const rgb = rgbStr.split(',').map(Number);
+          state.activeColorPalette.push(rgb);
+        }
+      });
+    }
+    if (document.querySelector('.resize-container')?.style.display === 'block') {
+      _updateResizePreview();
+    }
   }
 
   function toggleAllColors(select, showingUnavailable = false) {
-      const swatches = document.querySelectorAll('.wplace-color-swatch');
-      if (swatches) {
-          swatches.forEach(swatch => {
-              // Only toggle colors that are available or if we're showing unavailable colors
-              const isUnavailable = swatch.classList.contains('unavailable');
-              if (!isUnavailable || showingUnavailable) {
-                  // Don't try to select unavailable colors
-                  if (!isUnavailable) {
-                      swatch.classList.toggle('active', select);
-                  }
-              }
-          });
-      }
-      updateActiveColorPalette();
+    const swatches = document.querySelectorAll('.wplace-color-swatch');
+    if (swatches) {
+      swatches.forEach(swatch => {
+        // Only toggle colors that are available or if we're showing unavailable colors
+        const isUnavailable = swatch.classList.contains('unavailable');
+        if (!isUnavailable || showingUnavailable) {
+          // Don't try to select unavailable colors
+          if (!isUnavailable) {
+            swatch.classList.toggle('active', select);
+          }
+        }
+      });
+    }
+    updateActiveColorPalette();
   }
 
   function initializeColorPalette(container) {
-      const colorsContainer = container.querySelector('#colors-container');
-      const showAllToggle = container.querySelector('#showAllColorsToggle');
-      if (!colorsContainer) return;
+    const colorsContainer = container.querySelector('#colors-container');
+    const showAllToggle = container.querySelector('#showAllColorsToggle');
+    if (!colorsContainer) return;
 
-      // Use already captured colors from state (captured during upload)
-      // Don't re-fetch colors here, use what was captured when user clicked upload
-      if (!state.availableColors || state.availableColors.length === 0) {
-          // If no colors have been captured yet, show message
-          colorsContainer.innerHTML = '<div style="text-align: center; color: #888; padding: 20px;">Upload an image first to capture available colors</div>';
-          return;
-      }
-
-      function populateColors(showUnavailable = false) {
-          colorsContainer.innerHTML = '';
-          let availableCount = 0;
-          let totalCount = 0;
-
-          // Convert COLOR_MAP to array and filter out transparent
-          const allColors = Object.values(CONFIG.COLOR_MAP).filter(color => color.rgb !== null);
-
-          allColors.forEach(colorData => {
-              const { id, name, rgb } = colorData;
-              const rgbKey = `${rgb.r},${rgb.g},${rgb.b}`;
-              totalCount++;
-              
-              // Check if this color is available in the captured colors
-              const isAvailable = state.availableColors.some(c => 
-                  c.rgb[0] === rgb.r && c.rgb[1] === rgb.g && c.rgb[2] === rgb.b
-              );
-
-              // If not showing all colors and this color is not available, skip it
-              if (!showUnavailable && !isAvailable) {
-                  return;
-              }
-
-              if (isAvailable) availableCount++;
-
-              const colorItem = Utils.createElement('div', { className: 'wplace-color-item' });
-              const swatch = Utils.createElement('button', {
-                  className: `wplace-color-swatch ${!isAvailable ? 'unavailable' : ''}`,
-                  title: `${name} (ID: ${id})${!isAvailable ? ' (Unavailable)' : ''}`,
-                  'data-rgb': rgbKey,
-                  'data-color-id': id,
-              });
-              swatch.style.backgroundColor = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
-
-              // Make unavailable colors visually distinct
-              if (!isAvailable) {
-                  swatch.style.opacity = '0.4';
-                  swatch.style.filter = 'grayscale(50%)';
-                  swatch.disabled = true;
-              } else {
-                  // Select available colors by default
-                  swatch.classList.add('active');
-              }
-
-              const nameLabel = Utils.createElement('span', { 
-                  className: 'wplace-color-item-name',
-                  style: !isAvailable ? 'color: #888; font-style: italic;' : ''
-              }, name + (!isAvailable ? ' (N/A)' : ''));
-
-              // Only add click listener for available colors
-              if (isAvailable) {
-                  swatch.addEventListener('click', () => {
-                      swatch.classList.toggle('active');
-                      updateActiveColorPalette();
-                  });
-              }
-
-              colorItem.appendChild(swatch);
-              colorItem.appendChild(nameLabel);
-              colorsContainer.appendChild(colorItem);
-          });
-
-          updateActiveColorPalette();
-      }
-
-      // Initialize with only available colors
-      populateColors(false);
-
-      // Add toggle functionality
-      if (showAllToggle) {
-          showAllToggle.addEventListener('change', (e) => {
-              populateColors(e.target.checked);
-          });
-      }
-
-      container.querySelector('#selectAllBtn')?.addEventListener('click', () => toggleAllColors(true, showAllToggle?.checked));
-      container.querySelector('#unselectAllBtn')?.addEventListener('click', () => toggleAllColors(false, showAllToggle?.checked));
-  }
-    async function handleCaptcha() {
-        return new Promise(async (resolve, reject) => {
-            if (!CONFIG.AUTO_CAPTCHA_ENABLED) {
-                return reject(new Error("Auto-CAPTCHA is disabled."));
-            }
-
-            try {
-                const timeoutPromise = Utils.sleep(20000).then(() => reject(new Error("Auto-CAPTCHA timed out.")));
-
-                const solvePromise = (async () => {
-                    const mainPaintBtn = await Utils.waitForSelector('button.btn.btn-primary.btn-lg, button.btn-primary.sm\\:btn-xl', 200, 10000);
-                    if (!mainPaintBtn) throw new Error("Could not find the main paint button.");
-                    mainPaintBtn.click();
-                    await Utils.sleep(500);
-
-                    const transBtn = await Utils.waitForSelector('button#color-0', 200, 5000);
-                    if (!transBtn) throw new Error("Could not find the transparent color button.");
-                    transBtn.click();
-                    await Utils.sleep(500);
-
-                    const canvas = await Utils.waitForSelector('canvas', 200, 5000);
-                    if (!canvas) throw new Error("Could not find the canvas element.");
-
-                    canvas.setAttribute('tabindex', '0');
-                    canvas.focus();
-                    const rect = canvas.getBoundingClientRect();
-                    const centerX = Math.round(rect.left + rect.width / 2);
-                    const centerY = Math.round(rect.top + rect.height / 2);
-
-                    canvas.dispatchEvent(new MouseEvent('mousemove', { clientX: centerX, clientY: centerY, bubbles: true }));
-                    canvas.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', code: 'Space', bubbles: true }));
-                    await Utils.sleep(50);
-                    canvas.dispatchEvent(new KeyboardEvent('keyup', { key: ' ', code: 'Space', bubbles: true }));
-                    await Utils.sleep(500);
-
-                    let confirmBtn = await Utils.waitForSelector('button.btn.btn-primary.btn-lg, button.btn.btn-primary.sm\\:btn-xl');
-                    if (!confirmBtn) {
-                        const allPrimary = Array.from(document.querySelectorAll('button.btn-primary'));
-                        confirmBtn = allPrimary.length ? allPrimary[allPrimary.length - 1] : null;
-                    }
-                    if (!confirmBtn) throw new Error("Could not find the confirmation button.");
-                    confirmBtn.click();
-
-                    await tokenPromise;
-                    resolve();
-                })();
-
-                await Promise.race([solvePromise, timeoutPromise]);
-
-            } catch (error) {
-                console.error("Auto-CAPTCHA process failed:", error);
-                reject(error);
-            }
-        });
+    // Use already captured colors from state (captured during upload)
+    // Don't re-fetch colors here, use what was captured when user clicked upload
+    if (!state.availableColors || state.availableColors.length === 0) {
+      // If no colors have been captured yet, show message
+      colorsContainer.innerHTML = '<div style="text-align: center; color: #888; padding: 20px;">Upload an image first to capture available colors</div>';
+      return;
     }
+
+    function populateColors(showUnavailable = false) {
+      colorsContainer.innerHTML = '';
+      let availableCount = 0;
+      let totalCount = 0;
+
+      // Convert COLOR_MAP to array and filter out transparent
+      const allColors = Object.values(CONFIG.COLOR_MAP).filter(color => color.rgb !== null);
+
+      allColors.forEach(colorData => {
+        const { id, name, rgb } = colorData;
+        const rgbKey = `${rgb.r},${rgb.g},${rgb.b}`;
+        totalCount++;
+
+        // Check if this color is available in the captured colors
+        const isAvailable = state.availableColors.some(c =>
+          c.rgb[0] === rgb.r && c.rgb[1] === rgb.g && c.rgb[2] === rgb.b
+        );
+
+        // If not showing all colors and this color is not available, skip it
+        if (!showUnavailable && !isAvailable) {
+          return;
+        }
+
+        if (isAvailable) availableCount++;
+
+        const colorItem = Utils.createElement('div', { className: 'wplace-color-item' });
+        const swatch = Utils.createElement('button', {
+          className: `wplace-color-swatch ${!isAvailable ? 'unavailable' : ''}`,
+          title: `${name} (ID: ${id})${!isAvailable ? ' (Unavailable)' : ''}`,
+          'data-rgb': rgbKey,
+          'data-color-id': id,
+        });
+        swatch.style.backgroundColor = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+
+        // Make unavailable colors visually distinct
+        if (!isAvailable) {
+          swatch.style.opacity = '0.4';
+          swatch.style.filter = 'grayscale(50%)';
+          swatch.disabled = true;
+        } else {
+          // Select available colors by default
+          swatch.classList.add('active');
+        }
+
+        const nameLabel = Utils.createElement('span', {
+          className: 'wplace-color-item-name',
+          style: !isAvailable ? 'color: #888; font-style: italic;' : ''
+        }, name + (!isAvailable ? ' (N/A)' : ''));
+
+        // Only add click listener for available colors
+        if (isAvailable) {
+          swatch.addEventListener('click', () => {
+            swatch.classList.toggle('active');
+            updateActiveColorPalette();
+          });
+        }
+
+        colorItem.appendChild(swatch);
+        colorItem.appendChild(nameLabel);
+        colorsContainer.appendChild(colorItem);
+      });
+
+      updateActiveColorPalette();
+    }
+
+    // Initialize with only available colors
+    populateColors(false);
+
+    // Add toggle functionality
+    if (showAllToggle) {
+      showAllToggle.addEventListener('change', (e) => {
+        populateColors(e.target.checked);
+      });
+    }
+
+    container.querySelector('#selectAllBtn')?.addEventListener('click', () => toggleAllColors(true, showAllToggle?.checked));
+    container.querySelector('#unselectAllBtn')?.addEventListener('click', () => toggleAllColors(false, showAllToggle?.checked));
+  }
+  async function handleCaptcha() {
+    return new Promise(async (resolve, reject) => {
+      if (!CONFIG.AUTO_CAPTCHA_ENABLED) {
+        return reject(new Error("Auto-CAPTCHA is disabled."));
+      }
+
+      try {
+        const timeoutPromise = Utils.sleep(20000).then(() => reject(new Error("Auto-CAPTCHA timed out.")));
+
+        const solvePromise = (async () => {
+          const mainPaintBtn = await Utils.waitForSelector('button.btn.btn-primary.btn-lg, button.btn-primary.sm\\:btn-xl', 200, 10000);
+          if (!mainPaintBtn) throw new Error("Could not find the main paint button.");
+          mainPaintBtn.click();
+          await Utils.sleep(500);
+
+          const transBtn = await Utils.waitForSelector('button#color-0', 200, 5000);
+          if (!transBtn) throw new Error("Could not find the transparent color button.");
+          transBtn.click();
+          await Utils.sleep(500);
+
+          const canvas = await Utils.waitForSelector('canvas', 200, 5000);
+          if (!canvas) throw new Error("Could not find the canvas element.");
+
+          canvas.setAttribute('tabindex', '0');
+          canvas.focus();
+          const rect = canvas.getBoundingClientRect();
+          const centerX = Math.round(rect.left + rect.width / 2);
+          const centerY = Math.round(rect.top + rect.height / 2);
+
+          canvas.dispatchEvent(new MouseEvent('mousemove', { clientX: centerX, clientY: centerY, bubbles: true }));
+          canvas.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', code: 'Space', bubbles: true }));
+          await Utils.sleep(50);
+          canvas.dispatchEvent(new KeyboardEvent('keyup', { key: ' ', code: 'Space', bubbles: true }));
+          await Utils.sleep(500);
+
+          let confirmBtn = await Utils.waitForSelector('button.btn.btn-primary.btn-lg, button.btn.btn-primary.sm\\:btn-xl');
+          if (!confirmBtn) {
+            const allPrimary = Array.from(document.querySelectorAll('button.btn-primary'));
+            confirmBtn = allPrimary.length ? allPrimary[allPrimary.length - 1] : null;
+          }
+          if (!confirmBtn) throw new Error("Could not find the confirmation button.");
+          confirmBtn.click();
+
+          await tokenPromise;
+          resolve();
+        })();
+
+        await Promise.race([solvePromise, timeoutPromise]);
+
+      } catch (error) {
+        console.error("Auto-CAPTCHA process failed:", error);
+        reject(error);
+      }
+    });
+  }
 
 
   async function createUI() {
@@ -1766,9 +1766,8 @@ window.addEventListener('message', (event) => {
     style.setAttribute("data-wplace-theme", "true")
 
     style.textContent = `
-      ${
-        theme.animations.glow
-          ? `
+      ${theme.animations.glow
+        ? `
       @keyframes neonGlow {
         0%, 100% {
           text-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor;
@@ -1777,27 +1776,25 @@ window.addEventListener('message', (event) => {
           text-shadow: 0 0 2px currentColor, 0 0 5px currentColor, 0 0 8px currentColor;
         }
       }`
-          : ""
+        : ""
       }
 
-      ${
-        theme.animations.pixelBlink
-          ? `
+      ${theme.animations.pixelBlink
+        ? `
       @keyframes pixelBlink {
         0%, 50% { opacity: 1; }
         51%, 100% { opacity: 0.7; }
       }`
-          : ""
+        : ""
       }
 
-      ${
-        theme.animations.scanline
-          ? `
+      ${theme.animations.scanline
+        ? `
       @keyframes scanline {
         0% { transform: translateY(-100%); }
         100% { transform: translateY(400px); }
       }`
-          : ""
+        : ""
       }
 
       @keyframes pulse {
@@ -1817,14 +1814,13 @@ window.addEventListener('message', (event) => {
       #wplace-image-bot-container {
         position: fixed;
         top: 20px;
-        right: 20px;
+        left: 20px;
         width: ${CONFIG.currentTheme === "Neon Retro" ? "280px" : "280px"};
         max-height: calc(100vh - 40px);
-        background: ${
-          CONFIG.currentTheme === "Classic Autobot"
-            ? `linear-gradient(135deg, ${theme.primary} 0%, #1a1a1a 100%)`
-            : theme.primary
-        };
+        background: ${CONFIG.currentTheme === "Classic Autobot"
+        ? `linear-gradient(135deg, ${theme.primary} 0%, #1a1a1a 100%)`
+        : theme.primary
+      };
         border: ${theme.borderWidth} ${theme.borderStyle} ${CONFIG.currentTheme === "Classic Autobot" ? theme.accent : theme.text};
         border-radius: ${theme.borderRadius};
         padding: 0;
@@ -1841,9 +1837,8 @@ window.addEventListener('message', (event) => {
         ${CONFIG.currentTheme === "Neon Retro" ? "image-rendering: pixelated;" : ""}
       }
 
-      ${
-        theme.animations.scanline
-          ? `
+      ${theme.animations.scanline
+        ? `
       #wplace-image-bot-container::before {
         content: '';
         position: absolute;
@@ -1856,12 +1851,11 @@ window.addEventListener('message', (event) => {
         z-index: 1;
         pointer-events: none;
       }`
-          : ""
+        : ""
       }
 
-      ${
-        CONFIG.currentTheme === "Neon Retro"
-          ? `
+      ${CONFIG.currentTheme === "Neon Retro"
+        ? `
       #wplace-image-bot-container::after {
         content: '';
         position: absolute;
@@ -1880,7 +1874,7 @@ window.addEventListener('message', (event) => {
         pointer-events: none;
         z-index: 1;
       }`
-          : ""
+        : ""
       }
 
       #wplace-image-bot-container.wplace-dragging {
@@ -1902,14 +1896,13 @@ window.addEventListener('message', (event) => {
       #wplace-stats-container {
         position: fixed;
         top: 20px;
-        left: 20px;
+        left: 330px;
         width: ${CONFIG.currentTheme === "Neon Retro" ? "280px" : "280px"};
         max-height: calc(100vh - 40px);
-        background: ${
-          CONFIG.currentTheme === "Classic Autobot"
-            ? `linear-gradient(135deg, ${theme.primary} 0%, #1a1a1a 100%)`
-            : theme.primary
-        };
+        background: ${CONFIG.currentTheme === "Classic Autobot"
+        ? `linear-gradient(135deg, ${theme.primary} 0%, #1a1a1a 100%)`
+        : theme.primary
+      };
         border: ${theme.borderWidth} ${theme.borderStyle} ${CONFIG.currentTheme === "Classic Autobot" ? theme.accent : theme.text};
         border-radius: ${theme.borderRadius};
         padding: 0;
@@ -1932,11 +1925,10 @@ window.addEventListener('message', (event) => {
 
       .wplace-header {
         padding: ${CONFIG.currentTheme === "Neon Retro" ? "8px 12px" : "8px 12px"};
-        background: ${
-          CONFIG.currentTheme === "Classic Autobot"
-            ? `linear-gradient(135deg, ${theme.secondary} 0%, #2a2a2a 100%)`
-            : theme.secondary
-        };
+        background: ${CONFIG.currentTheme === "Classic Autobot"
+        ? `linear-gradient(135deg, ${theme.secondary} 0%, #2a2a2a 100%)`
+        : theme.secondary
+      };
         color: ${theme.highlight};
         font-size: ${CONFIG.currentTheme === "Neon Retro" ? "11px" : "13px"};
         font-weight: ${CONFIG.currentTheme === "Neon Retro" ? "normal" : "700"};
@@ -2056,17 +2048,15 @@ window.addEventListener('message', (event) => {
         overflow: hidden;
         font-family: ${theme.fontFamily};
         ${CONFIG.currentTheme === "Neon Retro" ? "text-transform: uppercase; letter-spacing: 1px; image-rendering: pixelated;" : ""}
-        background: ${
-          CONFIG.currentTheme === "Classic Autobot"
-            ? `linear-gradient(135deg, ${theme.accent} 0%, #4a4a4a 100%)`
-            : theme.accent
-        };
+        background: ${CONFIG.currentTheme === "Classic Autobot"
+        ? `linear-gradient(135deg, ${theme.accent} 0%, #4a4a4a 100%)`
+        : theme.accent
+      };
         ${CONFIG.currentTheme === "Classic Autobot" ? "border: 1px solid rgba(255,255,255,0.1);" : ""}
       }
 
-      ${
-        CONFIG.currentTheme === "Classic Autobot"
-          ? `
+      ${CONFIG.currentTheme === "Classic Autobot"
+        ? `
       .wplace-btn::before {
         content: '';
         position: absolute;
@@ -2080,7 +2070,7 @@ window.addEventListener('message', (event) => {
       .wplace-btn:hover:not(:disabled)::before {
         left: 100%;
       }`
-          : `
+        : `
       .wplace-btn::before {
         content: '';
         position: absolute;
@@ -2098,9 +2088,8 @@ window.addEventListener('message', (event) => {
 
       .wplace-btn:hover:not(:disabled) {
         transform: ${CONFIG.currentTheme === "Classic Autobot" ? "translateY(-1px)" : "none"};
-        box-shadow: ${
-          CONFIG.currentTheme === "Classic Autobot" ? "0 4px 12px rgba(0,0,0,0.4)" : "0 0 15px currentColor"
-        };
+        box-shadow: ${CONFIG.currentTheme === "Classic Autobot" ? "0 4px 12px rgba(0,0,0,0.4)" : "0 0 15px currentColor"
+      };
         ${theme.animations.pixelBlink ? "animation: pixelBlink 0.5s infinite;" : ""}
       }
       .wplace-btn:active:not(:disabled) {
@@ -2108,60 +2097,53 @@ window.addEventListener('message', (event) => {
       }
 
       .wplace-btn-primary {
-        background: ${
-          CONFIG.currentTheme === "Classic Autobot"
-            ? `linear-gradient(135deg, ${theme.accent} 0%, #6a5acd 100%)`
-            : theme.accent
-        };
+        background: ${CONFIG.currentTheme === "Classic Autobot"
+        ? `linear-gradient(135deg, ${theme.accent} 0%, #6a5acd 100%)`
+        : theme.accent
+      };
         color: ${theme.text};
         ${CONFIG.currentTheme === "Neon Retro" ? `border-color: ${theme.text};` : ""}
       }
       .wplace-btn-upload {
-        background: ${
-          CONFIG.currentTheme === "Classic Autobot"
-            ? `linear-gradient(135deg, ${theme.secondary} 0%, #4a4a4a 100%)`
-            : theme.purple
-        };
+        background: ${CONFIG.currentTheme === "Classic Autobot"
+        ? `linear-gradient(135deg, ${theme.secondary} 0%, #4a4a4a 100%)`
+        : theme.purple
+      };
         color: ${theme.text};
-        ${
-          CONFIG.currentTheme === "Classic Autobot"
-            ? `border: 1px dashed ${theme.highlight};`
-            : `border-color: ${theme.text}; border-style: dashed;`
-        }
+        ${CONFIG.currentTheme === "Classic Autobot"
+        ? `border: 1px dashed ${theme.highlight};`
+        : `border-color: ${theme.text}; border-style: dashed;`
+      }
       }
       .wplace-btn-start {
-        background: ${
-          CONFIG.currentTheme === "Classic Autobot"
-            ? `linear-gradient(135deg, ${theme.success} 0%, #228b22 100%)`
-            : theme.success
-        };
+        background: ${CONFIG.currentTheme === "Classic Autobot"
+        ? `linear-gradient(135deg, ${theme.success} 0%, #228b22 100%)`
+        : theme.success
+      };
         color: ${CONFIG.currentTheme === "Classic Autobot" ? "white" : theme.primary};
         ${CONFIG.currentTheme === "Neon Retro" ? `border-color: ${theme.success};` : ""}
       }
       .wplace-btn-stop {
-        background: ${
-          CONFIG.currentTheme === "Classic Autobot"
-            ? `linear-gradient(135deg, ${theme.error} 0%, #dc143c 100%)`
-            : theme.error
-        };
+        background: ${CONFIG.currentTheme === "Classic Autobot"
+        ? `linear-gradient(135deg, ${theme.error} 0%, #dc143c 100%)`
+        : theme.error
+      };
         color: ${CONFIG.currentTheme === "Classic Autobot" ? "white" : theme.text};
         ${CONFIG.currentTheme === "Neon Retro" ? `border-color: ${theme.error};` : ""}
       }
       .wplace-btn-select {
-        background: ${
-          CONFIG.currentTheme === "Classic Autobot"
-            ? `linear-gradient(135deg, ${theme.highlight} 0%, #9370db 100%)`
-            : theme.highlight
-        };
+        background: ${CONFIG.currentTheme === "Classic Autobot"
+        ? `linear-gradient(135deg, ${theme.highlight} 0%, #9370db 100%)`
+        : theme.highlight
+      };
         color: ${CONFIG.currentTheme === "Classic Autobot" ? "white" : theme.primary};
         ${CONFIG.currentTheme === "Neon Retro" ? `border-color: ${theme.highlight};` : ""}
       }
       .wplace-btn-file {
-        background: ${
-          CONFIG.currentTheme === "Classic Autobot"
-            ? "linear-gradient(135deg, #ff8c00 0%, #ff7f50 100%)"
-            : theme.warning
-        };
+        background: ${CONFIG.currentTheme === "Classic Autobot"
+        ? "linear-gradient(135deg, #ff8c00 0%, #ff7f50 100%)"
+        : theme.warning
+      };
         color: ${CONFIG.currentTheme === "Classic Autobot" ? "white" : theme.primary};
         ${CONFIG.currentTheme === "Neon Retro" ? `border-color: ${theme.warning};` : ""}
       }
@@ -2250,9 +2232,8 @@ window.addEventListener('message', (event) => {
         position: relative;
       }
 
-      ${
-        CONFIG.currentTheme === "Neon Retro"
-          ? `
+      ${CONFIG.currentTheme === "Neon Retro"
+        ? `
       .wplace-progress::before {
         content: '';
         position: absolute;
@@ -2270,24 +2251,22 @@ window.addEventListener('message', (event) => {
           );
         pointer-events: none;
       }`
-          : ""
+        : ""
       }
 
       .wplace-progress-bar {
         height: ${CONFIG.currentTheme === "Neon Retro" ? "100%" : "6px"};
-        background: ${
-          CONFIG.currentTheme === "Classic Autobot"
-            ? `linear-gradient(135deg, ${theme.highlight} 0%, #9370db 100%)`
-            : `linear-gradient(90deg, ${theme.success}, ${theme.neon})`
-        };
+        background: ${CONFIG.currentTheme === "Classic Autobot"
+        ? `linear-gradient(135deg, ${theme.highlight} 0%, #9370db 100%)`
+        : `linear-gradient(90deg, ${theme.success}, ${theme.neon})`
+      };
         transition: width ${CONFIG.currentTheme === "Neon Retro" ? "0.3s" : "0.5s"} ease;
         position: relative;
         ${CONFIG.currentTheme === "Neon Retro" ? `box-shadow: 0 0 10px ${theme.success};` : ""}
       }
 
-      ${
-        CONFIG.currentTheme === "Classic Autobot"
-          ? `
+      ${CONFIG.currentTheme === "Classic Autobot"
+        ? `
       .wplace-progress-bar::after {
         content: '';
         position: absolute;
@@ -2298,7 +2277,7 @@ window.addEventListener('message', (event) => {
         background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
         animation: shimmer 2s infinite;
       }`
-          : `
+        : `
       .wplace-progress-bar::after {
         content: '';
         position: absolute;
@@ -2358,9 +2337,8 @@ window.addEventListener('message', (event) => {
         border: ${theme.borderWidth} ${theme.borderStyle} ${theme.text};
         border-radius: ${theme.borderRadius};
         z-index: 10000;
-        box-shadow: ${
-          CONFIG.currentTheme === "Classic Autobot" ? "0 0 20px rgba(0,0,0,0.5)" : "0 0 30px rgba(0, 255, 65, 0.5)"
-        };
+        box-shadow: ${CONFIG.currentTheme === "Classic Autobot" ? "0 0 20px rgba(0,0,0,0.5)" : "0 0 30px rgba(0, 255, 65, 0.5)"
+      };
         width: 90%;
         max-width: 700px;
         max-height: 90%;
@@ -2410,9 +2388,8 @@ window.addEventListener('message', (event) => {
         -webkit-appearance: none;
       }
 
-      ${
-        CONFIG.currentTheme === "Neon Retro"
-          ? `
+      ${CONFIG.currentTheme === "Neon Retro"
+        ? `
       .resize-slider::-webkit-slider-thumb {
         -webkit-appearance: none;
         width: 16px;
@@ -2433,7 +2410,7 @@ window.addEventListener('message', (event) => {
         cursor: pointer;
         box-shadow: 0 0 5px ${theme.highlight};
       }`
-          : ""
+        : ""
       }
       
       .resize-zoom-controls {
@@ -2561,9 +2538,8 @@ window.addEventListener('message', (event) => {
         }
 
 
-      ${
-        CONFIG.currentTheme === "Neon Retro"
-          ? `
+      ${CONFIG.currentTheme === "Neon Retro"
+        ? `
       input[type="checkbox"] {
         -webkit-appearance: none;
         -moz-appearance: none;
@@ -2912,7 +2888,7 @@ window.addEventListener('message', (event) => {
       .wplace-btn-secondary:hover {
         background: ${theme.secondary};
       }`
-          : ""
+        : ""
       }
     `
     document.head.appendChild(style)
@@ -3226,8 +3202,8 @@ window.addEventListener('message', (event) => {
               box-shadow: 0 3px 10px rgba(0,0,0,0.1);
             ">
               ${Object.keys(CONFIG.THEMES).map(themeName =>
-                `<option value="${themeName}" ${CONFIG.currentTheme === themeName ? 'selected' : ''} style="background: #2d3748; color: white; padding: 10px;">${themeName}</option>`
-              ).join('')}
+      `<option value="${themeName}" ${CONFIG.currentTheme === themeName ? 'selected' : ''} style="background: #2d3748; color: white; padding: 10px;">${themeName}</option>`
+    ).join('')}
             </select>
           </div>
         </div>
@@ -3594,6 +3570,11 @@ window.addEventListener('message', (event) => {
         })
       }
     }
+    if (statsContainer && statsBtn) {
+      statsContainer.style.display = "block";
+      statsBtn.innerHTML = '<i class="fas fa-chart-line"></i>';
+      statsBtn.title = "Hide Stats";
+    }
 
     const settingsBtn = container.querySelector("#settingsBtn")
     const closeSettingsBtn = settingsContainer.querySelector("#closeSettingsBtn")
@@ -3659,28 +3640,28 @@ window.addEventListener('message', (event) => {
         })
       }
 
-    const overlayOpacitySlider = settingsContainer.querySelector("#overlayOpacitySlider");
-    const overlayOpacityValue = settingsContainer.querySelector("#overlayOpacityValue");
-    const enableBlueMarbleToggle = settingsContainer.querySelector("#enableBlueMarbleToggle");
+      const overlayOpacitySlider = settingsContainer.querySelector("#overlayOpacitySlider");
+      const overlayOpacityValue = settingsContainer.querySelector("#overlayOpacityValue");
+      const enableBlueMarbleToggle = settingsContainer.querySelector("#enableBlueMarbleToggle");
 
-    if (overlayOpacitySlider && overlayOpacityValue) {
+      if (overlayOpacitySlider && overlayOpacityValue) {
         overlayOpacitySlider.addEventListener('input', (e) => {
-            const opacity = parseFloat(e.target.value);
-            state.overlayOpacity = opacity;
-            overlayOpacityValue.textContent = `${Math.round(opacity * 100)}%`;
+          const opacity = parseFloat(e.target.value);
+          state.overlayOpacity = opacity;
+          overlayOpacityValue.textContent = `${Math.round(opacity * 100)}%`;
         });
-    }
+      }
 
-    if (enableBlueMarbleToggle) {
+      if (enableBlueMarbleToggle) {
         enableBlueMarbleToggle.addEventListener('click', async () => {
-            state.blueMarbleEnabled = enableBlueMarbleToggle.checked;
-            if (state.imageLoaded && overlayManager.imageBitmap) {
-                Utils.showAlert("Re-processing overlay...", "info");
-                await overlayManager.processImageIntoChunks();
-                Utils.showAlert("Overlay updated!", "success");
-            }
+          state.blueMarbleEnabled = enableBlueMarbleToggle.checked;
+          if (state.imageLoaded && overlayManager.imageBitmap) {
+            Utils.showAlert("Re-processing overlay...", "info");
+            await overlayManager.processImageIntoChunks();
+            Utils.showAlert("Overlay updated!", "success");
+          }
         });
-    }
+      }
 
     }
 
@@ -3728,13 +3709,13 @@ window.addEventListener('message', (event) => {
         saveBotSettings()
       })
     }
-    
+
     if (toggleOverlayBtn) {
-        toggleOverlayBtn.addEventListener('click', () => {
-            const isEnabled = overlayManager.toggle();
-            toggleOverlayBtn.classList.toggle('active', isEnabled);
-            Utils.showAlert(`Overlay ${isEnabled ? 'enabled' : 'disabled'}.`, 'info');
-        });
+      toggleOverlayBtn.addEventListener('click', () => {
+        const isEnabled = overlayManager.toggle();
+        toggleOverlayBtn.classList.toggle('active', isEnabled);
+        Utils.showAlert(`Overlay ${isEnabled ? 'enabled' : 'disabled'}.`, 'info');
+      });
     }
 
     if (state.minimized) {
@@ -3781,8 +3762,8 @@ window.addEventListener('message', (event) => {
 
         const confirmLoad = confirm(
           `${Utils.t("savedDataFound")}\n\n` +
-            `Saved: ${new Date(savedData.timestamp).toLocaleString()}\n` +
-            `Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels`,
+          `Saved: ${new Date(savedData.timestamp).toLocaleString()}\n` +
+          `Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels`,
         )
 
         if (confirmLoad) {
@@ -3800,10 +3781,10 @@ window.addEventListener('message', (event) => {
             });
 
             if (!state.colorsChecked) {
-                uploadBtn.disabled = false;
+              uploadBtn.disabled = false;
             } else {
-                uploadBtn.disabled = false;
-                selectPosBtn.disabled = false;
+              uploadBtn.disabled = false;
+              selectPosBtn.disabled = false;
             }
 
             if (state.imageLoaded && state.startPosition && state.region && state.colorsChecked) {
@@ -3849,7 +3830,7 @@ window.addEventListener('message', (event) => {
               selectPosBtn.disabled = false
               resizeBtn.disabled = false
             } else {
-                uploadBtn.disabled = false;
+              uploadBtn.disabled = false;
             }
 
             if (state.imageLoaded && state.startPosition && state.region && state.colorsChecked) {
@@ -3876,23 +3857,23 @@ window.addEventListener('message', (event) => {
     }
 
     updateStats = async () => {
-        const { charges, cooldown, max } = await WPlaceService.getCharges();
-        state.currentCharges = Math.floor(charges);
-        state.cooldown = cooldown;
-        state.maxCharges = Math.floor(max) > 1 ? Math.floor(max) : state.maxCharges;
+      const { charges, cooldown, max } = await WPlaceService.getCharges();
+      state.currentCharges = Math.floor(charges);
+      state.cooldown = cooldown;
+      state.maxCharges = Math.floor(max) > 1 ? Math.floor(max) : state.maxCharges;
 
-        if (cooldownSlider.max != state.maxCharges) {
-            cooldownSlider.max = state.maxCharges;
-        }
+      if (cooldownSlider.max != state.maxCharges) {
+        cooldownSlider.max = state.maxCharges;
+      }
 
-        let imageStatsHTML = '';
-        if (state.imageLoaded) {
-            const progress = state.totalPixels > 0 ? Math.round((state.paintedPixels / state.totalPixels) * 100) : 0;
-            const remainingPixels = state.totalPixels - state.paintedPixels;
-            state.estimatedTime = Utils.calculateEstimatedTime(remainingPixels, state.currentCharges, state.cooldown);
-            progressBar.style.width = `${progress}%`;
+      let imageStatsHTML = '';
+      if (state.imageLoaded) {
+        const progress = state.totalPixels > 0 ? Math.round((state.paintedPixels / state.totalPixels) * 100) : 0;
+        const remainingPixels = state.totalPixels - state.paintedPixels;
+        state.estimatedTime = Utils.calculateEstimatedTime(remainingPixels, state.currentCharges, state.cooldown);
+        progressBar.style.width = `${progress}%`;
 
-            imageStatsHTML = `
+        imageStatsHTML = `
                 <div class="wplace-stat-item">
                 <div class="wplace-stat-label"><i class="fas fa-image"></i> ${Utils.t("progress")}</div>
                 <div class="wplace-stat-value">${progress}%</div>
@@ -3906,17 +3887,17 @@ window.addEventListener('message', (event) => {
                 <div class="wplace-stat-value">${Utils.formatTime(state.estimatedTime)}</div>
                 </div>
             `;
-        }
+      }
 
-        let colorSwatchesHTML = '';
-        if (state.colorsChecked) {
-            colorSwatchesHTML = state.availableColors.map(color => {
-                const rgbString = `rgb(${color.rgb.join(',')})`;
-                return `<div class="wplace-stat-color-swatch" style="background-color: ${rgbString};" title="ID: ${color.id}\nRGB: ${color.rgb.join(', ')}"></div>`;
-            }).join('');
-        }
+      let colorSwatchesHTML = '';
+      if (state.colorsChecked) {
+        colorSwatchesHTML = state.availableColors.map(color => {
+          const rgbString = `rgb(${color.rgb.join(',')})`;
+          return `<div class="wplace-stat-color-swatch" style="background-color: ${rgbString};" title="ID: ${color.id}\nRGB: ${color.rgb.join(', ')}"></div>`;
+        }).join('');
+      }
 
-        statsArea.innerHTML = `
+      statsArea.innerHTML = `
             ${imageStatsHTML}
             <div class="wplace-stat-item">
             <div class="wplace-stat-label"><i class="fas fa-bolt"></i> ${Utils.t("charges")}</div>
@@ -3942,183 +3923,183 @@ window.addEventListener('message', (event) => {
     updateDataButtons()
 
     function showResizeDialog(processor) {
-        const { width, height } = processor.getDimensions();
-        const aspectRatio = width / height;
+      const { width, height } = processor.getDimensions();
+      const aspectRatio = width / height;
 
-        widthSlider.value = width;
-        heightSlider.value = height;
-        widthSlider.max = width * 2;
-        heightSlider.max = height * 2;
-        widthValue.textContent = width;
-        heightValue.textContent = height;
-        zoomSlider.value = 1;
-        paintWhiteToggle.checked = state.paintWhitePixels;
+      widthSlider.value = width;
+      heightSlider.value = height;
+      widthSlider.max = width * 2;
+      heightSlider.max = height * 2;
+      widthValue.textContent = width;
+      heightValue.textContent = height;
+      zoomSlider.value = 1;
+      paintWhiteToggle.checked = state.paintWhitePixels;
 
-        _updateResizePreview = async () => {
-            const newWidth = parseInt(widthSlider.value, 10);
-            const newHeight = parseInt(heightSlider.value, 10);
-            const zoomLevel = parseFloat(zoomSlider.value);
+      _updateResizePreview = async () => {
+        const newWidth = parseInt(widthSlider.value, 10);
+        const newHeight = parseInt(heightSlider.value, 10);
+        const zoomLevel = parseFloat(zoomSlider.value);
 
-            widthValue.textContent = newWidth;
-            heightValue.textContent = newHeight;
+        widthValue.textContent = newWidth;
+        heightValue.textContent = newHeight;
 
-            const tempCanvas = document.createElement('canvas');
-            const tempCtx = tempCanvas.getContext('2d');
-            tempCanvas.width = newWidth;
-            tempCanvas.height = newHeight;
-            tempCtx.imageSmoothingEnabled = false;
-            tempCtx.drawImage(processor.img, 0, 0, newWidth, newHeight);
+        const tempCanvas = document.createElement('canvas');
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCanvas.width = newWidth;
+        tempCanvas.height = newHeight;
+        tempCtx.imageSmoothingEnabled = false;
+        tempCtx.drawImage(processor.img, 0, 0, newWidth, newHeight);
 
-            const imgData = tempCtx.getImageData(0, 0, newWidth, newHeight);
-            const data = imgData.data;
+        const imgData = tempCtx.getImageData(0, 0, newWidth, newHeight);
+        const data = imgData.data;
 
-            for (let i = 0; i < data.length; i += 4) {
-                const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
+        for (let i = 0; i < data.length; i += 4) {
+          const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
 
-                if (a < CONFIG.TRANSPARENCY_THRESHOLD || (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b))) {
-                    data[i + 3] = 0;
-                    continue;
-                }
+          if (a < CONFIG.TRANSPARENCY_THRESHOLD || (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b))) {
+            data[i + 3] = 0;
+            continue;
+          }
 
-                const [nr, ng, nb] = Utils.findClosestPaletteColor(r, g, b, state.activeColorPalette);
-                data[i] = nr;
-                data[i + 1] = ng;
-                data[i + 2] = nb;
-                data[i + 3] = 255;
-            }
-            tempCtx.putImageData(imgData, 0, 0);
-            resizePreview.src = tempCanvas.toDataURL();
-            resizePreview.style.transform = `scale(${zoomLevel})`;
-        };
+          const [nr, ng, nb] = Utils.findClosestPaletteColor(r, g, b, state.activeColorPalette);
+          data[i] = nr;
+          data[i + 1] = ng;
+          data[i + 2] = nb;
+          data[i + 3] = 255;
+        }
+        tempCtx.putImageData(imgData, 0, 0);
+        resizePreview.src = tempCanvas.toDataURL();
+        resizePreview.style.transform = `scale(${zoomLevel})`;
+      };
 
-        const onWidthInput = () => {
-            if (keepAspect.checked) {
-                heightSlider.value = Math.round(parseInt(widthSlider.value, 10) / aspectRatio);
-            }
-            _updateResizePreview();
-        };
-
-        const onHeightInput = () => {
-            if (keepAspect.checked) {
-                widthSlider.value = Math.round(parseInt(heightSlider.value, 10) * aspectRatio);
-            }
-            _updateResizePreview();
-        };
-
-        paintWhiteToggle.onchange = (e) => {
-            state.paintWhitePixels = e.target.checked;
-            _updateResizePreview();
-        };
-
-        zoomSlider.addEventListener('input', _updateResizePreview);
-        widthSlider.addEventListener("input", onWidthInput);
-        heightSlider.addEventListener("input", onHeightInput);
-
-        confirmResize.onclick = async () => {
-            const newWidth = parseInt(widthSlider.value, 10);
-            const newHeight = parseInt(heightSlider.value, 10);
-            
-            // Generate the final paletted image data
-            const tempCanvas = document.createElement('canvas');
-            const tempCtx = tempCanvas.getContext('2d');
-            tempCanvas.width = newWidth;
-            tempCanvas.height = newHeight;
-            tempCtx.imageSmoothingEnabled = false;
-            tempCtx.drawImage(processor.img, 0, 0, newWidth, newHeight);
-            const imgData = tempCtx.getImageData(0, 0, newWidth, newHeight);
-            const data = imgData.data;
-            let totalValidPixels = 0;
-
-            for (let i = 0; i < data.length; i += 4) {
-                const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
-                const isTransparent = a < CONFIG.TRANSPARENCY_THRESHOLD;
-                const isWhiteAndSkipped = !state.paintWhitePixels && Utils.isWhitePixel(r, g, b);
-
-                if (isTransparent || isWhiteAndSkipped) {
-                    data[i+3] = 0; // Make it fully transparent for the overlay
-                    continue;
-                }
-                
-                totalValidPixels++;
-                const [nr, ng, nb] = Utils.findClosestPaletteColor(r, g, b, state.activeColorPalette);
-                data[i] = nr;
-                data[i + 1] = ng;
-                data[i + 2] = nb;
-                data[i + 3] = 255;
-            }
-            tempCtx.putImageData(imgData, 0, 0);
-
-            // Save the final pixel data for painting
-            const finalPixelsForPainting = processor.resize(newWidth, newHeight);
-            state.imageData.pixels = finalPixelsForPainting;
-            state.imageData.width = newWidth;
-            state.imageData.height = newHeight;
-            state.imageData.totalPixels = totalValidPixels;
-            state.totalPixels = totalValidPixels;
-            state.paintedPixels = 0;
-
-            // Use the paletted canvas for the overlay
-            const finalImageBitmap = await createImageBitmap(tempCanvas);
-            await overlayManager.setImage(finalImageBitmap);
-            overlayManager.enable();
-            toggleOverlayBtn.classList.add('active');
-
-            updateStats();
-            updateUI("resizeSuccess", "success", { width: newWidth, height: newHeight });
-            closeResizeDialog();
-        };
-
-        downloadPreviewBtn.onclick = () => {
-            const link = document.createElement('a');
-            link.download = 'wplace-preview.png';
-            link.href = resizePreview.src;
-            link.click();
-        };
-
-        cancelResize.onclick = closeResizeDialog;
-
-        resizeOverlay.style.display = "block";
-        resizeContainer.style.display = "block";
-        
-        // Reinitialize color palette with current available colors
-        initializeColorPalette(resizeContainer);
-        
+      const onWidthInput = () => {
+        if (keepAspect.checked) {
+          heightSlider.value = Math.round(parseInt(widthSlider.value, 10) / aspectRatio);
+        }
         _updateResizePreview();
+      };
+
+      const onHeightInput = () => {
+        if (keepAspect.checked) {
+          widthSlider.value = Math.round(parseInt(heightSlider.value, 10) * aspectRatio);
+        }
+        _updateResizePreview();
+      };
+
+      paintWhiteToggle.onchange = (e) => {
+        state.paintWhitePixels = e.target.checked;
+        _updateResizePreview();
+      };
+
+      zoomSlider.addEventListener('input', _updateResizePreview);
+      widthSlider.addEventListener("input", onWidthInput);
+      heightSlider.addEventListener("input", onHeightInput);
+
+      confirmResize.onclick = async () => {
+        const newWidth = parseInt(widthSlider.value, 10);
+        const newHeight = parseInt(heightSlider.value, 10);
+
+        // Generate the final paletted image data
+        const tempCanvas = document.createElement('canvas');
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCanvas.width = newWidth;
+        tempCanvas.height = newHeight;
+        tempCtx.imageSmoothingEnabled = false;
+        tempCtx.drawImage(processor.img, 0, 0, newWidth, newHeight);
+        const imgData = tempCtx.getImageData(0, 0, newWidth, newHeight);
+        const data = imgData.data;
+        let totalValidPixels = 0;
+
+        for (let i = 0; i < data.length; i += 4) {
+          const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
+          const isTransparent = a < CONFIG.TRANSPARENCY_THRESHOLD;
+          const isWhiteAndSkipped = !state.paintWhitePixels && Utils.isWhitePixel(r, g, b);
+
+          if (isTransparent || isWhiteAndSkipped) {
+            data[i + 3] = 0; // Make it fully transparent for the overlay
+            continue;
+          }
+
+          totalValidPixels++;
+          const [nr, ng, nb] = Utils.findClosestPaletteColor(r, g, b, state.activeColorPalette);
+          data[i] = nr;
+          data[i + 1] = ng;
+          data[i + 2] = nb;
+          data[i + 3] = 255;
+        }
+        tempCtx.putImageData(imgData, 0, 0);
+
+        // Save the final pixel data for painting
+        const finalPixelsForPainting = processor.resize(newWidth, newHeight);
+        state.imageData.pixels = finalPixelsForPainting;
+        state.imageData.width = newWidth;
+        state.imageData.height = newHeight;
+        state.imageData.totalPixels = totalValidPixels;
+        state.totalPixels = totalValidPixels;
+        state.paintedPixels = 0;
+
+        // Use the paletted canvas for the overlay
+        const finalImageBitmap = await createImageBitmap(tempCanvas);
+        await overlayManager.setImage(finalImageBitmap);
+        overlayManager.enable();
+        toggleOverlayBtn.classList.add('active');
+
+        updateStats();
+        updateUI("resizeSuccess", "success", { width: newWidth, height: newHeight });
+        closeResizeDialog();
+      };
+
+      downloadPreviewBtn.onclick = () => {
+        const link = document.createElement('a');
+        link.download = 'wplace-preview.png';
+        link.href = resizePreview.src;
+        link.click();
+      };
+
+      cancelResize.onclick = closeResizeDialog;
+
+      resizeOverlay.style.display = "block";
+      resizeContainer.style.display = "block";
+
+      // Reinitialize color palette with current available colors
+      initializeColorPalette(resizeContainer);
+
+      _updateResizePreview();
     }
 
     function closeResizeDialog() {
-        resizeOverlay.style.display = "none";
-        resizeContainer.style.display = "none";
-        _updateResizePreview = () => {};
+      resizeOverlay.style.display = "none";
+      resizeContainer.style.display = "none";
+      _updateResizePreview = () => { };
     }
 
     if (uploadBtn) {
       uploadBtn.addEventListener("click", async () => {
         const availableColors = Utils.extractAvailableColors();
         if (availableColors.length < 10) {
-            updateUI("noColorsFound", "error");
-            Utils.showAlert(Utils.t("noColorsFound"), "error");
-            return;
+          updateUI("noColorsFound", "error");
+          Utils.showAlert(Utils.t("noColorsFound"), "error");
+          return;
         }
 
         if (!state.colorsChecked) {
-            state.availableColors = availableColors;
-            state.colorsChecked = true;
-            updateUI("colorsFound", "success", { count: availableColors.length });
-            updateStats();
-            selectPosBtn.disabled = false;
-            // Only enable resize button if image is also loaded
-            if (state.imageLoaded) {
-                resizeBtn.disabled = false;
-            }
+          state.availableColors = availableColors;
+          state.colorsChecked = true;
+          updateUI("colorsFound", "success", { count: availableColors.length });
+          updateStats();
+          selectPosBtn.disabled = false;
+          // Only enable resize button if image is also loaded
+          if (state.imageLoaded) {
+            resizeBtn.disabled = false;
+          }
         }
 
         try {
           updateUI("loadingImage", "default")
           const imageSrc = await Utils.createImageUploader()
-          if (!imageSrc) { 
-              updateUI("colorsFound", "success", { count: state.availableColors.length });
-              return;
+          if (!imageSrc) {
+            updateUI("colorsFound", "success", { count: state.availableColors.length });
+            return;
           }
 
           const processor = new ImageProcessor(imageSrc)
@@ -4129,11 +4110,11 @@ window.addEventListener('message', (event) => {
 
           let totalValidPixels = 0;
           for (let i = 0; i < pixels.length; i += 4) {
-              const isTransparent = pixels[i + 3] < CONFIG.TRANSPARENCY_THRESHOLD;
-              const isWhiteAndSkipped = !state.paintWhitePixels && Utils.isWhitePixel(pixels[i], pixels[i+1], pixels[i+2]);
-              if (!isTransparent && !isWhiteAndSkipped) {
-                  totalValidPixels++;
-              }
+            const isTransparent = pixels[i + 3] < CONFIG.TRANSPARENCY_THRESHOLD;
+            const isWhiteAndSkipped = !state.paintWhitePixels && Utils.isWhitePixel(pixels[i], pixels[i + 1], pixels[i + 2]);
+            if (!isTransparent && !isWhiteAndSkipped) {
+              totalValidPixels++;
+            }
           }
 
           state.imageData = {
@@ -4158,7 +4139,7 @@ window.addEventListener('message', (event) => {
 
           // Only enable resize button if colors have also been captured
           if (state.colorsChecked) {
-              resizeBtn.disabled = false;
+            resizeBtn.disabled = false;
           }
           saveBtn.disabled = false
 
@@ -4328,9 +4309,9 @@ window.addEventListener('message', (event) => {
 
         Utils.showAlert(
           `${Utils.t("savedDataFound")}\n\n` +
-            `Saved: ${savedDate}\n` +
-            `Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels (${progress}%)\n` +
-            `${Utils.t("clickLoadToContinue")}`,
+          `Saved: ${savedDate}\n` +
+          `Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels (${progress}%)\n` +
+          `${Utils.t("clickLoadToContinue")}`,
           "info",
         )
       }
@@ -4339,12 +4320,12 @@ window.addEventListener('message', (event) => {
     setTimeout(checkSavedProgress, 1000)
 
     if (cooldownSlider && cooldownValue) {
-        cooldownSlider.addEventListener("input", (e) => {
-            const threshold = parseInt(e.target.value);
-            state.cooldownChargeThreshold = threshold;
-            cooldownValue.textContent = threshold;
-            saveBotSettings();
-        });
+      cooldownSlider.addEventListener("input", (e) => {
+        const threshold = parseInt(e.target.value);
+        state.cooldownChargeThreshold = threshold;
+        cooldownValue.textContent = threshold;
+        saveBotSettings();
+      });
     }
 
     loadBotSettings();
@@ -4364,14 +4345,14 @@ window.addEventListener('message', (event) => {
         .map(() => Array(width).fill(false))
     }
 
-    let pixelBatch = []
+    let pixelBatch = null;
 
     try {
       outerLoop: for (let y = startRow; y < height; y++) {
         for (let x = y === startRow ? startCol : 0; x < width; x++) {
           if (state.stopFlag) {
-            if (pixelBatch.length > 0) {
-              await sendPixelBatch(pixelBatch, regionX, regionY)
+            if (pixelBatch > 0 && pixelBatch.pixels.length > 0) {
+              await sendPixelBatch(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
             }
             state.lastPosition = { x, y }
             updateUI("paintingPaused", "warning", { x, y })
@@ -4387,63 +4368,90 @@ window.addEventListener('message', (event) => {
           const alpha = pixels[idx + 3]
 
           if (alpha < CONFIG.TRANSPARENCY_THRESHOLD || (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b))) {
-              continue;
+            continue;
           }
 
-      let targetRgb;
-      if (Utils.isWhitePixel(r, g, b)) {
-        targetRgb = [255, 255, 255];
-      } else {
-        targetRgb = Utils.findClosestPaletteColor(r, g, b, state.activeColorPalette);
-      }
+          let targetRgb;
+          if (Utils.isWhitePixel(r, g, b)) {
+            targetRgb = [255, 255, 255];
+          } else {
+            targetRgb = Utils.findClosestPaletteColor(r, g, b, state.activeColorPalette);
+          }
 
           const colorId = findClosestColor([r, g, b], state.availableColors);
 
-          const pixelX = startX + x
-          const pixelY = startY + y
+          let absX = startX + x;
+          let absY = startY + y;
 
-          pixelBatch.push({
+          let adderX = Math.floor(absX / 1000);
+          let adderY = Math.floor(absY / 1000);
+          let pixelX = absX % 1000;
+          let pixelY = absY % 1000;
+
+          if (!pixelBatch ||
+            pixelBatch.regionX !== regionX + adderX ||
+            pixelBatch.regionY !== regionY + adderY) {
+
+            if (pixelBatch && pixelBatch.pixels.length > 0) {
+              let success = await sendPixelBatch(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
+              if (success) {
+                pixelBatch.pixels.forEach((p) => {
+                  state.paintedMap[p.localY][p.localX] = true;
+                  state.paintedPixels++;
+                });
+                state.currentCharges -= pixelBatch.pixels.length;
+                updateStats();
+              }
+            }
+
+            pixelBatch = {
+              regionX: regionX + adderX,
+              regionY: regionY + adderY,
+              pixels: []
+            };
+          }
+
+          pixelBatch.pixels.push({
             x: pixelX,
             y: pixelY,
             color: colorId,
             localX: x,
             localY: y,
-          })
+          });
 
-          if (pixelBatch.length >= Math.floor(state.currentCharges)) {
-            let success = await sendPixelBatch(pixelBatch, regionX, regionY)
-
+          if (pixelBatch.pixels.length >= Math.floor(state.currentCharges)) {
+            let success = await sendPixelBatch(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
             if (success === "token_error") {
-                if (CONFIG.AUTO_CAPTCHA_ENABLED) {
-                    updateUI("captchaSolving", "warning");
-                    try {
-                        await handleCaptcha();
-                        success = await sendPixelBatch(pixelBatch, regionX, regionY);
-                        if (success === "token_error") {
-                           updateUI("captchaFailed", "error");
-                           state.stopFlag = true;
-                           break outerLoop;
-                        }
-                    } catch (e) {
-                        updateUI("captchaFailed", "error");
-                        state.stopFlag = true;
-                        break outerLoop;
-                    }
-                } else {
-                    updateUI("captchaNeeded", "error");
-                    Utils.showAlert(Utils.t("captchaNeeded"), "error");
+              if (CONFIG.AUTO_CAPTCHA_ENABLED) {
+                updateUI("captchaSolving", "warning");
+                try {
+                  await handleCaptcha();
+                  success = await sendPixelBatch(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
+                  if (success === "token_error") {
+                    updateUI("captchaFailed", "error");
                     state.stopFlag = true;
                     break outerLoop;
+                  }
+                } catch (e) {
+                  updateUI("captchaFailed", "error");
+                  state.stopFlag = true;
+                  break outerLoop;
                 }
+              } else {
+                updateUI("captchaNeeded", "error");
+                Utils.showAlert(Utils.t("captchaNeeded"), "error");
+                state.stopFlag = true;
+                break outerLoop;
+              }
             }
 
             if (success) {
-              pixelBatch.forEach((pixel) => {
-                state.paintedMap[pixel.localY][pixel.localX] = true
-                state.paintedPixels++
+              pixelBatch.pixels.forEach((pixel) => {
+                state.paintedMap[pixel.localY][pixel.localX] = true;
+                state.paintedPixels++;
               })
 
-              state.currentCharges -= pixelBatch.length
+              state.currentCharges -= pixelBatch.pixels.length;
               updateStats()
               updateUI("paintingProgress", "default", {
                 painted: state.paintedPixels,
@@ -4455,49 +4463,49 @@ window.addEventListener('message', (event) => {
               }
 
               if (CONFIG.PAINTING_SPEED_ENABLED && state.paintingSpeed > 0 && pixelBatch.length > 0) {
-                const delayPerPixel = 1000 / state.paintingSpeed
-                const totalDelay = Math.max(100, delayPerPixel * pixelBatch.length)
+                const delayPerPixel = 1000 / state.paintingSpeed // ms per pixel
+                const totalDelay = Math.max(100, delayPerPixel * pixelBatch.length) // minimum 100ms
                 await Utils.sleep(totalDelay)
               }
             }
 
-            pixelBatch = []
+            pixelBatch.pixels = [];
           }
 
-            while (state.currentCharges < state.cooldownChargeThreshold && !state.stopFlag) {
-                const { charges, cooldown } = await WPlaceService.getCharges();
-                state.currentCharges = Math.floor(charges);
-                state.cooldown = cooldown;
+          while (state.currentCharges < state.cooldownChargeThreshold && !state.stopFlag) {
+            const { charges, cooldown } = await WPlaceService.getCharges();
+            state.currentCharges = Math.floor(charges);
+            state.cooldown = cooldown;
 
-                if (state.currentCharges >= state.cooldownChargeThreshold) {
-                    updateStats();
-                    break;
-                }
-
-                updateUI("noChargesThreshold", "warning", {
-                    time: Utils.formatTime(state.cooldown),
-                    threshold: state.cooldownChargeThreshold,
-                    current: state.currentCharges
-                });
-                await updateStats();
-                await Utils.sleep(state.cooldown);
+            if (state.currentCharges >= state.cooldownChargeThreshold) {
+              updateStats();
+              break;
             }
-            if (state.stopFlag) break outerLoop;
+
+            updateUI("noChargesThreshold", "warning", {
+              time: Utils.formatTime(state.cooldown),
+              threshold: state.cooldownChargeThreshold,
+              current: state.currentCharges
+            });
+            await updateStats();
+            await Utils.sleep(state.cooldown);
+          }
+          if (state.stopFlag) break outerLoop;
 
         }
       }
 
-      if (pixelBatch.length > 0 && !state.stopFlag) {
-        const success = await sendPixelBatch(pixelBatch, regionX, regionY)
+      if (pixelBatch && pixelBatch.pixels.length > 0 && !state.stopFlag) {
+        const success = await sendPixelBatch(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
         if (success) {
-          pixelBatch.forEach((pixel) => {
+          pixelBatch.pixels.forEach((pixel) => {
             state.paintedMap[pixel.localY][pixel.localX] = true
             state.paintedPixels++
           })
-          state.currentCharges -= pixelBatch.length
+          state.currentCharges -= pixelBatch.pixels.length;
           if (CONFIG.PAINTING_SPEED_ENABLED && state.paintingSpeed > 0 && pixelBatch.length > 0) {
-            const delayPerPixel = 1000 / state.paintingSpeed
-            const totalDelay = Math.max(100, delayPerPixel * pixelBatch.length)
+            const delayPerPixel = 1000 / state.paintingSpeed // ms per pixel
+            const totalDelay = Math.max(100, delayPerPixel * pixelBatch.length) // minimum 100ms
             await Utils.sleep(totalDelay)
           }
         }
@@ -4518,8 +4526,8 @@ window.addEventListener('message', (event) => {
       overlayManager.clear();
       const toggleOverlayBtn = document.getElementById('toggleOverlayBtn');
       if (toggleOverlayBtn) {
-          toggleOverlayBtn.classList.remove('active');
-          toggleOverlayBtn.disabled = true;
+        toggleOverlayBtn.classList.remove('active');
+        toggleOverlayBtn.disabled = true;
       }
     }
 
@@ -4527,10 +4535,10 @@ window.addEventListener('message', (event) => {
   }
 
   async function sendPixelBatch(pixelBatch, regionX, regionY) {
-  if (!turnstileToken) {
-    tokenPromise = new Promise((resolve) => { _resolveToken = resolve });
-    return "token_error"
-  }
+    if (!turnstileToken) {
+      tokenPromise = new Promise((resolve) => { _resolveToken = resolve });
+      return "token_error"
+    }
 
     const coords = new Array(pixelBatch.length * 2)
     const colors = new Array(pixelBatch.length)
@@ -4542,7 +4550,7 @@ window.addEventListener('message', (event) => {
     }
 
     try {
-  const payload = { coords, colors, t: turnstileToken }
+      const payload = { coords, colors, t: turnstileToken }
 
       const res = await fetch(`https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`, {
         method: "POST",
@@ -4553,7 +4561,7 @@ window.addEventListener('message', (event) => {
 
       if (res.status === 403) {
         let data = null
-        try { data = await res.json() } catch (_) {}
+        try { data = await res.json() } catch (_) { }
         console.error("❌ 403 Forbidden. Turnstile token might be invalid or expired.")
         turnstileToken = null
         tokenPromise = new Promise((resolve) => { _resolveToken = resolve })
@@ -4567,67 +4575,67 @@ window.addEventListener('message', (event) => {
     }
   }
 
-    function saveBotSettings() {
-        try {
-            const settings = {
-                paintingSpeed: state.paintingSpeed,
-                paintingSpeedEnabled: document.getElementById('enableSpeedToggle')?.checked,
-                autoCaptchaEnabled: document.getElementById('enableAutoCaptchaToggle')?.checked,
-                cooldownChargeThreshold: state.cooldownChargeThreshold,
-                minimized: state.minimized,
-                overlayOpacity: state.overlayOpacity,
-                blueMarbleEnabled: document.getElementById('enableBlueMarbleToggle')?.checked,
-            };
-            CONFIG.PAINTING_SPEED_ENABLED = settings.paintingSpeedEnabled;
-            CONFIG.AUTO_CAPTCHA_ENABLED = settings.autoCaptchaEnabled;
+  function saveBotSettings() {
+    try {
+      const settings = {
+        paintingSpeed: state.paintingSpeed,
+        paintingSpeedEnabled: document.getElementById('enableSpeedToggle')?.checked,
+        autoCaptchaEnabled: document.getElementById('enableAutoCaptchaToggle')?.checked,
+        cooldownChargeThreshold: state.cooldownChargeThreshold,
+        minimized: state.minimized,
+        overlayOpacity: state.overlayOpacity,
+        blueMarbleEnabled: document.getElementById('enableBlueMarbleToggle')?.checked,
+      };
+      CONFIG.PAINTING_SPEED_ENABLED = settings.paintingSpeedEnabled;
+      CONFIG.AUTO_CAPTCHA_ENABLED = settings.autoCaptchaEnabled;
 
-            localStorage.setItem("wplace-bot-settings", JSON.stringify(settings));
-        } catch (e) {
-            console.warn("Could not save bot settings:", e);
-        }
+      localStorage.setItem("wplace-bot-settings", JSON.stringify(settings));
+    } catch (e) {
+      console.warn("Could not save bot settings:", e);
     }
+  }
 
-    function loadBotSettings() {
-        try {
-            const saved = localStorage.getItem("wplace-bot-settings");
-            if (!saved) return;
-            const settings = JSON.parse(saved);
+  function loadBotSettings() {
+    try {
+      const saved = localStorage.getItem("wplace-bot-settings");
+      if (!saved) return;
+      const settings = JSON.parse(saved);
 
-            state.paintingSpeed = settings.paintingSpeed || CONFIG.PAINTING_SPEED.DEFAULT;
-            state.cooldownChargeThreshold = settings.cooldownChargeThreshold || CONFIG.COOLDOWN_CHARGE_THRESHOLD;
-            state.minimized = settings.minimized ?? false;
-            CONFIG.PAINTING_SPEED_ENABLED = settings.paintingSpeedEnabled ?? false;
-            CONFIG.AUTO_CAPTCHA_ENABLED = settings.autoCaptchaEnabled ?? false;
-            state.overlayOpacity = settings.overlayOpacity ?? CONFIG.OVERLAY.OPACITY_DEFAULT;
-            state.blueMarbleEnabled = settings.blueMarbleEnabled ?? CONFIG.OVERLAY.BLUE_MARBLE_DEFAULT;
+      state.paintingSpeed = settings.paintingSpeed || CONFIG.PAINTING_SPEED.DEFAULT;
+      state.cooldownChargeThreshold = settings.cooldownChargeThreshold || CONFIG.COOLDOWN_CHARGE_THRESHOLD;
+      state.minimized = settings.minimized ?? false;
+      CONFIG.PAINTING_SPEED_ENABLED = settings.paintingSpeedEnabled ?? false;
+      CONFIG.AUTO_CAPTCHA_ENABLED = settings.autoCaptchaEnabled ?? false;
+      state.overlayOpacity = settings.overlayOpacity ?? CONFIG.OVERLAY.OPACITY_DEFAULT;
+      state.blueMarbleEnabled = settings.blueMarbleEnabled ?? CONFIG.OVERLAY.BLUE_MARBLE_DEFAULT;
 
-            const speedSlider = document.getElementById('speedSlider');
-            if (speedSlider) speedSlider.value = state.paintingSpeed;
-            const speedValue = document.getElementById('speedValue');
-            if (speedValue) speedValue.textContent = `${state.paintingSpeed} px/s`;
+      const speedSlider = document.getElementById('speedSlider');
+      if (speedSlider) speedSlider.value = state.paintingSpeed;
+      const speedValue = document.getElementById('speedValue');
+      if (speedValue) speedValue.textContent = `${state.paintingSpeed} px/s`;
 
-            const enableSpeedToggle = document.getElementById('enableSpeedToggle');
-            if (enableSpeedToggle) enableSpeedToggle.checked = CONFIG.PAINTING_SPEED_ENABLED;
-            
-            const enableAutoCaptchaToggle = document.getElementById('enableAutoCaptchaToggle');
-            if (enableAutoCaptchaToggle) enableAutoCaptchaToggle.checked = CONFIG.AUTO_CAPTCHA_ENABLED;
-            
-            const cooldownSlider = document.getElementById('cooldownSlider');
-            if (cooldownSlider) cooldownSlider.value = state.cooldownChargeThreshold;
-            const cooldownValue = document.getElementById('cooldownValue');
-            if (cooldownValue) cooldownValue.textContent = state.cooldownChargeThreshold;
-            
-            const overlayOpacitySlider = document.getElementById('overlayOpacitySlider');
-            if (overlayOpacitySlider) overlayOpacitySlider.value = state.overlayOpacity;
-            const overlayOpacityValue = document.getElementById('overlayOpacityValue');
-            if (overlayOpacityValue) overlayOpacityValue.textContent = `${Math.round(state.overlayOpacity * 100)}%`;
-            const enableBlueMarbleToggle = document.getElementById('enableBlueMarbleToggle');
-            if (enableBlueMarbleToggle) enableBlueMarbleToggle.checked = state.blueMarbleEnabled;
+      const enableSpeedToggle = document.getElementById('enableSpeedToggle');
+      if (enableSpeedToggle) enableSpeedToggle.checked = CONFIG.PAINTING_SPEED_ENABLED;
 
-        } catch (e) {
-            console.warn("Could not load bot settings:", e);
-        }
+      const enableAutoCaptchaToggle = document.getElementById('enableAutoCaptchaToggle');
+      if (enableAutoCaptchaToggle) enableAutoCaptchaToggle.checked = CONFIG.AUTO_CAPTCHA_ENABLED;
+
+      const cooldownSlider = document.getElementById('cooldownSlider');
+      if (cooldownSlider) cooldownSlider.value = state.cooldownChargeThreshold;
+      const cooldownValue = document.getElementById('cooldownValue');
+      if (cooldownValue) cooldownValue.textContent = state.cooldownChargeThreshold;
+
+      const overlayOpacitySlider = document.getElementById('overlayOpacitySlider');
+      if (overlayOpacitySlider) overlayOpacitySlider.value = state.overlayOpacity;
+      const overlayOpacityValue = document.getElementById('overlayOpacityValue');
+      if (overlayOpacityValue) overlayOpacityValue.textContent = `${Math.round(state.overlayOpacity * 100)}%`;
+      const enableBlueMarbleToggle = document.getElementById('enableBlueMarbleToggle');
+      if (enableBlueMarbleToggle) enableBlueMarbleToggle.checked = state.blueMarbleEnabled;
+
+    } catch (e) {
+      console.warn("Could not load bot settings:", e);
     }
+  }
 
   createUI()
 })()
