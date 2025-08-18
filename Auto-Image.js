@@ -18,41 +18,73 @@
       BLUE_MARBLE_DEFAULT: false,
     },
     // --- START: Color data from colour-converter.js ---
-    COLOR_PALETTE: [
-      [0,0,0],[60,60,60],[120,120,120],[170,170,170],[210,210,210],[255,255,255],
-      [96,0,24],[165,14,30],[237,28,36],[250,128,114],[228,92,26],[255,127,39],[246,170,9],
-      [249,221,59],[255,250,188],[156,132,49],[197,173,49],[232,212,95],[74,107,58],[90,148,74],[132,197,115],
-      [14,185,104],[19,230,123],[135,255,94],[12,129,110],[16,174,166],[19,225,190],[15,121,159],[96,247,242],
-      [187,250,242],[40,80,158],[64,147,228],[125,199,255],[77,49,184],[107,80,246],[153,177,251],
-      [74,66,132],[122,113,196],[181,174,241],[170,56,185],[224,159,249],
-      [203,0,122],[236,31,128],[243,141,169],[155,82,73],[209,128,120],[250,182,164],
-      [104,70,52],[149,104,42],[219,164,99],[123,99,82],[156,132,107],[214,181,148],
-      [209,128,81],[248,178,119],[255,197,165],[109,100,63],[148,140,107],[205,197,158],
-      [51,57,65],[109,117,141],[179,185,209]
-    ],
-    COLOR_NAMES: {
-      "0,0,0": "Black", "60,60,60": "Dark Gray", "120,120,120": "Gray", "210,210,210": "Light Gray", "255,255,255": "White",
-      "96,0,24": "Deep Red", "237,28,36": "Red", "255,127,39": "Orange", "246,170,9": "Gold", "249,221,59": "Yellow",
-      "255,250,188": "Light Yellow", "14,185,104": "Dark Green", "19,230,123": "Green", "135,255,94": "Light Green",
-      "12,129,110": "Dark Teal", "16,174,166": "Teal", "19,225,190": "Light Teal", "96,247,242": "Cyan", "40,80,158": "Dark Blue",
-      "64,147,228": "Blue", "107,80,246": "Indigo", "153,177,251": "Light Indigo", "120,12,153": "Dark Purple",
-      "170,56,185": "Purple", "224,159,249": "Light Purple", "203,0,122": "Dark Pink", "236,31,128": "Pink",
-      "243,141,169": "Light Pink", "104,70,52": "Dark Brown", "149,104,42": "Brown", "248,178,119": "Beige",
-      "170,170,170": "Medium Gray", "165,14,30": "Dark Red", "250,128,114": "Light Red", "228,92,26": "Dark Orange",
-      "156,132,49": "Dark Goldenrod", "197,173,49": "Goldenrod", "232,212,95": "Light Goldenrod", "74,107,58": "Dark Olive",
-      "90,148,74": "Olive", "132,197,115": "Light Olive", "15,121,159": "Dark Cyan", "187,250,242": "Light Cyan",
-      "125,199,255": "Light Blue", "77,49,184": "Dark Indigo", "74,66,132": "Dark Slate Blue", "122,113,196": "Slate Blue",
-      "181,174,241": "Light Slate Blue", "155,82,73": "Dark Peach", "209,128,120": "Peach", "250,182,164": "Light Peach",
-      "219,164,99": "Light Brown", "123,99,82": "Dark Tan", "156,132,107": "Tan", "214,181,148": "Light Tan",
-      "209,128,81": "Dark Beige", "255,197,165": "Light Beige", "109,100,63": "Dark Stone", "148,140,107": "Stone",
-      "205,197,158": "Light Stone", "51,57,65": "Dark Slate", "109,117,141": "Slate", "179,185,209": "Light Slate",
+    // New color structure with proper ID mapping
+    COLOR_MAP: {
+      0: {id: 1, name: 'Black', rgb: {r: 0, g: 0, b: 0}},
+      1: {id: 2, name: 'Dark Gray', rgb: {r: 64, g: 64, b: 64}},
+      2: {id: 3, name: 'Gray', rgb: {r: 128, g: 128, b: 128}},
+      3: {id: 32, name: 'Medium Gray', rgb: {r: 160, g: 160, b: 160}},
+      4: {id: 4, name: 'Light Gray', rgb: {r: 192, g: 192, b: 192}},
+      5: {id: 5, name: 'White', rgb: {r: 255, g: 255, b: 255}},
+      6: {id: 6, name: 'Deep Red', rgb: {r: 139, g: 0, b: 0}},
+      7: {id: 33, name: 'Dark Red', rgb: {r: 128, g: 0, b: 0}},
+      8: {id: 7, name: 'Red', rgb: {r: 255, g: 0, b: 0}},
+      9: {id: 34, name: 'Light Red', rgb: {r: 255, g: 128, b: 128}},
+      10: {id: 35, name: 'Dark Orange', rgb: {r: 204, g: 85, b: 0}},
+      11: {id: 8, name: 'Orange', rgb: {r: 255, g: 165, b: 0}},
+      12: {id: 9, name: 'Gold', rgb: {r: 255, g: 215, b: 0}},
+      13: {id: 10, name: 'Yellow', rgb: {r: 255, g: 255, b: 0}},
+      14: {id: 11, name: 'Light Yellow', rgb: {r: 255, g: 255, b: 224}},
+      15: {id: 37, name: 'Dark Goldenrod', rgb: {r: 184, g: 134, b: 11}},
+      16: {id: 38, name: 'Goldenrod', rgb: {r: 218, g: 165, b: 32}},
+      17: {id: 39, name: 'Light Goldenrod', rgb: {r: 250, g: 250, b: 210}},
+      18: {id: 40, name: 'Dark Olive', rgb: {r: 85, g: 107, b: 47}},
+      19: {id: 41, name: 'Olive', rgb: {r: 128, g: 128, b: 0}},
+      20: {id: 42, name: 'Light Olive', rgb: {r: 192, g: 192, b: 128}},
+      21: {id: 12, name: 'Dark Green', rgb: {r: 0, g: 100, b: 0}},
+      22: {id: 13, name: 'Green', rgb: {r: 0, g: 128, b: 0}},
+      23: {id: 14, name: 'Light Green', rgb: {r: 144, g: 238, b: 144}},
+      24: {id: 15, name: 'Dark Teal', rgb: {r: 0, g: 128, b: 128}},
+      25: {id: 16, name: 'Teal', rgb: {r: 0, g: 128, b: 128}},
+      26: {id: 17, name: 'Light Teal', rgb: {r: 176, g: 224, b: 230}},
+      27: {id: 43, name: 'Dark Cyan', rgb: {r: 0, g: 139, b: 139}},
+      28: {id: 20, name: 'Cyan', rgb: {r: 0, g: 255, b: 255}},
+      29: {id: 44, name: 'Light Cyan', rgb: {r: 224, g: 255, b: 255}},
+      30: {id: 18, name: 'Dark Blue', rgb: {r: 0, g: 0, b: 139}},
+      31: {id: 19, name: 'Blue', rgb: {r: 0, g: 0, b: 255}},
+      32: {id: 45, name: 'Light Blue', rgb: {r: 173, g: 216, b: 230}},
+      33: {id: 46, name: 'Dark Indigo', rgb: {r: 75, g: 0, b: 130}},
+      34: {id: 21, name: 'Indigo', rgb: {r: 75, g: 0, b: 130}},
+      35: {id: 22, name: 'Light Indigo', rgb: {r: 176, g: 196, b: 222}},
+      36: {id: 47, name: 'Dark Slate Blue', rgb: {r: 72, g: 61, b: 139}},
+      37: {id: 48, name: 'Slate Blue', rgb: {r: 106, g: 90, b: 205}},
+      38: {id: 49, name: 'Light Slate Blue', rgb: {r: 132, g: 112, b: 255}},
+      39: {id: 23, name: 'Dark Purple', rgb: {r: 128, g: 0, b: 128}},
+      40: {id: 24, name: 'Purple', rgb: {r: 128, g: 0, b: 128}},
+      41: {id: 25, name: 'Light Purple', rgb: {r: 221, g: 160, b: 221}},
+      42: {id: 26, name: 'Dark Pink', rgb: {r: 199, g: 21, b: 133}},
+      43: {id: 27, name: 'Pink', rgb: {r: 255, g: 192, b: 203}},
+      44: {id: 28, name: 'Light Pink', rgb: {r: 255, g: 182, b: 193}},
+      45: {id: 53, name: 'Dark Peach', rgb: {r: 255, g: 140, b: 105}},
+      46: {id: 54, name: 'Peach', rgb: {r: 255, g: 218, b: 185}},
+      47: {id: 55, name: 'Light Peach', rgb: {r: 255, g: 239, b: 213}},
+      48: {id: 29, name: 'Dark Brown', rgb: {r: 101, g: 67, b: 33}},
+      49: {id: 30, name: 'Brown', rgb: {r: 165, g: 42, b: 42}},
+      50: {id: 50, name: 'Light Brown', rgb: {r: 205, g: 133, b: 63}},
+      51: {id: 56, name: 'Dark Tan', rgb: {r: 139, g: 69, b: 19}},
+      52: {id: 57, name: 'Tan', rgb: {r: 210, g: 180, b: 140}},
+      53: {id: 36, name: 'Light Tan', rgb: {r: 238, g: 203, b: 173}},
+      54: {id: 51, name: 'Dark Beige', rgb: {r: 160, g: 130, b: 98}},
+      55: {id: 31, name: 'Beige', rgb: {r: 245, g: 245, b: 220}},
+      56: {id: 52, name: 'Light Beige', rgb: {r: 255, g: 248, b: 220}},
+      57: {id: 61, name: 'Dark Stone', rgb: {r: 105, g: 105, b: 105}},
+      58: {id: 62, name: 'Stone', rgb: {r: 128, g: 128, b: 128}},
+      59: {id: 63, name: 'Light Stone', rgb: {r: 176, g: 176, b: 176}},
+      60: {id: 58, name: 'Dark Slate', rgb: {r: 47, g: 79, b: 79}},
+      61: {id: 59, name: 'Slate', rgb: {r: 112, g: 128, b: 144}},
+      62: {id: 60, name: 'Light Slate', rgb: {r: 176, g: 196, b: 222}},
+      63: {id: 0, name: 'Transparent', rgb: null}
     },
-    PAID_COLORS: new Set([
-      "170,170,170", "165,14,30", "250,128,114", "228,92,26", "156,132,49", "197,173,49", "232,212,95", "74,107,58",
-      "90,148,74", "132,197,115", "15,121,159", "187,250,242", "125,199,255", "77,49,184", "74,66,132", "122,113,196",
-      "181,174,241", "155,82,73", "209,128,120", "250,182,164", "219,164,99", "123,99,82", "156,132,107", "214,181,148",
-      "209,128,81", "255,197,165", "109,100,63", "148,140,107", "205,197,158", "51,57,65", "109,117,141", "179,185,209",
-    ]),
     // --- END: Color data ---
     // Optimized CSS Classes for reuse
     CSS_CLASSES: {
@@ -757,7 +789,13 @@ window.addEventListener('message', (event) => {
     findClosestPaletteColor: (r, g, b, palette) => {
         let menorDist = Infinity;
         let cor = [0, 0, 0];
-        if (!palette || palette.length === 0) return cor;
+        if (!palette || palette.length === 0) {
+            // If no palette provided, use all available colors from COLOR_MAP
+            const availableColors = Object.values(CONFIG.COLOR_MAP)
+                .filter(color => color.rgb !== null)
+                .map(color => [color.rgb.r, color.rgb.g, color.rgb.b]);
+            palette = availableColors;
+        }
 
         for (let i = 0; i < palette.length; i++) {
             const [pr, pg, pb] = palette[i];
@@ -1168,8 +1206,11 @@ window.addEventListener('message', (event) => {
       const activeSwatches = document.querySelectorAll('.wplace-color-swatch.active');
       if (activeSwatches) {
           activeSwatches.forEach(swatch => {
-              const rgb = swatch.getAttribute('data-rgb').split(',').map(Number);
-              state.activeColorPalette.push(rgb);
+              const rgbStr = swatch.getAttribute('data-rgb');
+              if (rgbStr) {
+                  const rgb = rgbStr.split(',').map(Number);
+                  state.activeColorPalette.push(rgb);
+              }
           });
       }
       if (document.querySelector('.resize-container')?.style.display === 'block') {
@@ -1177,9 +1218,8 @@ window.addEventListener('message', (event) => {
       }
   }
 
-  function toggleAllColors(select, isPaid, showingUnavailable = false) {
-      const selector = isPaid ? '.wplace-color-swatch.paid' : '.wplace-color-swatch:not(.paid)';
-      const swatches = document.querySelectorAll(selector);
+  function toggleAllColors(select, showingUnavailable = false) {
+      const swatches = document.querySelectorAll('.wplace-color-swatch');
       if (swatches) {
           swatches.forEach(swatch => {
               // Only toggle colors that are available or if we're showing unavailable colors
@@ -1196,23 +1236,29 @@ window.addEventListener('message', (event) => {
   }
 
   function initializeColorPalette(container) {
-      const freeContainer = container.querySelector('#colors-free');
-      const paidContainer = container.querySelector('#colors-paid');
+      const colorsContainer = container.querySelector('#colors-container');
       const showAllToggle = container.querySelector('#showAllColorsToggle');
-      if (!freeContainer || !paidContainer) return;
+      if (!colorsContainer) return;
+
+      // Sync with currently available colors when panel opens
+      const currentAvailableColors = Utils.extractAvailableColors();
+      if (currentAvailableColors.length > 0) {
+          state.availableColors = currentAvailableColors;
+      }
 
       function populateColors(showUnavailable = false) {
-          freeContainer.innerHTML = '';
-          paidContainer.innerHTML = '';
+          colorsContainer.innerHTML = '';
 
-          const uniqueColors = [...new Set(CONFIG.COLOR_PALETTE.map(JSON.stringify))].map(JSON.parse);
+          // Convert COLOR_MAP to array and filter out transparent
+          const allColors = Object.values(CONFIG.COLOR_MAP).filter(color => color.rgb !== null);
 
-          uniqueColors.forEach(rgb => {
-              const key = rgb.join(',');
-              const name = CONFIG.COLOR_NAMES[key] || `rgb(${key})`;
-              const isPaid = CONFIG.PAID_COLORS.has(key);
+          allColors.forEach(colorData => {
+              const { id, name, rgb } = colorData;
+              const rgbKey = `${rgb.r},${rgb.g},${rgb.b}`;
+              
+              // Check if this color is available in the captured colors
               const isAvailable = state.availableColors.some(c => 
-                  c.rgb[0] === rgb[0] && c.rgb[1] === rgb[1] && c.rgb[2] === rgb[2]
+                  c.rgb[0] === rgb.r && c.rgb[1] === rgb.g && c.rgb[2] === rgb.b
               );
 
               // If not showing all colors and this color is not available, skip it
@@ -1222,27 +1268,27 @@ window.addEventListener('message', (event) => {
 
               const colorItem = Utils.createElement('div', { className: 'wplace-color-item' });
               const swatch = Utils.createElement('button', {
-                  className: `wplace-color-swatch ${isPaid ? 'paid' : ''} ${!isAvailable ? 'unavailable' : ''}`,
-                  title: `${name}${!isAvailable ? ' (Unavailable)' : ''}`,
-                  'data-rgb': key,
+                  className: `wplace-color-swatch ${!isAvailable ? 'unavailable' : ''}`,
+                  title: `${name} (ID: ${id})${!isAvailable ? ' (Unavailable)' : ''}`,
+                  'data-rgb': rgbKey,
+                  'data-color-id': id,
               });
-              swatch.style.backgroundColor = `rgb(${key})`;
+              swatch.style.backgroundColor = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
 
               // Make unavailable colors visually distinct
               if (!isAvailable) {
                   swatch.style.opacity = '0.4';
                   swatch.style.filter = 'grayscale(50%)';
                   swatch.disabled = true;
+              } else {
+                  // Select available colors by default
+                  swatch.classList.add('active');
               }
 
               const nameLabel = Utils.createElement('span', { 
                   className: 'wplace-color-item-name',
                   style: !isAvailable ? 'color: #888; font-style: italic;' : ''
               }, name + (!isAvailable ? ' (N/A)' : ''));
-
-              if (!isPaid && isAvailable) {
-                  swatch.classList.add('active');
-              }
 
               // Only add click listener for available colors
               if (isAvailable) {
@@ -1254,12 +1300,7 @@ window.addEventListener('message', (event) => {
 
               colorItem.appendChild(swatch);
               colorItem.appendChild(nameLabel);
-
-              if (isPaid) {
-                  paidContainer.appendChild(colorItem);
-              } else {
-                  freeContainer.appendChild(colorItem);
-              }
+              colorsContainer.appendChild(colorItem);
           });
 
           updateActiveColorPalette();
@@ -1275,10 +1316,8 @@ window.addEventListener('message', (event) => {
           });
       }
 
-      container.querySelector('#selectAllFreeBtn')?.addEventListener('click', () => toggleAllColors(true, false, showAllToggle?.checked));
-      container.querySelector('#unselectAllFreeBtn')?.addEventListener('click', () => toggleAllColors(false, false, showAllToggle?.checked));
-      container.querySelector('#selectAllPaidBtn')?.addEventListener('click', () => toggleAllColors(true, true, showAllToggle?.checked));
-      container.querySelector('#unselectAllPaidBtn')?.addEventListener('click', () => toggleAllColors(false, true, showAllToggle?.checked));
+      container.querySelector('#selectAllBtn')?.addEventListener('click', () => toggleAllColors(true, showAllToggle?.checked));
+      container.querySelector('#unselectAllBtn')?.addEventListener('click', () => toggleAllColors(false, showAllToggle?.checked));
   }
     async function handleCaptcha() {
         return new Promise(async (resolve, reject) => {
@@ -2073,6 +2112,8 @@ window.addEventListener('message', (event) => {
         grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
         gap: 10px;
         padding-top: 8px;
+        max-height: 300px;
+        overflow-y: auto;
       }
       .wplace-color-item {
         display: flex;
@@ -2098,9 +2139,6 @@ window.addEventListener('message', (event) => {
         transition: transform 0.1s ease, box-shadow 0.2s ease;
         position: relative;
         margin: 0 auto;
-      }
-      .wplace-color-swatch.paid {
-        border-color: gold;
       }
       .wplace-color-swatch.unavailable {
         border-color: #666;
@@ -3019,16 +3057,10 @@ window.addEventListener('message', (event) => {
                   </label>
               </div>
               <div class="wplace-row">
-                  <button id="selectAllFreeBtn" class="wplace-btn">All Free</button>
-                  <button id="unselectAllFreeBtn" class="wplace-btn">None Free</button>
+                  <button id="selectAllBtn" class="wplace-btn">Select All</button>
+                  <button id="unselectAllBtn" class="wplace-btn">Unselect All</button>
               </div>
-              <div id="colors-free" class="wplace-color-grid"></div>
-              <hr class="wplace-color-divider">
-              <div class="wplace-row">
-                  <button id="selectAllPaidBtn" class="wplace-btn">All Paid</button>
-                  <button id="unselectAllPaidBtn" class="wplace-btn">None Paid</button>
-              </div>
-              <div id="colors-paid" class="wplace-color-grid"></div>
+              <div id="colors-container" class="wplace-color-grid"></div>
           </div>
       </div>
 
@@ -3682,6 +3714,10 @@ window.addEventListener('message', (event) => {
 
         resizeOverlay.style.display = "block";
         resizeContainer.style.display = "block";
+        
+        // Reinitialize color palette with current available colors
+        initializeColorPalette(resizeContainer);
+        
         _updateResizePreview();
     }
 
