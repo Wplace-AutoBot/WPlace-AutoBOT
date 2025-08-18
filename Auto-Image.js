@@ -21,62 +21,62 @@
     // New color structure with proper ID mapping
     COLOR_MAP: {
       0: {id: 1, name: 'Black', rgb: {r: 0, g: 0, b: 0}},
-      1: {id: 2, name: 'Dark Gray', rgb: {r: 64, g: 64, b: 64}},
-      2: {id: 3, name: 'Gray', rgb: {r: 128, g: 128, b: 128}},
+      1: {id: 2, name: 'Dark Gray', rgb: {r: 60, g: 60, b: 60}},
+      2: {id: 3, name: 'Gray', rgb: {r: 120, g: 120, b: 120}},
       3: {id: 32, name: 'Medium Gray', rgb: {r: 160, g: 160, b: 160}},
-      4: {id: 4, name: 'Light Gray', rgb: {r: 192, g: 192, b: 192}},
+      4: {id: 4, name: 'Light Gray', rgb: {r: 210, g: 210, b: 210}},
       5: {id: 5, name: 'White', rgb: {r: 255, g: 255, b: 255}},
-      6: {id: 6, name: 'Deep Red', rgb: {r: 139, g: 0, b: 0}},
+      6: {id: 6, name: 'Deep Red', rgb: {r: 96, g: 0, b: 24}},
       7: {id: 33, name: 'Dark Red', rgb: {r: 128, g: 0, b: 0}},
-      8: {id: 7, name: 'Red', rgb: {r: 255, g: 0, b: 0}},
+      8: {id: 7, name: 'Red', rgb: {r: 237, g: 28, b: 36}},
       9: {id: 34, name: 'Light Red', rgb: {r: 255, g: 128, b: 128}},
       10: {id: 35, name: 'Dark Orange', rgb: {r: 204, g: 85, b: 0}},
-      11: {id: 8, name: 'Orange', rgb: {r: 255, g: 165, b: 0}},
-      12: {id: 9, name: 'Gold', rgb: {r: 255, g: 215, b: 0}},
-      13: {id: 10, name: 'Yellow', rgb: {r: 255, g: 255, b: 0}},
-      14: {id: 11, name: 'Light Yellow', rgb: {r: 255, g: 255, b: 224}},
+      11: {id: 8, name: 'Orange', rgb: {r: 255, g: 127, b: 39}},
+      12: {id: 9, name: 'Gold', rgb: {r: 246, g: 170, b: 9}},
+      13: {id: 10, name: 'Yellow', rgb: {r: 249, g: 221, b: 59}},
+      14: {id: 11, name: 'Light Yellow', rgb: {r: 255, g: 250, b: 188}},
       15: {id: 37, name: 'Dark Goldenrod', rgb: {r: 184, g: 134, b: 11}},
       16: {id: 38, name: 'Goldenrod', rgb: {r: 218, g: 165, b: 32}},
       17: {id: 39, name: 'Light Goldenrod', rgb: {r: 250, g: 250, b: 210}},
       18: {id: 40, name: 'Dark Olive', rgb: {r: 85, g: 107, b: 47}},
       19: {id: 41, name: 'Olive', rgb: {r: 128, g: 128, b: 0}},
       20: {id: 42, name: 'Light Olive', rgb: {r: 192, g: 192, b: 128}},
-      21: {id: 12, name: 'Dark Green', rgb: {r: 0, g: 100, b: 0}},
-      22: {id: 13, name: 'Green', rgb: {r: 0, g: 128, b: 0}},
-      23: {id: 14, name: 'Light Green', rgb: {r: 144, g: 238, b: 144}},
-      24: {id: 15, name: 'Dark Teal', rgb: {r: 0, g: 128, b: 128}},
-      25: {id: 16, name: 'Teal', rgb: {r: 0, g: 128, b: 128}},
-      26: {id: 17, name: 'Light Teal', rgb: {r: 176, g: 224, b: 230}},
+      21: {id: 12, name: 'Dark Green', rgb: {r: 14, g: 185, b: 104}},
+      22: {id: 13, name: 'Green', rgb: {r: 19, g: 230, b: 123}},
+      23: {id: 14, name: 'Light Green', rgb: {r: 135, g: 255, b: 94}},
+      24: {id: 15, name: 'Dark Teal', rgb: {r: 12, g: 129, b: 110}},
+      25: {id: 16, name: 'Teal', rgb: {r: 16, g: 174, b: 166}},
+      26: {id: 17, name: 'Light Teal', rgb: {r: 19, g: 225, b: 190}},
       27: {id: 43, name: 'Dark Cyan', rgb: {r: 0, g: 139, b: 139}},
-      28: {id: 20, name: 'Cyan', rgb: {r: 0, g: 255, b: 255}},
+      28: {id: 20, name: 'Cyan', rgb: {r: 96, g: 247, b: 242}},
       29: {id: 44, name: 'Light Cyan', rgb: {r: 224, g: 255, b: 255}},
-      30: {id: 18, name: 'Dark Blue', rgb: {r: 0, g: 0, b: 139}},
-      31: {id: 19, name: 'Blue', rgb: {r: 0, g: 0, b: 255}},
+      30: {id: 18, name: 'Dark Blue', rgb: {r: 40, g: 80, b: 158}},
+      31: {id: 19, name: 'Blue', rgb: {r: 64, g: 147, b: 228}},
       32: {id: 45, name: 'Light Blue', rgb: {r: 173, g: 216, b: 230}},
       33: {id: 46, name: 'Dark Indigo', rgb: {r: 75, g: 0, b: 130}},
-      34: {id: 21, name: 'Indigo', rgb: {r: 75, g: 0, b: 130}},
-      35: {id: 22, name: 'Light Indigo', rgb: {r: 176, g: 196, b: 222}},
+      34: {id: 21, name: 'Indigo', rgb: {r: 107, g: 80, b: 246}},
+      35: {id: 22, name: 'Light Indigo', rgb: {r: 153, g: 177, b: 251}},
       36: {id: 47, name: 'Dark Slate Blue', rgb: {r: 72, g: 61, b: 139}},
       37: {id: 48, name: 'Slate Blue', rgb: {r: 106, g: 90, b: 205}},
       38: {id: 49, name: 'Light Slate Blue', rgb: {r: 132, g: 112, b: 255}},
-      39: {id: 23, name: 'Dark Purple', rgb: {r: 128, g: 0, b: 128}},
-      40: {id: 24, name: 'Purple', rgb: {r: 128, g: 0, b: 128}},
-      41: {id: 25, name: 'Light Purple', rgb: {r: 221, g: 160, b: 221}},
-      42: {id: 26, name: 'Dark Pink', rgb: {r: 199, g: 21, b: 133}},
-      43: {id: 27, name: 'Pink', rgb: {r: 255, g: 192, b: 203}},
-      44: {id: 28, name: 'Light Pink', rgb: {r: 255, g: 182, b: 193}},
+      39: {id: 23, name: 'Dark Purple', rgb: {r: 120, g: 12, b: 153}},
+      40: {id: 24, name: 'Purple', rgb: {r: 170, g: 56, b: 185}},
+      41: {id: 25, name: 'Light Purple', rgb: {r: 224, g: 159, b: 249}},
+      42: {id: 26, name: 'Dark Pink', rgb: {r: 203, g: 0, b: 122}},
+      43: {id: 27, name: 'Pink', rgb: {r: 236, g: 31, b: 128}},
+      44: {id: 28, name: 'Light Pink', rgb: {r: 243, g: 141, b: 169}},
       45: {id: 53, name: 'Dark Peach', rgb: {r: 255, g: 140, b: 105}},
       46: {id: 54, name: 'Peach', rgb: {r: 255, g: 218, b: 185}},
       47: {id: 55, name: 'Light Peach', rgb: {r: 255, g: 239, b: 213}},
-      48: {id: 29, name: 'Dark Brown', rgb: {r: 101, g: 67, b: 33}},
-      49: {id: 30, name: 'Brown', rgb: {r: 165, g: 42, b: 42}},
+      48: {id: 29, name: 'Dark Brown', rgb: {r: 104, g: 70, b: 52}},
+      49: {id: 30, name: 'Brown', rgb: {r: 149, g: 104, b: 42}},
       50: {id: 50, name: 'Light Brown', rgb: {r: 205, g: 133, b: 63}},
       51: {id: 56, name: 'Dark Tan', rgb: {r: 139, g: 69, b: 19}},
       52: {id: 57, name: 'Tan', rgb: {r: 210, g: 180, b: 140}},
       53: {id: 36, name: 'Light Tan', rgb: {r: 238, g: 203, b: 173}},
       54: {id: 51, name: 'Dark Beige', rgb: {r: 160, g: 130, b: 98}},
-      55: {id: 31, name: 'Beige', rgb: {r: 245, g: 245, b: 220}},
-      56: {id: 52, name: 'Light Beige', rgb: {r: 255, g: 248, b: 220}},
+      55: {id: 31, name: 'Beige', rgb: {r: 248, g: 178, b: 119}},
+      56: {id: 52, name: 'Light Beige', rgb: {r: 255, g: 197, b: 165}},
       57: {id: 61, name: 'Dark Stone', rgb: {r: 105, g: 105, b: 105}},
       58: {id: 62, name: 'Stone', rgb: {r: 128, g: 128, b: 128}},
       59: {id: 63, name: 'Light Stone', rgb: {r: 176, g: 176, b: 176}},
@@ -1253,18 +1253,8 @@ window.addEventListener('message', (event) => {
           let availableCount = 0;
           let totalCount = 0;
 
-          console.log("Resize panel - Available colors:", state.availableColors); // Debug log
-          console.log("Resize panel - First few available colors with RGB:", 
-              state.availableColors.slice(0, 5).map(c => ({
-                  id: c.id, 
-                  rgb: c.rgb,
-                  rgbValues: `[${c.rgb[0]}, ${c.rgb[1]}, ${c.rgb[2]}]`
-              }))
-          ); // Debug log
-
           // Convert COLOR_MAP to array and filter out transparent
           const allColors = Object.values(CONFIG.COLOR_MAP).filter(color => color.rgb !== null);
-          console.log("Resize panel - All colors from COLOR_MAP:", allColors.length); // Debug log
 
           allColors.forEach(colorData => {
               const { id, name, rgb } = colorData;
@@ -1272,25 +1262,9 @@ window.addEventListener('message', (event) => {
               totalCount++;
               
               // Check if this color is available in the captured colors
-              // First try to match by ID, then fall back to RGB matching
-              const isAvailable = state.availableColors.some(c => {
-                  // Primary match: by ID
-                  if (c.id === id) return true;
-                  
-                  // Fallback match: by RGB (for cases where IDs don't align)
-                  return c.rgb[0] === rgb.r && c.rgb[1] === rgb.g && c.rgb[2] === rgb.b;
-              });
-
-              // Debug: Log a few color comparisons
-              if (id <= 5) {
-                  console.log(`Color ${name} (ID:${id}) RGB(${rgb.r},${rgb.g},${rgb.b}): available = ${isAvailable}`);
-                  if (!isAvailable) {
-                      console.log(`  No match found for RGB(${rgb.r},${rgb.g},${rgb.b}) in available colors`);
-                      // Show what RGB values are actually available
-                      const availableRGBs = state.availableColors.slice(0, 3).map(c => `[${c.rgb[0]},${c.rgb[1]},${c.rgb[2]}]`);
-                      console.log(`  First few available RGBs: ${availableRGBs.join(', ')}`);
-                  }
-              }
+              const isAvailable = state.availableColors.some(c => 
+                  c.rgb[0] === rgb.r && c.rgb[1] === rgb.g && c.rgb[2] === rgb.b
+              );
 
               // If not showing all colors and this color is not available, skip it
               if (!showUnavailable && !isAvailable) {
@@ -1336,7 +1310,6 @@ window.addEventListener('message', (event) => {
               colorsContainer.appendChild(colorItem);
           });
 
-          console.log(`Resize panel populated: ${availableCount} available colors out of ${totalCount} total colors`);
           updateActiveColorPalette();
       }
 
