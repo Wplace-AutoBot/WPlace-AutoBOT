@@ -211,7 +211,7 @@
   // BILINGUAL TEXT STRINGS
   const TEXT = {
     en: {
-    title: "WPlace Auto-draw",
+    title: "WPlace Auto-drawing",
     toggleOverlay: "Toggle Overlay",
     scanColors: "Scan Colors",
     uploadImage: "Upload Image",
@@ -1250,23 +1250,49 @@ window.addEventListener('message', (event) => {
 
       function populateColors(showUnavailable = false) {
           colorsContainer.innerHTML = '';
+          let availableCount = 0;
+          let totalCount = 0;
+
+          console.log("Resize panel - Available colors:", state.availableColors); // Debug log
+          console.log("Resize panel - First few available colors with RGB:", 
+              state.availableColors.slice(0, 5).map(c => ({
+                  id: c.id, 
+                  rgb: c.rgb,
+                  rgbValues: `[${c.rgb[0]}, ${c.rgb[1]}, ${c.rgb[2]}]`
+              }))
+          ); // Debug log
 
           // Convert COLOR_MAP to array and filter out transparent
           const allColors = Object.values(CONFIG.COLOR_MAP).filter(color => color.rgb !== null);
+          console.log("Resize panel - All colors from COLOR_MAP:", allColors.length); // Debug log
 
           allColors.forEach(colorData => {
               const { id, name, rgb } = colorData;
               const rgbKey = `${rgb.r},${rgb.g},${rgb.b}`;
+              totalCount++;
               
               // Check if this color is available in the captured colors
               const isAvailable = state.availableColors.some(c => 
                   c.rgb[0] === rgb.r && c.rgb[1] === rgb.g && c.rgb[2] === rgb.b
               );
 
+              // Debug: Log a few color comparisons
+              if (id <= 5) {
+                  console.log(`Color ${name} (ID:${id}) RGB(${rgb.r},${rgb.g},${rgb.b}): available = ${isAvailable}`);
+                  if (!isAvailable) {
+                      console.log(`  No match found for RGB(${rgb.r},${rgb.g},${rgb.b}) in available colors`);
+                      // Show what RGB values are actually available
+                      const availableRGBs = state.availableColors.slice(0, 3).map(c => `[${c.rgb[0]},${c.rgb[1]},${c.rgb[2]}]`);
+                      console.log(`  First few available RGBs: ${availableRGBs.join(', ')}`);
+                  }
+              }
+
               // If not showing all colors and this color is not available, skip it
               if (!showUnavailable && !isAvailable) {
                   return;
               }
+
+              if (isAvailable) availableCount++;
 
               const colorItem = Utils.createElement('div', { className: 'wplace-color-item' });
               const swatch = Utils.createElement('button', {
@@ -1305,6 +1331,7 @@ window.addEventListener('message', (event) => {
               colorsContainer.appendChild(colorItem);
           });
 
+          console.log(`Resize panel populated: ${availableCount} available colors out of ${totalCount} total colors`);
           updateActiveColorPalette();
       }
 
@@ -3732,6 +3759,7 @@ window.addEventListener('message', (event) => {
     if (uploadBtn) {
       uploadBtn.addEventListener("click", async () => {
         const availableColors = Utils.extractAvailableColors();
+        console.log("Captured available colors:", availableColors); // Debug log
         if (availableColors.length < 10) {
             updateUI("noColorsFound", "error");
             Utils.showAlert(Utils.t("noColorsFound"), "error");
