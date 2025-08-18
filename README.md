@@ -87,6 +87,10 @@ javascript:fetch("https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBO
 
 ---
 
+- Contributors avatars (auto-generated):  
+  <img src="https://contrib.rocks/image?repo=Wplace-AutoBot/WPlace-AutoBOT" alt="Contributors" />
+
+
 <p align="center">
   <a href="#"><img src="https://komarev.com/ghpvc/?username=WPlace-AutoBOT&style=for-the-badge&label=Views:&color=gray"/></a>
 </p>
