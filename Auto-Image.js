@@ -211,7 +211,7 @@
   // BILINGUAL TEXT STRINGS
   const TEXT = {
     en: {
-    title: "WPlace Auto-drawing",
+    title: "WPlace Auto-Image",
     toggleOverlay: "Toggle Overlay",
     scanColors: "Scan Colors",
     uploadImage: "Upload Image",
@@ -1272,9 +1272,14 @@ window.addEventListener('message', (event) => {
               totalCount++;
               
               // Check if this color is available in the captured colors
-              const isAvailable = state.availableColors.some(c => 
-                  c.rgb[0] === rgb.r && c.rgb[1] === rgb.g && c.rgb[2] === rgb.b
-              );
+              // First try to match by ID, then fall back to RGB matching
+              const isAvailable = state.availableColors.some(c => {
+                  // Primary match: by ID
+                  if (c.id === id) return true;
+                  
+                  // Fallback match: by RGB (for cases where IDs don't align)
+                  return c.rgb[0] === rgb.r && c.rgb[1] === rgb.g && c.rgb[2] === rgb.b;
+              });
 
               // Debug: Log a few color comparisons
               if (id <= 5) {
