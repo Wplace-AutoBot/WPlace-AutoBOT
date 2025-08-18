@@ -179,7 +179,7 @@
   // BILINGUAL TEXT STRINGS
   const TEXT = {
     en: {
-    title: "We",
+    title: "WPlace Auto-Image",
     toggleOverlay: "Toggle Overlay",
     scanColors: "Scan Colors",
     uploadImage: "Upload Image",
@@ -1177,12 +1177,19 @@ window.addEventListener('message', (event) => {
       }
   }
 
-  function toggleAllColors(select, isPaid) {
+  function toggleAllColors(select, isPaid, showingUnavailable = false) {
       const selector = isPaid ? '.wplace-color-swatch.paid' : '.wplace-color-swatch:not(.paid)';
       const swatches = document.querySelectorAll(selector);
       if (swatches) {
           swatches.forEach(swatch => {
-              swatch.classList.toggle('active', select);
+              // Only toggle colors that are available or if we're showing unavailable colors
+              const isUnavailable = swatch.classList.contains('unavailable');
+              if (!isUnavailable || showingUnavailable) {
+                  // Don't try to select unavailable colors
+                  if (!isUnavailable) {
+                      swatch.classList.toggle('active', select);
+                  }
+              }
           });
       }
       updateActiveColorPalette();
@@ -1191,53 +1198,87 @@ window.addEventListener('message', (event) => {
   function initializeColorPalette(container) {
       const freeContainer = container.querySelector('#colors-free');
       const paidContainer = container.querySelector('#colors-paid');
+      const showAllToggle = container.querySelector('#showAllColorsToggle');
       if (!freeContainer || !paidContainer) return;
 
-      freeContainer.innerHTML = '';
-      paidContainer.innerHTML = '';
+      function populateColors(showUnavailable = false) {
+          freeContainer.innerHTML = '';
+          paidContainer.innerHTML = '';
 
-      const uniqueColors = [...new Set(CONFIG.COLOR_PALETTE.map(JSON.stringify))].map(JSON.parse);
+          const uniqueColors = [...new Set(CONFIG.COLOR_PALETTE.map(JSON.stringify))].map(JSON.parse);
 
-      uniqueColors.forEach(rgb => {
-          const key = rgb.join(',');
-          const name = CONFIG.COLOR_NAMES[key] || `rgb(${key})`;
-          const isPaid = CONFIG.PAID_COLORS.has(key);
+          uniqueColors.forEach(rgb => {
+              const key = rgb.join(',');
+              const name = CONFIG.COLOR_NAMES[key] || `rgb(${key})`;
+              const isPaid = CONFIG.PAID_COLORS.has(key);
+              const isAvailable = state.availableColors.some(c => 
+                  c.rgb[0] === rgb[0] && c.rgb[1] === rgb[1] && c.rgb[2] === rgb[2]
+              );
 
-          const colorItem = Utils.createElement('div', { className: 'wplace-color-item' });
-          const swatch = Utils.createElement('button', {
-              className: `wplace-color-swatch ${isPaid ? 'paid' : ''}`,
-              title: name,
-              'data-rgb': key,
+              // If not showing all colors and this color is not available, skip it
+              if (!showUnavailable && !isAvailable) {
+                  return;
+              }
+
+              const colorItem = Utils.createElement('div', { className: 'wplace-color-item' });
+              const swatch = Utils.createElement('button', {
+                  className: `wplace-color-swatch ${isPaid ? 'paid' : ''} ${!isAvailable ? 'unavailable' : ''}`,
+                  title: `${name}${!isAvailable ? ' (Unavailable)' : ''}`,
+                  'data-rgb': key,
+              });
+              swatch.style.backgroundColor = `rgb(${key})`;
+
+              // Make unavailable colors visually distinct
+              if (!isAvailable) {
+                  swatch.style.opacity = '0.4';
+                  swatch.style.filter = 'grayscale(50%)';
+                  swatch.disabled = true;
+              }
+
+              const nameLabel = Utils.createElement('span', { 
+                  className: 'wplace-color-item-name',
+                  style: !isAvailable ? 'color: #888; font-style: italic;' : ''
+              }, name + (!isAvailable ? ' (N/A)' : ''));
+
+              if (!isPaid && isAvailable) {
+                  swatch.classList.add('active');
+              }
+
+              // Only add click listener for available colors
+              if (isAvailable) {
+                  swatch.addEventListener('click', () => {
+                      swatch.classList.toggle('active');
+                      updateActiveColorPalette();
+                  });
+              }
+
+              colorItem.appendChild(swatch);
+              colorItem.appendChild(nameLabel);
+
+              if (isPaid) {
+                  paidContainer.appendChild(colorItem);
+              } else {
+                  freeContainer.appendChild(colorItem);
+              }
           });
-          swatch.style.backgroundColor = `rgb(${key})`;
 
-          const nameLabel = Utils.createElement('span', { className: 'wplace-color-item-name' }, name);
+          updateActiveColorPalette();
+      }
 
-          if (!isPaid) {
-              swatch.classList.add('active');
-          }
+      // Initialize with only available colors
+      populateColors(false);
 
-          swatch.addEventListener('click', () => {
-              swatch.classList.toggle('active');
-              updateActiveColorPalette();
+      // Add toggle functionality
+      if (showAllToggle) {
+          showAllToggle.addEventListener('change', (e) => {
+              populateColors(e.target.checked);
           });
+      }
 
-          colorItem.appendChild(swatch);
-          colorItem.appendChild(nameLabel);
-
-          if (isPaid) {
-              paidContainer.appendChild(colorItem);
-          } else {
-              freeContainer.appendChild(colorItem);
-          }
-      });
-
-      container.querySelector('#selectAllFreeBtn')?.addEventListener('click', () => toggleAllColors(true, false));
-      container.querySelector('#unselectAllFreeBtn')?.addEventListener('click', () => toggleAllColors(false, false));
-      container.querySelector('#selectAllPaidBtn')?.addEventListener('click', () => toggleAllColors(true, true));
-      container.querySelector('#unselectAllPaidBtn')?.addEventListener('click', () => toggleAllColors(false, true));
-
-      updateActiveColorPalette();
+      container.querySelector('#selectAllFreeBtn')?.addEventListener('click', () => toggleAllColors(true, false, showAllToggle?.checked));
+      container.querySelector('#unselectAllFreeBtn')?.addEventListener('click', () => toggleAllColors(false, false, showAllToggle?.checked));
+      container.querySelector('#selectAllPaidBtn')?.addEventListener('click', () => toggleAllColors(true, true, showAllToggle?.checked));
+      container.querySelector('#unselectAllPaidBtn')?.addEventListener('click', () => toggleAllColors(false, true, showAllToggle?.checked));
   }
     async function handleCaptcha() {
         return new Promise(async (resolve, reject) => {
@@ -2061,6 +2102,11 @@ window.addEventListener('message', (event) => {
       .wplace-color-swatch.paid {
         border-color: gold;
       }
+      .wplace-color-swatch.unavailable {
+        border-color: #666;
+        border-style: dashed;
+        cursor: not-allowed;
+      }
       .wplace-color-swatch:hover {
         transform: scale(1.1);
         z-index: 1;
@@ -2068,6 +2114,10 @@ window.addEventListener('message', (event) => {
       .wplace-color-swatch:not(.active) {
         opacity: 0.3;
         filter: grayscale(80%);
+      }
+      .wplace-color-swatch.unavailable:not(.active) {
+        opacity: 0.2;
+        filter: grayscale(90%);
       }
       .wplace-color-swatch.active::after {
         content: '✔';
@@ -2962,6 +3012,12 @@ window.addEventListener('message', (event) => {
               <i class="fas fa-palette"></i>&nbsp;Color Palette
           </div>
           <div class="wplace-controls">
+              <div class="wplace-row single">
+                  <label style="display: flex; align-items: center; gap: 8px; font-size: 12px;">
+                      <input type="checkbox" id="showAllColorsToggle" style="cursor: pointer;">
+                      <span>Show All Colors (including unavailable)</span>
+                  </label>
+              </div>
               <div class="wplace-row">
                   <button id="selectAllFreeBtn" class="wplace-btn">All Free</button>
                   <button id="unselectAllFreeBtn" class="wplace-btn">None Free</button>
