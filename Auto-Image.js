@@ -3359,11 +3359,29 @@
           minimizeBtn.title = "Restore"
         } else {
           container.classList.remove("wplace-minimized")
-          content.classList.add("wplace-hidden")
+          content.classList.remove("wplace-hidden")
           minimizeBtn.innerHTML = '<i class="fas fa-minus"></i>'
           minimizeBtn.title = "Minimize"
         }
+        saveBotSettings() // Save minimize state
       })
+    }
+
+    // Initialize UI state based on current state
+    if (state.minimized) {
+      container.classList.add("wplace-minimized")
+      content.classList.add("wplace-hidden")
+      if (minimizeBtn) {
+        minimizeBtn.innerHTML = '<i class="fas fa-expand"></i>'
+        minimizeBtn.title = "Restore"
+      }
+    } else {
+      container.classList.remove("wplace-minimized")
+      content.classList.remove("wplace-hidden")
+      if (minimizeBtn) {
+        minimizeBtn.innerHTML = '<i class="fas fa-minus"></i>'
+        minimizeBtn.title = "Minimize"
+      }
     }
 
     // Save progress functionality
@@ -3932,80 +3950,6 @@
     const { width, height, pixels } = state.imageData
     const { x: startX, y: startY } = state.startPosition
     const { x: regionX, y: regionY } = state.region
-    async function detectTileSize() {
-      try {
-        const imgEl = Array.from(document.querySelectorAll('img')).find(img => /\/files\/s0\/tiles\//.test(img.src) && img.naturalWidth > 0)
-        if (imgEl) return imgEl.naturalWidth
-      } catch (_) { /* ignore */ }
-      try {
-        const probe = new Image()
-        probe.crossOrigin = 'anonymous'
-        const size = await new Promise(resolve => {
-          const to = setTimeout(()=> resolve(null), 4000)
-            probe.onload = () => { clearTimeout(to); resolve(probe.naturalWidth || probe.width || null) }
-            probe.onerror = () => { clearTimeout(to); resolve(null) }
-        })
-        if (size && size > 0 && size <= 2048) return size
-      } catch (_) { /* ignore */ }
-      return 256
-    }
-
-    let tileSize = await detectTileSize()
-    const boardTileCache = new Map() // key: "tx,ty" -> { data: number[][], size }
-
-    // Build quick map colorId -> rgb
-    const colorIdToRgb = new Map();
-    if (state.availableColors) for (const c of state.availableColors) colorIdToRgb.set(c.id, c.rgb)
-
-    async function loadBoardTile(tx, ty) {
-      const key = `${tx},${ty}`
-      if (boardTileCache.has(key)) return boardTileCache.get(key)
-      const url = `https://backend.wplace.live/files/s0/tiles/${tx}/${ty}.png`
-      const img = new Image()
-      img.crossOrigin = 'anonymous'
-      const tilePromise = new Promise((resolve) => {
-        img.onload = () => {
-          const canvas = document.createElement('canvas')
-          canvas.width = img.width
-          canvas.height = img.height
-          tileSize = img.width // assume square
-          const ctx = canvas.getContext('2d')
-          ctx.drawImage(img, 0, 0)
-          const raw = ctx.getImageData(0, 0, canvas.width, canvas.height).data
-          const grid = Array(canvas.width).fill().map(()=>Array(canvas.height).fill(0))
-          for (let x=0; x<canvas.width; x++) {
-            for (let y=0; y<canvas.height; y++) {
-              const i = (y * canvas.width + x) * 4
-              const a = raw[i+3]
-              if (a !== 255) { grid[x][y] = 0; continue }
-              const r = raw[i], g = raw[i+1], b = raw[i+2]
-              const id = findClosestColor([r,g,b], state.availableColors)
-              grid[x][y] = id
-            }
-          }
-          const tileObj = { data: grid, size: canvas.width }
-          boardTileCache.set(key, tileObj)
-          resolve(tileObj)
-        }
-        img.onerror = () => resolve(null)
-      })
-      img.src = url
-      return tilePromise
-    }
-
-    const minGlobalX = startX
-    const minGlobalY = startY
-    const maxGlobalX = startX + width - 1
-    const maxGlobalY = startY + height - 1
-    const minTileX = Math.floor(minGlobalX / tileSize)
-    const minTileY = Math.floor(minGlobalY / tileSize)
-    const maxTileX = Math.floor(maxGlobalX / tileSize)
-    const maxTileY = Math.floor(maxGlobalY / tileSize)
-    for (let tx = minTileX; tx <= maxTileX; tx++) {
-      for (let ty = minTileY; ty <= maxTileY; ty++) {
-        try { await loadBoardTile(tx, ty) } catch (_) { /* ignore tile errors */ }
-      }
-    }
 
     const startRow = state.lastPosition.y || 0
     const startCol = state.lastPosition.x || 0
@@ -4042,39 +3986,20 @@
               continue;
           }
 
+      // Step 1: Quantize source pixel to the user's selected palette (with white bias)
       let targetRgb;
       if (Utils.isWhitePixel(r, g, b)) {
+        // Force pure white for white-ish pixels to avoid drifting to yellowish tones
         targetRgb = [255, 255, 255];
       } else {
         targetRgb = Utils.findClosestPaletteColor(r, g, b, state.activeColorPalette);
       }
 
+          // Step 2: Find the closest available in-game color to the quantized color
           const colorId = findClosestColor(targetRgb, state.availableColors);
 
           const pixelX = startX + x
           const pixelY = startY + y
-          const tileX = Math.floor(pixelX / tileSize)
-          const tileY = Math.floor(pixelY / tileSize)
-          const tileKey = `${tileX},${tileY}`
-          const boardTile = boardTileCache.get(tileKey)
-          if (boardTile) {
-            const localX = pixelX % boardTile.size
-            const localY = pixelY % boardTile.size
-            const existingId = (boardTile.data[localX] && boardTile.data[localX][localY]) || 0
-            if (existingId === colorId) {
-              state.paintedMap[y][x] = true
-              state.paintedPixels++
-              if (state.paintedPixels % 25 === 0) {
-                updateStats()
-                updateUI("paintingProgress", "default", {
-                  painted: state.paintedPixels,
-                  total: state.totalPixels,
-                })
-                if (state.paintedPixels % 50 === 0) Utils.saveProgress()
-              }
-              continue
-            }
-          }
 
           pixelBatch.push({
             x: pixelX,
@@ -4251,6 +4176,7 @@
                 paintingSpeedEnabled: document.getElementById('enableSpeedToggle')?.checked,
                 autoCaptchaEnabled: document.getElementById('enableAutoCaptchaToggle')?.checked,
                 cooldownChargeThreshold: state.cooldownChargeThreshold,
+                minimized: state.minimized,
             };
             // Update global config from UI elements before saving
             CONFIG.PAINTING_SPEED_ENABLED = settings.paintingSpeedEnabled;
@@ -4271,6 +4197,7 @@
             // Apply settings
             state.paintingSpeed = settings.paintingSpeed || CONFIG.PAINTING_SPEED.DEFAULT;
             state.cooldownChargeThreshold = settings.cooldownChargeThreshold || CONFIG.COOLDOWN_CHARGE_THRESHOLD;
+            state.minimized = settings.minimized ?? false;
             CONFIG.PAINTING_SPEED_ENABLED = settings.paintingSpeedEnabled ?? false;
             CONFIG.AUTO_CAPTCHA_ENABLED = settings.autoCaptchaEnabled ?? false;
 
