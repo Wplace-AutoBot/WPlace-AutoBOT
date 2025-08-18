@@ -134,9 +134,7 @@
       },
       "Neon Retro": {
         primary: "#1a1a2e",
-    availableColors: [], // Default to empty array
-    activeColorPalette: [], // User-selected colors for conversion
-    paintWhitePixels: true, // Default to ON
+        secondary: "#16213e",
         accent: "#0f3460",
         text: "#00ff41",
         highlight: "#ff6b35",
@@ -1241,7 +1239,7 @@
               totalPixels: state.imageData.totalPixels,
             }
             : null,
-          paintedMap: state.paintedMap ? Array.from(state.paintedMap) : null,
+          paintedMap: state.paintedMap ? state.paintedMap.map((row) => Array.from(row)) : null,
         }
 
         localStorage.setItem("wplace-bot-progress", JSON.stringify(progressData))
@@ -1275,9 +1273,6 @@
     restoreProgress: (savedData) => {
       try {
         Object.assign(state, savedData.state)
-        if (state.availableColors && state.availableColors.length) {
-          primeColorHelpers();
-        }
 
         if (savedData.imageData) {
           state.imageData = {
@@ -1287,7 +1282,7 @@
         }
 
         if (savedData.paintedMap) {
-          state.paintedMap = new Uint8Array(savedData.paintedMap);
+          state.paintedMap = savedData.paintedMap.map((row) => Array.from(row))
         }
 
         return true
@@ -1320,7 +1315,7 @@
               totalPixels: state.imageData.totalPixels,
             }
             : null,
-          paintedMap: state.paintedMap ? Array.from(state.paintedMap) : null,
+          paintedMap: state.paintedMap ? state.paintedMap.map((row) => Array.from(row)) : null,
         }
 
         const filename = `wplace-bot-progress-${new Date().toISOString().slice(0, 19).replace(/:/g, "-")}.json`
@@ -1507,59 +1502,45 @@
   }
 
   // COLOR MATCHING FUNCTION - Optimized with caching
-  // Improved color cache using integer keys & squared distance (avoid sqrt)
-  const colorCache = new Map(); // key: 24-bit int -> color id
-  let cachedWhiteId = null;
-
-  function primeColorHelpers() {
-    cachedWhiteId = null;
-    for (let i = 0; i < state.availableColors.length; i++) {
-      const c = state.availableColors[i];
-      if (c.rgb[0] >= 250 && c.rgb[1] >= 250 && c.rgb[2] >= 250) {
-        cachedWhiteId = c.id;
-        break;
-      }
-    }
-  }
+  const colorCache = new Map()
 
   function findClosestColor(targetRgb, availableColors) {
-    const key = (targetRgb[0] << 16) | (targetRgb[1] << 8) | targetRgb[2];
-    const cached = colorCache.get(key);
-    if (cached !== undefined) return cached;
+    const cacheKey = `${targetRgb[0]},${targetRgb[1]},${targetRgb[2]}`
 
-    // Fast path for white-ish
-    if (cachedWhiteId !== null && targetRgb[0] >= 250 && targetRgb[1] >= 250 && targetRgb[2] >= 250) {
-      colorCache.set(key, cachedWhiteId);
-      return cachedWhiteId;
+    if (colorCache.has(cacheKey)) {
+      return colorCache.get(cacheKey)
     }
 
-    let bestId = availableColors[0]?.id || 1;
-    let bestDist = 1e12;
-    const tr = targetRgb[0];
-    const tg = targetRgb[1];
-    const tb = targetRgb[2];
+    const isNearWhite = targetRgb[0] >= 250 && targetRgb[1] >= 250 && targetRgb[2] >= 250
+    if (isNearWhite) {
+      const whiteEntry = availableColors.find(c => c.rgb[0] >= 250 && c.rgb[1] >= 250 && c.rgb[2] >= 250)
+      if (whiteEntry) {
+        colorCache.set(cacheKey, whiteEntry.id)
+        return whiteEntry.id
+      }
+    }
+
+    let minDistance = Number.POSITIVE_INFINITY
+    let closestColorId = availableColors[0]?.id || 1
+
     for (let i = 0; i < availableColors.length; i++) {
-      const c = availableColors[i];
-      const cr = c.rgb[0] - tr;
-      const cg = c.rgb[1] - tg;
-      const cb = c.rgb[2] - tb;
-      const dist = cr * cr + cg * cg + cb * cb; // squared distance
-      if (dist < bestDist) {
-        bestDist = dist;
-        bestId = c.id;
-        if (dist === 0) break;
+      const color = availableColors[i]
+      const distance = Utils.colorDistance(targetRgb, color.rgb)
+      if (distance < minDistance) {
+        minDistance = distance
+        closestColorId = color.id
+        if (distance === 0) break
       }
     }
-    colorCache.set(key, bestId);
-    // Simple LRU trim
-    if (colorCache.size > 20000) {
-      let n = 0;
-      for (const k of colorCache.keys()) { // trim first 1000 entries
-        colorCache.delete(k);
-        if (++n > 1000) break;
-      }
+
+    colorCache.set(cacheKey, closestColorId)
+
+    if (colorCache.size > 10000) {
+      const firstKey = colorCache.keys().next().value
+      colorCache.delete(firstKey)
     }
-    return bestId;
+
+    return closestColorId
   }
 
   // UI UPDATE FUNCTIONS (declared early to avoid reference errors)
@@ -4103,7 +4084,6 @@
 
         if (!state.colorsChecked) {
           state.availableColors = availableColors;
-          primeColorHelpers();
           state.colorsChecked = true;
           updateUI("colorsFound", "success", { count: availableColors.length });
           updateStats();
@@ -4359,28 +4339,27 @@
     const startRow = state.lastPosition.y || 0
     const startCol = state.lastPosition.x || 0
 
-    // Use a flat Uint8Array as bitset for painted map for memory & speed
     if (!state.paintedMap) {
-      state.paintedMap = new Uint8Array(width * height);
+      state.paintedMap = Array(height)
+        .fill()
+        .map(() => Array(width).fill(false))
     }
 
     let pixelBatch = null;
 
     try {
-      let lastStatsUpdate = 0;
-      const statsUpdateInterval = 1500; // ms
       outerLoop: for (let y = startRow; y < height; y++) {
-        const rowOffset = y * width;
         for (let x = y === startRow ? startCol : 0; x < width; x++) {
           if (state.stopFlag) {
-            if (pixelBatch && pixelBatch.pixels.length > 0) {
+            if (pixelBatch > 0 && pixelBatch.pixels.length > 0) {
               await sendPixelBatch(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
             }
             state.lastPosition = { x, y }
             updateUI("paintingPaused", "warning", { x, y })
             break outerLoop
           }
-          if (state.paintedMap[rowOffset + x]) continue
+
+          if (state.paintedMap[y][x]) continue
 
           const idx = (y * width + x) * 4
           const r = pixels[idx]
@@ -4409,22 +4388,19 @@
           let pixelX = absX % 1000;
           let pixelY = absY % 1000;
 
-          if (!pixelBatch || pixelBatch.regionX !== regionX + adderX || pixelBatch.regionY !== regionY + adderY) {
+          if (!pixelBatch ||
+            pixelBatch.regionX !== regionX + adderX ||
+            pixelBatch.regionY !== regionY + adderY) {
 
             if (pixelBatch && pixelBatch.pixels.length > 0) {
               let success = await sendPixelBatch(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
               if (success) {
-                for (let i = 0; i < pixelBatch.pixels.length; i++) {
-                  const p = pixelBatch.pixels[i];
-                  state.paintedMap[p.localY * width + p.localX] = 1;
+                pixelBatch.pixels.forEach((p) => {
+                  state.paintedMap[p.localY][p.localX] = true;
                   state.paintedPixels++;
-                }
+                });
                 state.currentCharges -= pixelBatch.pixels.length;
-                const now = performance.now();
-                if (now - lastStatsUpdate > statsUpdateInterval) {
-                  updateStats();
-                  lastStatsUpdate = now;
-                }
+                updateStats();
               }
             }
 
@@ -4470,25 +4446,26 @@
             }
 
             if (success) {
-              for (let i = 0; i < pixelBatch.pixels.length; i++) {
-                const pix = pixelBatch.pixels[i];
-                state.paintedMap[pix.localY * width + pix.localX] = 1;
+              pixelBatch.pixels.forEach((pixel) => {
+                state.paintedMap[pixel.localY][pixel.localX] = true;
                 state.paintedPixels++;
-              }
+              })
+
               state.currentCharges -= pixelBatch.pixels.length;
-              const now = performance.now();
-              if (now - lastStatsUpdate > statsUpdateInterval) {
-                updateStats();
-                updateUI("paintingProgress", "default", { painted: state.paintedPixels, total: state.totalPixels });
-                lastStatsUpdate = now;
+              updateStats()
+              updateUI("paintingProgress", "default", {
+                painted: state.paintedPixels,
+                total: state.totalPixels,
+              })
+
+              if (state.paintedPixels % 50 === 0) {
+                Utils.saveProgress()
               }
-              if ((state.paintedPixels & 0x3F) === 0) { // every 64
-                Utils.saveProgress();
-              }
-              if (CONFIG.PAINTING_SPEED_ENABLED && state.paintingSpeed > 0) {
-                const delayPerPixel = 1000 / state.paintingSpeed;
-                const totalDelay = Math.max(50, delayPerPixel * pixelBatch.pixels.length);
-                await Utils.sleep(totalDelay);
+
+              if (CONFIG.PAINTING_SPEED_ENABLED && state.paintingSpeed > 0 && pixelBatch.length > 0) {
+                const delayPerPixel = 1000 / state.paintingSpeed // ms per pixel
+                const totalDelay = Math.max(100, delayPerPixel * pixelBatch.length) // minimum 100ms
+                await Utils.sleep(totalDelay)
               }
             }
 
@@ -4505,12 +4482,12 @@
               break;
             }
 
-            const now = performance.now();
-            if (now - lastStatsUpdate > statsUpdateInterval) {
-              updateUI("noChargesThreshold", "warning", { time: Utils.formatTime(state.cooldown), threshold: state.cooldownChargeThreshold, current: state.currentCharges });
-              updateStats();
-              lastStatsUpdate = now;
-            }
+            updateUI("noChargesThreshold", "warning", {
+              time: Utils.formatTime(state.cooldown),
+              threshold: state.cooldownChargeThreshold,
+              current: state.currentCharges
+            });
+            await updateStats();
             await Utils.sleep(state.cooldown);
           }
           if (state.stopFlag) break outerLoop;
@@ -4521,16 +4498,15 @@
       if (pixelBatch && pixelBatch.pixels.length > 0 && !state.stopFlag) {
         const success = await sendPixelBatch(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
         if (success) {
-          for (let i = 0; i < pixelBatch.pixels.length; i++) {
-            const p = pixelBatch.pixels[i];
-            state.paintedMap[p.localY * width + p.localX] = 1;
-            state.paintedPixels++;
-          }
+          pixelBatch.pixels.forEach((pixel) => {
+            state.paintedMap[pixel.localY][pixel.localX] = true
+            state.paintedPixels++
+          })
           state.currentCharges -= pixelBatch.pixels.length;
-          if (CONFIG.PAINTING_SPEED_ENABLED && state.paintingSpeed > 0) {
-            const delayPerPixel = 1000 / state.paintingSpeed;
-            const totalDelay = Math.max(50, delayPerPixel * pixelBatch.pixels.length);
-            await Utils.sleep(totalDelay);
+          if (CONFIG.PAINTING_SPEED_ENABLED && state.paintingSpeed > 0 && pixelBatch.length > 0) {
+            const delayPerPixel = 1000 / state.paintingSpeed // ms per pixel
+            const totalDelay = Math.max(100, delayPerPixel * pixelBatch.length) // minimum 100ms
+            await Utils.sleep(totalDelay)
           }
         }
       }
