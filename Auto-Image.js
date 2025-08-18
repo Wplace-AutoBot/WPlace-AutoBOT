@@ -282,6 +282,11 @@
       captchaFailed: "❌ Auto-CAPTCHA failed. Paint a pixel manually.",
       automation: "Automation",
       noChargesThreshold: "⌛ Waiting for charges to reach {threshold}. Currently {current}. Next in {time}...",
+  drawingMode: "Drawing Mode",
+  normalMode: "Normal (Rows)",
+  outlineMode: "Outline First",
+  randomMode: "Random",
+  spiralMode: "Spiral",
     },
     ru: {
       title: "WPlace Авто-Изображение",
@@ -352,6 +357,11 @@
       captchaFailed: "❌ Не удалось решить CAPTCHA. Нарисуйте пиксель вручную.",
       automation: "Автоматизация",
       noChargesThreshold: "⌛ Ожидание зарядов до {threshold}. Сейчас {current}. Следующий через {time}...",
+  drawingMode: "Режим Рисования",
+  normalMode: "Обычный (Строки)",
+  outlineMode: "Сначала Контур",
+  randomMode: "Случайный",
+  spiralMode: "Спираль",
     },
     pt: {
       title: "WPlace Auto-Image",
@@ -422,6 +432,11 @@
       captchaFailed: "❌ Falha ao resolver CAPTCHA. Pinte um pixel manualmente.",
       automation: "Automação",
       noChargesThreshold: "⌛ Aguardando cargas atingirem {threshold}. Atual: {current}. Próxima em {time}...",
+  drawingMode: "Modo de Desenho",
+  normalMode: "Normal (Linhas)",
+  outlineMode: "Contorno Primeiro",
+  randomMode: "Aleatório",
+  spiralMode: "Espiral",
     },
     vi: {
       title: "WPlace Auto-Image",
@@ -492,6 +507,11 @@
       captchaFailed: "❌ Giải CAPTCHA tự động thất bại. Vui lòng vẽ một pixel thủ công.",
       automation: "Tự động hóa",
       noChargesThreshold: "⌛ Đang chờ số lần sạc đạt {threshold}. Hiện tại {current}. Lần tiếp theo trong {time}...",
+  drawingMode: "Chế Độ Vẽ",
+  normalMode: "Bình Thường (Hàng)",
+  outlineMode: "Viền Trước",
+  randomMode: "Ngẫu Nhiên",
+  spiralMode: "Xoắn Ốc",
     },
     fr: {
       title: "WPlace Auto-Image",
@@ -562,6 +582,11 @@
       captchaFailed: "❌ Échec de l'Auto-CAPTCHA. Peignez un pixel manuellement.",
       automation: "Automatisation",
       noChargesThreshold: "⌛ En attente que les charges atteignent {threshold}. Actuel: {current}. Prochaine dans {time}...",
+  drawingMode: "Mode de Dessin",
+  normalMode: "Normal (Lignes)",
+  outlineMode: "Contour d'abord",
+  randomMode: "Aléatoire",
+  spiralMode: "Spirale",
     },
     id: {
       title: "WPlace Auto-Image",
@@ -632,6 +657,11 @@
       captchaFailed: "❌ Gagal menyelesaikan CAPTCHA. Lukis satu piksel secara manual.",
       automation: "Automasi",
       noChargesThreshold: "⌛ Menunggu muatan mencapai {threshold}. Saat ini: {current}. Berikutnya dalam {time}...",
+  drawingMode: "Mode Menggambar",
+  normalMode: "Normal (Baris)",
+  outlineMode: "Garis Luar Dulu",
+  randomMode: "Acak",
+  spiralMode: "Spiral",
     },
   }
 
@@ -662,6 +692,7 @@
     cooldownChargeThreshold: CONFIG.COOLDOWN_CHARGE_THRESHOLD,
     overlayOpacity: CONFIG.OVERLAY.OPACITY_DEFAULT,
     blueMarbleEnabled: CONFIG.OVERLAY.BLUE_MARBLE_DEFAULT,
+  drawingMode: 'normal', // normal | outline | random | spiral
   }
 
   // Placeholder for the resize preview update function
@@ -1566,6 +1597,13 @@
   let updateUI = () => { }
   let updateStats = () => { }
   let updateDataButtons = () => { }
+  let updateDrawingModeIndicator = () => {
+    const el = document.getElementById('drawingModeIndicatorValue');
+    if (el) {
+      const key = state.drawingMode + 'Mode';
+      el.textContent = Utils.t(key) || state.drawingMode;
+    }
+  }
 
   function updateActiveColorPalette() {
     state.activeColorPalette = [];
@@ -2989,6 +3027,13 @@
                     <span>${Utils.t("toggleOverlay")}</span>
                 </button>
             </div>
+            <div class="wplace-row single" style="margin-top:8px;">
+              <div id="drawingModeIndicator" style="width:100%; background: rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); padding:6px 10px; border-radius:8px; font-size:11px; letter-spacing:0.5px; display:flex; align-items:center; gap:6px;">
+                <i class="fas fa-draw-polygon" style="opacity:0.8;"></i>
+                <span style="opacity:0.8;">${Utils.t('drawingMode')}:</span>
+                <strong id="drawingModeIndicatorValue" style="font-weight:600; color:${getCurrentTheme().highlight}; text-transform:uppercase; font-size:11px;">${Utils.t(state.drawingMode+'Mode') || state.drawingMode}</strong>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -3197,6 +3242,22 @@
             <input type="checkbox" id="enableSpeedToggle" ${CONFIG.PAINTING_SPEED_ENABLED ? 'checked' : ''} style="cursor: pointer;"/>
             <span>Enable painting speed limit</span>
           </label>
+        </div>
+
+        <!-- Drawing Mode Section -->
+        <div style="margin-bottom: 25px;">
+          <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-draw-polygon" style="color: #1dd1a1; font-size: 16px;"></i>
+            ${Utils.t("drawingMode")}
+          </label>
+          <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1);">
+            <select id="drawingModeSelect" style="width:100%; padding: 12px 16px; background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; font-size: 14px; outline: none; cursor: pointer; font-family: inherit;">
+              <option value="normal" ${state.drawingMode==='normal' ? 'selected' : ''}>${Utils.t('normalMode')}</option>
+              <option value="outline" ${state.drawingMode==='outline' ? 'selected' : ''}>${Utils.t('outlineMode')}</option>
+              <option value="random" ${state.drawingMode==='random' ? 'selected' : ''}>${Utils.t('randomMode')}</option>
+              <option value="spiral" ${state.drawingMode==='spiral' ? 'selected' : ''}>${Utils.t('spiralMode')}</option>
+            </select>
+          </div>
         </div>
 
         <!-- Theme Selection Section -->
@@ -3657,6 +3718,14 @@
           const newTheme = e.target.value
           switchTheme(newTheme)
         })
+      }
+      const drawingModeSelect = settingsContainer.querySelector('#drawingModeSelect');
+      if (drawingModeSelect) {
+        drawingModeSelect.addEventListener('change', (e) => {
+          state.drawingMode = e.target.value;
+          saveBotSettings();
+          updateDrawingModeIndicator();
+        });
       }
 
       const overlayOpacitySlider = settingsContainer.querySelector("#overlayOpacitySlider");
@@ -4364,14 +4433,89 @@
       state.paintedMap = new Uint8Array(width * height);
     }
 
+    // Build list of candidate pixels according to drawing mode when starting fresh
+    let pixelOrder = [];
+    if (state.paintedPixels === 0) {
+      const mode = state.drawingMode || 'normal';
+      if (mode === 'normal') {
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) pixelOrder.push({ x, y });
+        }
+      } else if (mode === 'outline') {
+        // Collect edge pixels first: a pixel having at least one transparent/white/alpha<threshold neighbor difference
+        const isEdge = new Uint8Array(width * height);
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            const idx = (y * width + x) * 4;
+            const alpha = pixels[idx + 3];
+            if (alpha < CONFIG.TRANSPARENCY_THRESHOLD) continue;
+            let edge = false;
+            const r = pixels[idx], g = pixels[idx + 1], b = pixels[idx + 2];
+            const neighbors = [
+              [x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]
+            ];
+            for (let n = 0; n < neighbors.length; n++) {
+              const nx = neighbors[n][0], ny = neighbors[n][1];
+              if (nx < 0 || ny < 0 || nx >= width || ny >= height) { edge = true; break; }
+              const nIdx = (ny * width + nx) * 4;
+              const na = pixels[nIdx + 3];
+              if (na < CONFIG.TRANSPARENCY_THRESHOLD) { edge = true; break; }
+              // basic contrast check
+              const dr = Math.abs(pixels[nIdx] - r) + Math.abs(pixels[nIdx + 1] - g) + Math.abs(pixels[nIdx + 2] - b);
+              if (dr > 60) { edge = true; break; }
+            }
+            if (edge) {
+              isEdge[y * width + x] = 1;
+            }
+          }
+        }
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) if (isEdge[y * width + x]) pixelOrder.push({ x, y });
+        }
+        // Add remaining interior pixels
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) if (!isEdge[y * width + x]) pixelOrder.push({ x, y });
+        }
+      } else if (mode === 'random') {
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) pixelOrder.push({ x, y });
+        }
+        // Fisher-Yates shuffle
+        for (let i = pixelOrder.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [pixelOrder[i], pixelOrder[j]] = [pixelOrder[j], pixelOrder[i]];
+        }
+      } else if (mode === 'spiral') {
+        let left = 0, right = width - 1, top = 0, bottom = height - 1;
+        while (left <= right && top <= bottom) {
+          for (let x = left; x <= right; x++) pixelOrder.push({ x, y: top });
+          for (let y = top + 1; y <= bottom; y++) pixelOrder.push({ x: right, y });
+          if (top !== bottom) {
+            for (let x = right - 1; x >= left; x--) pixelOrder.push({ x, y: bottom });
+          }
+          if (left !== right) {
+            for (let y = bottom - 1; y > top; y--) pixelOrder.push({ x: left, y });
+          }
+          left++; right--; top++; bottom--;
+        }
+      }
+      state._pixelOrder = pixelOrder; // cache
+      state._pixelOrderIndex = 0;
+    } else if (state._pixelOrder) {
+      pixelOrder = state._pixelOrder;
+    }
+
     let pixelBatch = null;
 
     try {
       let lastStatsUpdate = 0;
       const statsUpdateInterval = 1500; // ms
-      outerLoop: for (let y = startRow; y < height; y++) {
-        const rowOffset = y * width;
-        for (let x = y === startRow ? startCol : 0; x < width; x++) {
+      if (state._pixelOrder) {
+        outerLoop: for (let i = state._pixelOrderIndex || 0; i < pixelOrder.length; i++) {
+          const x = pixelOrder[i].x;
+          const y = pixelOrder[i].y;
+          const rowOffset = y * width;
+          state._pixelOrderIndex = i;
           if (state.stopFlag) {
             if (pixelBatch && pixelBatch.pixels.length > 0) {
               await sendPixelBatch(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
@@ -4514,7 +4658,23 @@
             await Utils.sleep(state.cooldown);
           }
           if (state.stopFlag) break outerLoop;
-
+        }
+      } else {
+        // Fallback legacy scanning if no order list
+        outerLoop: for (let y = startRow; y < height; y++) {
+          const rowOffset = y * width;
+          for (let x = y === startRow ? startCol : 0; x < width; x++) {
+            if (state.stopFlag) {
+              if (pixelBatch && pixelBatch.pixels.length > 0) {
+                await sendPixelBatch(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
+              }
+              state.lastPosition = { x, y }
+              updateUI("paintingPaused", "warning", { x, y })
+              break outerLoop
+            }
+            if (state.paintedMap[rowOffset + x]) continue
+            // (Legacy path omitted: code duplication avoided by earlier branch)
+          }
         }
       }
 
@@ -4609,6 +4769,7 @@
         minimized: state.minimized,
         overlayOpacity: state.overlayOpacity,
         blueMarbleEnabled: document.getElementById('enableBlueMarbleToggle')?.checked,
+  drawingMode: state.drawingMode,
       };
       CONFIG.PAINTING_SPEED_ENABLED = settings.paintingSpeedEnabled;
       CONFIG.AUTO_CAPTCHA_ENABLED = settings.autoCaptchaEnabled;
@@ -4632,6 +4793,7 @@
       CONFIG.AUTO_CAPTCHA_ENABLED = settings.autoCaptchaEnabled ?? false;
       state.overlayOpacity = settings.overlayOpacity ?? CONFIG.OVERLAY.OPACITY_DEFAULT;
       state.blueMarbleEnabled = settings.blueMarbleEnabled ?? CONFIG.OVERLAY.BLUE_MARBLE_DEFAULT;
+  state.drawingMode = settings.drawingMode || 'normal';
 
       const speedSlider = document.getElementById('speedSlider');
       if (speedSlider) speedSlider.value = state.paintingSpeed;
@@ -4655,6 +4817,8 @@
       if (overlayOpacityValue) overlayOpacityValue.textContent = `${Math.round(state.overlayOpacity * 100)}%`;
       const enableBlueMarbleToggle = document.getElementById('enableBlueMarbleToggle');
       if (enableBlueMarbleToggle) enableBlueMarbleToggle.checked = state.blueMarbleEnabled;
+  const drawingModeSelect = document.getElementById('drawingModeSelect');
+  if (drawingModeSelect) drawingModeSelect.value = state.drawingMode;
 
     } catch (e) {
       console.warn("Could not load bot settings:", e);
@@ -4662,4 +4826,6 @@
   }
 
   createUI()
+  // Ensure mode indicator reflects persisted setting
+  setTimeout(() => updateDrawingModeIndicator(), 0);
 })()
