@@ -1342,6 +1342,45 @@ window.addEventListener('message', (event) => {
         throw error
       }
     },
+
+    // Helper function to restore overlay from loaded data
+    restoreOverlayFromData: async () => {
+      if (!state.imageLoaded || !state.imageData || !state.startPosition || !state.region) {
+        return false;
+      }
+
+      try {
+        // Recreate ImageBitmap from loaded pixel data
+        const imageData = new ImageData(
+          state.imageData.pixels,
+          state.imageData.width,
+          state.imageData.height
+        );
+        
+        const canvas = new OffscreenCanvas(state.imageData.width, state.imageData.height);
+        const ctx = canvas.getContext('2d');
+        ctx.putImageData(imageData, 0, 0);
+        const imageBitmap = await canvas.transferToImageBitmap();
+        
+        // Set up overlay with restored data
+        await overlayManager.setImage(imageBitmap);
+        await overlayManager.setPosition(state.startPosition, state.region);
+        overlayManager.enable();
+        
+        // Update overlay button state
+        const toggleOverlayBtn = document.getElementById('toggleOverlayBtn');
+        if (toggleOverlayBtn) {
+          toggleOverlayBtn.disabled = false;
+          toggleOverlayBtn.classList.add('active');
+        }
+        
+        console.log('Overlay restored from data');
+        return true;
+      } catch (error) {
+        console.error('Failed to restore overlay from data:', error);
+        return false;
+      }
+    },
   }
 
   // IMAGE PROCESSOR CLASS
@@ -3755,6 +3794,11 @@ window.addEventListener('message', (event) => {
 
             updateStats()
 
+            // Restore overlay if image data was loaded from localStorage
+            Utils.restoreOverlayFromData().catch(error => {
+              console.error('Failed to restore overlay from localStorage:', error);
+            });
+
             if (!state.colorsChecked) {
                 uploadBtn.disabled = false;
             } else {
@@ -3794,6 +3838,11 @@ window.addEventListener('message', (event) => {
             updateDataButtons()
 
             await updateStats()
+
+            // Restore overlay if image data was loaded from file
+            await Utils.restoreOverlayFromData().catch(error => {
+              console.error('Failed to restore overlay from file:', error);
+            });
 
             if (state.colorsChecked) {
               uploadBtn.disabled = false
