@@ -35,7 +35,8 @@
       11: { id: 12, name: 'Dark Green', rgb: { r: 14, g: 185, b: 104 } },
       12: { id: 13, name: 'Green', rgb: { r: 19, g: 230, b: 123 } },
       13: { id: 14, name: 'Light Green', rgb: { r: 135, g: 255, b: 94 } },
-      14: { id: 15, name: 'Dark Teal', rgb: { r: 12, g: 129, b: 110 } },
+    drawingStyle: 'normal',
+    randomSeed: null,
       15: { id: 16, name: 'Teal', rgb: { r: 16, g: 174, b: 166 } },
       16: { id: 17, name: 'Light Teal', rgb: { r: 19, g: 225, b: 190 } },
       17: { id: 20, name: 'Cyan', rgb: { r: 96, g: 247, b: 242 } },
@@ -661,9 +662,10 @@
     cooldownChargeThreshold: CONFIG.COOLDOWN_CHARGE_THRESHOLD,
     overlayOpacity: CONFIG.OVERLAY.OPACITY_DEFAULT,
     blueMarbleEnabled: CONFIG.OVERLAY.BLUE_MARBLE_DEFAULT,
-  drawingStyle: 'normal',
-  pixelOrder: null,
-  lastPixelIndex: 0,
+    drawingStyle: 'normal',
+    randomSeed: null,
+    pixelOrder: null,
+    lastPixelIndex: 0,
   }
 
   // Placeholder for the resize preview update function
@@ -676,7 +678,7 @@
       this.startCoords = null; // { region: {x, y}, pixel: {x, y} }
       this.imageBitmap = null;
       this.chunkedTiles = new Map(); // Map<"tileX,tileY", ImageBitmap>
-      this.tileSize = 1000;
+  this.tileSize = 1000;
     }
 
     toggle() {
@@ -720,6 +722,7 @@
       const { width: imageWidth, height: imageHeight } = this.imageBitmap;
       const { x: startPixelX, y: startPixelY } = this.startCoords.pixel;
       const { x: startRegionX, y: startRegionY } = this.startCoords.region;
+  const randomSeed = this.randomSeed;
 
       const endPixelX = startPixelX + imageWidth;
       const endPixelY = startPixelY + imageHeight;
@@ -788,6 +791,7 @@
     // --- OVERLAY UPDATE: Simplified compositing logic for solid, semi-transparent overlay ---
     async processAndRespondToTileRequest(eventData) {
       const { endpoint, blobID, blobData } = eventData;
+  const randomSeed = this.randomSeed;
 
       let finalBlob = blobData;
 
@@ -1236,6 +1240,7 @@
             availableColors: state.availableColors,
             drawingStyle: state.drawingStyle,
             lastPixelIndex: state.lastPixelIndex,
+            randomSeed: state.randomSeed,
           },
           imageData: state.imageData
             ? {
@@ -1281,6 +1286,7 @@
         Object.assign(state, savedData.state)
   state.drawingStyle = savedData.state.drawingStyle || 'normal';
   state.lastPixelIndex = savedData.state.lastPixelIndex || 0;
+  state.randomSeed = savedData.state.randomSeed || null;
   state.pixelOrder = null;
 
         if (savedData.imageData) {
@@ -1317,6 +1323,7 @@
             availableColors: state.availableColors,
             drawingStyle: state.drawingStyle,
             lastPixelIndex: state.lastPixelIndex,
+            randomSeed: state.randomSeed,
           },
           imageData: state.imageData
             ? {
@@ -4414,28 +4421,84 @@
       };
       switch (state.drawingStyle) {
         case 'outline': {
-          const outline = [], inner = [];
-          for (let y=0;y<height;y++) for (let x=0;x<width;x++) if (isValid(x,y)) {
-            let boundary=false; const dirs=[[1,0],[-1,0],[0,1],[0,-1]]; for (const [dx,dy] of dirs){const nx=x+dx, ny=y+dy; if(nx<0||ny<0||nx>=width||ny>=height){boundary=true;break;} const nIdx=(ny*width+nx)*4; if(pixels[nIdx+3]<CONFIG.TRANSPARENCY_THRESHOLD){boundary=true;break;}}
-            (boundary?outline:inner).push({x,y});
+          const INF = 1e9;
+          const dist = Array(height).fill().map(()=>Array(width).fill(INF));
+          const q = [];
+          const dirs4 = [[1,0],[-1,0],[0,1],[0,-1]];
+          for (let y=0;y<height;y++) {
+            for (let x=0;x<width;x++) {
+              if (!isValid(x,y)) continue;
+              let boundary = false;
+              for (const [dx,dy] of dirs4) {
+                const nx = x+dx, ny = y+dy;
+                if (nx<0 || ny<0 || nx>=width || ny>=height) { boundary = true; break; }
+                const nIdx = (ny*width+nx)*4;
+                if (pixels[nIdx+3] < CONFIG.TRANSPARENCY_THRESHOLD || (!state.paintWhitePixels && Utils.isWhitePixel(pixels[nIdx], pixels[nIdx+1], pixels[nIdx+2]))) { boundary = true; break; }
+              }
+              if (boundary) { dist[y][x] = 0; q.push([x,y]); }
+            }
           }
-          return outline.concat(inner);
+          if (q.length === 0) {
+            const arr=[]; for (let y=0;y<height;y++) for(let x=0;x<width;x++) if(isValid(x,y)) arr.push({x,y}); return arr;
+          }
+            for (let qi=0; qi<q.length; qi++) { 
+              const [x,y] = q[qi];
+              const d = dist[y][x];
+              for (const [dx,dy] of dirs4) {
+                const nx = x+dx, ny = y+dy;
+                if (nx<0 || ny<0 || nx>=width || ny>=height) continue;
+                if (!isValid(nx,ny)) continue;
+                if (dist[ny][nx] > d + 1) { dist[ny][nx] = d + 1; q.push([nx,ny]); }
+              }
+            }
+          let maxD = 0;
+          for (let y=0;y<height;y++) for (let x=0;x<width;x++) if (dist[y][x]!==INF) maxD = Math.max(maxD, dist[y][x]);
+          const layers = Array.from({length:maxD+1}, ()=>[]);
+          for (let y=0;y<height;y++) for (let x=0;x<width;x++) if (dist[y][x]!==INF) layers[dist[y][x]].push({x,y});
+          return layers.flat();
         }
         case 'spiral': {
           const visited = Array(height).fill().map(()=>Array(width).fill(false));
-          let cx=Math.floor(width/2), cy=Math.floor(height/2); let steps=1; const dirs=[[1,0],[0,1],[-1,0],[0,-1]]; let dir=0; if (isValid(cx,cy)) order.push({x:cx,y:cy}); visited[cy][cx]=true;
-          while(order.length < width*height){ for(let r=0;r<2;r++){ const [dx,dy]=dirs[dir%4]; for(let s=0;s<steps;s++){ cx+=dx; cy+=dy; if(cx<0||cy<0||cx>=width||cy>=height) continue; if(!visited[cy][cx]){visited[cy][cx]=true; if(isValid(cx,cy)) order.push({x:cx,y:cy});}} dir++; } steps++; if(steps>Math.max(width,height)*2) break;}
+          let cx=Math.floor(width/2), cy=Math.floor(height/2);
+          const dirs=[[1,0],[0,1],[-1,0],[0,-1]]; let dir=0; let steps=1;
+          if (cx>=0 && cy>=0 && cx<width && cy<height && isValid(cx,cy)) order.push({x:cx,y:cy});
+          visited[cy]?.[cx] = true;
+          const maxNeeded = width*height; 
+          while(order.length < maxNeeded){
+            for(let r=0;r<2;r++){
+              const [dx,dy]=dirs[dir%4];
+              for(let s=0;s<steps;s++){
+                cx+=dx; cy+=dy;
+                if(cx<0||cy<0||cx>=width||cy>=height) continue;
+                if(!visited[cy][cx]){
+                  visited[cy][cx]=true;
+                  if(isValid(cx,cy)) order.push({x:cx,y:cy});
+                }
+              }
+              dir++;
+            }
+            steps++;
+            if(steps> (width+height)) break; // safety bound
+          }
           return order;
         }
         case 'random': {
           for (let y=0;y<height;y++) for (let x=0;x<width;x++) if (isValid(x,y)) order.push({x,y});
-          for (let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [order[i],order[j]]=[order[j],order[i]];}
+          if (!state.randomSeed) {
+            state.randomSeed = Date.now() & 0xffffffff;
+          }
+          let seed = state.randomSeed;
+          const rand = () => {
+            seed ^= seed << 13; seed ^= seed >>> 17; seed ^= seed << 5; return (seed >>> 0)/4294967296;
+          };
+          for (let i=order.length-1;i>0;i--){const j=Math.floor(rand()*(i+1)); [order[i],order[j]]=[order[j],order[i]];}
           return order;
         }
         case 'diagonal': {
           const buckets=new Map();
           for (let y=0;y<height;y++) for (let x=0;x<width;x++) if (isValid(x,y)) { const k=x+y; if(!buckets.has(k)) buckets.set(k,[]); buckets.get(k).push({x,y}); }
-          return Array.from(buckets.keys()).sort((a,b)=>a-b).flatMap(k=>buckets.get(k));
+          const keys = Array.from(buckets.keys()).sort((a,b)=>a-b);
+          return keys.flatMap(k=>buckets.get(k));
         }
         case 'checkerboard': {
           const first=[], second=[]; for (let y=0;y<height;y++) for (let x=0;x<width;x++) if(isValid(x,y)){ ((x+y)%2===0?first:second).push({x,y}); }
@@ -4456,7 +4519,7 @@
     }
 
     let pixelBatch=null;
-    for (let i=state.lastPixelIndex; i < state.pixelOrder.length; i++) {
+  for (let i=state.lastPixelIndex; i < state.pixelOrder.length; i++) {
       if (state.stopFlag) break;
       const {x,y}=state.pixelOrder[i];
       if (state.paintedMap[y][x]) continue;
@@ -4474,12 +4537,16 @@
             updateUI('paintingProgress','default',{painted:state.paintedPixels,total:state.totalPixels});
             if (state.paintedPixels % 50 === 0) Utils.saveProgress();
             if (CONFIG.PAINTING_SPEED_ENABLED && state.paintingSpeed>0 && pixelBatch.pixels.length>0) { const d=1000/state.paintingSpeed; const t=Math.max(100,d*pixelBatch.pixels.length); await Utils.sleep(t);}            
+            // Persist last index after batch success
+            Utils.saveProgress();
           }
         }
         pixelBatch = { regionX: regionX+adderX, regionY: regionY+adderY, pixels: [] };
       }
       pixelBatch.pixels.push({x:pixelX,y:pixelY,color:colorId,localX:x,localY:y});
-      if (pixelBatch.pixels.length >= Math.floor(state.currentCharges)) {
+  // Persist progress frequently for resume capability
+  state.lastPixelIndex = i;
+  if (pixelBatch.pixels.length >= Math.floor(state.currentCharges)) {
         let success = await sendPixelBatch(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
         if (success === 'token_error') { state.stopFlag=true; break; }
         if (success) {
@@ -4488,6 +4555,7 @@
           updateUI('paintingProgress','default',{painted:state.paintedPixels,total:state.totalPixels});
           if (state.paintedPixels % 50 === 0) Utils.saveProgress();
           if (CONFIG.PAINTING_SPEED_ENABLED && state.paintingSpeed>0 && pixelBatch.pixels.length>0) { const d=1000/state.paintingSpeed; const t=Math.max(100,d*pixelBatch.pixels.length); await Utils.sleep(t);}          
+          Utils.saveProgress();
         }
         pixelBatch.pixels=[];
         while (state.currentCharges < state.cooldownChargeThreshold && !state.stopFlag) {
