@@ -4421,41 +4421,59 @@
       };
       switch (state.drawingStyle) {
         case 'outline': {
-          const INF = 1e9;
-          const dist = Array(height).fill().map(()=>Array(width).fill(INF));
-          const q = [];
+          const boundary = Array(height).fill().map(()=>Array(width).fill(false));
           const dirs4 = [[1,0],[-1,0],[0,1],[0,-1]];
           for (let y=0;y<height;y++) {
             for (let x=0;x<width;x++) {
               if (!isValid(x,y)) continue;
-              let boundary = false;
               for (const [dx,dy] of dirs4) {
-                const nx = x+dx, ny = y+dy;
-                if (nx<0 || ny<0 || nx>=width || ny>=height) { boundary = true; break; }
-                const nIdx = (ny*width+nx)*4;
-                if (pixels[nIdx+3] < CONFIG.TRANSPARENCY_THRESHOLD || (!state.paintWhitePixels && Utils.isWhitePixel(pixels[nIdx], pixels[nIdx+1], pixels[nIdx+2]))) { boundary = true; break; }
-              }
-              if (boundary) { dist[y][x] = 0; q.push([x,y]); }
-            }
-          }
-          if (q.length === 0) {
-            const arr=[]; for (let y=0;y<height;y++) for(let x=0;x<width;x++) if(isValid(x,y)) arr.push({x,y}); return arr;
-          }
-            for (let qi=0; qi<q.length; qi++) { 
-              const [x,y] = q[qi];
-              const d = dist[y][x];
-              for (const [dx,dy] of dirs4) {
-                const nx = x+dx, ny = y+dy;
-                if (nx<0 || ny<0 || nx>=width || ny>=height) continue;
-                if (!isValid(nx,ny)) continue;
-                if (dist[ny][nx] > d + 1) { dist[ny][nx] = d + 1; q.push([nx,ny]); }
+                const nx=x+dx, ny=y+dy;
+                if (nx<0||ny<0||nx>=width||ny>=height) { boundary[y][x]=true; break; }
+                const nIdx=(ny*width+nx)*4;
+                if (pixels[nIdx+3] < CONFIG.TRANSPARENCY_THRESHOLD || (!state.paintWhitePixels && Utils.isWhitePixel(pixels[nIdx],pixels[nIdx+1],pixels[nIdx+2]))){ boundary[y][x]=true; break; }
               }
             }
-          let maxD = 0;
-          for (let y=0;y<height;y++) for (let x=0;x<width;x++) if (dist[y][x]!==INF) maxD = Math.max(maxD, dist[y][x]);
-          const layers = Array.from({length:maxD+1}, ()=>[]);
-          for (let y=0;y<height;y++) for (let x=0;x<width;x++) if (dist[y][x]!==INF) layers[dist[y][x]].push({x,y});
-          return layers.flat();
+          }
+
+          const dirs8 = [[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1],[0,-1],[1,-1]];
+          const visitedB = Array(height).fill().map(()=>Array(width).fill(false));
+          const perimeterOrder = [];
+
+          function traceContour(sx,sy){
+            let x=sx, y=sy; let first=true; let lastDir=0; 
+            visitedB[y][x]=true; perimeterOrder.push({x,y});
+            while(true){
+              let advanced=false;
+              for(let k=0;k<8;k++){
+                const dirIndex=(lastDir+7+k)%8; 
+                const [dx,dy]=dirs8[dirIndex];
+                const nx=x+dx, ny=y+dy;
+                if(nx<0||ny<0||nx>=width||ny>=height) continue;
+                if(!boundary[ny][nx] || visitedB[ny][nx]) continue;
+                x=nx; y=ny; lastDir=dirIndex; visitedB[y][x]=true; perimeterOrder.push({x,y}); advanced=true; break;
+              }
+              if(!advanced) break; 
+              if(!first && x===sx && y===sy) break;
+              first=false;
+            }
+          }
+
+          for (let y=0;y<height;y++) for (let x=0;x<width;x++) if (boundary[y][x] && !visitedB[y][x]) traceContour(x,y);
+
+          const INF = 1e9; const dist = Array(height).fill().map(()=>Array(width).fill(INF));
+          const q=[];
+          for (let i=0;i<perimeterOrder.length;i++){ const {x,y}=perimeterOrder[i]; dist[y][x]=0; q.push([x,y]); }
+          for (let qi=0; qi<q.length; qi++){
+            const [x,y]=q[qi]; const d=dist[y][x];
+            for (const [dx,dy] of dirs4){
+              const nx=x+dx, ny=y+dy; if(nx<0||ny<0||nx>=width||ny>=height) continue; if(!isValid(nx,ny)) continue; if(dist[ny][nx]>d+1){ dist[ny][nx]=d+1; q.push([nx,ny]); }
+            }
+          }
+          let maxD=0; for (let y=0;y<height;y++) for (let x=0;x<width;x++) if (dist[y][x]!==INF) maxD=Math.max(maxD,dist[y][x]);
+          const interiorLayers = Array.from({length:maxD+1},()=>[]);
+          for (let y=0;y<height;y++) for (let x=0;x<width;x++) if(dist[y][x]>0 && dist[y][x]!==INF) interiorLayers[dist[y][x]].push({x,y});
+          const interiorOrder = interiorLayers.flat();
+          return perimeterOrder.concat(interiorOrder);
         }
         case 'spiral': {
           const visited = Array(height).fill().map(()=>Array(width).fill(false));
