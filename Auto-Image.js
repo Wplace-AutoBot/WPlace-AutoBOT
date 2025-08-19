@@ -1,4 +1,4 @@
-(async () => {
+; (async () => {
   // CONFIGURATION CONSTANTS
   const CONFIG = {
     COOLDOWN_DEFAULT: 31000,
@@ -13,6 +13,7 @@
     PAINTING_SPEED_ENABLED: false,
     AUTO_CAPTCHA_ENABLED: false, // Disabled by default
     COOLDOWN_CHARGE_THRESHOLD: 1, // Default wait threshold
+    DRAWING_STYLES: ["normal", "outline", "spiral", "random", "diagonal", "checkerboard"],
     OVERLAY: {
       OPACITY_DEFAULT: 0.6,
       BLUE_MARBLE_DEFAULT: false,
@@ -134,9 +135,7 @@
       },
       "Neon Retro": {
         primary: "#1a1a2e",
-    availableColors: [], // Default to empty array
-    activeColorPalette: [], // User-selected colors for conversion
-    paintWhitePixels: true, // Default to ON
+        secondary: "#16213e",
         accent: "#0f3460",
         text: "#00ff41",
         highlight: "#ff6b35",
@@ -282,11 +281,6 @@
       captchaFailed: "❌ Auto-CAPTCHA failed. Paint a pixel manually.",
       automation: "Automation",
       noChargesThreshold: "⌛ Waiting for charges to reach {threshold}. Currently {current}. Next in {time}...",
-  drawingMode: "Drawing Mode",
-  normalMode: "Normal (Rows)",
-  outlineMode: "Outline First",
-  randomMode: "Random",
-  spiralMode: "Spiral",
     },
     ru: {
       title: "WPlace Авто-Изображение",
@@ -357,11 +351,6 @@
       captchaFailed: "❌ Не удалось решить CAPTCHA. Нарисуйте пиксель вручную.",
       automation: "Автоматизация",
       noChargesThreshold: "⌛ Ожидание зарядов до {threshold}. Сейчас {current}. Следующий через {time}...",
-  drawingMode: "Режим Рисования",
-  normalMode: "Обычный (Строки)",
-  outlineMode: "Сначала Контур",
-  randomMode: "Случайный",
-  spiralMode: "Спираль",
     },
     pt: {
       title: "WPlace Auto-Image",
@@ -432,11 +421,6 @@
       captchaFailed: "❌ Falha ao resolver CAPTCHA. Pinte um pixel manualmente.",
       automation: "Automação",
       noChargesThreshold: "⌛ Aguardando cargas atingirem {threshold}. Atual: {current}. Próxima em {time}...",
-  drawingMode: "Modo de Desenho",
-  normalMode: "Normal (Linhas)",
-  outlineMode: "Contorno Primeiro",
-  randomMode: "Aleatório",
-  spiralMode: "Espiral",
     },
     vi: {
       title: "WPlace Auto-Image",
@@ -507,11 +491,6 @@
       captchaFailed: "❌ Giải CAPTCHA tự động thất bại. Vui lòng vẽ một pixel thủ công.",
       automation: "Tự động hóa",
       noChargesThreshold: "⌛ Đang chờ số lần sạc đạt {threshold}. Hiện tại {current}. Lần tiếp theo trong {time}...",
-  drawingMode: "Chế Độ Vẽ",
-  normalMode: "Bình Thường (Hàng)",
-  outlineMode: "Viền Trước",
-  randomMode: "Ngẫu Nhiên",
-  spiralMode: "Xoắn Ốc",
     },
     fr: {
       title: "WPlace Auto-Image",
@@ -582,11 +561,6 @@
       captchaFailed: "❌ Échec de l'Auto-CAPTCHA. Peignez un pixel manuellement.",
       automation: "Automatisation",
       noChargesThreshold: "⌛ En attente que les charges atteignent {threshold}. Actuel: {current}. Prochaine dans {time}...",
-  drawingMode: "Mode de Dessin",
-  normalMode: "Normal (Lignes)",
-  outlineMode: "Contour d'abord",
-  randomMode: "Aléatoire",
-  spiralMode: "Spirale",
     },
     id: {
       title: "WPlace Auto-Image",
@@ -657,11 +631,6 @@
       captchaFailed: "❌ Gagal menyelesaikan CAPTCHA. Lukis satu piksel secara manual.",
       automation: "Automasi",
       noChargesThreshold: "⌛ Menunggu muatan mencapai {threshold}. Saat ini: {current}. Berikutnya dalam {time}...",
-  drawingMode: "Mode Menggambar",
-  normalMode: "Normal (Baris)",
-  outlineMode: "Garis Luar Dulu",
-  randomMode: "Acak",
-  spiralMode: "Spiral",
     },
   }
 
@@ -692,7 +661,9 @@
     cooldownChargeThreshold: CONFIG.COOLDOWN_CHARGE_THRESHOLD,
     overlayOpacity: CONFIG.OVERLAY.OPACITY_DEFAULT,
     blueMarbleEnabled: CONFIG.OVERLAY.BLUE_MARBLE_DEFAULT,
-  drawingMode: 'normal', // normal | outline | random | spiral
+  drawingStyle: 'normal',
+  pixelOrder: null,
+  lastPixelIndex: 0,
   }
 
   // Placeholder for the resize preview update function
@@ -1263,6 +1234,8 @@
             imageLoaded: state.imageLoaded,
             colorsChecked: state.colorsChecked,
             availableColors: state.availableColors,
+            drawingStyle: state.drawingStyle,
+            lastPixelIndex: state.lastPixelIndex,
           },
           imageData: state.imageData
             ? {
@@ -1272,7 +1245,7 @@
               totalPixels: state.imageData.totalPixels,
             }
             : null,
-          paintedMap: state.paintedMap ? Array.from(state.paintedMap) : null,
+          paintedMap: state.paintedMap ? state.paintedMap.map((row) => Array.from(row)) : null,
         }
 
         localStorage.setItem("wplace-bot-progress", JSON.stringify(progressData))
@@ -1306,9 +1279,9 @@
     restoreProgress: (savedData) => {
       try {
         Object.assign(state, savedData.state)
-        if (state.availableColors && state.availableColors.length) {
-          primeColorHelpers();
-        }
+  state.drawingStyle = savedData.state.drawingStyle || 'normal';
+  state.lastPixelIndex = savedData.state.lastPixelIndex || 0;
+  state.pixelOrder = null;
 
         if (savedData.imageData) {
           state.imageData = {
@@ -1318,7 +1291,7 @@
         }
 
         if (savedData.paintedMap) {
-          state.paintedMap = new Uint8Array(savedData.paintedMap);
+          state.paintedMap = savedData.paintedMap.map((row) => Array.from(row))
         }
 
         return true
@@ -1342,6 +1315,8 @@
             imageLoaded: state.imageLoaded,
             colorsChecked: state.colorsChecked,
             availableColors: state.availableColors,
+            drawingStyle: state.drawingStyle,
+            lastPixelIndex: state.lastPixelIndex,
           },
           imageData: state.imageData
             ? {
@@ -1351,7 +1326,7 @@
               totalPixels: state.imageData.totalPixels,
             }
             : null,
-          paintedMap: state.paintedMap ? Array.from(state.paintedMap) : null,
+          paintedMap: state.paintedMap ? state.paintedMap.map((row) => Array.from(row)) : null,
         }
 
         const filename = `wplace-bot-progress-${new Date().toISOString().slice(0, 19).replace(/:/g, "-")}.json`
@@ -1538,72 +1513,51 @@
   }
 
   // COLOR MATCHING FUNCTION - Optimized with caching
-  // Improved color cache using integer keys & squared distance (avoid sqrt)
-  const colorCache = new Map(); // key: 24-bit int -> color id
-  let cachedWhiteId = null;
-
-  function primeColorHelpers() {
-    cachedWhiteId = null;
-    for (let i = 0; i < state.availableColors.length; i++) {
-      const c = state.availableColors[i];
-      if (c.rgb[0] >= 250 && c.rgb[1] >= 250 && c.rgb[2] >= 250) {
-        cachedWhiteId = c.id;
-        break;
-      }
-    }
-  }
+  const colorCache = new Map()
 
   function findClosestColor(targetRgb, availableColors) {
-    const key = (targetRgb[0] << 16) | (targetRgb[1] << 8) | targetRgb[2];
-    const cached = colorCache.get(key);
-    if (cached !== undefined) return cached;
+    const cacheKey = `${targetRgb[0]},${targetRgb[1]},${targetRgb[2]}`
 
-    // Fast path for white-ish
-    if (cachedWhiteId !== null && targetRgb[0] >= 250 && targetRgb[1] >= 250 && targetRgb[2] >= 250) {
-      colorCache.set(key, cachedWhiteId);
-      return cachedWhiteId;
+    if (colorCache.has(cacheKey)) {
+      return colorCache.get(cacheKey)
     }
 
-    let bestId = availableColors[0]?.id || 1;
-    let bestDist = 1e12;
-    const tr = targetRgb[0];
-    const tg = targetRgb[1];
-    const tb = targetRgb[2];
+    const isNearWhite = targetRgb[0] >= 250 && targetRgb[1] >= 250 && targetRgb[2] >= 250
+    if (isNearWhite) {
+      const whiteEntry = availableColors.find(c => c.rgb[0] >= 250 && c.rgb[1] >= 250 && c.rgb[2] >= 250)
+      if (whiteEntry) {
+        colorCache.set(cacheKey, whiteEntry.id)
+        return whiteEntry.id
+      }
+    }
+
+    let minDistance = Number.POSITIVE_INFINITY
+    let closestColorId = availableColors[0]?.id || 1
+
     for (let i = 0; i < availableColors.length; i++) {
-      const c = availableColors[i];
-      const cr = c.rgb[0] - tr;
-      const cg = c.rgb[1] - tg;
-      const cb = c.rgb[2] - tb;
-      const dist = cr * cr + cg * cg + cb * cb; // squared distance
-      if (dist < bestDist) {
-        bestDist = dist;
-        bestId = c.id;
-        if (dist === 0) break;
+      const color = availableColors[i]
+      const distance = Utils.colorDistance(targetRgb, color.rgb)
+      if (distance < minDistance) {
+        minDistance = distance
+        closestColorId = color.id
+        if (distance === 0) break
       }
     }
-    colorCache.set(key, bestId);
-    // Simple LRU trim
-    if (colorCache.size > 20000) {
-      let n = 0;
-      for (const k of colorCache.keys()) { // trim first 1000 entries
-        colorCache.delete(k);
-        if (++n > 1000) break;
-      }
+
+    colorCache.set(cacheKey, closestColorId)
+
+    if (colorCache.size > 10000) {
+      const firstKey = colorCache.keys().next().value
+      colorCache.delete(firstKey)
     }
-    return bestId;
+
+    return closestColorId
   }
 
   // UI UPDATE FUNCTIONS (declared early to avoid reference errors)
   let updateUI = () => { }
   let updateStats = () => { }
   let updateDataButtons = () => { }
-  let updateDrawingModeIndicator = () => {
-    const el = document.getElementById('drawingModeIndicatorValue');
-    if (el) {
-      const key = state.drawingMode + 'Mode';
-      el.textContent = Utils.t(key) || state.drawingMode;
-    }
-  }
 
   function updateActiveColorPalette() {
     state.activeColorPalette = [];
@@ -2958,6 +2912,22 @@
           <i class="fas fa-image"></i>
           <span>${Utils.t("title")}</span>
         </div>
+
+        <!-- Drawing Style Section -->
+        <div style="margin-bottom: 25px;">
+          <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-paint-brush" style="color: #00f2fe; font-size: 16px;"></i>
+            Drawing Style
+          </label>
+          <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1);">
+            <select id="drawingStyleSelect" style="width:100%; padding:12px 16px; background: rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.2); border-radius:8px; font-size:14px; outline:none; cursor:pointer;">
+              ${CONFIG.DRAWING_STYLES.map(styleName => `<option value="${styleName}" ${styleName === state.drawingStyle ? 'selected' : ''}>${styleName.charAt(0).toUpperCase()+styleName.slice(1)}</option>`).join('')}
+            </select>
+            <p style="font-size:11px; color:rgba(255,255,255,0.7); margin-top:8px; line-height:1.4;">
+              normal: rows; outline: edges first; spiral: center outward; random: shuffled; diagonal: x+y groups; checkerboard: alternating parity first.
+            </p>
+          </div>
+        </div>
         <div class="wplace-header-controls">
           <button id="settingsBtn" class="wplace-header-btn" title="${Utils.t("settings")}">
             <i class="fas fa-cog"></i>
@@ -3026,13 +2996,6 @@
                     <i class="fas fa-eye"></i>
                     <span>${Utils.t("toggleOverlay")}</span>
                 </button>
-            </div>
-            <div class="wplace-row single" style="margin-top:8px;">
-              <div id="drawingModeIndicator" style="width:100%; background: rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); padding:6px 10px; border-radius:8px; font-size:11px; letter-spacing:0.5px; display:flex; align-items:center; gap:6px;">
-                <i class="fas fa-draw-polygon" style="opacity:0.8;"></i>
-                <span style="opacity:0.8;">${Utils.t('drawingMode')}:</span>
-                <strong id="drawingModeIndicatorValue" style="font-weight:600; color:${getCurrentTheme().highlight}; text-transform:uppercase; font-size:11px;">${Utils.t(state.drawingMode+'Mode') || state.drawingMode}</strong>
-              </div>
             </div>
           </div>
         </div>
@@ -3242,22 +3205,6 @@
             <input type="checkbox" id="enableSpeedToggle" ${CONFIG.PAINTING_SPEED_ENABLED ? 'checked' : ''} style="cursor: pointer;"/>
             <span>Enable painting speed limit</span>
           </label>
-        </div>
-
-        <!-- Drawing Mode Section -->
-        <div style="margin-bottom: 25px;">
-          <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-draw-polygon" style="color: #1dd1a1; font-size: 16px;"></i>
-            ${Utils.t("drawingMode")}
-          </label>
-          <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1);">
-            <select id="drawingModeSelect" style="width:100%; padding: 12px 16px; background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; font-size: 14px; outline: none; cursor: pointer; font-family: inherit;">
-              <option value="normal" ${state.drawingMode==='normal' ? 'selected' : ''}>${Utils.t('normalMode')}</option>
-              <option value="outline" ${state.drawingMode==='outline' ? 'selected' : ''}>${Utils.t('outlineMode')}</option>
-              <option value="random" ${state.drawingMode==='random' ? 'selected' : ''}>${Utils.t('randomMode')}</option>
-              <option value="spiral" ${state.drawingMode==='spiral' ? 'selected' : ''}>${Utils.t('spiralMode')}</option>
-            </select>
-          </div>
         </div>
 
         <!-- Theme Selection Section -->
@@ -3658,7 +3605,8 @@
 
     const settingsBtn = container.querySelector("#settingsBtn")
     const closeSettingsBtn = settingsContainer.querySelector("#closeSettingsBtn")
-    const applySettingsBtn = settingsContainer.querySelector("#applySettingsBtn");
+  const applySettingsBtn = settingsContainer.querySelector("#applySettingsBtn");
+  const drawingStyleSelect = settingsContainer.querySelector('#drawingStyleSelect');
 
 
     if (settingsBtn && closeSettingsBtn && applySettingsBtn) {
@@ -3691,6 +3639,16 @@
       })
 
       applySettingsBtn.addEventListener("click", () => {
+        if (drawingStyleSelect) {
+          const newStyle = drawingStyleSelect.value;
+          if (CONFIG.DRAWING_STYLES.includes(newStyle)) {
+            if (state.drawingStyle !== newStyle) {
+              state.drawingStyle = newStyle;
+              state.pixelOrder = null;
+              state.lastPixelIndex = 0;
+            }
+          }
+        }
         saveBotSettings();
         Utils.showAlert(Utils.t("settingsSaved"), "success");
         closeSettingsBtn.click();
@@ -3719,14 +3677,6 @@
           switchTheme(newTheme)
         })
       }
-      const drawingModeSelect = settingsContainer.querySelector('#drawingModeSelect');
-      if (drawingModeSelect) {
-        drawingModeSelect.addEventListener('change', (e) => {
-          state.drawingMode = e.target.value;
-          saveBotSettings();
-          updateDrawingModeIndicator();
-        });
-      }
 
       const overlayOpacitySlider = settingsContainer.querySelector("#overlayOpacitySlider");
       const overlayOpacityValue = settingsContainer.querySelector("#overlayOpacityValue");
@@ -3747,6 +3697,19 @@
             Utils.showAlert("Re-processing overlay...", "info");
             await overlayManager.processImageIntoChunks();
             Utils.showAlert("Overlay updated!", "success");
+          }
+        });
+      }
+
+      if (drawingStyleSelect) {
+        drawingStyleSelect.addEventListener('change', () => {
+          const style = drawingStyleSelect.value;
+          if (CONFIG.DRAWING_STYLES.includes(style)) {
+            state.drawingStyle = style;
+            state.pixelOrder = null;
+            state.lastPixelIndex = 0;
+            saveBotSettings();
+            Utils.showAlert(`Drawing style set to ${style}`, 'info');
           }
         });
       }
@@ -4172,7 +4135,6 @@
 
         if (!state.colorsChecked) {
           state.availableColors = availableColors;
-          primeColorHelpers();
           state.colorsChecked = true;
           updateUI("colorsFound", "success", { count: availableColors.length });
           updateStats();
@@ -4421,301 +4383,124 @@
   }
 
   async function processImage() {
-    const { width, height, pixels } = state.imageData
-    const { x: startX, y: startY } = state.startPosition
-    const { x: regionX, y: regionY } = state.region
+    const { width, height, pixels } = state.imageData;
+    const { x: startX, y: startY } = state.startPosition;
+    const { x: regionX, y: regionY } = state.region;
 
-    const startRow = state.lastPosition.y || 0
-    const startCol = state.lastPosition.x || 0
-
-    // Use a flat Uint8Array as bitset for painted map for memory & speed
     if (!state.paintedMap) {
-      state.paintedMap = new Uint8Array(width * height);
+      state.paintedMap = Array(height).fill().map(() => Array(width).fill(false));
     }
 
-    // Build list of candidate pixels according to drawing mode when starting fresh
-    let pixelOrder = [];
-    if (state.paintedPixels === 0) {
-      const mode = state.drawingMode || 'normal';
-      if (mode === 'normal') {
-        for (let y = 0; y < height; y++) {
-          for (let x = 0; x < width; x++) pixelOrder.push({ x, y });
-        }
-      } else if (mode === 'outline') {
-        // Collect edge pixels first: a pixel having at least one transparent/white/alpha<threshold neighbor difference
-        const isEdge = new Uint8Array(width * height);
-        for (let y = 0; y < height; y++) {
-          for (let x = 0; x < width; x++) {
-            const idx = (y * width + x) * 4;
-            const alpha = pixels[idx + 3];
-            if (alpha < CONFIG.TRANSPARENCY_THRESHOLD) continue;
-            let edge = false;
-            const r = pixels[idx], g = pixels[idx + 1], b = pixels[idx + 2];
-            const neighbors = [
-              [x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]
-            ];
-            for (let n = 0; n < neighbors.length; n++) {
-              const nx = neighbors[n][0], ny = neighbors[n][1];
-              if (nx < 0 || ny < 0 || nx >= width || ny >= height) { edge = true; break; }
-              const nIdx = (ny * width + nx) * 4;
-              const na = pixels[nIdx + 3];
-              if (na < CONFIG.TRANSPARENCY_THRESHOLD) { edge = true; break; }
-              // basic contrast check
-              const dr = Math.abs(pixels[nIdx] - r) + Math.abs(pixels[nIdx + 1] - g) + Math.abs(pixels[nIdx + 2] - b);
-              if (dr > 60) { edge = true; break; }
-            }
-            if (edge) {
-              isEdge[y * width + x] = 1;
-            }
+    function computePixelOrder() {
+      const order = [];
+      const isValid = (x, y) => {
+        const idx = (y * width + x) * 4;
+        const a = pixels[idx + 3];
+        if (a < CONFIG.TRANSPARENCY_THRESHOLD) return false;
+        if (!state.paintWhitePixels && Utils.isWhitePixel(pixels[idx], pixels[idx + 1], pixels[idx + 2])) return false;
+        return true;
+      };
+      switch (state.drawingStyle) {
+        case 'outline': {
+          const outline = [], inner = [];
+          for (let y=0;y<height;y++) for (let x=0;x<width;x++) if (isValid(x,y)) {
+            let boundary=false; const dirs=[[1,0],[-1,0],[0,1],[0,-1]]; for (const [dx,dy] of dirs){const nx=x+dx, ny=y+dy; if(nx<0||ny<0||nx>=width||ny>=height){boundary=true;break;} const nIdx=(ny*width+nx)*4; if(pixels[nIdx+3]<CONFIG.TRANSPARENCY_THRESHOLD){boundary=true;break;}}
+            (boundary?outline:inner).push({x,y});
           }
+          return outline.concat(inner);
         }
-        for (let y = 0; y < height; y++) {
-          for (let x = 0; x < width; x++) if (isEdge[y * width + x]) pixelOrder.push({ x, y });
+        case 'spiral': {
+          const visited = Array(height).fill().map(()=>Array(width).fill(false));
+          let cx=Math.floor(width/2), cy=Math.floor(height/2); let steps=1; const dirs=[[1,0],[0,1],[-1,0],[0,-1]]; let dir=0; if (isValid(cx,cy)) order.push({x:cx,y:cy}); visited[cy][cx]=true;
+          while(order.length < width*height){ for(let r=0;r<2;r++){ const [dx,dy]=dirs[dir%4]; for(let s=0;s<steps;s++){ cx+=dx; cy+=dy; if(cx<0||cy<0||cx>=width||cy>=height) continue; if(!visited[cy][cx]){visited[cy][cx]=true; if(isValid(cx,cy)) order.push({x:cx,y:cy});}} dir++; } steps++; if(steps>Math.max(width,height)*2) break;}
+          return order;
         }
-        // Add remaining interior pixels
-        for (let y = 0; y < height; y++) {
-          for (let x = 0; x < width; x++) if (!isEdge[y * width + x]) pixelOrder.push({ x, y });
+        case 'random': {
+          for (let y=0;y<height;y++) for (let x=0;x<width;x++) if (isValid(x,y)) order.push({x,y});
+          for (let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [order[i],order[j]]=[order[j],order[i]];}
+          return order;
         }
-      } else if (mode === 'random') {
-        for (let y = 0; y < height; y++) {
-          for (let x = 0; x < width; x++) pixelOrder.push({ x, y });
+        case 'diagonal': {
+          const buckets=new Map();
+          for (let y=0;y<height;y++) for (let x=0;x<width;x++) if (isValid(x,y)) { const k=x+y; if(!buckets.has(k)) buckets.set(k,[]); buckets.get(k).push({x,y}); }
+          return Array.from(buckets.keys()).sort((a,b)=>a-b).flatMap(k=>buckets.get(k));
         }
-        // Fisher-Yates shuffle
-        for (let i = pixelOrder.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [pixelOrder[i], pixelOrder[j]] = [pixelOrder[j], pixelOrder[i]];
+        case 'checkerboard': {
+          const first=[], second=[]; for (let y=0;y<height;y++) for (let x=0;x<width;x++) if(isValid(x,y)){ ((x+y)%2===0?first:second).push({x,y}); }
+          return first.concat(second);
         }
-      } else if (mode === 'spiral') {
-        let left = 0, right = width - 1, top = 0, bottom = height - 1;
-        while (left <= right && top <= bottom) {
-          for (let x = left; x <= right; x++) pixelOrder.push({ x, y: top });
-          for (let y = top + 1; y <= bottom; y++) pixelOrder.push({ x: right, y });
-          if (top !== bottom) {
-            for (let x = right - 1; x >= left; x--) pixelOrder.push({ x, y: bottom });
-          }
-          if (left !== right) {
-            for (let y = bottom - 1; y > top; y--) pixelOrder.push({ x: left, y });
-          }
-          left++; right--; top++; bottom--;
+        default: {
+          const arr=[]; for (let y=0;y<height;y++) for (let x=0;x<width;x++) if(isValid(x,y)) arr.push({x,y}); return arr;
         }
       }
-      state._pixelOrder = pixelOrder; // cache
-      state._pixelOrderIndex = 0;
-    } else if (state._pixelOrder) {
-      pixelOrder = state._pixelOrder;
     }
 
-    let pixelBatch = null;
-
-    try {
-      let lastStatsUpdate = 0;
-      const statsUpdateInterval = 1500; // ms
-      if (state._pixelOrder) {
-        outerLoop: for (let i = state._pixelOrderIndex || 0; i < pixelOrder.length; i++) {
-          const x = pixelOrder[i].x;
-          const y = pixelOrder[i].y;
-          const rowOffset = y * width;
-          state._pixelOrderIndex = i;
-          if (state.stopFlag) {
-            if (pixelBatch && pixelBatch.pixels.length > 0) {
-              await sendPixelBatch(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
-            }
-            state.lastPosition = { x, y }
-            updateUI("paintingPaused", "warning", { x, y })
-            break outerLoop
-          }
-          if (state.paintedMap[rowOffset + x]) continue
-
-          const idx = (y * width + x) * 4
-          const r = pixels[idx]
-          const g = pixels[idx + 1]
-          const b = pixels[idx + 2]
-          const alpha = pixels[idx + 3]
-
-          if (alpha < CONFIG.TRANSPARENCY_THRESHOLD || (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b))) {
-            continue;
-          }
-
-          let targetRgb;
-          if (Utils.isWhitePixel(r, g, b)) {
-            targetRgb = [255, 255, 255];
-          } else {
-            targetRgb = Utils.findClosestPaletteColor(r, g, b, state.activeColorPalette);
-          }
-
-          const colorId = findClosestColor([r, g, b], state.availableColors);
-
-          let absX = startX + x;
-          let absY = startY + y;
-
-          let adderX = Math.floor(absX / 1000);
-          let adderY = Math.floor(absY / 1000);
-          let pixelX = absX % 1000;
-          let pixelY = absY % 1000;
-
-          if (!pixelBatch || pixelBatch.regionX !== regionX + adderX || pixelBatch.regionY !== regionY + adderY) {
-
-            if (pixelBatch && pixelBatch.pixels.length > 0) {
-              let success = await sendPixelBatch(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
-              if (success) {
-                for (let i = 0; i < pixelBatch.pixels.length; i++) {
-                  const p = pixelBatch.pixels[i];
-                  state.paintedMap[p.localY * width + p.localX] = 1;
-                  state.paintedPixels++;
-                }
-                state.currentCharges -= pixelBatch.pixels.length;
-                const now = performance.now();
-                if (now - lastStatsUpdate > statsUpdateInterval) {
-                  updateStats();
-                  lastStatsUpdate = now;
-                }
-              }
-            }
-
-            pixelBatch = {
-              regionX: regionX + adderX,
-              regionY: regionY + adderY,
-              pixels: []
-            };
-          }
-
-          pixelBatch.pixels.push({
-            x: pixelX,
-            y: pixelY,
-            color: colorId,
-            localX: x,
-            localY: y,
-          });
-
-          if (pixelBatch.pixels.length >= Math.floor(state.currentCharges)) {
-            let success = await sendPixelBatch(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
-            if (success === "token_error") {
-              if (CONFIG.AUTO_CAPTCHA_ENABLED) {
-                updateUI("captchaSolving", "warning");
-                try {
-                  await handleCaptcha();
-                  success = await sendPixelBatch(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
-                  if (success === "token_error") {
-                    updateUI("captchaFailed", "error");
-                    state.stopFlag = true;
-                    break outerLoop;
-                  }
-                } catch (e) {
-                  updateUI("captchaFailed", "error");
-                  state.stopFlag = true;
-                  break outerLoop;
-                }
-              } else {
-                updateUI("captchaNeeded", "error");
-                Utils.showAlert(Utils.t("captchaNeeded"), "error");
-                state.stopFlag = true;
-                break outerLoop;
-              }
-            }
-
-            if (success) {
-              for (let i = 0; i < pixelBatch.pixels.length; i++) {
-                const pix = pixelBatch.pixels[i];
-                state.paintedMap[pix.localY * width + pix.localX] = 1;
-                state.paintedPixels++;
-              }
-              state.currentCharges -= pixelBatch.pixels.length;
-              const now = performance.now();
-              if (now - lastStatsUpdate > statsUpdateInterval) {
-                updateStats();
-                updateUI("paintingProgress", "default", { painted: state.paintedPixels, total: state.totalPixels });
-                lastStatsUpdate = now;
-              }
-              if ((state.paintedPixels & 0x3F) === 0) { // every 64
-                Utils.saveProgress();
-              }
-              if (CONFIG.PAINTING_SPEED_ENABLED && state.paintingSpeed > 0) {
-                const delayPerPixel = 1000 / state.paintingSpeed;
-                const totalDelay = Math.max(50, delayPerPixel * pixelBatch.pixels.length);
-                await Utils.sleep(totalDelay);
-              }
-            }
-
-            pixelBatch.pixels = [];
-          }
-
-          while (state.currentCharges < state.cooldownChargeThreshold && !state.stopFlag) {
-            const { charges, cooldown } = await WPlaceService.getCharges();
-            state.currentCharges = Math.floor(charges);
-            state.cooldown = cooldown;
-
-            if (state.currentCharges >= state.cooldownChargeThreshold) {
-              updateStats();
-              break;
-            }
-
-            const now = performance.now();
-            if (now - lastStatsUpdate > statsUpdateInterval) {
-              updateUI("noChargesThreshold", "warning", { time: Utils.formatTime(state.cooldown), threshold: state.cooldownChargeThreshold, current: state.currentCharges });
-              updateStats();
-              lastStatsUpdate = now;
-            }
-            await Utils.sleep(state.cooldown);
-          }
-          if (state.stopFlag) break outerLoop;
-        }
+    if (!state.pixelOrder) {
+      if (state.drawingStyle === 'normal') {
+        state.pixelOrder = (function(){ const arr=[]; for(let y=0;y<height;y++) for(let x=0;x<width;x++) arr.push({x,y}); return arr; })();
       } else {
-        // Fallback legacy scanning if no order list
-        outerLoop: for (let y = startRow; y < height; y++) {
-          const rowOffset = y * width;
-          for (let x = y === startRow ? startCol : 0; x < width; x++) {
-            if (state.stopFlag) {
-              if (pixelBatch && pixelBatch.pixels.length > 0) {
-                await sendPixelBatch(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
-              }
-              state.lastPosition = { x, y }
-              updateUI("paintingPaused", "warning", { x, y })
-              break outerLoop
-            }
-            if (state.paintedMap[rowOffset + x]) continue
-            // (Legacy path omitted: code duplication avoided by earlier branch)
+        state.pixelOrder = computePixelOrder();
+      }
+    }
+
+    let pixelBatch=null;
+    for (let i=state.lastPixelIndex; i < state.pixelOrder.length; i++) {
+      if (state.stopFlag) break;
+      const {x,y}=state.pixelOrder[i];
+      if (state.paintedMap[y][x]) continue;
+      const idx=(y*width+x)*4; const r=pixels[idx], g=pixels[idx+1], b=pixels[idx+2], a=pixels[idx+3];
+      if (a < CONFIG.TRANSPARENCY_THRESHOLD || (!state.paintWhitePixels && Utils.isWhitePixel(r,g,b))) continue;
+      const colorId = findClosestColor([r,g,b], state.availableColors);
+      const absX=startX+x, absY=startY+y; const adderX=Math.floor(absX/1000), adderY=Math.floor(absY/1000); const pixelX=absX%1000, pixelY=absY%1000;
+      if (!pixelBatch || pixelBatch.regionX!==regionX+adderX || pixelBatch.regionY!==regionY+adderY) {
+        if (pixelBatch && pixelBatch.pixels.length>0) {
+          const success = await sendPixelBatch(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
+          if (success === 'token_error') { state.stopFlag=true; break; }
+          if (success) {
+            pixelBatch.pixels.forEach(p=>{ state.paintedMap[p.localY][p.localX]=true; state.paintedPixels++; });
+            state.currentCharges -= pixelBatch.pixels.length; updateStats();
+            updateUI('paintingProgress','default',{painted:state.paintedPixels,total:state.totalPixels});
+            if (state.paintedPixels % 50 === 0) Utils.saveProgress();
+            if (CONFIG.PAINTING_SPEED_ENABLED && state.paintingSpeed>0 && pixelBatch.pixels.length>0) { const d=1000/state.paintingSpeed; const t=Math.max(100,d*pixelBatch.pixels.length); await Utils.sleep(t);}            
           }
         }
+        pixelBatch = { regionX: regionX+adderX, regionY: regionY+adderY, pixels: [] };
       }
-
-      if (pixelBatch && pixelBatch.pixels.length > 0 && !state.stopFlag) {
-        const success = await sendPixelBatch(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
+      pixelBatch.pixels.push({x:pixelX,y:pixelY,color:colorId,localX:x,localY:y});
+      if (pixelBatch.pixels.length >= Math.floor(state.currentCharges)) {
+        let success = await sendPixelBatch(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
+        if (success === 'token_error') { state.stopFlag=true; break; }
         if (success) {
-          for (let i = 0; i < pixelBatch.pixels.length; i++) {
-            const p = pixelBatch.pixels[i];
-            state.paintedMap[p.localY * width + p.localX] = 1;
-            state.paintedPixels++;
-          }
-          state.currentCharges -= pixelBatch.pixels.length;
-          if (CONFIG.PAINTING_SPEED_ENABLED && state.paintingSpeed > 0) {
-            const delayPerPixel = 1000 / state.paintingSpeed;
-            const totalDelay = Math.max(50, delayPerPixel * pixelBatch.pixels.length);
-            await Utils.sleep(totalDelay);
-          }
+          pixelBatch.pixels.forEach(p=>{ state.paintedMap[p.localY][p.localX]=true; state.paintedPixels++; });
+          state.currentCharges -= pixelBatch.pixels.length; updateStats();
+          updateUI('paintingProgress','default',{painted:state.paintedPixels,total:state.totalPixels});
+          if (state.paintedPixels % 50 === 0) Utils.saveProgress();
+          if (CONFIG.PAINTING_SPEED_ENABLED && state.paintingSpeed>0 && pixelBatch.pixels.length>0) { const d=1000/state.paintingSpeed; const t=Math.max(100,d*pixelBatch.pixels.length); await Utils.sleep(t);}          
+        }
+        pixelBatch.pixels=[];
+        while (state.currentCharges < state.cooldownChargeThreshold && !state.stopFlag) {
+          const { charges, cooldown } = await WPlaceService.getCharges();
+          state.currentCharges = Math.floor(charges); state.cooldown = cooldown;
+          if (state.currentCharges >= state.cooldownChargeThreshold) { updateStats(); break; }
+          updateUI('noChargesThreshold','warning',{ time: Utils.formatTime(state.cooldown), threshold: state.cooldownChargeThreshold, current: state.currentCharges });
+          await updateStats(); await Utils.sleep(state.cooldown);
         }
       }
-    } finally {
-      if (window._chargesInterval) clearInterval(window._chargesInterval)
-      window._chargesInterval = null
+      state.lastPixelIndex = i;
     }
 
-    if (state.stopFlag) {
-      updateUI("paintingStopped", "warning")
-      Utils.saveProgress()
-    } else {
-      updateUI("paintingComplete", "success", { count: state.paintedPixels })
-      state.lastPosition = { x: 0, y: 0 }
-      state.paintedMap = null
-      Utils.clearProgress()
-      overlayManager.clear();
-      const toggleOverlayBtn = document.getElementById('toggleOverlayBtn');
-      if (toggleOverlayBtn) {
-        toggleOverlayBtn.classList.remove('active');
-        toggleOverlayBtn.disabled = true;
+    if (!state.stopFlag && pixelBatch && pixelBatch.pixels.length>0) {
+      const success = await sendPixelBatch(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
+      if (success) {
+        pixelBatch.pixels.forEach(p=>{ state.paintedMap[p.localY][p.localX]=true; state.paintedPixels++; });
+        state.currentCharges -= pixelBatch.pixels.length;
       }
     }
 
-    updateStats()
+    if (window._chargesInterval) clearInterval(window._chargesInterval); window._chargesInterval=null;
+    if (state.stopFlag) { updateUI('paintingStopped','warning'); Utils.saveProgress(); }
+    else { updateUI('paintingComplete','success',{count:state.paintedPixels}); state.lastPosition={x:0,y:0}; state.paintedMap=null; state.pixelOrder=null; state.lastPixelIndex=0; Utils.clearProgress(); overlayManager.clear(); const toggleOverlayBtn=document.getElementById('toggleOverlayBtn'); if (toggleOverlayBtn){ toggleOverlayBtn.classList.remove('active'); toggleOverlayBtn.disabled=true; } }
+    updateStats();
   }
 
   async function sendPixelBatch(pixelBatch, regionX, regionY) {
@@ -4769,7 +4554,7 @@
         minimized: state.minimized,
         overlayOpacity: state.overlayOpacity,
         blueMarbleEnabled: document.getElementById('enableBlueMarbleToggle')?.checked,
-  drawingMode: state.drawingMode,
+  drawingStyle: state.drawingStyle,
       };
       CONFIG.PAINTING_SPEED_ENABLED = settings.paintingSpeedEnabled;
       CONFIG.AUTO_CAPTCHA_ENABLED = settings.autoCaptchaEnabled;
@@ -4793,7 +4578,7 @@
       CONFIG.AUTO_CAPTCHA_ENABLED = settings.autoCaptchaEnabled ?? false;
       state.overlayOpacity = settings.overlayOpacity ?? CONFIG.OVERLAY.OPACITY_DEFAULT;
       state.blueMarbleEnabled = settings.blueMarbleEnabled ?? CONFIG.OVERLAY.BLUE_MARBLE_DEFAULT;
-  state.drawingMode = settings.drawingMode || 'normal';
+  state.drawingStyle = settings.drawingStyle || 'normal';
 
       const speedSlider = document.getElementById('speedSlider');
       if (speedSlider) speedSlider.value = state.paintingSpeed;
@@ -4817,8 +4602,8 @@
       if (overlayOpacityValue) overlayOpacityValue.textContent = `${Math.round(state.overlayOpacity * 100)}%`;
       const enableBlueMarbleToggle = document.getElementById('enableBlueMarbleToggle');
       if (enableBlueMarbleToggle) enableBlueMarbleToggle.checked = state.blueMarbleEnabled;
-  const drawingModeSelect = document.getElementById('drawingModeSelect');
-  if (drawingModeSelect) drawingModeSelect.value = state.drawingMode;
+  const drawingStyleSelectEl = document.getElementById('drawingStyleSelect');
+  if (drawingStyleSelectEl) drawingStyleSelectEl.value = state.drawingStyle;
 
     } catch (e) {
       console.warn("Could not load bot settings:", e);
@@ -4826,6 +4611,4 @@
   }
 
   createUI()
-  // Ensure mode indicator reflects persisted setting
-  setTimeout(() => updateDrawingModeIndicator(), 0);
 })()
