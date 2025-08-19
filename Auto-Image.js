@@ -4480,7 +4480,7 @@
           let cx=Math.floor(width/2), cy=Math.floor(height/2);
           const dirs=[[1,0],[0,1],[-1,0],[0,-1]]; let dir=0; let steps=1;
           if (cx>=0 && cy>=0 && cx<width && cy<height && isValid(cx,cy)) order.push({x:cx,y:cy});
-          visited[cy]?.[cx] = true;
+          if (visited[cy]) visited[cy][cx] = true;
           const maxNeeded = width*height; 
           while(order.length < maxNeeded){
             for(let r=0;r<2;r++){
