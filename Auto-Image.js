@@ -4414,61 +4414,60 @@
       };
       switch (state.drawingStyle) {
         case 'outline': {
-          const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
+          const dirs = [[1,0],[0,1],[-1,0],[0,-1]]; // clockwise order for nicer tracing
           const dist = Array(height).fill().map(()=>Array(width).fill(-1));
-          const queue = [];
-          let validCount = 0;
 
-          for (let y=0; y<height; y++) {
-            for (let x=0; x<width; x++) {
-              if (!isValid(x,y)) continue;
-              validCount++;
-              let boundary = false;
-              for (const [dx,dy] of dirs) {
-                const nx = x+dx, ny = y+dy;
-                if (nx < 0 || ny < 0 || nx >= width || ny >= height) { boundary = true; break; }
-                const nIdx=(ny*width+nx)*4;
-                if (pixels[nIdx+3] < CONFIG.TRANSPARENCY_THRESHOLD || (!state.paintWhitePixels && Utils.isWhitePixel(pixels[nIdx], pixels[nIdx+1], pixels[nIdx+2]) && state.paintWhitePixels===false)) { boundary = true; break; }
-              }
-              if (boundary) { dist[y][x] = 0; queue.push([x,y]); }
-            }
-          }
-
-            if (queue.length === 0) {
-              for (let y=0; y<height; y++) for (let x=0; x<width; x++) if (isValid(x,y)) { dist[y][x]=0; queue.push([x,y]); }
-            }
-
-          // BFS inward
-          for (let qi=0; qi<queue.length; qi++) {
-            const [x,y] = queue[qi];
-            const baseD = dist[y][x];
+          const isBoundary = (x,y) => {
             for (const [dx,dy] of dirs) {
               const nx=x+dx, ny=y+dy;
-              if (nx<0||ny<0||nx>=width||ny>=height) continue;
-              if (dist[ny][nx] !== -1) continue;
-              if (!isValid(nx,ny)) continue; // skip invalid interior holes
-              dist[ny][nx] = baseD + 1;
-              queue.push([nx,ny]);
+              if (nx<0||ny<0||nx>=width||ny>=height) return true;
+              if (!isValid(nx,ny)) return true;
+            }
+            return false;
+          };
+
+          const q=[];
+          for (let y=0;y<height;y++) for (let x=0;x<width;x++) if (isValid(x,y) && isBoundary(x,y)) { dist[y][x]=0; q.push([x,y]); }
+          if (q.length===0) { 
+            for (let y=0;y<height;y++) for (let x=0;x<width;x++) if (isValid(x,y)) { dist[y][x]=0; q.push([x,y]); }
+          }
+
+          for (let i=0;i<q.length;i++) {
+            const [x,y]=q[i];
+            for (const [dx,dy] of dirs) {
+              const nx=x+dx, ny=y+dy; if (nx<0||ny<0||nx>=width||ny>=height) continue;
+              if (dist[ny][nx]!==-1) continue; if (!isValid(nx,ny)) continue;
+              dist[ny][nx]=dist[y][x]+1; q.push([nx,ny]);
             }
           }
 
-          // Bucket pixels by distance (layer)
-          const layers = [];
-          for (let y=0; y<height; y++) {
-            for (let x=0; x<width; x++) {
-              const d = dist[y][x];
-              if (d === -1) continue;
-              if (!layers[d]) layers[d] = [];
-              layers[d].push({x,y});
+          // Determine maximum layer
+          let maxLayer=0; for (let y=0;y<height;y++) for (let x=0;x<width;x++) if (dist[y][x]>maxLayer) maxLayer=dist[y][x];
+
+          const order=[];
+          const traverseLoop=(sx,sy,L,remaining)=>{
+            const stack=[[sx,sy]]; // DFS
+            while(stack.length){
+              const [x,y]=stack.pop();
+              const key=y*width+x; if(!remaining.has(key)) continue;
+              remaining.delete(key); order.push({x,y});
+              for (const [dx,dy] of dirs) {
+                const nx=x+dx, ny=y+dy; if(nx<0||ny<0||nx>=width||ny>=height) continue;
+                if (dist[ny][nx]===L && remaining.has(ny*width+nx)) stack.push([nx,ny]);
+              }
+            }
+          };
+
+          for (let L=0; L<=maxLayer; L++) {
+            const remaining = new Set();
+            for (let y=0;y<height;y++) for (let x=0;x<width;x++) if (dist[y][x]===L) remaining.add(y*width+x);
+            while (remaining.size) {
+              let first=null; for (const k of remaining){ first=k; break; }
+              const fy=Math.floor(first/width), fx=first%width;
+              traverseLoop(fx,fy,L,remaining);
             }
           }
-
-          // Optional: within each layer, sort to create a more contiguous drawing path (simple scan order)
-          for (let i=0; i<layers.length; i++) {
-            if (layers[i]) layers[i].sort((a,b)=> a.y === b.y ? a.x - b.x : a.y - b.y);
-          }
-
-          return layers.flat();
+          return order;
         }
         case 'spiral': {
           const visited = Array(height).fill().map(()=>Array(width).fill(false));
