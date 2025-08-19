@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="300" height="300" alt="wbot" src="https://github.com/user-attachments/assets/86619bdf-cd77-4b8a-8c62-649b2da0448b" />
+  <img width="300" height="300" alt="image" src="https://github.com/user-attachments/assets/92c38d55-37ef-4e88-bf24-9dba693fa0ab" />
 </p>
 
 <p align="center"><strong>WPlace AutoBOT</strong></p>
