@@ -80,8 +80,10 @@ javascript:fetch("https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBO
 
 - [x] Making AutoFarm working
 - [ ] Merge both scripts into one  
-- [x] Fix script bugs  
-- [] Add new options
+- [x] Add Overlay system
+- [x] Add Cross Tiles Support
+- [x] Add AutoCaptcha Solver
+- [ ] Add Correct Pixel Skip
 - [ ] Tutorials
 
 ---
