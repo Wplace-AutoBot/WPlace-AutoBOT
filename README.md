@@ -16,6 +16,13 @@ This project was fork from https://github.com/DarkModde/WPlace-AutoBOT
 
 <p align="center">
   If you're wondering—yes! These scripts were Developed by a team consisting of Brazilians, Vietnamese, and Indonesians. HUEHUE!</strong></sub>
+  <p align="center">
+  <img src="https://cdn.jsdelivr.net/gh/hjnilsson/country-flags/svg/br.svg" alt="Brazil" width="32"/>
+  &nbsp;
+  <img src="https://cdn.jsdelivr.net/gh/hjnilsson/country-flags/svg/vn.svg" alt="Vietnam" width="32"/>
+  &nbsp;
+  <img src="https://cdn.jsdelivr.net/gh/hjnilsson/country-flags/svg/id.svg" alt="Indonesia" width="32"/>
+</p>
 </p>
 
 ---
