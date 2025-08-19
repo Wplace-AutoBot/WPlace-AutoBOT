@@ -15,7 +15,7 @@ This project was fork from https://github.com/DarkModde/WPlace-AutoBOT
 <br>
 
 <p align="center">
-  If you're wondering—yes! These scripts were created by a team consisting of Brazilians, Vietnamese, and Indonesians. HUEHUE!</strong></sub>
+  If you're wondering—yes! These scripts were Developed by a team consisting of Brazilians, Vietnamese, and Indonesians. HUEHUE!</strong></sub>
 </p>
 
 ---
