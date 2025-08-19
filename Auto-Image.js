@@ -3192,7 +3192,7 @@
           </label>
         </div>
 
-        <!-- Drawing Style Section (moved into settings) -->
+        <!-- Drawing Style Section  -->
         <div style="margin-bottom: 25px;">
           <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
             <i class="fas fa-paint-brush" style="color: #00f2fe; font-size: 16px;"></i>
@@ -3647,6 +3647,10 @@
               state.drawingStyle = newStyle;
               state.pixelOrder = null;
               state.lastPixelIndex = 0;
+              // Refresh stats to show updated drawing mode immediately
+              if (typeof updateStats === 'function') {
+                updateStats();
+              }
             }
           }
         }
@@ -3711,6 +3715,9 @@
             state.lastPixelIndex = 0;
             saveBotSettings();
             Utils.showAlert(`Drawing style set to ${style}`, 'info');
+            if (typeof updateStats === 'function') {
+              updateStats();
+            }
           }
         });
       }
@@ -3950,6 +3957,10 @@
       }
 
       statsArea.innerHTML = `
+            <div class="wplace-stat-item">
+            <div class="wplace-stat-label"><i class="fas fa-vector-square"></i> Drawing Mode</div>
+            <div class="wplace-stat-value">${state.drawingStyle.charAt(0).toUpperCase()+state.drawingStyle.slice(1)}</div>
+            </div>
             ${imageStatsHTML}
             <div class="wplace-stat-item">
             <div class="wplace-stat-label"><i class="fas fa-bolt"></i> ${Utils.t("charges")}</div>
