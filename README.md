@@ -79,6 +79,19 @@ javascript:fetch("https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBO
 
 <br>
 
+### ✨┃Features
+
+- [x] Automatically farms droplets/levels
+- [x] Overlay 
+- [x] Paint over multiple tiles
+- [x] AutoCaptcha Solver
+- [x] MultiLanguage Support
+- [x] Multi account through save and load feature
+
+
+---
+
+
 ---
 
 <p align="center">
