@@ -35,8 +35,7 @@
       11: { id: 12, name: 'Dark Green', rgb: { r: 14, g: 185, b: 104 } },
       12: { id: 13, name: 'Green', rgb: { r: 19, g: 230, b: 123 } },
       13: { id: 14, name: 'Light Green', rgb: { r: 135, g: 255, b: 94 } },
-    drawingStyle: 'normal',
-    randomSeed: null,
+      14: { id: 15, name: 'Dark Teal', rgb: { r: 12, g: 129, b: 110 } },
       15: { id: 16, name: 'Teal', rgb: { r: 16, g: 174, b: 166 } },
       16: { id: 17, name: 'Light Teal', rgb: { r: 19, g: 225, b: 190 } },
       17: { id: 20, name: 'Cyan', rgb: { r: 96, g: 247, b: 242 } },
@@ -662,10 +661,9 @@
     cooldownChargeThreshold: CONFIG.COOLDOWN_CHARGE_THRESHOLD,
     overlayOpacity: CONFIG.OVERLAY.OPACITY_DEFAULT,
     blueMarbleEnabled: CONFIG.OVERLAY.BLUE_MARBLE_DEFAULT,
-    drawingStyle: 'normal',
-    randomSeed: null,
-    pixelOrder: null,
-    lastPixelIndex: 0,
+  drawingStyle: 'normal',
+  pixelOrder: null,
+  lastPixelIndex: 0,
   }
 
   // Placeholder for the resize preview update function
@@ -678,7 +676,7 @@
       this.startCoords = null; // { region: {x, y}, pixel: {x, y} }
       this.imageBitmap = null;
       this.chunkedTiles = new Map(); // Map<"tileX,tileY", ImageBitmap>
-  this.tileSize = 1000;
+      this.tileSize = 1000;
     }
 
     toggle() {
@@ -722,7 +720,6 @@
       const { width: imageWidth, height: imageHeight } = this.imageBitmap;
       const { x: startPixelX, y: startPixelY } = this.startCoords.pixel;
       const { x: startRegionX, y: startRegionY } = this.startCoords.region;
-  const randomSeed = this.randomSeed;
 
       const endPixelX = startPixelX + imageWidth;
       const endPixelY = startPixelY + imageHeight;
@@ -791,7 +788,6 @@
     // --- OVERLAY UPDATE: Simplified compositing logic for solid, semi-transparent overlay ---
     async processAndRespondToTileRequest(eventData) {
       const { endpoint, blobID, blobData } = eventData;
-  const randomSeed = this.randomSeed;
 
       let finalBlob = blobData;
 
@@ -1240,7 +1236,6 @@
             availableColors: state.availableColors,
             drawingStyle: state.drawingStyle,
             lastPixelIndex: state.lastPixelIndex,
-            randomSeed: state.randomSeed,
           },
           imageData: state.imageData
             ? {
@@ -1286,7 +1281,6 @@
         Object.assign(state, savedData.state)
   state.drawingStyle = savedData.state.drawingStyle || 'normal';
   state.lastPixelIndex = savedData.state.lastPixelIndex || 0;
-  state.randomSeed = savedData.state.randomSeed || null;
   state.pixelOrder = null;
 
         if (savedData.imageData) {
@@ -1323,7 +1317,6 @@
             availableColors: state.availableColors,
             drawingStyle: state.drawingStyle,
             lastPixelIndex: state.lastPixelIndex,
-            randomSeed: state.randomSeed,
           },
           imageData: state.imageData
             ? {
@@ -4421,102 +4414,28 @@
       };
       switch (state.drawingStyle) {
         case 'outline': {
-          const boundary = Array(height).fill().map(()=>Array(width).fill(false));
-          const dirs4 = [[1,0],[-1,0],[0,1],[0,-1]];
-          for (let y=0;y<height;y++) {
-            for (let x=0;x<width;x++) {
-              if (!isValid(x,y)) continue;
-              for (const [dx,dy] of dirs4) {
-                const nx=x+dx, ny=y+dy;
-                if (nx<0||ny<0||nx>=width||ny>=height) { boundary[y][x]=true; break; }
-                const nIdx=(ny*width+nx)*4;
-                if (pixels[nIdx+3] < CONFIG.TRANSPARENCY_THRESHOLD || (!state.paintWhitePixels && Utils.isWhitePixel(pixels[nIdx],pixels[nIdx+1],pixels[nIdx+2]))){ boundary[y][x]=true; break; }
-              }
-            }
+          const outline = [], inner = [];
+          for (let y=0;y<height;y++) for (let x=0;x<width;x++) if (isValid(x,y)) {
+            let boundary=false; const dirs=[[1,0],[-1,0],[0,1],[0,-1]]; for (const [dx,dy] of dirs){const nx=x+dx, ny=y+dy; if(nx<0||ny<0||nx>=width||ny>=height){boundary=true;break;} const nIdx=(ny*width+nx)*4; if(pixels[nIdx+3]<CONFIG.TRANSPARENCY_THRESHOLD){boundary=true;break;}}
+            (boundary?outline:inner).push({x,y});
           }
-
-          const dirs8 = [[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1],[0,-1],[1,-1]];
-          const visitedB = Array(height).fill().map(()=>Array(width).fill(false));
-          const perimeterOrder = [];
-
-          function traceContour(sx,sy){
-            let x=sx, y=sy; let first=true; let lastDir=0; 
-            visitedB[y][x]=true; perimeterOrder.push({x,y});
-            while(true){
-              let advanced=false;
-              for(let k=0;k<8;k++){
-                const dirIndex=(lastDir+7+k)%8; 
-                const [dx,dy]=dirs8[dirIndex];
-                const nx=x+dx, ny=y+dy;
-                if(nx<0||ny<0||nx>=width||ny>=height) continue;
-                if(!boundary[ny][nx] || visitedB[ny][nx]) continue;
-                x=nx; y=ny; lastDir=dirIndex; visitedB[y][x]=true; perimeterOrder.push({x,y}); advanced=true; break;
-              }
-              if(!advanced) break; 
-              if(!first && x===sx && y===sy) break;
-              first=false;
-            }
-          }
-
-          for (let y=0;y<height;y++) for (let x=0;x<width;x++) if (boundary[y][x] && !visitedB[y][x]) traceContour(x,y);
-
-          const INF = 1e9; const dist = Array(height).fill().map(()=>Array(width).fill(INF));
-          const q=[];
-          for (let i=0;i<perimeterOrder.length;i++){ const {x,y}=perimeterOrder[i]; dist[y][x]=0; q.push([x,y]); }
-          for (let qi=0; qi<q.length; qi++){
-            const [x,y]=q[qi]; const d=dist[y][x];
-            for (const [dx,dy] of dirs4){
-              const nx=x+dx, ny=y+dy; if(nx<0||ny<0||nx>=width||ny>=height) continue; if(!isValid(nx,ny)) continue; if(dist[ny][nx]>d+1){ dist[ny][nx]=d+1; q.push([nx,ny]); }
-            }
-          }
-          let maxD=0; for (let y=0;y<height;y++) for (let x=0;x<width;x++) if (dist[y][x]!==INF) maxD=Math.max(maxD,dist[y][x]);
-          const interiorLayers = Array.from({length:maxD+1},()=>[]);
-          for (let y=0;y<height;y++) for (let x=0;x<width;x++) if(dist[y][x]>0 && dist[y][x]!==INF) interiorLayers[dist[y][x]].push({x,y});
-          const interiorOrder = interiorLayers.flat();
-          return perimeterOrder.concat(interiorOrder);
+          return outline.concat(inner);
         }
         case 'spiral': {
           const visited = Array(height).fill().map(()=>Array(width).fill(false));
-          let cx=Math.floor(width/2), cy=Math.floor(height/2);
-          const dirs=[[1,0],[0,1],[-1,0],[0,-1]]; let dir=0; let steps=1;
-          if (cx>=0 && cy>=0 && cx<width && cy<height && isValid(cx,cy)) order.push({x:cx,y:cy});
-          if (visited[cy]) visited[cy][cx] = true;
-          const maxNeeded = width*height; 
-          while(order.length < maxNeeded){
-            for(let r=0;r<2;r++){
-              const [dx,dy]=dirs[dir%4];
-              for(let s=0;s<steps;s++){
-                cx+=dx; cy+=dy;
-                if(cx<0||cy<0||cx>=width||cy>=height) continue;
-                if(!visited[cy][cx]){
-                  visited[cy][cx]=true;
-                  if(isValid(cx,cy)) order.push({x:cx,y:cy});
-                }
-              }
-              dir++;
-            }
-            steps++;
-            if(steps> (width+height)) break; // safety bound
-          }
+          let cx=Math.floor(width/2), cy=Math.floor(height/2); let steps=1; const dirs=[[1,0],[0,1],[-1,0],[0,-1]]; let dir=0; if (isValid(cx,cy)) order.push({x:cx,y:cy}); visited[cy][cx]=true;
+          while(order.length < width*height){ for(let r=0;r<2;r++){ const [dx,dy]=dirs[dir%4]; for(let s=0;s<steps;s++){ cx+=dx; cy+=dy; if(cx<0||cy<0||cx>=width||cy>=height) continue; if(!visited[cy][cx]){visited[cy][cx]=true; if(isValid(cx,cy)) order.push({x:cx,y:cy});}} dir++; } steps++; if(steps>Math.max(width,height)*2) break;}
           return order;
         }
         case 'random': {
           for (let y=0;y<height;y++) for (let x=0;x<width;x++) if (isValid(x,y)) order.push({x,y});
-          if (!state.randomSeed) {
-            state.randomSeed = Date.now() & 0xffffffff;
-          }
-          let seed = state.randomSeed;
-          const rand = () => {
-            seed ^= seed << 13; seed ^= seed >>> 17; seed ^= seed << 5; return (seed >>> 0)/4294967296;
-          };
-          for (let i=order.length-1;i>0;i--){const j=Math.floor(rand()*(i+1)); [order[i],order[j]]=[order[j],order[i]];}
+          for (let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [order[i],order[j]]=[order[j],order[i]];}
           return order;
         }
         case 'diagonal': {
           const buckets=new Map();
           for (let y=0;y<height;y++) for (let x=0;x<width;x++) if (isValid(x,y)) { const k=x+y; if(!buckets.has(k)) buckets.set(k,[]); buckets.get(k).push({x,y}); }
-          const keys = Array.from(buckets.keys()).sort((a,b)=>a-b);
-          return keys.flatMap(k=>buckets.get(k));
+          return Array.from(buckets.keys()).sort((a,b)=>a-b).flatMap(k=>buckets.get(k));
         }
         case 'checkerboard': {
           const first=[], second=[]; for (let y=0;y<height;y++) for (let x=0;x<width;x++) if(isValid(x,y)){ ((x+y)%2===0?first:second).push({x,y}); }
@@ -4537,18 +4456,13 @@
     }
 
     let pixelBatch=null;
-  for (let i=state.lastPixelIndex; i < state.pixelOrder.length; i++) {
+    for (let i=state.lastPixelIndex; i < state.pixelOrder.length; i++) {
       if (state.stopFlag) break;
       const {x,y}=state.pixelOrder[i];
       if (state.paintedMap[y][x]) continue;
       const idx=(y*width+x)*4; const r=pixels[idx], g=pixels[idx+1], b=pixels[idx+2], a=pixels[idx+3];
       if (a < CONFIG.TRANSPARENCY_THRESHOLD || (!state.paintWhitePixels && Utils.isWhitePixel(r,g,b))) continue;
       const colorId = findClosestColor([r,g,b], state.availableColors);
-      // Guard against null/undefined colorId issues
-      if (colorId == null || !Number.isFinite(colorId)) {
-        console.warn('Skipping pixel with invalid colorId', {x,y,colorId});
-        continue;
-      }
       const absX=startX+x, absY=startY+y; const adderX=Math.floor(absX/1000), adderY=Math.floor(absY/1000); const pixelX=absX%1000, pixelY=absY%1000;
       if (!pixelBatch || pixelBatch.regionX!==regionX+adderX || pixelBatch.regionY!==regionY+adderY) {
         if (pixelBatch && pixelBatch.pixels.length>0) {
@@ -4560,16 +4474,12 @@
             updateUI('paintingProgress','default',{painted:state.paintedPixels,total:state.totalPixels});
             if (state.paintedPixels % 50 === 0) Utils.saveProgress();
             if (CONFIG.PAINTING_SPEED_ENABLED && state.paintingSpeed>0 && pixelBatch.pixels.length>0) { const d=1000/state.paintingSpeed; const t=Math.max(100,d*pixelBatch.pixels.length); await Utils.sleep(t);}            
-            // Persist last index after batch success
-            Utils.saveProgress();
           }
         }
         pixelBatch = { regionX: regionX+adderX, regionY: regionY+adderY, pixels: [] };
       }
       pixelBatch.pixels.push({x:pixelX,y:pixelY,color:colorId,localX:x,localY:y});
-  // Persist progress frequently for resume capability
-  state.lastPixelIndex = i;
-  if (pixelBatch.pixels.length >= Math.floor(state.currentCharges)) {
+      if (pixelBatch.pixels.length >= Math.floor(state.currentCharges)) {
         let success = await sendPixelBatch(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
         if (success === 'token_error') { state.stopFlag=true; break; }
         if (success) {
@@ -4578,7 +4488,6 @@
           updateUI('paintingProgress','default',{painted:state.paintedPixels,total:state.totalPixels});
           if (state.paintedPixels % 50 === 0) Utils.saveProgress();
           if (CONFIG.PAINTING_SPEED_ENABLED && state.paintingSpeed>0 && pixelBatch.pixels.length>0) { const d=1000/state.paintingSpeed; const t=Math.max(100,d*pixelBatch.pixels.length); await Utils.sleep(t);}          
-          Utils.saveProgress();
         }
         pixelBatch.pixels=[];
         while (state.currentCharges < state.cooldownChargeThreshold && !state.stopFlag) {
@@ -4612,20 +4521,10 @@
       return "token_error"
     }
 
-    // Filter out any malformed pixels (defensive)
-    const valid = [];
-    for (const p of pixelBatch) {
-      if (p && Number.isFinite(p.x) && Number.isFinite(p.y) && Number.isFinite(p.color)) valid.push(p); else console.warn('Dropping invalid pixel from batch', p);
-    }
-    if (valid.length === 0) {
-      console.warn('All pixels in batch invalid, skipping send');
-      return false;
-    }
-
-    const coords = new Array(valid.length * 2)
-    const colors = new Array(valid.length)
-    for (let i = 0; i < valid.length; i++) {
-      const pixel = valid[i]
+    const coords = new Array(pixelBatch.length * 2)
+    const colors = new Array(pixelBatch.length)
+    for (let i = 0; i < pixelBatch.length; i++) {
+      const pixel = pixelBatch[i]
       coords[i * 2] = pixel.x
       coords[i * 2 + 1] = pixel.y
       colors[i] = pixel.color
@@ -4650,11 +4549,7 @@
         return "token_error"
       }
       const data = await res.json()
-      const paintedOk = data?.painted === valid.length;
-      if (!paintedOk) {
-        console.warn('Server painted count mismatch', {expected: valid.length, received: data?.painted, payloadSize: pixelBatch.length});
-      }
-      return paintedOk
+      return data?.painted === pixelBatch.length
     } catch (e) {
       console.error("Batch paint request failed:", e)
       return false
