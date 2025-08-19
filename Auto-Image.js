@@ -13,6 +13,7 @@
     PAINTING_SPEED_ENABLED: false,
     AUTO_CAPTCHA_ENABLED: false, // Disabled by default
     COOLDOWN_CHARGE_THRESHOLD: 1, // Default wait threshold
+    DRAWING_STYLES: ["normal", "outline", "spiral", "random", "diagonal", "checkerboard"],
     OVERLAY: {
       OPACITY_DEFAULT: 0.6,
       BLUE_MARBLE_DEFAULT: false,
@@ -660,6 +661,9 @@
     cooldownChargeThreshold: CONFIG.COOLDOWN_CHARGE_THRESHOLD,
     overlayOpacity: CONFIG.OVERLAY.OPACITY_DEFAULT,
     blueMarbleEnabled: CONFIG.OVERLAY.BLUE_MARBLE_DEFAULT,
+  drawingStyle: 'normal',
+  pixelOrder: null,
+  lastPixelIndex: 0,
   }
 
   // Placeholder for the resize preview update function
@@ -1230,6 +1234,8 @@
             imageLoaded: state.imageLoaded,
             colorsChecked: state.colorsChecked,
             availableColors: state.availableColors,
+            drawingStyle: state.drawingStyle,
+            lastPixelIndex: state.lastPixelIndex,
           },
           imageData: state.imageData
             ? {
@@ -1273,6 +1279,9 @@
     restoreProgress: (savedData) => {
       try {
         Object.assign(state, savedData.state)
+  state.drawingStyle = savedData.state.drawingStyle || 'normal';
+  state.lastPixelIndex = savedData.state.lastPixelIndex || 0;
+  state.pixelOrder = null;
 
         if (savedData.imageData) {
           state.imageData = {
@@ -1306,6 +1315,8 @@
             imageLoaded: state.imageLoaded,
             colorsChecked: state.colorsChecked,
             availableColors: state.availableColors,
+            drawingStyle: state.drawingStyle,
+            lastPixelIndex: state.lastPixelIndex,
           },
           imageData: state.imageData
             ? {
@@ -2901,6 +2912,7 @@
           <i class="fas fa-image"></i>
           <span>${Utils.t("title")}</span>
         </div>
+
         <div class="wplace-header-controls">
           <button id="settingsBtn" class="wplace-header-btn" title="${Utils.t("settings")}">
             <i class="fas fa-cog"></i>
@@ -3178,6 +3190,22 @@
             <input type="checkbox" id="enableSpeedToggle" ${CONFIG.PAINTING_SPEED_ENABLED ? 'checked' : ''} style="cursor: pointer;"/>
             <span>Enable painting speed limit</span>
           </label>
+        </div>
+
+        <!-- Drawing Style Section  -->
+        <div style="margin-bottom: 25px;">
+          <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-paint-brush" style="color: #00f2fe; font-size: 16px;"></i>
+            Drawing Style
+          </label>
+          <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1);">
+            <select id="drawingStyleSelect" style="width:100%; padding:12px 16px; background: rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.2); border-radius:8px; font-size:14px; outline:none; cursor:pointer;">
+              ${CONFIG.DRAWING_STYLES.map(styleName => `<option value="${styleName}" ${styleName === state.drawingStyle ? 'selected' : ''}>${styleName.charAt(0).toUpperCase()+styleName.slice(1)}</option>`).join('')}
+            </select>
+            <p style="font-size:11px; color:rgba(255,255,255,0.7); margin-top:8px; line-height:1.4;">
+              normal: rows; outline: edges first; spiral: center outward; random: shuffled; diagonal: x+y groups; checkerboard: alternating parity first.
+            </p>
+          </div>
         </div>
 
         <!-- Theme Selection Section -->
@@ -3578,7 +3606,8 @@
 
     const settingsBtn = container.querySelector("#settingsBtn")
     const closeSettingsBtn = settingsContainer.querySelector("#closeSettingsBtn")
-    const applySettingsBtn = settingsContainer.querySelector("#applySettingsBtn");
+  const applySettingsBtn = settingsContainer.querySelector("#applySettingsBtn");
+  const drawingStyleSelect = settingsContainer.querySelector('#drawingStyleSelect');
 
 
     if (settingsBtn && closeSettingsBtn && applySettingsBtn) {
@@ -3611,6 +3640,20 @@
       })
 
       applySettingsBtn.addEventListener("click", () => {
+        if (drawingStyleSelect) {
+          const newStyle = drawingStyleSelect.value;
+          if (CONFIG.DRAWING_STYLES.includes(newStyle)) {
+            if (state.drawingStyle !== newStyle) {
+              state.drawingStyle = newStyle;
+              state.pixelOrder = null;
+              state.lastPixelIndex = 0;
+              // Refresh stats to show updated drawing mode immediately
+              if (typeof updateStats === 'function') {
+                updateStats();
+              }
+            }
+          }
+        }
         saveBotSettings();
         Utils.showAlert(Utils.t("settingsSaved"), "success");
         closeSettingsBtn.click();
@@ -3659,6 +3702,22 @@
             Utils.showAlert("Re-processing overlay...", "info");
             await overlayManager.processImageIntoChunks();
             Utils.showAlert("Overlay updated!", "success");
+          }
+        });
+      }
+
+      if (drawingStyleSelect) {
+        drawingStyleSelect.addEventListener('change', () => {
+          const style = drawingStyleSelect.value;
+          if (CONFIG.DRAWING_STYLES.includes(style)) {
+            state.drawingStyle = style;
+            state.pixelOrder = null;
+            state.lastPixelIndex = 0;
+            saveBotSettings();
+            Utils.showAlert(`Drawing style set to ${style}`, 'info');
+            if (typeof updateStats === 'function') {
+              updateStats();
+            }
           }
         });
       }
@@ -3898,6 +3957,10 @@
       }
 
       statsArea.innerHTML = `
+            <div class="wplace-stat-item">
+            <div class="wplace-stat-label"><i class="fas fa-vector-square"></i> Drawing Mode</div>
+            <div class="wplace-stat-value">${state.drawingStyle.charAt(0).toUpperCase()+state.drawingStyle.slice(1)}</div>
+            </div>
             ${imageStatsHTML}
             <div class="wplace-stat-item">
             <div class="wplace-stat-label"><i class="fas fa-bolt"></i> ${Utils.t("charges")}</div>
@@ -4332,244 +4395,172 @@
   }
 
   async function processImage() {
-    const { width, height, pixels } = state.imageData
-    const { x: startX, y: startY } = state.startPosition
-    const { x: regionX, y: regionY } = state.region
-
-    const startRow = state.lastPosition.y || 0
-    const startCol = state.lastPosition.x || 0
+    const { width, height, pixels } = state.imageData;
+    const { x: startX, y: startY } = state.startPosition;
+    const { x: regionX, y: regionY } = state.region;
 
     if (!state.paintedMap) {
-      state.paintedMap = Array(height)
-        .fill()
-        .map(() => Array(width).fill(false))
+      state.paintedMap = Array(height).fill().map(() => Array(width).fill(false));
     }
 
-    let pixelBatch = null;
+    function computePixelOrder() {
+      const order = [];
+      const isValid = (x, y) => {
+        const idx = (y * width + x) * 4;
+        const a = pixels[idx + 3];
+        if (a < CONFIG.TRANSPARENCY_THRESHOLD) return false;
+        if (!state.paintWhitePixels && Utils.isWhitePixel(pixels[idx], pixels[idx + 1], pixels[idx + 2])) return false;
+        return true;
+      };
+      switch (state.drawingStyle) {
+        case 'outline': {
+          const dirs = [[1,0],[0,1],[-1,0],[0,-1]]; // clockwise order for nicer tracing
+          const dist = Array(height).fill().map(()=>Array(width).fill(-1));
 
-    try {
-      outerLoop: for (let y = startRow; y < height; y++) {
-        for (let x = y === startRow ? startCol : 0; x < width; x++) {
-          if (state.stopFlag) {
-            if (pixelBatch && pixelBatch.pixels.length > 0) {
-              await sendPixelBatch(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
+          const isBoundary = (x,y) => {
+            for (const [dx,dy] of dirs) {
+              const nx=x+dx, ny=y+dy;
+              if (nx<0||ny<0||nx>=width||ny>=height) return true;
+              if (!isValid(nx,ny)) return true;
             }
-            state.lastPosition = { x, y }
-            updateUI("paintingPaused", "warning", { x, y })
-            break outerLoop
+            return false;
+          };
+
+          const q=[];
+          for (let y=0;y<height;y++) for (let x=0;x<width;x++) if (isValid(x,y) && isBoundary(x,y)) { dist[y][x]=0; q.push([x,y]); }
+          if (q.length===0) { 
+            for (let y=0;y<height;y++) for (let x=0;x<width;x++) if (isValid(x,y)) { dist[y][x]=0; q.push([x,y]); }
           }
 
-          if (state.paintedMap[y][x]) continue
-
-          const idx = (y * width + x) * 4
-          const r = pixels[idx]
-          const g = pixels[idx + 1]
-          const b = pixels[idx + 2]
-          const alpha = pixels[idx + 3]
-
-          if (alpha < CONFIG.TRANSPARENCY_THRESHOLD || (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b))) {
-            continue;
-          }
-
-          let targetRgb;
-          if (Utils.isWhitePixel(r, g, b)) {
-            targetRgb = [255, 255, 255];
-          } else {
-            targetRgb = Utils.findClosestPaletteColor(r, g, b, state.activeColorPalette);
-          }
-
-          const colorId = findClosestColor([r, g, b], state.availableColors);
-
-          let absX = startX + x;
-          let absY = startY + y;
-
-          let adderX = Math.floor(absX / 1000);
-          let adderY = Math.floor(absY / 1000);
-          let pixelX = absX % 1000;
-          let pixelY = absY % 1000;
-
-          if (!pixelBatch ||
-            pixelBatch.regionX !== regionX + adderX ||
-            pixelBatch.regionY !== regionY + adderY) {
-
-            if (pixelBatch && pixelBatch.pixels.length > 0) {
-              let success = await sendPixelBatch(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
-              if (success === "token_error") {
-                if (CONFIG.AUTO_CAPTCHA_ENABLED) {
-                  updateUI("captchaSolving", "warning");
-                  try {
-                    await handleCaptcha();
-                    success = await sendPixelBatch(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
-                    if (success === "token_error") {
-                      updateUI("captchaFailed", "error");
-                      state.stopFlag = true;
-                      break outerLoop;
-                    }
-                  } catch (e) {
-                    updateUI("captchaFailed", "error");
-                    state.stopFlag = true;
-                    break outerLoop;
-                  }
-                } else {
-                  updateUI("captchaNeeded", "error");
-                  Utils.showAlert(Utils.t("captchaNeeded"), "error");
-                  state.stopFlag = true;
-                  break outerLoop;
-                }
-              }
-              if (success) {
-                pixelBatch.pixels.forEach((p) => {
-                  state.paintedMap[p.localY][p.localX] = true;
-                  state.paintedPixels++;
-                });
-                state.currentCharges -= pixelBatch.pixels.length;
-                updateUI("paintingProgress", "default", {
-                  painted: state.paintedPixels,
-                  total: state.totalPixels,
-                })
-
-                if (state.paintedPixels % 50 === 0) {
-                  Utils.saveProgress()
-                }
-
-                if (CONFIG.PAINTING_SPEED_ENABLED && state.paintingSpeed > 0 && pixelBatch.pixels.length > 0) {
-                  const delayPerPixel = 1000 / state.paintingSpeed // ms per pixel
-                  const totalDelay = Math.max(100, delayPerPixel * pixelBatch.pixels.length) // minimum 100ms
-                  await Utils.sleep(totalDelay)
-                }
-                updateStats();
-              }
-
+          for (let i=0;i<q.length;i++) {
+            const [x,y]=q[i];
+            for (const [dx,dy] of dirs) {
+              const nx=x+dx, ny=y+dy; if (nx<0||ny<0||nx>=width||ny>=height) continue;
+              if (dist[ny][nx]!==-1) continue; if (!isValid(nx,ny)) continue;
+              dist[ny][nx]=dist[y][x]+1; q.push([nx,ny]);
             }
-
-            pixelBatch = {
-              regionX: regionX + adderX,
-              regionY: regionY + adderY,
-              pixels: []
-            };
           }
 
-          pixelBatch.pixels.push({
-            x: pixelX,
-            y: pixelY,
-            color: colorId,
-            localX: x,
-            localY: y,
-          });
+          // Determine maximum layer
+          let maxLayer=0; for (let y=0;y<height;y++) for (let x=0;x<width;x++) if (dist[y][x]>maxLayer) maxLayer=dist[y][x];
 
-          if (pixelBatch.pixels.length >= Math.floor(state.currentCharges)) {
-            let success = await sendPixelBatch(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
-            if (success === "token_error") {
-              if (CONFIG.AUTO_CAPTCHA_ENABLED) {
-                updateUI("captchaSolving", "warning");
-                try {
-                  await handleCaptcha();
-                  success = await sendPixelBatch(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
-                  if (success === "token_error") {
-                    updateUI("captchaFailed", "error");
-                    state.stopFlag = true;
-                    break outerLoop;
-                  }
-                } catch (e) {
-                  updateUI("captchaFailed", "error");
-                  state.stopFlag = true;
-                  break outerLoop;
-                }
-              } else {
-                updateUI("captchaNeeded", "error");
-                Utils.showAlert(Utils.t("captchaNeeded"), "error");
-                state.stopFlag = true;
-                break outerLoop;
+          const order=[];
+          const traverseLoop=(sx,sy,L,remaining)=>{
+            const stack=[[sx,sy]]; // DFS
+            while(stack.length){
+              const [x,y]=stack.pop();
+              const key=y*width+x; if(!remaining.has(key)) continue;
+              remaining.delete(key); order.push({x,y});
+              for (const [dx,dy] of dirs) {
+                const nx=x+dx, ny=y+dy; if(nx<0||ny<0||nx>=width||ny>=height) continue;
+                if (dist[ny][nx]===L && remaining.has(ny*width+nx)) stack.push([nx,ny]);
               }
             }
+          };
 
-            if (success) {
-              pixelBatch.pixels.forEach((pixel) => {
-                state.paintedMap[pixel.localY][pixel.localX] = true;
-                state.paintedPixels++;
-              })
-
-              state.currentCharges -= pixelBatch.pixels.length;
-              updateStats()
-              updateUI("paintingProgress", "default", {
-                painted: state.paintedPixels,
-                total: state.totalPixels,
-              })
-
-              if (state.paintedPixels % 50 === 0) {
-                Utils.saveProgress()
-              }
-
-              if (CONFIG.PAINTING_SPEED_ENABLED && state.paintingSpeed > 0 && pixelBatch.pixels.length > 0) {
-                const delayPerPixel = 1000 / state.paintingSpeed // ms per pixel
-                const totalDelay = Math.max(100, delayPerPixel * pixelBatch.pixels.length) // minimum 100ms
-                await Utils.sleep(totalDelay)
-              }
+          for (let L=0; L<=maxLayer; L++) {
+            const remaining = new Set();
+            for (let y=0;y<height;y++) for (let x=0;x<width;x++) if (dist[y][x]===L) remaining.add(y*width+x);
+            while (remaining.size) {
+              let first=null; for (const k of remaining){ first=k; break; }
+              const fy=Math.floor(first/width), fx=first%width;
+              traverseLoop(fx,fy,L,remaining);
             }
-
-            pixelBatch.pixels = [];
           }
-
-          while (state.currentCharges < state.cooldownChargeThreshold && !state.stopFlag) {
-            const { charges, cooldown } = await WPlaceService.getCharges();
-            state.currentCharges = Math.floor(charges);
-            state.cooldown = cooldown;
-
-            if (state.currentCharges >= state.cooldownChargeThreshold) {
-              updateStats();
-              break;
-            }
-
-            updateUI("noChargesThreshold", "warning", {
-              time: Utils.formatTime(state.cooldown),
-              threshold: state.cooldownChargeThreshold,
-              current: state.currentCharges
-            });
-            await updateStats();
-            await Utils.sleep(state.cooldown);
-          }
-          if (state.stopFlag) break outerLoop;
-
+          return order;
+        }
+        case 'spiral': {
+          const visited = Array(height).fill().map(()=>Array(width).fill(false));
+          let cx=Math.floor(width/2), cy=Math.floor(height/2); let steps=1; const dirs=[[1,0],[0,1],[-1,0],[0,-1]]; let dir=0; if (isValid(cx,cy)) order.push({x:cx,y:cy}); visited[cy][cx]=true;
+          while(order.length < width*height){ for(let r=0;r<2;r++){ const [dx,dy]=dirs[dir%4]; for(let s=0;s<steps;s++){ cx+=dx; cy+=dy; if(cx<0||cy<0||cx>=width||cy>=height) continue; if(!visited[cy][cx]){visited[cy][cx]=true; if(isValid(cx,cy)) order.push({x:cx,y:cy});}} dir++; } steps++; if(steps>Math.max(width,height)*2) break;}
+          return order;
+        }
+        case 'random': {
+          for (let y=0;y<height;y++) for (let x=0;x<width;x++) if (isValid(x,y)) order.push({x,y});
+          for (let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [order[i],order[j]]=[order[j],order[i]];}
+          return order;
+        }
+        case 'diagonal': {
+          const buckets=new Map();
+          for (let y=0;y<height;y++) for (let x=0;x<width;x++) if (isValid(x,y)) { const k=x+y; if(!buckets.has(k)) buckets.set(k,[]); buckets.get(k).push({x,y}); }
+          return Array.from(buckets.keys()).sort((a,b)=>a-b).flatMap(k=>buckets.get(k));
+        }
+        case 'checkerboard': {
+          const first=[], second=[]; for (let y=0;y<height;y++) for (let x=0;x<width;x++) if(isValid(x,y)){ ((x+y)%2===0?first:second).push({x,y}); }
+          return first.concat(second);
+        }
+        default: {
+          const arr=[]; for (let y=0;y<height;y++) for (let x=0;x<width;x++) if(isValid(x,y)) arr.push({x,y}); return arr;
         }
       }
+    }
 
-      if (pixelBatch && pixelBatch.pixels.length > 0 && !state.stopFlag) {
-        const success = await sendPixelBatch(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
+    if (!state.pixelOrder) {
+      if (state.drawingStyle === 'normal') {
+        state.pixelOrder = (function(){ const arr=[]; for(let y=0;y<height;y++) for(let x=0;x<width;x++) arr.push({x,y}); return arr; })();
+      } else {
+        state.pixelOrder = computePixelOrder();
+      }
+    }
+
+    let pixelBatch=null;
+    for (let i=state.lastPixelIndex; i < state.pixelOrder.length; i++) {
+      if (state.stopFlag) break;
+      const {x,y}=state.pixelOrder[i];
+      if (state.paintedMap[y][x]) continue;
+      const idx=(y*width+x)*4; const r=pixels[idx], g=pixels[idx+1], b=pixels[idx+2], a=pixels[idx+3];
+      if (a < CONFIG.TRANSPARENCY_THRESHOLD || (!state.paintWhitePixels && Utils.isWhitePixel(r,g,b))) continue;
+      const colorId = findClosestColor([r,g,b], state.availableColors);
+      const absX=startX+x, absY=startY+y; const adderX=Math.floor(absX/1000), adderY=Math.floor(absY/1000); const pixelX=absX%1000, pixelY=absY%1000;
+      if (!pixelBatch || pixelBatch.regionX!==regionX+adderX || pixelBatch.regionY!==regionY+adderY) {
+        if (pixelBatch && pixelBatch.pixels.length>0) {
+          const success = await sendPixelBatch(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
+          if (success === 'token_error') { state.stopFlag=true; break; }
+          if (success) {
+            pixelBatch.pixels.forEach(p=>{ state.paintedMap[p.localY][p.localX]=true; state.paintedPixels++; });
+            state.currentCharges -= pixelBatch.pixels.length; updateStats();
+            updateUI('paintingProgress','default',{painted:state.paintedPixels,total:state.totalPixels});
+            if (state.paintedPixels % 50 === 0) Utils.saveProgress();
+            if (CONFIG.PAINTING_SPEED_ENABLED && state.paintingSpeed>0 && pixelBatch.pixels.length>0) { const d=1000/state.paintingSpeed; const t=Math.max(100,d*pixelBatch.pixels.length); await Utils.sleep(t);}            
+          }
+        }
+        pixelBatch = { regionX: regionX+adderX, regionY: regionY+adderY, pixels: [] };
+      }
+      pixelBatch.pixels.push({x:pixelX,y:pixelY,color:colorId,localX:x,localY:y});
+      if (pixelBatch.pixels.length >= Math.floor(state.currentCharges)) {
+        let success = await sendPixelBatch(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
+        if (success === 'token_error') { state.stopFlag=true; break; }
         if (success) {
-          pixelBatch.pixels.forEach((pixel) => {
-            state.paintedMap[pixel.localY][pixel.localX] = true
-            state.paintedPixels++
-          })
-          state.currentCharges -= pixelBatch.pixels.length;
-          if (CONFIG.PAINTING_SPEED_ENABLED && state.paintingSpeed > 0 && pixelBatch.pixels.length > 0) {
-            const delayPerPixel = 1000 / state.paintingSpeed // ms per pixel
-            const totalDelay = Math.max(100, delayPerPixel * pixelBatch.pixels.length) // minimum 100ms
-            await Utils.sleep(totalDelay)
-          }
+          pixelBatch.pixels.forEach(p=>{ state.paintedMap[p.localY][p.localX]=true; state.paintedPixels++; });
+          state.currentCharges -= pixelBatch.pixels.length; updateStats();
+          updateUI('paintingProgress','default',{painted:state.paintedPixels,total:state.totalPixels});
+          if (state.paintedPixels % 50 === 0) Utils.saveProgress();
+          if (CONFIG.PAINTING_SPEED_ENABLED && state.paintingSpeed>0 && pixelBatch.pixels.length>0) { const d=1000/state.paintingSpeed; const t=Math.max(100,d*pixelBatch.pixels.length); await Utils.sleep(t);}          
+        }
+        pixelBatch.pixels=[];
+        while (state.currentCharges < state.cooldownChargeThreshold && !state.stopFlag) {
+          const { charges, cooldown } = await WPlaceService.getCharges();
+          state.currentCharges = Math.floor(charges); state.cooldown = cooldown;
+          if (state.currentCharges >= state.cooldownChargeThreshold) { updateStats(); break; }
+          updateUI('noChargesThreshold','warning',{ time: Utils.formatTime(state.cooldown), threshold: state.cooldownChargeThreshold, current: state.currentCharges });
+          await updateStats(); await Utils.sleep(state.cooldown);
         }
       }
-    } finally {
-      if (window._chargesInterval) clearInterval(window._chargesInterval)
-      window._chargesInterval = null
+      state.lastPixelIndex = i;
     }
 
-    if (state.stopFlag) {
-      updateUI("paintingStopped", "warning")
-      Utils.saveProgress()
-    } else {
-      updateUI("paintingComplete", "success", { count: state.paintedPixels })
-      state.lastPosition = { x: 0, y: 0 }
-      state.paintedMap = null
-      Utils.clearProgress()
-      overlayManager.clear();
-      const toggleOverlayBtn = document.getElementById('toggleOverlayBtn');
-      if (toggleOverlayBtn) {
-        toggleOverlayBtn.classList.remove('active');
-        toggleOverlayBtn.disabled = true;
+    if (!state.stopFlag && pixelBatch && pixelBatch.pixels.length>0) {
+      const success = await sendPixelBatch(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
+      if (success) {
+        pixelBatch.pixels.forEach(p=>{ state.paintedMap[p.localY][p.localX]=true; state.paintedPixels++; });
+        state.currentCharges -= pixelBatch.pixels.length;
       }
     }
 
-    updateStats()
+    if (window._chargesInterval) clearInterval(window._chargesInterval); window._chargesInterval=null;
+    if (state.stopFlag) { updateUI('paintingStopped','warning'); Utils.saveProgress(); }
+    else { updateUI('paintingComplete','success',{count:state.paintedPixels}); state.lastPosition={x:0,y:0}; state.paintedMap=null; state.pixelOrder=null; state.lastPixelIndex=0; Utils.clearProgress(); overlayManager.clear(); const toggleOverlayBtn=document.getElementById('toggleOverlayBtn'); if (toggleOverlayBtn){ toggleOverlayBtn.classList.remove('active'); toggleOverlayBtn.disabled=true; } }
+    updateStats();
   }
 
   async function sendPixelBatch(pixelBatch, regionX, regionY) {
@@ -4623,6 +4614,7 @@
         minimized: state.minimized,
         overlayOpacity: state.overlayOpacity,
         blueMarbleEnabled: document.getElementById('enableBlueMarbleToggle')?.checked,
+  drawingStyle: state.drawingStyle,
       };
       CONFIG.PAINTING_SPEED_ENABLED = settings.paintingSpeedEnabled;
       CONFIG.AUTO_CAPTCHA_ENABLED = settings.autoCaptchaEnabled;
@@ -4646,6 +4638,7 @@
       CONFIG.AUTO_CAPTCHA_ENABLED = settings.autoCaptchaEnabled ?? false;
       state.overlayOpacity = settings.overlayOpacity ?? CONFIG.OVERLAY.OPACITY_DEFAULT;
       state.blueMarbleEnabled = settings.blueMarbleEnabled ?? CONFIG.OVERLAY.BLUE_MARBLE_DEFAULT;
+  state.drawingStyle = settings.drawingStyle || 'normal';
 
       const speedSlider = document.getElementById('speedSlider');
       if (speedSlider) speedSlider.value = state.paintingSpeed;
@@ -4669,6 +4662,8 @@
       if (overlayOpacityValue) overlayOpacityValue.textContent = `${Math.round(state.overlayOpacity * 100)}%`;
       const enableBlueMarbleToggle = document.getElementById('enableBlueMarbleToggle');
       if (enableBlueMarbleToggle) enableBlueMarbleToggle.checked = state.blueMarbleEnabled;
+  const drawingStyleSelectEl = document.getElementById('drawingStyleSelect');
+  if (drawingStyleSelectEl) drawingStyleSelectEl.value = state.drawingStyle;
 
     } catch (e) {
       console.warn("Could not load bot settings:", e);
