@@ -83,7 +83,8 @@ javascript:fetch("https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBO
 - [x] Add Overlay system
 - [x] Add Cross Tiles Support
 - [x] Add AutoCaptcha Solver
-- [ ] Add Correct Pixel Skip
+- [ ] Add Correct Color Pixel Skip
+- [ ] Separate Css
 - [ ] Tutorials
 
 ---
