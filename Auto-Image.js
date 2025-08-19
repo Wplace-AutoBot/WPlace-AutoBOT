@@ -4544,6 +4544,11 @@
       const idx=(y*width+x)*4; const r=pixels[idx], g=pixels[idx+1], b=pixels[idx+2], a=pixels[idx+3];
       if (a < CONFIG.TRANSPARENCY_THRESHOLD || (!state.paintWhitePixels && Utils.isWhitePixel(r,g,b))) continue;
       const colorId = findClosestColor([r,g,b], state.availableColors);
+      // Guard against null/undefined colorId issues
+      if (colorId == null || !Number.isFinite(colorId)) {
+        console.warn('Skipping pixel with invalid colorId', {x,y,colorId});
+        continue;
+      }
       const absX=startX+x, absY=startY+y; const adderX=Math.floor(absX/1000), adderY=Math.floor(absY/1000); const pixelX=absX%1000, pixelY=absY%1000;
       if (!pixelBatch || pixelBatch.regionX!==regionX+adderX || pixelBatch.regionY!==regionY+adderY) {
         if (pixelBatch && pixelBatch.pixels.length>0) {
@@ -4607,10 +4612,20 @@
       return "token_error"
     }
 
-    const coords = new Array(pixelBatch.length * 2)
-    const colors = new Array(pixelBatch.length)
-    for (let i = 0; i < pixelBatch.length; i++) {
-      const pixel = pixelBatch[i]
+    // Filter out any malformed pixels (defensive)
+    const valid = [];
+    for (const p of pixelBatch) {
+      if (p && Number.isFinite(p.x) && Number.isFinite(p.y) && Number.isFinite(p.color)) valid.push(p); else console.warn('Dropping invalid pixel from batch', p);
+    }
+    if (valid.length === 0) {
+      console.warn('All pixels in batch invalid, skipping send');
+      return false;
+    }
+
+    const coords = new Array(valid.length * 2)
+    const colors = new Array(valid.length)
+    for (let i = 0; i < valid.length; i++) {
+      const pixel = valid[i]
       coords[i * 2] = pixel.x
       coords[i * 2 + 1] = pixel.y
       colors[i] = pixel.color
@@ -4635,7 +4650,11 @@
         return "token_error"
       }
       const data = await res.json()
-      return data?.painted === pixelBatch.length
+      const paintedOk = data?.painted === valid.length;
+      if (!paintedOk) {
+        console.warn('Server painted count mismatch', {expected: valid.length, received: data?.painted, payloadSize: pixelBatch.length});
+      }
+      return paintedOk
     } catch (e) {
       console.error("Batch paint request failed:", e)
       return false
