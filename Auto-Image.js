@@ -2913,21 +2913,6 @@
           <span>${Utils.t("title")}</span>
         </div>
 
-        <!-- Drawing Style Section -->
-        <div style="margin-bottom: 25px;">
-          <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-paint-brush" style="color: #00f2fe; font-size: 16px;"></i>
-            Drawing Style
-          </label>
-          <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1);">
-            <select id="drawingStyleSelect" style="width:100%; padding:12px 16px; background: rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.2); border-radius:8px; font-size:14px; outline:none; cursor:pointer;">
-              ${CONFIG.DRAWING_STYLES.map(styleName => `<option value="${styleName}" ${styleName === state.drawingStyle ? 'selected' : ''}>${styleName.charAt(0).toUpperCase()+styleName.slice(1)}</option>`).join('')}
-            </select>
-            <p style="font-size:11px; color:rgba(255,255,255,0.7); margin-top:8px; line-height:1.4;">
-              normal: rows; outline: edges first; spiral: center outward; random: shuffled; diagonal: x+y groups; checkerboard: alternating parity first.
-            </p>
-          </div>
-        </div>
         <div class="wplace-header-controls">
           <button id="settingsBtn" class="wplace-header-btn" title="${Utils.t("settings")}">
             <i class="fas fa-cog"></i>
@@ -3205,6 +3190,22 @@
             <input type="checkbox" id="enableSpeedToggle" ${CONFIG.PAINTING_SPEED_ENABLED ? 'checked' : ''} style="cursor: pointer;"/>
             <span>Enable painting speed limit</span>
           </label>
+        </div>
+
+        <!-- Drawing Style Section (moved into settings) -->
+        <div style="margin-bottom: 25px;">
+          <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-paint-brush" style="color: #00f2fe; font-size: 16px;"></i>
+            Drawing Style
+          </label>
+          <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1);">
+            <select id="drawingStyleSelect" style="width:100%; padding:12px 16px; background: rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.2); border-radius:8px; font-size:14px; outline:none; cursor:pointer;">
+              ${CONFIG.DRAWING_STYLES.map(styleName => `<option value="${styleName}" ${styleName === state.drawingStyle ? 'selected' : ''}>${styleName.charAt(0).toUpperCase()+styleName.slice(1)}</option>`).join('')}
+            </select>
+            <p style="font-size:11px; color:rgba(255,255,255,0.7); margin-top:8px; line-height:1.4;">
+              normal: rows; outline: edges first; spiral: center outward; random: shuffled; diagonal: x+y groups; checkerboard: alternating parity first.
+            </p>
+          </div>
         </div>
 
         <!-- Theme Selection Section -->
