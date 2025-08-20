@@ -11,7 +11,7 @@
       DEFAULT: 5,      // Default 5 pixels per second
     },
     PAINTING_SPEED_ENABLED: false,
-    AUTO_CAPTCHA_ENABLED: false, // Disabled by default
+    AUTO_CAPTCHA_ENABLED: true, // Turnstile generator enabled by default
     COOLDOWN_CHARGE_THRESHOLD: 1, // Default wait threshold
     OVERLAY: {
       OPACITY_DEFAULT: 0.6,
@@ -242,9 +242,12 @@
       estimatedTime: "Estimated time",
       initMessage: "Click 'Upload Image' to begin",
       waitingInit: "Waiting for initialization...",
+      initializingToken: "🔧 Initializing Turnstile token generator...",
+      tokenReady: "✅ Token generator ready - you can now start painting!",
+      tokenRetryLater: "⚠️ Token generator will retry when needed",
       resizeSuccess: "✅ Image resized to {width}x{height}",
       paintingPaused: "⏸️ Painting paused at position X: {x}, Y: {y}",
-      captchaNeeded: "❗ CAPTCHA token needed. Paint one pixel manually to continue.",
+      captchaNeeded: "❗ Token generation failed. Please try again in a moment.",
       saveData: "Save Progress",
       loadData: "Load Progress",
       saveToFile: "Save to File",
@@ -270,14 +273,14 @@
       themeSettings: "Theme Settings",
       themeSettingsDesc: "Choose your preferred color theme for the interface.",
       languageSelectDesc: "Select your preferred language. Changes will take effect immediately.",
-      autoCaptcha: "Auto-CAPTCHA Solver",
-      autoCaptchaDesc: "Automatically attempts to solve the CAPTCHA by simulating a manual pixel placement when the token expires.",
+      autoCaptcha: "Auto-CAPTCHA Solver (Turnstile)",
+      autoCaptchaDesc: "Automatically generates Turnstile tokens using integrated generator. Falls back to browser automation if needed.",
       applySettings: "Apply Settings",
       settingsSaved: "✅ Settings saved successfully!",
       cooldownSettings: "Cooldown Settings",
       waitCharges: "Wait until charges reach",
-      captchaSolving: "🤖 Attempting to solve CAPTCHA...",
-      captchaFailed: "❌ Auto-CAPTCHA failed. Paint a pixel manually.",
+      captchaSolving: "🔑 Generating Turnstile token...",
+      captchaFailed: "❌ Turnstile token generation failed. Trying fallback method...",
       automation: "Automation",
       noChargesThreshold: "⌛ Waiting for charges to reach {threshold}. Currently {current}. Next in {time}...",
     },
@@ -312,9 +315,12 @@
       estimatedTime: "Примерное время",
       initMessage: "Нажмите 'Загрузить изображение', чтобы начать",
       waitingInit: "Ожидание инициализации...",
+      initializingToken: "🔧 Инициализация генератора Turnstile токенов...",
+      tokenReady: "✅ Генератор токенов готов - можете начинать рисование!",
+      tokenRetryLater: "⚠️ Генератор токенов повторит попытку при необходимости",
       resizeSuccess: "✅ Изображение изменено до {width}x{height}",
       paintingPaused: "⏸️ Рисование приостановлено на позиции X: {x}, Y: {y}",
-      captchaNeeded: "❗ Требуется токен CAPTCHA. Нарисуйте один пиксель вручную, чтобы продолжить.",
+      captchaNeeded: "❗ Генерация токена не удалась. Пожалуйста, попробуйте через некоторое время.",
       saveData: "Сохранить прогресс",
       loadData: "Загрузить прогресс",
       saveToFile: "Сохранить в файл",
@@ -340,14 +346,14 @@
       themeSettings: "Настройки темы",
       themeSettingsDesc: "Выберите предпочтительную цветовую тему интерфейса.",
       languageSelectDesc: "Выберите предпочтительный язык. Изменения вступят в силу немедленно.",
-      autoCaptcha: "Авто-решение CAPTCHA",
-      autoCaptchaDesc: "Автоматически пытается решить CAPTCHA, симулируя ручное размещение пикселя, когда токен истекает.",
+      autoCaptcha: "Авто-решение CAPTCHA (Turnstile)",
+      autoCaptchaDesc: "Автоматически генерирует Turnstile токены используя встроенный генератор. Возвращается к автоматизации браузера при необходимости.",
       applySettings: "Применить настройки",
       settingsSaved: "✅ Настройки успешно сохранены!",
       cooldownSettings: "Настройки перезарядки",
       waitCharges: "Ждать до накопления зарядов",
-      captchaSolving: "🤖 Пытаюсь решить CAPTCHA...",
-      captchaFailed: "❌ Не удалось решить CAPTCHA. Нарисуйте пиксель вручную.",
+      captchaSolving: "🔑 Генерирую Turnstile токен...",
+      captchaFailed: "❌ Не удалось сгенерировать Turnstile токен. Пробую резервный метод...",
       automation: "Автоматизация",
       noChargesThreshold: "⌛ Ожидание зарядов до {threshold}. Сейчас {current}. Следующий через {time}...",
     },
@@ -382,9 +388,12 @@
       estimatedTime: "Tempo estimado",
       initMessage: "Clique em 'Upload da Imagem' para começar",
       waitingInit: "Aguardando inicialização...",
+      initializingToken: "🔧 Inicializando gerador de tokens Turnstile...",
+      tokenReady: "✅ Gerador de tokens pronto - você pode começar a pintar!",
+      tokenRetryLater: "⚠️ Gerador de tokens tentará novamente quando necessário",
       resizeSuccess: "✅ Imagem redimensionada для {width}x{height}",
       paintingPaused: "⏸️ Pintura pausada na posição X: {x}, Y: {y}",
-      captchaNeeded: "❗ Token CAPTCHA necessário. Pinte um pixel manualmente para continuar.",
+      captchaNeeded: "❗ Falha na geração de token. Tente novamente em alguns instantes.",
       saveData: "Salvar Progresso",
       loadData: "Carregar Progresso",
       saveToFile: "Salvar em Arquivo",
@@ -452,9 +461,12 @@
       estimatedTime: "Thời gian ước tính",
       initMessage: "Nhấp 'Tải lên hình ảnh' để bắt đầu",
       waitingInit: "Đang chờ khởi tạo...",
+      initializingToken: "🔧 Đang khởi tạo bộ tạo token Turnstile...",
+      tokenReady: "✅ Bộ tạo token đã sẵn sàng - bạn có thể bắt đầu vẽ!",
+      tokenRetryLater: "⚠️ Bộ tạo token sẽ thử lại khi cần thiết",
       resizeSuccess: "✅ Đã thay đổi kích thước hình ảnh thành {width}x{height}",
       paintingPaused: "⏸️ Tạm dừng vẽ tại vị trí X: {x}, Y: {y}",
-      captchaNeeded: "❗ Cần token CAPTCHA. Vẽ một pixel thủ công để tiếp tục.",
+      captchaNeeded: "❗ Tạo token thất bại. Vui lòng thử lại sau.",
       saveData: "Lưu tiến trình",
       loadData: "Tải tiến trình",
       saveToFile: "Lưu vào tệp",
@@ -522,9 +534,12 @@
       estimatedTime: "Temps estimé",
       initMessage: "Cliquez sur 'Télécharger l'image' pour commencer",
       waitingInit: "En attente d'initialisation...",
+      initializingToken: "🔧 Initialisation du générateur de tokens Turnstile...",
+      tokenReady: "✅ Générateur de tokens prêt - vous pouvez commencer à peindre!",
+      tokenRetryLater: "⚠️ Le générateur de tokens réessaiera si nécessaire",
       resizeSuccess: "✅ Image redimensionnée en {width}x{height}",
       paintingPaused: "⏸️ Peinture en pause à la position X: {x}, Y: {y}",
-      captchaNeeded: "❗ Token CAPTCHA nécessaire. Peignez un pixel manuellement pour continuer.",
+      captchaNeeded: "❗ Échec de la génération de token. Veuillez réessayer dans un moment.",
       saveData: "Sauvegarder le progrès",
       loadData: "Charger le progrès",
       saveToFile: "Sauvegarder dans un fichier",
@@ -592,9 +607,12 @@
       estimatedTime: "Perkiraan waktu",
       initMessage: "Klik 'Unggah Gambar' untuk memulai",
       waitingInit: "Menunggu inisialisasi...",
+      initializingToken: "🔧 Menginisialisasi generator token Turnstile...",
+      tokenReady: "✅ Generator token siap - Anda bisa mulai melukis!",
+      tokenRetryLater: "⚠️ Generator token akan mencoba lagi saat diperlukan",
       resizeSuccess: "✅ Gambar berhasil diubah ukurannya menjadi {width}x{height}",
       paintingPaused: "⏸️ Melukis dijeda di posisi X: {x}, Y: {y}",
-      captchaNeeded: "❗ Token CAPTCHA diperlukan. Lukis satu piksel secara manual untuk melanjutkan.",
+      captchaNeeded: "❗ Pembuatan token gagal. Silakan coba lagi sebentar lagi.",
       saveData: "Simpan Progres",
       loadData: "Muat Progres",
       saveToFile: "Simpan ke File",
@@ -843,11 +861,20 @@
 
   async function ensureToken() {
     if (!turnstileToken) {
-      updateUI("captchaNeeded", "error")
-      Utils.showAlert(Utils.t("captchaNeeded"), "error")
-      try { await tokenPromise } catch (_) { }
+      console.log("🔄 No token available, generating new one...");
+      try {
+        const token = await handleCaptcha();
+        if (token) {
+          turnstileToken = token;
+          console.log("✅ Token generated successfully");
+        }
+      } catch (error) {
+        console.error("❌ Token generation failed:", error);
+        updateUI("captchaNeeded", "error");
+        Utils.showAlert(Utils.t("captchaNeeded"), "error");
+      }
     }
-    return turnstileToken
+    return turnstileToken;
   }
 
   function inject(callback) {
@@ -956,6 +983,91 @@
         await Utils.sleep(interval);
       }
       return null;
+    },
+
+    // Turnstile Generator Integration
+    turnstileLoaded: false,
+
+    async loadTurnstile() {
+      if (this.turnstileLoaded || window.turnstile) {
+        return Promise.resolve();
+      }
+      
+      return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+        script.async = true;
+        script.defer = true;
+        script.onload = () => {
+          this.turnstileLoaded = true;
+          resolve();
+        };
+        script.onerror = () => reject(new Error('Failed to load Turnstile'));
+        document.head.appendChild(script);
+      });
+    },
+
+    async executeTurnstile(sitekey, action = 'paint') {
+      await this.loadTurnstile();
+      
+      if (typeof window.turnstile?.execute === 'function') {
+        try {
+          const token = await window.turnstile.execute(sitekey, { action });
+          if (token && token.length > 20) {
+            return token;
+          }
+        } catch (error) {
+          console.warn('Turnstile execute failed:', error);
+        }
+      }
+
+      // Fallback to DOM rendering
+      return await new Promise(resolve => {
+        const container = document.createElement('div');
+        container.style.position = 'fixed';
+        container.style.left = '-9999px';
+        document.body.appendChild(container);
+        
+        window.turnstile.render(container, {
+          sitekey,
+          callback: token => {
+            document.body.removeChild(container);
+            resolve(token);
+          }
+        });
+      });
+    },
+
+    async generatePaintToken(sitekey) {
+      return this.executeTurnstile(sitekey, 'paint');
+    },
+
+    detectSitekey(fallback = '0x4AAAAAABpqJe8FO0N84q0F') {
+      try {
+        // Try to find sitekey in data attributes
+        const sitekeySel = document.querySelector('[data-sitekey]');
+        if (sitekeySel) {
+          const sitekey = sitekeySel.getAttribute('data-sitekey');
+          if (sitekey && sitekey.length > 10) {
+            return sitekey;
+          }
+        }
+
+        // Try turnstile element
+        const turnstileEl = document.querySelector('.cf-turnstile');
+        if (turnstileEl?.dataset?.sitekey && turnstileEl.dataset.sitekey.length > 10) {
+          return turnstileEl.dataset.sitekey;
+        }
+
+        // Try global variable
+        if (typeof window !== 'undefined' && window.__TURNSTILE_SITEKEY && window.__TURNSTILE_SITEKEY.length > 10) {
+          return window.__TURNSTILE_SITEKEY;
+        }
+      } catch (error) {
+        console.warn('Error detecting sitekey:', error);
+      }
+      
+      return fallback;
     },
 
     createElement: (tag, props = {}, children = []) => {
@@ -1674,11 +1786,31 @@
     container.querySelector('#unselectAllBtn')?.addEventListener('click', () => toggleAllColors(false, showAllToggle?.checked));
   }
   async function handleCaptcha() {
-    return new Promise(async (resolve, reject) => {
-      if (!CONFIG.AUTO_CAPTCHA_ENABLED) {
-        return reject(new Error("Auto-CAPTCHA is disabled."));
+    try {
+      // Turnstile generator integration
+      const sitekey = Utils.detectSitekey();
+      console.log("🔑 Generating Turnstile token for sitekey:", sitekey);
+      
+      const token = await Utils.generatePaintToken(sitekey);
+      
+      if (token && token.length > 20) {
+        console.log("✅ Turnstile token generated successfully");
+        return token;
+      } else {
+        throw new Error("Invalid or empty token received");
       }
+    } catch (error) {
+      console.error("❌ Turnstile token generation failed:", error);
+      
+      // Fallback to original browser automation if Turnstile fails
+      console.log("🔄 Falling back to browser automation...");
+      return handleCaptchaFallback();
+    }
+  }
 
+  // Keep original method as fallback
+  async function handleCaptchaFallback() {
+    return new Promise(async (resolve, reject) => {
       try {
         const timeoutPromise = Utils.sleep(20000).then(() => reject(new Error("Auto-CAPTCHA timed out.")));
 
@@ -1708,15 +1840,28 @@
           canvas.dispatchEvent(new KeyboardEvent('keyup', { key: ' ', code: 'Space', bubbles: true }));
           await Utils.sleep(500);
 
-          let confirmBtn = await Utils.waitForSelector('button.btn.btn-primary.btn-lg, button.btn.btn-primary.sm\\:btn-xl');
-          if (!confirmBtn) {
-            const allPrimary = Array.from(document.querySelectorAll('button.btn-primary'));
-            confirmBtn = allPrimary.length ? allPrimary[allPrimary.length - 1] : null;
-          }
-          if (!confirmBtn) throw new Error("Could not find the confirmation button.");
-          confirmBtn.click();
+          // 800ms delay before sending confirmation
+          await Utils.sleep(800);
 
+          // Keep confirming until token is captured
+          const confirmLoop = async () => {
+            while (!turnstileToken) {
+              let confirmBtn = await Utils.waitForSelector('button.btn.btn-primary.btn-lg, button.btn.btn-primary.sm\\:btn-xl');
+              if (!confirmBtn) {
+                const allPrimary = Array.from(document.querySelectorAll('button.btn-primary'));
+                confirmBtn = allPrimary.length ? allPrimary[allPrimary.length - 1] : null;
+              }
+              if (confirmBtn) {
+                confirmBtn.click();
+              }
+              await Utils.sleep(500); // 500ms delay between confirmation attempts
+            }
+          };
+
+          // Start confirmation loop and wait for token
+          confirmLoop();
           await tokenPromise;
+          await Utils.sleep(1000); // 1 second delay after captcha token is captured
           resolve();
         })();
 
@@ -3101,15 +3246,8 @@
             <i class="fas fa-robot" style="color: #4facfe; font-size: 16px;"></i>
             ${Utils.t("automation")}
           </label>
-          <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1);">
-              <label for="enableAutoCaptchaToggle" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
-                  <div>
-                      <span style="font-weight: 500;">${Utils.t("autoCaptcha")}</span>
-                      <p style="font-size: 12px; color: rgba(255,255,255,0.7); margin: 4px 0 0 0;">${Utils.t("autoCaptchaDesc")}</p>
-                  </div>
-                  <input type="checkbox" id="enableAutoCaptchaToggle" ${CONFIG.AUTO_CAPTCHA_ENABLED ? 'checked' : ''} style="cursor: pointer; width: 20px; height: 20px;"/>
-              </label>
-          </div>
+          <!-- Turnstile generator is always enabled - no toggle needed -->
+
         </div>
 
         <!-- Overlay Settings Section -->
@@ -4346,6 +4484,7 @@
     }
 
     let pixelBatch = null;
+    let skippedPixels = { transparent: 0, white: 0, alreadyPainted: 0 };
 
     try {
       outerLoop: for (let y = startRow; y < height; y++) {
@@ -4359,7 +4498,10 @@
             break outerLoop
           }
 
-          if (state.paintedMap[y][x]) continue
+          if (state.paintedMap[y][x]) {
+            skippedPixels.alreadyPainted++;
+            continue;
+          }
 
           const idx = (y * width + x) * 4
           const r = pixels[idx]
@@ -4368,6 +4510,11 @@
           const alpha = pixels[idx + 3]
 
           if (alpha < CONFIG.TRANSPARENCY_THRESHOLD || (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b))) {
+            if (alpha < CONFIG.TRANSPARENCY_THRESHOLD) {
+              skippedPixels.transparent++;
+            } else {
+              skippedPixels.white++;
+            }
             continue;
           }
 
@@ -4395,24 +4542,17 @@
             if (pixelBatch && pixelBatch.pixels.length > 0) {
               let success = await sendPixelBatch(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
               if (success === "token_error") {
-                if (CONFIG.AUTO_CAPTCHA_ENABLED) {
-                  updateUI("captchaSolving", "warning");
-                  try {
-                    await handleCaptcha();
-                    success = await sendPixelBatch(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
-                    if (success === "token_error") {
-                      updateUI("captchaFailed", "error");
-                      state.stopFlag = true;
-                      break outerLoop;
-                    }
-                  } catch (e) {
+                updateUI("captchaSolving", "warning");
+                try {
+                  await handleCaptcha();
+                  success = await sendPixelBatch(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
+                  if (success === "token_error") {
                     updateUI("captchaFailed", "error");
                     state.stopFlag = true;
                     break outerLoop;
                   }
-                } else {
-                  updateUI("captchaNeeded", "error");
-                  Utils.showAlert(Utils.t("captchaNeeded"), "error");
+                } catch (e) {
+                  updateUI("captchaFailed", "error");
                   state.stopFlag = true;
                   break outerLoop;
                 }
@@ -4438,6 +4578,11 @@
                   await Utils.sleep(totalDelay)
                 }
                 updateStats();
+              } else {
+                // If batch failed, don't mark pixels as painted so they can be retried
+                console.warn(`⚠️ Batch failed for region ${pixelBatch.regionX},${pixelBatch.regionY} with ${pixelBatch.pixels.length} pixels. Will retry later.`);
+                // Wait a bit before continuing to avoid rapid retries
+                await Utils.sleep(1000);
               }
 
             }
@@ -4460,24 +4605,17 @@
           if (pixelBatch.pixels.length >= Math.floor(state.currentCharges)) {
             let success = await sendPixelBatch(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
             if (success === "token_error") {
-              if (CONFIG.AUTO_CAPTCHA_ENABLED) {
-                updateUI("captchaSolving", "warning");
-                try {
-                  await handleCaptcha();
-                  success = await sendPixelBatch(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
-                  if (success === "token_error") {
-                    updateUI("captchaFailed", "error");
-                    state.stopFlag = true;
-                    break outerLoop;
-                  }
-                } catch (e) {
+              updateUI("captchaSolving", "warning");
+              try {
+                await handleCaptcha();
+                success = await sendPixelBatch(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
+                if (success === "token_error") {
                   updateUI("captchaFailed", "error");
                   state.stopFlag = true;
                   break outerLoop;
                 }
-              } else {
-                updateUI("captchaNeeded", "error");
-                Utils.showAlert(Utils.t("captchaNeeded"), "error");
+              } catch (e) {
+                updateUI("captchaFailed", "error");
                 state.stopFlag = true;
                 break outerLoop;
               }
@@ -4505,6 +4643,11 @@
                 const totalDelay = Math.max(100, delayPerPixel * pixelBatch.pixels.length) // minimum 100ms
                 await Utils.sleep(totalDelay)
               }
+            } else {
+              // If batch failed, don't mark pixels as painted so they can be retried
+              console.warn(`⚠️ Batch failed with ${pixelBatch.pixels.length} pixels. Will retry later.`);
+              // Wait a bit before continuing to avoid rapid retries
+              await Utils.sleep(1000);
             }
 
             pixelBatch.pixels = [];
@@ -4546,6 +4689,9 @@
             const totalDelay = Math.max(100, delayPerPixel * pixelBatch.pixels.length) // minimum 100ms
             await Utils.sleep(totalDelay)
           }
+        } else {
+          // If final batch failed, log it but don't retry to avoid infinite loops
+          console.warn(`⚠️ Final batch failed with ${pixelBatch.pixels.length} pixels. These pixels will need to be painted on next run.`);
         }
       }
     } finally {
@@ -4569,13 +4715,31 @@
       }
     }
 
+    // Log skip statistics
+    console.log(`📊 Pixel Statistics:`);
+    console.log(`   Painted: ${state.paintedPixels}`);
+    console.log(`   Skipped - Transparent: ${skippedPixels.transparent}`);
+    console.log(`   Skipped - White (disabled): ${skippedPixels.white}`);
+    console.log(`   Skipped - Already painted: ${skippedPixels.alreadyPainted}`);
+    console.log(`   Total processed: ${state.paintedPixels + skippedPixels.transparent + skippedPixels.white + skippedPixels.alreadyPainted}`);
+
     updateStats()
   }
 
   async function sendPixelBatch(pixelBatch, regionX, regionY) {
-    if (!turnstileToken) {
-      tokenPromise = new Promise((resolve) => { _resolveToken = resolve });
-      return "token_error"
+    let token = turnstileToken;
+    
+    // Generate new token if we don't have one
+    if (!token) {
+      try {
+        console.log("🔑 Generating Turnstile token for pixel batch...");
+        token = await handleCaptcha();
+        turnstileToken = token; // Store for potential reuse
+      } catch (error) {
+        console.error("❌ Failed to generate Turnstile token:", error);
+        tokenPromise = new Promise((resolve) => { _resolveToken = resolve });
+        return "token_error";
+      }
     }
 
     const coords = new Array(pixelBatch.length * 2)
@@ -4588,7 +4752,7 @@
     }
 
     try {
-      const payload = { coords, colors, t: turnstileToken }
+      const payload = { coords, colors, t: token }
 
       const res = await fetch(`https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`, {
         method: "POST",
@@ -4601,10 +4765,39 @@
         let data = null
         try { data = await res.json() } catch (_) { }
         console.error("❌ 403 Forbidden. Turnstile token might be invalid or expired.")
-        turnstileToken = null
-        tokenPromise = new Promise((resolve) => { _resolveToken = resolve })
-        return "token_error"
+        
+        // Try to generate a new token and retry once
+        try {
+          console.log("🔄 Regenerating Turnstile token after 403...");
+          token = await handleCaptcha();
+          turnstileToken = token;
+          
+          // Retry the request with new token
+          const retryPayload = { coords, colors, t: token };
+          const retryRes = await fetch(`https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=UTF-8" },
+            credentials: "include",
+            body: JSON.stringify(retryPayload),
+          });
+          
+          if (retryRes.status === 403) {
+            turnstileToken = null;
+            tokenPromise = new Promise((resolve) => { _resolveToken = resolve });
+            return "token_error";
+          }
+          
+          const retryData = await retryRes.json();
+          return retryData?.painted === pixelBatch.length;
+          
+        } catch (retryError) {
+          console.error("❌ Token regeneration failed:", retryError);
+          turnstileToken = null;
+          tokenPromise = new Promise((resolve) => { _resolveToken = resolve });
+          return "token_error";
+        }
       }
+      
       const data = await res.json()
       return data?.painted === pixelBatch.length
     } catch (e) {
@@ -4618,14 +4811,13 @@
       const settings = {
         paintingSpeed: state.paintingSpeed,
         paintingSpeedEnabled: document.getElementById('enableSpeedToggle')?.checked,
-        autoCaptchaEnabled: document.getElementById('enableAutoCaptchaToggle')?.checked,
         cooldownChargeThreshold: state.cooldownChargeThreshold,
         minimized: state.minimized,
         overlayOpacity: state.overlayOpacity,
         blueMarbleEnabled: document.getElementById('enableBlueMarbleToggle')?.checked,
       };
       CONFIG.PAINTING_SPEED_ENABLED = settings.paintingSpeedEnabled;
-      CONFIG.AUTO_CAPTCHA_ENABLED = settings.autoCaptchaEnabled;
+      // AUTO_CAPTCHA_ENABLED is always true - no need to save/load
 
       localStorage.setItem("wplace-bot-settings", JSON.stringify(settings));
     } catch (e) {
@@ -4655,12 +4847,11 @@
       const enableSpeedToggle = document.getElementById('enableSpeedToggle');
       if (enableSpeedToggle) enableSpeedToggle.checked = CONFIG.PAINTING_SPEED_ENABLED;
 
-      const enableAutoCaptchaToggle = document.getElementById('enableAutoCaptchaToggle');
-      if (enableAutoCaptchaToggle) enableAutoCaptchaToggle.checked = CONFIG.AUTO_CAPTCHA_ENABLED;
+      // AUTO_CAPTCHA_ENABLED is always true - no toggle to set
 
       const cooldownSlider = document.getElementById('cooldownSlider');
       if (cooldownSlider) cooldownSlider.value = state.cooldownChargeThreshold;
-      const cooldownValue = document.getElementById('cooldownValue');
+      const cooldownValue = document.getElementById('cooldownValue'); 
       if (cooldownValue) cooldownValue.textContent = state.cooldownChargeThreshold;
 
       const overlayOpacitySlider = document.getElementById('overlayOpacitySlider');
@@ -4675,5 +4866,34 @@
     }
   }
 
-  createUI()
+  // Initialize Turnstile generator integration
+  console.log("🚀 WPlace Auto-Image with Turnstile Generator loaded");
+  console.log("🔑 Turnstile generator: ALWAYS ENABLED");
+  console.log("🎯 Manual pixel captcha solving: DISABLED - fully automated!");
+
+  // Auto-generate token on startup
+  async function initializeTokenGenerator() {
+    try {
+      console.log("🔧 Initializing Turnstile token generator...");
+      updateUI("initializingToken", "default");
+      
+      const token = await handleCaptcha();
+      if (token) {
+        turnstileToken = token;
+        console.log("✅ Startup token generated successfully");
+        updateUI("tokenReady", "success");
+      } else {
+        console.warn("⚠️ Startup token generation failed, will retry when needed");
+        updateUI("tokenRetryLater", "warning");
+      }
+    } catch (error) {
+      console.warn("⚠️ Startup token generation failed:", error);
+      updateUI("tokenRetryLater", "warning");
+    }
+  }
+
+  createUI().then(() => {
+    // Generate token automatically after UI is ready
+    setTimeout(initializeTokenGenerator, 1000);
+  })
 })()
