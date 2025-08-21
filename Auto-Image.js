@@ -1009,32 +1009,45 @@
 
     async executeTurnstile(sitekey, action = 'paint') {
       await this.loadTurnstile();
-      
-      if (typeof window.turnstile?.execute === 'function') {
-        try {
-          const token = await window.turnstile.execute(sitekey, { action });
-          if (token && token.length > 20) {
-            return token;
-          }
-        } catch (error) {
-          console.warn('Turnstile execute failed:', error);
+      try {
+        if (this._turnstileWidgetId && typeof window.turnstile?.execute === 'function') {
+          const token = await window.turnstile.execute(this._turnstileWidgetId, { action });
+          if (token && token.length > 20) return token;
         }
+      } catch (err) {
+        console.warn('Turnstile execute re-use failed, will re-render widget:', err);
       }
 
-      // Fallback to DOM rendering
-      return await new Promise(resolve => {
-        const container = document.createElement('div');
-        container.style.position = 'fixed';
-        container.style.left = '-9999px';
-        document.body.appendChild(container);
-        
-        window.turnstile.render(container, {
-          sitekey,
-          callback: token => {
-            document.body.removeChild(container);
-            resolve(token);
-          }
-        });
+      return await new Promise((resolve, reject) => {
+        try {
+          const container = document.createElement('div');
+          container.style.position = 'fixed';
+          container.style.left = '-9999px';
+          container.style.top = '0';
+          container.setAttribute('aria-hidden', 'true');
+          document.body.appendChild(container);
+
+          const widgetId = window.turnstile.render(container, {
+            sitekey,
+            size: 'invisible',
+            action,
+            retry: 'auto',
+            callback: (token) => {
+              resolve(token);
+            },
+            'error-callback': (e) => {
+              console.warn('Turnstile error-callback:', e);
+              resolve(null);
+            },
+            'timeout-callback': () => {
+              console.warn('Turnstile timeout-callback');
+              resolve(null);
+            }
+          });
+          this._turnstileWidgetId = widgetId;
+        } catch (e) {
+          reject(e);
+        }
       });
     },
 
