@@ -985,6 +985,7 @@
   chromaPenaltyWeight: 0.15,
   customTransparencyThreshold: CONFIG.TRANSPARENCY_THRESHOLD,
   customWhiteThreshold: CONFIG.WHITE_THRESHOLD,
+  resizeSettings: null,
   }
 
   // Placeholder for the resize preview update function
@@ -2037,6 +2038,22 @@
           state.imageData = {
             ...savedData.imageData,
             pixels: new Uint8ClampedArray(savedData.imageData.pixels),
+          }
+
+          try {
+            const canvas = document.createElement('canvas');
+            canvas.width = state.imageData.width;
+            canvas.height = state.imageData.height;
+            const ctx = canvas.getContext('2d');
+            const imageData = new ImageData(state.imageData.pixels, state.imageData.width, state.imageData.height);
+            ctx.putImageData(imageData, 0, 0);
+            const proc = new ImageProcessor('');
+            proc.img = canvas; 
+            proc.canvas = canvas;
+            proc.ctx = ctx;
+            state.imageData.processor = proc;
+          } catch (e) {
+            console.warn('Could not rebuild processor from saved image data:', e);
           }
         }
 
@@ -4805,15 +4822,19 @@
     updateDataButtons()
 
     function showResizeDialog(processor) {
-      const { width, height } = processor.getDimensions();
-      const aspectRatio = width / height;
+  const { width, height } = processor.getDimensions();
+  const aspectRatio = width / height;
 
-      widthSlider.value = width;
-      heightSlider.value = height;
-      widthSlider.max = width * 2;
-      heightSlider.max = height * 2;
-      widthValue.textContent = width;
-      heightValue.textContent = height;
+  const rs = state.resizeSettings;
+  const initialW = rs && rs.baseWidth === width && rs.baseHeight === height ? (rs.width || width) : width;
+  const initialH = rs && rs.baseWidth === width && rs.baseHeight === height ? (rs.height || height) : height;
+
+  widthSlider.value = initialW;
+  heightSlider.value = initialH;
+  widthSlider.max = width * 2;
+  heightSlider.max = height * 2;
+  widthValue.textContent = initialW;
+  heightValue.textContent = initialH;
       zoomSlider.value = 1;
       paintWhiteToggle.checked = state.paintWhitePixels;
 
@@ -5041,11 +5062,18 @@
         state.totalPixels = totalValidPixels;
         state.paintedPixels = 0;
 
-        // Use the paletted canvas for the overlay
+        state.resizeSettings = { baseWidth: newWidth, baseHeight: newHeight, width: newWidth, height: newHeight };
+        saveBotSettings();
+
         const finalImageBitmap = await createImageBitmap(tempCanvas);
         await overlayManager.setImage(finalImageBitmap);
         overlayManager.enable();
         toggleOverlayBtn.classList.add('active');
+
+        const dataUrl = tempCanvas.toDataURL();
+        const newProcessor = new ImageProcessor(dataUrl);
+        await newProcessor.load();
+        state.imageData.processor = newProcessor;
 
         updateStats();
         updateUI("resizeSuccess", "success", { width: newWidth, height: newHeight });
@@ -5132,6 +5160,9 @@
           state.paintedPixels = 0
           state.imageLoaded = true
           state.lastPosition = { x: 0, y: 0 }
+          // New image: clear previous resize settings
+          state.resizeSettings = null;
+          saveBotSettings();
 
           // Use the original image for the overlay initially
           const imageBitmap = await createImageBitmap(processor.img);
@@ -5692,6 +5723,8 @@
   chromaPenaltyWeight: state.chromaPenaltyWeight,
   customTransparencyThreshold: state.customTransparencyThreshold,
   customWhiteThreshold: state.customWhiteThreshold,
+  paintWhitePixels: state.paintWhitePixels,
+  resizeSettings: state.resizeSettings,
       };
       CONFIG.PAINTING_SPEED_ENABLED = settings.paintingSpeedEnabled;
       // AUTO_CAPTCHA_ENABLED is always true - no need to save/load
@@ -5721,6 +5754,8 @@
   state.chromaPenaltyWeight = settings.chromaPenaltyWeight ?? 0.15;
   state.customTransparencyThreshold = settings.customTransparencyThreshold ?? CONFIG.TRANSPARENCY_THRESHOLD;
   state.customWhiteThreshold = settings.customWhiteThreshold ?? CONFIG.WHITE_THRESHOLD;
+  state.paintWhitePixels = settings.paintWhitePixels ?? true;
+  state.resizeSettings = settings.resizeSettings ?? null;
 
       const speedSlider = document.getElementById('speedSlider');
       if (speedSlider) speedSlider.value = state.paintingSpeed;
