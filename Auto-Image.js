@@ -16,6 +16,7 @@
     OVERLAY: {
       OPACITY_DEFAULT: 0.6,
       BLUE_MARBLE_DEFAULT: false,
+      ditheringEnabled: false,
     },
     // --- START: Color data from colour-converter.js ---
     // New color structure with proper ID mapping
@@ -977,6 +978,7 @@
     cooldownChargeThreshold: CONFIG.COOLDOWN_CHARGE_THRESHOLD,
     overlayOpacity: CONFIG.OVERLAY.OPACITY_DEFAULT,
     blueMarbleEnabled: CONFIG.OVERLAY.BLUE_MARBLE_DEFAULT,
+  ditheringEnabled: false,
   // Advanced color matching settings
   colorMatchingAlgorithm: 'lab', // 'lab' | 'legacy'
   enableChromaPenalty: true,
@@ -4125,6 +4127,13 @@
             </div>
             <input type="range" id="chromaPenaltyWeightSlider" min="0" max="0.5" step="0.01" value="${state.chromaPenaltyWeight}" style="width:100%;" />
           </div>
+          <label style="display:flex; align-items:center; justify-content:space-between; font-size:12px;">
+            <div style="flex:1;">
+              <span style="font-weight:600;">Enable Dithering</span>
+              <div style="margin-top:2px; opacity:0.65;">Floyd–Steinberg error diffusion in preview and applied output</div>
+            </div>
+            <input type="checkbox" id="enableDitheringToggle" ${state.ditheringEnabled?'checked':''} style="width:18px; height:18px; cursor:pointer;" />
+          </label>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
             <label style="display:flex; flex-direction:column; gap:4px; font-size:12px;">
               <span style="font-weight:600;">Transparency</span>
@@ -4717,20 +4726,79 @@
         const imgData = tempCtx.getImageData(0, 0, newWidth, newHeight);
         const data = imgData.data;
 
-        for (let i = 0; i < data.length; i += 4) {
-          const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
+        const tThresh = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
 
-          const tThresh = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
-          if (a < tThresh || (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b))) {
-            data[i + 3] = 0;
-            continue;
+        const applyFSDither = () => {
+          const w = newWidth, h = newHeight;
+          const n = w * h;
+          const work = new Float32Array(n * 3);
+          const eligible = new Uint8Array(n);
+          for (let y = 0; y < h; y++) {
+            for (let x = 0; x < w; x++) {
+              const idx = y * w + x;
+              const i4 = idx * 4;
+              const r = data[i4], g = data[i4 + 1], b = data[i4 + 2], a = data[i4 + 3];
+              const isEligible = a >= tThresh && (state.paintWhitePixels || !Utils.isWhitePixel(r, g, b));
+              eligible[idx] = isEligible ? 1 : 0;
+              work[idx * 3] = r;
+              work[idx * 3 + 1] = g;
+              work[idx * 3 + 2] = b;
+              if (!isEligible) {
+                data[i4 + 3] = 0; // transparent in preview overlay
+              }
+            }
           }
 
-          const [nr, ng, nb] = Utils.findClosestPaletteColor(r, g, b, state.activeColorPalette);
-          data[i] = nr;
-          data[i + 1] = ng;
-          data[i + 2] = nb;
-          data[i + 3] = 255;
+          const diffuse = (nx, ny, er, eg, eb, factor) => {
+            if (nx < 0 || nx >= w || ny < 0 || ny >= h) return;
+            const nidx = ny * w + nx;
+            if (!eligible[nidx]) return;
+            const base = nidx * 3;
+            work[base] = Math.min(255, Math.max(0, work[base] + er * factor));
+            work[base + 1] = Math.min(255, Math.max(0, work[base + 1] + eg * factor));
+            work[base + 2] = Math.min(255, Math.max(0, work[base + 2] + eb * factor));
+          };
+
+          for (let y = 0; y < h; y++) {
+            for (let x = 0; x < w; x++) {
+              const idx = y * w + x;
+              if (!eligible[idx]) continue;
+              const base = idx * 3;
+              const r0 = work[base], g0 = work[base + 1], b0 = work[base + 2];
+              const [nr, ng, nb] = Utils.findClosestPaletteColor(r0, g0, b0, state.activeColorPalette);
+              const i4 = idx * 4;
+              data[i4] = nr;
+              data[i4 + 1] = ng;
+              data[i4 + 2] = nb;
+              data[i4 + 3] = 255;
+
+              const er = r0 - nr;
+              const eg = g0 - ng;
+              const eb = b0 - nb;
+
+              diffuse(x + 1, y, er, eg, eb, 7 / 16);
+              diffuse(x - 1, y + 1, er, eg, eb, 3 / 16);
+              diffuse(x, y + 1, er, eg, eb, 5 / 16);
+              diffuse(x + 1, y + 1, er, eg, eb, 1 / 16);
+            }
+          }
+        };
+
+        if (state.ditheringEnabled) {
+          applyFSDither();
+        } else {
+          for (let i = 0; i < data.length; i += 4) {
+            const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
+            if (a < tThresh || (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b))) {
+              data[i + 3] = 0;
+              continue;
+            }
+            const [nr, ng, nb] = Utils.findClosestPaletteColor(r, g, b, state.activeColorPalette);
+            data[i] = nr;
+            data[i + 1] = ng;
+            data[i + 2] = nb;
+            data[i + 3] = 255;
+          }
         }
         tempCtx.putImageData(imgData, 0, 0);
         resizePreview.src = tempCanvas.toDataURL();
@@ -4773,30 +4841,91 @@
         tempCtx.drawImage(processor.img, 0, 0, newWidth, newHeight);
         const imgData = tempCtx.getImageData(0, 0, newWidth, newHeight);
         const data = imgData.data;
+        const tThresh2 = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
         let totalValidPixels = 0;
 
-        for (let i = 0; i < data.length; i += 4) {
-          const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
-          const isTransparent = a < (state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD);
-          const isWhiteAndSkipped = !state.paintWhitePixels && Utils.isWhitePixel(r, g, b);
-
-          if (isTransparent || isWhiteAndSkipped) {
-            data[i + 3] = 0; // Make it fully transparent for the overlay
-            continue;
+        const applyFSDitherFinal = () => {
+          const w = newWidth, h = newHeight;
+          const n = w * h;
+          const work = new Float32Array(n * 3);
+          const eligible = new Uint8Array(n);
+          for (let y = 0; y < h; y++) {
+            for (let x = 0; x < w; x++) {
+              const idx = y * w + x;
+              const i4 = idx * 4;
+              const r = data[i4], g = data[i4 + 1], b = data[i4 + 2], a = data[i4 + 3];
+              const isEligible = a >= tThresh2 && (state.paintWhitePixels || !Utils.isWhitePixel(r, g, b));
+              eligible[idx] = isEligible ? 1 : 0;
+              work[idx * 3] = r;
+              work[idx * 3 + 1] = g;
+              work[idx * 3 + 2] = b;
+              if (!isEligible) {
+                data[i4 + 3] = 0;
+              }
+            }
           }
 
-          totalValidPixels++;
-          const [nr, ng, nb] = Utils.findClosestPaletteColor(r, g, b, state.activeColorPalette);
-          data[i] = nr;
-          data[i + 1] = ng;
-          data[i + 2] = nb;
-          data[i + 3] = 255;
+          const diffuse = (nx, ny, er, eg, eb, factor) => {
+            if (nx < 0 || nx >= w || ny < 0 || ny >= h) return;
+            const nidx = ny * w + nx;
+            if (!eligible[nidx]) return;
+            const base = nidx * 3;
+            work[base] = Math.min(255, Math.max(0, work[base] + er * factor));
+            work[base + 1] = Math.min(255, Math.max(0, work[base + 1] + eg * factor));
+            work[base + 2] = Math.min(255, Math.max(0, work[base + 2] + eb * factor));
+          };
+
+          for (let y = 0; y < h; y++) {
+            for (let x = 0; x < w; x++) {
+              const idx = y * w + x;
+              if (!eligible[idx]) continue;
+              const base = idx * 3;
+              const r0 = work[base], g0 = work[base + 1], b0 = work[base + 2];
+              const [nr, ng, nb] = Utils.findClosestPaletteColor(r0, g0, b0, state.activeColorPalette);
+              const i4 = idx * 4;
+              data[i4] = nr;
+              data[i4 + 1] = ng;
+              data[i4 + 2] = nb;
+              data[i4 + 3] = 255;
+              totalValidPixels++;
+
+              const er = r0 - nr;
+              const eg = g0 - ng;
+              const eb = b0 - nb;
+
+              diffuse(x + 1, y, er, eg, eb, 7 / 16);
+              diffuse(x - 1, y + 1, er, eg, eb, 3 / 16);
+              diffuse(x, y + 1, er, eg, eb, 5 / 16);
+              diffuse(x + 1, y + 1, er, eg, eb, 1 / 16);
+            }
+          }
+        };
+
+        if (state.ditheringEnabled) {
+          applyFSDitherFinal();
+        } else {
+          for (let i = 0; i < data.length; i += 4) {
+            const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
+            const isTransparent = a < tThresh2;
+            const isWhiteAndSkipped = !state.paintWhitePixels && Utils.isWhitePixel(r, g, b);
+            if (isTransparent || isWhiteAndSkipped) {
+              data[i + 3] = 0; // overlay transparency
+              continue;
+            }
+            totalValidPixels++;
+            const [nr, ng, nb] = Utils.findClosestPaletteColor(r, g, b, state.activeColorPalette);
+            data[i] = nr;
+            data[i + 1] = ng;
+            data[i + 2] = nb;
+            data[i + 3] = 255;
+          }
         }
         tempCtx.putImageData(imgData, 0, 0);
 
         // Save the final pixel data for painting
-        const finalPixelsForPainting = processor.resize(newWidth, newHeight);
-        state.imageData.pixels = finalPixelsForPainting;
+        // Persist the paletted (and possibly dithered) pixels so painting uses the same output seen in overlay
+        const palettedPixels = new Uint8ClampedArray(imgData.data);
+        state.imageData.pixels = palettedPixels;
         state.imageData.width = newWidth;
         state.imageData.height = newHeight;
         state.imageData.totalPixels = totalValidPixels;
@@ -5443,6 +5572,7 @@
         minimized: state.minimized,
         overlayOpacity: state.overlayOpacity,
         blueMarbleEnabled: document.getElementById('enableBlueMarbleToggle')?.checked,
+  ditheringEnabled: state.ditheringEnabled,
   colorMatchingAlgorithm: state.colorMatchingAlgorithm,
   enableChromaPenalty: state.enableChromaPenalty,
   chromaPenaltyWeight: state.chromaPenaltyWeight,
@@ -5471,6 +5601,7 @@
       CONFIG.AUTO_CAPTCHA_ENABLED = settings.autoCaptchaEnabled ?? false;
       state.overlayOpacity = settings.overlayOpacity ?? CONFIG.OVERLAY.OPACITY_DEFAULT;
       state.blueMarbleEnabled = settings.blueMarbleEnabled ?? CONFIG.OVERLAY.BLUE_MARBLE_DEFAULT;
+  state.ditheringEnabled = settings.ditheringEnabled ?? false;
   state.colorMatchingAlgorithm = settings.colorMatchingAlgorithm || 'lab';
   state.enableChromaPenalty = settings.enableChromaPenalty ?? true;
   state.chromaPenaltyWeight = settings.chromaPenaltyWeight ?? 0.15;
@@ -5565,13 +5696,15 @@
       const resetBtn = document.getElementById('resetAdvancedColorBtn');
       const algoSelect = document.getElementById('colorAlgorithmSelect');
       const chromaToggle = document.getElementById('enableChromaPenaltyToggle');
-      const transInput = document.getElementById('transparencyThresholdInput');
+  const transInput = document.getElementById('transparencyThresholdInput');
       const whiteInput = document.getElementById('whiteThresholdInput');
+  const ditherToggle = document.getElementById('enableDitheringToggle');
       if (algoSelect) algoSelect.addEventListener('change', e => { state.colorMatchingAlgorithm = e.target.value; saveBotSettings(); _updateResizePreview(); });
       if (chromaToggle) chromaToggle.addEventListener('change', e => { state.enableChromaPenalty = e.target.checked; saveBotSettings(); _updateResizePreview(); });
       if (chromaSlider && chromaValue) chromaSlider.addEventListener('input', e => { state.chromaPenaltyWeight = parseFloat(e.target.value)||0.15; chromaValue.textContent = state.chromaPenaltyWeight.toFixed(2); saveBotSettings(); _updateResizePreview(); });
       if (transInput) transInput.addEventListener('change', e => { const v=parseInt(e.target.value,10); if(!isNaN(v)&&v>=0&&v<=255){ state.customTransparencyThreshold=v; CONFIG.TRANSPARENCY_THRESHOLD=v; saveBotSettings(); _updateResizePreview(); }});
       if (whiteInput) whiteInput.addEventListener('change', e => { const v=parseInt(e.target.value,10); if(!isNaN(v)&&v>=200&&v<=255){ state.customWhiteThreshold=v; CONFIG.WHITE_THRESHOLD=v; saveBotSettings(); _updateResizePreview(); }});
+  if (ditherToggle) ditherToggle.addEventListener('change', e => { state.ditheringEnabled = e.target.checked; saveBotSettings(); _updateResizePreview(); });
       if (resetBtn) resetBtn.addEventListener('click', () => {
         state.colorMatchingAlgorithm='lab'; state.enableChromaPenalty=true; state.chromaPenaltyWeight=0.15; state.customTransparencyThreshold=CONFIG.TRANSPARENCY_THRESHOLD=100; state.customWhiteThreshold=CONFIG.WHITE_THRESHOLD=250; saveBotSettings(); const a=document.getElementById('colorAlgorithmSelect'); if(a) a.value='lab'; const ct=document.getElementById('enableChromaPenaltyToggle'); if(ct) ct.checked=true; if(chromaSlider) chromaSlider.value=0.15; if(chromaValue) chromaValue.textContent='0.15'; if(transInput) transInput.value=100; if(whiteInput) whiteInput.value=250; _updateResizePreview(); Utils.showAlert('Advanced color settings reset.', 'success'); });
     };
