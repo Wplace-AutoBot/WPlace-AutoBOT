@@ -1029,7 +1029,7 @@
 
           const widgetId = window.turnstile.render(container, {
             sitekey,
-            size: 'invisible',
+            size: 'flexible',
             action,
             retry: 'auto',
             callback: (token) => {
