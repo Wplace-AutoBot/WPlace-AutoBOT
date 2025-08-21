@@ -4855,7 +4855,11 @@
       zoomSlider.value = 1;
       paintWhiteToggle.checked = state.paintWhitePixels;
 
+      let _previewTimer = null;
+      let _previewJobId = 0;
+      let _isDraggingSize = false;
       _updateResizePreview = async () => {
+        const jobId = ++_previewJobId;
         const newWidth = parseInt(widthSlider.value, 10);
         const newHeight = parseInt(heightSlider.value, 10);
         const zoomLevel = parseFloat(zoomSlider.value);
@@ -4868,8 +4872,16 @@
         tempCanvas.width = newWidth;
         tempCanvas.height = newHeight;
         tempCtx.imageSmoothingEnabled = false;
+        if (!state.availableColors || state.availableColors.length === 0) {
+          if (baseProcessor !== processor && (!baseProcessor.img || !baseProcessor.canvas)) {
+            await baseProcessor.load();
+          }
+          tempCtx.drawImage(baseProcessor.img, 0, 0, newWidth, newHeight);
+          resizePreview.src = tempCanvas.toDataURL();
+          resizePreview.style.transform = `scale(${zoomLevel})`;
+          return;
+        }
   if (baseProcessor !== processor && (!baseProcessor.img || !baseProcessor.canvas)) {
-          // load on demand if instantiated from stored dataUrl
           await baseProcessor.load();
         }
         tempCtx.drawImage(baseProcessor.img, 0, 0, newWidth, newHeight);
@@ -4877,7 +4889,7 @@
         const imgData = tempCtx.getImageData(0, 0, newWidth, newHeight);
         const data = imgData.data;
 
-        const tThresh = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
+  const tThresh = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
 
         const applyFSDither = () => {
           const w = newWidth, h = newHeight;
@@ -4935,7 +4947,8 @@
           }
         };
 
-        if (state.ditheringEnabled) {
+        // Skip expensive dithering while user is dragging sliders
+        if (state.ditheringEnabled && !_isDraggingSize) {
           applyFSDither();
         } else {
           for (let i = 0; i < data.length; i += 4) {
@@ -4951,6 +4964,8 @@
             data[i + 3] = 255;
           }
         }
+        // If a newer job started while we were processing, abort attaching result
+        if (jobId !== _previewJobId) return;
         tempCtx.putImageData(imgData, 0, 0);
         resizePreview.src = tempCanvas.toDataURL();
         resizePreview.style.transform = `scale(${zoomLevel})`;
@@ -4983,9 +4998,32 @@
         _updateResizePreview();
       };
 
-      zoomSlider.addEventListener('input', _updateResizePreview);
-      widthSlider.addEventListener("input", onWidthInput);
-      heightSlider.addEventListener("input", onHeightInput);
+      // Zoom only affects CSS transform; avoid recomputing pixels
+      zoomSlider.addEventListener('input', () => {
+        const zoomLevel = parseFloat(zoomSlider.value);
+        resizePreview.style.transform = `scale(${zoomLevel})`;
+      });
+      const schedulePreview = () => {
+        if (_previewTimer) clearTimeout(_previewTimer);
+        const run = () => {
+          _previewTimer = null;
+          _updateResizePreview();
+        };
+        if (window.requestIdleCallback) {
+          _previewTimer = setTimeout(() => requestIdleCallback(run, { timeout: 150 }), 50);
+        } else {
+          _previewTimer = setTimeout(() => requestAnimationFrame(run), 50);
+        }
+      };
+      // Track dragging to reduce work and skip dithering during drag
+      const markDragStart = () => { _isDraggingSize = true; };
+      const markDragEnd = () => { _isDraggingSize = false; schedulePreview(); };
+      widthSlider.addEventListener('pointerdown', markDragStart);
+      heightSlider.addEventListener('pointerdown', markDragStart);
+      widthSlider.addEventListener('pointerup', markDragEnd);
+      heightSlider.addEventListener('pointerup', markDragEnd);
+      widthSlider.addEventListener("input", () => { onWidthInput(); schedulePreview(); });
+      heightSlider.addEventListener("input", () => { onHeightInput(); schedulePreview(); });
 
       confirmResize.onclick = async () => {
         const newWidth = parseInt(widthSlider.value, 10);
@@ -5006,7 +5044,7 @@
         const tThresh2 = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
         let totalValidPixels = 0;
 
-        const applyFSDitherFinal = () => {
+        const applyFSDitherFinal = async () => {
           const w = newWidth, h = newHeight;
           const n = w * h;
           const work = new Float32Array(n * 3);
@@ -5025,6 +5063,8 @@
                 data[i4 + 3] = 0;
               }
             }
+            // Yield to keep UI responsive
+            if ((y & 15) === 0) await Promise.resolve();
           }
 
           const diffuse = (nx, ny, er, eg, eb, factor) => {
@@ -5060,11 +5100,13 @@
               diffuse(x, y + 1, er, eg, eb, 5 / 16);
               diffuse(x + 1, y + 1, er, eg, eb, 1 / 16);
             }
+            // Yield every row to reduce jank
+            await Promise.resolve();
           }
         };
 
         if (state.ditheringEnabled) {
-          applyFSDitherFinal();
+          await applyFSDitherFinal();
         } else {
           for (let i = 0; i < data.length; i += 4) {
             const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
