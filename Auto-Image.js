@@ -1029,7 +1029,7 @@
 
           const widgetId = window.turnstile.render(container, {
             sitekey,
-            size: 'flexible',
+            // size must be one of: "normal", "compact", "flexible". We keep default (normal) and hide via offscreen positioning.
             action,
             retry: 'auto',
             callback: (token) => {
