@@ -1649,31 +1649,65 @@
     },
 
     colorDistance: (a, b) => Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2) + Math.pow(a[2] - b[2], 2)),
-
+    _labCache: new Map(), // key: (r<<16)|(g<<8)|b  value: [L,a,b]
+    _rgbToLab: (r, g, b) => {
+      // sRGB -> linear
+      const srgbToLinear = (v) => {
+        v /= 255;
+        return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+      };
+      const rl = srgbToLinear(r);
+      const gl = srgbToLinear(g);
+      const bl = srgbToLinear(b);
+      let X = rl * 0.4124 + gl * 0.3576 + bl * 0.1805;
+      let Y = rl * 0.2126 + gl * 0.7152 + bl * 0.0722;
+      let Z = rl * 0.0193 + gl * 0.1192 + bl * 0.9505;
+      X /= 0.95047;
+      Y /= 1.00000;
+      Z /= 1.08883;
+      const f = (t) => (t > 0.008856 ? Math.cbrt(t) : (7.787 * t) + 16 / 116);
+      const fX = f(X), fY = f(Y), fZ = f(Z);
+      const L = 116 * fY - 16;
+      const a = 500 * (fX - fY);
+      const b2 = 200 * (fY - fZ);
+      return [L, a, b2];
+    },
+    _lab: (r, g, b) => {
+      const key = (r << 16) | (g << 8) | b;
+      let v = Utils._labCache.get(key);
+      if (!v) {
+        v = Utils._rgbToLab(r, g, b);
+        Utils._labCache.set(key, v);
+      }
+      return v;
+    },
     findClosestPaletteColor: (r, g, b, palette) => {
-      let menorDist = Infinity;
-      let cor = [0, 0, 0];
+      // Use provided palette or derive from COLOR_MAP
       if (!palette || palette.length === 0) {
-        // If no palette provided, use all available colors from COLOR_MAP
-        const availableColors = Object.values(CONFIG.COLOR_MAP)
-          .filter(color => color.rgb !== null)
-          .map(color => [color.rgb.r, color.rgb.g, color.rgb.b]);
-        palette = availableColors;
+        palette = Object.values(CONFIG.COLOR_MAP)
+          .filter(c => c.rgb)
+            .map(c => [c.rgb.r, c.rgb.g, c.rgb.b]);
       }
 
+      // Convert target to Lab once
+      const [Lt, at, bt] = Utils._lab(r, g, b);
+      let best = null;
+      let bestDist = Infinity;
+      // Iterate palette using cached Lab conversions; use squared distance (no sqrt) for speed
       for (let i = 0; i < palette.length; i++) {
         const [pr, pg, pb] = palette[i];
-        const rmean = (pr + r) / 2;
-        const rdiff = pr - r;
-        const gdiff = pg - g;
-        const bdiff = pb - b;
-        const dist = Math.sqrt(((512 + rmean) * rdiff * rdiff >> 8) + 4 * gdiff * gdiff + ((767 - rmean) * bdiff * bdiff >> 8));
-        if (dist < menorDist) {
-          menorDist = dist;
-          cor = [pr, pg, pb];
+        const [Lp, ap, bp] = Utils._lab(pr, pg, pb);
+        const dL = Lt - Lp;
+        const da = at - ap;
+        const db = bt - bp;
+        const dist = dL * dL + da * da + db * db; // CIE76 squared
+        if (dist < bestDist) {
+          bestDist = dist;
+          best = palette[i];
+          if (bestDist === 0) break; // Exact match
         }
       }
-      return cor;
+      return best || [0, 0, 0];
     },
 
     isWhitePixel: (r, g, b) =>
