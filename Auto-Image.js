@@ -4955,6 +4955,10 @@
           heightSlider.value = Math.round(parseInt(widthSlider.value, 10) / aspectRatio);
         }
         _updateResizePreview();
+  const curW = parseInt(widthSlider.value, 10);
+  const curH = parseInt(heightSlider.value, 10);
+  state.resizeSettings = { baseWidth: width, baseHeight: height, width: curW, height: curH };
+  saveBotSettings();
       };
 
       const onHeightInput = () => {
@@ -4962,6 +4966,10 @@
           widthSlider.value = Math.round(parseInt(heightSlider.value, 10) * aspectRatio);
         }
         _updateResizePreview();
+  const curW = parseInt(widthSlider.value, 10);
+  const curH = parseInt(heightSlider.value, 10);
+  state.resizeSettings = { baseWidth: width, baseHeight: height, width: curW, height: curH };
+  saveBotSettings();
       };
 
       paintWhiteToggle.onchange = (e) => {
@@ -5080,7 +5088,7 @@
         state.totalPixels = totalValidPixels;
         state.paintedPixels = 0;
 
-        state.resizeSettings = { baseWidth: newWidth, baseHeight: newHeight, width: newWidth, height: newHeight };
+  state.resizeSettings = { baseWidth: width, baseHeight: height, width: newWidth, height: newHeight };
         saveBotSettings();
 
         const finalImageBitmap = await createImageBitmap(tempCanvas);
