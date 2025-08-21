@@ -977,6 +977,12 @@
     cooldownChargeThreshold: CONFIG.COOLDOWN_CHARGE_THRESHOLD,
     overlayOpacity: CONFIG.OVERLAY.OPACITY_DEFAULT,
     blueMarbleEnabled: CONFIG.OVERLAY.BLUE_MARBLE_DEFAULT,
+  // Advanced color matching settings
+  colorMatchingAlgorithm: 'lab', // 'lab' | 'legacy'
+  enableChromaPenalty: true,
+  chromaPenaltyWeight: 0.15,
+  customTransparencyThreshold: CONFIG.TRANSPARENCY_THRESHOLD,
+  customWhiteThreshold: CONFIG.WHITE_THRESHOLD,
   }
 
   // Placeholder for the resize preview update function
@@ -1688,30 +1694,55 @@
           .filter(c => c.rgb)
             .map(c => [c.rgb.r, c.rgb.g, c.rgb.b]);
       }
-
-      // Convert target to Lab once
+      if (state.colorMatchingAlgorithm === 'legacy') {
+        let menorDist = Infinity;
+        let cor = [0, 0, 0];
+        for (let i = 0; i < palette.length; i++) {
+          const [pr, pg, pb] = palette[i];
+          const rmean = (pr + r) / 2;
+          const rdiff = pr - r;
+          const gdiff = pg - g;
+          const bdiff = pb - b;
+          const dist = Math.sqrt(((512 + rmean) * rdiff * rdiff >> 8) + 4 * gdiff * gdiff + ((767 - rmean) * bdiff * bdiff >> 8));
+          if (dist < menorDist) {
+            menorDist = dist;
+            cor = [pr, pg, pb];
+          }
+        }
+        return cor;
+      }
+      // LAB algorithm
       const [Lt, at, bt] = Utils._lab(r, g, b);
+      const targetChroma = Math.sqrt(at * at + bt * bt);
       let best = null;
       let bestDist = Infinity;
-      // Iterate palette using cached Lab conversions; use squared distance (no sqrt) for speed
       for (let i = 0; i < palette.length; i++) {
         const [pr, pg, pb] = palette[i];
         const [Lp, ap, bp] = Utils._lab(pr, pg, pb);
         const dL = Lt - Lp;
         const da = at - ap;
         const db = bt - bp;
-        const dist = dL * dL + da * da + db * db; // CIE76 squared
+        let dist = dL * dL + da * da + db * db;
+        if (state.enableChromaPenalty && targetChroma > 20) {
+          const candChroma = Math.sqrt(ap * ap + bp * bp);
+          if (candChroma < targetChroma) {
+            const chromaDiff = targetChroma - candChroma;
+            dist += chromaDiff * chromaDiff * state.chromaPenaltyWeight;
+          }
+        }
         if (dist < bestDist) {
           bestDist = dist;
           best = palette[i];
-          if (bestDist === 0) break; // Exact match
+          if (bestDist === 0) break;
         }
       }
       return best || [0, 0, 0];
     },
 
-    isWhitePixel: (r, g, b) =>
-      r >= CONFIG.WHITE_THRESHOLD && g >= CONFIG.WHITE_THRESHOLD && b >= CONFIG.WHITE_THRESHOLD,
+    isWhitePixel: (r, g, b) => {
+      const wt = state.customWhiteThreshold || CONFIG.WHITE_THRESHOLD;
+      return r >= wt && g >= wt && b >= wt;
+    },
 
     createImageUploader: () =>
       new Promise((resolve) => {
@@ -2133,51 +2164,52 @@
 
   function findClosestColor(targetRgb, availableColors) {
     if (!availableColors || availableColors.length === 0) return 1
-
-    const cacheKey = `${targetRgb[0]},${targetRgb[1]},${targetRgb[2]}`
+    const cacheKey = `${targetRgb[0]},${targetRgb[1]},${targetRgb[2]}|${state.colorMatchingAlgorithm}|${state.enableChromaPenalty?'c':'nc'}|${state.chromaPenaltyWeight}`
     if (colorCache.has(cacheKey)) return colorCache.get(cacheKey)
 
-    // Fast path for near white
-    if (targetRgb[0] >= 250 && targetRgb[1] >= 250 && targetRgb[2] >= 250) {
-      const whiteEntry = availableColors.find(c => c.rgb[0] >= 250 && c.rgb[1] >= 250 && c.rgb[2] >= 250)
-      if (whiteEntry) {
-        colorCache.set(cacheKey, whiteEntry.id)
-        return whiteEntry.id
-      }
+    const whiteThreshold = state.customWhiteThreshold || CONFIG.WHITE_THRESHOLD
+    if (targetRgb[0] >= whiteThreshold && targetRgb[1] >= whiteThreshold && targetRgb[2] >= whiteThreshold) {
+      const whiteEntry = availableColors.find(c => c.rgb[0] >= whiteThreshold && c.rgb[1] >= whiteThreshold && c.rgb[2] >= whiteThreshold)
+      if (whiteEntry) { colorCache.set(cacheKey, whiteEntry.id); return whiteEntry.id }
     }
 
-    const [Lt, at, bt] = Utils._lab(targetRgb[0], targetRgb[1], targetRgb[2])
-    const targetChroma = Math.sqrt(at * at + bt * bt)
     let bestId = availableColors[0].id
     let bestScore = Infinity
 
-    for (let i = 0; i < availableColors.length; i++) {
-      const c = availableColors[i]
-      const [r, g, b] = c.rgb
-      const [L2, a2, b2] = Utils._lab(r, g, b)
-      const dL = Lt - L2
-      const da = at - a2
-      const db = bt - b2
-      let dist = dL * dL + da * da + db * db // CIE76 squared
-      if (targetChroma > 20) {
-        const candChroma = Math.sqrt(a2 * a2 + b2 * b2)
-        if (candChroma < targetChroma) {
-          const chromaDiff = targetChroma - candChroma
-          dist += chromaDiff * chromaDiff * 0.15
-        }
+    if (state.colorMatchingAlgorithm === 'legacy') {
+      for (let i = 0; i < availableColors.length; i++) {
+        const c = availableColors[i]
+        const [r, g, b] = c.rgb
+        const rmean = (r + targetRgb[0]) / 2
+        const rdiff = r - targetRgb[0]
+        const gdiff = g - targetRgb[1]
+        const bdiff = b - targetRgb[2]
+        const dist = Math.sqrt(((512 + rmean) * rdiff * rdiff >> 8) + 4 * gdiff * gdiff + ((767 - rmean) * bdiff * bdiff >> 8))
+        if (dist < bestScore) { bestScore = dist; bestId = c.id; if (dist === 0) break }
       }
-      if (dist < bestScore) {
-        bestScore = dist
-        bestId = c.id
-        if (dist === 0) break
+    } else { // lab
+      const [Lt, at, bt] = Utils._lab(targetRgb[0], targetRgb[1], targetRgb[2])
+      const targetChroma = Math.sqrt(at * at + bt * bt)
+      const penaltyWeight = state.enableChromaPenalty ? (state.chromaPenaltyWeight || 0.15) : 0
+      for (let i = 0; i < availableColors.length; i++) {
+        const c = availableColors[i]
+        const [r, g, b] = c.rgb
+        const [L2, a2, b2] = Utils._lab(r, g, b)
+        const dL = Lt - L2, da = at - a2, db = bt - b2
+        let dist = dL * dL + da * da + db * db
+        if (penaltyWeight > 0 && targetChroma > 20) {
+          const candChroma = Math.sqrt(a2 * a2 + b2 * b2)
+          if (candChroma < targetChroma) {
+            const cd = targetChroma - candChroma
+            dist += cd * cd * penaltyWeight
+          }
+        }
+        if (dist < bestScore) { bestScore = dist; bestId = c.id; if (dist === 0) break }
       }
     }
 
     colorCache.set(cacheKey, bestId)
-    if (colorCache.size > 12000) { // prune oldest
-      const firstKey = colorCache.keys().next().value
-      colorCache.delete(firstKey)
-    }
+    if (colorCache.size > 15000) { const firstKey = colorCache.keys().next().value; colorCache.delete(firstKey) }
     return bestId
   }
 
@@ -3847,6 +3879,47 @@
           </label>
         </div>
 
+        <!-- Advanced Color Matching Section -->
+        <div style="margin-bottom: 25px;">
+          <details id="advancedColorDetails" style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 12px; border: 1px solid rgba(255,255,255,0.15);">
+            <summary style="cursor: pointer; list-style: none; display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px;">
+              <i class="fas fa-flask" style="color:#ffd166;"></i> Advanced Color Matching
+            </summary>
+            <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 14px;">
+              <label style="display:flex; flex-direction:column; gap:4px; font-size:12px;">
+                <span style="font-weight:600;">Algorithm</span>
+                <select id="colorAlgorithmSelect" style="padding:8px 10px; border-radius:6px; border:1px solid rgba(255,255,255,0.25); background: rgba(0,0,0,0.25); color:#fff;">
+                  <option value="lab" ${state.colorMatchingAlgorithm==='lab'?'selected':''}>Perceptual (Lab)</option>
+                  <option value="legacy" ${state.colorMatchingAlgorithm==='legacy'?'selected':''}>Legacy (Weighted RGB)</option>
+                </select>
+                <small style="opacity:0.7;">Choose perceptual Lab for accuracy or legacy for speed.</small>
+              </label>
+              <label style="display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:12px;">
+                <div style="flex:1;">
+                  <span style="font-weight:600;">Chroma Penalty</span>
+                  <p style="margin:4px 0 0; opacity:0.7; font-size:11px;">Discourages dull colors replacing vibrant ones (Lab only).</p>
+                </div>
+                <input type="checkbox" id="enableChromaPenaltyToggle" ${state.enableChromaPenalty?'checked':''} style="width:20px; height:20px; cursor:pointer;"/>
+              </label>
+              <label style="display:flex; flex-direction:column; gap:4px; font-size:12px;">
+                <span style="font-weight:600; display:flex; justify-content:space-between;">Chroma Penalty Weight <span id="chromaWeightValue" style="background:rgba(0,0,0,0.3); padding:2px 6px; border-radius:4px;">${state.chromaPenaltyWeight}</span></span>
+                <input type="range" id="chromaPenaltyWeightSlider" min="0" max="0.5" step="0.01" value="${state.chromaPenaltyWeight}" style="width:100%;" />
+              </label>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; font-size:12px;">
+                <label style="display:flex; flex-direction:column; gap:4px;">
+                  <span style="font-weight:600;">Transparency Threshold</span>
+                  <input type="number" id="transparencyThresholdInput" min="0" max="255" value="${state.customTransparencyThreshold}" style="padding:6px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.25); background: rgba(0,0,0,0.25); color:#fff;" />
+                </label>
+                <label style="display:flex; flex-direction:column; gap:4px;">
+                  <span style="font-weight:600;">White Threshold</span>
+                  <input type="number" id="whiteThresholdInput" min="200" max="255" value="${state.customWhiteThreshold}" style="padding:6px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.25); background: rgba(0,0,0,0.25); color:#fff;" />
+                </label>
+              </div>
+              <button id="resetAdvancedColorBtn" style="padding:8px 12px; border-radius:8px; background: linear-gradient(135deg,#ff6a6a,#ff4757); color:white; border:none; cursor:pointer; font-size:12px; font-weight:600;">Reset Advanced Settings</button>
+            </div>
+          </details>
+        </div>
+
         <!-- Theme Selection Section -->
         <div style="margin-bottom: 25px;">
           <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
@@ -4282,6 +4355,24 @@
       })
 
       applySettingsBtn.addEventListener("click", () => {
+        // Sync advanced settings before save
+        const colorAlgorithmSelect = document.getElementById('colorAlgorithmSelect');
+        if (colorAlgorithmSelect) state.colorMatchingAlgorithm = colorAlgorithmSelect.value;
+        const enableChromaPenaltyToggle = document.getElementById('enableChromaPenaltyToggle');
+        if (enableChromaPenaltyToggle) state.enableChromaPenalty = enableChromaPenaltyToggle.checked;
+        const chromaPenaltyWeightSlider = document.getElementById('chromaPenaltyWeightSlider');
+        if (chromaPenaltyWeightSlider) state.chromaPenaltyWeight = parseFloat(chromaPenaltyWeightSlider.value) || 0.15;
+        const transparencyThresholdInput = document.getElementById('transparencyThresholdInput');
+        if (transparencyThresholdInput) {
+          const v = parseInt(transparencyThresholdInput.value, 10); if (!isNaN(v) && v >=0 && v <=255) state.customTransparencyThreshold = v;
+        }
+        const whiteThresholdInput = document.getElementById('whiteThresholdInput');
+        if (whiteThresholdInput) {
+          const v = parseInt(whiteThresholdInput.value, 10); if (!isNaN(v) && v >=200 && v <=255) state.customWhiteThreshold = v;
+        }
+        // Update functional thresholds
+        CONFIG.TRANSPARENCY_THRESHOLD = state.customTransparencyThreshold;
+        CONFIG.WHITE_THRESHOLD = state.customWhiteThreshold;
         saveBotSettings();
         Utils.showAlert(Utils.t("settingsSaved"), "success");
         closeSettingsBtn.click();
@@ -4331,6 +4422,40 @@
             await overlayManager.processImageIntoChunks();
             Utils.showAlert("Overlay updated!", "success");
           }
+        });
+      }
+
+      // Advanced color matching listeners (live updates)
+      const chromaPenaltyWeightSlider = document.getElementById('chromaPenaltyWeightSlider');
+      const chromaWeightValue = document.getElementById('chromaWeightValue');
+      if (chromaPenaltyWeightSlider && chromaWeightValue) {
+        chromaPenaltyWeightSlider.addEventListener('input', (e) => {
+          state.chromaPenaltyWeight = parseFloat(e.target.value) || 0.15;
+          chromaWeightValue.textContent = state.chromaPenaltyWeight.toFixed(2);
+        });
+      }
+      const resetAdvancedColorBtn = document.getElementById('resetAdvancedColorBtn');
+      if (resetAdvancedColorBtn) {
+        resetAdvancedColorBtn.addEventListener('click', () => {
+          state.colorMatchingAlgorithm = 'lab';
+          state.enableChromaPenalty = true;
+            state.chromaPenaltyWeight = 0.15;
+          state.customTransparencyThreshold = CONFIG.TRANSPARENCY_THRESHOLD = 100;
+          state.customWhiteThreshold = CONFIG.WHITE_THRESHOLD = 250;
+          const colorAlgorithmSelect = document.getElementById('colorAlgorithmSelect');
+          const enableChromaPenaltyToggle = document.getElementById('enableChromaPenaltyToggle');
+          const chromaPenaltyWeightSlider2 = document.getElementById('chromaPenaltyWeightSlider');
+          const transparencyThresholdInput = document.getElementById('transparencyThresholdInput');
+          const whiteThresholdInput = document.getElementById('whiteThresholdInput');
+          const chromaWeightValue2 = document.getElementById('chromaWeightValue');
+          if (colorAlgorithmSelect) colorAlgorithmSelect.value = 'lab';
+          if (enableChromaPenaltyToggle) enableChromaPenaltyToggle.checked = true;
+          if (chromaPenaltyWeightSlider2) chromaPenaltyWeightSlider2.value = 0.15;
+          if (transparencyThresholdInput) transparencyThresholdInput.value = 100;
+          if (whiteThresholdInput) whiteThresholdInput.value = 250;
+          if (chromaWeightValue2) chromaWeightValue2.textContent = '0.15';
+          saveBotSettings();
+          Utils.showAlert('Advanced color settings reset.', 'success');
         });
       }
 
@@ -4627,7 +4752,8 @@
         for (let i = 0; i < data.length; i += 4) {
           const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
 
-          if (a < CONFIG.TRANSPARENCY_THRESHOLD || (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b))) {
+          const tThresh = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
+          if (a < tThresh || (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b))) {
             data[i + 3] = 0;
             continue;
           }
@@ -4683,7 +4809,7 @@
 
         for (let i = 0; i < data.length; i += 4) {
           const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
-          const isTransparent = a < CONFIG.TRANSPARENCY_THRESHOLD;
+          const isTransparent = a < (state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD);
           const isWhiteAndSkipped = !state.paintWhitePixels && Utils.isWhitePixel(r, g, b);
 
           if (isTransparent || isWhiteAndSkipped) {
@@ -4781,7 +4907,7 @@
 
           let totalValidPixels = 0;
           for (let i = 0; i < pixels.length; i += 4) {
-            const isTransparent = pixels[i + 3] < CONFIG.TRANSPARENCY_THRESHOLD;
+            const isTransparent = pixels[i + 3] < (state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD);
             const isWhiteAndSkipped = !state.paintWhitePixels && Utils.isWhitePixel(pixels[i], pixels[i + 1], pixels[i + 2]);
             if (!isTransparent && !isWhiteAndSkipped) {
               totalValidPixels++;
@@ -5042,8 +5168,9 @@
           const b = pixels[idx + 2]
           const alpha = pixels[idx + 3]
 
-          if (alpha < CONFIG.TRANSPARENCY_THRESHOLD || (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b))) {
-            if (alpha < CONFIG.TRANSPARENCY_THRESHOLD) {
+          const tThresh2 = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
+          if (alpha < tThresh2 || (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b))) {
+            if (alpha < tThresh2) {
               skippedPixels.transparent++;
             } else {
               skippedPixels.white++;
@@ -5348,6 +5475,11 @@
         minimized: state.minimized,
         overlayOpacity: state.overlayOpacity,
         blueMarbleEnabled: document.getElementById('enableBlueMarbleToggle')?.checked,
+  colorMatchingAlgorithm: state.colorMatchingAlgorithm,
+  enableChromaPenalty: state.enableChromaPenalty,
+  chromaPenaltyWeight: state.chromaPenaltyWeight,
+  customTransparencyThreshold: state.customTransparencyThreshold,
+  customWhiteThreshold: state.customWhiteThreshold,
       };
       CONFIG.PAINTING_SPEED_ENABLED = settings.paintingSpeedEnabled;
       // AUTO_CAPTCHA_ENABLED is always true - no need to save/load
@@ -5371,6 +5503,11 @@
       CONFIG.AUTO_CAPTCHA_ENABLED = settings.autoCaptchaEnabled ?? false;
       state.overlayOpacity = settings.overlayOpacity ?? CONFIG.OVERLAY.OPACITY_DEFAULT;
       state.blueMarbleEnabled = settings.blueMarbleEnabled ?? CONFIG.OVERLAY.BLUE_MARBLE_DEFAULT;
+  state.colorMatchingAlgorithm = settings.colorMatchingAlgorithm || 'lab';
+  state.enableChromaPenalty = settings.enableChromaPenalty ?? true;
+  state.chromaPenaltyWeight = settings.chromaPenaltyWeight ?? 0.15;
+  state.customTransparencyThreshold = settings.customTransparencyThreshold ?? CONFIG.TRANSPARENCY_THRESHOLD;
+  state.customWhiteThreshold = settings.customWhiteThreshold ?? CONFIG.WHITE_THRESHOLD;
 
       const speedSlider = document.getElementById('speedSlider');
       if (speedSlider) speedSlider.value = state.paintingSpeed;
@@ -5393,6 +5530,18 @@
       if (overlayOpacityValue) overlayOpacityValue.textContent = `${Math.round(state.overlayOpacity * 100)}%`;
       const enableBlueMarbleToggle = document.getElementById('enableBlueMarbleToggle');
       if (enableBlueMarbleToggle) enableBlueMarbleToggle.checked = state.blueMarbleEnabled;
+  const colorAlgorithmSelect = document.getElementById('colorAlgorithmSelect');
+  if (colorAlgorithmSelect) colorAlgorithmSelect.value = state.colorMatchingAlgorithm;
+  const enableChromaPenaltyToggle = document.getElementById('enableChromaPenaltyToggle');
+  if (enableChromaPenaltyToggle) enableChromaPenaltyToggle.checked = state.enableChromaPenalty;
+  const chromaPenaltyWeightSlider = document.getElementById('chromaPenaltyWeightSlider');
+  if (chromaPenaltyWeightSlider) chromaPenaltyWeightSlider.value = state.chromaPenaltyWeight;
+  const chromaWeightValue = document.getElementById('chromaWeightValue');
+  if (chromaWeightValue) chromaWeightValue.textContent = state.chromaPenaltyWeight;
+  const transparencyThresholdInput = document.getElementById('transparencyThresholdInput');
+  if (transparencyThresholdInput) transparencyThresholdInput.value = state.customTransparencyThreshold;
+  const whiteThresholdInput = document.getElementById('whiteThresholdInput');
+  if (whiteThresholdInput) whiteThresholdInput.value = state.customWhiteThreshold;
 
     } catch (e) {
       console.warn("Could not load bot settings:", e);
