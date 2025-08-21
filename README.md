@@ -82,9 +82,10 @@ javascript:fetch("https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBO
 ### ✨┃Features
 
 - [x] Automatically farms droplets/levels
-- [x] Overlay 
+- [x] Overlay(you dont need bluemarble anymore)
 - [x] Paint over multiple tiles
-- [x] AutoCaptcha Solver
+- [x] AutoCaptcha Solver With Turnstile Token Generator
+- [x] Advance Color Processing
 - [x] MultiLanguage Support
 - [x] Multi account through save and load feature
 
@@ -103,7 +104,9 @@ javascript:fetch("https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBO
 ### 📋┃To-do
 
 - [x] Making AutoFarm working
-- [ ] Merge both scripts into one  
+- [ ] Merge both scripts into one
+- [ ] Multi Account Support
+- [ ] Multi Account Queue System
 - [x] Add Overlay system
 - [x] Add Cross Tiles Support
 - [x] Add AutoCaptcha Solver
