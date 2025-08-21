@@ -1011,8 +1011,18 @@
       await this.loadTurnstile();
       try {
         if (this._turnstileWidgetId && typeof window.turnstile?.execute === 'function') {
-          const token = await window.turnstile.execute(this._turnstileWidgetId, { action });
-          if (token && token.length > 20) return token;
+          // For previously created widget try refresh semantics: reset triggers new callback.
+          return await new Promise(res => {
+            const onToken = (t) => { if (t && t.length > 20) res(t); else res(null); };
+            try {
+              // Temporary hook by wrapping original callback via reset; Turnstile will invoke original callback again.
+              const currentId = this._turnstileWidgetId;
+              // Call reset to force new token; the original callback we registered below will resolve outer promise.
+              window.turnstile.reset(currentId);
+              // Fallback timeout
+              setTimeout(() => res(null), 4000);
+            } catch { res(null); }
+          });
         }
       } catch (err) {
         console.warn('Turnstile execute re-use failed, will re-render widget:', err);
@@ -1022,14 +1032,17 @@
         try {
           const container = document.createElement('div');
           container.style.position = 'fixed';
-          container.style.left = '-9999px';
-          container.style.top = '0';
+          container.style.width = '1px';
+          container.style.height = '1px';
+          container.style.bottom = '0';
+          container.style.right = '0';
+          container.style.opacity = '0';
+          container.style.pointerEvents = 'none';
           container.setAttribute('aria-hidden', 'true');
           document.body.appendChild(container);
 
           const widgetId = window.turnstile.render(container, {
             sitekey,
-            // Allowed sizes: compact | normal | flexible
             size: 'compact',
             action,
             retry: 'auto',
@@ -1046,14 +1059,13 @@
             }
           });
           this._turnstileWidgetId = widgetId;
-          // Manually execute after render for invisible-like behavior
-          try {
-            if (typeof window.turnstile?.execute === 'function') {
-              window.turnstile.execute(widgetId, { action });
-            }
-          } catch (execErr) {
-            console.warn('Turnstile execute after render failed (callback may still fire):', execErr);
-          }
+          setTimeout(() => {
+            try {
+              if (!turnstileToken && this._turnstileWidgetId) {
+                window.turnstile.reset(this._turnstileWidgetId);
+              }
+            } catch {/* ignore */}
+          }, 2500);
         } catch (e) {
           reject(e);
         }
