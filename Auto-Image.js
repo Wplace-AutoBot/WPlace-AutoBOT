@@ -1877,10 +1877,76 @@
       return Math.max(timeFromSpeed, timeFromCharges)
     },
 
-    saveProgress: () => {
+    // --- Painted map packing helpers (compact, efficient storage) ---
+    packPaintedMapToBase64: (paintedMap, width, height) => {
+      if (!paintedMap || !width || !height) return null;
+      const totalBits = width * height;
+      const byteLen = Math.ceil(totalBits / 8);
+      const bytes = new Uint8Array(byteLen);
+      let bitIndex = 0;
+      for (let y = 0; y < height; y++) {
+        const row = paintedMap[y];
+        for (let x = 0; x < width; x++) {
+          const bit = row && row[x] ? 1 : 0;
+          const b = bitIndex >> 3; // byte index
+          const o = bitIndex & 7;  // bit offset
+          if (bit) bytes[b] |= (1 << o);
+          bitIndex++;
+        }
+      }
+      let binary = "";
+      const chunk = 0x8000;
+      for (let i = 0; i < bytes.length; i += chunk) {
+        binary += String.fromCharCode.apply(null, bytes.subarray(i, Math.min(i + chunk, bytes.length)));
+      }
+      return btoa(binary);
+    },
+
+    unpackPaintedMapFromBase64: (base64, width, height) => {
+      if (!base64 || !width || !height) return null;
+      const binary = atob(base64);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      const map = Array(height).fill().map(() => Array(width).fill(false));
+      let bitIndex = 0;
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          const b = bitIndex >> 3;
+          const o = bitIndex & 7;
+          map[y][x] = ((bytes[b] >> o) & 1) === 1;
+          bitIndex++;
+        }
+      }
+      return map;
+    },
+
+    migrateProgressToV2: (saved) => {
+      if (!saved) return saved;
+      const isV1 = !saved.version || saved.version === '1' || saved.version === '1.0' || saved.version === '1.1';
+      if (!isV1) return saved; 
+
+      try {
+        const migrated = { ...saved };
+        const width = migrated.imageData?.width;
+        const height = migrated.imageData?.height;
+        if (migrated.paintedMap && width && height) {
+          const data = Utils.packPaintedMapToBase64(migrated.paintedMap, width, height);
+          migrated.paintedMapPacked = { width, height, data };
+        }
+        delete migrated.paintedMap;
+        migrated.version = '2';
+        return migrated;
+      } catch (e) {
+        console.warn('Migration to v2 failed, using original data:', e);
+        return saved;
+      }
+    },
+
+  saveProgress: () => {
       try {
         const progressData = {
           timestamp: Date.now(),
+      version: "2",
           state: {
             totalPixels: state.totalPixels,
             paintedPixels: state.paintedPixels,
@@ -1899,7 +1965,13 @@
               totalPixels: state.imageData.totalPixels,
             }
             : null,
-          paintedMap: state.paintedMap ? state.paintedMap.map((row) => Array.from(row)) : null,
+          paintedMapPacked: (state.paintedMap && state.imageData)
+            ? {
+                width: state.imageData.width,
+                height: state.imageData.height,
+                data: Utils.packPaintedMapToBase64(state.paintedMap, state.imageData.width, state.imageData.height)
+              }
+            : null,
         }
 
         localStorage.setItem("wplace-bot-progress", JSON.stringify(progressData))
@@ -1913,7 +1985,14 @@
     loadProgress: () => {
       try {
         const saved = localStorage.getItem("wplace-bot-progress")
-        return saved ? JSON.parse(saved) : null
+        if (!saved) return null;
+        let data = JSON.parse(saved);
+        const migrated = Utils.migrateProgressToV2(data);
+        if (migrated && migrated !== data) {
+          try { localStorage.setItem("wplace-bot-progress", JSON.stringify(migrated)); } catch {}
+          data = migrated;
+        }
+        return data;
       } catch (error) {
         console.error("Error loading progress:", error)
         return null
@@ -1941,7 +2020,11 @@
           }
         }
 
-        if (savedData.paintedMap) {
+        // Prefer packed form if available; fallback to legacy paintedMap array for backward compatibility
+        if (savedData.paintedMapPacked && savedData.paintedMapPacked.data) {
+          const { width, height, data } = savedData.paintedMapPacked;
+          state.paintedMap = Utils.unpackPaintedMapFromBase64(data, width, height);
+        } else if (savedData.paintedMap) {
           state.paintedMap = savedData.paintedMap.map((row) => Array.from(row))
         }
 
@@ -1952,11 +2035,11 @@
       }
     },
 
-    saveProgressToFile: () => {
+  saveProgressToFile: () => {
       try {
         const progressData = {
           timestamp: Date.now(),
-          version: "1.0",
+      version: "2",
           state: {
             totalPixels: state.totalPixels,
             paintedPixels: state.paintedPixels,
@@ -1975,7 +2058,14 @@
               totalPixels: state.imageData.totalPixels,
             }
             : null,
-          paintedMap: state.paintedMap ? state.paintedMap.map((row) => Array.from(row)) : null,
+          // Compact painted map storage
+          paintedMapPacked: (state.paintedMap && state.imageData)
+            ? {
+                width: state.imageData.width,
+                height: state.imageData.height,
+                data: Utils.packPaintedMapToBase64(state.paintedMap, state.imageData.width, state.imageData.height)
+              }
+            : null,
         }
 
         const filename = `wplace-bot-progress-${new Date().toISOString().slice(0, 19).replace(/:/g, "-")}.json`
@@ -1990,12 +2080,11 @@
     loadProgressFromFile: async () => {
       try {
         const data = await Utils.createFileUploader()
-
-        if (!data.version || !data.state) {
+        if (!data || !data.state) {
           throw new Error("Invalid file format")
         }
-
-        const success = Utils.restoreProgress(data)
+        const migrated = Utils.migrateProgressToV2(data) || data;
+        const success = Utils.restoreProgress(migrated)
         return success
       } catch (error) {
         console.error("Error loading from file:", error)
