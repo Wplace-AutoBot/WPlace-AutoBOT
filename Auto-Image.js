@@ -4837,13 +4837,19 @@
       const aspectRatio = width / height;
 
   const rs = state.resizeSettings;
-  const initialW = rs && rs.baseWidth === width && rs.baseHeight === height ? (rs.width || width) : width;
-  const initialH = rs && rs.baseWidth === width && rs.baseHeight === height ? (rs.height || height) : height;
-
-  widthSlider.value = initialW;
-  heightSlider.value = initialH;
   widthSlider.max = width * 2;
   heightSlider.max = height * 2;
+  let initialW = width;
+  let initialH = height;
+  if (rs && Number.isFinite(rs.width) && Number.isFinite(rs.height) && rs.width > 0 && rs.height > 0) {
+    initialW = rs.width;
+    initialH = rs.height;
+  }
+  // Clamp to slider ranges
+  initialW = Math.max(parseInt(widthSlider.min, 10) || 10, Math.min(initialW, parseInt(widthSlider.max, 10)));
+  initialH = Math.max(parseInt(heightSlider.min, 10) || 10, Math.min(initialH, parseInt(heightSlider.max, 10)));
+  widthSlider.value = initialW;
+  heightSlider.value = initialH;
   widthValue.textContent = initialW;
   heightValue.textContent = initialH;
       zoomSlider.value = 1;
