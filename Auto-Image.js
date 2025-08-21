@@ -1942,11 +1942,29 @@
       }
     },
 
+    migrateProgressToV21: (saved) => {
+      if (!saved) return saved;
+      if (saved.version === '2.1') return saved;
+      const isV2 = saved.version === '2' || saved.version === '2.0';
+      const isV1 = !saved.version || saved.version === '1' || saved.version === '1.0' || saved.version === '1.1';
+      if (!isV2 && !isV1) return saved; // save this for future
+      try {
+        const migrated = { ...saved };
+        delete migrated.paintedMapPacked;
+        delete migrated.paintedMap;
+        migrated.version = '2.1';
+        return migrated;
+      } catch (e) {
+        console.warn('Migration to v2.1 failed, using original data:', e);
+        return saved;
+      }
+    },
+
   saveProgress: () => {
       try {
         const progressData = {
           timestamp: Date.now(),
-      version: "2",
+      version: "2.1",
           state: {
             totalPixels: state.totalPixels,
             paintedPixels: state.paintedPixels,
@@ -1965,13 +1983,7 @@
               totalPixels: state.imageData.totalPixels,
             }
             : null,
-          paintedMapPacked: (state.paintedMap && state.imageData)
-            ? {
-                width: state.imageData.width,
-                height: state.imageData.height,
-                data: Utils.packPaintedMapToBase64(state.paintedMap, state.imageData.width, state.imageData.height)
-              }
-            : null,
+          paintedMapPacked: null,
         }
 
         localStorage.setItem("wplace-bot-progress", JSON.stringify(progressData))
@@ -1987,7 +1999,15 @@
         const saved = localStorage.getItem("wplace-bot-progress")
         if (!saved) return null;
         let data = JSON.parse(saved);
-        const migrated = Utils.migrateProgressToV2(data);
+        const ver = data.version;
+        let migrated = data;
+        if (ver === '2.1') {
+          // already latest
+        } else if (ver === '2' || ver === '2.0') {
+          migrated = Utils.migrateProgressToV21(data);
+        } else {
+          migrated = Utils.migrateProgressToV21(data);
+        }
         if (migrated && migrated !== data) {
           try { localStorage.setItem("wplace-bot-progress", JSON.stringify(migrated)); } catch {}
           data = migrated;
@@ -2039,7 +2059,7 @@
       try {
         const progressData = {
           timestamp: Date.now(),
-      version: "2",
+      version: "2.1",
           state: {
             totalPixels: state.totalPixels,
             paintedPixels: state.paintedPixels,
@@ -2058,14 +2078,7 @@
               totalPixels: state.imageData.totalPixels,
             }
             : null,
-          // Compact painted map storage
-          paintedMapPacked: (state.paintedMap && state.imageData)
-            ? {
-                width: state.imageData.width,
-                height: state.imageData.height,
-                data: Utils.packPaintedMapToBase64(state.paintedMap, state.imageData.width, state.imageData.height)
-              }
-            : null,
+          paintedMapPacked: null,
         }
 
         const filename = `wplace-bot-progress-${new Date().toISOString().slice(0, 19).replace(/:/g, "-")}.json`
@@ -2077,14 +2090,21 @@
       }
     },
 
-    loadProgressFromFile: async () => {
+  loadProgressFromFile: async () => {
       try {
         const data = await Utils.createFileUploader()
         if (!data || !data.state) {
           throw new Error("Invalid file format")
         }
-        const migrated = Utils.migrateProgressToV2(data) || data;
-        const success = Utils.restoreProgress(migrated)
+        const ver = data.version;
+        let migrated = data;
+        if (ver === '2.1') {
+        } else if (ver === '2' || ver === '2.0') {
+          migrated = Utils.migrateProgressToV21(data) || data;
+        } else {
+          migrated = Utils.migrateProgressToV21(data) || data;
+        }
+    const success = Utils.restoreProgress(migrated)
         return success
       } catch (error) {
         console.error("Error loading from file:", error)
@@ -5319,14 +5339,28 @@
     const { x: startX, y: startY } = state.startPosition
     const { x: regionX, y: regionY } = state.region
 
-    const startRow = state.lastPosition.y || 0
-    const startCol = state.lastPosition.x || 0
+    const tThresh2 = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
+    const isEligibleAt = (x, y) => {
+      const idx = (y * width + x) * 4;
+      const r = pixels[idx], g = pixels[idx + 1], b = pixels[idx + 2], a = pixels[idx + 3];
+      if (a < tThresh2) return false;
+      if (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b)) return false;
+      return true;
+    };
 
-    if (!state.paintedMap) {
-      state.paintedMap = Array(height)
-        .fill()
-        .map(() => Array(width).fill(false))
+    let startRow = 0;
+    let startCol = 0;
+    let foundStart = false;
+    let seen = 0;
+    const target = Math.max(0, Math.min(state.paintedPixels || 0, width * height));
+    for (let y = 0; y < height && !foundStart; y++) {
+      for (let x = 0; x < width; x++) {
+        if (!isEligibleAt(x, y)) continue;
+        if (seen === target) { startRow = y; startCol = x; foundStart = true; break; }
+        seen++;
+      }
     }
+    if (!foundStart) { startRow = height; startCol = 0; }
 
     let pixelBatch = null;
     let skippedPixels = { transparent: 0, white: 0, alreadyPainted: 0 };
@@ -5343,11 +5377,7 @@
             break outerLoop
           }
 
-          if (state.paintedMap[y][x]) {
-            skippedPixels.alreadyPainted++;
-            continue;
-          }
-
+          
           const idx = (y * width + x) * 4
           const r = pixels[idx]
           const g = pixels[idx + 1]
@@ -5404,10 +5434,7 @@
                 }
               }
               if (success) {
-                pixelBatch.pixels.forEach((p) => {
-                  state.paintedMap[p.localY][p.localX] = true;
-                  state.paintedPixels++;
-                });
+                pixelBatch.pixels.forEach((p) => { state.paintedPixels++; });
                 state.currentCharges -= pixelBatch.pixels.length;
                 updateUI("paintingProgress", "default", {
                   painted: state.paintedPixels,
@@ -5469,7 +5496,6 @@
 
             if (success) {
               pixelBatch.pixels.forEach((pixel) => {
-                state.paintedMap[pixel.localY][pixel.localX] = true;
                 state.paintedPixels++;
               })
 
@@ -5526,7 +5552,6 @@
         const success = await sendPixelBatch(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
         if (success) {
           pixelBatch.pixels.forEach((pixel) => {
-            state.paintedMap[pixel.localY][pixel.localX] = true
             state.paintedPixels++
           })
           state.currentCharges -= pixelBatch.pixels.length;
