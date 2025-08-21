@@ -105,7 +105,7 @@ javascript:fetch("https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBO
 
 - [x] Making AutoFarm working
 - [ ] Merge both scripts into one
-- [ ] Multi Account Support
+- [ ] Multi Account Switcher(currently in development)
 - [ ] Multi Account Queue System
 - [x] Add Overlay system
 - [x] Add Cross Tiles Support
