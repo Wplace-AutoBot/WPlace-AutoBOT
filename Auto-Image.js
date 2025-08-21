@@ -965,7 +965,6 @@
     maxCharges: 1, // Default max charges
     cooldown: CONFIG.COOLDOWN_DEFAULT,
     imageData: null,
-    originalImage: null,
     stopFlag: false,
     colorsChecked: false,
     startPosition: null,
@@ -987,8 +986,10 @@
   customTransparencyThreshold: CONFIG.TRANSPARENCY_THRESHOLD,
   customWhiteThreshold: CONFIG.WHITE_THRESHOLD,
   resizeSettings: null,
+  originalImage: null,
   }
 
+  // Placeholder for the resize preview update function
   let _updateResizePreview = () => { };
 
   // --- OVERLAY UPDATE: New OverlayManager class to handle all overlay logic ---
@@ -1984,13 +1985,6 @@
               totalPixels: state.imageData.totalPixels,
             }
             : null,
-          originalImage: state.originalImage
-            ? {
-              width: state.originalImage.width,
-              height: state.originalImage.height,
-              pixels: Array.from(state.originalImage.pixels),
-            }
-            : null,
           paintedMapPacked: null,
         }
 
@@ -2064,14 +2058,6 @@
           }
         }
 
-        if (savedData.originalImage) {
-          state.originalImage = {
-            width: savedData.originalImage.width,
-            height: savedData.originalImage.height,
-            pixels: new Uint8ClampedArray(savedData.originalImage.pixels),
-          };
-        }
-
         // Prefer packed form if available; fallback to legacy paintedMap array for backward compatibility
         if (savedData.paintedMapPacked && savedData.paintedMapPacked.data) {
           const { width, height, data } = savedData.paintedMapPacked;
@@ -2110,13 +2096,6 @@
               totalPixels: state.imageData.totalPixels,
             }
             : null,
-          originalImage: state.originalImage
-            ? {
-              width: state.originalImage.width,
-              height: state.originalImage.height,
-              pixels: Array.from(state.originalImage.pixels),
-            }
-            : null,
           paintedMapPacked: null,
         }
 
@@ -2143,7 +2122,7 @@
         } else {
           migrated = Utils.migrateProgressToV21(data) || data;
         }
-  const success = Utils.restoreProgress(migrated)
+    const success = Utils.restoreProgress(migrated)
         return success
       } catch (error) {
         console.error("Error loading from file:", error)
@@ -4203,10 +4182,6 @@
     resizeContainer.innerHTML = `
       <h3 style="margin-top: 0; color: ${theme.text}">${Utils.t("resizeImage")}</h3>
       <div class="resize-controls">
-        <label style="display:flex; align-items:center; gap:8px;">
-          <input type="checkbox" id="useOriginalSource">
-          <span>Use Original Image As Source</span>
-        </label>
         <label>
           Width: <span id="widthValue">0</span>px
           <input type="range" id="widthSlider" class="resize-slider" min="10" max="500" value="100">
@@ -4600,8 +4575,7 @@
     const resizePreview = resizeContainer.querySelector("#resizePreview")
     const confirmResize = resizeContainer.querySelector("#confirmResize")
     const cancelResize = resizeContainer.querySelector("#cancelResize")
-  const downloadPreviewBtn = resizeContainer.querySelector("#downloadPreviewBtn");
-  const useOriginalSourceToggle = resizeContainer.querySelector('#useOriginalSource');
+    const downloadPreviewBtn = resizeContainer.querySelector("#downloadPreviewBtn");
 
     if (compactBtn) {
       compactBtn.addEventListener("click", () => {
@@ -4848,8 +4822,13 @@
 
     updateDataButtons()
 
-  function showResizeDialog(processor) {
-  const { width, height } = processor.getDimensions();
+    function showResizeDialog(processor) {
+      // Always base resizing off the original image if we have it
+      let baseProcessor = processor;
+      if (state.originalImage?.dataUrl) {
+        baseProcessor = new ImageProcessor(state.originalImage.dataUrl);
+      }
+      const { width, height } = baseProcessor.getDimensions ? baseProcessor.getDimensions() : processor.getDimensions();
   const aspectRatio = width / height;
 
   const rs = state.resizeSettings;
@@ -4864,10 +4843,6 @@
   heightValue.textContent = initialH;
       zoomSlider.value = 1;
       paintWhiteToggle.checked = state.paintWhitePixels;
-      if (useOriginalSourceToggle) {
-        useOriginalSourceToggle.disabled = !state.originalImage;
-        useOriginalSourceToggle.checked = !!state.originalImage;
-      }
 
       _updateResizePreview = async () => {
         const newWidth = parseInt(widthSlider.value, 10);
@@ -4882,18 +4857,11 @@
         tempCanvas.width = newWidth;
         tempCanvas.height = newHeight;
         tempCtx.imageSmoothingEnabled = false;
-        // Choose source: original image if toggled, else current processor
-        let srcImg = processor.img;
-        if (useOriginalSourceToggle && useOriginalSourceToggle.checked && state.originalImage) {
-          const srcCanvas = document.createElement('canvas');
-          srcCanvas.width = state.originalImage.width;
-          srcCanvas.height = state.originalImage.height;
-          const sctx = srcCanvas.getContext('2d');
-          const sdata = new ImageData(state.originalImage.pixels, state.originalImage.width, state.originalImage.height);
-          sctx.putImageData(sdata, 0, 0);
-          srcImg = srcCanvas;
+        if (baseProcessor !== processor && !baseProcessor.img) {
+          // load on demand if instantiated from stored dataUrl
+          await baseProcessor.load();
         }
-        tempCtx.drawImage(srcImg, 0, 0, newWidth, newHeight);
+        tempCtx.drawImage(baseProcessor.img, 0, 0, newWidth, newHeight);
 
         const imgData = tempCtx.getImageData(0, 0, newWidth, newHeight);
         const data = imgData.data;
@@ -5010,17 +4978,10 @@
         tempCanvas.width = newWidth;
         tempCanvas.height = newHeight;
         tempCtx.imageSmoothingEnabled = false;
-        let srcImg2 = processor.img;
-        if (useOriginalSourceToggle && useOriginalSourceToggle.checked && state.originalImage) {
-          const srcCanvas2 = document.createElement('canvas');
-          srcCanvas2.width = state.originalImage.width;
-          srcCanvas2.height = state.originalImage.height;
-          const sctx2 = srcCanvas2.getContext('2d');
-          const sdata2 = new ImageData(state.originalImage.pixels, state.originalImage.width, state.originalImage.height);
-          sctx2.putImageData(sdata2, 0, 0);
-          srcImg2 = srcCanvas2;
+        if (baseProcessor !== processor && !baseProcessor.img) {
+          await baseProcessor.load();
         }
-        tempCtx.drawImage(srcImg2, 0, 0, newWidth, newHeight);
+        tempCtx.drawImage(baseProcessor.img, 0, 0, newWidth, newHeight);
         const imgData = tempCtx.getImageData(0, 0, newWidth, newHeight);
         const data = imgData.data;
         const tThresh2 = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
@@ -5122,10 +5083,7 @@
         overlayManager.enable();
         toggleOverlayBtn.classList.add('active');
 
-        const dataUrl = tempCanvas.toDataURL();
-        const newProcessor = new ImageProcessor(dataUrl);
-        await newProcessor.load();
-        state.imageData.processor = newProcessor;
+  // Keep state.imageData.processor as the original-based source; painting uses paletted pixels already stored
 
         updateStats();
         updateUI("resizeSuccess", "success", { width: newWidth, height: newHeight });
@@ -5208,19 +5166,15 @@
             processor,
           }
 
-          // Save original full-resolution image on first upload
-          state.originalImage = {
-            width,
-            height,
-            pixels: new Uint8ClampedArray(pixels),
-          }
-
           state.totalPixels = totalValidPixels
           state.paintedPixels = 0
           state.imageLoaded = true
           state.lastPosition = { x: 0, y: 0 }
           // New image: clear previous resize settings
           state.resizeSettings = null;
+          // Save original image for this browser (dataUrl + dims)
+          state.originalImage = { dataUrl: imageSrc, width, height };
+          saveBotSettings();
           saveBotSettings();
 
           // Use the original image for the overlay initially
@@ -5784,6 +5738,7 @@
   customWhiteThreshold: state.customWhiteThreshold,
   paintWhitePixels: state.paintWhitePixels,
   resizeSettings: state.resizeSettings,
+  originalImage: state.originalImage,
       };
       CONFIG.PAINTING_SPEED_ENABLED = settings.paintingSpeedEnabled;
       // AUTO_CAPTCHA_ENABLED is always true - no need to save/load
@@ -5815,6 +5770,7 @@
   state.customWhiteThreshold = settings.customWhiteThreshold ?? CONFIG.WHITE_THRESHOLD;
   state.paintWhitePixels = settings.paintWhitePixels ?? true;
   state.resizeSettings = settings.resizeSettings ?? null;
+  state.originalImage = settings.originalImage ?? null;
 
       const speedSlider = document.getElementById('speedSlider');
       if (speedSlider) speedSlider.value = state.paintingSpeed;
