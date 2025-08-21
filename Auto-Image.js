@@ -965,6 +965,7 @@
     maxCharges: 1, // Default max charges
     cooldown: CONFIG.COOLDOWN_DEFAULT,
     imageData: null,
+    originalImage: null,
     stopFlag: false,
     colorsChecked: false,
     startPosition: null,
@@ -988,7 +989,6 @@
   resizeSettings: null,
   }
 
-  // Placeholder for the resize preview update function
   let _updateResizePreview = () => { };
 
   // --- OVERLAY UPDATE: New OverlayManager class to handle all overlay logic ---
@@ -1984,6 +1984,13 @@
               totalPixels: state.imageData.totalPixels,
             }
             : null,
+          originalImage: state.originalImage
+            ? {
+              width: state.originalImage.width,
+              height: state.originalImage.height,
+              pixels: Array.from(state.originalImage.pixels),
+            }
+            : null,
           paintedMapPacked: null,
         }
 
@@ -2057,6 +2064,14 @@
           }
         }
 
+        if (savedData.originalImage) {
+          state.originalImage = {
+            width: savedData.originalImage.width,
+            height: savedData.originalImage.height,
+            pixels: new Uint8ClampedArray(savedData.originalImage.pixels),
+          };
+        }
+
         // Prefer packed form if available; fallback to legacy paintedMap array for backward compatibility
         if (savedData.paintedMapPacked && savedData.paintedMapPacked.data) {
           const { width, height, data } = savedData.paintedMapPacked;
@@ -2095,6 +2110,13 @@
               totalPixels: state.imageData.totalPixels,
             }
             : null,
+          originalImage: state.originalImage
+            ? {
+              width: state.originalImage.width,
+              height: state.originalImage.height,
+              pixels: Array.from(state.originalImage.pixels),
+            }
+            : null,
           paintedMapPacked: null,
         }
 
@@ -2121,7 +2143,7 @@
         } else {
           migrated = Utils.migrateProgressToV21(data) || data;
         }
-    const success = Utils.restoreProgress(migrated)
+  const success = Utils.restoreProgress(migrated)
         return success
       } catch (error) {
         console.error("Error loading from file:", error)
@@ -4181,6 +4203,10 @@
     resizeContainer.innerHTML = `
       <h3 style="margin-top: 0; color: ${theme.text}">${Utils.t("resizeImage")}</h3>
       <div class="resize-controls">
+        <label style="display:flex; align-items:center; gap:8px;">
+          <input type="checkbox" id="useOriginalSource">
+          <span>Use Original Image As Source</span>
+        </label>
         <label>
           Width: <span id="widthValue">0</span>px
           <input type="range" id="widthSlider" class="resize-slider" min="10" max="500" value="100">
@@ -4574,7 +4600,8 @@
     const resizePreview = resizeContainer.querySelector("#resizePreview")
     const confirmResize = resizeContainer.querySelector("#confirmResize")
     const cancelResize = resizeContainer.querySelector("#cancelResize")
-    const downloadPreviewBtn = resizeContainer.querySelector("#downloadPreviewBtn");
+  const downloadPreviewBtn = resizeContainer.querySelector("#downloadPreviewBtn");
+  const useOriginalSourceToggle = resizeContainer.querySelector('#useOriginalSource');
 
     if (compactBtn) {
       compactBtn.addEventListener("click", () => {
@@ -4821,7 +4848,7 @@
 
     updateDataButtons()
 
-    function showResizeDialog(processor) {
+  function showResizeDialog(processor) {
   const { width, height } = processor.getDimensions();
   const aspectRatio = width / height;
 
@@ -4837,6 +4864,10 @@
   heightValue.textContent = initialH;
       zoomSlider.value = 1;
       paintWhiteToggle.checked = state.paintWhitePixels;
+      if (useOriginalSourceToggle) {
+        useOriginalSourceToggle.disabled = !state.originalImage;
+        useOriginalSourceToggle.checked = !!state.originalImage;
+      }
 
       _updateResizePreview = async () => {
         const newWidth = parseInt(widthSlider.value, 10);
@@ -4851,7 +4882,18 @@
         tempCanvas.width = newWidth;
         tempCanvas.height = newHeight;
         tempCtx.imageSmoothingEnabled = false;
-        tempCtx.drawImage(processor.img, 0, 0, newWidth, newHeight);
+        // Choose source: original image if toggled, else current processor
+        let srcImg = processor.img;
+        if (useOriginalSourceToggle && useOriginalSourceToggle.checked && state.originalImage) {
+          const srcCanvas = document.createElement('canvas');
+          srcCanvas.width = state.originalImage.width;
+          srcCanvas.height = state.originalImage.height;
+          const sctx = srcCanvas.getContext('2d');
+          const sdata = new ImageData(state.originalImage.pixels, state.originalImage.width, state.originalImage.height);
+          sctx.putImageData(sdata, 0, 0);
+          srcImg = srcCanvas;
+        }
+        tempCtx.drawImage(srcImg, 0, 0, newWidth, newHeight);
 
         const imgData = tempCtx.getImageData(0, 0, newWidth, newHeight);
         const data = imgData.data;
@@ -4968,7 +5010,17 @@
         tempCanvas.width = newWidth;
         tempCanvas.height = newHeight;
         tempCtx.imageSmoothingEnabled = false;
-        tempCtx.drawImage(processor.img, 0, 0, newWidth, newHeight);
+        let srcImg2 = processor.img;
+        if (useOriginalSourceToggle && useOriginalSourceToggle.checked && state.originalImage) {
+          const srcCanvas2 = document.createElement('canvas');
+          srcCanvas2.width = state.originalImage.width;
+          srcCanvas2.height = state.originalImage.height;
+          const sctx2 = srcCanvas2.getContext('2d');
+          const sdata2 = new ImageData(state.originalImage.pixels, state.originalImage.width, state.originalImage.height);
+          sctx2.putImageData(sdata2, 0, 0);
+          srcImg2 = srcCanvas2;
+        }
+        tempCtx.drawImage(srcImg2, 0, 0, newWidth, newHeight);
         const imgData = tempCtx.getImageData(0, 0, newWidth, newHeight);
         const data = imgData.data;
         const tThresh2 = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
@@ -5154,6 +5206,13 @@
             pixels,
             totalPixels: totalValidPixels,
             processor,
+          }
+
+          // Save original full-resolution image on first upload
+          state.originalImage = {
+            width,
+            height,
+            pixels: new Uint8ClampedArray(pixels),
           }
 
           state.totalPixels = totalValidPixels
