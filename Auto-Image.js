@@ -4823,13 +4823,18 @@
     updateDataButtons()
 
     function showResizeDialog(processor) {
-      // Always base resizing off the original image if we have it
       let baseProcessor = processor;
+      let width, height;
       if (state.originalImage?.dataUrl) {
         baseProcessor = new ImageProcessor(state.originalImage.dataUrl);
+        width = state.originalImage.width;
+        height = state.originalImage.height;
+      } else {
+        const dims = processor.getDimensions();
+        width = dims.width;
+        height = dims.height;
       }
-      const { width, height } = baseProcessor.getDimensions ? baseProcessor.getDimensions() : processor.getDimensions();
-  const aspectRatio = width / height;
+      const aspectRatio = width / height;
 
   const rs = state.resizeSettings;
   const initialW = rs && rs.baseWidth === width && rs.baseHeight === height ? (rs.width || width) : width;
@@ -4857,7 +4862,7 @@
         tempCanvas.width = newWidth;
         tempCanvas.height = newHeight;
         tempCtx.imageSmoothingEnabled = false;
-        if (baseProcessor !== processor && !baseProcessor.img) {
+  if (baseProcessor !== processor && (!baseProcessor.img || !baseProcessor.canvas)) {
           // load on demand if instantiated from stored dataUrl
           await baseProcessor.load();
         }
@@ -4978,7 +4983,7 @@
         tempCanvas.width = newWidth;
         tempCanvas.height = newHeight;
         tempCtx.imageSmoothingEnabled = false;
-        if (baseProcessor !== processor && !baseProcessor.img) {
+  if (baseProcessor !== processor && (!baseProcessor.img || !baseProcessor.canvas)) {
           await baseProcessor.load();
         }
         tempCtx.drawImage(baseProcessor.img, 0, 0, newWidth, newHeight);
