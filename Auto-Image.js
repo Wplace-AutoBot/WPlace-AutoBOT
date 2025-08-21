@@ -2132,14 +2132,13 @@
   const colorCache = new Map()
 
   function findClosestColor(targetRgb, availableColors) {
+    if (!availableColors || availableColors.length === 0) return 1
+
     const cacheKey = `${targetRgb[0]},${targetRgb[1]},${targetRgb[2]}`
+    if (colorCache.has(cacheKey)) return colorCache.get(cacheKey)
 
-    if (colorCache.has(cacheKey)) {
-      return colorCache.get(cacheKey)
-    }
-
-    const isNearWhite = targetRgb[0] >= 250 && targetRgb[1] >= 250 && targetRgb[2] >= 250
-    if (isNearWhite) {
+    // Fast path for near white
+    if (targetRgb[0] >= 250 && targetRgb[1] >= 250 && targetRgb[2] >= 250) {
       const whiteEntry = availableColors.find(c => c.rgb[0] >= 250 && c.rgb[1] >= 250 && c.rgb[2] >= 250)
       if (whiteEntry) {
         colorCache.set(cacheKey, whiteEntry.id)
@@ -2147,27 +2146,39 @@
       }
     }
 
-    let minDistance = Number.POSITIVE_INFINITY
-    let closestColorId = availableColors[0]?.id || 1
+    const [Lt, at, bt] = Utils._lab(targetRgb[0], targetRgb[1], targetRgb[2])
+    const targetChroma = Math.sqrt(at * at + bt * bt)
+    let bestId = availableColors[0].id
+    let bestScore = Infinity
 
     for (let i = 0; i < availableColors.length; i++) {
-      const color = availableColors[i]
-      const distance = Utils.colorDistance(targetRgb, color.rgb)
-      if (distance < minDistance) {
-        minDistance = distance
-        closestColorId = color.id
-        if (distance === 0) break
+      const c = availableColors[i]
+      const [r, g, b] = c.rgb
+      const [L2, a2, b2] = Utils._lab(r, g, b)
+      const dL = Lt - L2
+      const da = at - a2
+      const db = bt - b2
+      let dist = dL * dL + da * da + db * db // CIE76 squared
+      if (targetChroma > 20) {
+        const candChroma = Math.sqrt(a2 * a2 + b2 * b2)
+        if (candChroma < targetChroma) {
+          const chromaDiff = targetChroma - candChroma
+          dist += chromaDiff * chromaDiff * 0.15
+        }
+      }
+      if (dist < bestScore) {
+        bestScore = dist
+        bestId = c.id
+        if (dist === 0) break
       }
     }
 
-    colorCache.set(cacheKey, closestColorId)
-
-    if (colorCache.size > 10000) {
+    colorCache.set(cacheKey, bestId)
+    if (colorCache.size > 12000) { // prune oldest
       const firstKey = colorCache.keys().next().value
       colorCache.delete(firstKey)
     }
-
-    return closestColorId
+    return bestId
   }
 
   // UI UPDATE FUNCTIONS (declared early to avoid reference errors)
