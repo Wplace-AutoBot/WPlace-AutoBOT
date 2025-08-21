@@ -1350,11 +1350,25 @@
     _lastSitekey: null,
 
     async loadTurnstile() {
-      if (this.turnstileLoaded && window.turnstile) {
+      // If Turnstile is already present, just resolve.
+      if (window.turnstile) {
+        this.turnstileLoaded = true;
         return Promise.resolve();
       }
       
       return new Promise((resolve, reject) => {
+        // Avoid adding the script twice
+        if (document.querySelector('script[src^="https://challenges.cloudflare.com/turnstile/v0/api.js"]')) {
+          const checkReady = () => {
+            if (window.turnstile) {
+              this.turnstileLoaded = true;
+              resolve();
+            } else {
+              setTimeout(checkReady, 100);
+            }
+          };
+          return checkReady();
+        }
         const script = document.createElement('script');
         script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
         script.async = true;
@@ -1383,12 +1397,12 @@
         this._turnstileContainer = document.createElement('div');
         this._turnstileContainer.style.cssText = `
           position: fixed !important;
-          left: -9999px !important;
+          left: -9999px !important; /* keep off-screen for invisible mode */
           top: -9999px !important;
           width: 300px !important;
           height: 65px !important;
           pointer-events: none !important;
-          visibility: hidden !important;
+          opacity: 0 !important; /* do not use visibility:hidden to avoid engine quirks */
           z-index: -1 !important;
         `;
         this._turnstileContainer.setAttribute('aria-hidden', 'true');
@@ -1398,10 +1412,48 @@
       return this._turnstileContainer;
     },
 
+    ensureTurnstileOverlayContainer() {
+      if (this._turnstileOverlay && document.body.contains(this._turnstileOverlay)) {
+        return this._turnstileOverlay;
+      }
+      const overlay = document.createElement('div');
+      overlay.id = 'turnstile-overlay-container';
+      overlay.style.cssText = `
+        position: fixed;
+        right: 16px;
+        bottom: 16px;
+        width: 320px;
+        min-height: 80px;
+        background: rgba(0,0,0,0.7);
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 10px;
+        padding: 12px;
+        z-index: 100000;
+        backdrop-filter: blur(6px);
+        color: #fff;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      `;
+      const title = document.createElement('div');
+      title.textContent = 'Cloudflare Turnstile — please complete the check if shown';
+      title.style.cssText = 'font: 600 12px/1.3 \"Segoe UI\",sans-serif; margin-bottom: 8px; opacity: 0.9;';
+      const widgetHost = document.createElement('div');
+      widgetHost.id = 'turnstile-overlay-host';
+      widgetHost.style.cssText = 'width: 100%; min-height: 70px;';
+      const closeBtn = document.createElement('button');
+      closeBtn.textContent = 'Hide';
+      closeBtn.style.cssText = 'position:absolute; top:6px; right:6px; font-size:11px; background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.2); border-radius:6px; padding:2px 6px; cursor:pointer;';
+      closeBtn.addEventListener('click', () => overlay.remove());
+      overlay.appendChild(title);
+      overlay.appendChild(widgetHost);
+      overlay.appendChild(closeBtn);
+      document.body.appendChild(overlay);
+      this._turnstileOverlay = overlay;
+      return overlay;
+    },
+
     async executeTurnstile(sitekey, action = 'paint') {
       await this.loadTurnstile();
-      
-      // Try to reuse existing widget if sitekey matches
+
       if (this._turnstileWidgetId && this._lastSitekey === sitekey && window.turnstile?.execute) {
         try {
           console.log("🔄 Reusing existing Turnstile widget...");
@@ -1409,42 +1461,74 @@
             window.turnstile.execute(this._turnstileWidgetId, { action }),
             new Promise((_, reject) => setTimeout(() => reject(new Error('Execute timeout')), 15000))
           ]);
-          
           if (token && token.length > 20) {
             console.log("✅ Token generated via widget reuse");
             return token;
           }
         } catch (err) {
-          console.warn('🔄 Widget reuse failed, creating new widget:', err.message);
+          console.warn('🔄 Widget reuse failed, will create a fresh widget:', err.message);
         }
       }
 
-      // Create new widget
-      console.log("🆕 Creating new Turnstile widget...");
-      return await this.createNewTurnstileWidget(sitekey, action);
+      const invisible = await this.createNewTurnstileWidgetInvisible(sitekey, action);
+      if (invisible && invisible.length > 20) return invisible;
+
+      console.log('👀 Falling back to interactive Turnstile (visible).');
+      return await this.createNewTurnstileWidgetInteractive(sitekey, action);
     },
 
-    async createNewTurnstileWidget(sitekey, action) {
+    async createNewTurnstileWidgetInvisible(sitekey, action) {
+      return new Promise((resolve) => {
+        try {
+          if (this._turnstileWidgetId && window.turnstile?.remove) {
+            try { window.turnstile.remove(this._turnstileWidgetId); } catch {}
+          }
+          const container = this.ensureTurnstileContainer();
+          container.innerHTML = '';
+          const widgetId = window.turnstile.render(container, {
+            sitekey,
+            action,
+            size: 'invisible',
+            retry: 'auto',
+            'retry-interval': 8000,
+            callback: (token) => {
+              console.log('✅ Invisible Turnstile callback');
+              resolve(token);
+            },
+            'error-callback': () => resolve(null),
+            'timeout-callback': () => resolve(null),
+          });
+          this._turnstileWidgetId = widgetId;
+          this._lastSitekey = sitekey;
+          if (!widgetId) return resolve(null);
+          Promise.race([
+            window.turnstile.execute(widgetId, { action }),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Invisible execute timeout')), 12000))
+          ]).then(resolve).catch(() => resolve(null));
+        } catch (e) {
+          console.warn('Invisible Turnstile failed:', e);
+          resolve(null);
+        }
+      });
+    },
+
+    async createNewTurnstileWidgetInteractive(sitekey, action) {
       return new Promise((resolve, reject) => {
         try {
-          // Clean up previous widget
           if (this._turnstileWidgetId && window.turnstile?.remove) {
-            try {
-              window.turnstile.remove(this._turnstileWidgetId);
-            } catch (e) {
-              console.warn('Failed to remove old widget:', e);
-            }
+            try { window.turnstile.remove(this._turnstileWidgetId); } catch {}
           }
 
-          const container = this.ensureTurnstileContainer();
-          container.innerHTML = ''; // Clear container
+          const overlay = this.ensureTurnstileOverlayContainer();
+          const host = overlay.querySelector('#turnstile-overlay-host');
+          host.innerHTML = '';
 
-          // Set timeout for widget creation
           const timeoutId = setTimeout(() => {
+            console.warn('⏰ Interactive Turnstile timed out');
             resolve(null);
-          }, 20000);
+          }, 120000); // give users up to 2 minutes
 
-          const widgetId = window.turnstile.render(container, {
+          const widgetId = window.turnstile.render(host, {
             sitekey,
             action,
             size: 'normal',
@@ -1452,34 +1536,31 @@
             'retry-interval': 8000,
             callback: (token) => {
               clearTimeout(timeoutId);
-              console.log("✅ Turnstile widget callback triggered");
+              // Hide overlay after success
+              try { overlay.remove(); } catch {}
+              console.log('✅ Interactive Turnstile solved');
               resolve(token);
             },
             'error-callback': (error) => {
-              clearTimeout(timeoutId);
-              console.warn('🚨 Turnstile error-callback:', error);
-              resolve(null);
+              console.warn('🚨 Interactive Turnstile error:', error);
             },
             'timeout-callback': () => {
-              clearTimeout(timeoutId);
-              console.warn('⏰ Turnstile timeout-callback');
-              resolve(null);
+              console.warn('⏰ Turnstile timeout callback (interactive)');
             },
             'expired-callback': () => {
-              console.warn('⚠️ Turnstile token expired');
-              // Don't resolve here, let the main timeout handle it
+              console.warn('⚠️ Interactive Turnstile token expired');
             }
           });
 
           this._turnstileWidgetId = widgetId;
           this._lastSitekey = sitekey;
-          
           if (!widgetId) {
             clearTimeout(timeoutId);
             resolve(null);
+            return;
           }
         } catch (error) {
-          console.error('❌ Error creating Turnstile widget:', error);
+          console.error('❌ Error creating interactive Turnstile widget:', error);
           reject(error);
         }
       });
@@ -1502,9 +1583,13 @@
       if (this._turnstileContainer && document.body.contains(this._turnstileContainer)) {
         this._turnstileContainer.remove();
       }
+      if (this._turnstileOverlay && document.body.contains(this._turnstileOverlay)) {
+        this._turnstileOverlay.remove();
+      }
       
       this._turnstileWidgetId = null;
       this._turnstileContainer = null;
+      this._turnstileOverlay = null;
       this._lastSitekey = null;
     },
 
@@ -2478,6 +2563,7 @@
       // Use optimized token generation with automatic sitekey detection
       const sitekey = Utils.detectSitekey();
       console.log("🔑 Generating Turnstile token for sitekey:", sitekey);
+  console.log('🧭 UA:', navigator.userAgent, 'Platform:', navigator.platform);
       
       const token = await Utils.generatePaintToken(sitekey);
       
@@ -2494,7 +2580,8 @@
       
       // Fallback to original browser automation if Turnstile fails
       console.log("🔄 Falling back to browser automation...");
-      return handleCaptchaFallback();
+  const fbToken = await handleCaptchaFallback();
+  return fbToken;
     }
   }
 
@@ -2502,6 +2589,10 @@
   async function handleCaptchaFallback() {
     return new Promise(async (resolve, reject) => {
       try {
+        // Ensure we have a fresh promise to await for a new token capture
+        if (!_resolveToken) {
+          tokenPromise = new Promise((res) => { _resolveToken = res; });
+        }
         const timeoutPromise = Utils.sleep(20000).then(() => reject(new Error("Auto-CAPTCHA timed out.")));
 
         const solvePromise = (async () => {
@@ -2550,9 +2641,9 @@
 
           // Start confirmation loop and wait for token
           confirmLoop();
-          await tokenPromise;
-          await Utils.sleep(1000); // 1 second delay after captcha token is captured
-          resolve();
+          const token = await tokenPromise;
+          await Utils.sleep(300); // small delay after token is captured
+          resolve(token);
         })();
 
         await Promise.race([solvePromise, timeoutPromise]);
