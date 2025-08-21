@@ -1152,7 +1152,7 @@
   let _resolveToken = null
   let tokenPromise = new Promise((resolve) => { _resolveToken = resolve })
   let retryCount = 0
-  const MAX_RETRIES = 3
+  const MAX_RETRIES = 10
   const TOKEN_LIFETIME = 240000 // 4 minutes (tokens typically last 5 min, use 4 for safety)
 
   function setTurnstileToken(t) {
