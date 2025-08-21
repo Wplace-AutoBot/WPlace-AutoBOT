@@ -3879,46 +3879,6 @@
           </label>
         </div>
 
-        <!-- Advanced Color Matching Section -->
-        <div style="margin-bottom: 25px;">
-          <details id="advancedColorDetails" style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 12px; border: 1px solid rgba(255,255,255,0.15);">
-            <summary style="cursor: pointer; list-style: none; display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px;">
-              <i class="fas fa-flask" style="color:#ffd166;"></i> Advanced Color Matching
-            </summary>
-            <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 14px;">
-              <label style="display:flex; flex-direction:column; gap:4px; font-size:12px;">
-                <span style="font-weight:600;">Algorithm</span>
-                <select id="colorAlgorithmSelect" style="padding:8px 10px; border-radius:6px; border:1px solid rgba(255,255,255,0.25); background: rgba(0,0,0,0.25); color:#fff;">
-                  <option value="lab" ${state.colorMatchingAlgorithm==='lab'?'selected':''}>Perceptual (Lab)</option>
-                  <option value="legacy" ${state.colorMatchingAlgorithm==='legacy'?'selected':''}>Legacy (Weighted RGB)</option>
-                </select>
-                <small style="opacity:0.7;">Choose perceptual Lab for accuracy or legacy for speed.</small>
-              </label>
-              <label style="display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:12px;">
-                <div style="flex:1;">
-                  <span style="font-weight:600;">Chroma Penalty</span>
-                  <p style="margin:4px 0 0; opacity:0.7; font-size:11px;">Discourages dull colors replacing vibrant ones (Lab only).</p>
-                </div>
-                <input type="checkbox" id="enableChromaPenaltyToggle" ${state.enableChromaPenalty?'checked':''} style="width:20px; height:20px; cursor:pointer;"/>
-              </label>
-              <label style="display:flex; flex-direction:column; gap:4px; font-size:12px;">
-                <span style="font-weight:600; display:flex; justify-content:space-between;">Chroma Penalty Weight <span id="chromaWeightValue" style="background:rgba(0,0,0,0.3); padding:2px 6px; border-radius:4px;">${state.chromaPenaltyWeight}</span></span>
-                <input type="range" id="chromaPenaltyWeightSlider" min="0" max="0.5" step="0.01" value="${state.chromaPenaltyWeight}" style="width:100%;" />
-              </label>
-              <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; font-size:12px;">
-                <label style="display:flex; flex-direction:column; gap:4px;">
-                  <span style="font-weight:600;">Transparency Threshold</span>
-                  <input type="number" id="transparencyThresholdInput" min="0" max="255" value="${state.customTransparencyThreshold}" style="padding:6px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.25); background: rgba(0,0,0,0.25); color:#fff;" />
-                </label>
-                <label style="display:flex; flex-direction:column; gap:4px;">
-                  <span style="font-weight:600;">White Threshold</span>
-                  <input type="number" id="whiteThresholdInput" min="200" max="255" value="${state.customWhiteThreshold}" style="padding:6px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.25); background: rgba(0,0,0,0.25); color:#fff;" />
-                </label>
-              </div>
-              <button id="resetAdvancedColorBtn" style="padding:8px 12px; border-radius:8px; background: linear-gradient(135deg,#ff6a6a,#ff4757); color:white; border:none; cursor:pointer; font-size:12px; font-weight:600;">Reset Advanced Settings</button>
-            </div>
-          </details>
-        </div>
 
         <!-- Theme Selection Section -->
         <div style="margin-bottom: 25px;">
@@ -4137,6 +4097,46 @@
               </div>
               <div id="colors-container" class="wplace-color-grid"></div>
           </div>
+      </div>
+
+      <div class="wplace-section" id="advanced-color-section" style="margin-top: 15px;">
+        <div class="wplace-section-title">
+          <i class="fas fa-flask"></i>&nbsp;Advanced Color Matching
+        </div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <label style="display:flex; flex-direction:column; gap:4px; font-size:12px;">
+            <span style="font-weight:600;">Algorithm</span>
+            <select id="colorAlgorithmSelect" style="padding:6px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); color:#fff;">
+              <option value="lab" ${state.colorMatchingAlgorithm==='lab'?'selected':''}>Perceptual (Lab)</option>
+            <option value="legacy" ${state.colorMatchingAlgorithm==='legacy'?'selected':''}>Legacy (RGB)</option>
+            </select>
+          </label>
+          <label style="display:flex; align-items:center; justify-content:space-between; font-size:12px;">
+            <div style="flex:1;">
+              <span style="font-weight:600;">Chroma Penalty</span>
+              <div style="margin-top:2px; opacity:0.65;">Preserve vivid colors (Lab only)</div>
+            </div>
+            <input type="checkbox" id="enableChromaPenaltyToggle" ${state.enableChromaPenalty?'checked':''} style="width:18px; height:18px; cursor:pointer;" />
+          </label>
+          <div>
+            <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:4px;">
+              <span>Chroma Weight</span>
+              <span id="chromaWeightValue" style="background:rgba(255,255,255,0.08); padding:2px 6px; border-radius:4px;">${state.chromaPenaltyWeight}</span>
+            </div>
+            <input type="range" id="chromaPenaltyWeightSlider" min="0" max="0.5" step="0.01" value="${state.chromaPenaltyWeight}" style="width:100%;" />
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+            <label style="display:flex; flex-direction:column; gap:4px; font-size:12px;">
+              <span style="font-weight:600;">Transparency</span>
+              <input type="number" id="transparencyThresholdInput" min="0" max="255" value="${state.customTransparencyThreshold}" style="padding:6px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); color:#fff;" />
+            </label>
+            <label style="display:flex; flex-direction:column; gap:4px; font-size:12px;">
+              <span style="font-weight:600;">White Thresh</span>
+              <input type="number" id="whiteThresholdInput" min="200" max="255" value="${state.customWhiteThreshold}" style="padding:6px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); color:#fff;" />
+            </label>
+          </div>
+          <button id="resetAdvancedColorBtn" class="wplace-btn" style="background:linear-gradient(135deg,#ff6a6a,#ff4757); font-size:11px;">Reset Advanced</button>
+        </div>
       </div>
 
       <div class="resize-buttons">
@@ -4425,39 +4425,7 @@
         });
       }
 
-      // Advanced color matching listeners (live updates)
-      const chromaPenaltyWeightSlider = document.getElementById('chromaPenaltyWeightSlider');
-      const chromaWeightValue = document.getElementById('chromaWeightValue');
-      if (chromaPenaltyWeightSlider && chromaWeightValue) {
-        chromaPenaltyWeightSlider.addEventListener('input', (e) => {
-          state.chromaPenaltyWeight = parseFloat(e.target.value) || 0.15;
-          chromaWeightValue.textContent = state.chromaPenaltyWeight.toFixed(2);
-        });
-      }
-      const resetAdvancedColorBtn = document.getElementById('resetAdvancedColorBtn');
-      if (resetAdvancedColorBtn) {
-        resetAdvancedColorBtn.addEventListener('click', () => {
-          state.colorMatchingAlgorithm = 'lab';
-          state.enableChromaPenalty = true;
-            state.chromaPenaltyWeight = 0.15;
-          state.customTransparencyThreshold = CONFIG.TRANSPARENCY_THRESHOLD = 100;
-          state.customWhiteThreshold = CONFIG.WHITE_THRESHOLD = 250;
-          const colorAlgorithmSelect = document.getElementById('colorAlgorithmSelect');
-          const enableChromaPenaltyToggle = document.getElementById('enableChromaPenaltyToggle');
-          const chromaPenaltyWeightSlider2 = document.getElementById('chromaPenaltyWeightSlider');
-          const transparencyThresholdInput = document.getElementById('transparencyThresholdInput');
-          const whiteThresholdInput = document.getElementById('whiteThresholdInput');
-          const chromaWeightValue2 = document.getElementById('chromaWeightValue');
-          if (colorAlgorithmSelect) colorAlgorithmSelect.value = 'lab';
-          if (enableChromaPenaltyToggle) enableChromaPenaltyToggle.checked = true;
-          if (chromaPenaltyWeightSlider2) chromaPenaltyWeightSlider2.value = 0.15;
-          if (transparencyThresholdInput) transparencyThresholdInput.value = 100;
-          if (whiteThresholdInput) whiteThresholdInput.value = 250;
-          if (chromaWeightValue2) chromaWeightValue2.textContent = '0.15';
-          saveBotSettings();
-          Utils.showAlert('Advanced color settings reset.', 'success');
-        });
-      }
+  // (Advanced color listeners moved outside to work with resize dialog)
 
     }
 
@@ -5589,6 +5557,26 @@
   createUI().then(() => {
     // Generate token automatically after UI is ready
     setTimeout(initializeTokenGenerator, 1000);
+
+    // Attach advanced color matching listeners (resize dialog)
+    const advancedInit = () => {
+      const chromaSlider = document.getElementById('chromaPenaltyWeightSlider');
+      const chromaValue = document.getElementById('chromaWeightValue');
+      const resetBtn = document.getElementById('resetAdvancedColorBtn');
+      const algoSelect = document.getElementById('colorAlgorithmSelect');
+      const chromaToggle = document.getElementById('enableChromaPenaltyToggle');
+      const transInput = document.getElementById('transparencyThresholdInput');
+      const whiteInput = document.getElementById('whiteThresholdInput');
+      if (algoSelect) algoSelect.addEventListener('change', e => { state.colorMatchingAlgorithm = e.target.value; saveBotSettings(); _updateResizePreview(); });
+      if (chromaToggle) chromaToggle.addEventListener('change', e => { state.enableChromaPenalty = e.target.checked; saveBotSettings(); _updateResizePreview(); });
+      if (chromaSlider && chromaValue) chromaSlider.addEventListener('input', e => { state.chromaPenaltyWeight = parseFloat(e.target.value)||0.15; chromaValue.textContent = state.chromaPenaltyWeight.toFixed(2); saveBotSettings(); _updateResizePreview(); });
+      if (transInput) transInput.addEventListener('change', e => { const v=parseInt(e.target.value,10); if(!isNaN(v)&&v>=0&&v<=255){ state.customTransparencyThreshold=v; CONFIG.TRANSPARENCY_THRESHOLD=v; saveBotSettings(); _updateResizePreview(); }});
+      if (whiteInput) whiteInput.addEventListener('change', e => { const v=parseInt(e.target.value,10); if(!isNaN(v)&&v>=200&&v<=255){ state.customWhiteThreshold=v; CONFIG.WHITE_THRESHOLD=v; saveBotSettings(); _updateResizePreview(); }});
+      if (resetBtn) resetBtn.addEventListener('click', () => {
+        state.colorMatchingAlgorithm='lab'; state.enableChromaPenalty=true; state.chromaPenaltyWeight=0.15; state.customTransparencyThreshold=CONFIG.TRANSPARENCY_THRESHOLD=100; state.customWhiteThreshold=CONFIG.WHITE_THRESHOLD=250; saveBotSettings(); const a=document.getElementById('colorAlgorithmSelect'); if(a) a.value='lab'; const ct=document.getElementById('enableChromaPenaltyToggle'); if(ct) ct.checked=true; if(chromaSlider) chromaSlider.value=0.15; if(chromaValue) chromaValue.textContent='0.15'; if(transInput) transInput.value=100; if(whiteInput) whiteInput.value=250; _updateResizePreview(); Utils.showAlert('Advanced color settings reset.', 'success'); });
+    };
+    // Delay to ensure resize UI built
+    setTimeout(advancedInit, 500);
     
     // Add cleanup on page unload
     window.addEventListener('beforeunload', () => {
