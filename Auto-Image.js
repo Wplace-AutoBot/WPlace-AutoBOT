@@ -277,6 +277,8 @@
       autoCaptchaDesc: "Automatically generates Turnstile tokens using integrated generator. Falls back to browser automation if needed.",
       applySettings: "Apply Settings",
       settingsSaved: "✅ Settings saved successfully!",
+      speedOn: "ON",
+      speedOff: "OFF",
       cooldownSettings: "Cooldown Settings",
       waitCharges: "Wait until charges reach",
       captchaSolving: "🔑 Generating Turnstile token...",
@@ -348,6 +350,8 @@
       languageSelectDesc: "Выберите предпочтительный язык. Изменения вступят в силу немедленно.",
       autoCaptcha: "Авто-решение CAPTCHA (Turnstile)",
       autoCaptchaDesc: "Автоматически генерирует Turnstile токены используя встроенный генератор. Возвращается к автоматизации браузера при необходимости.",
+      speedOn: "ВКЛ",
+      speedOff: "ВЫКЛ",
       applySettings: "Применить настройки",
       settingsSaved: "✅ Настройки успешно сохранены!",
       cooldownSettings: "Настройки перезарядки",
@@ -423,6 +427,8 @@
       autoCaptchaDesc: "Tenta resolver o CAPTCHA automaticamente simulando a colocação manual de um pixel quando o token expira.",
       applySettings: "Aplicar Configurações",
       settingsSaved: "✅ Configurações salvas com sucesso!",
+      speedOn: "LIGADO",
+      speedOff: "DESLIGADO",
       cooldownSettings: "Configurações de Cooldown",
       waitCharges: "Aguardar até as cargas atingirem",
       captchaSolving: "🤖 Tentando resolver o CAPTCHA...",
@@ -496,6 +502,8 @@
       autoCaptchaDesc: "Tự động cố gắng giải CAPTCHA bằng cách mô phỏng việc đặt pixel thủ công khi token hết hạn.",
       applySettings: "Áp dụng cài đặt",
       settingsSaved: "✅ Đã lưu cài đặt thành công!",
+      speedOn: "BẬT",
+      speedOff: "TẮT",
       cooldownSettings: "Cài đặt thời gian chờ",
       waitCharges: "Chờ cho đến khi số lần sạc đạt",
       captchaSolving: "🤖 Đang cố gắng giải CAPTCHA...",
@@ -569,6 +577,8 @@
       autoCaptchaDesc: "Tente automatiquement de résoudre le CAPTCHA en simulant un placement manuel de pixel lorsque le jeton expire.",
       applySettings: "Appliquer les paramètres",
       settingsSaved: "✅ Paramètres enregistrés avec succès !",
+      speedOn: "ACTIVÉ",
+      speedOff: "DÉSACTIVÉ",
       cooldownSettings: "Paramètres de recharge",
       waitCharges: "Attendre que les charges atteignent",
       captchaSolving: "🤖 Tentative de résolution du CAPTCHA...",
@@ -642,6 +652,8 @@
       autoCaptchaDesc: "Mencoba menyelesaikan CAPTCHA secara otomatis dengan mensimulasikan penempatan piksel manual saat token kedaluwarsa.",
       applySettings: "Terapkan Pengaturan",
       settingsSaved: "✅ Pengaturan berhasil disimpan!",
+      speedOn: "HIDUP",
+      speedOff: "MATI",
       cooldownSettings: "Pengaturan Cooldown",
       waitCharges: "Tunggu hingga muatan mencapai",
       captchaSolving: "🤖 Mencoba menyelesaikan CAPTCHA...",
@@ -2811,6 +2823,59 @@
         opacity: 0.8;
       }
 
+      /* Custom Toggle Switch Styles */
+      .speed-toggle-wrapper {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+        cursor: pointer;
+      }
+
+      .speed-toggle-wrapper input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .speed-toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(255,255,255,0.3);
+        transition: all 0.3s ease;
+        border-radius: 24px;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+      }
+
+      .speed-toggle-slider:before {
+        position: absolute;
+        content: '';
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: all 0.3s ease;
+        border-radius: 50%;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      }
+
+      .speed-toggle-wrapper input:checked + .speed-toggle-slider {
+        background-color: #4facfe;
+      }
+
+      .speed-toggle-wrapper input:checked + .speed-toggle-slider:before {
+        transform: translateX(26px);
+      }
+
+      .speed-toggle-slider:hover {
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.4), 0 0 8px rgba(79, 172, 254, 0.3);
+      }
+
       #wplace-settings-container {
         position: fixed;
         top: 50%;
@@ -3291,11 +3356,30 @@
 
         <!-- Speed Control Section -->
         <div style="margin-bottom: 25px;">
-          <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-tachometer-alt" style="color: #4facfe; font-size: 16px;"></i>
-            ${Utils.t("paintingSpeed")}
+          <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <i class="fas fa-tachometer-alt" style="color: #4facfe; font-size: 16px;"></i>
+              ${Utils.t("paintingSpeed")}
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span id="speedStatusText" style="font-size: 12px; font-weight: 500; color: ${CONFIG.PAINTING_SPEED_ENABLED ? '#4facfe' : 'rgba(255,255,255,0.5)'};">
+                ${CONFIG.PAINTING_SPEED_ENABLED ? Utils.t("speedOn") : Utils.t("speedOff")}
+              </span>
+              <label class="speed-toggle-wrapper">
+                <input type="checkbox" id="enableSpeedToggle" ${CONFIG.PAINTING_SPEED_ENABLED ? 'checked' : ''}/>
+                <span class="speed-toggle-slider"></span>
+              </label>
+            </div>
           </label>
-          <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1);">
+          <div id="speedControlContainer" style="
+            background: rgba(255,255,255,0.1); 
+            border-radius: 12px; 
+            padding: 18px; 
+            border: 1px solid rgba(255,255,255,0.1);
+            opacity: ${CONFIG.PAINTING_SPEED_ENABLED ? '1' : '0.4'};
+            transition: all 0.3s ease;
+            pointer-events: ${CONFIG.PAINTING_SPEED_ENABLED ? 'auto' : 'none'};
+          ">
             <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
               <input type="range" id="speedSlider" min="${CONFIG.PAINTING_SPEED.MIN}" max="${CONFIG.PAINTING_SPEED.MAX}" value="${CONFIG.PAINTING_SPEED.DEFAULT}"
                 style="
@@ -3305,7 +3389,7 @@
                   border-radius: 4px;
                   outline: none;
                   -webkit-appearance: none;
-                  cursor: pointer;
+                  cursor: ${CONFIG.PAINTING_SPEED_ENABLED ? 'pointer' : 'not-allowed'};
                 ">
               <div id="speedValue" style="
                 min-width: 70px;
@@ -3325,10 +3409,6 @@
               <span><i class="fas fa-rabbit"></i> ${CONFIG.PAINTING_SPEED.MAX}</span>
             </div>
           </div>
-           <label style="display: flex; align-items: center; gap: 8px; color: white; margin-top: 10px;">
-            <input type="checkbox" id="enableSpeedToggle" ${CONFIG.PAINTING_SPEED_ENABLED ? 'checked' : ''} style="cursor: pointer;"/>
-            <span>Enable painting speed limit</span>
-          </label>
         </div>
 
         <!-- Theme Selection Section -->
@@ -3810,6 +3890,51 @@
             Utils.showAlert("Re-processing overlay...", "info");
             await overlayManager.processImageIntoChunks();
             Utils.showAlert("Overlay updated!", "success");
+          }
+        });
+      }
+
+      // Speed Control Event Listeners
+      const speedSlider = settingsContainer.querySelector("#speedSlider");
+      const speedValue = settingsContainer.querySelector("#speedValue");
+      const enableSpeedToggle = settingsContainer.querySelector("#enableSpeedToggle");
+      const speedControlContainer = settingsContainer.querySelector("#speedControlContainer");
+      const speedStatusText = settingsContainer.querySelector("#speedStatusText");
+
+      if (speedSlider && speedValue) {
+        speedSlider.addEventListener('input', (e) => {
+          const speed = parseInt(e.target.value);
+          state.paintingSpeed = speed;
+          speedValue.textContent = `${speed} px/s`;
+        });
+      }
+
+      if (enableSpeedToggle && speedControlContainer && speedStatusText) {
+        enableSpeedToggle.addEventListener('change', (e) => {
+          const enabled = e.target.checked;
+          CONFIG.PAINTING_SPEED_ENABLED = enabled;
+          
+          // Update visual state
+          if (enabled) {
+            // Enable state
+            speedControlContainer.style.opacity = '1';
+            speedControlContainer.style.pointerEvents = 'auto';
+            speedStatusText.textContent = Utils.t("speedOn");
+            speedStatusText.style.color = '#4facfe';
+            
+            if (speedSlider) {
+              speedSlider.style.cursor = 'pointer';
+            }
+          } else {
+            // Disable state
+            speedControlContainer.style.opacity = '0.4';
+            speedControlContainer.style.pointerEvents = 'none';
+            speedStatusText.textContent = Utils.t("speedOff");
+            speedStatusText.style.color = 'rgba(255,255,255,0.5)';
+            
+            if (speedSlider) {
+              speedSlider.style.cursor = 'not-allowed';
+            }
           }
         });
       }
@@ -4858,7 +4983,29 @@
       if (speedValue) speedValue.textContent = `${state.paintingSpeed} px/s`;
 
       const enableSpeedToggle = document.getElementById('enableSpeedToggle');
-      if (enableSpeedToggle) enableSpeedToggle.checked = CONFIG.PAINTING_SPEED_ENABLED;
+      const speedControlContainer = document.getElementById('speedControlContainer');
+      const speedStatusText = document.getElementById('speedStatusText');
+      
+      if (enableSpeedToggle) {
+        enableSpeedToggle.checked = CONFIG.PAINTING_SPEED_ENABLED;
+        
+        // Update visual state based on enabled status
+        if (speedControlContainer && speedStatusText) {
+          if (CONFIG.PAINTING_SPEED_ENABLED) {
+            speedControlContainer.style.opacity = '1';
+            speedControlContainer.style.pointerEvents = 'auto';
+            speedStatusText.textContent = Utils.t("speedOn");
+            speedStatusText.style.color = '#4facfe';
+            if (speedSlider) speedSlider.style.cursor = 'pointer';
+          } else {
+            speedControlContainer.style.opacity = '0.4';
+            speedControlContainer.style.pointerEvents = 'none';
+            speedStatusText.textContent = Utils.t("speedOff");
+            speedStatusText.style.color = 'rgba(255,255,255,0.5)';
+            if (speedSlider) speedSlider.style.cursor = 'not-allowed';
+          }
+        }
+      }
 
       // AUTO_CAPTCHA_ENABLED is always true - no toggle to set
 
