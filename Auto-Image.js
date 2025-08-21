@@ -1029,7 +1029,8 @@
 
           const widgetId = window.turnstile.render(container, {
             sitekey,
-            size: 'invisible',
+            // Allowed sizes: compact | normal | flexible
+            size: 'compact',
             action,
             retry: 'auto',
             callback: (token) => {
@@ -1045,6 +1046,14 @@
             }
           });
           this._turnstileWidgetId = widgetId;
+          // Manually execute after render for invisible-like behavior
+          try {
+            if (typeof window.turnstile?.execute === 'function') {
+              window.turnstile.execute(widgetId, { action });
+            }
+          } catch (execErr) {
+            console.warn('Turnstile execute after render failed (callback may still fire):', execErr);
+          }
         } catch (e) {
           reject(e);
         }
