@@ -3366,7 +3366,7 @@
         background: rgba(0,0,0,0.2);
         margin: 15px 0;
         height: 300px;
-        overflow: auto;
+        overflow: hidden;
       }
 
   .resize-canvas-stack { position: relative; transform-origin: center center; display: inline-block; }
@@ -4396,9 +4396,11 @@
       </div>
 
       <div class="resize-preview-wrapper">
-          <div id="resizeCanvasStack" class="resize-canvas-stack">
-            <canvas id="resizeCanvas" class="resize-base-canvas"></canvas>
-            <canvas id="maskCanvas" class="resize-mask-canvas"></canvas>
+          <div id="resizePanStage" style="position:relative; width:100%; height:100%; overflow:hidden;">
+            <div id="resizeCanvasStack" class="resize-canvas-stack" style="position:absolute; left:0; top:0; transform-origin: top left;">
+              <canvas id="resizeCanvas" class="resize-base-canvas"></canvas>
+              <canvas id="maskCanvas" class="resize-mask-canvas"></canvas>
+            </div>
           </div>
       </div>
       <div class="resize-tools">
@@ -4790,6 +4792,7 @@
   const zoomOutBtn = resizeContainer.querySelector('#zoomOutBtn');
   const zoomFitBtn = resizeContainer.querySelector('#zoomFitBtn');
   const zoomActualBtn = resizeContainer.querySelector('#zoomActualBtn');
+  const panStage = resizeContainer.querySelector('#resizePanStage');
   const canvasStack = resizeContainer.querySelector('#resizeCanvasStack');
   const baseCanvas = resizeContainer.querySelector('#resizeCanvas');
   const maskCanvas = resizeContainer.querySelector('#maskCanvas');
@@ -5250,16 +5253,38 @@
         _updateResizePreview();
       };
 
+      let panX = 0, panY = 0;
+      const clampPan = () => {
+        const wrapRect = panStage?.getBoundingClientRect() || { width: 0, height: 0 };
+        const w = (baseCanvas.width || 1) * _zoomLevel;
+        const h = (baseCanvas.height || 1) * _zoomLevel;
+        if (w <= wrapRect.width) {
+          panX = Math.floor((wrapRect.width - w) / 2);
+        } else {
+          const minX = wrapRect.width - w;
+          panX = Math.min(0, Math.max(minX, panX));
+        }
+        if (h <= wrapRect.height) {
+          panY = Math.floor((wrapRect.height - h) / 2);
+        } else {
+          const minY = wrapRect.height - h;
+          panY = Math.min(0, Math.max(minY, panY));
+        }
+      };
+      const applyPan = () => {
+        clampPan();
+        canvasStack.style.transform = `translate(${panX}px, ${panY}px) scale(${_zoomLevel})`;
+      };
+
       const updateZoomLayout = () => {
         const w = baseCanvas.width || 1, h = baseCanvas.height || 1;
-        const cssW = Math.max(1, Math.round(w * _zoomLevel));
-        const cssH = Math.max(1, Math.round(h * _zoomLevel));
-        baseCanvas.style.width = cssW + 'px';
-        baseCanvas.style.height = cssH + 'px';
-        maskCanvas.style.width = cssW + 'px';
-        maskCanvas.style.height = cssH + 'px';
-        canvasStack.style.width = cssW + 'px';
-        canvasStack.style.height = cssH + 'px';
+        baseCanvas.style.width = w + 'px';
+        baseCanvas.style.height = h + 'px';
+        maskCanvas.style.width = w + 'px';
+        maskCanvas.style.height = h + 'px';
+        canvasStack.style.width = w + 'px';
+        canvasStack.style.height = h + 'px';
+        applyPan();
       };
       const applyZoom = (z) => {
         _zoomLevel = Math.max(0.05, Math.min(20, z || 1));
@@ -5270,12 +5295,11 @@
       zoomSlider.addEventListener('input', () => {
         applyZoom(parseFloat(zoomSlider.value));
       });
-      if (zoomInBtn) zoomInBtn.addEventListener('click', () => applyZoom(parseFloat(zoomSlider.value) + 0.1));
-      if (zoomOutBtn) zoomOutBtn.addEventListener('click', () => applyZoom(parseFloat(zoomSlider.value) - 0.1));
+  if (zoomInBtn) zoomInBtn.addEventListener('click', () => applyZoom(parseFloat(zoomSlider.value) + 0.1));
+  if (zoomOutBtn) zoomOutBtn.addEventListener('click', () => applyZoom(parseFloat(zoomSlider.value) - 0.1));
       const computeFitZoom = () => {
-        const wrap = resizeContainer.querySelector('.resize-preview-wrapper');
-        if (!wrap) return 1;
-        const wrapRect = wrap.getBoundingClientRect();
+        const wrapRect = panStage?.getBoundingClientRect();
+        if (!wrapRect) return 1;
         const w = baseCanvas.width || 1;
         const h = baseCanvas.height || 1;
         const margin = 10;
@@ -5283,8 +5307,55 @@
         const scaleY = (wrapRect.height - margin) / h;
         return Math.max(0.05, Math.min(20, Math.min(scaleX, scaleY)));
       };
-  if (zoomFitBtn) zoomFitBtn.addEventListener('click', () => applyZoom(computeFitZoom()));
-  if (zoomActualBtn) zoomActualBtn.addEventListener('click', () => applyZoom(1));
+  if (zoomFitBtn) zoomFitBtn.addEventListener('click', () => { applyZoom(computeFitZoom()); centerInView(); });
+  if (zoomActualBtn) zoomActualBtn.addEventListener('click', () => { applyZoom(1); centerInView(); });
+
+      const centerInView = () => {
+        if (!panStage) return;
+        const rect = panStage.getBoundingClientRect();
+        const w = (baseCanvas.width || 1) * _zoomLevel;
+        const h = (baseCanvas.height || 1) * _zoomLevel;
+        panX = Math.floor((rect.width - w) / 2);
+        panY = Math.floor((rect.height - h) / 2);
+        applyPan();
+      };
+
+      let isPanning = false; let startX = 0, startY = 0, startPanX = 0, startPanY = 0;
+      let allowPan = false;
+      const isPanMouseButton = (e) => e.button === 1 || e.button === 2;
+      const setCursor = (val) => { if (panStage) panStage.style.cursor = val; };
+      if (panStage) {
+        panStage.addEventListener('contextmenu', (e) => { if (allowPan) e.preventDefault(); });
+        window.addEventListener('keydown', (e) => { if (e.code === 'Space') { allowPan = true; setCursor('grab'); }});
+        window.addEventListener('keyup', (e) => { if (e.code === 'Space') { allowPan = false; if (!isPanning) setCursor(''); }});
+        panStage.addEventListener('mousedown', (e) => {
+          if (!allowPan && !isPanMouseButton(e)) return;
+          e.preventDefault();
+          isPanning = true; startX = e.clientX; startY = e.clientY; startPanX = panX; startPanY = panY;
+          setCursor('grabbing');
+        });
+        window.addEventListener('mousemove', (e) => {
+          if (!isPanning) return;
+          const dx = e.clientX - startX; const dy = e.clientY - startY;
+          panX = startPanX + dx; panY = startPanY + dy; applyPan();
+        });
+        window.addEventListener('mouseup', () => { if (isPanning) { isPanning = false; setCursor(allowPan ? 'grab' : ''); }});
+        panStage.addEventListener('wheel', (e) => {
+          if (!e.ctrlKey && !e.metaKey) return;
+          e.preventDefault();
+          const rect = panStage.getBoundingClientRect();
+          const cx = e.clientX - rect.left - panX;
+          const cy = e.clientY - rect.top - panY;
+          const before = _zoomLevel;
+          const step = Math.max(0.05, Math.min(0.5, Math.abs(e.deltaY) > 20 ? 0.2 : 0.1));
+          const next = Math.max(0.05, Math.min(20, before + (e.deltaY > 0 ? -step : step)));
+          if (next === before) return;
+          const scale = next / before;
+          panX = panX - cx * (scale - 1);
+          panY = panY - cy * (scale - 1);
+          applyZoom(next);
+        }, { passive: false });
+      }
       const schedulePreview = () => {
         if (_previewTimer) clearTimeout(_previewTimer);
         const run = () => {
@@ -5436,6 +5507,8 @@
       };
 
       const handlePaint = (e) => {
+        // Suppress painting while panning
+        if ((e.buttons & 4) === 4 || (e.buttons & 2) === 2 || allowPan) return;
         const { x, y } = mapClientToPixel(e.clientX, e.clientY);
         const w = baseCanvas.width, h = baseCanvas.height;
         if (x < 0 || y < 0 || x >= w || y >= h) return;
@@ -5451,7 +5524,10 @@
         redrawMaskOverlay();
       };
 
-      maskCanvas.addEventListener('mousedown', (e) => { draggingMask = true; handlePaint(e); });
+      maskCanvas.addEventListener('mousedown', (e) => {
+        if (e.button === 1 || e.button === 2 || allowPan) return; // let pan handler manage
+        draggingMask = true; handlePaint(e);
+      });
       window.addEventListener('mousemove', (e) => { if (draggingMask) handlePaint(e); });
       window.addEventListener('mouseup', () => { if (draggingMask) { draggingMask = false; saveBotSettings(); }});
 
@@ -5627,7 +5703,12 @@
       setTimeout(() => {
         if (typeof computeFitZoom === 'function') {
           const z = computeFitZoom();
-          if (!isNaN(z) && isFinite(z)) applyZoom(z);
+          if (!isNaN(z) && isFinite(z)) {
+            applyZoom(z);
+            centerInView();
+          }
+        } else {
+          centerInView();
         }
       }, 0);
     }
