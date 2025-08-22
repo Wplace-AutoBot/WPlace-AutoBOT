@@ -4392,8 +4392,24 @@
           </div>
       </div>
       <div class="resize-tools">
-        <button id="clearIgnoredBtn" title="Clear all ignored pixels">Clear Ignored</button>
-        <span style="opacity:.8;">Click or drag on the preview to toggle pixels to NOT paint.</span>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <label style="font-size:12px; opacity:.85;">Brush</label>
+            <input id="maskBrushSize" type="range" min="1" max="7" step="1" value="1" style="width:120px;">
+            <span id="maskBrushSizeValue" style="font-size:12px; opacity:.85; min-width:18px; text-align:center;">1</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <label style="font-size:12px; opacity:.85;">Mode</label>
+            <div class="mask-mode-group" style="display:flex; gap:6px;">
+              <button id="maskModeIgnore" class="wplace-btn" style="padding:4px 8px; font-size:12px;">Ignore</button>
+              <button id="maskModeUnignore" class="wplace-btn" style="padding:4px 8px; font-size:12px;">Unignore</button>
+              <button id="maskModeToggle" class="wplace-btn wplace-btn-primary" style="padding:4px 8px; font-size:12px;">Toggle</button>
+            </div>
+          </div>
+          <button id="clearIgnoredBtn" class="wplace-btn" title="Clear all ignored pixels" style="padding:4px 8px; font-size:12px;">Clear</button>
+          <button id="invertMaskBtn" class="wplace-btn" title="Invert mask" style="padding:4px 8px; font-size:12px;">Invert</button>
+          <span style="opacity:.8; font-size:12px;">Shift = Row • Alt = Column</span>
+        </div>
       </div>
 
       <div class="wplace-section" id="color-palette-section" style="margin-top: 15px;">
@@ -5076,11 +5092,13 @@
           }
           baseCtx.clearRect(0,0,newWidth,newHeight);
           baseCtx.drawImage(baseProcessor.img, 0, 0, newWidth, newHeight);
+          // Draw mask on overlay canvas only
+          maskCtx.clearRect(0,0,maskCanvas.width,maskCanvas.height);
           if (state.resizeIgnoreMask) {
-            const imgData = baseCtx.getImageData(0,0,newWidth,newHeight);
-            const m = state.resizeIgnoreMask;
-            for (let i=0;i<m.length;i++) if (m[i]) { const p=i*4; imgData.data[p]=255; imgData.data[p+1]=0; imgData.data[p+2]=0; imgData.data[p+3]=160; }
-            baseCtx.putImageData(imgData,0,0);
+            const img = maskCtx.createImageData(newWidth, newHeight);
+            const md = img.data; const m = state.resizeIgnoreMask;
+            for (let i=0;i<m.length;i++) if (m[i]) { const p=i*4; md[p]=255; md[p+1]=0; md[p+2]=0; md[p+3]=150; }
+            maskCtx.putImageData(img,0,0);
           }
           canvasStack.style.transform = `scale(${_zoomLevel})`;
           return;
@@ -5168,14 +5186,16 @@
             data[i + 3] = 255;
           }
         }
-        // If a newer job started while we were processing, abort attaching result
+
         if (jobId !== _previewJobId) return;
-        // apply red overlay to ignored pixels in preview
-        if (state.resizeIgnoreMask) {
-          const m = state.resizeIgnoreMask;
-          for (let i=0;i<m.length;i++) if (m[i]) { const p=i*4; data[p]=255; data[p+1]=0; data[p+2]=0; data[p+3]=160; }
-        }
         baseCtx.putImageData(imgData, 0, 0);
+        maskCtx.clearRect(0,0,maskCanvas.width,maskCanvas.height);
+        if (state.resizeIgnoreMask) {
+          const img = maskCtx.createImageData(newWidth, newHeight);
+          const md = img.data; const m = state.resizeIgnoreMask;
+          for (let i=0;i<m.length;i++) if (m[i]) { const p=i*4; md[p]=255; md[p+1]=0; md[p+2]=0; md[p+3]=150; }
+          maskCtx.putImageData(img,0,0);
+        }
         canvasStack.style.transform = `scale(${_zoomLevel})`;
       };
 
@@ -5230,35 +5250,161 @@
       heightSlider.addEventListener('pointerdown', markDragStart);
       widthSlider.addEventListener('pointerup', markDragEnd);
       heightSlider.addEventListener('pointerup', markDragEnd);
-      widthSlider.addEventListener("input", () => { onWidthInput(); schedulePreview(); });
-      heightSlider.addEventListener("input", () => { onHeightInput(); schedulePreview(); });
+  widthSlider.addEventListener("input", () => { onWidthInput(); schedulePreview(); });
+  heightSlider.addEventListener("input", () => { onHeightInput(); schedulePreview(); });
 
-      // Click/drag to toggle ignored pixels
+      // Mask painting UX: brush size, modes, row/column fills, and precise coords
       let draggingMask = false;
-      const pointToggle = (clientX, clientY) => {
+      let lastPaintX = -1, lastPaintY = -1;
+      let brushSize = 1;
+      let maskMode = 'toggle'; // 'ignore' | 'unignore' | 'toggle'
+      const brushEl = resizeContainer.querySelector('#maskBrushSize');
+      const brushValEl = resizeContainer.querySelector('#maskBrushSizeValue');
+      const btnIgnore = resizeContainer.querySelector('#maskModeIgnore');
+      const btnUnignore = resizeContainer.querySelector('#maskModeUnignore');
+      const btnToggle = resizeContainer.querySelector('#maskModeToggle');
+      const clearIgnoredBtnEl = resizeContainer.querySelector('#clearIgnoredBtn');
+      const invertMaskBtn = resizeContainer.querySelector('#invertMaskBtn');
+
+      const setMode = (mode) => {
+        maskMode = mode;
+        btnIgnore.classList.toggle('wplace-btn-primary', mode === 'ignore');
+        btnUnignore.classList.toggle('wplace-btn-primary', mode === 'unignore');
+        btnToggle.classList.toggle('wplace-btn-primary', mode === 'toggle');
+      };
+      if (brushEl && brushValEl) {
+        brushEl.addEventListener('input', () => { brushSize = parseInt(brushEl.value, 10) || 1; brushValEl.textContent = brushSize; });
+        brushValEl.textContent = brushEl.value;
+        brushSize = parseInt(brushEl.value, 10) || 1;
+      }
+      if (btnIgnore) btnIgnore.addEventListener('click', () => setMode('ignore'));
+      if (btnUnignore) btnUnignore.addEventListener('click', () => setMode('unignore'));
+      if (btnToggle) btnToggle.addEventListener('click', () => setMode('toggle'));
+
+      const mapClientToPixel = (clientX, clientY) => {
+        // Compute without rounding until final step to avoid drift at higher zoom
         const rect = baseCanvas.getBoundingClientRect();
-        const x = Math.floor((clientX - rect.left) / parseFloat(zoomSlider.value));
-        const y = Math.floor((clientY - rect.top) / parseFloat(zoomSlider.value));
-        const w = baseCanvas.width, h = baseCanvas.height;
-        if (x < 0 || y < 0 || x >= w || y >= h) return;
-        const idx = y * w + x;
+        const scaleX = rect.width / baseCanvas.width;
+        const scaleY = rect.height / baseCanvas.height;
+        const dx = (clientX - rect.left) / scaleX;
+        const dy = (clientY - rect.top) / scaleY;
+        const x = Math.floor(dx);
+        const y = Math.floor(dy);
+        return { x, y };
+      };
+
+      const ensureMask = (w, h) => {
         if (!state.resizeIgnoreMask || state.resizeIgnoreMask.length !== w * h) {
           state.resizeIgnoreMask = new Uint8Array(w * h);
         }
-        state.resizeIgnoreMask[idx] = state.resizeIgnoreMask[idx] ? 0 : 1;
-        // quick visual hint by updating a pixel in mask canvas
-        const color = state.resizeIgnoreMask[idx] ? 'rgba(255,0,0,0.6)' : 'rgba(0,0,0,0)';
-        if (state.resizeIgnoreMask[idx]) {
-          maskCtx.fillStyle = color; maskCtx.fillRect(x, y, 1, 1);
-        } else {
-          maskCtx.clearRect(x, y, 1, 1);
+      };
+
+      const paintCircle = (cx, cy, radius, value) => {
+        const w = baseCanvas.width, h = baseCanvas.height;
+        ensureMask(w, h);
+        const r2 = radius * radius;
+        for (let yy = cy - radius; yy <= cy + radius; yy++) {
+          if (yy < 0 || yy >= h) continue;
+          for (let xx = cx - radius; xx <= cx + radius; xx++) {
+            if (xx < 0 || xx >= w) continue;
+            const dx = xx - cx, dy = yy - cy;
+            if (dx * dx + dy * dy <= r2) {
+              const idx = yy * w + xx;
+              if (maskMode === 'toggle') {
+                state.resizeIgnoreMask[idx] = state.resizeIgnoreMask[idx] ? 0 : 1;
+              } else if (maskMode === 'ignore') {
+                state.resizeIgnoreMask[idx] = 1;
+              } else {
+                state.resizeIgnoreMask[idx] = 0;
+              }
+            }
+          }
         }
       };
-      maskCanvas.addEventListener('mousedown', (e) => { draggingMask = true; pointToggle(e.clientX, e.clientY); _updateResizePreview(); });
-      window.addEventListener('mousemove', (e) => { if (draggingMask) { pointToggle(e.clientX, e.clientY); } });
-      window.addEventListener('mouseup', () => { if (draggingMask) { draggingMask = false; saveBotSettings(); } });
-      const clearIgnoredBtnEl = resizeContainer.querySelector('#clearIgnoredBtn');
-      if (clearIgnoredBtnEl) clearIgnoredBtnEl.addEventListener('click', () => { if (state.resizeIgnoreMask) state.resizeIgnoreMask.fill(0); maskCtx.clearRect(0,0,maskCanvas.width,maskCanvas.height); _updateResizePreview(); saveBotSettings(); });
+
+      const paintRow = (y, value) => {
+        const w = baseCanvas.width, h = baseCanvas.height;
+        ensureMask(w, h);
+        if (y < 0 || y >= h) return;
+        for (let x = 0; x < w; x++) {
+          const idx = y * w + x;
+          if (maskMode === 'toggle') {
+            state.resizeIgnoreMask[idx] = state.resizeIgnoreMask[idx] ? 0 : 1;
+          } else if (maskMode === 'ignore') {
+            state.resizeIgnoreMask[idx] = 1;
+          } else {
+            state.resizeIgnoreMask[idx] = 0;
+          }
+        }
+      };
+
+      const paintColumn = (x, value) => {
+        const w = baseCanvas.width, h = baseCanvas.height;
+        ensureMask(w, h);
+        if (x < 0 || x >= w) return;
+        for (let y = 0; y < h; y++) {
+          const idx = y * w + x;
+          if (maskMode === 'toggle') {
+            state.resizeIgnoreMask[idx] = state.resizeIgnoreMask[idx] ? 0 : 1;
+          } else if (maskMode === 'ignore') {
+            state.resizeIgnoreMask[idx] = 1;
+          } else {
+            state.resizeIgnoreMask[idx] = 0;
+          }
+        }
+      };
+
+      const redrawMaskOverlay = () => {
+        const w = baseCanvas.width, h = baseCanvas.height;
+        maskCanvas.width = w; maskCanvas.height = h;
+        maskCtx.clearRect(0, 0, w, h);
+        if (!state.resizeIgnoreMask) return;
+        // Draw ignored pixels as semi-transparent red squares
+        const img = maskCtx.createImageData(w, h);
+        const md = img.data;
+        for (let i = 0; i < state.resizeIgnoreMask.length; i++) {
+          if (state.resizeIgnoreMask[i]) {
+            const p = i * 4;
+            md[p] = 255; md[p + 1] = 0; md[p + 2] = 0; md[p + 3] = 150;
+          }
+        }
+        maskCtx.putImageData(img, 0, 0);
+      };
+
+      const handlePaint = (e) => {
+        const { x, y } = mapClientToPixel(e.clientX, e.clientY);
+        const w = baseCanvas.width, h = baseCanvas.height;
+        if (x < 0 || y < 0 || x >= w || y >= h) return;
+        const radius = Math.max(1, Math.floor(brushSize / 2));
+        if (e.shiftKey) {
+          paintRow(y);
+        } else if (e.altKey) {
+          paintColumn(x);
+        } else {
+          paintCircle(x, y, radius);
+        }
+        lastPaintX = x; lastPaintY = y;
+        redrawMaskOverlay();
+      };
+
+      maskCanvas.addEventListener('mousedown', (e) => { draggingMask = true; handlePaint(e); });
+      window.addEventListener('mousemove', (e) => { if (draggingMask) handlePaint(e); });
+      window.addEventListener('mouseup', () => { if (draggingMask) { draggingMask = false; saveBotSettings(); }});
+
+      if (clearIgnoredBtnEl) clearIgnoredBtnEl.addEventListener('click', () => {
+        if (state.resizeIgnoreMask) state.resizeIgnoreMask.fill(0);
+        redrawMaskOverlay();
+        _updateResizePreview();
+        saveBotSettings();
+      });
+
+      if (invertMaskBtn) invertMaskBtn.addEventListener('click', () => {
+        if (!state.resizeIgnoreMask) return;
+        for (let i = 0; i < state.resizeIgnoreMask.length; i++) state.resizeIgnoreMask[i] = state.resizeIgnoreMask[i] ? 0 : 1;
+        redrawMaskOverlay();
+        _updateResizePreview();
+        saveBotSettings();
+      });
 
       confirmResize.onclick = async () => {
         const newWidth = parseInt(widthSlider.value, 10);
@@ -5391,9 +5537,16 @@
 
       downloadPreviewBtn.onclick = () => {
         try {
+          const w = baseCanvas.width, h = baseCanvas.height;
+          const out = document.createElement('canvas');
+          out.width = w; out.height = h;
+          const octx = out.getContext('2d');
+          octx.imageSmoothingEnabled = false;
+          octx.drawImage(baseCanvas, 0, 0);
+          octx.drawImage(maskCanvas, 0, 0);
           const link = document.createElement('a');
           link.download = 'wplace-preview.png';
-          link.href = baseCanvas.toDataURL();
+          link.href = out.toDataURL();
           link.click();
         } catch (e) { console.warn('Failed to download preview:', e); }
       };
