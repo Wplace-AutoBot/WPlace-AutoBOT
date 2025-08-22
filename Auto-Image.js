@@ -3369,7 +3369,7 @@
         overflow: auto;
       }
 
-      .resize-canvas-stack { position: relative; transform-origin: top left; }
+  .resize-canvas-stack { position: relative; transform-origin: center center; display: inline-block; }
       .resize-base-canvas, .resize-mask-canvas {
         position: absolute; left: 0; top: 0;
         image-rendering: pixelated;
@@ -5091,7 +5091,9 @@
         widthValue.textContent = newWidth;
         heightValue.textContent = newHeight;
 
-        ensureMaskSize(newWidth, newHeight);
+  ensureMaskSize(newWidth, newHeight);
+  canvasStack.style.width = newWidth + 'px';
+  canvasStack.style.height = newHeight + 'px';
         baseCtx.imageSmoothingEnabled = false;
         if (!state.availableColors || state.availableColors.length === 0) {
           if (baseProcessor !== processor && (!baseProcessor.img || !baseProcessor.canvas)) {
