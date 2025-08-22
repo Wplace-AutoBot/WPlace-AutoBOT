@@ -3379,6 +3379,13 @@
       .resize-mask-canvas { pointer-events: auto; }
       .resize-tools { display:flex; gap:8px; align-items:center; margin-top:8px; font-size:12px; }
       .resize-tools button { padding:6px 10px; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.06); color:#fff; cursor:pointer; }
+      .mask-mode-group .wplace-btn.active,
+      .mask-mode-group .wplace-btn[aria-pressed="true"] {
+        background: ${theme.highlight};
+        color: ${theme.primary};
+        border-color: ${theme.text};
+        box-shadow: 0 0 8px rgba(0,0,0,0.25) inset, 0 0 6px rgba(0,0,0,0.2);
+      }
 
       .resize-controls {
         display: grid;
@@ -5257,7 +5264,7 @@
       let draggingMask = false;
       let lastPaintX = -1, lastPaintY = -1;
       let brushSize = 1;
-      let maskMode = 'toggle'; // 'ignore' | 'unignore' | 'toggle'
+      let maskMode = 'ignore'; // 'ignore' | 'unignore' | 'toggle'
       const brushEl = resizeContainer.querySelector('#maskBrushSize');
       const brushValEl = resizeContainer.querySelector('#maskBrushSizeValue');
       const btnIgnore = resizeContainer.querySelector('#maskModeIgnore');
@@ -5266,20 +5273,30 @@
       const clearIgnoredBtnEl = resizeContainer.querySelector('#clearIgnoredBtn');
       const invertMaskBtn = resizeContainer.querySelector('#invertMaskBtn');
 
-      const setMode = (mode) => {
-        maskMode = mode;
-        btnIgnore.classList.toggle('wplace-btn-primary', mode === 'ignore');
-        btnUnignore.classList.toggle('wplace-btn-primary', mode === 'unignore');
-        btnToggle.classList.toggle('wplace-btn-primary', mode === 'toggle');
+      const updateModeButtons = () => {
+        const map = [
+          [btnIgnore, 'ignore'],
+          [btnUnignore, 'unignore'],
+          [btnToggle, 'toggle']
+        ];
+        for (const [el, m] of map) {
+          if (!el) continue;
+          const active = maskMode === m;
+          el.classList.toggle('active', active);
+          el.setAttribute('aria-pressed', active ? 'true' : 'false');
+        }
       };
+      const setMode = (mode) => { maskMode = mode; updateModeButtons(); };
       if (brushEl && brushValEl) {
         brushEl.addEventListener('input', () => { brushSize = parseInt(brushEl.value, 10) || 1; brushValEl.textContent = brushSize; });
         brushValEl.textContent = brushEl.value;
         brushSize = parseInt(brushEl.value, 10) || 1;
       }
-      if (btnIgnore) btnIgnore.addEventListener('click', () => setMode('ignore'));
-      if (btnUnignore) btnUnignore.addEventListener('click', () => setMode('unignore'));
-      if (btnToggle) btnToggle.addEventListener('click', () => setMode('toggle'));
+  if (btnIgnore) btnIgnore.addEventListener('click', () => setMode('ignore'));
+  if (btnUnignore) btnUnignore.addEventListener('click', () => setMode('unignore'));
+  if (btnToggle) btnToggle.addEventListener('click', () => setMode('toggle'));
+  // Initialize button state (default to toggle mode)
+  updateModeButtons();
 
       const mapClientToPixel = (clientX, clientY) => {
         // Compute without rounding until final step to avoid drift at higher zoom
