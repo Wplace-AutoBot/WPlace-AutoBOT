@@ -987,6 +987,7 @@
   customWhiteThreshold: CONFIG.WHITE_THRESHOLD,
   resizeSettings: null,
   originalImage: null,
+  resizeIgnoreMask: null,
   }
 
   // Placeholder for the resize preview update function
@@ -3368,13 +3369,16 @@
         overflow: auto;
       }
 
-      .resize-preview {
-        max-width: none;
-        transition: transform 0.1s ease;
+      .resize-canvas-stack { position: relative; transform-origin: top left; }
+      .resize-base-canvas, .resize-mask-canvas {
+        position: absolute; left: 0; top: 0;
         image-rendering: pixelated;
         image-rendering: -moz-crisp-edges;
         image-rendering: crisp-edges;
       }
+      .resize-mask-canvas { pointer-events: auto; }
+      .resize-tools { display:flex; gap:8px; align-items:center; margin-top:8px; font-size:12px; }
+      .resize-tools button { padding:6px 10px; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.06); color:#fff; cursor:pointer; }
 
       .resize-controls {
         display: grid;
@@ -4382,7 +4386,14 @@
       </div>
 
       <div class="resize-preview-wrapper">
-          <img id="resizePreview" class="resize-preview" src="" alt="Resized image preview will appear here.">
+          <div id="resizeCanvasStack" class="resize-canvas-stack">
+            <canvas id="resizeCanvas" class="resize-base-canvas"></canvas>
+            <canvas id="maskCanvas" class="resize-mask-canvas"></canvas>
+          </div>
+      </div>
+      <div class="resize-tools">
+        <button id="clearIgnoredBtn" title="Clear all ignored pixels">Clear Ignored</button>
+        <span style="opacity:.8;">Click or drag on the preview to toggle pixels to NOT paint.</span>
       </div>
 
       <div class="wplace-section" id="color-palette-section" style="margin-top: 15px;">
@@ -4747,11 +4758,16 @@
     const heightValue = resizeContainer.querySelector("#heightValue")
     const keepAspect = resizeContainer.querySelector("#keepAspect")
     const paintWhiteToggle = resizeContainer.querySelector("#paintWhiteToggle");
-    const zoomSlider = resizeContainer.querySelector("#zoomSlider");
-    const resizePreview = resizeContainer.querySelector("#resizePreview")
+  const zoomSlider = resizeContainer.querySelector("#zoomSlider");
+  const canvasStack = resizeContainer.querySelector('#resizeCanvasStack');
+  const baseCanvas = resizeContainer.querySelector('#resizeCanvas');
+  const maskCanvas = resizeContainer.querySelector('#maskCanvas');
+  const baseCtx = baseCanvas.getContext('2d');
+  const maskCtx = maskCanvas.getContext('2d');
     const confirmResize = resizeContainer.querySelector("#confirmResize")
     const cancelResize = resizeContainer.querySelector("#cancelResize")
-    const downloadPreviewBtn = resizeContainer.querySelector("#downloadPreviewBtn");
+  const downloadPreviewBtn = resizeContainer.querySelector("#downloadPreviewBtn");
+  const clearIgnoredBtn = resizeContainer.querySelector('#clearIgnoredBtn');
 
     if (compactBtn) {
       compactBtn.addEventListener("click", () => {
@@ -5034,35 +5050,47 @@
       let _previewTimer = null;
       let _previewJobId = 0;
       let _isDraggingSize = false;
+      let _zoomLevel = 1;
+      const ensureMaskSize = (w, h) => {
+        if (!state.resizeIgnoreMask || state.resizeIgnoreMask.length !== w * h) {
+          state.resizeIgnoreMask = new Uint8Array(w * h);
+        }
+        baseCanvas.width = w; baseCanvas.height = h;
+        maskCanvas.width = w; maskCanvas.height = h;
+        maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+      };
       _updateResizePreview = async () => {
         const jobId = ++_previewJobId;
         const newWidth = parseInt(widthSlider.value, 10);
         const newHeight = parseInt(heightSlider.value, 10);
-        const zoomLevel = parseFloat(zoomSlider.value);
+        _zoomLevel = parseFloat(zoomSlider.value);
 
         widthValue.textContent = newWidth;
         heightValue.textContent = newHeight;
 
-        const tempCanvas = document.createElement('canvas');
-        const tempCtx = tempCanvas.getContext('2d');
-        tempCanvas.width = newWidth;
-        tempCanvas.height = newHeight;
-        tempCtx.imageSmoothingEnabled = false;
+        ensureMaskSize(newWidth, newHeight);
+        baseCtx.imageSmoothingEnabled = false;
         if (!state.availableColors || state.availableColors.length === 0) {
           if (baseProcessor !== processor && (!baseProcessor.img || !baseProcessor.canvas)) {
             await baseProcessor.load();
           }
-          tempCtx.drawImage(baseProcessor.img, 0, 0, newWidth, newHeight);
-          resizePreview.src = tempCanvas.toDataURL();
-          resizePreview.style.transform = `scale(${zoomLevel})`;
+          baseCtx.clearRect(0,0,newWidth,newHeight);
+          baseCtx.drawImage(baseProcessor.img, 0, 0, newWidth, newHeight);
+          if (state.resizeIgnoreMask) {
+            const imgData = baseCtx.getImageData(0,0,newWidth,newHeight);
+            const m = state.resizeIgnoreMask;
+            for (let i=0;i<m.length;i++) if (m[i]) { const p=i*4; imgData.data[p]=255; imgData.data[p+1]=0; imgData.data[p+2]=0; imgData.data[p+3]=160; }
+            baseCtx.putImageData(imgData,0,0);
+          }
+          canvasStack.style.transform = `scale(${_zoomLevel})`;
           return;
         }
   if (baseProcessor !== processor && (!baseProcessor.img || !baseProcessor.canvas)) {
           await baseProcessor.load();
         }
-        tempCtx.drawImage(baseProcessor.img, 0, 0, newWidth, newHeight);
-
-        const imgData = tempCtx.getImageData(0, 0, newWidth, newHeight);
+        baseCtx.clearRect(0,0,newWidth,newHeight);
+        baseCtx.drawImage(baseProcessor.img, 0, 0, newWidth, newHeight);
+        const imgData = baseCtx.getImageData(0, 0, newWidth, newHeight);
         const data = imgData.data;
 
   const tThresh = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
@@ -5142,9 +5170,13 @@
         }
         // If a newer job started while we were processing, abort attaching result
         if (jobId !== _previewJobId) return;
-        tempCtx.putImageData(imgData, 0, 0);
-        resizePreview.src = tempCanvas.toDataURL();
-        resizePreview.style.transform = `scale(${zoomLevel})`;
+        // apply red overlay to ignored pixels in preview
+        if (state.resizeIgnoreMask) {
+          const m = state.resizeIgnoreMask;
+          for (let i=0;i<m.length;i++) if (m[i]) { const p=i*4; data[p]=255; data[p+1]=0; data[p+2]=0; data[p+3]=160; }
+        }
+        baseCtx.putImageData(imgData, 0, 0);
+        canvasStack.style.transform = `scale(${_zoomLevel})`;
       };
 
       const onWidthInput = () => {
@@ -5176,8 +5208,8 @@
 
       // Zoom only affects CSS transform; avoid recomputing pixels
       zoomSlider.addEventListener('input', () => {
-        const zoomLevel = parseFloat(zoomSlider.value);
-        resizePreview.style.transform = `scale(${zoomLevel})`;
+        _zoomLevel = parseFloat(zoomSlider.value);
+        canvasStack.style.transform = `scale(${_zoomLevel})`;
       });
       const schedulePreview = () => {
         if (_previewTimer) clearTimeout(_previewTimer);
@@ -5201,6 +5233,33 @@
       widthSlider.addEventListener("input", () => { onWidthInput(); schedulePreview(); });
       heightSlider.addEventListener("input", () => { onHeightInput(); schedulePreview(); });
 
+      // Click/drag to toggle ignored pixels
+      let draggingMask = false;
+      const pointToggle = (clientX, clientY) => {
+        const rect = baseCanvas.getBoundingClientRect();
+        const x = Math.floor((clientX - rect.left) / parseFloat(zoomSlider.value));
+        const y = Math.floor((clientY - rect.top) / parseFloat(zoomSlider.value));
+        const w = baseCanvas.width, h = baseCanvas.height;
+        if (x < 0 || y < 0 || x >= w || y >= h) return;
+        const idx = y * w + x;
+        if (!state.resizeIgnoreMask || state.resizeIgnoreMask.length !== w * h) {
+          state.resizeIgnoreMask = new Uint8Array(w * h);
+        }
+        state.resizeIgnoreMask[idx] = state.resizeIgnoreMask[idx] ? 0 : 1;
+        // quick visual hint by updating a pixel in mask canvas
+        const color = state.resizeIgnoreMask[idx] ? 'rgba(255,0,0,0.6)' : 'rgba(0,0,0,0)';
+        if (state.resizeIgnoreMask[idx]) {
+          maskCtx.fillStyle = color; maskCtx.fillRect(x, y, 1, 1);
+        } else {
+          maskCtx.clearRect(x, y, 1, 1);
+        }
+      };
+      maskCanvas.addEventListener('mousedown', (e) => { draggingMask = true; pointToggle(e.clientX, e.clientY); _updateResizePreview(); });
+      window.addEventListener('mousemove', (e) => { if (draggingMask) { pointToggle(e.clientX, e.clientY); } });
+      window.addEventListener('mouseup', () => { if (draggingMask) { draggingMask = false; saveBotSettings(); } });
+      const clearIgnoredBtnEl = resizeContainer.querySelector('#clearIgnoredBtn');
+      if (clearIgnoredBtnEl) clearIgnoredBtnEl.addEventListener('click', () => { if (state.resizeIgnoreMask) state.resizeIgnoreMask.fill(0); maskCtx.clearRect(0,0,maskCanvas.width,maskCanvas.height); _updateResizePreview(); saveBotSettings(); });
+
       confirmResize.onclick = async () => {
         const newWidth = parseInt(widthSlider.value, 10);
         const newHeight = parseInt(heightSlider.value, 10);
@@ -5215,10 +5274,11 @@
           await baseProcessor.load();
         }
         tempCtx.drawImage(baseProcessor.img, 0, 0, newWidth, newHeight);
-        const imgData = tempCtx.getImageData(0, 0, newWidth, newHeight);
+  const imgData = tempCtx.getImageData(0, 0, newWidth, newHeight);
         const data = imgData.data;
         const tThresh2 = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
         let totalValidPixels = 0;
+  const mask = (state.resizeIgnoreMask && state.resizeIgnoreMask.length === newWidth * newHeight) ? state.resizeIgnoreMask : null;
 
         const applyFSDitherFinal = async () => {
           const w = newWidth, h = newHeight;
@@ -5230,7 +5290,8 @@
               const idx = y * w + x;
               const i4 = idx * 4;
               const r = data[i4], g = data[i4 + 1], b = data[i4 + 2], a = data[i4 + 3];
-              const isEligible = a >= tThresh2 && (state.paintWhitePixels || !Utils.isWhitePixel(r, g, b));
+              const masked = mask && mask[idx];
+              const isEligible = !masked && a >= tThresh2 && (state.paintWhitePixels || !Utils.isWhitePixel(r, g, b));
               eligible[idx] = isEligible ? 1 : 0;
               work[idx * 3] = r;
               work[idx * 3 + 1] = g;
@@ -5286,7 +5347,8 @@
         } else {
           for (let i = 0; i < data.length; i += 4) {
             const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
-            const isTransparent = a < tThresh2;
+            const masked = mask && mask[(i>>2)];
+            const isTransparent = a < tThresh2 || masked;
             const isWhiteAndSkipped = !state.paintWhitePixels && Utils.isWhitePixel(r, g, b);
             if (isTransparent || isWhiteAndSkipped) {
               data[i + 3] = 0; // overlay transparency
@@ -5328,10 +5390,12 @@
       };
 
       downloadPreviewBtn.onclick = () => {
-        const link = document.createElement('a');
-        link.download = 'wplace-preview.png';
-        link.href = resizePreview.src;
-        link.click();
+        try {
+          const link = document.createElement('a');
+          link.download = 'wplace-preview.png';
+          link.href = baseCanvas.toDataURL();
+          link.click();
+        } catch (e) { console.warn('Failed to download preview:', e); }
       };
 
       cancelResize.onclick = closeResizeDialog;
@@ -5409,6 +5473,8 @@
           state.lastPosition = { x: 0, y: 0 }
           // New image: clear previous resize settings
           state.resizeSettings = null;
+          // Also clear any previous ignore mask
+          state.resizeIgnoreMask = null;
           // Save original image for this browser (dataUrl + dims)
           state.originalImage = { dataUrl: imageSrc, width, height };
           saveBotSettings();
@@ -5994,6 +6060,10 @@
   paintWhitePixels: state.paintWhitePixels,
   resizeSettings: state.resizeSettings,
   originalImage: state.originalImage,
+  // Save ignore mask (as base64) with its dimensions
+  resizeIgnoreMask: (state.resizeIgnoreMask && state.resizeSettings && state.resizeSettings.width * state.resizeSettings.height === state.resizeIgnoreMask.length)
+    ? { w: state.resizeSettings.width, h: state.resizeSettings.height, data: btoa(String.fromCharCode(...state.resizeIgnoreMask)) }
+    : null,
       };
       CONFIG.PAINTING_SPEED_ENABLED = settings.paintingSpeedEnabled;
       // AUTO_CAPTCHA_ENABLED is always true - no need to save/load
@@ -6026,6 +6096,17 @@
   state.paintWhitePixels = settings.paintWhitePixels ?? true;
   state.resizeSettings = settings.resizeSettings ?? null;
   state.originalImage = settings.originalImage ?? null;
+  // Restore ignore mask if dims match current resizeSettings
+  if (settings.resizeIgnoreMask && settings.resizeIgnoreMask.data && state.resizeSettings && settings.resizeIgnoreMask.w === state.resizeSettings.width && settings.resizeIgnoreMask.h === state.resizeSettings.height) {
+    try {
+      const bin = atob(settings.resizeIgnoreMask.data);
+      const arr = new Uint8Array(bin.length);
+      for (let i=0;i<bin.length;i++) arr[i] = bin.charCodeAt(i);
+      state.resizeIgnoreMask = arr;
+    } catch { state.resizeIgnoreMask = null; }
+  } else {
+    state.resizeIgnoreMask = null;
+  }
 
       const speedSlider = document.getElementById('speedSlider');
       if (speedSlider) speedSlider.value = state.paintingSpeed;
