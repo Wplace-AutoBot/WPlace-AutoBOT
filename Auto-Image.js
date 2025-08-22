@@ -3481,7 +3481,7 @@
         background: rgba(0,0,0,0.2);
         margin: 15px 0;
         height: 300px;
-        overflow: auto;
+        overflow: hidden;
       }
 
   .resize-canvas-stack { position: relative; transform-origin: center center; display: inline-block; }
@@ -3494,6 +3494,15 @@
       .resize-mask-canvas { pointer-events: auto; }
       .resize-tools { display:flex; gap:8px; align-items:center; margin-top:8px; font-size:12px; }
       .resize-tools button { padding:6px 10px; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.06); color:#fff; cursor:pointer; }
+      .wplace-btn.active,
+      .wplace-btn[aria-pressed="true"] {
+        background: ${theme.highlight} !important;
+        color: ${theme.primary} !important;
+        border-color: ${theme.text} !important;
+        box-shadow: 0 0 8px rgba(0,0,0,0.25) inset, 0 0 6px rgba(0,0,0,0.2) !important;
+      }
+      .wplace-btn.active i,
+      .wplace-btn[aria-pressed="true"] i { filter: drop-shadow(0 0 3px ${theme.primary}); }
       .mask-mode-group .wplace-btn.active,
       .mask-mode-group .wplace-btn[aria-pressed="true"] {
         background: ${theme.highlight};
@@ -4507,14 +4516,22 @@
           <button id="zoomInBtn" class="wplace-btn" title="Zoom In" style="padding:4px 8px;"><i class="fas fa-search-plus"></i></button>
           <button id="zoomFitBtn" class="wplace-btn" title="Fit to view" style="padding:4px 8px;">Fit</button>
           <button id="zoomActualBtn" class="wplace-btn" title="Actual size (100%)" style="padding:4px 8px;">100%</button>
+          <button id="panModeBtn" class="wplace-btn" title="Pan (drag to move view)" style="padding:4px 8px;">
+            <i class="fas fa-hand-paper"></i>
+          </button>
           <span id="zoomValue" style="margin-left:6px; min-width:48px; text-align:right; opacity:.85; font-size:12px;">100%</span>
+          <div id="cameraHelp" style="font-size:11px; opacity:.75; margin-left:auto;">
+            Drag to pan • Pinch to zoom • Double‑tap to zoom
+          </div>
         </div>
       </div>
 
       <div class="resize-preview-wrapper">
-          <div id="resizeCanvasStack" class="resize-canvas-stack">
-            <canvas id="resizeCanvas" class="resize-base-canvas"></canvas>
-            <canvas id="maskCanvas" class="resize-mask-canvas"></canvas>
+          <div id="resizePanStage" style="position:relative; width:100%; height:100%; overflow:hidden;">
+            <div id="resizeCanvasStack" class="resize-canvas-stack" style="position:absolute; left:0; top:0; transform-origin: top left;">
+              <canvas id="resizeCanvas" class="resize-base-canvas"></canvas>
+              <canvas id="maskCanvas" class="resize-mask-canvas"></canvas>
+            </div>
           </div>
       </div>
       <div class="resize-tools">
@@ -4906,6 +4923,8 @@
   const zoomOutBtn = resizeContainer.querySelector('#zoomOutBtn');
   const zoomFitBtn = resizeContainer.querySelector('#zoomFitBtn');
   const zoomActualBtn = resizeContainer.querySelector('#zoomActualBtn');
+  const panModeBtn = resizeContainer.querySelector('#panModeBtn');
+  const panStage = resizeContainer.querySelector('#resizePanStage');
   const canvasStack = resizeContainer.querySelector('#resizeCanvasStack');
   const baseCanvas = resizeContainer.querySelector('#resizeCanvas');
   const maskCanvas = resizeContainer.querySelector('#maskCanvas');
@@ -4951,8 +4970,9 @@
 
     if (toggleOverlayBtn) {
       toggleOverlayBtn.addEventListener('click', () => {
-        const isEnabled = overlayManager.toggle();
-        toggleOverlayBtn.classList.toggle('active', isEnabled);
+  const isEnabled = overlayManager.toggle();
+  toggleOverlayBtn.classList.toggle('active', isEnabled);
+  toggleOverlayBtn.setAttribute('aria-pressed', isEnabled ? 'true' : 'false');
         Utils.showAlert(`Overlay ${isEnabled ? 'enabled' : 'disabled'}.`, 'info');
       });
     }
@@ -5366,16 +5386,38 @@
         _updateResizePreview();
       };
 
+      let panX = 0, panY = 0;
+      const clampPan = () => {
+        const wrapRect = panStage?.getBoundingClientRect() || { width: 0, height: 0 };
+        const w = (baseCanvas.width || 1) * _zoomLevel;
+        const h = (baseCanvas.height || 1) * _zoomLevel;
+        if (w <= wrapRect.width) {
+          panX = Math.floor((wrapRect.width - w) / 2);
+        } else {
+          const minX = wrapRect.width - w;
+          panX = Math.min(0, Math.max(minX, panX));
+        }
+        if (h <= wrapRect.height) {
+          panY = Math.floor((wrapRect.height - h) / 2);
+        } else {
+          const minY = wrapRect.height - h;
+          panY = Math.min(0, Math.max(minY, panY));
+        }
+      };
+      const applyPan = () => {
+        clampPan();
+        canvasStack.style.transform = `translate(${panX}px, ${panY}px) scale(${_zoomLevel})`;
+      };
+
       const updateZoomLayout = () => {
         const w = baseCanvas.width || 1, h = baseCanvas.height || 1;
-        const cssW = Math.max(1, Math.round(w * _zoomLevel));
-        const cssH = Math.max(1, Math.round(h * _zoomLevel));
-        baseCanvas.style.width = cssW + 'px';
-        baseCanvas.style.height = cssH + 'px';
-        maskCanvas.style.width = cssW + 'px';
-        maskCanvas.style.height = cssH + 'px';
-        canvasStack.style.width = cssW + 'px';
-        canvasStack.style.height = cssH + 'px';
+        baseCanvas.style.width = w + 'px';
+        baseCanvas.style.height = h + 'px';
+        maskCanvas.style.width = w + 'px';
+        maskCanvas.style.height = h + 'px';
+        canvasStack.style.width = w + 'px';
+        canvasStack.style.height = h + 'px';
+        applyPan();
       };
       const applyZoom = (z) => {
         _zoomLevel = Math.max(0.05, Math.min(20, z || 1));
@@ -5386,12 +5428,11 @@
       zoomSlider.addEventListener('input', () => {
         applyZoom(parseFloat(zoomSlider.value));
       });
-      if (zoomInBtn) zoomInBtn.addEventListener('click', () => applyZoom(parseFloat(zoomSlider.value) + 0.1));
-      if (zoomOutBtn) zoomOutBtn.addEventListener('click', () => applyZoom(parseFloat(zoomSlider.value) - 0.1));
+  if (zoomInBtn) zoomInBtn.addEventListener('click', () => applyZoom(parseFloat(zoomSlider.value) + 0.1));
+  if (zoomOutBtn) zoomOutBtn.addEventListener('click', () => applyZoom(parseFloat(zoomSlider.value) - 0.1));
       const computeFitZoom = () => {
-        const wrap = resizeContainer.querySelector('.resize-preview-wrapper');
-        if (!wrap) return 1;
-        const wrapRect = wrap.getBoundingClientRect();
+        const wrapRect = panStage?.getBoundingClientRect();
+        if (!wrapRect) return 1;
         const w = baseCanvas.width || 1;
         const h = baseCanvas.height || 1;
         const margin = 10;
@@ -5399,8 +5440,117 @@
         const scaleY = (wrapRect.height - margin) / h;
         return Math.max(0.05, Math.min(20, Math.min(scaleX, scaleY)));
       };
-  if (zoomFitBtn) zoomFitBtn.addEventListener('click', () => applyZoom(computeFitZoom()));
-  if (zoomActualBtn) zoomActualBtn.addEventListener('click', () => applyZoom(1));
+  if (zoomFitBtn) zoomFitBtn.addEventListener('click', () => { applyZoom(computeFitZoom()); centerInView(); });
+  if (zoomActualBtn) zoomActualBtn.addEventListener('click', () => { applyZoom(1); centerInView(); });
+
+      const centerInView = () => {
+        if (!panStage) return;
+        const rect = panStage.getBoundingClientRect();
+        const w = (baseCanvas.width || 1) * _zoomLevel;
+        const h = (baseCanvas.height || 1) * _zoomLevel;
+        panX = Math.floor((rect.width - w) / 2);
+        panY = Math.floor((rect.height - h) / 2);
+        applyPan();
+      };
+
+  let isPanning = false; let startX = 0, startY = 0, startPanX = 0, startPanY = 0;
+  let allowPan = false; // Space key
+  let panMode = false;  // Explicit pan mode toggle for touch/one-button mice
+      const isPanMouseButton = (e) => e.button === 1 || e.button === 2;
+  const setCursor = (val) => { if (panStage) panStage.style.cursor = val; };
+  const isPanActive = (e) => panMode || allowPan || isPanMouseButton(e);
+      const updatePanModeBtn = () => {
+        if (!panModeBtn) return;
+        panModeBtn.classList.toggle('active', panMode);
+        panModeBtn.setAttribute('aria-pressed', panMode ? 'true' : 'false');
+      };
+      if (panModeBtn) {
+        updatePanModeBtn();
+        panModeBtn.addEventListener('click', () => { panMode = !panMode; updatePanModeBtn(); setCursor(panMode ? 'grab' : ''); });
+      }
+      if (panStage) {
+        panStage.addEventListener('contextmenu', (e) => { if (allowPan) e.preventDefault(); });
+        window.addEventListener('keydown', (e) => { if (e.code === 'Space') { allowPan = true; setCursor('grab'); }});
+        window.addEventListener('keyup', (e) => { if (e.code === 'Space') { allowPan = false; if (!isPanning) setCursor(''); }});
+        panStage.addEventListener('mousedown', (e) => {
+          if (!isPanActive(e)) return;
+          e.preventDefault();
+          isPanning = true; startX = e.clientX; startY = e.clientY; startPanX = panX; startPanY = panY;
+          setCursor('grabbing');
+        });
+        window.addEventListener('mousemove', (e) => {
+          if (!isPanning) return;
+          const dx = e.clientX - startX; const dy = e.clientY - startY;
+          panX = startPanX + dx; panY = startPanY + dy; applyPan();
+        });
+        window.addEventListener('mouseup', () => { if (isPanning) { isPanning = false; setCursor(allowPan ? 'grab' : ''); }});
+  panStage.addEventListener('wheel', (e) => {
+          if (!e.ctrlKey && !e.metaKey) return;
+          e.preventDefault();
+          const rect = panStage.getBoundingClientRect();
+          const cx = e.clientX - rect.left - panX;
+          const cy = e.clientY - rect.top - panY;
+          const before = _zoomLevel;
+          const step = Math.max(0.05, Math.min(0.5, Math.abs(e.deltaY) > 20 ? 0.2 : 0.1));
+          const next = Math.max(0.05, Math.min(20, before + (e.deltaY > 0 ? -step : step)));
+          if (next === before) return;
+          const scale = next / before;
+          panX = panX - cx * (scale - 1);
+          panY = panY - cy * (scale - 1);
+          applyZoom(next);
+        }, { passive: false });
+        let lastTouchDist = null;
+        let touchStartTime = 0;
+        let doubleTapTimer = null;
+        panStage.addEventListener('touchstart', (e) => {
+          if (e.touches.length === 1) {
+            const t = e.touches[0];
+            isPanning = true; startX = t.clientX; startY = t.clientY; startPanX = panX; startPanY = panY;
+            setCursor('grabbing');
+            const now = Date.now();
+            if (now - touchStartTime < 300) {
+              // double tap -> toggle 100%/fit
+              const z = Math.abs(_zoomLevel - 1) < 0.01 ? computeFitZoom() : 1;
+              applyZoom(z);
+              centerInView();
+              if (doubleTapTimer) clearTimeout(doubleTapTimer);
+            } else {
+              touchStartTime = now;
+              doubleTapTimer = setTimeout(() => { doubleTapTimer = null; }, 320);
+            }
+          } else if (e.touches.length === 2) {
+            // Pinch start
+            const [a, b] = e.touches;
+            lastTouchDist = Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
+          }
+        }, { passive: true });
+        panStage.addEventListener('touchmove', (e) => {
+          if (e.touches.length === 1 && isPanning) {
+            const t = e.touches[0];
+            const dx = t.clientX - startX; const dy = t.clientY - startY;
+            panX = startPanX + dx; panY = startPanY + dy; applyPan();
+          } else if (e.touches.length === 2 && lastTouchDist != null) {
+            e.preventDefault();
+            const [a, b] = e.touches;
+            const dist = Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
+            const rect = panStage.getBoundingClientRect();
+            const centerX = (a.clientX + b.clientX) / 2 - rect.left - panX;
+            const centerY = (a.clientY + b.clientY) / 2 - rect.top - panY;
+            const before = _zoomLevel;
+            const scale = dist / (lastTouchDist || dist);
+            const next = Math.max(0.05, Math.min(20, before * scale));
+            if (next !== before) {
+              panX = panX - centerX * (next / before - 1);
+              panY = panY - centerY * (next / before - 1);
+              applyZoom(next);
+            }
+            lastTouchDist = dist;
+          }
+        }, { passive: false });
+        panStage.addEventListener('touchend', () => {
+          isPanning = false; lastTouchDist = null; setCursor(panMode || allowPan ? 'grab' : '');
+        });
+      }
       const schedulePreview = () => {
         if (_previewTimer) clearTimeout(_previewTimer);
         const run = () => {
@@ -5552,6 +5702,8 @@
       };
 
       const handlePaint = (e) => {
+        // Suppress painting while panning
+        if ((e.buttons & 4) === 4 || (e.buttons & 2) === 2 || allowPan) return;
         const { x, y } = mapClientToPixel(e.clientX, e.clientY);
         const w = baseCanvas.width, h = baseCanvas.height;
         if (x < 0 || y < 0 || x >= w || y >= h) return;
@@ -5567,7 +5719,14 @@
         redrawMaskOverlay();
       };
 
-      maskCanvas.addEventListener('mousedown', (e) => { draggingMask = true; handlePaint(e); });
+  maskCanvas.addEventListener('mousedown', (e) => {
+        if (e.button === 1 || e.button === 2 || allowPan) return; // let pan handler manage
+        draggingMask = true; handlePaint(e);
+      });
+  // Avoid hijacking touch gestures for panning/zooming
+  maskCanvas.addEventListener('touchstart', (e) => { /* let panStage handle */ }, { passive: true });
+  maskCanvas.addEventListener('touchmove', (e) => { /* let panStage handle */ }, { passive: true });
+  maskCanvas.addEventListener('touchend', (e) => { /* let panStage handle */ }, { passive: true });
       window.addEventListener('mousemove', (e) => { if (draggingMask) handlePaint(e); });
       window.addEventListener('mouseup', () => { if (draggingMask) { draggingMask = false; saveBotSettings(); }});
 
@@ -5705,8 +5864,9 @@
 
         const finalImageBitmap = await createImageBitmap(tempCanvas);
         await overlayManager.setImage(finalImageBitmap);
-        overlayManager.enable();
-        toggleOverlayBtn.classList.add('active');
+  overlayManager.enable();
+  toggleOverlayBtn.classList.add('active');
+  toggleOverlayBtn.setAttribute('aria-pressed', 'true');
 
   // Keep state.imageData.processor as the original-based source; painting uses paletted pixels already stored
 
@@ -5743,7 +5903,12 @@
       setTimeout(() => {
         if (typeof computeFitZoom === 'function') {
           const z = computeFitZoom();
-          if (!isNaN(z) && isFinite(z)) applyZoom(z);
+          if (!isNaN(z) && isFinite(z)) {
+            applyZoom(z);
+            centerInView();
+          }
+        } else {
+          centerInView();
         }
       }, 0);
     }
@@ -5825,6 +5990,7 @@
           overlayManager.enable();
           toggleOverlayBtn.disabled = false;
           toggleOverlayBtn.classList.add('active');
+          toggleOverlayBtn.setAttribute('aria-pressed', 'true');
 
           // Only enable resize button if colors have also been captured
           if (state.colorsChecked) {
