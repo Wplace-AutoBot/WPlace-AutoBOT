@@ -5118,7 +5118,7 @@
             for (let i=0;i<m.length;i++) if (m[i]) { const p=i*4; md[p]=255; md[p+1]=0; md[p+2]=0; md[p+3]=150; }
             maskCtx.putImageData(img,0,0);
           }
-          canvasStack.style.transform = `scale(${_zoomLevel})`;
+          updateZoomLayout();
           return;
         }
   if (baseProcessor !== processor && (!baseProcessor.img || !baseProcessor.canvas)) {
@@ -5214,7 +5214,7 @@
           for (let i=0;i<m.length;i++) if (m[i]) { const p=i*4; md[p]=255; md[p+1]=0; md[p+2]=0; md[p+3]=150; }
           maskCtx.putImageData(img,0,0);
         }
-  canvasStack.style.transform = `scale(${_zoomLevel})`;
+  updateZoomLayout();
       };
 
       const onWidthInput = () => {
@@ -5228,10 +5228,7 @@
   saveBotSettings();
         // Auto-fit after size changes
         const fit = (typeof computeFitZoom === 'function') ? computeFitZoom() : 1;
-        if (!isNaN(fit) && isFinite(fit)) {
-          const z = Math.max(0.05, Math.min(20, fit));
-          zoomSlider.value = z;
-        }
+  if (!isNaN(fit) && isFinite(fit)) applyZoom(fit);
       };
 
       const onHeightInput = () => {
@@ -5245,10 +5242,7 @@
   saveBotSettings();
         // Auto-fit after size changes
         const fit = (typeof computeFitZoom === 'function') ? computeFitZoom() : 1;
-        if (!isNaN(fit) && isFinite(fit)) {
-          const z = Math.max(0.05, Math.min(20, fit));
-          zoomSlider.value = z;
-        }
+  if (!isNaN(fit) && isFinite(fit)) applyZoom(fit);
       };
 
       paintWhiteToggle.onchange = (e) => {
@@ -5256,10 +5250,21 @@
         _updateResizePreview();
       };
 
+      const updateZoomLayout = () => {
+        const w = baseCanvas.width || 1, h = baseCanvas.height || 1;
+        const cssW = Math.max(1, Math.round(w * _zoomLevel));
+        const cssH = Math.max(1, Math.round(h * _zoomLevel));
+        baseCanvas.style.width = cssW + 'px';
+        baseCanvas.style.height = cssH + 'px';
+        maskCanvas.style.width = cssW + 'px';
+        maskCanvas.style.height = cssH + 'px';
+        canvasStack.style.width = cssW + 'px';
+        canvasStack.style.height = cssH + 'px';
+      };
       const applyZoom = (z) => {
         _zoomLevel = Math.max(0.05, Math.min(20, z || 1));
         zoomSlider.value = _zoomLevel;
-        canvasStack.style.transform = `scale(${_zoomLevel})`;
+        updateZoomLayout();
         if (zoomValue) zoomValue.textContent = `${Math.round(_zoomLevel * 100)}%`;
       };
       zoomSlider.addEventListener('input', () => {
@@ -5278,8 +5283,8 @@
         const scaleY = (wrapRect.height - margin) / h;
         return Math.max(0.05, Math.min(20, Math.min(scaleX, scaleY)));
       };
-      if (zoomFitBtn) zoomFitBtn.addEventListener('click', () => applyZoom(computeFitZoom()));
-      if (zoomActualBtn) zoomActualBtn.addEventListener('click', () => applyZoom(1));
+  if (zoomFitBtn) zoomFitBtn.addEventListener('click', () => applyZoom(computeFitZoom()));
+  if (zoomActualBtn) zoomActualBtn.addEventListener('click', () => applyZoom(1));
       const schedulePreview = () => {
         if (_previewTimer) clearTimeout(_previewTimer);
         const run = () => {
@@ -5622,11 +5627,7 @@
       setTimeout(() => {
         if (typeof computeFitZoom === 'function') {
           const z = computeFitZoom();
-          if (!isNaN(z) && isFinite(z)) {
-            zoomSlider.value = Math.max(0.05, Math.min(20, z));
-            // Trigger applyZoom to update value and transform
-            const ev = new Event('input'); zoomSlider.dispatchEvent(ev);
-          }
+          if (!isNaN(z) && isFinite(z)) applyZoom(z);
         }
       }, 0);
     }
