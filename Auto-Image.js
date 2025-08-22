@@ -3379,6 +3379,15 @@
       .resize-mask-canvas { pointer-events: auto; }
       .resize-tools { display:flex; gap:8px; align-items:center; margin-top:8px; font-size:12px; }
       .resize-tools button { padding:6px 10px; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.06); color:#fff; cursor:pointer; }
+      .wplace-btn.active,
+      .wplace-btn[aria-pressed="true"] {
+        background: ${theme.highlight} !important;
+        color: ${theme.primary} !important;
+        border-color: ${theme.text} !important;
+        box-shadow: 0 0 8px rgba(0,0,0,0.25) inset, 0 0 6px rgba(0,0,0,0.2) !important;
+      }
+      .wplace-btn.active i,
+      .wplace-btn[aria-pressed="true"] i { filter: drop-shadow(0 0 3px ${theme.primary}); }
       .mask-mode-group .wplace-btn.active,
       .mask-mode-group .wplace-btn[aria-pressed="true"] {
         background: ${theme.highlight};
@@ -4845,8 +4854,9 @@
 
     if (toggleOverlayBtn) {
       toggleOverlayBtn.addEventListener('click', () => {
-        const isEnabled = overlayManager.toggle();
-        toggleOverlayBtn.classList.toggle('active', isEnabled);
+  const isEnabled = overlayManager.toggle();
+  toggleOverlayBtn.classList.toggle('active', isEnabled);
+  toggleOverlayBtn.setAttribute('aria-pressed', isEnabled ? 'true' : 'false');
         Utils.showAlert(`Overlay ${isEnabled ? 'enabled' : 'disabled'}.`, 'info');
       });
     }
@@ -5333,8 +5343,15 @@
       const isPanMouseButton = (e) => e.button === 1 || e.button === 2;
   const setCursor = (val) => { if (panStage) panStage.style.cursor = val; };
   const isPanActive = (e) => panMode || allowPan || isPanMouseButton(e);
-  const updatePanModeBtn = () => { if (panModeBtn) panModeBtn.classList.toggle('active', panMode); };
-  if (panModeBtn) panModeBtn.addEventListener('click', () => { panMode = !panMode; updatePanModeBtn(); setCursor(panMode ? 'grab' : ''); });
+      const updatePanModeBtn = () => {
+        if (!panModeBtn) return;
+        panModeBtn.classList.toggle('active', panMode);
+        panModeBtn.setAttribute('aria-pressed', panMode ? 'true' : 'false');
+      };
+      if (panModeBtn) {
+        updatePanModeBtn();
+        panModeBtn.addEventListener('click', () => { panMode = !panMode; updatePanModeBtn(); setCursor(panMode ? 'grab' : ''); });
+      }
       if (panStage) {
         panStage.addEventListener('contextmenu', (e) => { if (allowPan) e.preventDefault(); });
         window.addEventListener('keydown', (e) => { if (e.code === 'Space') { allowPan = true; setCursor('grab'); }});
@@ -5731,8 +5748,9 @@
 
         const finalImageBitmap = await createImageBitmap(tempCanvas);
         await overlayManager.setImage(finalImageBitmap);
-        overlayManager.enable();
-        toggleOverlayBtn.classList.add('active');
+  overlayManager.enable();
+  toggleOverlayBtn.classList.add('active');
+  toggleOverlayBtn.setAttribute('aria-pressed', 'true');
 
   // Keep state.imageData.processor as the original-based source; painting uses paletted pixels already stored
 
@@ -5856,6 +5874,7 @@
           overlayManager.enable();
           toggleOverlayBtn.disabled = false;
           toggleOverlayBtn.classList.add('active');
+          toggleOverlayBtn.setAttribute('aria-pressed', 'true');
 
           // Only enable resize button if colors have also been captured
           if (state.colorsChecked) {
