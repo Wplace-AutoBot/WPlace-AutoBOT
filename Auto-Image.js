@@ -4391,7 +4391,13 @@
           <button id="zoomInBtn" class="wplace-btn" title="Zoom In" style="padding:4px 8px;"><i class="fas fa-search-plus"></i></button>
           <button id="zoomFitBtn" class="wplace-btn" title="Fit to view" style="padding:4px 8px;">Fit</button>
           <button id="zoomActualBtn" class="wplace-btn" title="Actual size (100%)" style="padding:4px 8px;">100%</button>
+          <button id="panModeBtn" class="wplace-btn" title="Pan (drag to move view)" style="padding:4px 8px;">
+            <i class="fas fa-hand-paper"></i>
+          </button>
           <span id="zoomValue" style="margin-left:6px; min-width:48px; text-align:right; opacity:.85; font-size:12px;">100%</span>
+          <div id="cameraHelp" style="font-size:11px; opacity:.75; margin-left:auto;">
+            Drag to pan • Pinch to zoom • Double‑tap to zoom
+          </div>
         </div>
       </div>
 
@@ -4792,6 +4798,7 @@
   const zoomOutBtn = resizeContainer.querySelector('#zoomOutBtn');
   const zoomFitBtn = resizeContainer.querySelector('#zoomFitBtn');
   const zoomActualBtn = resizeContainer.querySelector('#zoomActualBtn');
+  const panModeBtn = resizeContainer.querySelector('#panModeBtn');
   const panStage = resizeContainer.querySelector('#resizePanStage');
   const canvasStack = resizeContainer.querySelector('#resizeCanvasStack');
   const baseCanvas = resizeContainer.querySelector('#resizeCanvas');
@@ -5320,16 +5327,20 @@
         applyPan();
       };
 
-      let isPanning = false; let startX = 0, startY = 0, startPanX = 0, startPanY = 0;
-      let allowPan = false;
+  let isPanning = false; let startX = 0, startY = 0, startPanX = 0, startPanY = 0;
+  let allowPan = false; // Space key
+  let panMode = false;  // Explicit pan mode toggle for touch/one-button mice
       const isPanMouseButton = (e) => e.button === 1 || e.button === 2;
-      const setCursor = (val) => { if (panStage) panStage.style.cursor = val; };
+  const setCursor = (val) => { if (panStage) panStage.style.cursor = val; };
+  const isPanActive = (e) => panMode || allowPan || isPanMouseButton(e);
+  const updatePanModeBtn = () => { if (panModeBtn) panModeBtn.classList.toggle('active', panMode); };
+  if (panModeBtn) panModeBtn.addEventListener('click', () => { panMode = !panMode; updatePanModeBtn(); setCursor(panMode ? 'grab' : ''); });
       if (panStage) {
         panStage.addEventListener('contextmenu', (e) => { if (allowPan) e.preventDefault(); });
         window.addEventListener('keydown', (e) => { if (e.code === 'Space') { allowPan = true; setCursor('grab'); }});
         window.addEventListener('keyup', (e) => { if (e.code === 'Space') { allowPan = false; if (!isPanning) setCursor(''); }});
         panStage.addEventListener('mousedown', (e) => {
-          if (!allowPan && !isPanMouseButton(e)) return;
+          if (!isPanActive(e)) return;
           e.preventDefault();
           isPanning = true; startX = e.clientX; startY = e.clientY; startPanX = panX; startPanY = panY;
           setCursor('grabbing');
@@ -5340,7 +5351,7 @@
           panX = startPanX + dx; panY = startPanY + dy; applyPan();
         });
         window.addEventListener('mouseup', () => { if (isPanning) { isPanning = false; setCursor(allowPan ? 'grab' : ''); }});
-        panStage.addEventListener('wheel', (e) => {
+  panStage.addEventListener('wheel', (e) => {
           if (!e.ctrlKey && !e.metaKey) return;
           e.preventDefault();
           const rect = panStage.getBoundingClientRect();
@@ -5355,6 +5366,57 @@
           panY = panY - cy * (scale - 1);
           applyZoom(next);
         }, { passive: false });
+        let lastTouchDist = null;
+        let touchStartTime = 0;
+        let doubleTapTimer = null;
+        panStage.addEventListener('touchstart', (e) => {
+          if (e.touches.length === 1) {
+            const t = e.touches[0];
+            isPanning = true; startX = t.clientX; startY = t.clientY; startPanX = panX; startPanY = panY;
+            setCursor('grabbing');
+            const now = Date.now();
+            if (now - touchStartTime < 300) {
+              // double tap -> toggle 100%/fit
+              const z = Math.abs(_zoomLevel - 1) < 0.01 ? computeFitZoom() : 1;
+              applyZoom(z);
+              centerInView();
+              if (doubleTapTimer) clearTimeout(doubleTapTimer);
+            } else {
+              touchStartTime = now;
+              doubleTapTimer = setTimeout(() => { doubleTapTimer = null; }, 320);
+            }
+          } else if (e.touches.length === 2) {
+            // Pinch start
+            const [a, b] = e.touches;
+            lastTouchDist = Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
+          }
+        }, { passive: true });
+        panStage.addEventListener('touchmove', (e) => {
+          if (e.touches.length === 1 && isPanning) {
+            const t = e.touches[0];
+            const dx = t.clientX - startX; const dy = t.clientY - startY;
+            panX = startPanX + dx; panY = startPanY + dy; applyPan();
+          } else if (e.touches.length === 2 && lastTouchDist != null) {
+            e.preventDefault();
+            const [a, b] = e.touches;
+            const dist = Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
+            const rect = panStage.getBoundingClientRect();
+            const centerX = (a.clientX + b.clientX) / 2 - rect.left - panX;
+            const centerY = (a.clientY + b.clientY) / 2 - rect.top - panY;
+            const before = _zoomLevel;
+            const scale = dist / (lastTouchDist || dist);
+            const next = Math.max(0.05, Math.min(20, before * scale));
+            if (next !== before) {
+              panX = panX - centerX * (next / before - 1);
+              panY = panY - centerY * (next / before - 1);
+              applyZoom(next);
+            }
+            lastTouchDist = dist;
+          }
+        }, { passive: false });
+        panStage.addEventListener('touchend', () => {
+          isPanning = false; lastTouchDist = null; setCursor(panMode || allowPan ? 'grab' : '');
+        });
       }
       const schedulePreview = () => {
         if (_previewTimer) clearTimeout(_previewTimer);
@@ -5524,10 +5586,14 @@
         redrawMaskOverlay();
       };
 
-      maskCanvas.addEventListener('mousedown', (e) => {
+  maskCanvas.addEventListener('mousedown', (e) => {
         if (e.button === 1 || e.button === 2 || allowPan) return; // let pan handler manage
         draggingMask = true; handlePaint(e);
       });
+  // Avoid hijacking touch gestures for panning/zooming
+  maskCanvas.addEventListener('touchstart', (e) => { /* let panStage handle */ }, { passive: true });
+  maskCanvas.addEventListener('touchmove', (e) => { /* let panStage handle */ }, { passive: true });
+  maskCanvas.addEventListener('touchend', (e) => { /* let panStage handle */ }, { passive: true });
       window.addEventListener('mousemove', (e) => { if (draggingMask) handlePaint(e); });
       window.addEventListener('mouseup', () => { if (draggingMask) { draggingMask = false; saveBotSettings(); }});
 
