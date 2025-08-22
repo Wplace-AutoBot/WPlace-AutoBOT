@@ -4386,9 +4386,12 @@
             Paint White Pixels
         </label>
         <div class="resize-zoom-controls">
-          <i class="fas fa-search-minus"></i>
-          <input type="range" id="zoomSlider" class="resize-slider" min="1" max="10" value="1" step="0.1">
-          <i class="fas fa-search-plus"></i>
+          <button id="zoomOutBtn" class="wplace-btn" title="Zoom Out" style="padding:4px 8px;"><i class="fas fa-search-minus"></i></button>
+          <input type="range" id="zoomSlider" class="resize-slider" min="0.1" max="20" value="1" step="0.05" style="max-width: 220px;">
+          <button id="zoomInBtn" class="wplace-btn" title="Zoom In" style="padding:4px 8px;"><i class="fas fa-search-plus"></i></button>
+          <button id="zoomFitBtn" class="wplace-btn" title="Fit to view" style="padding:4px 8px;">Fit</button>
+          <button id="zoomActualBtn" class="wplace-btn" title="Actual size (100%)" style="padding:4px 8px;">100%</button>
+          <span id="zoomValue" style="margin-left:6px; min-width:48px; text-align:right; opacity:.85; font-size:12px;">100%</span>
         </div>
       </div>
 
@@ -4782,6 +4785,11 @@
     const keepAspect = resizeContainer.querySelector("#keepAspect")
     const paintWhiteToggle = resizeContainer.querySelector("#paintWhiteToggle");
   const zoomSlider = resizeContainer.querySelector("#zoomSlider");
+  const zoomValue = resizeContainer.querySelector('#zoomValue');
+  const zoomInBtn = resizeContainer.querySelector('#zoomInBtn');
+  const zoomOutBtn = resizeContainer.querySelector('#zoomOutBtn');
+  const zoomFitBtn = resizeContainer.querySelector('#zoomFitBtn');
+  const zoomActualBtn = resizeContainer.querySelector('#zoomActualBtn');
   const canvasStack = resizeContainer.querySelector('#resizeCanvasStack');
   const baseCanvas = resizeContainer.querySelector('#resizeCanvas');
   const maskCanvas = resizeContainer.querySelector('#maskCanvas');
@@ -5067,7 +5075,8 @@
   heightSlider.value = initialH;
   widthValue.textContent = initialW;
   heightValue.textContent = initialH;
-      zoomSlider.value = 1;
+  zoomSlider.value = 1;
+  if (zoomValue) zoomValue.textContent = '100%';
       paintWhiteToggle.checked = state.paintWhitePixels;
 
       let _previewTimer = null;
@@ -5205,7 +5214,7 @@
           for (let i=0;i<m.length;i++) if (m[i]) { const p=i*4; md[p]=255; md[p+1]=0; md[p+2]=0; md[p+3]=150; }
           maskCtx.putImageData(img,0,0);
         }
-        canvasStack.style.transform = `scale(${_zoomLevel})`;
+  canvasStack.style.transform = `scale(${_zoomLevel})`;
       };
 
       const onWidthInput = () => {
@@ -5217,6 +5226,12 @@
   const curH = parseInt(heightSlider.value, 10);
   state.resizeSettings = { baseWidth: width, baseHeight: height, width: curW, height: curH };
   saveBotSettings();
+        // Auto-fit after size changes
+        const fit = (typeof computeFitZoom === 'function') ? computeFitZoom() : 1;
+        if (!isNaN(fit) && isFinite(fit)) {
+          const z = Math.max(0.05, Math.min(20, fit));
+          zoomSlider.value = z;
+        }
       };
 
       const onHeightInput = () => {
@@ -5228,6 +5243,12 @@
   const curH = parseInt(heightSlider.value, 10);
   state.resizeSettings = { baseWidth: width, baseHeight: height, width: curW, height: curH };
   saveBotSettings();
+        // Auto-fit after size changes
+        const fit = (typeof computeFitZoom === 'function') ? computeFitZoom() : 1;
+        if (!isNaN(fit) && isFinite(fit)) {
+          const z = Math.max(0.05, Math.min(20, fit));
+          zoomSlider.value = z;
+        }
       };
 
       paintWhiteToggle.onchange = (e) => {
@@ -5235,11 +5256,30 @@
         _updateResizePreview();
       };
 
-      // Zoom only affects CSS transform; avoid recomputing pixels
-      zoomSlider.addEventListener('input', () => {
-        _zoomLevel = parseFloat(zoomSlider.value);
+      const applyZoom = (z) => {
+        _zoomLevel = Math.max(0.05, Math.min(20, z || 1));
+        zoomSlider.value = _zoomLevel;
         canvasStack.style.transform = `scale(${_zoomLevel})`;
+        if (zoomValue) zoomValue.textContent = `${Math.round(_zoomLevel * 100)}%`;
+      };
+      zoomSlider.addEventListener('input', () => {
+        applyZoom(parseFloat(zoomSlider.value));
       });
+      if (zoomInBtn) zoomInBtn.addEventListener('click', () => applyZoom(parseFloat(zoomSlider.value) + 0.1));
+      if (zoomOutBtn) zoomOutBtn.addEventListener('click', () => applyZoom(parseFloat(zoomSlider.value) - 0.1));
+      const computeFitZoom = () => {
+        const wrap = resizeContainer.querySelector('.resize-preview-wrapper');
+        if (!wrap) return 1;
+        const wrapRect = wrap.getBoundingClientRect();
+        const w = baseCanvas.width || 1;
+        const h = baseCanvas.height || 1;
+        const margin = 10;
+        const scaleX = (wrapRect.width - margin) / w;
+        const scaleY = (wrapRect.height - margin) / h;
+        return Math.max(0.05, Math.min(20, Math.min(scaleX, scaleY)));
+      };
+      if (zoomFitBtn) zoomFitBtn.addEventListener('click', () => applyZoom(computeFitZoom()));
+      if (zoomActualBtn) zoomActualBtn.addEventListener('click', () => applyZoom(1));
       const schedulePreview = () => {
         if (_previewTimer) clearTimeout(_previewTimer);
         const run = () => {
@@ -5579,6 +5619,16 @@
       initializeColorPalette(resizeContainer);
 
       _updateResizePreview();
+      setTimeout(() => {
+        if (typeof computeFitZoom === 'function') {
+          const z = computeFitZoom();
+          if (!isNaN(z) && isFinite(z)) {
+            zoomSlider.value = Math.max(0.05, Math.min(20, z));
+            // Trigger applyZoom to update value and transform
+            const ev = new Event('input'); zoomSlider.dispatchEvent(ev);
+          }
+        }
+      }, 0);
     }
 
     function closeResizeDialog() {
