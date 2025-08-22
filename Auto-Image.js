@@ -797,6 +797,82 @@
       automation: "自动化",
       noChargesThreshold: "⌛ 等待次数达到 {threshold}。当前 {current}。下次在 {time}...",
     },
+    "zh-tw": {
+      title: "WPlace 自動圖像",
+      toggleOverlay: "切換覆蓋層",
+      scanColors: "掃描顏色",
+      uploadImage: "上傳圖像",
+      resizeImage: "調整大小",
+      selectPosition: "選擇位置",
+      startPainting: "開始繪製",
+      stopPainting: "停止繪製",
+      checkingColors: "🔍 正在檢查可用顏色...",
+      noColorsFound: "❌ 請在網站上打開調色板後再試！",
+      colorsFound: "✅ 找到 {count} 個可用顏色，準備上傳。",
+      loadingImage: "🖼️ 正在載入圖像...",
+      imageLoaded: "✅ 圖像已載入，包含 {count} 個有效像素",
+      imageError: "❌ 載入圖像時出錯",
+      selectPositionAlert: "請在你想讓作品開始的位置繪製第一個像素！",
+      waitingPosition: "👆 正在等待你繪製參考像素...",
+      positionSet: "✅ 位置設定成功！",
+      positionTimeout: "❌ 選擇位置逾時",
+      startPaintingMsg: "🎨 開始繪製...",
+      paintingProgress: "🧱 進度: {painted}/{total} 像素...",
+      noCharges: "⌛ 無可用次數，等待 {time}...",
+      paintingStopped: "⏹️ 已被使用者停止",
+      paintingComplete: "✅ 繪製完成！共繪製 {count} 個像素。",
+      paintingError: "❌ 繪製過程中出錯",
+      missingRequirements: "❌ 請先載入圖像並選擇位置",
+      progress: "進度",
+      pixels: "像素",
+      charges: "次數",
+      estimatedTime: "預計時間",
+      initMessage: "點擊「上傳圖像」開始",
+      waitingInit: "正在等待初始化...",
+      initializingToken: "🔧 正在初始化 Turnstile 令牌產生器...",
+      tokenReady: "✅ 令牌產生器已就緒 - 可以開始繪製！",
+      tokenRetryLater: "⚠️ 令牌產生器稍後將重試",
+      resizeSuccess: "✅ 圖像已調整為 {width}x{height}",
+      paintingPaused: "⏸️ 在位置 X: {x}, Y: {y} 暫停",
+      captchaNeeded: "❗ 令牌產生失敗，請稍後再試。",
+      saveData: "儲存進度",
+      loadData: "載入進度",
+      saveToFile: "儲存至檔案",
+      loadFromFile: "從檔案載入",
+      dataManager: "資料管理",
+      autoSaved: "✅ 進度已自動儲存",
+      dataLoaded: "✅ 進度載入成功",
+      fileSaved: "✅ 已成功儲存至檔案",
+      fileLoaded: "✅ 已成功從檔案載入",
+      noSavedData: "❌ 未找到已儲存進度",
+      savedDataFound: "✅ 找到已儲存進度！是否載入以繼續？",
+      savedDate: "儲存時間: {date}",
+      clickLoadToContinue: "點擊「載入進度」繼續。",
+      fileError: "❌ 處理檔案時出錯",
+      invalidFileFormat: "❌ 檔案格式無效",
+      paintingSpeed: "繪製速度",
+      pixelsPerSecond: "像素/秒",
+      speedSetting: "速度: {speed} 像素/秒",
+      settings: "設定",
+      botSettings: "機器人設定",
+      close: "關閉",
+      language: "語言",
+      themeSettings: "主題設定",
+      themeSettingsDesc: "為介面選擇你喜歡的配色主題。",
+      languageSelectDesc: "選擇你偏好的語言，變更立即生效。",
+      autoCaptcha: "自動 CAPTCHA 解決",
+      autoCaptchaDesc: "使用整合的產生器自動產生 Turnstile 令牌，必要時回退到瀏覽器自動化。",
+      applySettings: "套用設定",
+      settingsSaved: "✅ 設定儲存成功！",
+      speedOn: "開啟",
+      speedOff: "關閉",
+      cooldownSettings: "冷卻設定",
+      waitCharges: "等待次數達到",
+      captchaSolving: "🔑 正在產生 Turnstile 令牌...",
+      captchaFailed: "❌ 令牌產生失敗。嘗試回退方法...",
+      automation: "自動化",
+      noChargesThreshold: "⌛ 等待次數達到 {threshold}。目前 {current}。下次在 {time}...",
+    },
     ja: {
       title: "WPlace 自動画像",
       toggleOverlay: "オーバーレイ切替",
@@ -1000,6 +1076,7 @@
       this.startCoords = null; // { region: {x, y}, pixel: {x, y} }
       this.imageBitmap = null;
       this.chunkedTiles = new Map(); // Map<"tileX,tileY", ImageBitmap>
+      this.originalTiles = new Map(); // Map<"tileX,tileY", ImageBitmap> store latest original tile bitmaps
       this.tileSize = 1000;
       this.processPromise = null; // Track ongoing processing
       this.lastProcessedHash = null; // Cache invalidation
@@ -1018,6 +1095,7 @@
       this.disable();
       this.imageBitmap = null;
       this.chunkedTiles.clear();
+      this.originalTiles.clear();
       this.lastProcessedHash = null;
       if (this.processPromise) {
         this.processPromise = null;
@@ -1193,6 +1271,13 @@
           const tileKey = `${tileX},${tileY}`;
 
           const chunkBitmap = this.chunkedTiles.get(tileKey);
+          // Also store the original tile bitmap for later pixel color checks
+          try {
+            const originalBitmap = await createImageBitmap(blobData);
+            this.originalTiles.set(tileKey, originalBitmap);
+          } catch (e) {
+            console.warn('OverlayManager: could not create original bitmap for', tileKey, e);
+          }
           if (chunkBitmap) {
             try {
               // Use faster compositing for better performance
@@ -1212,6 +1297,36 @@
         blobID: blobID,
         blobData: finalBlob
       }, '*');
+    }
+
+    // Returns [r,g,b,a] for a pixel inside a region tile (tileX, tileY are region coords)
+    async getTilePixelColor(tileX, tileY, pixelX, pixelY) {
+      const tileKey = `${tileX},${tileY}`;
+      const bitmap = this.originalTiles.get(tileKey);
+      if (!bitmap) return null;
+
+      try {
+        let canvas, ctx;
+        if (typeof OffscreenCanvas !== 'undefined') {
+          canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+          ctx = canvas.getContext('2d');
+        } else {
+          canvas = document.createElement('canvas');
+          canvas.width = bitmap.width;
+          canvas.height = bitmap.height;
+          ctx = canvas.getContext('2d');
+        }
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(bitmap, 0, 0);
+
+        const x = Math.max(0, Math.min(bitmap.width - 1, pixelX));
+        const y = Math.max(0, Math.min(bitmap.height - 1, pixelY));
+        const data = ctx.getImageData(x, y, 1, 1).data;
+        return [data[0], data[1], data[2], data[3]];
+      } catch (e) {
+        console.warn('OverlayManager.getTilePixelColor failed for', tileKey, pixelX, pixelY, e);
+        return null;
+      }
     }
 
     async _compositeTileOptimized(originalBlob, overlayBitmap) {
@@ -4253,6 +4368,7 @@
               <option value="fr" ${state.language === 'fr' ? 'selected' : ''} style="background: #2d3748; color: white;">🇫🇷 Français</option>
               <option value="tr" ${state.language === 'tr' ? 'selected' : ''} style="background: #2d3748; color: white;">🇹🇷 Türkçe</option>
               <option value="zh" ${state.language === 'zh' ? 'selected' : ''} style="background: #2d3748; color: white;">🇨🇳 简体中文</option>
+              <option value="zh-tw" ${state.language === 'zh-tw' ? 'selected' : ''} style="background: #2d3748; color: white;">🇹🇼 繁體中文</option>
               <option value="ja" ${state.language === 'ja' ? 'selected' : ''} style="background: #2d3748; color: white;">🇯🇵 日本語</option>
               <option value="ko" ${state.language === 'ko' ? 'selected' : ''} style="background: #2d3748; color: white;">🇰🇷 한국어</option>
               </select>
@@ -6025,6 +6141,25 @@
               regionY: regionY + adderY,
               pixels: []
             };
+          }
+
+          
+          try {
+            const tileRegionX = pixelBatch ? (pixelBatch.regionX) : (regionX + adderX);
+            const tileRegionY = pixelBatch ? (pixelBatch.regionY) : (regionY + adderY);
+            const tileKeyParts = [(regionX + adderX), (regionY + adderY)];
+            const existingColorRGBA = await overlayManager.getTilePixelColor(tileKeyParts[0], tileKeyParts[1], pixelX, pixelY).catch(() => null);
+            if (existingColorRGBA && Array.isArray(existingColorRGBA)) {
+              const [er, eg, eb] = existingColorRGBA;
+              const existingColorId = findClosestColor([er, eg, eb], state.availableColors);
+              if (existingColorId === colorId) {
+                skippedPixels.alreadyPainted++;
+                console.log(`Skipped already painted pixel at (${pixelX}, ${pixelY})`);
+                continue; // Skip
+              }
+            }
+          } catch (e) {
+            /* ignore */
           }
 
           pixelBatch.pixels.push({
