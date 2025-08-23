@@ -1064,6 +1064,8 @@
   resizeSettings: null,
   originalImage: null,
   resizeIgnoreMask: null,
+  antiGriefEnabled: false,
+  _antiGriefTimer: null,
   }
 
   let _updateResizePreview = () => { };
@@ -2490,9 +2492,15 @@
 
         // Update overlay button state
         const toggleOverlayBtn = document.getElementById('toggleOverlayBtn');
+        const antiGriefBtn = document.getElementById('antiGriefBtn');
         if (toggleOverlayBtn) {
           toggleOverlayBtn.disabled = false;
           toggleOverlayBtn.classList.add('active');
+        }
+  const antiGriefBtn2 = document.getElementById('antiGriefBtn');
+  if (antiGriefBtn2) antiGriefBtn2.disabled = false;
+        if (antiGriefBtn) {
+          antiGriefBtn.disabled = false;
         }
 
         console.log('Overlay restored from data');
@@ -2676,10 +2684,146 @@
     return bestId
   }
 
-  // UI UPDATE FUNCTIONS (declared early to avoid reference errors)
+  
   let updateUI = () => { }
   let updateStats = () => { }
   let updateDataButtons = () => { }
+
+  async function startAntiGrief() {
+    stopAntiGrief();
+    if (!state.imageLoaded || !state.startPosition || !state.region) return;
+    state.antiGriefEnabled = true;
+    const antiGriefBtn = document.getElementById('antiGriefBtn');
+    if (antiGriefBtn) {
+      antiGriefBtn.disabled = false;
+      antiGriefBtn.classList.add('active');
+      antiGriefBtn.setAttribute('aria-pressed', 'true');
+    }
+
+    const defendOnce = async () => {
+      if (!state.antiGriefEnabled) return;
+      if (!state.imageLoaded || !state.startPosition || !state.region) return;
+      if (state.running) return; // skip while painting is running
+      try {
+        // Ensure we have latest tile caches to read colors
+        if (overlayManager && overlayManager.imageBitmap && overlayManager.startCoords) {
+          await overlayManager.processImageIntoChunks();
+        }
+
+  const { width, height, pixels } = state.imageData;
+  const mask = (state.resizeIgnoreMask && state.resizeIgnoreMask.length === width * height) ? state.resizeIgnoreMask : null;
+        const { x: startX, y: startY } = state.startPosition;
+        const { x: regionX, y: regionY } = state.region;
+
+        const tileSize = 1000;
+        let totalMismatches = 0;
+
+        for (let localY = 0; localY < height && state.antiGriefEnabled; localY++) {
+          const absY = startY + localY;
+          const adderY = Math.floor(absY / tileSize);
+          const pixelY = absY % tileSize;
+          let currentRegionX = null, currentRegionY = regionY + adderY;
+          let batch = null;
+
+          for (let localX = 0; localX < width && state.antiGriefEnabled; localX++) {
+            const pixIndex = (localY * width + localX);
+            if (mask && mask[pixIndex]) continue; 
+            const idx = pixIndex * 4;
+            const r = pixels[idx], g = pixels[idx + 1], b = pixels[idx + 2], a = pixels[idx + 3];
+            const tThresh = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
+            if (a < tThresh) continue;
+            if (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b)) continue;
+
+            const absX = startX + localX;
+            const adderX = Math.floor(absX / tileSize);
+            const pixelX = absX % tileSize;
+
+            const regionTileX = regionX + adderX;
+            const regionTileY = regionY + adderY;
+
+            if (currentRegionX === null) currentRegionX = regionTileX;
+            if (regionTileX !== currentRegionX) {
+              if (batch && batch.pixels.length > 0) {
+                const ok = await sendBatchWithRetry(batch.pixels, batch.regionX, batch.regionY);
+                if (ok) {
+                  state.currentCharges = Math.max(0, state.currentCharges - batch.pixels.length);
+                }
+              }
+              batch = null;
+              currentRegionX = regionTileX;
+            }
+
+            let existing = null;
+            try {
+              existing = await overlayManager.getTilePixelColor(regionTileX, regionTileY, pixelX, pixelY);
+            } catch (_) {}
+            if (!existing) continue;
+            const [er, eg, eb] = existing;
+
+            // Desired palette color
+            const desiredId = findClosestColor([r, g, b], state.availableColors);
+            const existingId = findClosestColor([er, eg, eb], state.availableColors);
+            if (desiredId === existingId) continue; // already correct
+
+            // Initialize batch for this region
+            if (!batch) batch = { regionX: regionTileX, regionY: regionTileY, pixels: [] };
+            batch.pixels.push({ x: pixelX, y: pixelY, color: desiredId });
+            totalMismatches++;
+
+            if (batch.pixels.length >= Math.max(1, Math.floor(state.currentCharges))) {
+              await ensureToken();
+              const ok = await sendBatchWithRetry(batch.pixels, batch.regionX, batch.regionY);
+              if (ok) {
+                state.currentCharges = Math.max(0, state.currentCharges - batch.pixels.length);
+              }
+              batch.pixels = [];
+
+              while (state.currentCharges < Math.max(1, state.cooldownChargeThreshold) && state.antiGriefEnabled && !state.running) {
+                const { charges, cooldown } = await WPlaceService.getCharges();
+                state.currentCharges = Math.floor(charges);
+                state.cooldown = cooldown;
+                if (state.currentCharges >= state.cooldownChargeThreshold) break;
+                await Utils.sleep(Math.max(1000, cooldown));
+              }
+            }
+          }
+
+          // Flush the row's last batch
+          if (batch && batch.pixels.length > 0 && state.antiGriefEnabled) {
+            await ensureToken();
+            const ok = await sendBatchWithRetry(batch.pixels, batch.regionX, batch.regionY);
+            if (ok) {
+              state.currentCharges = Math.max(0, state.currentCharges - batch.pixels.length);
+            }
+          }
+        }
+
+        if (totalMismatches > 0) {
+          console.log(`🛡️ Anti-Grief repainted ${totalMismatches} pixels.`);
+        }
+      } catch (e) {
+        console.warn('Anti-Grief iteration failed:', e);
+      } finally {
+        try { await updateStats(); } catch {}
+      }
+    };
+
+    await defendOnce();
+    state._antiGriefTimer = setInterval(defendOnce, 30000);
+  }
+
+  function stopAntiGrief() {
+    state.antiGriefEnabled = false;
+    if (state._antiGriefTimer) {
+      clearInterval(state._antiGriefTimer);
+      state._antiGriefTimer = null;
+    }
+    const antiGriefBtn = document.getElementById('antiGriefBtn');
+    if (antiGriefBtn) {
+      antiGriefBtn.classList.remove('active');
+      antiGriefBtn.setAttribute('aria-pressed', 'false');
+    }
+  }
 
   function updateActiveColorPalette() {
     state.activeColorPalette = [];
@@ -2702,7 +2846,7 @@
     const swatches = document.querySelectorAll('.wplace-color-swatch');
     if (swatches) {
       swatches.forEach(swatch => {
-        // Only toggle colors that are available or if we're showing unavailable colors
+
         const isUnavailable = swatch.classList.contains('unavailable');
         if (!isUnavailable || showingUnavailable) {
           // Don't try to select unavailable colors
@@ -2720,10 +2864,9 @@
     const showAllToggle = container.querySelector('#showAllColorsToggle');
     if (!colorsContainer) return;
 
-    // Use already captured colors from state (captured during upload)
-    // Don't re-fetch colors here, use what was captured when user clicked upload
+    
     if (!state.availableColors || state.availableColors.length === 0) {
-      // If no colors have been captured yet, show message
+     
       colorsContainer.innerHTML = '<div style="text-align: center; color: #888; padding: 20px;">Upload an image first to capture available colors</div>';
       return;
     }
@@ -2733,7 +2876,7 @@
       let availableCount = 0;
       let totalCount = 0;
 
-      // Convert COLOR_MAP to array and filter out transparent
+      
       const allColors = Object.values(CONFIG.COLOR_MAP).filter(color => color.rgb !== null);
 
       allColors.forEach(colorData => {
@@ -2741,12 +2884,12 @@
         const rgbKey = `${rgb.r},${rgb.g},${rgb.b}`;
         totalCount++;
 
-        // Check if this color is available in the captured colors
+        
         const isAvailable = state.availableColors.some(c =>
           c.rgb[0] === rgb.r && c.rgb[1] === rgb.g && c.rgb[2] === rgb.b
         );
 
-        // If not showing all colors and this color is not available, skip it
+
         if (!showUnavailable && !isAvailable) {
           return;
         }
@@ -4164,6 +4307,12 @@
                     <span>${Utils.t("toggleOverlay")}</span>
                 </button>
             </div>
+      <div class="wplace-row single">
+        <button id="antiGriefBtn" class="wplace-btn" disabled aria-pressed="false" title="Defend your art automatically">
+          <i class="fas fa-shield-halved"></i>
+          <span>Anti-Grief</span>
+        </button>
+      </div>
           </div>
         </div>
 
@@ -4707,6 +4856,7 @@
     const compactBtn = container.querySelector("#compactBtn")
     const statsBtn = container.querySelector("#statsBtn")
     const toggleOverlayBtn = container.querySelector("#toggleOverlayBtn");
+  const antiGriefBtn = container.querySelector("#antiGriefBtn");
     const statusText = container.querySelector("#statusText")
     const progressBar = container.querySelector("#progressBar")
     const statsArea = statsContainer.querySelector("#statsArea")
@@ -5022,6 +5172,25 @@
   toggleOverlayBtn.classList.toggle('active', isEnabled);
   toggleOverlayBtn.setAttribute('aria-pressed', isEnabled ? 'true' : 'false');
         Utils.showAlert(`Overlay ${isEnabled ? 'enabled' : 'disabled'}.`, 'info');
+      });
+    }
+
+    if (antiGriefBtn) {
+      antiGriefBtn.disabled = !state.imageLoaded || !state.startPosition || !state.region;
+      antiGriefBtn.classList.toggle('active', state.antiGriefEnabled);
+      antiGriefBtn.setAttribute('aria-pressed', state.antiGriefEnabled ? 'true' : 'false');
+      antiGriefBtn.addEventListener('click', async () => {
+        state.antiGriefEnabled = !state.antiGriefEnabled;
+        antiGriefBtn.classList.toggle('active', state.antiGriefEnabled);
+        antiGriefBtn.setAttribute('aria-pressed', state.antiGriefEnabled ? 'true' : 'false');
+        saveBotSettings();
+        if (state.antiGriefEnabled) {
+          Utils.showAlert('Anti-Grief enabled. Defending every 30s.', 'success');
+          await startAntiGrief();
+        } else {
+          Utils.showAlert('Anti-Grief disabled.', 'info');
+          stopAntiGrief();
+        }
       });
     }
 
@@ -6224,6 +6393,9 @@
       resizeBtn.disabled = true
       saveBtn.disabled = true
       toggleOverlayBtn.disabled = true;
+  if (antiGriefBtn) antiGriefBtn.disabled = true;
+  const prevAntiGrief = state.antiGriefEnabled;
+  if (prevAntiGrief) { stopAntiGrief(); }
 
       updateUI("startPaintingMsg", "success")
 
@@ -6247,6 +6419,18 @@
           startBtn.disabled = false
         }
         toggleOverlayBtn.disabled = false;
+        if (antiGriefBtn) {
+          antiGriefBtn.disabled = !state.imageLoaded || !state.startPosition || !state.region;
+        }
+        // Resume anti-grief if it was previously enabled
+        if (prevAntiGrief && !state.antiGriefEnabled) {
+          state.antiGriefEnabled = true;
+          if (antiGriefBtn) {
+            antiGriefBtn.classList.add('active');
+            antiGriefBtn.setAttribute('aria-pressed', 'true');
+          }
+          startAntiGrief();
+        }
       }
     }
 
@@ -6296,6 +6480,10 @@
     }
 
     loadBotSettings();
+    // Auto-start Anti-Grief if enabled and ready
+    if (state.antiGriefEnabled && state.imageLoaded && state.startPosition && state.region) {
+      startAntiGrief();
+    }
   }
 
   async function processImage() {
@@ -6701,6 +6889,7 @@
   resizeIgnoreMask: (state.resizeIgnoreMask && state.resizeSettings && state.resizeSettings.width * state.resizeSettings.height === state.resizeIgnoreMask.length)
     ? { w: state.resizeSettings.width, h: state.resizeSettings.height, data: btoa(String.fromCharCode(...state.resizeIgnoreMask)) }
     : null,
+  antiGriefEnabled: state.antiGriefEnabled,
       };
       CONFIG.PAINTING_SPEED_ENABLED = settings.paintingSpeedEnabled;
       // AUTO_CAPTCHA_ENABLED is always true - no need to save/load
@@ -6743,6 +6932,14 @@
     } catch { state.resizeIgnoreMask = null; }
   } else {
     state.resizeIgnoreMask = null;
+  }
+
+  state.antiGriefEnabled = settings.antiGriefEnabled ?? false;
+  const antiGriefBtn = document.getElementById('antiGriefBtn');
+  if (antiGriefBtn) {
+    antiGriefBtn.disabled = !state.imageLoaded || !state.startPosition || !state.region;
+    antiGriefBtn.classList.toggle('active', state.antiGriefEnabled);
+    antiGriefBtn.setAttribute('aria-pressed', state.antiGriefEnabled ? 'true' : 'false');
   }
 
       const speedSlider = document.getElementById('speedSlider');
