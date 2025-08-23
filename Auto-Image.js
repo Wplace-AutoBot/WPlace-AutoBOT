@@ -10,6 +10,11 @@
       MAX: 1000,       // Maximum 1000 pixels batch size
       DEFAULT: 5,      // Default 5 pixels batch size
     },
+    BATCH_MODE: "normal", // "normal" or "random" - default to normal
+    RANDOM_BATCH_RANGE: {
+      MIN: 3,          // Random range minimum
+      MAX: 20,         // Random range maximum
+    },
     PAINTING_SPEED_ENABLED: false, // Off by default
     AUTO_CAPTCHA_ENABLED: true, // Turnstile generator enabled by default
     TOKEN_SOURCE: "generator", // "generator", "manual", or "hybrid" - default to generator
@@ -1059,8 +1064,12 @@
     estimatedTime: 0,
     language: "en",
     paintingSpeed: CONFIG.PAINTING_SPEED.DEFAULT, // pixels batch size
+    batchMode: CONFIG.BATCH_MODE, // "normal" or "random"
+    randomBatchMin: CONFIG.RANDOM_BATCH_RANGE.MIN, // Random range minimum
+    randomBatchMax: CONFIG.RANDOM_BATCH_RANGE.MAX, // Random range maximum
     cooldownChargeThreshold: CONFIG.COOLDOWN_CHARGE_THRESHOLD,
     tokenSource: CONFIG.TOKEN_SOURCE, // "generator" or "manual"
+    initialSetupComplete: false, // Track if initial startup setup is complete (only happens once)
     overlayOpacity: CONFIG.OVERLAY.OPACITY_DEFAULT,
     blueMarbleEnabled: CONFIG.OVERLAY.BLUE_MARBLE_DEFAULT,
   ditheringEnabled: true,
@@ -1689,44 +1698,83 @@
     async executeTurnstile(sitekey, action = 'paint') {
       await this.loadTurnstile();
 
-      if (this._turnstileWidgetId && this._lastSitekey === sitekey && window.turnstile?.execute) {
-        try {
-          console.log("🔄 Reusing existing Turnstile widget...");
-          const token = await Promise.race([
-            window.turnstile.execute(this._turnstileWidgetId, { action }),
-            new Promise((_, reject) => setTimeout(() => reject(new Error('Execute timeout')), 15000))
-          ]);
-          if (token && token.length > 20) {
-            console.log("✅ Token generated via widget reuse");
-            return token;
+      // Try multiple sitekeys if the first one fails
+      const sitekeys = [
+        sitekey,
+        '0x4AAAAAABpqJe8FO0N84q0F'
+      ];
+
+      for (let i = 0; i < sitekeys.length; i++) {
+        const currentSitekey = sitekeys[i];
+        console.log(`🔧 Trying sitekey ${i + 2}/${sitekeys.length}:`, currentSitekey);
+
+        // Try reusing existing widget first
+        if (this._turnstileWidgetId && this._lastSitekey === currentSitekey && window.turnstile?.execute) {
+          try {
+            console.log("🔄 Reusing existing Turnstile widget...");
+            const token = await Promise.race([
+              window.turnstile.execute(this._turnstileWidgetId, { action }),
+              new Promise((_, reject) => setTimeout(() => reject(new Error('Execute timeout')), 15000))
+            ]);
+            if (token && typeof token === 'string' && token.length > 20) {
+              console.log("✅ Token generated via widget reuse");
+              return token;
+            }
+          } catch (err) {
+            console.warn('🔄 Widget reuse failed:', err.message);
           }
-        } catch (err) {
-          console.warn('🔄 Widget reuse failed, will create a fresh widget:', err.message);
         }
+
+        // Try invisible widget
+        const invisible = await this.createNewTurnstileWidgetInvisible(currentSitekey, action);
+        if (invisible && typeof invisible === 'string' && invisible.length > 20) {
+          console.log(`✅ Token generated with sitekey ${i + 1}: ${currentSitekey}`);
+          return invisible;
+        }
+
+        console.warn(`❌ Sitekey ${i + 1} failed:`, currentSitekey);
+        
+        // Clean up failed widget before trying next sitekey
+        if (this._turnstileWidgetId && window.turnstile?.remove) {
+          try { window.turnstile.remove(this._turnstileWidgetId); } catch {}
+        }
+        this._turnstileWidgetId = null;
       }
 
-      const invisible = await this.createNewTurnstileWidgetInvisible(sitekey, action);
-      if (invisible && invisible.length > 20) return invisible;
-
-      console.log('👀 Falling back to interactive Turnstile (visible).');
+      console.log('👀 All sitekeys failed for invisible widgets, trying interactive...');
       return await this.createNewTurnstileWidgetInteractive(sitekey, action);
     },
 
     async createNewTurnstileWidgetInvisible(sitekey, action) {
       return new Promise((resolve) => {
         try {
+          // Force cleanup of any existing widget
           if (this._turnstileWidgetId && window.turnstile?.remove) {
-            try { window.turnstile.remove(this._turnstileWidgetId); } catch {}
+            try { 
+              window.turnstile.remove(this._turnstileWidgetId); 
+              console.log('🧹 Cleaned up existing Turnstile widget');
+            } catch (e) {
+              console.warn('⚠️ Widget cleanup warning:', e.message);
+            }
           }
+          
           const container = this.ensureTurnstileContainer();
           container.innerHTML = '';
           
+          // Verify Turnstile is available
+          if (!window.turnstile?.render) {
+            console.error('❌ Turnstile not available for rendering');
+            resolve(null);
+            return;
+          }
+          
           // Set a timeout to resolve with null if no token is received
           const timeout = setTimeout(() => {
-            console.warn('⏰ Turnstile widget timeout - no token received');
+            console.warn('⏰ Turnstile widget timeout - no token received in 15s');
             resolve(null);
           }, 15000);
           
+          console.log('🔧 Creating invisible Turnstile widget...');
           const widgetId = window.turnstile.render(container, {
             sitekey,
             action,
@@ -1735,8 +1783,22 @@
             'retry-interval': 8000,
             callback: (token) => {
               clearTimeout(timeout);
-              console.log('✅ Turnstile token received from hidden widget:', token ? 'Valid token' : 'Invalid token');
-              resolve(token);
+              console.log('🔍 Turnstile callback received:', {
+                type: typeof token,
+                value: token,
+                length: token?.length || 0,
+                isString: typeof token === 'string',
+                isValid: typeof token === 'string' && token.length > 20
+              });
+              
+              // Ensure we have a valid string token
+              if (typeof token === 'string' && token.length > 20) {
+                console.log('✅ Valid token received from hidden widget');
+                resolve(token);
+              } else {
+                console.warn('❌ Invalid token received from hidden widget - resolving with null');
+                resolve(null);
+              }
             },
             'error-callback': (error) => {
               clearTimeout(timeout);
@@ -1745,7 +1807,7 @@
             },
             'timeout-callback': () => {
               clearTimeout(timeout);
-              console.warn('⏰ Turnstile timeout callback');
+              console.warn('⏰ Turnstile timeout callback triggered');
               resolve(null);
             },
           });
@@ -1755,30 +1817,102 @@
           
           if (!widgetId) {
             clearTimeout(timeout);
-            console.warn('❌ Failed to create Turnstile widget');
+            console.warn('❌ Failed to create Turnstile widget - render returned invalid ID');
             resolve(null);
+          } else {
+            console.log('✅ Turnstile widget created with ID:', widgetId);
           }
         } catch (e) {
-          console.warn('❌ Invisible Turnstile failed:', e);
+          console.error('❌ Invisible Turnstile creation failed:', e);
           resolve(null);
         }
       });
     },
 
     async createNewTurnstileWidgetInteractive(sitekey, action) {
-      // Since we want purely background token generation, attempt invisible again
-      // or fallback to manual pixel placement automation
-      console.log('🔄 Interactive widget requested - falling back to invisible or manual automation');
+      // Create a visible widget that users can interact with if needed
+      console.log('🔄 Creating interactive Turnstile widget (visible)');
       
-      // Try invisible one more time
-      const invisibleToken = await this.createNewTurnstileWidgetInvisible(sitekey, action);
-      if (invisibleToken && invisibleToken.length > 20) {
-        return invisibleToken;
-      }
-      
-      // If invisible fails, return null to trigger manual automation fallback
-      console.log('⚠️ All Turnstile methods exhausted, manual fallback will be used');
-      return null;
+      return new Promise((resolve) => {
+        try {
+          // Force cleanup of any existing widget
+          if (this._turnstileWidgetId && window.turnstile?.remove) {
+            try { 
+              window.turnstile.remove(this._turnstileWidgetId); 
+            } catch (e) {
+              console.warn('⚠️ Widget cleanup warning:', e.message);
+            }
+          }
+          
+          const container = this.ensureTurnstileContainer();
+          container.innerHTML = '';
+          
+          // Make container visible for interactive mode
+          container.style.display = 'block';
+          container.style.position = 'fixed';
+          container.style.top = '50%';
+          container.style.left = '50%';
+          container.style.transform = 'translate(-50%, -50%)';
+          container.style.zIndex = '10000';
+          container.style.backgroundColor = 'white';
+          container.style.padding = '20px';
+          container.style.borderRadius = '8px';
+          container.style.boxShadow = '0 4px 20px rgba(0,0,0,0.3)';
+          
+          // Add instruction text
+          container.innerHTML = '<div style="margin-bottom: 15px; color: #333; font-family: Arial, sans-serif;"><strong>CAPTCHA Required</strong><br>Please complete the CAPTCHA below to continue:</div>';
+          
+          const widgetContainer = document.createElement('div');
+          container.appendChild(widgetContainer);
+          
+          // Set a timeout for interactive mode
+          const timeout = setTimeout(() => {
+            console.warn('⏰ Interactive Turnstile widget timeout');
+            container.style.display = 'none';
+            resolve(null);
+          }, 60000); // 60 seconds for user interaction
+          
+          const widgetId = window.turnstile.render(widgetContainer, {
+            sitekey,
+            action,
+            size: 'normal',
+            theme: 'light',
+            callback: (token) => {
+              clearTimeout(timeout);
+              container.style.display = 'none';
+              console.log('✅ Interactive Turnstile completed successfully');
+              
+              if (typeof token === 'string' && token.length > 20) {
+                resolve(token);
+              } else {
+                console.warn('❌ Invalid token from interactive widget');
+                resolve(null);
+              }
+            },
+            'error-callback': (error) => {
+              clearTimeout(timeout);
+              container.style.display = 'none';
+              console.warn('❌ Interactive Turnstile error:', error);
+              resolve(null);
+            },
+          });
+          
+          this._turnstileWidgetId = widgetId;
+          this._lastSitekey = sitekey;
+          
+          if (!widgetId) {
+            clearTimeout(timeout);
+            container.style.display = 'none';
+            console.warn('❌ Failed to create interactive Turnstile widget');
+            resolve(null);
+          } else {
+            console.log('✅ Interactive Turnstile widget created, waiting for user interaction...');
+          }
+        } catch (e) {
+          console.error('❌ Interactive Turnstile creation failed:', e);
+          resolve(null);
+        }
+      });
     },
 
     async generatePaintToken(sitekey) {
@@ -1808,8 +1942,16 @@
     detectSitekey(fallback = '0x4AAAAAABpqJe8FO0N84q0F') {
       // Cache sitekey to avoid repeated DOM queries
       if (this._cachedSitekey) {
+        console.log("🔍 Using cached sitekey:", this._cachedSitekey);
         return this._cachedSitekey;
       }
+
+      // List of potential sitekeys to try
+      const potentialSitekeys = [
+        '0x4AAAAAABpqJe8FO0N84q0F', // WPlace common sitekey
+        '0x4AAAAAAAJ7xjKAp6Mt_7zw', // Alternative WPlace sitekey
+        '0x4AAAAAADm5QWx6Ov2LNF2g', // Another common sitekey
+      ];
 
       try {
         // Try to find sitekey in data attributes
@@ -1831,6 +1973,17 @@
           return this._cachedSitekey;
         }
 
+        // Try to find sitekey in meta tags
+        const metaTags = document.querySelectorAll('meta[name*="turnstile"], meta[property*="turnstile"]');
+        for (const meta of metaTags) {
+          const content = meta.getAttribute('content');
+          if (content && content.length > 10) {
+            this._cachedSitekey = content;
+            console.log("🔍 Sitekey detected from meta tag:", this._cachedSitekey);
+            return this._cachedSitekey;
+          }
+        }
+
         // Try global variable
         if (typeof window !== 'undefined' && window.__TURNSTILE_SITEKEY && window.__TURNSTILE_SITEKEY.length > 10) {
           this._cachedSitekey = window.__TURNSTILE_SITEKEY;
@@ -1842,13 +1995,22 @@
         const scripts = document.querySelectorAll('script');
         for (const script of scripts) {
           const content = script.textContent || script.innerHTML;
-          const sitekeyMatch = content.match(/sitekey['":\s]+(['"0-9a-zA-Z_-]{20,})/i);
+          const sitekeyMatch = content.match(/sitekey['":\s]+(['"0-9a-zA-X_-]{20,})/i);
           if (sitekeyMatch && sitekeyMatch[1] && sitekeyMatch[1].length > 10) {
             this._cachedSitekey = sitekeyMatch[1].replace(/['"]/g, '');
             console.log("🔍 Sitekey detected from script content:", this._cachedSitekey);
             return this._cachedSitekey;
           }
         }
+
+        // If no sitekey found through detection, try the known working sitekeys
+        console.log("🔍 No sitekey detected, trying known working sitekeys...");
+        for (const testSitekey of potentialSitekeys) {
+          console.log("🔍 Trying sitekey:", testSitekey);
+          this._cachedSitekey = testSitekey;
+          return testSitekey;
+        }
+        
       } catch (error) {
         console.warn('Error detecting sitekey:', error);
       }
@@ -2877,18 +3039,23 @@
       // Use optimized token generation with automatic sitekey detection
       const sitekey = Utils.detectSitekey();
       console.log("🔑 Generating Turnstile token for sitekey:", sitekey);
-      console.log('🧭 UA:', navigator.userAgent, 'Platform:', navigator.platform);
+      console.log('🧭 UA:', navigator.userAgent.substring(0, 50) + '...', 'Platform:', navigator.platform);
+      
+      // Add additional checks before token generation
+      if (!window.turnstile) {
+        throw new Error('Turnstile library not loaded');
+      }
       
       const token = await Utils.generatePaintToken(sitekey);
       
-      console.log(`🔍 Token received - Type: ${typeof token}, Value: ${token ? (token.length > 50 ? token.substring(0, 50) + '...' : token) : 'null/undefined'}, Length: ${token?.length || 0}`);
+      console.log(`🔍 Token received - Type: ${typeof token}, Value: ${token ? (typeof token === 'string' ? (token.length > 50 ? token.substring(0, 50) + '...' : token) : JSON.stringify(token)) : 'null/undefined'}, Length: ${token?.length || 0}`);
       
-      if (token && token.length > 20) {
+      if (typeof token === 'string' && token.length > 20) {
         const duration = Math.round(performance.now() - startTime);
         console.log(`✅ Turnstile token generated successfully in ${duration}ms`);
         return token;
       } else {
-        throw new Error(`Invalid or empty token received - Type: ${typeof token}, Length: ${token?.length || 0}`);
+        throw new Error(`Invalid or empty token received - Type: ${typeof token}, Value: ${JSON.stringify(token)}, Length: ${token?.length || 0}`);
       }
     } catch (error) {
       const duration = Math.round(performance.now() - startTime);
@@ -4198,7 +4365,7 @@
           <div class="wplace-section-title">🖼️ Image Management</div>
           <div class="wplace-controls">
             <div class="wplace-row">
-              <button id="uploadBtn" class="wplace-btn wplace-btn-upload">
+              <button id="uploadBtn" class="wplace-btn wplace-btn-upload" disabled title="🔄 Waiting for initial setup to complete...">
                 <i class="fas fa-upload"></i>
                 <span>${Utils.t("uploadImage")}</span>
               </button>
@@ -4260,7 +4427,7 @@
                 <i class="fas fa-save"></i>
                 <span>${Utils.t("saveData")}</span>
               </button>
-              <button id="loadBtn" class="wplace-btn wplace-btn-primary">
+              <button id="loadBtn" class="wplace-btn wplace-btn-primary" disabled title="🔄 Waiting for token generator to initialize...">
                 <i class="fas fa-folder-open"></i>
                 <span>${Utils.t("loadData")}</span>
               </button>
@@ -4270,7 +4437,7 @@
                 <i class="fas fa-download"></i>
                 <span>${Utils.t("saveToFile")}</span>
               </button>
-              <button id="loadFromFileBtn" class="wplace-btn wplace-btn-file">
+              <button id="loadFromFileBtn" class="wplace-btn wplace-btn-file" disabled title="🔄 Waiting for token generator to initialize...">
                 <i class="fas fa-upload"></i>
                 <span>${Utils.t("loadFromFile")}</span>
               </button>
@@ -4310,42 +4477,88 @@
       </div>
     `
 
-    // Modern Settings Container
+    // Modern Settings Container with Theme Support
+    // Use the theme variable already declared at the top of createUI function
     const settingsContainer = document.createElement("div")
     settingsContainer.id = "wplace-settings-container"
+    
+    // Apply theme-based styling
+    const themeBackground = theme.primary ? 
+      `linear-gradient(135deg, ${theme.primary} 0%, ${theme.secondary || theme.primary} 100%)` : 
+      `linear-gradient(135deg, #667eea 0%, #764ba2 100%)`
+    
     settingsContainer.style.cssText = `
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border: none;
-      border-radius: 16px;
+      background: ${themeBackground};
+      border: ${theme.borderWidth || '1px'} ${theme.borderStyle || 'solid'} ${theme.accent || 'rgba(255,255,255,0.1)'};
+      border-radius: ${theme.borderRadius || '16px'};
       padding: 0;
       z-index: 10002;
       display: none;
       min-width: 420px;
       max-width: 480px;
-      color: white;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1);
-      backdrop-filter: blur(10px);
+      color: ${theme.text || 'white'};
+      font-family: ${theme.fontFamily || "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"};
+      box-shadow: ${theme.boxShadow || '0 20px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1)'};
+      backdrop-filter: ${theme.backdropFilter || 'blur(10px)'};
       overflow: hidden;
       animation: settingsSlideIn 0.4s ease-out;
+      ${theme.animations?.glow ? `
+        box-shadow: ${theme.boxShadow || '0 20px 40px rgba(0,0,0,0.3)'}, 
+                   0 0 30px ${theme.highlight || theme.neon || '#00ffff'};
+      ` : ''}
     `
 
     settingsContainer.innerHTML = `
-      <div class="wplace-settings-header" style="background: rgba(255,255,255,0.1); padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); cursor: move;">
+      <div class="wplace-settings-header" style="
+        background: ${theme.accent ? `${theme.accent}33` : 'rgba(255,255,255,0.1)'}; 
+        padding: 20px; 
+        border-bottom: 1px solid ${theme.accent || 'rgba(255,255,255,0.1)'}; 
+        cursor: move;
+        ${theme.animations?.scanline ? `
+          position: relative;
+          overflow: hidden;
+        ` : ''}
+      ">
+        ${theme.animations?.scanline ? `
+          <div style="
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, ${theme.neon || '#00ffff'}, transparent);
+            animation: scanline 2s linear infinite;
+          "></div>
+        ` : ''}
         <div style="display: flex; justify-content: space-between; align-items: center;">
-          <h3 style="margin: 0; color: white; font-size: 20px; font-weight: 300; display: flex; align-items: center; gap: 10px;">
-            <i class="fas fa-cog" style="font-size: 18px; animation: spin 2s linear infinite;"></i>
+          <h3 style="
+            margin: 0; 
+            color: ${theme.text || 'white'}; 
+            font-size: 20px; 
+            font-weight: 300; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px;
+            ${theme.animations?.glow ? `
+              text-shadow: 0 0 10px ${theme.highlight || theme.neon || '#00ffff'};
+            ` : ''}
+          ">
+            <i class="fas fa-cog" style="
+              font-size: 18px; 
+              animation: spin 2s linear infinite;
+              color: ${theme.highlight || theme.neon || '#00ffff'};
+            "></i>
             ${Utils.t("settings")}
           </h3>
           <button id="closeSettingsBtn" style="
-            background: rgba(255,255,255,0.1);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 50%;
+            background: ${theme.accent ? `${theme.accent}66` : 'rgba(255,255,255,0.1)'};
+            color: ${theme.text || 'white'};
+            border: 1px solid ${theme.accent || 'rgba(255,255,255,0.2)'};
+            border-radius: ${theme.borderRadius === '0' ? '0' : '50%'};
             width: 32px;
             height: 32px;
             cursor: pointer;
@@ -4355,7 +4568,18 @@
             transition: all 0.3s ease;
             font-size: 14px;
             font-weight: 300;
-          " onmouseover="this.style.background='rgba(255,255,255,0.2)'; this.style.transform='scale(1.1)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'; this.style.transform='scale(1)'">✕</button>
+            ${theme.animations?.glow ? `
+              box-shadow: 0 0 10px ${theme.error || '#ff0000'}33;
+            ` : ''}
+          " onmouseover="
+            this.style.background='${theme.error || '#ff0000'}66'; 
+            this.style.transform='scale(1.1)';
+            ${theme.animations?.glow ? `this.style.boxShadow='0 0 20px ${theme.error || '#ff0000'}';` : ''}
+          " onmouseout="
+            this.style.background='${theme.accent ? `${theme.accent}66` : 'rgba(255,255,255,0.1)'}'; 
+            this.style.transform='scale(1)';
+            ${theme.animations?.glow ? `this.style.boxShadow='0 0 10px ${theme.error || '#ff0000'}33';` : ''}
+          ">✕</button>
         </div>
       </div>
 
@@ -4403,26 +4627,56 @@
 
         <!-- Overlay Settings Section -->
         <div style="margin-bottom: 25px;">
-          <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-eye" style="color: #48dbfb; font-size: 16px;"></i>
+          <label style="display: block; margin-bottom: 12px; color: ${theme.text || 'white'}; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-eye" style="color: ${theme.highlight || '#48dbfb'}; font-size: 16px;"></i>
             Overlay Settings
           </label>
-          <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1);">
+          <div style="
+            background: ${theme.accent ? `${theme.accent}20` : 'rgba(255,255,255,0.1)'}; 
+            border-radius: ${theme.borderRadius || '12px'}; 
+            padding: 18px; 
+            border: 1px solid ${theme.accent || 'rgba(255,255,255,0.1)'};
+            ${theme.animations?.glow ? `
+              box-shadow: 0 0 15px ${theme.accent || 'rgba(255,255,255,0.1)'}33;
+            ` : ''}
+          ">
               <!-- Opacity Slider -->
               <div style="margin-bottom: 15px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                   <span style="font-weight: 500; font-size: 13px;">Overlay Opacity</span>
-                   <div id="overlayOpacityValue" style="min-width: 40px; text-align: center; background: rgba(0,0,0,0.2); padding: 4px 8px; border-radius: 6px; font-size: 12px;">${Math.round(state.overlayOpacity * 100)}%</div>
+                   <span style="font-weight: 500; font-size: 13px; color: ${theme.text || 'white'};">Overlay Opacity</span>
+                   <div id="overlayOpacityValue" style="
+                     min-width: 40px; 
+                     text-align: center; 
+                     background: ${theme.secondary || 'rgba(0,0,0,0.2)'}; 
+                     color: ${theme.text || 'white'};
+                     padding: 4px 8px; 
+                     border-radius: ${theme.borderRadius === '0' ? '0' : '6px'}; 
+                     font-size: 12px;
+                     border: 1px solid ${theme.accent || 'transparent'};
+                   ">${Math.round(state.overlayOpacity * 100)}%</div>
                 </div>
-                <input type="range" id="overlayOpacitySlider" min="0.1" max="1" step="0.05" value="${state.overlayOpacity}" style="width: 100%; -webkit-appearance: none; height: 8px; background: linear-gradient(to right, #48dbfb 0%, #d3a4ff 100%); border-radius: 4px; outline: none; cursor: pointer;">
+                <input type="range" id="overlayOpacitySlider" min="0.1" max="1" step="0.05" value="${state.overlayOpacity}" style="
+                  width: 100%; 
+                  -webkit-appearance: none; 
+                  height: 8px; 
+                  background: linear-gradient(to right, ${theme.highlight || '#48dbfb'} 0%, ${theme.purple || theme.neon || '#d3a4ff'} 100%); 
+                  border-radius: ${theme.borderRadius === '0' ? '0' : '4px'}; 
+                  outline: none; 
+                  cursor: pointer;
+                ">
               </div>
               <!-- Blue Marble Toggle -->
               <label for="enableBlueMarbleToggle" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
                   <div>
-                      <span style="font-weight: 500;">Blue Marble Effect</span>
-                      <p style="font-size: 12px; color: rgba(255,255,255,0.7); margin: 4px 0 0 0;">Renders a dithered "shredded" overlay.</p>
+                      <span style="font-weight: 500; color: ${theme.text || 'white'};">Blue Marble Effect</span>
+                      <p style="font-size: 12px; color: ${theme.text ? `${theme.text}BB` : 'rgba(255,255,255,0.7)'}; margin: 4px 0 0 0;">Renders a dithered "shredded" overlay.</p>
                   </div>
-                  <input type="checkbox" id="enableBlueMarbleToggle" ${state.blueMarbleEnabled ? 'checked' : ''} style="cursor: pointer; width: 20px; height: 20px;"/>
+                  <input type="checkbox" id="enableBlueMarbleToggle" ${state.blueMarbleEnabled ? 'checked' : ''} style="
+                    cursor: pointer; 
+                    width: 20px; 
+                    height: 20px;
+                    accent-color: ${theme.highlight || '#48dbfb'};
+                  "/>
               </label>
           </div>
         </div>
@@ -4433,7 +4687,31 @@
             <i class="fas fa-tachometer-alt" style="color: #4facfe; font-size: 16px;"></i>
             ${Utils.t("paintingSpeed")}
           </label>
-          <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1);">
+          
+          <!-- Batch Mode Selection -->
+          <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 8px; color: rgba(255,255,255,0.9); font-weight: 500; font-size: 14px;">
+              <i class="fas fa-dice" style="color: #f093fb; margin-right: 6px;"></i>
+              Batch Mode
+            </label>
+            <select id="batchModeSelect" style="
+              width: 100%;
+              padding: 10px 12px;
+              background: rgba(255,255,255,0.15);
+              color: white;
+              border: 1px solid rgba(255,255,255,0.2);
+              border-radius: 8px;
+              font-size: 13px;
+              outline: none;
+              cursor: pointer;
+            ">
+              <option value="normal" style="background: #2d3748; color: white;">📦 Normal (Fixed Size)</option>
+              <option value="random" style="background: #2d3748; color: white;">🎲 Random (Range)</option>
+            </select>
+          </div>
+          
+          <!-- Normal Mode: Fixed Size Slider -->
+          <div id="normalBatchControls" style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px;">
             <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
               <input type="range" id="speedSlider" min="${CONFIG.PAINTING_SPEED.MIN}" max="${CONFIG.PAINTING_SPEED.MAX}" value="${CONFIG.PAINTING_SPEED.DEFAULT}"
                 style="
@@ -4463,7 +4741,50 @@
               <span><i class="fas fa-rabbit"></i> ${CONFIG.PAINTING_SPEED.MAX}</span>
             </div>
           </div>
-           <label style="display: flex; align-items: center; gap: 8px; color: white; margin-top: 10px;">
+          
+          <!-- Random Mode: Range Controls -->
+          <div id="randomBatchControls" style="display: none; background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+              <div>
+                <label style="display: block; color: rgba(255,255,255,0.8); font-size: 12px; margin-bottom: 8px;">
+                  <i class="fas fa-arrow-down" style="color: #4facfe; margin-right: 4px;"></i>
+                  Minimum Batch Size
+                </label>
+                <input type="number" id="randomBatchMin" min="1" max="1000" value="${CONFIG.RANDOM_BATCH_RANGE.MIN}" style="
+                  width: 100%;
+                  padding: 10px 12px;
+                  background: rgba(255,255,255,0.1);
+                  color: white;
+                  border: 1px solid rgba(255,255,255,0.2);
+                  border-radius: 8px;
+                  font-size: 13px;
+                  outline: none;
+                ">
+              </div>
+              <div>
+                <label style="display: block; color: rgba(255,255,255,0.8); font-size: 12px; margin-bottom: 8px;">
+                  <i class="fas fa-arrow-up" style="color: #00f2fe; margin-right: 4px;"></i>
+                  Maximum Batch Size
+                </label>
+                <input type="number" id="randomBatchMax" min="1" max="1000" value="${CONFIG.RANDOM_BATCH_RANGE.MAX}" style="
+                  width: 100%;
+                  padding: 10px 12px;
+                  background: rgba(255,255,255,0.1);
+                  color: white;
+                  border: 1px solid rgba(255,255,255,0.2);
+                  border-radius: 8px;
+                  font-size: 13px;
+                  outline: none;
+                ">
+              </div>
+            </div>
+            <p style="font-size: 11px; color: rgba(255,255,255,0.6); margin: 8px 0 0 0; text-align: center;">
+              🎲 Random batch size between min and max values
+            </p>
+          </div>
+          
+          <!-- Speed Control Toggle -->
+          <label style="display: flex; align-items: center; gap: 8px; color: white;">
             <input type="checkbox" id="enableSpeedToggle" ${CONFIG.PAINTING_SPEED_ENABLED ? 'checked' : ''} style="cursor: pointer;"/>
             <span>Enable painting speed limit (batch size control)</span>
           </label>
@@ -4835,6 +5156,21 @@
     const loadBtn = container.querySelector("#loadBtn")
     const saveToFileBtn = container.querySelector("#saveToFileBtn")
     const loadFromFileBtn = container.querySelector("#loadFromFileBtn")
+    
+    // Disable load/upload buttons until initial setup is complete (startup only)
+    if (loadBtn) {
+      loadBtn.disabled = !state.initialSetupComplete;
+      loadBtn.title = state.initialSetupComplete ? "" : "🔄 Waiting for initial setup to complete...";
+    }
+    if (loadFromFileBtn) {
+      loadFromFileBtn.disabled = !state.initialSetupComplete;
+      loadFromFileBtn.title = state.initialSetupComplete ? "" : "🔄 Waiting for initial setup to complete...";
+    }
+    if (uploadBtn) {
+      uploadBtn.disabled = !state.initialSetupComplete;
+      uploadBtn.title = state.initialSetupComplete ? "" : "🔄 Waiting for initial setup to complete...";
+    }
+    
     const minimizeBtn = container.querySelector("#minimizeBtn")
     const compactBtn = container.querySelector("#compactBtn")
     const statsBtn = container.querySelector("#statsBtn")
@@ -5070,6 +5406,64 @@
         })
       }
 
+      // Batch mode controls
+      const batchModeSelect = settingsContainer.querySelector("#batchModeSelect")
+      const normalBatchControls = settingsContainer.querySelector("#normalBatchControls")
+      const randomBatchControls = settingsContainer.querySelector("#randomBatchControls")
+      const randomBatchMin = settingsContainer.querySelector("#randomBatchMin")
+      const randomBatchMax = settingsContainer.querySelector("#randomBatchMax")
+      
+      if (batchModeSelect) {
+        batchModeSelect.addEventListener("change", (e) => {
+          state.batchMode = e.target.value
+          
+          // Switch between normal and random controls
+          if (normalBatchControls && randomBatchControls) {
+            if (e.target.value === 'random') {
+              normalBatchControls.style.display = 'none'
+              randomBatchControls.style.display = 'block'
+            } else {
+              normalBatchControls.style.display = 'block'
+              randomBatchControls.style.display = 'none'
+            }
+          }
+          
+          saveBotSettings()
+          console.log(`📦 Batch mode changed to: ${state.batchMode}`)
+          Utils.showAlert(`Batch mode set to: ${state.batchMode === 'random' ? 'Random Range' : 'Normal Fixed Size'}`, "success")
+        })
+      }
+      
+      if (randomBatchMin) {
+        randomBatchMin.addEventListener("input", (e) => {
+          const min = parseInt(e.target.value)
+          if (min >= 1 && min <= 1000) {
+            state.randomBatchMin = min
+            // Ensure min doesn't exceed max
+            if (randomBatchMax && min > state.randomBatchMax) {
+              state.randomBatchMax = min
+              randomBatchMax.value = min
+            }
+            saveBotSettings()
+          }
+        })
+      }
+      
+      if (randomBatchMax) {
+        randomBatchMax.addEventListener("input", (e) => {
+          const max = parseInt(e.target.value)
+          if (max >= 1 && max <= 1000) {
+            state.randomBatchMax = max
+            // Ensure max doesn't go below min
+            if (randomBatchMin && max < state.randomBatchMin) {
+              state.randomBatchMin = max
+              randomBatchMin.value = max
+            }
+            saveBotSettings()
+          }
+        })
+      }
+
       const languageSelect = settingsContainer.querySelector("#languageSelect")
       if (languageSelect) {
         languageSelect.addEventListener("change", (e) => {
@@ -5248,6 +5642,12 @@
 
     if (loadBtn) {
       loadBtn.addEventListener("click", () => {
+        // Check if initial setup is complete
+        if (!state.initialSetupComplete) {
+          Utils.showAlert("🔄 Please wait for the initial setup to complete before loading progress.", "warning");
+          return;
+        }
+        
         const savedData = Utils.loadProgress()
         if (!savedData) {
           updateUI("noSavedData", "warning")
@@ -5306,6 +5706,12 @@
 
     if (loadFromFileBtn) {
       loadFromFileBtn.addEventListener("click", async () => {
+        // Check if initial setup is complete
+        if (!state.initialSetupComplete) {
+          Utils.showAlert("🔄 Please wait for the initial setup to complete before loading from file.", "warning");
+          return;
+        }
+        
         try {
           const success = await Utils.loadProgressFromFile()
           if (success) {
@@ -6644,10 +7050,11 @@
             localY: y,
           });
 
-          // Use paintingSpeed as batch size, but limit by available charges
-          const maxBatchSize = Math.min(state.paintingSpeed, Math.floor(state.currentCharges));
+          // Calculate batch size based on mode (normal/random)
+          const maxBatchSize = calculateBatchSize();
           if (pixelBatch.pixels.length >= maxBatchSize) {
-            console.log(`📦 Sending batch with ${pixelBatch.pixels.length} pixels (batch size setting: ${state.paintingSpeed}, max allowed: ${maxBatchSize})`);
+            const modeText = state.batchMode === 'random' ? `random (${state.randomBatchMin}-${state.randomBatchMax})` : 'normal';
+            console.log(`📦 Sending batch with ${pixelBatch.pixels.length} pixels (mode: ${modeText}, target: ${maxBatchSize})`);
             const success = await sendBatchWithRetry(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
 
             if (success) {
@@ -6754,6 +7161,28 @@
     console.log(`   Total processed: ${state.paintedPixels + skippedPixels.transparent + skippedPixels.white + skippedPixels.alreadyPainted}`);
 
     updateStats()
+  }
+
+  // Helper function to calculate batch size based on mode
+  function calculateBatchSize() {
+    let targetBatchSize;
+    
+    if (state.batchMode === 'random') {
+      // Generate random batch size within the specified range
+      const min = Math.max(1, state.randomBatchMin);
+      const max = Math.max(min, state.randomBatchMax);
+      targetBatchSize = Math.floor(Math.random() * (max - min + 1)) + min;
+      console.log(`🎲 Random batch size generated: ${targetBatchSize} (range: ${min}-${max})`);
+    } else {
+      // Normal mode - use the fixed paintingSpeed value
+      targetBatchSize = state.paintingSpeed;
+    }
+    
+    // Always limit by available charges
+    const maxAllowed = Math.floor(state.currentCharges);
+    const finalBatchSize = Math.min(targetBatchSize, maxAllowed);
+    
+    return finalBatchSize;
   }
 
   // Helper function to retry batch until success with exponential backoff
@@ -6885,6 +7314,9 @@
       const settings = {
         paintingSpeed: state.paintingSpeed,
         paintingSpeedEnabled: document.getElementById('enableSpeedToggle')?.checked,
+        batchMode: state.batchMode, // "normal" or "random"
+        randomBatchMin: state.randomBatchMin,
+        randomBatchMax: state.randomBatchMax,
         cooldownChargeThreshold: state.cooldownChargeThreshold,
         tokenSource: state.tokenSource, // "generator", "hybrid", or "manual"
         minimized: state.minimized,
@@ -6925,6 +7357,9 @@
       const settings = JSON.parse(saved);
 
       state.paintingSpeed = settings.paintingSpeed || CONFIG.PAINTING_SPEED.DEFAULT;
+      state.batchMode = settings.batchMode || CONFIG.BATCH_MODE; // Default to "normal"
+      state.randomBatchMin = settings.randomBatchMin || CONFIG.RANDOM_BATCH_RANGE.MIN;
+      state.randomBatchMax = settings.randomBatchMax || CONFIG.RANDOM_BATCH_RANGE.MAX;
       state.cooldownChargeThreshold = settings.cooldownChargeThreshold || CONFIG.COOLDOWN_CHARGE_THRESHOLD;
       state.tokenSource = settings.tokenSource || CONFIG.TOKEN_SOURCE; // Default to "generator"
       state.minimized = settings.minimized ?? false;
@@ -6965,6 +7400,30 @@
 
       const enableSpeedToggle = document.getElementById('enableSpeedToggle');
       if (enableSpeedToggle) enableSpeedToggle.checked = CONFIG.PAINTING_SPEED_ENABLED;
+
+      // Batch mode UI initialization
+      const batchModeSelect = document.getElementById('batchModeSelect');
+      if (batchModeSelect) batchModeSelect.value = state.batchMode;
+      
+      const normalBatchControls = document.getElementById('normalBatchControls');
+      const randomBatchControls = document.getElementById('randomBatchControls');
+      
+      // Show/hide appropriate controls based on batch mode
+      if (normalBatchControls && randomBatchControls) {
+        if (state.batchMode === 'random') {
+          normalBatchControls.style.display = 'none';
+          randomBatchControls.style.display = 'block';
+        } else {
+          normalBatchControls.style.display = 'block';
+          randomBatchControls.style.display = 'none';
+        }
+      }
+      
+      const randomBatchMin = document.getElementById('randomBatchMin');
+      if (randomBatchMin) randomBatchMin.value = state.randomBatchMin;
+      
+      const randomBatchMax = document.getElementById('randomBatchMax');
+      if (randomBatchMax) randomBatchMax.value = state.randomBatchMax;
 
       // AUTO_CAPTCHA_ENABLED is always true - no toggle to set
 
@@ -7017,12 +7476,58 @@
   console.log("🎯 Manual pixel captcha solving: Available as fallback/alternative");
   console.log("📱 Turnstile widgets: DISABLED - pure background token generation only!");
 
+  // Function to enable file operations after initial startup setup is complete
+  function enableFileOperations() {
+    state.initialSetupComplete = true;
+    
+    const loadBtn = document.querySelector("#loadBtn");
+    const loadFromFileBtn = document.querySelector("#loadFromFileBtn");
+    const uploadBtn = document.querySelector("#uploadBtn");
+    
+    if (loadBtn) {
+      loadBtn.disabled = false;
+      loadBtn.title = "";
+      // Add a subtle animation to indicate the button is now available
+      loadBtn.style.animation = "pulse 0.6s ease-in-out";
+      setTimeout(() => {
+        if (loadBtn) loadBtn.style.animation = "";
+      }, 600);
+      console.log("✅ Load Progress button enabled after initial setup");
+    }
+    
+    if (loadFromFileBtn) {
+      loadFromFileBtn.disabled = false;
+      loadFromFileBtn.title = "";
+      // Add a subtle animation to indicate the button is now available
+      loadFromFileBtn.style.animation = "pulse 0.6s ease-in-out";
+      setTimeout(() => {
+        if (loadFromFileBtn) loadFromFileBtn.style.animation = "";
+      }, 600);
+      console.log("✅ Load from File button enabled after initial setup");
+    }
+    
+    if (uploadBtn) {
+      uploadBtn.disabled = false;
+      uploadBtn.title = "";
+      // Add a subtle animation to indicate the button is now available
+      uploadBtn.style.animation = "pulse 0.6s ease-in-out";
+      setTimeout(() => {
+        if (uploadBtn) uploadBtn.style.animation = "";
+      }, 600);
+      console.log("✅ Upload Image button enabled after initial setup");
+    }
+    
+    // Show a notification that file operations are now available
+    Utils.showAlert("📂 File operations (Load/Upload) are now available!", "success");
+  }
+
   // Optimized token initialization with better timing and error handling
   async function initializeTokenGenerator() {
     // Skip if already have valid token
     if (isTokenValid()) {
       console.log("✅ Valid token already available, skipping initialization");
       updateUI("tokenReady", "success");
+      enableFileOperations(); // Enable file operations since initial setup is complete
       return;
     }
 
@@ -7039,16 +7544,26 @@
         console.log("✅ Startup token generated successfully");
         updateUI("tokenReady", "success");
         Utils.showAlert("🔑 Token generator ready!", "success");
+        enableFileOperations(); // Enable file operations since initial setup is complete
       } else {
         console.warn("⚠️ Startup token generation failed, will retry when needed");
         updateUI("tokenRetryLater", "warning");
+        // Still enable file operations even if initial token generation fails
+        // Users can load progress and use manual/hybrid modes
+        enableFileOperations();
       }
     } catch (error) {
       console.warn("⚠️ Startup token generation failed:", error);
       updateUI("tokenRetryLater", "warning");
+      // Still enable file operations even if initial setup fails
+      // Users can load progress and use manual/hybrid modes
+      enableFileOperations();
       // Don't show error alert for initialization failures, just log them
     }
   }
+
+  // Load theme preference immediately on startup before creating UI
+  loadThemePreference()
 
   createUI().then(() => {
     // Generate token automatically after UI is ready
