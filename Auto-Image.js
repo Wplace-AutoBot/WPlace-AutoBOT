@@ -1332,7 +1332,15 @@
         const y = Math.max(0, Math.min(cached.h - 1, pixelY));
         const idx = (y * cached.w + x) * 4;
         const d = cached.data;
-        return [d[idx], d[idx + 1], d[idx + 2], d[idx + 3]];
+        const a = d[idx + 3];
+        const alphaThresh = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
+        if (a < alphaThresh) {
+          // Treat as transparent / unavailable
+          // Lightweight debug: show when transparency causes skip (only if verbose enabled)
+          if (window._overlayDebug) console.debug('getTilePixelColor: transparent pixel, skipping', tileKey, x, y, a);
+          return null;
+        }
+        return [d[idx], d[idx + 1], d[idx + 2], a];
       }
 
       // Fallback: draw stored bitmap to canvas and read single pixel
@@ -1356,7 +1364,13 @@
         const x = Math.max(0, Math.min(bitmap.width - 1, pixelX));
         const y = Math.max(0, Math.min(bitmap.height - 1, pixelY));
         const data = ctx.getImageData(x, y, 1, 1).data;
-        return [data[0], data[1], data[2], data[3]];
+        const a = data[3];
+        const alphaThresh = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
+        if (a < alphaThresh) {
+          if (window._overlayDebug) console.debug('getTilePixelColor: transparent pixel (fallback), skipping', tileKey, x, y, a);
+          return null;
+        }
+        return [data[0], data[1], data[2], a];
       } catch (e) {
         console.warn('OverlayManager.getTilePixelColor failed for', tileKey, pixelX, pixelY, e);
         return null;
