@@ -113,7 +113,6 @@ javascript:fetch("https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBO
 - [x] Add AutoCaptcha Solver
 - [x] Add Correct Color Pixel Skip
 - [ ] Separate Css
-- [ ] Tutorials
 
 ---
 
