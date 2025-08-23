@@ -1077,6 +1077,7 @@
       this.imageBitmap = null;
       this.chunkedTiles = new Map(); // Map<"tileX,tileY", ImageBitmap>
       this.originalTiles = new Map(); // Map<"tileX,tileY", ImageBitmap> store latest original tile bitmaps
+      this.originalTilesData = new Map(); // Map<"tileX,tileY", {w,h,data:Uint8ClampedArray}> cache full ImageData for fast pixel reads
       this.tileSize = 1000;
       this.processPromise = null; // Track ongoing processing
       this.lastProcessedHash = null; // Cache invalidation
@@ -1095,7 +1096,8 @@
       this.disable();
       this.imageBitmap = null;
       this.chunkedTiles.clear();
-      this.originalTiles.clear();
+  this.originalTiles.clear();
+  this.originalTilesData.clear();
       this.lastProcessedHash = null;
       if (this.processPromise) {
         this.processPromise = null;
@@ -1275,6 +1277,27 @@
           try {
             const originalBitmap = await createImageBitmap(blobData);
             this.originalTiles.set(tileKey, originalBitmap);
+            // Cache full ImageData for fast pixel access (avoid repeated drawImage/getImageData)
+            try {
+              let canvas, ctx;
+              if (typeof OffscreenCanvas !== 'undefined') {
+                canvas = new OffscreenCanvas(originalBitmap.width, originalBitmap.height);
+                ctx = canvas.getContext('2d');
+              } else {
+                canvas = document.createElement('canvas');
+                canvas.width = originalBitmap.width;
+                canvas.height = originalBitmap.height;
+                ctx = canvas.getContext('2d');
+              }
+              ctx.imageSmoothingEnabled = false;
+              ctx.drawImage(originalBitmap, 0, 0);
+              const imgData = ctx.getImageData(0, 0, originalBitmap.width, originalBitmap.height);
+              // Store typed array copy to avoid retaining large canvas
+              this.originalTilesData.set(tileKey, { w: originalBitmap.width, h: originalBitmap.height, data: new Uint8ClampedArray(imgData.data) });
+            } catch (e) {
+              // If ImageData extraction fails, still keep the bitmap as fallback
+              console.warn('OverlayManager: could not cache ImageData for', tileKey, e);
+            }
           } catch (e) {
             console.warn('OverlayManager: could not create original bitmap for', tileKey, e);
           }
@@ -1302,6 +1325,17 @@
     // Returns [r,g,b,a] for a pixel inside a region tile (tileX, tileY are region coords)
     async getTilePixelColor(tileX, tileY, pixelX, pixelY) {
       const tileKey = `${tileX},${tileY}`;
+      // Prefer cached ImageData if available
+      const cached = this.originalTilesData.get(tileKey);
+      if (cached && cached.data && cached.w > 0 && cached.h > 0) {
+        const x = Math.max(0, Math.min(cached.w - 1, pixelX));
+        const y = Math.max(0, Math.min(cached.h - 1, pixelY));
+        const idx = (y * cached.w + x) * 4;
+        const d = cached.data;
+        return [d[idx], d[idx + 1], d[idx + 2], d[idx + 3]];
+      }
+
+      // Fallback: draw stored bitmap to canvas and read single pixel
       const bitmap = this.originalTiles.get(tileKey);
       if (!bitmap) return null;
 
@@ -6318,6 +6352,7 @@
             if (existingColorRGBA && Array.isArray(existingColorRGBA)) {
               const [er, eg, eb] = existingColorRGBA;
               const existingColorId = findClosestColor([er, eg, eb], state.availableColors);
+              // console.log(`pixel at (${pixelX}, ${pixelY}) has color ${existingColorId} it should be ${colorId}`);
               if (existingColorId === colorId) {
                 skippedPixels.alreadyPainted++;
                 console.log(`Skipped already painted pixel at (${pixelX}, ${pixelY})`);
