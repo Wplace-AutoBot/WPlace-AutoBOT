@@ -82,7 +82,7 @@ javascript:fetch("https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBO
 ### ✨┃Features
 
 - [x] Automatically farms droplets/levels
-- [x] Add Correct Color Pixel Skip
+- [x] Correct Color Pixel Skip
 - [x] Overlay(you dont need bluemarble anymore)
 - [x] Paint over multiple tiles
 - [x] AutoCaptcha Solver With Turnstile Token Generator
@@ -111,6 +111,7 @@ javascript:fetch("https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBO
 - [x] Add Overlay system
 - [x] Add Cross Tiles Support
 - [x] Add AutoCaptcha Solver
+- [x] Add Correct Color Pixel Skip
 - [ ] Separate Css
 - [ ] Tutorials
 
