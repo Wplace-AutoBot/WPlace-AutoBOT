@@ -16,7 +16,7 @@
     OVERLAY: {
       OPACITY_DEFAULT: 0.6,
       BLUE_MARBLE_DEFAULT: false,
-      ditheringEnabled: true,
+      ditheringEnabled: false,
     },
     // --- START: Color data from colour-converter.js ---
     // New color structure with proper ID mapping
@@ -1054,9 +1054,9 @@
     cooldownChargeThreshold: CONFIG.COOLDOWN_CHARGE_THRESHOLD,
     overlayOpacity: CONFIG.OVERLAY.OPACITY_DEFAULT,
     blueMarbleEnabled: CONFIG.OVERLAY.BLUE_MARBLE_DEFAULT,
-  ditheringEnabled: false,
+  ditheringEnabled: true,
   // Advanced color matching settings
-  colorMatchingAlgorithm: 'lab', // 'lab' | 'legacy'
+  colorMatchingAlgorithm: 'lab',
   enableChromaPenalty: true,
   chromaPenaltyWeight: 0.15,
   customTransparencyThreshold: CONFIG.TRANSPARENCY_THRESHOLD,
@@ -1066,8 +1066,8 @@
   resizeIgnoreMask: null,
   }
 
-  // Placeholder for the resize preview update function
   let _updateResizePreview = () => { };
+  let _resizeDialogCleanup = null;
 
   // --- OVERLAY UPDATE: Optimized OverlayManager class with performance improvements ---
   class OverlayManager {
@@ -5267,6 +5267,50 @@
       let _previewJobId = 0;
       let _isDraggingSize = false;
       let _zoomLevel = 1;
+      let _ditherWorkBuf = null; 
+      let _ditherEligibleBuf = null;
+      const ensureDitherBuffers = (n) => {
+        if (!_ditherWorkBuf || _ditherWorkBuf.length !== n * 3) _ditherWorkBuf = new Float32Array(n * 3);
+        if (!_ditherEligibleBuf || _ditherEligibleBuf.length !== n) _ditherEligibleBuf = new Uint8Array(n);
+        return { work: _ditherWorkBuf, eligible: _ditherEligibleBuf };
+      };
+      let _maskImageData = null;
+      let _maskData = null;
+      let _dirty = null;
+      const _resetDirty = () => { _dirty = { minX: Infinity, minY: Infinity, maxX: -1, maxY: -1 }; };
+      const _markDirty = (x, y) => {
+        if (!_dirty) _resetDirty();
+        if (x < _dirty.minX) _dirty.minX = x;
+        if (y < _dirty.minY) _dirty.minY = y;
+        if (x > _dirty.maxX) _dirty.maxX = x;
+        if (y > _dirty.maxY) _dirty.maxY = y;
+      };
+      const _flushDirty = () => {
+        if (!_dirty || _dirty.maxX < _dirty.minX || _dirty.maxY < _dirty.minY) return;
+        const x = Math.max(0, _dirty.minX);
+        const y = Math.max(0, _dirty.minY);
+        const w = Math.min(maskCanvas.width - x, _dirty.maxX - x + 1);
+        const h = Math.min(maskCanvas.height - y, _dirty.maxY - y + 1);
+        if (w > 0 && h > 0) maskCtx.putImageData(_maskImageData, 0, 0, x, y, w, h);
+        _resetDirty();
+      };
+      const _ensureMaskOverlayBuffers = (w, h, rebuildFromMask = false) => {
+        if (!_maskImageData || _maskImageData.width !== w || _maskImageData.height !== h) {
+          _maskImageData = maskCtx.createImageData(w, h);
+          _maskData = _maskImageData.data;
+          rebuildFromMask = true;
+        }
+        if (rebuildFromMask) {
+          const m = state.resizeIgnoreMask;
+          const md = _maskData;
+          md.fill(0);
+          if (m) {
+            for (let i = 0; i < m.length; i++) if (m[i]) { const p = i * 4; md[p] = 255; md[p + 1] = 0; md[p + 2] = 0; md[p + 3] = 150; }
+          }
+          maskCtx.putImageData(_maskImageData, 0, 0);
+          _resetDirty();
+        }
+      };
       const ensureMaskSize = (w, h) => {
         if (!state.resizeIgnoreMask || state.resizeIgnoreMask.length !== w * h) {
           state.resizeIgnoreMask = new Uint8Array(w * h);
@@ -5274,6 +5318,8 @@
         baseCanvas.width = w; baseCanvas.height = h;
         maskCanvas.width = w; maskCanvas.height = h;
         maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+        // Ensure overlay buffers exist and rebuild from mask when dimensions change
+        _ensureMaskOverlayBuffers(w, h, true);
       };
       _updateResizePreview = async () => {
         const jobId = ++_previewJobId;
@@ -5294,14 +5340,9 @@
           }
           baseCtx.clearRect(0,0,newWidth,newHeight);
           baseCtx.drawImage(baseProcessor.img, 0, 0, newWidth, newHeight);
-          // Draw mask on overlay canvas only
+          // Draw existing mask overlay buffer
           maskCtx.clearRect(0,0,maskCanvas.width,maskCanvas.height);
-          if (state.resizeIgnoreMask) {
-            const img = maskCtx.createImageData(newWidth, newHeight);
-            const md = img.data; const m = state.resizeIgnoreMask;
-            for (let i=0;i<m.length;i++) if (m[i]) { const p=i*4; md[p]=255; md[p+1]=0; md[p+2]=0; md[p+3]=150; }
-            maskCtx.putImageData(img,0,0);
-          }
+          if (_maskImageData) maskCtx.putImageData(_maskImageData, 0, 0);
           updateZoomLayout();
           return;
         }
@@ -5318,8 +5359,7 @@
         const applyFSDither = () => {
           const w = newWidth, h = newHeight;
           const n = w * h;
-          const work = new Float32Array(n * 3);
-          const eligible = new Uint8Array(n);
+          const { work, eligible } = ensureDitherBuffers(n);
           for (let y = 0; y < h; y++) {
             for (let x = 0; x < w; x++) {
               const idx = y * w + x;
@@ -5391,13 +5431,8 @@
 
         if (jobId !== _previewJobId) return;
         baseCtx.putImageData(imgData, 0, 0);
-        maskCtx.clearRect(0,0,maskCanvas.width,maskCanvas.height);
-        if (state.resizeIgnoreMask) {
-          const img = maskCtx.createImageData(newWidth, newHeight);
-          const md = img.data; const m = state.resizeIgnoreMask;
-          for (let i=0;i<m.length;i++) if (m[i]) { const p=i*4; md[p]=255; md[p+1]=0; md[p+2]=0; md[p+3]=150; }
-          maskCtx.putImageData(img,0,0);
-        }
+  maskCtx.clearRect(0,0,maskCanvas.width,maskCanvas.height);
+  if (_maskImageData) maskCtx.putImageData(_maskImageData, 0, 0);
   updateZoomLayout();
       };
 
@@ -5452,9 +5487,14 @@
           panY = Math.min(0, Math.max(minY, panY));
         }
       };
+      let _panRaf = 0;
       const applyPan = () => {
-        clampPan();
-        canvasStack.style.transform = `translate(${panX}px, ${panY}px) scale(${_zoomLevel})`;
+        if (_panRaf) return;
+        _panRaf = requestAnimationFrame(() => {
+          clampPan();
+          canvasStack.style.transform = `translate3d(${Math.round(panX)}px, ${Math.round(panY)}px, 0) scale(${_zoomLevel})`;
+          _panRaf = 0;
+        });
       };
 
       const updateZoomLayout = () => {
@@ -5688,12 +5728,20 @@
             const dx = xx - cx, dy = yy - cy;
             if (dx * dx + dy * dy <= r2) {
               const idx = yy * w + xx;
+              let val = state.resizeIgnoreMask[idx];
               if (maskMode === 'toggle') {
-                state.resizeIgnoreMask[idx] = state.resizeIgnoreMask[idx] ? 0 : 1;
+                val = val ? 0 : 1;
               } else if (maskMode === 'ignore') {
-                state.resizeIgnoreMask[idx] = 1;
+                val = 1;
               } else {
-                state.resizeIgnoreMask[idx] = 0;
+                val = 0;
+              }
+              state.resizeIgnoreMask[idx] = val;
+              if (_maskData) {
+                const p = idx * 4;
+                if (val) { _maskData[p] = 255; _maskData[p + 1] = 0; _maskData[p + 2] = 0; _maskData[p + 3] = 150; }
+                else { _maskData[p] = 0; _maskData[p + 1] = 0; _maskData[p + 2] = 0; _maskData[p + 3] = 0; }
+                _markDirty(xx, yy);
               }
             }
           }
@@ -5706,14 +5754,22 @@
         if (y < 0 || y >= h) return;
         for (let x = 0; x < w; x++) {
           const idx = y * w + x;
+          let val = state.resizeIgnoreMask[idx];
           if (maskMode === 'toggle') {
-            state.resizeIgnoreMask[idx] = state.resizeIgnoreMask[idx] ? 0 : 1;
+            val = val ? 0 : 1;
           } else if (maskMode === 'ignore') {
-            state.resizeIgnoreMask[idx] = 1;
+            val = 1;
           } else {
-            state.resizeIgnoreMask[idx] = 0;
+            val = 0;
+          }
+          state.resizeIgnoreMask[idx] = val;
+          if (_maskData) {
+            const p = idx * 4;
+            if (val) { _maskData[p] = 255; _maskData[p + 1] = 0; _maskData[p + 2] = 0; _maskData[p + 3] = 150; }
+            else { _maskData[p] = 0; _maskData[p + 1] = 0; _maskData[p + 2] = 0; _maskData[p + 3] = 0; }
           }
         }
+        if (_maskData) { _markDirty(0, y); _markDirty(w - 1, y); }
       };
 
       const paintColumn = (x, value) => {
@@ -5722,31 +5778,27 @@
         if (x < 0 || x >= w) return;
         for (let y = 0; y < h; y++) {
           const idx = y * w + x;
+          let val = state.resizeIgnoreMask[idx];
           if (maskMode === 'toggle') {
-            state.resizeIgnoreMask[idx] = state.resizeIgnoreMask[idx] ? 0 : 1;
+            val = val ? 0 : 1;
           } else if (maskMode === 'ignore') {
-            state.resizeIgnoreMask[idx] = 1;
+            val = 1;
           } else {
-            state.resizeIgnoreMask[idx] = 0;
+            val = 0;
+          }
+          state.resizeIgnoreMask[idx] = val;
+          if (_maskData) {
+            const p = idx * 4;
+            if (val) { _maskData[p] = 255; _maskData[p + 1] = 0; _maskData[p + 2] = 0; _maskData[p + 3] = 150; }
+            else { _maskData[p] = 0; _maskData[p + 1] = 0; _maskData[p + 2] = 0; _maskData[p + 3] = 0; }
           }
         }
+        if (_maskData) { _markDirty(x, 0); _markDirty(x, h - 1); }
       };
 
       const redrawMaskOverlay = () => {
-        const w = baseCanvas.width, h = baseCanvas.height;
-        maskCanvas.width = w; maskCanvas.height = h;
-        maskCtx.clearRect(0, 0, w, h);
-        if (!state.resizeIgnoreMask) return;
-        // Draw ignored pixels as semi-transparent red squares
-        const img = maskCtx.createImageData(w, h);
-        const md = img.data;
-        for (let i = 0; i < state.resizeIgnoreMask.length; i++) {
-          if (state.resizeIgnoreMask[i]) {
-            const p = i * 4;
-            md[p] = 255; md[p + 1] = 0; md[p + 2] = 0; md[p + 3] = 150;
-          }
-        }
-        maskCtx.putImageData(img, 0, 0);
+        // Only flush the dirty region; full rebuild happens on size change
+        _flushDirty();
       };
 
       const handlePaint = (e) => {
@@ -5779,8 +5831,9 @@
       window.addEventListener('mouseup', () => { if (draggingMask) { draggingMask = false; saveBotSettings(); }});
 
       if (clearIgnoredBtnEl) clearIgnoredBtnEl.addEventListener('click', () => {
+        const w = baseCanvas.width, h = baseCanvas.height;
         if (state.resizeIgnoreMask) state.resizeIgnoreMask.fill(0);
-        redrawMaskOverlay();
+        _ensureMaskOverlayBuffers(w, h, true);
         _updateResizePreview();
         saveBotSettings();
       });
@@ -5788,7 +5841,8 @@
       if (invertMaskBtn) invertMaskBtn.addEventListener('click', () => {
         if (!state.resizeIgnoreMask) return;
         for (let i = 0; i < state.resizeIgnoreMask.length; i++) state.resizeIgnoreMask[i] = state.resizeIgnoreMask[i] ? 0 : 1;
-        redrawMaskOverlay();
+        const w = baseCanvas.width, h = baseCanvas.height;
+        _ensureMaskOverlayBuffers(w, h, true);
         _updateResizePreview();
         saveBotSettings();
       });
@@ -5816,8 +5870,7 @@
         const applyFSDitherFinal = async () => {
           const w = newWidth, h = newHeight;
           const n = w * h;
-          const work = new Float32Array(n * 3);
-          const eligible = new Uint8Array(n);
+          const { work, eligible } = ensureDitherBuffers(n);
           for (let y = 0; y < h; y++) {
             for (let x = 0; x < w; x++) {
               const idx = y * w + x;
@@ -5948,6 +6001,11 @@
       initializeColorPalette(resizeContainer);
 
       _updateResizePreview();
+      _resizeDialogCleanup = () => {
+        try { zoomSlider.replaceWith(zoomSlider.cloneNode(true)); } catch {}
+        try { if (zoomInBtn) zoomInBtn.replaceWith(zoomInBtn.cloneNode(true)); } catch {}
+        try { if (zoomOutBtn) zoomOutBtn.replaceWith(zoomOutBtn.cloneNode(true)); } catch {}
+      };
       setTimeout(() => {
         if (typeof computeFitZoom === 'function') {
           const z = computeFitZoom();
@@ -5962,9 +6020,15 @@
     }
 
     function closeResizeDialog() {
+  try { if (typeof _resizeDialogCleanup === 'function') { _resizeDialogCleanup(); } } catch {}
       resizeOverlay.style.display = "none";
       resizeContainer.style.display = "none";
       _updateResizePreview = () => { };
+      try { if (typeof cancelAnimationFrame === 'function' && _panRaf) { cancelAnimationFrame(_panRaf); } } catch {}
+      try { if (_previewTimer) { clearTimeout(_previewTimer); _previewTimer = null; } } catch {}
+      _maskImageData = null; _maskData = null; _dirty = null;
+      _ditherWorkBuf = null; _ditherEligibleBuf = null;
+  _resizeDialogCleanup = null;
     }
 
     if (uploadBtn) {
