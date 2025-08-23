@@ -6,12 +6,13 @@
     WHITE_THRESHOLD: 250,
     LOG_INTERVAL: 10,
     PAINTING_SPEED: {
-      MIN: 1,          // Minimum 1 pixel per second
-      MAX: 1000,       // Maximum 1000 pixels per second
-      DEFAULT: 5,      // Default 5 pixels per second
+      MIN: 1,          // Minimum 1 pixel batch size
+      MAX: 1000,       // Maximum 1000 pixels batch size
+      DEFAULT: 5,      // Default 5 pixels batch size
     },
-    PAINTING_SPEED_ENABLED: false,
+    PAINTING_SPEED_ENABLED: false, // Off by default
     AUTO_CAPTCHA_ENABLED: true, // Turnstile generator enabled by default
+    TOKEN_SOURCE: "generator", // "generator", "manual", or "hybrid" - default to generator
     COOLDOWN_CHARGE_THRESHOLD: 1, // Default wait threshold
     OVERLAY: {
       OPACITY_DEFAULT: 0.6,
@@ -1050,8 +1051,9 @@
     lastPosition: { x: 0, y: 0 },
     estimatedTime: 0,
     language: "en",
-    paintingSpeed: CONFIG.PAINTING_SPEED.DEFAULT, // pixels per second
+    paintingSpeed: CONFIG.PAINTING_SPEED.DEFAULT, // pixels batch size
     cooldownChargeThreshold: CONFIG.COOLDOWN_CHARGE_THRESHOLD,
+    tokenSource: CONFIG.TOKEN_SOURCE, // "generator" or "manual"
     overlayOpacity: CONFIG.OVERLAY.OPACITY_DEFAULT,
     blueMarbleEnabled: CONFIG.OVERLAY.BLUE_MARBLE_DEFAULT,
   ditheringEnabled: true,
@@ -1635,7 +1637,7 @@
       });
     },
 
-    // Create or reuse the turnstile container
+    // Create or reuse the turnstile container - completely hidden for token generation
     ensureTurnstileContainer() {
       if (!this._turnstileContainer || !document.body.contains(this._turnstileContainer)) {
         // Clean up old container if it exists
@@ -1646,13 +1648,15 @@
         this._turnstileContainer = document.createElement('div');
         this._turnstileContainer.style.cssText = `
           position: fixed !important;
-          left: -9999px !important; /* keep off-screen for invisible mode */
-          top: -9999px !important;
-          width: 300px !important;
-          height: 65px !important;
+          left: -99999px !important;
+          top: -99999px !important;
+          width: 1px !important;
+          height: 1px !important;
           pointer-events: none !important;
-          opacity: 0 !important; /* do not use visibility:hidden to avoid engine quirks */
-          z-index: -1 !important;
+          opacity: 0 !important;
+          visibility: hidden !important;
+          z-index: -99999 !important;
+          overflow: hidden !important;
         `;
         this._turnstileContainer.setAttribute('aria-hidden', 'true');
         this._turnstileContainer.id = 'turnstile-widget-container';
@@ -1661,43 +1665,11 @@
       return this._turnstileContainer;
     },
 
+    // No interactive overlay container needed - pure background operation
     ensureTurnstileOverlayContainer() {
-      if (this._turnstileOverlay && document.body.contains(this._turnstileOverlay)) {
-        return this._turnstileOverlay;
-      }
-      const overlay = document.createElement('div');
-      overlay.id = 'turnstile-overlay-container';
-      overlay.style.cssText = `
-        position: fixed;
-        right: 16px;
-        bottom: 16px;
-        width: 320px;
-        min-height: 80px;
-        background: rgba(0,0,0,0.7);
-        border: 1px solid rgba(255,255,255,0.2);
-        border-radius: 10px;
-        padding: 12px;
-        z-index: 100000;
-        backdrop-filter: blur(6px);
-        color: #fff;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-      `;
-      const title = document.createElement('div');
-      title.textContent = 'Cloudflare Turnstile — please complete the check if shown';
-      title.style.cssText = 'font: 600 12px/1.3 \"Segoe UI\",sans-serif; margin-bottom: 8px; opacity: 0.9;';
-      const widgetHost = document.createElement('div');
-      widgetHost.id = 'turnstile-overlay-host';
-      widgetHost.style.cssText = 'width: 100%; min-height: 70px;';
-      const closeBtn = document.createElement('button');
-      closeBtn.textContent = 'Hide';
-      closeBtn.style.cssText = 'position:absolute; top:6px; right:6px; font-size:11px; background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.2); border-radius:6px; padding:2px 6px; cursor:pointer;';
-      closeBtn.addEventListener('click', () => overlay.remove());
-      overlay.appendChild(title);
-      overlay.appendChild(widgetHost);
-      overlay.appendChild(closeBtn);
-      document.body.appendChild(overlay);
-      this._turnstileOverlay = overlay;
-      return overlay;
+      // Return null since we don't want any visible widgets
+      console.log('🚫 Interactive Turnstile overlay disabled - background mode only');
+      return null;
     },
 
     async executeTurnstile(sitekey, action = 'paint') {
@@ -1734,85 +1706,65 @@
           }
           const container = this.ensureTurnstileContainer();
           container.innerHTML = '';
+          
+          // Set a timeout to resolve with null if no token is received
+          const timeout = setTimeout(() => {
+            console.warn('⏰ Turnstile widget timeout - no token received');
+            resolve(null);
+          }, 15000);
+          
           const widgetId = window.turnstile.render(container, {
             sitekey,
             action,
-            size: 'invisible',
+            size: 'compact',
             retry: 'auto',
             'retry-interval': 8000,
             callback: (token) => {
-              console.log('✅ Invisible Turnstile callback');
+              clearTimeout(timeout);
+              console.log('✅ Turnstile token received from hidden widget:', token ? 'Valid token' : 'Invalid token');
               resolve(token);
             },
-            'error-callback': () => resolve(null),
-            'timeout-callback': () => resolve(null),
+            'error-callback': (error) => {
+              clearTimeout(timeout);
+              console.warn('❌ Turnstile error callback:', error);
+              resolve(null);
+            },
+            'timeout-callback': () => {
+              clearTimeout(timeout);
+              console.warn('⏰ Turnstile timeout callback');
+              resolve(null);
+            },
           });
+          
           this._turnstileWidgetId = widgetId;
           this._lastSitekey = sitekey;
-          if (!widgetId) return resolve(null);
-          Promise.race([
-            window.turnstile.execute(widgetId, { action }),
-            new Promise((_, reject) => setTimeout(() => reject(new Error('Invisible execute timeout')), 12000))
-          ]).then(resolve).catch(() => resolve(null));
+          
+          if (!widgetId) {
+            clearTimeout(timeout);
+            console.warn('❌ Failed to create Turnstile widget');
+            resolve(null);
+          }
         } catch (e) {
-          console.warn('Invisible Turnstile failed:', e);
+          console.warn('❌ Invisible Turnstile failed:', e);
           resolve(null);
         }
       });
     },
 
     async createNewTurnstileWidgetInteractive(sitekey, action) {
-      return new Promise((resolve, reject) => {
-        try {
-          if (this._turnstileWidgetId && window.turnstile?.remove) {
-            try { window.turnstile.remove(this._turnstileWidgetId); } catch {}
-          }
-
-          const overlay = this.ensureTurnstileOverlayContainer();
-          const host = overlay.querySelector('#turnstile-overlay-host');
-          host.innerHTML = '';
-
-          const timeoutId = setTimeout(() => {
-            console.warn('⏰ Interactive Turnstile timed out');
-            resolve(null);
-          }, 120000); // give users up to 2 minutes
-
-          const widgetId = window.turnstile.render(host, {
-            sitekey,
-            action,
-            size: 'normal',
-            retry: 'auto',
-            'retry-interval': 8000,
-            callback: (token) => {
-              clearTimeout(timeoutId);
-              // Hide overlay after success
-              try { overlay.remove(); } catch {}
-              console.log('✅ Interactive Turnstile solved');
-              resolve(token);
-            },
-            'error-callback': (error) => {
-              console.warn('🚨 Interactive Turnstile error:', error);
-            },
-            'timeout-callback': () => {
-              console.warn('⏰ Turnstile timeout callback (interactive)');
-            },
-            'expired-callback': () => {
-              console.warn('⚠️ Interactive Turnstile token expired');
-            }
-          });
-
-          this._turnstileWidgetId = widgetId;
-          this._lastSitekey = sitekey;
-          if (!widgetId) {
-            clearTimeout(timeoutId);
-            resolve(null);
-            return;
-          }
-        } catch (error) {
-          console.error('❌ Error creating interactive Turnstile widget:', error);
-          reject(error);
-        }
-      });
+      // Since we want purely background token generation, attempt invisible again
+      // or fallback to manual pixel placement automation
+      console.log('🔄 Interactive widget requested - falling back to invisible or manual automation');
+      
+      // Try invisible one more time
+      const invisibleToken = await this.createNewTurnstileWidgetInvisible(sitekey, action);
+      if (invisibleToken && invisibleToken.length > 20) {
+        return invisibleToken;
+      }
+      
+      // If invisible fails, return null to trigger manual automation fallback
+      console.log('⚠️ All Turnstile methods exhausted, manual fallback will be used');
+      return null;
     },
 
     async generatePaintToken(sitekey) {
@@ -1832,13 +1784,10 @@
       if (this._turnstileContainer && document.body.contains(this._turnstileContainer)) {
         this._turnstileContainer.remove();
       }
-      if (this._turnstileOverlay && document.body.contains(this._turnstileOverlay)) {
-        this._turnstileOverlay.remove();
-      }
       
       this._turnstileWidgetId = null;
       this._turnstileContainer = null;
-      this._turnstileOverlay = null;
+      this._turnstileOverlay = null; // Keep for compatibility but won't exist
       this._lastSitekey = null;
     },
 
@@ -2808,29 +2757,44 @@
   }
   async function handleCaptcha() {
     const startTime = performance.now();
+    
+    // Check user's token source preference
+    if (state.tokenSource === "manual") {
+      console.log("🎯 Manual token source selected - using pixel placement automation");
+      return await handleCaptchaFallback();
+    }
+    
+    // Generator mode (pure) or Hybrid mode - try generator first
     try {
       // Use optimized token generation with automatic sitekey detection
       const sitekey = Utils.detectSitekey();
       console.log("🔑 Generating Turnstile token for sitekey:", sitekey);
-  console.log('🧭 UA:', navigator.userAgent, 'Platform:', navigator.platform);
+      console.log('🧭 UA:', navigator.userAgent, 'Platform:', navigator.platform);
       
       const token = await Utils.generatePaintToken(sitekey);
+      
+      console.log(`🔍 Token received - Type: ${typeof token}, Value: ${token ? (token.length > 50 ? token.substring(0, 50) + '...' : token) : 'null/undefined'}, Length: ${token?.length || 0}`);
       
       if (token && token.length > 20) {
         const duration = Math.round(performance.now() - startTime);
         console.log(`✅ Turnstile token generated successfully in ${duration}ms`);
         return token;
       } else {
-        throw new Error("Invalid or empty token received");
+        throw new Error(`Invalid or empty token received - Type: ${typeof token}, Length: ${token?.length || 0}`);
       }
     } catch (error) {
       const duration = Math.round(performance.now() - startTime);
       console.error(`❌ Turnstile token generation failed after ${duration}ms:`, error);
       
-      // Fallback to original browser automation if Turnstile fails
-      console.log("🔄 Falling back to browser automation...");
-  const fbToken = await handleCaptchaFallback();
-  return fbToken;
+      // Fallback to manual pixel placement for hybrid mode
+      if (state.tokenSource === "hybrid") {
+        console.log("🔄 Hybrid mode: Generator failed, automatically switching to manual pixel placement...");
+        const fbToken = await handleCaptchaFallback();
+        return fbToken;
+      } else {
+        // Pure generator mode - don't fallback, just fail
+        throw error;
+      }
     }
   }
 
@@ -4289,14 +4253,44 @@
 
       <div style="padding: 25px; max-height: 70vh; overflow-y: auto;">
         
+        <!-- Token Source Selection -->
+        <div style="margin-bottom: 25px;">
+          <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-key" style="color: #4facfe; font-size: 16px;"></i>
+            Token Source
+          </label>
+          <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1);">
+            <select id="tokenSourceSelect" style="
+              width: 100%;
+              padding: 12px 16px;
+              background: rgba(255,255,255,0.15);
+              color: white;
+              border: 1px solid rgba(255,255,255,0.2);
+              border-radius: 8px;
+              font-size: 14px;
+              outline: none;
+              cursor: pointer;
+              transition: all 0.3s ease;
+              font-family: inherit;
+              box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            ">
+              <option value="generator" ${state.tokenSource === 'generator' ? 'selected' : ''} style="background: #2d3748; color: white; padding: 10px;">🤖 Automatic Token Generator (Recommended)</option>
+              <option value="hybrid" ${state.tokenSource === 'hybrid' ? 'selected' : ''} style="background: #2d3748; color: white; padding: 10px;">🔄 Generator + Auto Fallback</option>
+              <option value="manual" ${state.tokenSource === 'manual' ? 'selected' : ''} style="background: #2d3748; color: white; padding: 10px;">🎯 Manual Pixel Placement</option>
+            </select>
+            <p style="font-size: 12px; color: rgba(255,255,255,0.7); margin: 8px 0 0 0;">
+              Generator mode creates tokens automatically. Hybrid mode falls back to manual when generator fails. Manual mode only uses pixel placement.
+            </p>
+          </div>
+        </div>
+
         <!-- Automation Section -->
         <div style="margin-bottom: 25px;">
           <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
             <i class="fas fa-robot" style="color: #4facfe; font-size: 16px;"></i>
             ${Utils.t("automation")}
           </label>
-          <!-- Turnstile generator is always enabled - no toggle needed -->
-
+          <!-- Token generator is always enabled - settings moved to Token Source above -->
         </div>
 
         <!-- Overlay Settings Section -->
@@ -4344,7 +4338,7 @@
                   cursor: pointer;
                 ">
               <div id="speedValue" style="
-                min-width: 70px;
+                min-width: 100px;
                 text-align: center;
                 background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
                 padding: 8px 12px;
@@ -4354,7 +4348,7 @@
                 font-size: 13px;
                 box-shadow: 0 3px 10px rgba(79, 172, 254, 0.3);
                 border: 1px solid rgba(255,255,255,0.2);
-              ">${CONFIG.PAINTING_SPEED.DEFAULT} px/s</div>
+              ">${CONFIG.PAINTING_SPEED.DEFAULT} (batch size)</div>
             </div>
             <div style="display: flex; justify-content: space-between; color: rgba(255,255,255,0.7); font-size: 11px; margin-top: 8px;">
               <span><i class="fas fa-turtle"></i> ${CONFIG.PAINTING_SPEED.MIN}</span>
@@ -4363,7 +4357,7 @@
           </div>
            <label style="display: flex; align-items: center; gap: 8px; color: white; margin-top: 10px;">
             <input type="checkbox" id="enableSpeedToggle" ${CONFIG.PAINTING_SPEED_ENABLED ? 'checked' : ''} style="cursor: pointer;"/>
-            <span>Enable painting speed limit</span>
+            <span>Enable painting speed limit (batch size control)</span>
           </label>
         </div>
 
@@ -4910,6 +4904,21 @@
 
       makeDraggable(settingsContainer)
 
+      const tokenSourceSelect = settingsContainer.querySelector("#tokenSourceSelect")
+      if (tokenSourceSelect) {
+        tokenSourceSelect.addEventListener("change", (e) => {
+          state.tokenSource = e.target.value
+          saveBotSettings()
+          console.log(`🔑 Token source changed to: ${state.tokenSource}`)
+          const sourceNames = {
+            'generator': 'Automatic Generator',
+            'hybrid': 'Generator + Auto Fallback',
+            'manual': 'Manual Pixel Placement'
+          }
+          Utils.showAlert(`Token source set to: ${sourceNames[state.tokenSource]}`, "success")
+        })
+      }
+
       const languageSelect = settingsContainer.querySelector("#languageSelect")
       if (languageSelect) {
         languageSelect.addEventListener("change", (e) => {
@@ -4941,6 +4950,18 @@
           const opacity = parseFloat(e.target.value);
           state.overlayOpacity = opacity;
           overlayOpacityValue.textContent = `${Math.round(opacity * 100)}%`;
+        });
+      }
+
+      // Speed slider event listener
+      const speedSlider = settingsContainer.querySelector("#speedSlider");
+      const speedValue = settingsContainer.querySelector("#speedValue");
+      if (speedSlider && speedValue) {
+        speedSlider.addEventListener('input', (e) => {
+          const speed = parseInt(e.target.value, 10);
+          state.paintingSpeed = speed;
+          speedValue.textContent = `${speed} (batch size)`;
+          saveBotSettings();
         });
       }
 
@@ -6386,6 +6407,7 @@
             pixelBatch.regionY !== regionY + adderY) {
 
             if (pixelBatch && pixelBatch.pixels.length > 0) {
+              console.log(`🌍 Sending region-change batch with ${pixelBatch.pixels.length} pixels (switching to region ${regionX + adderX},${regionY + adderY})`);
               const success = await sendBatchWithRetry(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
               
               if (success) {
@@ -6401,8 +6423,9 @@
                 }
 
                 if (CONFIG.PAINTING_SPEED_ENABLED && state.paintingSpeed > 0 && pixelBatch.pixels.length > 0) {
-                  const delayPerPixel = 1000 / state.paintingSpeed // ms per pixel
-                  const totalDelay = Math.max(100, delayPerPixel * pixelBatch.pixels.length) // minimum 100ms
+                  // paintingSpeed now represents batch size, so add a small delay based on batch size
+                  const batchDelayFactor = Math.max(1, 100 / state.paintingSpeed); // Larger batches = less delay
+                  const totalDelay = Math.max(100, batchDelayFactor * pixelBatch.pixels.length);
                   await Utils.sleep(totalDelay)
                 }
                 updateStats();
@@ -6449,7 +6472,10 @@
             localY: y,
           });
 
-          if (pixelBatch.pixels.length >= Math.floor(state.currentCharges)) {
+          // Use paintingSpeed as batch size, but limit by available charges
+          const maxBatchSize = Math.min(state.paintingSpeed, Math.floor(state.currentCharges));
+          if (pixelBatch.pixels.length >= maxBatchSize) {
+            console.log(`📦 Sending batch with ${pixelBatch.pixels.length} pixels (batch size setting: ${state.paintingSpeed}, max allowed: ${maxBatchSize})`);
             const success = await sendBatchWithRetry(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
 
             if (success) {
@@ -6507,6 +6533,7 @@
       }
 
       if (pixelBatch && pixelBatch.pixels.length > 0 && !state.stopFlag) {
+        console.log(`🏁 Sending final batch with ${pixelBatch.pixels.length} pixels`);
         const success = await sendBatchWithRetry(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
         if (success) {
           pixelBatch.pixels.forEach((pixel) => {
@@ -6685,6 +6712,7 @@
         paintingSpeed: state.paintingSpeed,
         paintingSpeedEnabled: document.getElementById('enableSpeedToggle')?.checked,
         cooldownChargeThreshold: state.cooldownChargeThreshold,
+        tokenSource: state.tokenSource, // "generator", "hybrid", or "manual"
         minimized: state.minimized,
         overlayOpacity: state.overlayOpacity,
         blueMarbleEnabled: document.getElementById('enableBlueMarbleToggle')?.checked,
@@ -6719,6 +6747,7 @@
 
       state.paintingSpeed = settings.paintingSpeed || CONFIG.PAINTING_SPEED.DEFAULT;
       state.cooldownChargeThreshold = settings.cooldownChargeThreshold || CONFIG.COOLDOWN_CHARGE_THRESHOLD;
+      state.tokenSource = settings.tokenSource || CONFIG.TOKEN_SOURCE; // Default to "generator"
       state.minimized = settings.minimized ?? false;
       CONFIG.PAINTING_SPEED_ENABLED = settings.paintingSpeedEnabled ?? false;
       CONFIG.AUTO_CAPTCHA_ENABLED = settings.autoCaptchaEnabled ?? false;
@@ -6748,7 +6777,7 @@
       const speedSlider = document.getElementById('speedSlider');
       if (speedSlider) speedSlider.value = state.paintingSpeed;
       const speedValue = document.getElementById('speedValue');
-      if (speedValue) speedValue.textContent = `${state.paintingSpeed} px/s`;
+      if (speedValue) speedValue.textContent = `${state.paintingSpeed} (batch size)`;
 
       const enableSpeedToggle = document.getElementById('enableSpeedToggle');
       if (enableSpeedToggle) enableSpeedToggle.checked = CONFIG.PAINTING_SPEED_ENABLED;
@@ -6766,6 +6795,10 @@
       if (overlayOpacityValue) overlayOpacityValue.textContent = `${Math.round(state.overlayOpacity * 100)}%`;
       const enableBlueMarbleToggle = document.getElementById('enableBlueMarbleToggle');
       if (enableBlueMarbleToggle) enableBlueMarbleToggle.checked = state.blueMarbleEnabled;
+  
+      const tokenSourceSelect = document.getElementById('tokenSourceSelect');
+      if (tokenSourceSelect) tokenSourceSelect.value = state.tokenSource;
+  
   const colorAlgorithmSelect = document.getElementById('colorAlgorithmSelect');
   if (colorAlgorithmSelect) colorAlgorithmSelect.value = state.colorMatchingAlgorithm;
   const enableChromaPenaltyToggle = document.getElementById('enableChromaPenaltyToggle');
@@ -6785,9 +6818,10 @@
   }
 
   // Initialize Turnstile generator integration
-  console.log("🚀 WPlace Auto-Image with Turnstile Generator loaded");
-  console.log("🔑 Turnstile generator: ALWAYS ENABLED");
-  console.log("🎯 Manual pixel captcha solving: DISABLED - fully automated!");
+  console.log("🚀 WPlace Auto-Image with Turnstile Token Generator loaded");
+  console.log("🔑 Turnstile token generator: ALWAYS ENABLED (Background mode)");
+  console.log("🎯 Manual pixel captcha solving: Available as fallback/alternative");
+  console.log("📱 Turnstile widgets: DISABLED - pure background token generation only!");
 
   // Optimized token initialization with better timing and error handling
   async function initializeTokenGenerator() {
