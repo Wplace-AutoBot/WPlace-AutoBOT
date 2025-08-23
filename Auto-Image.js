@@ -16,7 +16,7 @@
     OVERLAY: {
       OPACITY_DEFAULT: 0.6,
       BLUE_MARBLE_DEFAULT: false,
-      ditheringEnabled: false,
+      ditheringEnabled: true,
     },
     // --- START: Color data from colour-converter.js ---
     // New color structure with proper ID mapping
