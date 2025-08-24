@@ -89,6 +89,7 @@ javascript:fetch("https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBO
 - [x] Advance Color Processing
 - [x] MultiLanguage Support
 - [x] Multi account through save and load feature
+- [x] Works on mobile :p
 
 
 ---
