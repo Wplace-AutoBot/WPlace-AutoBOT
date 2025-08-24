@@ -3295,7 +3295,7 @@
     // Link external CSS file
     const cssLink = document.createElement('link');
     cssLink.rel = 'stylesheet';
-    cssLink.href = 'https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/auto-image-styles.css';
+    cssLink.href = 'https://raw.githubusercontent.com/Staninna/WPlace-AutoBOT/refs/heads/main/auto-image-styles.css';
     cssLink.setAttribute('data-wplace-theme', 'true');
     document.head.appendChild(cssLink);
 
