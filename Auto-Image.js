@@ -5037,10 +5037,21 @@
       </div>
       <div class="resize-tools">
         <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-          <div style="display:flex; align-items:center; gap:6px;">
-            <label style="font-size:12px; opacity:.85;">Brush</label>
-            <input id="maskBrushSize" type="range" min="1" max="7" step="1" value="1" style="width:120px;">
-            <span id="maskBrushSizeValue" style="font-size:12px; opacity:.85; min-width:18px; text-align:center;">1</span>
+          <div>
+              <div style="display:flex; align-items:center; gap:6px; justify-content:space-between;">
+                <label style="font-size:12px; opacity:.85;">Brush</label>
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <input id="maskBrushSize" type="range" min="1" max="7" step="1" value="1" style="width:120px;">
+                  <span id="maskBrushSizeValue" style="font-size:12px; opacity:.85; min-width:18px; text-align:center;">1</span>
+                </div>
+              </div>
+            <div style="display:flex; align-items:center; gap:6px; justify-content:space-between;">
+              <label style="font-size:12px; opacity:.85;">Row/col size</label>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <input id="rowColSize" type="range" min="1" max="7" step="1" value="1" style="width:120px;">
+                <span id="rowColSizeValue" style="font-size:12px; opacity:.85; min-width:18px; text-align:center;">1</span>
+              </div>
+            </div>
           </div>
           <div style="display:flex; align-items:center; gap:6px;">
             <label style="font-size:12px; opacity:.85;">Mode</label>
@@ -6261,6 +6272,7 @@
       let draggingMask = false;
       let lastPaintX = -1, lastPaintY = -1;
       let brushSize = 1;
+      let rowColSize = 1;
       let maskMode = 'ignore'; // 'ignore' | 'unignore' | 'toggle'
       const brushEl = resizeContainer.querySelector('#maskBrushSize');
       const brushValEl = resizeContainer.querySelector('#maskBrushSizeValue');
@@ -6269,6 +6281,8 @@
       const btnToggle = resizeContainer.querySelector('#maskModeToggle');
       const clearIgnoredBtnEl = resizeContainer.querySelector('#clearIgnoredBtn');
       const invertMaskBtn = resizeContainer.querySelector('#invertMaskBtn');
+      const rowColSizeEl = resizeContainer.querySelector('#rowColSize');
+      const rowColSizeValEl = resizeContainer.querySelector('#rowColSizeValue');
 
       const updateModeButtons = () => {
         const map = [
@@ -6288,6 +6302,11 @@
         brushEl.addEventListener('input', () => { brushSize = parseInt(brushEl.value, 10) || 1; brushValEl.textContent = brushSize; });
         brushValEl.textContent = brushEl.value;
         brushSize = parseInt(brushEl.value, 10) || 1;
+      }
+      if (rowColSizeEl && rowColSizeValEl) {
+        rowColSizeEl.addEventListener('input', () => { rowColSize = parseInt(rowColSizeEl.value, 10) || 1; rowColSizeValEl.textContent = rowColSize; });
+        rowColSizeValEl.textContent = rowColSizeEl.value;
+        rowColSize = parseInt(rowColSizeEl.value, 10) || 1;
       }
   if (btnIgnore) btnIgnore.addEventListener('click', () => setMode('ignore'));
   if (btnUnignore) btnUnignore.addEventListener('click', () => setMode('unignore'));
@@ -6348,48 +6367,64 @@
         const w = baseCanvas.width, h = baseCanvas.height;
         ensureMask(w, h);
         if (y < 0 || y >= h) return;
-        for (let x = 0; x < w; x++) {
-          const idx = y * w + x;
-          let val = state.resizeIgnoreMask[idx];
-          if (maskMode === 'toggle') {
-            val = val ? 0 : 1;
-          } else if (maskMode === 'ignore') {
-            val = 1;
-          } else {
-            val = 0;
+        
+        // Paint multiple rows based on rowColSize
+        const halfSize = Math.floor(rowColSize / 2);
+        const startY = Math.max(0, y - halfSize);
+        const endY = Math.min(h - 1, y + halfSize);
+        
+        for (let rowY = startY; rowY <= endY; rowY++) {
+          for (let x = 0; x < w; x++) {
+            const idx = rowY * w + x;
+            let val = state.resizeIgnoreMask[idx];
+            if (maskMode === 'toggle') {
+              val = val ? 0 : 1;
+            } else if (maskMode === 'ignore') {
+              val = 1;
+            } else {
+              val = 0;
+            }
+            state.resizeIgnoreMask[idx] = val;
+            if (_maskData) {
+              const p = idx * 4;
+              if (val) { _maskData[p] = 255; _maskData[p + 1] = 0; _maskData[p + 2] = 0; _maskData[p + 3] = 150; }
+              else { _maskData[p] = 0; _maskData[p + 1] = 0; _maskData[p + 2] = 0; _maskData[p + 3] = 0; }
+            }
           }
-          state.resizeIgnoreMask[idx] = val;
-          if (_maskData) {
-            const p = idx * 4;
-            if (val) { _maskData[p] = 255; _maskData[p + 1] = 0; _maskData[p + 2] = 0; _maskData[p + 3] = 150; }
-            else { _maskData[p] = 0; _maskData[p + 1] = 0; _maskData[p + 2] = 0; _maskData[p + 3] = 0; }
-          }
+          if (_maskData) { _markDirty(0, rowY); _markDirty(w - 1, rowY); }
         }
-        if (_maskData) { _markDirty(0, y); _markDirty(w - 1, y); }
       };
 
       const paintColumn = (x, value) => {
         const w = baseCanvas.width, h = baseCanvas.height;
         ensureMask(w, h);
         if (x < 0 || x >= w) return;
-        for (let y = 0; y < h; y++) {
-          const idx = y * w + x;
-          let val = state.resizeIgnoreMask[idx];
-          if (maskMode === 'toggle') {
-            val = val ? 0 : 1;
-          } else if (maskMode === 'ignore') {
-            val = 1;
-          } else {
-            val = 0;
+        
+        // Paint multiple columns based on rowColSize
+        const halfSize = Math.floor(rowColSize / 2);
+        const startX = Math.max(0, x - halfSize);
+        const endX = Math.min(w - 1, x + halfSize);
+        
+        for (let colX = startX; colX <= endX; colX++) {
+          for (let y = 0; y < h; y++) {
+            const idx = y * w + colX;
+            let val = state.resizeIgnoreMask[idx];
+            if (maskMode === 'toggle') {
+              val = val ? 0 : 1;
+            } else if (maskMode === 'ignore') {
+              val = 1;
+            } else {
+              val = 0;
+            }
+            state.resizeIgnoreMask[idx] = val;
+            if (_maskData) {
+              const p = idx * 4;
+              if (val) { _maskData[p] = 255; _maskData[p + 1] = 0; _maskData[p + 2] = 0; _maskData[p + 3] = 150; }
+              else { _maskData[p] = 0; _maskData[p + 1] = 0; _maskData[p + 2] = 0; _maskData[p + 3] = 0; }
+            }
           }
-          state.resizeIgnoreMask[idx] = val;
-          if (_maskData) {
-            const p = idx * 4;
-            if (val) { _maskData[p] = 255; _maskData[p + 1] = 0; _maskData[p + 2] = 0; _maskData[p + 3] = 150; }
-            else { _maskData[p] = 0; _maskData[p + 1] = 0; _maskData[p + 2] = 0; _maskData[p + 3] = 0; }
-          }
+          if (_maskData) { _markDirty(colX, 0); _markDirty(colX, h - 1); }
         }
-        if (_maskData) { _markDirty(x, 0); _markDirty(x, h - 1); }
       };
 
       const redrawMaskOverlay = () => {
