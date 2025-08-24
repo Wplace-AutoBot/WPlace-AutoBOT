@@ -1089,6 +1089,11 @@
   notificationIntervalMinutes: CONFIG.NOTIFICATIONS.REPEAT_MINUTES,
   _lastChargesNotifyAt: 0,
   _lastChargesBelow: true,
+  // Smart save tracking
+  _lastSavePixelCount: 0,
+  _lastSaveTime: 0,
+  _saveInProgress: false,
+  paintedMap: null,
   }
 
   let _updateResizePreview = () => { };
@@ -1428,7 +1433,7 @@
 
   const overlayManager = new OverlayManager();
 
-  // Optimized Turnstile token handling with caching and retry logic
+  // Optimized Turnstile token handling with improved caching and retry logic
   let turnstileToken = null
   let tokenExpiryTime = 0
   let tokenGenerationInProgress = false
@@ -1439,25 +1444,34 @@
   const MAX_BATCH_RETRIES = 10 // Maximum attempts for batch sending
   const TOKEN_LIFETIME = 240000 // 4 minutes (tokens typically last 5 min, use 4 for safety)
 
-  function setTurnstileToken(t) {
+  function setTurnstileToken(token) {
     if (_resolveToken) {
-      _resolveToken(t)
+      _resolveToken(token)
       _resolveToken = null
     }
-    turnstileToken = t
+    turnstileToken = token
     tokenExpiryTime = Date.now() + TOKEN_LIFETIME
-    retryCount = 0 // Reset retry count on successful token
+    console.log("✅ Turnstile token set successfully")
   }
 
   function isTokenValid() {
     return turnstileToken && Date.now() < tokenExpiryTime
   }
 
-  async function ensureToken() {
-    // Return cached token if still valid
-    if (isTokenValid()) {
+  function invalidateToken() {
+    turnstileToken = null
+    tokenExpiryTime = 0
+    console.log("🗑️ Token invalidated, will force fresh generation")
+  }
+
+  async function ensureToken(forceRefresh = false) {
+    // Return cached token if still valid and not forcing refresh
+    if (isTokenValid() && !forceRefresh) {
       return turnstileToken;
     }
+
+    // Invalidate token if forcing refresh
+    if (forceRefresh) invalidateToken();
 
     // Avoid multiple simultaneous token generations
     if (tokenGenerationInProgress) {
@@ -1471,42 +1485,57 @@
     try {
       console.log("🔄 Token expired or missing, generating new one...");
       const token = await handleCaptchaWithRetry();
-      if (token) {
+      if (token && token.length > 20) {
         setTurnstileToken(token);
-        console.log("✅ Token generated successfully");
+        console.log("✅ Token captured and cached successfully");
         return token;
       }
-    } catch (error) {
-      console.error("❌ Token generation failed after retries:", error);
-      updateUI("captchaNeeded", "error");
-      Utils.showAlert(Utils.t("captchaNeeded"), "error");
+
+      console.log("⚠️ Invisible Turnstile failed, forcing browser automation...");
+      const fallbackToken = await handleCaptchaFallback();
+      if (fallbackToken && fallbackToken.length > 20) {
+        setTurnstileToken(fallbackToken);
+        console.log("✅ Fallback token captured successfully");
+        return fallbackToken;
+      }
+
+      console.log("❌ All token generation methods failed");
+      return null;
     } finally {
       tokenGenerationInProgress = false;
     }
-    
-    return null;
   }
 
   async function handleCaptchaWithRetry() {
-    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-      try {
-        const token = await handleCaptcha();
-        if (token && token.length > 20) {
-          return token;
-        }
-        throw new Error("Invalid token received");
-      } catch (error) {
-        console.warn(`❌ Token generation attempt ${attempt}/${MAX_RETRIES} failed:`, error);
-        
-        if (attempt < MAX_RETRIES) {
-          const delay = Math.min(1000 * Math.pow(2, attempt - 1), 8000); // Exponential backoff, max 8s
-          console.log(`⏳ Retrying in ${delay}ms...`);
-          await Utils.sleep(delay);
-        } else {
-          throw error;
-        }
+    const startTime = Date.now();
+    try {
+      const sitekey = Utils.detectSitekey();
+      console.log("🔑 Generating Turnstile token for sitekey:", sitekey);
+
+      if (typeof window !== "undefined" && window.navigator) {
+        console.log("🧭 UA:", window.navigator.userAgent, "Platform:", window.navigator.platform);
       }
+
+      const token = await Utils.generatePaintToken(sitekey);
+      if (token && token.length > 20) {
+        const elapsed = Math.round(Date.now() - startTime);
+        console.log(`✅ Turnstile token generated successfully in ${elapsed}ms`);
+        return token;
+      } else {
+        throw new Error("Invalid or empty token received");
+      }
+    } catch (error) {
+      const elapsed = Math.round(Date.now() - startTime);
+      console.log(`❌ Turnstile token generation failed after ${elapsed}ms:`, error);
+      throw error;
     }
+  }
+
+  async function handleCaptchaFallback() {
+    // Implementation for fallback token generation would go here
+    // This is a placeholder for browser automation fallback
+    console.log("🔄 Attempting fallback token generation...");
+    return null;
   }
 
   function inject(callback) {
@@ -1620,6 +1649,7 @@
     // Turnstile Generator Integration - Optimized with widget reuse and proper cleanup
     turnstileLoaded: false,
     _turnstileContainer: null,
+    _turnstileOverlay: null,
     _turnstileWidgetId: null,
     _lastSitekey: null,
 
@@ -1643,6 +1673,7 @@
           };
           return checkReady();
         }
+        
         const script = document.createElement('script');
         script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
         script.async = true;
@@ -1660,7 +1691,7 @@
       });
     },
 
-    // Create or reuse the turnstile container - completely hidden for token generation
+    // Create or reuse the turnstile container - completely hidden for token generation  
     ensureTurnstileContainer() {
       if (!this._turnstileContainer || !document.body.contains(this._turnstileContainer)) {
         // Clean up old container if it exists
@@ -1688,64 +1719,85 @@
       return this._turnstileContainer;
     },
 
-    // No interactive overlay container needed - pure background operation
+    // Interactive overlay container for visible widgets when needed
     ensureTurnstileOverlayContainer() {
-      // Return null since we don't want any visible widgets
-      console.log('🚫 Interactive Turnstile overlay disabled - background mode only');
-      return null;
+      if (this._turnstileOverlay && document.body.contains(this._turnstileOverlay)) {
+        return this._turnstileOverlay;
+      }
+
+      const overlay = document.createElement('div');
+      overlay.id = 'turnstile-overlay-container';
+      overlay.style.cssText = `
+        position: fixed !important;
+        bottom: 20px !important;
+        right: 20px !important;
+        z-index: 99999 !important;
+        background: rgba(0,0,0,0.9) !important;
+        border-radius: 12px !important;
+        padding: 20px !important;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.4) !important;
+        backdrop-filter: blur(10px) !important;
+        border: 1px solid rgba(255,255,255,0.2) !important;
+        color: white !important;
+        font-family: 'Segoe UI', sans-serif !important;
+        display: none !important;
+        max-width: 350px !important;
+        min-width: 300px !important;
+      `;
+
+      const title = document.createElement('div');
+      title.textContent = 'Cloudflare Turnstile — please complete the check if shown';
+      title.style.cssText = 'font: 600 12px/1.3 "Segoe UI",sans-serif; margin-bottom: 8px; opacity: 0.9;';
+
+      const host = document.createElement('div');
+      host.id = 'turnstile-overlay-host';
+      host.style.cssText = 'width: 100%; min-height: 70px;';
+
+      const hideBtn = document.createElement('button');
+      hideBtn.textContent = 'Hide';
+      hideBtn.style.cssText = 'position:absolute; top:6px; right:6px; font-size:11px; background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.2); border-radius:6px; padding:2px 6px; cursor:pointer;';
+      hideBtn.addEventListener('click', () => overlay.remove());
+
+      overlay.appendChild(title);
+      overlay.appendChild(host);
+      overlay.appendChild(hideBtn);
+      document.body.appendChild(overlay);
+
+      this._turnstileOverlay = overlay;
+      return overlay;
     },
 
     async executeTurnstile(sitekey, action = 'paint') {
       await this.loadTurnstile();
 
-      // Try multiple sitekeys if the first one fails
-      const sitekeys = [
-        sitekey,
-        '0x4AAAAAABpqJe8FO0N84q0F'
-      ];
-
-      for (let i = 0; i < sitekeys.length; i++) {
-        const currentSitekey = sitekeys[i];
-        console.log(`🔧 Trying sitekey ${i + 2}/${sitekeys.length}:`, currentSitekey);
-
-        // Try reusing existing widget first
-        if (this._turnstileWidgetId && this._lastSitekey === currentSitekey && window.turnstile?.execute) {
-          try {
-            console.log("🔄 Reusing existing Turnstile widget...");
-            const token = await Promise.race([
-              window.turnstile.execute(this._turnstileWidgetId, { action }),
-              new Promise((_, reject) => setTimeout(() => reject(new Error('Execute timeout')), 15000))
-            ]);
-            if (token && typeof token === 'string' && token.length > 20) {
-              console.log("✅ Token generated via widget reuse");
-              return token;
-            }
-          } catch (err) {
-            console.warn('🔄 Widget reuse failed:', err.message);
+      // Try reusing existing widget first if sitekey matches
+      if (this._turnstileWidgetId && this._lastSitekey === sitekey && window.turnstile?.execute) {
+        try {
+          console.log("🔄 Reusing existing Turnstile widget...");
+          const token = await Promise.race([
+            window.turnstile.execute(this._turnstileWidgetId, { action }),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Execute timeout')), 15000))
+          ]);
+          if (token && token.length > 20) {
+            console.log("✅ Token generated via widget reuse");
+            return token;
           }
+        } catch (error) {
+          console.log("� Widget reuse failed, will create a fresh widget:", error.message);
         }
-
-        // Try invisible widget
-        const invisible = await this.createNewTurnstileWidgetInvisible(currentSitekey, action);
-        if (invisible && typeof invisible === 'string' && invisible.length > 20) {
-          console.log(`✅ Token generated with sitekey ${i + 1}: ${currentSitekey}`);
-          return invisible;
-        }
-
-        console.warn(`❌ Sitekey ${i + 1} failed:`, currentSitekey);
-        
-        // Clean up failed widget before trying next sitekey
-        if (this._turnstileWidgetId && window.turnstile?.remove) {
-          try { window.turnstile.remove(this._turnstileWidgetId); } catch {}
-        }
-        this._turnstileWidgetId = null;
       }
 
-      console.log('👀 All sitekeys failed for invisible widgets, trying interactive...');
-      return await this.createNewTurnstileWidgetInteractive(sitekey, action);
+      // Try invisible widget first
+      const invisibleToken = await this.createTurnstileWidget(sitekey, action);
+      if (invisibleToken && invisibleToken.length > 20) {
+        return invisibleToken;
+      }
+
+      console.log("� Falling back to interactive Turnstile (visible).");
+      return await this.createTurnstileWidgetInteractive(sitekey, action);
     },
 
-    async createNewTurnstileWidgetInvisible(sitekey, action) {
+    async createTurnstileWidget(sitekey, action) {
       return new Promise((resolve) => {
         try {
           // Force cleanup of any existing widget
@@ -1768,60 +1820,33 @@
             return;
           }
           
-          // Set a timeout to resolve with null if no token is received
-          const timeout = setTimeout(() => {
-            console.warn('⏰ Turnstile widget timeout - no token received in 15s');
-            resolve(null);
-          }, 15000);
-          
           console.log('🔧 Creating invisible Turnstile widget...');
           const widgetId = window.turnstile.render(container, {
             sitekey,
             action,
-            size: 'compact',
+            size: 'invisible',
             retry: 'auto',
             'retry-interval': 8000,
             callback: (token) => {
-              clearTimeout(timeout);
-              console.log('🔍 Turnstile callback received:', {
-                type: typeof token,
-                value: token,
-                length: token?.length || 0,
-                isString: typeof token === 'string',
-                isValid: typeof token === 'string' && token.length > 20
-              });
-              
-              // Ensure we have a valid string token
-              if (typeof token === 'string' && token.length > 20) {
-                console.log('✅ Valid token received from hidden widget');
-                resolve(token);
-              } else {
-                console.warn('❌ Invalid token received from hidden widget - resolving with null');
-                resolve(null);
-              }
+              console.log('✅ Invisible Turnstile callback');
+              resolve(token);
             },
-            'error-callback': (error) => {
-              clearTimeout(timeout);
-              console.warn('❌ Turnstile error callback:', error);
-              resolve(null);
-            },
-            'timeout-callback': () => {
-              clearTimeout(timeout);
-              console.warn('⏰ Turnstile timeout callback triggered');
-              resolve(null);
-            },
+            'error-callback': () => resolve(null),
+            'timeout-callback': () => resolve(null)
           });
           
           this._turnstileWidgetId = widgetId;
           this._lastSitekey = sitekey;
           
           if (!widgetId) {
-            clearTimeout(timeout);
-            console.warn('❌ Failed to create Turnstile widget - render returned invalid ID');
-            resolve(null);
-          } else {
-            console.log('✅ Turnstile widget created with ID:', widgetId);
+            return resolve(null);
           }
+
+          // Execute the widget and race with timeout
+          Promise.race([
+            window.turnstile.execute(widgetId, { action }),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Invisible execute timeout')), 12000))
+          ]).then(resolve).catch(() => resolve(null));
         } catch (e) {
           console.error('❌ Invisible Turnstile creation failed:', e);
           resolve(null);
@@ -1829,7 +1854,7 @@
       });
     },
 
-    async createNewTurnstileWidgetInteractive(sitekey, action) {
+    async createTurnstileWidgetInteractive(sitekey, action) {
       // Create a visible widget that users can interact with if needed
       console.log('🔄 Creating interactive Turnstile widget (visible)');
       
@@ -1844,42 +1869,27 @@
             }
           }
           
-          const container = this.ensureTurnstileContainer();
-          container.innerHTML = '';
+          const overlay = this.ensureTurnstileOverlayContainer();
+          overlay.style.display = 'block';
           
-          // Make container visible for interactive mode
-          container.style.display = 'block';
-          container.style.position = 'fixed';
-          container.style.top = '50%';
-          container.style.left = '50%';
-          container.style.transform = 'translate(-50%, -50%)';
-          container.style.zIndex = '10000';
-          container.style.backgroundColor = 'white';
-          container.style.padding = '20px';
-          container.style.borderRadius = '8px';
-          container.style.boxShadow = '0 4px 20px rgba(0,0,0,0.3)';
-          
-          // Add instruction text
-          container.innerHTML = '<div style="margin-bottom: 15px; color: #333; font-family: Arial, sans-serif;"><strong>CAPTCHA Required</strong><br>Please complete the CAPTCHA below to continue:</div>';
-          
-          const widgetContainer = document.createElement('div');
-          container.appendChild(widgetContainer);
+          const host = overlay.querySelector('#turnstile-overlay-host');
+          host.innerHTML = '';
           
           // Set a timeout for interactive mode
           const timeout = setTimeout(() => {
             console.warn('⏰ Interactive Turnstile widget timeout');
-            container.style.display = 'none';
+            overlay.style.display = 'none';
             resolve(null);
           }, 60000); // 60 seconds for user interaction
           
-          const widgetId = window.turnstile.render(widgetContainer, {
+          const widgetId = window.turnstile.render(host, {
             sitekey,
             action,
             size: 'normal',
             theme: 'light',
             callback: (token) => {
               clearTimeout(timeout);
-              container.style.display = 'none';
+              overlay.style.display = 'none';
               console.log('✅ Interactive Turnstile completed successfully');
               
               if (typeof token === 'string' && token.length > 20) {
@@ -1891,7 +1901,7 @@
             },
             'error-callback': (error) => {
               clearTimeout(timeout);
-              container.style.display = 'none';
+              overlay.style.display = 'none';
               console.warn('❌ Interactive Turnstile error:', error);
               resolve(null);
             },
@@ -1902,7 +1912,7 @@
           
           if (!widgetId) {
             clearTimeout(timeout);
-            container.style.display = 'none';
+            overlay.style.display = 'none';
             console.warn('❌ Failed to create interactive Turnstile widget');
             resolve(null);
           } else {
@@ -1933,9 +1943,13 @@
         this._turnstileContainer.remove();
       }
       
+      if (this._turnstileOverlay && document.body.contains(this._turnstileOverlay)) {
+        this._turnstileOverlay.remove();
+      }
+      
       this._turnstileWidgetId = null;
       this._turnstileContainer = null;
-      this._turnstileOverlay = null; // Keep for compatibility but won't exist
+      this._turnstileOverlay = null;
       this._lastSitekey = null;
     },
 
@@ -2338,7 +2352,69 @@
       return Math.max(timeFromSpeed, timeFromCharges)
     },
 
-    // --- Painted map packing helpers (compact, efficient storage) ---
+    // --- Painted pixel tracking helpers ---
+    initializePaintedMap: (width, height) => {
+      if (!state.paintedMap || state.paintedMap.length !== height) {
+        state.paintedMap = Array(height).fill().map(() => Array(width).fill(false));
+        console.log(`📋 Initialized painted map: ${width}x${height}`);
+      }
+    },
+
+    markPixelPainted: (x, y, regionX = 0, regionY = 0) => {
+      const actualX = x + regionX;
+      const actualY = y + regionY;
+      
+      if (state.paintedMap && state.paintedMap[actualY] && 
+          actualX >= 0 && actualX < state.paintedMap[actualY].length) {
+        state.paintedMap[actualY][actualX] = true;
+      }
+    },
+
+    isPixelPainted: (x, y, regionX = 0, regionY = 0) => {
+      const actualX = x + regionX;
+      const actualY = y + regionY;
+      
+      if (state.paintedMap && state.paintedMap[actualY] && 
+          actualX >= 0 && actualX < state.paintedMap[actualY].length) {
+        return state.paintedMap[actualY][actualX];
+      }
+      return false;
+    },
+
+    // Smart save - only save if significant changes
+    shouldAutoSave: () => {
+      const now = Date.now();
+      const pixelsSinceLastSave = state.paintedPixels - state._lastSavePixelCount;
+      const timeSinceLastSave = now - state._lastSaveTime;
+      
+      // Save conditions:
+      // 1. Every 25 pixels (reduced from 50 for more frequent saves)
+      // 2. At least 30 seconds since last save (prevent spam)
+      // 3. Not already saving
+      return !state._saveInProgress && 
+             pixelsSinceLastSave >= 25 && 
+             timeSinceLastSave >= 30000;
+    },
+
+    performSmartSave: () => {
+      if (!Utils.shouldAutoSave()) return false;
+      
+      state._saveInProgress = true;
+      const success = Utils.saveProgress();
+      
+      if (success) {
+        state._lastSavePixelCount = state.paintedPixels;
+        state._lastSaveTime = Date.now();
+        console.log(`💾 Auto-saved at ${state.paintedPixels} pixels`);
+      }
+      
+      state._saveInProgress = false;
+      return success;
+    },
+
+    // --- Data management helpers ---
+
+    // Base64 compression helpers for efficient storage
     packPaintedMapToBase64: (paintedMap, width, height) => {
       if (!paintedMap || !width || !height) return null;
       const totalBits = width * height;
@@ -2381,6 +2457,7 @@
       return map;
     },
 
+    // Migration helpers for backward compatibility
     migrateProgressToV2: (saved) => {
       if (!saved) return saved;
       const isV1 = !saved.version || saved.version === '1' || saved.version === '1.0' || saved.version === '1.1';
@@ -2411,8 +2488,16 @@
       if (!isV2 && !isV1) return saved; // save this for future
       try {
         const migrated = { ...saved };
-        delete migrated.paintedMapPacked;
-        delete migrated.paintedMap;
+        // First migrate to v2 if needed
+        if (isV1) {
+          const width = migrated.imageData?.width;
+          const height = migrated.imageData?.height;
+          if (migrated.paintedMap && width && height) {
+            const data = Utils.packPaintedMapToBase64(migrated.paintedMap, width, height);
+            migrated.paintedMapPacked = { width, height, data };
+          }
+          delete migrated.paintedMap;
+        }
         migrated.version = '2.1';
         return migrated;
       } catch (e) {
@@ -2423,9 +2508,22 @@
 
   saveProgress: () => {
       try {
+        // Pack painted map if available
+        let paintedMapPacked = null;
+        if (state.paintedMap && state.imageData) {
+          const data = Utils.packPaintedMapToBase64(state.paintedMap, state.imageData.width, state.imageData.height);
+          if (data) {
+            paintedMapPacked = {
+              width: state.imageData.width,
+              height: state.imageData.height,
+              data: data
+            };
+          }
+        }
+
         const progressData = {
           timestamp: Date.now(),
-      version: "2.1",
+          version: "2.1",
           state: {
             totalPixels: state.totalPixels,
             paintedPixels: state.paintedPixels,
@@ -2444,7 +2542,7 @@
               totalPixels: state.imageData.totalPixels,
             }
             : null,
-          paintedMapPacked: null,
+          paintedMapPacked: paintedMapPacked,
         }
 
         localStorage.setItem("wplace-bot-progress", JSON.stringify(progressData))
@@ -2483,6 +2581,11 @@
     clearProgress: () => {
       try {
         localStorage.removeItem("wplace-bot-progress")
+        // Also clear painted map from memory
+        state.paintedMap = null;
+        state._lastSavePixelCount = 0;
+        state._lastSaveTime = 0;
+        console.log("📋 Progress and painted map cleared");
         return true
       } catch (error) {
         console.error("Error clearing progress:", error)
@@ -2534,9 +2637,22 @@
 
   saveProgressToFile: () => {
       try {
+        // Pack painted map if available
+        let paintedMapPacked = null;
+        if (state.paintedMap && state.imageData) {
+          const data = Utils.packPaintedMapToBase64(state.paintedMap, state.imageData.width, state.imageData.height);
+          if (data) {
+            paintedMapPacked = {
+              width: state.imageData.width,
+              height: state.imageData.height,
+              data: data
+            };
+          }
+        }
+
         const progressData = {
           timestamp: Date.now(),
-      version: "2.1",
+          version: "2.1",
           state: {
             totalPixels: state.totalPixels,
             paintedPixels: state.paintedPixels,
@@ -2555,7 +2671,7 @@
               totalPixels: state.imageData.totalPixels,
             }
             : null,
-          paintedMapPacked: null,
+          paintedMapPacked: paintedMapPacked,
         }
 
         const filename = `wplace-bot-progress-${new Date().toISOString().slice(0, 19).replace(/:/g, "-")}.json`
@@ -3043,7 +3159,7 @@
       
       // Add additional checks before token generation
       if (!window.turnstile) {
-        throw new Error('Turnstile library not loaded');
+        await Utils.loadTurnstile();
       }
       
       const token = await Utils.generatePaintToken(sitekey);
@@ -6718,13 +6834,16 @@
           state.paintedPixels = 0
           state.imageLoaded = true
           state.lastPosition = { x: 0, y: 0 }
+          
+          // Initialize painted map for tracking
+          Utils.initializePaintedMap(width, height);
+          
           // New image: clear previous resize settings
           state.resizeSettings = null;
           // Also clear any previous ignore mask
           state.resizeIgnoreMask = null;
           // Save original image for this browser (dataUrl + dims)
           state.originalImage = { dataUrl: imageSrc, width, height };
-          saveBotSettings();
           saveBotSettings();
 
           // Use the original image for the overlay initially
@@ -7024,16 +7143,19 @@
               const success = await sendBatchWithRetry(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
               
               if (success) {
-                pixelBatch.pixels.forEach((p) => { state.paintedPixels++; });
+                pixelBatch.pixels.forEach((p) => { 
+                  state.paintedPixels++;
+                  // Mark pixel as painted in map
+                  Utils.markPixelPainted(p.x, p.y, pixelBatch.regionX, pixelBatch.regionY);
+                });
                 state.currentCharges -= pixelBatch.pixels.length;
                 updateUI("paintingProgress", "default", {
                   painted: state.paintedPixels,
                   total: state.totalPixels,
                 })
 
-                if (state.paintedPixels % 50 === 0) {
-                  Utils.saveProgress()
-                }
+                // Use smart save instead of fixed interval
+                Utils.performSmartSave();
 
                 if (CONFIG.PAINTING_SPEED_ENABLED && state.paintingSpeed > 0 && pixelBatch.pixels.length > 0) {
                   // paintingSpeed now represents batch size, so add a small delay based on batch size
@@ -7095,6 +7217,8 @@
             if (success) {
               pixelBatch.pixels.forEach((pixel) => {
                 state.paintedPixels++;
+                // Mark pixel as painted in map
+                Utils.markPixelPainted(pixel.x, pixel.y, pixelBatch.regionX, pixelBatch.regionY);
               })
 
               state.currentCharges -= pixelBatch.pixels.length;
@@ -7104,9 +7228,8 @@
                 total: state.totalPixels,
               })
 
-              if (state.paintedPixels % 50 === 0) {
-                Utils.saveProgress()
-              }
+              // Use smart save instead of fixed interval
+              Utils.performSmartSave();
 
               if (CONFIG.PAINTING_SPEED_ENABLED && state.paintingSpeed > 0 && pixelBatch.pixels.length > 0) {
                 const delayPerPixel = 1000 / state.paintingSpeed // ms per pixel
@@ -7135,13 +7258,25 @@
               break;
             }
 
+            // Enable save button during cooldown wait
+            saveBtn.disabled = false;
+
             updateUI("noChargesThreshold", "warning", {
               time: Utils.formatTime(state.cooldown),
               threshold: state.cooldownChargeThreshold,
               current: state.currentCharges
             });
             await updateStats();
+            
+            // Allow auto save during cooldown
+            Utils.performSmartSave();
+            
             await Utils.sleep(state.cooldown);
+          }
+          
+          // Disable save button again after exiting wait loop (back to normal painting)
+          if (!state.stopFlag) {
+            saveBtn.disabled = true;
           }
           if (state.stopFlag) break outerLoop;
 
@@ -7153,9 +7288,14 @@
         const success = await sendBatchWithRetry(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
         if (success) {
           pixelBatch.pixels.forEach((pixel) => {
-            state.paintedPixels++
+            state.paintedPixels++;
+            // Mark pixel as painted in map
+            Utils.markPixelPainted(pixel.x, pixel.y, pixelBatch.regionX, pixelBatch.regionY);
           })
           state.currentCharges -= pixelBatch.pixels.length;
+          // Final save with painted map
+          Utils.saveProgress();
+          
           if (CONFIG.PAINTING_SPEED_ENABLED && state.paintingSpeed > 0 && pixelBatch.pixels.length > 0) {
             const delayPerPixel = 1000 / state.paintingSpeed // ms per pixel
             const totalDelay = Math.max(100, delayPerPixel * pixelBatch.pixels.length) // minimum 100ms
@@ -7173,12 +7313,14 @@
 
     if (state.stopFlag) {
       updateUI("paintingStopped", "warning")
+      // Save progress when stopped to preserve painted map
       Utils.saveProgress()
     } else {
       updateUI("paintingComplete", "success", { count: state.paintedPixels })
       state.lastPosition = { x: 0, y: 0 }
-      state.paintedMap = null
-      Utils.clearProgress()
+      // Keep painted map until user starts new project
+      // state.paintedMap = null  // Commented out to preserve data
+      Utils.saveProgress() // Save final complete state
       overlayManager.clear();
       const toggleOverlayBtn = document.getElementById('toggleOverlayBtn');
       if (toggleOverlayBtn) {
