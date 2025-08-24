@@ -1700,18 +1700,7 @@
         }
         
         this._turnstileContainer = document.createElement('div');
-        this._turnstileContainer.style.cssText = `
-          position: fixed !important;
-          left: -99999px !important;
-          top: -99999px !important;
-          width: 1px !important;
-          height: 1px !important;
-          pointer-events: none !important;
-          opacity: 0 !important;
-          visibility: hidden !important;
-          z-index: -99999 !important;
-          overflow: hidden !important;
-        `;
+        this._turnstileContainer.className = 'wplace-turnstile-hidden';
         this._turnstileContainer.setAttribute('aria-hidden', 'true');
         this._turnstileContainer.id = 'turnstile-widget-container';
         document.body.appendChild(this._turnstileContainer);
@@ -1727,35 +1716,19 @@
 
       const overlay = document.createElement('div');
       overlay.id = 'turnstile-overlay-container';
-      overlay.style.cssText = `
-        position: fixed !important;
-        bottom: 20px !important;
-        right: 20px !important;
-        z-index: 99999 !important;
-        background: rgba(0,0,0,0.9) !important;
-        border-radius: 12px !important;
-        padding: 20px !important;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.4) !important;
-        backdrop-filter: blur(10px) !important;
-        border: 1px solid rgba(255,255,255,0.2) !important;
-        color: white !important;
-        font-family: 'Segoe UI', sans-serif !important;
-        display: none !important;
-        max-width: 350px !important;
-        min-width: 300px !important;
-      `;
+      overlay.className = 'wplace-turnstile-overlay wplace-overlay-hidden';
 
       const title = document.createElement('div');
       title.textContent = 'Cloudflare Turnstile — please complete the check if shown';
-      title.style.cssText = 'font: 600 12px/1.3 "Segoe UI",sans-serif; margin-bottom: 8px; opacity: 0.9;';
+      title.className = 'wplace-turnstile-title';
 
       const host = document.createElement('div');
       host.id = 'turnstile-overlay-host';
-      host.style.cssText = 'width: 100%; min-height: 70px;';
+      host.className = 'wplace-turnstile-host';
 
       const hideBtn = document.createElement('button');
       hideBtn.textContent = 'Hide';
-      hideBtn.style.cssText = 'position:absolute; top:6px; right:6px; font-size:11px; background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.2); border-radius:6px; padding:2px 6px; cursor:pointer;';
+      hideBtn.className = 'wplace-turnstile-hide-btn';
       hideBtn.addEventListener('click', () => overlay.remove());
 
       overlay.appendChild(title);
@@ -2084,40 +2057,7 @@
 
     showAlert: (message, type = "info") => {
       const alertDiv = document.createElement("div")
-      alertDiv.style.cssText = `
-        position: fixed;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        padding: 12px 20px;
-        border-radius: 8px;
-        color: white;
-        font-weight: 600;
-        z-index: 10001;
-        max-width: 400px;
-        text-align: center;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        animation: slideDown 0.3s ease-out;
-        font-family: 'Segoe UI', sans-serif;
-      `
-
-      const colors = {
-        info: "background: linear-gradient(135deg, #3498db, #2980b9);",
-        success: "background: linear-gradient(135deg, #27ae60, #229954);",
-        warning: "background: linear-gradient(135deg, #f39c12, #e67e22);",
-        error: "background: linear-gradient(135deg, #e74c3c, #c0392b);",
-      }
-
-      alertDiv.style.cssText += colors[type] || colors.info
-
-      const style = document.createElement("style")
-      style.textContent = `
-        @keyframes slideDown {
-          from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
-          to { transform: translateX(-50%) translateY(0); opacity: 1; }
-        }
-      `
-      document.head.appendChild(style)
+      alertDiv.className = `wplace-alert-base wplace-alert-${type}`
 
       alertDiv.textContent = message
       document.body.appendChild(alertDiv)
@@ -2126,7 +2066,6 @@
         alertDiv.style.animation = "slideDown 0.3s ease-out reverse"
         setTimeout(() => {
           document.body.removeChild(alertDiv)
-          document.head.removeChild(style)
         }, 300)
       }, 4000)
     },
@@ -3292,12 +3231,19 @@
       document.head.appendChild(googleFonts)
     }
 
-    // Link external CSS file
+    // Link external CSS files
     const cssLink = document.createElement('link');
     cssLink.rel = 'stylesheet';
-    cssLink.href = 'https://staninna.github.io/WPlace-AutoBOT/auto-image-styles.css';  // TODO: Before merge change to https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/auto-image-styles.css
+    cssLink.href = 'https://staninna.github.io/WPlace-AutoBOT/auto-image-complete-styles.css';  // TODO: Before merge change to https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/auto-image-styles.css
     cssLink.setAttribute('data-wplace-theme', 'true');
     document.head.appendChild(cssLink);
+
+    // Link complete styles CSS file (includes extracted inline styles)
+    const completeCssLink = document.createElement('link');
+    completeCssLink.rel = 'stylesheet';
+    completeCssLink.href = './auto-image-complete-styles.css';
+    completeCssLink.setAttribute('data-wplace-complete', 'true');
+    document.head.appendChild(completeCssLink);
 
     // Apply theme-specific dynamic styles
     const style = document.createElement("style")
@@ -3838,17 +3784,9 @@
       `linear-gradient(135deg, ${theme.primary} 0%, ${theme.secondary || theme.primary} 100%)` : 
       `linear-gradient(135deg, #667eea 0%, #764ba2 100%)`
     
-    settingsContainer.style.cssText = `
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: ${themeBackground};
-      border: ${theme.borderWidth || '1px'} ${theme.borderStyle || 'solid'} ${theme.accent || 'rgba(255,255,255,0.1)'};
-      border-radius: ${theme.borderRadius || '16px'};
-      padding: 0;
-      z-index: 10002;
-      display: none;
+    settingsContainer.className = 'wplace-settings-container-base';
+    // Apply theme-specific background
+    settingsContainer.style.background = themeBackground;
       min-width: 420px;
       max-width: 480px;
       color: ${theme.text || 'white'};
