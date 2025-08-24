@@ -1,0 +1,749 @@
+/* WPlace Auto-Image Bot Styles */
+
+/* Animations */
+@keyframes neonGlow {
+  0%, 100% {
+    text-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor;
+  }
+  50% {
+    text-shadow: 0 0 2px currentColor, 0 0 5px currentColor, 0 0 8px currentColor;
+  }
+}
+
+@keyframes pixelBlink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0.7; }
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(400px); }
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(0, 255, 0, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0); }
+}
+
+@keyframes slideIn {
+  from { transform: translateY(-10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes slideDown {
+  from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+  to { transform: translateX(-50%) translateY(0); opacity: 1; }
+}
+
+/* Main containers - will be dynamically styled based on theme */
+#wplace-image-bot-container {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  width: 280px;
+  max-height: calc(100vh - 40px);
+  padding: 0;
+  z-index: 9998;
+  animation: slideIn 0.4s ease-out;
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: all 0.3s ease;
+  user-select: none;
+}
+
+#wplace-image-bot-container.wplace-dragging {
+  transition: none;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.8), 0 0 0 2px rgba(255,255,255,0.2);
+  transform: scale(1.02);
+  z-index: 9999;
+}
+
+#wplace-image-bot-container.wplace-minimized {
+  width: 200px;
+  height: auto;
+  overflow: hidden;
+}
+
+#wplace-image-bot-container.wplace-compact {
+  width: 240px;
+}
+
+/* Stats Container */
+#wplace-stats-container {
+  position: fixed;
+  top: 20px;
+  left: 330px;
+  width: 280px;
+  max-height: calc(100vh - 40px);
+  padding: 0;
+  z-index: 9997;
+  animation: slideIn 0.4s ease-out;
+  overflow-y: auto;
+  transition: all 0.3s ease;
+  user-select: none;
+}
+
+#wplace-stats-container.wplace-dragging {
+  transition: none;
+}
+
+/* Header styles */
+.wplace-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: move;
+  user-select: none;
+  transition: background 0.2s ease;
+  position: relative;
+  z-index: 2;
+}
+
+.wplace-header-title {
+  display: flex;
+  align-items: center;
+}
+
+.wplace-header-controls {
+  display: flex;
+}
+
+.wplace-header-btn {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.wplace-header-btn:hover {
+  transform: scale(1.1);
+}
+
+/* Content areas */
+.wplace-content {
+  display: block;
+  position: relative;
+  z-index: 2;
+}
+
+.wplace-content.wplace-hidden {
+  display: none;
+}
+
+.wplace-status-section {
+  margin-bottom: 12px;
+  padding: 8px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.wplace-section {
+  margin-bottom: 12px;
+  padding: 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.wplace-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Controls and buttons */
+.wplace-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.wplace-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.wplace-row.single {
+  grid-template-columns: 1fr;
+}
+
+.wplace-btn {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.wplace-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.wplace-btn:hover::before {
+  left: 100%;
+}
+
+.wplace-btn:hover:not(:disabled) {
+  box-shadow: 0 0 15px currentColor;
+}
+
+.wplace-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.wplace-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.wplace-btn:disabled::before {
+  display: none;
+}
+
+.wplace-btn-overlay.active {
+  background: linear-gradient(135deg, #29b6f6 0%, #8e2de2 100%);
+  box-shadow: 0 0 15px #8e2de2;
+}
+
+/* Stats display */
+.wplace-stats {
+  margin-bottom: 8px;
+}
+
+.wplace-stat-item {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.wplace-stat-item:last-child {
+  border-bottom: none;
+}
+
+.wplace-stat-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  opacity: 0.9;
+}
+
+.wplace-stat-value {
+  font-weight: 600;
+}
+
+.wplace-colors-section {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.wplace-stat-colors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16px, 1fr));
+  gap: 4px;
+  margin-top: 8px;
+  padding: 4px;
+  background: rgba(0,0,0,0.2);
+  border-radius: 4px;
+  max-height: 80px;
+  overflow-y: auto;
+}
+
+.wplace-stat-color-swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: inset 0 0 2px rgba(0,0,0,0.5);
+}
+
+/* Progress bars */
+.wplace-progress {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.wplace-progress-bar {
+  position: relative;
+  transition: width 0.5s ease;
+}
+
+/* Status indicators */
+.wplace-status {
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.status-default {
+  background: rgba(255,255,255,0.1);
+}
+
+.status-success {
+  background: rgba(0, 255, 0, 0.1);
+  box-shadow: 0 0 15px currentColor;
+}
+
+.status-error {
+  background: rgba(255, 0, 0, 0.1);
+  box-shadow: 0 0 15px currentColor;
+}
+
+.status-warning {
+  background: rgba(255, 165, 0, 0.1);
+  box-shadow: 0 0 15px currentColor;
+}
+
+/* Resize container */
+.resize-container {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10000;
+  width: 90%;
+  max-width: 700px;
+  max-height: 90%;
+  overflow: auto;
+}
+
+.resize-preview-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0,0,0,0.2);
+  margin: 15px 0;
+  height: 300px;
+  overflow: hidden;
+}
+
+.resize-canvas-stack { 
+  position: relative; 
+  transform-origin: center center; 
+  display: inline-block; 
+}
+
+.resize-base-canvas, .resize-mask-canvas {
+  position: absolute; 
+  left: 0; 
+  top: 0;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+.resize-mask-canvas { 
+  pointer-events: auto; 
+}
+
+.resize-tools { 
+  display: flex; 
+  gap: 8px; 
+  align-items: center; 
+  margin-top: 8px; 
+  font-size: 12px; 
+}
+
+.resize-tools button { 
+  padding: 6px 10px; 
+  border-radius: 6px; 
+  border: 1px solid rgba(255,255,255,0.2); 
+  background: rgba(255,255,255,0.06); 
+  color: #fff; 
+  cursor: pointer; 
+}
+
+.wplace-btn.active,
+.wplace-btn[aria-pressed="true"] {
+  box-shadow: 0 0 8px rgba(0,0,0,0.25) inset, 0 0 6px rgba(0,0,0,0.2) !important;
+}
+
+.mask-mode-group .wplace-btn.active,
+.mask-mode-group .wplace-btn[aria-pressed="true"] {
+  box-shadow: 0 0 8px rgba(0,0,0,0.25) inset, 0 0 6px rgba(0,0,0,0.2);
+}
+
+.resize-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  align-items: center;
+}
+
+.resize-slider {
+  width: 100%;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.resize-zoom-controls {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.resize-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.resize-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 9999;
+  display: none;
+}
+
+/* Color grid */
+.wplace-color-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+  gap: 10px;
+  padding-top: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.wplace-color-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.wplace-color-item-name {
+  font-size: 9px;
+  color: #ccc;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+.wplace-color-swatch {
+  width: 22px;
+  height: 22px;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.2s ease;
+  position: relative;
+  margin: 0 auto;
+}
+
+.wplace-color-swatch.unavailable {
+  border-color: #666;
+  border-style: dashed;
+  cursor: not-allowed;
+}
+
+.wplace-color-swatch:hover {
+  transform: scale(1.1);
+  z-index: 1;
+}
+
+.wplace-color-swatch:not(.active) {
+  opacity: 0.3;
+  filter: grayscale(80%);
+}
+
+.wplace-color-swatch.unavailable:not(.active) {
+  opacity: 0.2;
+  filter: grayscale(90%);
+}
+
+.wplace-color-swatch.active::after {
+  content: '✔';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  text-shadow: 0 0 3px black;
+}
+
+.wplace-color-divider {
+  border: none;
+  height: 1px;
+  background: rgba(255,255,255,0.1);
+  margin: 8px 0;
+}
+
+/* Cooldown controls */
+.wplace-cooldown-control {
+  margin-top: 8px;
+}
+
+.wplace-cooldown-control label {
+  font-size: 11px;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.wplace-slider-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wplace-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  background: #444;
+  border-radius: 2px;
+  outline: none;
+}
+
+.wplace-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+/* Settings container */
+#wplace-settings-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10001;
+  min-width: 400px;
+  max-width: 500px;
+}
+
+.wplace-settings {
+  padding: 16px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.wplace-setting-section {
+  margin-bottom: 20px;
+  padding: 12px;
+}
+
+.wplace-setting-title {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.wplace-setting-title i {
+  margin-right: 8px;
+}
+
+.wplace-setting-content {
+  /* Content styling will be theme-dependent */
+}
+
+.wplace-speed-control {
+  margin-top: 12px;
+  padding: 12px;
+}
+
+.wplace-speed-label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.wplace-speed-label i {
+  margin-right: 6px;
+}
+
+.wplace-speed-slider-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.wplace-speed-slider {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.wplace-speed-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid;
+}
+
+.wplace-speed-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid;
+}
+
+.wplace-speed-display {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 90px;
+  justify-content: flex-end;
+}
+
+#speedValue {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.wplace-speed-unit {
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+.wplace-speed-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+.wplace-speed-display {
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-weight: 600;
+  min-width: 80px;
+  text-align: center;
+}
+
+.wplace-select {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.wplace-select:focus {
+  outline: none;
+}
+
+.wplace-description {
+  font-size: 12px;
+  opacity: 0.8;
+  line-height: 1.4;
+}
+
+.wplace-theme-custom {
+  margin-top: 15px;
+  padding: 15px;
+}
+
+.wplace-custom-group {
+  margin-bottom: 15px;
+}
+
+.wplace-custom-label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.wplace-custom-label i {
+  margin-right: 8px;
+  width: 16px;
+}
+
+.wplace-color-input-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.wplace-color-input {
+  width: 50px;
+  height: 30px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background: transparent;
+}
+
+.wplace-color-text {
+  flex: 1;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: monospace;
+}
+
+.wplace-animation-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.wplace-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.wplace-custom-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  border-top: 1px solid;
+  padding-top: 15px;
+}
+
+/* Theme-specific overrides will be applied dynamically via JavaScript */

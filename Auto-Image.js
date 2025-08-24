@@ -3292,406 +3292,222 @@
       document.head.appendChild(googleFonts)
     }
 
+    // Link external CSS file
+    const cssLink = document.createElement('link');
+    cssLink.rel = 'stylesheet';
+    cssLink.href = 'https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/auto-image-styles.css';
+    cssLink.setAttribute('data-wplace-theme', 'true');
+    document.head.appendChild(cssLink);
+
+    // Apply theme-specific dynamic styles
     const style = document.createElement("style")
-    style.setAttribute("data-wplace-theme", "true")
+    style.setAttribute("data-wplace-theme-dynamic", "true")
 
     style.textContent = `
-      ${theme.animations.glow
-        ? `
-      @keyframes neonGlow {
-        0%, 100% {
-          text-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor;
+      /* Dynamic theme-specific styles */
+      ${theme.animations.glow ? `
+        .wplace-header { animation: neonGlow 2s ease-in-out infinite alternate; }
+        .fas, .fa { filter: drop-shadow(0 0 3px currentColor); }
+      ` : ""}
+
+      ${theme.animations.pixelBlink ? `
+        .wplace-btn:hover:not(:disabled) { animation: pixelBlink 0.5s infinite; }
+        .status-error { animation: pixelBlink 0.5s infinite; }
+        .wplace-progress-bar::after { animation: pixelBlink 1s infinite; }
+      ` : ""}
+
+      ${theme.animations.scanline ? `
+        #wplace-image-bot-container::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 2px;
+          background: linear-gradient(90deg, transparent, ${theme.neon}, transparent);
+          animation: scanline 3s linear infinite;
+          z-index: 1;
+          pointer-events: none;
         }
-        50% {
-          text-shadow: 0 0 2px currentColor, 0 0 5px currentColor, 0 0 8px currentColor;
-        }
-      }`
-        : ""
-      }
+      ` : ""}
 
-      ${theme.animations.pixelBlink
-        ? `
-      @keyframes pixelBlink {
-        0%, 50% { opacity: 1; }
-        51%, 100% { opacity: 0.7; }
-      }`
-        : ""
-      }
-
-      ${theme.animations.scanline
-        ? `
-      @keyframes scanline {
-        0% { transform: translateY(-100%); }
-        100% { transform: translateY(400px); }
-      }`
-        : ""
-      }
-
-      @keyframes pulse {
-        0% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.7); }
-        70% { box-shadow: 0 0 0 10px rgba(0, 255, 0, 0); }
-        100% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0); }
-      }
-      @keyframes slideIn {
-        from { transform: translateY(-10px); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
-      }
-      @keyframes shimmer {
-        0% { transform: translateX(-100%); }
-        100% { transform: translateX(100%); }
-      }
-
+      /* Theme-specific container styles */
       #wplace-image-bot-container {
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        width: ${CONFIG.currentTheme === "Neon Retro" ? "280px" : "280px"};
-        max-height: calc(100vh - 40px);
         background: ${CONFIG.currentTheme === "Classic Autobot"
-        ? `linear-gradient(135deg, ${theme.primary} 0%, #1a1a1a 100%)`
-        : theme.primary
-      };
+          ? `linear-gradient(135deg, ${theme.primary} 0%, #1a1a1a 100%)`
+          : theme.primary
+        };
         border: ${theme.borderWidth} ${theme.borderStyle} ${CONFIG.currentTheme === "Classic Autobot" ? theme.accent : theme.text};
         border-radius: ${theme.borderRadius};
-        padding: 0;
         box-shadow: ${theme.boxShadow};
-        z-index: 9998;
         font-family: ${theme.fontFamily};
         color: ${theme.text};
-        animation: slideIn 0.4s ease-out;
-        overflow-y: auto; /* Allow scrolling for main panel */
-        overflow-x: hidden;
         ${theme.backdropFilter ? `backdrop-filter: ${theme.backdropFilter};` : ""}
-        transition: all 0.3s ease;
-        user-select: none;
         ${CONFIG.currentTheme === "Neon Retro" ? "image-rendering: pixelated;" : ""}
       }
 
-      ${theme.animations.scanline
-        ? `
-      #wplace-image-bot-container::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 2px;
-        background: linear-gradient(90deg, transparent, ${theme.neon}, transparent);
-        animation: scanline 3s linear infinite;
-        z-index: 1;
-        pointer-events: none;
-      }`
-        : ""
-      }
+      ${CONFIG.currentTheme === "Neon Retro" ? `
+        #wplace-image-bot-container::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background:
+            repeating-linear-gradient(
+              0deg,
+              transparent,
+              transparent 2px,
+              rgba(0, 255, 65, 0.03) 2px,
+              rgba(0, 255, 65, 0.03) 4px
+            );
+          pointer-events: none;
+          z-index: 1;
+        }
+      ` : ""}
 
-      ${CONFIG.currentTheme === "Neon Retro"
-        ? `
-      #wplace-image-bot-container::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background:
-          repeating-linear-gradient(
-            0deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 255, 65, 0.03) 2px,
-            rgba(0, 255, 65, 0.03) 4px
-          );
-        pointer-events: none;
-        z-index: 1;
-      }`
-        : ""
-      }
-
-      #wplace-image-bot-container.wplace-dragging {
-        transition: none;
-        box-shadow: 0 12px 40px rgba(0,0,0,0.8), 0 0 0 2px rgba(255,255,255,0.2);
-        transform: scale(1.02);
-        z-index: 9999;
-      }
-      #wplace-image-bot-container.wplace-minimized {
-        width: 200px;
-        height: auto;
-        overflow: hidden;
-      }
-      #wplace-image-bot-container.wplace-compact {
-        width: 240px;
-      }
-
-      /* Stats Container */
       #wplace-stats-container {
-        position: fixed;
-        top: 20px;
-        left: 330px;
-        width: ${CONFIG.currentTheme === "Neon Retro" ? "280px" : "280px"};
-        max-height: calc(100vh - 40px);
         background: ${CONFIG.currentTheme === "Classic Autobot"
-        ? `linear-gradient(135deg, ${theme.primary} 0%, #1a1a1a 100%)`
-        : theme.primary
-      };
+          ? `linear-gradient(135deg, ${theme.primary} 0%, #1a1a1a 100%)`
+          : theme.primary
+        };
         border: ${theme.borderWidth} ${theme.borderStyle} ${CONFIG.currentTheme === "Classic Autobot" ? theme.accent : theme.text};
         border-radius: ${theme.borderRadius};
-        padding: 0;
         box-shadow: ${theme.boxShadow};
-        z-index: 9997;
         font-family: ${theme.fontFamily};
         color: ${theme.text};
-        animation: slideIn 0.4s ease-out;
-        overflow-y: auto; /* Make stats panel scrollable */
         ${theme.backdropFilter ? `backdrop-filter: ${theme.backdropFilter};` : ""}
-        transition: all 0.3s ease;
-        user-select: none;
         ${CONFIG.currentTheme === "Neon Retro" ? "image-rendering: pixelated;" : ""}
-      }
-
-      /* FIX: Disable transition during drag to prevent lag */
-      #wplace-stats-container.wplace-dragging {
-        transition: none;
       }
 
       .wplace-header {
         padding: ${CONFIG.currentTheme === "Neon Retro" ? "8px 12px" : "8px 12px"};
         background: ${CONFIG.currentTheme === "Classic Autobot"
-        ? `linear-gradient(135deg, ${theme.secondary} 0%, #2a2a2a 100%)`
-        : theme.secondary
-      };
+          ? `linear-gradient(135deg, ${theme.secondary} 0%, #2a2a2a 100%)`
+          : theme.secondary
+        };
         color: ${theme.highlight};
         font-size: ${CONFIG.currentTheme === "Neon Retro" ? "11px" : "13px"};
         font-weight: ${CONFIG.currentTheme === "Neon Retro" ? "normal" : "700"};
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        cursor: move;
-        user-select: none;
         border-bottom: ${CONFIG.currentTheme === "Neon Retro" ? "2px" : "1px"} solid ${CONFIG.currentTheme === "Classic Autobot" ? "rgba(255,255,255,0.1)" : theme.text};
         ${CONFIG.currentTheme === "Classic Autobot" ? "text-shadow: 0 1px 2px rgba(0,0,0,0.5);" : "text-transform: uppercase; letter-spacing: 1px;"}
-        transition: background 0.2s ease;
-        position: relative;
-        z-index: 2;
-        ${theme.animations.glow ? "animation: neonGlow 2s ease-in-out infinite alternate;" : ""}
+        font-family: ${theme.fontFamily};
       }
 
-      .wplace-header-title {
-        display: flex;
-        align-items: center;
-        gap: ${CONFIG.currentTheme === "Neon Retro" ? "6px" : "6px"};
-      }
-
-      .wplace-header-controls {
-        display: flex;
-        gap: ${CONFIG.currentTheme === "Neon Retro" ? "6px" : "6px"};
-      }
+      .wplace-header-title { gap: ${CONFIG.currentTheme === "Neon Retro" ? "6px" : "6px"}; }
+      .wplace-header-controls { gap: ${CONFIG.currentTheme === "Neon Retro" ? "6px" : "6px"}; }
 
       .wplace-header-btn {
         background: ${CONFIG.currentTheme === "Classic Autobot" ? "rgba(255,255,255,0.1)" : theme.accent};
         border: ${CONFIG.currentTheme === "Neon Retro" ? `2px solid ${theme.text}` : "none"};
         color: ${theme.text};
-        cursor: pointer;
         border-radius: ${CONFIG.currentTheme === "Classic Autobot" ? "4px" : "0"};
         width: ${CONFIG.currentTheme === "Classic Autobot" ? "18px" : "auto"};
         height: ${CONFIG.currentTheme === "Classic Autobot" ? "18px" : "auto"};
         padding: ${CONFIG.currentTheme === "Neon Retro" ? "4px 6px" : "0"};
         font-size: ${CONFIG.currentTheme === "Neon Retro" ? "8px" : "10px"};
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s;
         font-family: ${theme.fontFamily};
         ${CONFIG.currentTheme === "Neon Retro" ? "image-rendering: pixelated;" : ""}
       }
       .wplace-header-btn:hover {
         background: ${CONFIG.currentTheme === "Classic Autobot" ? theme.accent : theme.text};
         color: ${CONFIG.currentTheme === "Classic Autobot" ? theme.text : theme.primary};
-        transform: ${CONFIG.currentTheme === "Classic Autobot" ? "scale(1.1)" : "none"};
         ${CONFIG.currentTheme === "Neon Retro" ? `box-shadow: 0 0 10px ${theme.text};` : ""}
       }
 
-      .wplace-content {
-        padding: ${CONFIG.currentTheme === "Neon Retro" ? "12px" : "12px"};
-        display: block;
-        position: relative;
-        z-index: 2;
-      }
-      .wplace-content.wplace-hidden {
-        display: none;
-      }
-
-      .wplace-status-section {
-        margin-bottom: 12px;
-        padding: 8px;
-        background: rgba(255,255,255,0.03);
-        border-radius: ${theme.borderRadius};
-        border: 1px solid rgba(255,255,255,0.1);
-      }
-
-      .wplace-section {
-        margin-bottom: ${CONFIG.currentTheme === "Neon Retro" ? "12px" : "12px"};
-        padding: 12px;
-        background: rgba(255,255,255,0.03);
-        border-radius: ${theme.borderRadius};
-        border: 1px solid rgba(255,255,255,0.1);
-      }
-
-      .wplace-section-title {
-        font-size: 11px;
-        font-weight: 600;
-        margin-bottom: 8px;
-        color: ${theme.highlight};
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-
-      .wplace-controls {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-      }
-      .wplace-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-      }
-      .wplace-row.single {
-        grid-template-columns: 1fr;
-      }
+      .wplace-content { padding: ${CONFIG.currentTheme === "Neon Retro" ? "12px" : "12px"}; }
+      .wplace-section { border-radius: ${theme.borderRadius}; }
+      .wplace-section-title { color: ${theme.highlight}; }
 
       .wplace-btn {
         padding: ${CONFIG.currentTheme === "Neon Retro" ? "12px 8px" : "8px 12px"};
         border: ${CONFIG.currentTheme === "Neon Retro" ? "2px solid" : "none"};
         border-radius: ${theme.borderRadius};
         font-weight: ${CONFIG.currentTheme === "Neon Retro" ? "normal" : "500"};
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
         gap: ${CONFIG.currentTheme === "Neon Retro" ? "8px" : "6px"};
         font-size: ${CONFIG.currentTheme === "Neon Retro" ? "8px" : "11px"};
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
         font-family: ${theme.fontFamily};
         ${CONFIG.currentTheme === "Neon Retro" ? "text-transform: uppercase; letter-spacing: 1px; image-rendering: pixelated;" : ""}
         background: ${CONFIG.currentTheme === "Classic Autobot"
-        ? `linear-gradient(135deg, ${theme.accent} 0%, #4a4a4a 100%)`
-        : theme.accent
-      };
+          ? `linear-gradient(135deg, ${theme.accent} 0%, #4a4a4a 100%)`
+          : theme.accent
+        };
         ${CONFIG.currentTheme === "Classic Autobot" ? "border: 1px solid rgba(255,255,255,0.1);" : ""}
       }
 
-      ${CONFIG.currentTheme === "Classic Autobot"
-        ? `
-      .wplace-btn::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-        transition: left 0.5s ease;
-      }
-      .wplace-btn:hover:not(:disabled)::before {
-        left: 100%;
-      }`
-        : `
-      .wplace-btn::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-        transition: left 0.5s;
-      }
-      .wplace-btn:hover::before {
-        left: 100%;
-      }`
-      }
-
-      .wplace-btn:hover:not(:disabled) {
-        transform: ${CONFIG.currentTheme === "Classic Autobot" ? "translateY(-1px)" : "none"};
-        box-shadow: ${CONFIG.currentTheme === "Classic Autobot" ? "0 4px 12px rgba(0,0,0,0.4)" : "0 0 15px currentColor"
-      };
-        ${theme.animations.pixelBlink ? "animation: pixelBlink 0.5s infinite;" : ""}
-      }
-      .wplace-btn:active:not(:disabled) {
-        transform: translateY(0);
-      }
+      ${CONFIG.currentTheme === "Classic Autobot" ? `
+        .wplace-btn::before {
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+          transition: left 0.5s ease;
+        }
+        .wplace-btn:hover:not(:disabled)::before { left: 100%; }
+        .wplace-btn:hover:not(:disabled) {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+      ` : `
+        .wplace-btn:hover:not(:disabled) { box-shadow: 0 0 15px currentColor; }
+      `}
 
       .wplace-btn-primary {
         background: ${CONFIG.currentTheme === "Classic Autobot"
-        ? `linear-gradient(135deg, ${theme.accent} 0%, #6a5acd 100%)`
-        : theme.accent
-      };
+          ? `linear-gradient(135deg, ${theme.accent} 0%, #6a5acd 100%)`
+          : theme.accent
+        };
         color: ${theme.text};
         ${CONFIG.currentTheme === "Neon Retro" ? `border-color: ${theme.text};` : ""}
       }
+
       .wplace-btn-upload {
         background: ${CONFIG.currentTheme === "Classic Autobot"
-        ? `linear-gradient(135deg, ${theme.secondary} 0%, #4a4a4a 100%)`
-        : theme.purple
-      };
+          ? `linear-gradient(135deg, ${theme.secondary} 0%, #4a4a4a 100%)`
+          : theme.purple
+        };
         color: ${theme.text};
         ${CONFIG.currentTheme === "Classic Autobot"
-        ? `border: 1px dashed ${theme.highlight};`
-        : `border-color: ${theme.text}; border-style: dashed;`
+          ? `border: 1px dashed ${theme.highlight};`
+          : `border-color: ${theme.text}; border-style: dashed;`
+        }
       }
-      }
+
       .wplace-btn-start {
         background: ${CONFIG.currentTheme === "Classic Autobot"
-        ? `linear-gradient(135deg, ${theme.success} 0%, #228b22 100%)`
-        : theme.success
-      };
+          ? `linear-gradient(135deg, ${theme.success} 0%, #228b22 100%)`
+          : theme.success
+        };
         color: ${CONFIG.currentTheme === "Classic Autobot" ? "white" : theme.primary};
         ${CONFIG.currentTheme === "Neon Retro" ? `border-color: ${theme.success};` : ""}
       }
+
       .wplace-btn-stop {
         background: ${CONFIG.currentTheme === "Classic Autobot"
-        ? `linear-gradient(135deg, ${theme.error} 0%, #dc143c 100%)`
-        : theme.error
-      };
+          ? `linear-gradient(135deg, ${theme.error} 0%, #dc143c 100%)`
+          : theme.error
+        };
         color: ${CONFIG.currentTheme === "Classic Autobot" ? "white" : theme.text};
         ${CONFIG.currentTheme === "Neon Retro" ? `border-color: ${theme.error};` : ""}
       }
+
       .wplace-btn-select {
         background: ${CONFIG.currentTheme === "Classic Autobot"
-        ? `linear-gradient(135deg, ${theme.highlight} 0%, #9370db 100%)`
-        : theme.highlight
-      };
+          ? `linear-gradient(135deg, ${theme.highlight} 0%, #9370db 100%)`
+          : theme.highlight
+        };
         color: ${CONFIG.currentTheme === "Classic Autobot" ? "white" : theme.primary};
         ${CONFIG.currentTheme === "Neon Retro" ? `border-color: ${theme.highlight};` : ""}
       }
+
       .wplace-btn-file {
         background: ${CONFIG.currentTheme === "Classic Autobot"
-        ? "linear-gradient(135deg, #ff8c00 0%, #ff7f50 100%)"
-        : theme.warning
-      };
+          ? "linear-gradient(135deg, #ff8c00 0%, #ff7f50 100%)"
+          : theme.warning
+        };
         color: ${CONFIG.currentTheme === "Classic Autobot" ? "white" : theme.primary};
         ${CONFIG.currentTheme === "Neon Retro" ? `border-color: ${theme.warning};` : ""}
       }
-      .wplace-btn:disabled {
-        opacity: ${CONFIG.currentTheme === "Classic Autobot" ? "0.5" : "0.3"};
-        cursor: not-allowed;
-        transform: none !important;
-        ${theme.animations.pixelBlink ? "animation: none !important;" : ""}
-        box-shadow: none !important;
-      }
-      .wplace-btn:disabled::before {
-        display: none;
-      }
-      
-      .wplace-btn-overlay.active {
-        background: linear-gradient(135deg, #29b6f6 0%, #8e2de2 100%);
-        box-shadow: 0 0 15px #8e2de2;
-      }
+
+      .wplace-btn:disabled { opacity: ${CONFIG.currentTheme === "Classic Autobot" ? "0.5" : "0.3"}; }
 
       .wplace-stats {
         background: ${CONFIG.currentTheme === "Classic Autobot" ? "rgba(255,255,255,0.03)" : theme.secondary};
@@ -3703,132 +3519,68 @@
       }
 
       .wplace-stat-item {
-        display: flex;
-        justify-content: space-between;
         padding: ${CONFIG.currentTheme === "Neon Retro" ? "6px 0" : "4px 0"};
         font-size: ${CONFIG.currentTheme === "Neon Retro" ? "8px" : "11px"};
-        border-bottom: 1px solid rgba(255,255,255,0.05);
         ${CONFIG.currentTheme === "Neon Retro" ? "text-transform: uppercase; letter-spacing: 1px;" : ""}
       }
-      .wplace-stat-item:last-child {
-        border-bottom: none;
-      }
-      .wplace-stat-label {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        opacity: 0.9;
-        font-size: ${CONFIG.currentTheme === "Neon Retro" ? "8px" : "10px"};
-      }
-      .wplace-stat-value {
-        font-weight: 600;
-        color: ${theme.highlight};
-      }
-
-      .wplace-colors-section {
-        margin-top: 10px;
-        padding-top: 8px;
-        border-top: 1px solid rgba(255,255,255,0.05);
-      }
-
-      .wplace-stat-colors-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(16px, 1fr));
-        gap: 4px;
-        margin-top: 8px;
-        padding: 4px;
-        background: rgba(0,0,0,0.2);
-        border-radius: 4px;
-        max-height: 80px; /* Limit height and allow scrolling */
-        overflow-y: auto;
-      }
-      
-      .wplace-stat-color-swatch {
-        width: 16px;
-        height: 16px;
-        border-radius: 3px;
-        border: 1px solid rgba(255,255,255,0.1);
-        box-shadow: inset 0 0 2px rgba(0,0,0,0.5);
-      }
+      .wplace-stat-label { font-size: ${CONFIG.currentTheme === "Neon Retro" ? "8px" : "10px"}; }
+      .wplace-stat-value { color: ${theme.highlight}; }
 
       .wplace-progress {
-        width: 100%;
         background: ${CONFIG.currentTheme === "Classic Autobot" ? "rgba(0,0,0,0.3)" : theme.secondary};
         border: ${CONFIG.currentTheme === "Neon Retro" ? `2px solid ${theme.text}` : "1px solid rgba(255,255,255,0.1)"};
         border-radius: ${theme.borderRadius};
         margin: ${CONFIG.currentTheme === "Neon Retro" ? "10px 0" : "8px 0"};
-        overflow: hidden;
         height: ${CONFIG.currentTheme === "Neon Retro" ? "16px" : "6px"};
-        position: relative;
       }
 
-      ${CONFIG.currentTheme === "Neon Retro"
-        ? `
-      .wplace-progress::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background:
-          repeating-linear-gradient(
-            45deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 255, 65, 0.1) 2px,
-            rgba(0, 255, 65, 0.1) 4px
-          );
-        pointer-events: none;
-      }`
-        : ""
-      }
+      ${CONFIG.currentTheme === "Neon Retro" ? `
+        .wplace-progress::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background:
+            repeating-linear-gradient(
+              45deg,
+              transparent,
+              transparent 2px,
+              rgba(0, 255, 65, 0.1) 2px,
+              rgba(0, 255, 65, 0.1) 4px
+            );
+          pointer-events: none;
+        }
+      ` : ""}
 
       .wplace-progress-bar {
         height: ${CONFIG.currentTheme === "Neon Retro" ? "100%" : "6px"};
         background: ${CONFIG.currentTheme === "Classic Autobot"
-        ? `linear-gradient(135deg, ${theme.highlight} 0%, #9370db 100%)`
-        : `linear-gradient(90deg, ${theme.success}, ${theme.neon})`
-      };
+          ? `linear-gradient(135deg, ${theme.highlight} 0%, #9370db 100%)`
+          : `linear-gradient(90deg, ${theme.success}, ${theme.neon})`
+        };
         transition: width ${CONFIG.currentTheme === "Neon Retro" ? "0.3s" : "0.5s"} ease;
-        position: relative;
         ${CONFIG.currentTheme === "Neon Retro" ? `box-shadow: 0 0 10px ${theme.success};` : ""}
       }
 
-      ${CONFIG.currentTheme === "Classic Autobot"
-        ? `
-      .wplace-progress-bar::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-        animation: shimmer 2s infinite;
-      }`
-        : `
-      .wplace-progress-bar::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        right: 0;
-        width: 4px;
-        height: 100%;
-        background: ${theme.text};
-        animation: pixelBlink 1s infinite;
-      }`
-      }
+      ${CONFIG.currentTheme === "Classic Autobot" ? `
+        .wplace-progress-bar::after {
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+          animation: shimmer 2s infinite;
+        }
+      ` : `
+        .wplace-progress-bar::after {
+          background: ${theme.text};
+        }
+      `}
 
       .wplace-status {
         padding: ${CONFIG.currentTheme === "Neon Retro" ? "10px" : "6px"};
         border: ${CONFIG.currentTheme === "Neon Retro" ? "2px solid" : "1px solid"};
         border-radius: ${theme.borderRadius};
-        text-align: center;
         font-size: ${CONFIG.currentTheme === "Neon Retro" ? "8px" : "11px"};
         ${CONFIG.currentTheme === "Neon Retro" ? "text-transform: uppercase; letter-spacing: 1px;" : ""}
-        position: relative;
-        overflow: hidden;
       }
 
       .status-default {
@@ -3847,7 +3599,6 @@
         border-color: ${theme.error};
         color: ${CONFIG.currentTheme === "Classic Autobot" ? theme.error : theme.text};
         box-shadow: 0 0 15px ${theme.error};
-        ${theme.animations.pixelBlink ? "animation: pixelBlink 0.5s infinite;" : ""}
       }
       .status-warning {
         background: ${CONFIG.currentTheme === "Classic Autobot" ? "rgba(255, 165, 0, 0.1)" : theme.warning};
@@ -3856,71 +3607,17 @@
         box-shadow: 0 0 15px ${theme.warning};
       }
 
+      /* Settings and other dynamic elements */
       .resize-container {
-        display: none;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
         background: ${theme.primary};
-        padding: 20px;
         border: ${theme.borderWidth} ${theme.borderStyle} ${theme.text};
         border-radius: ${theme.borderRadius};
-        z-index: 10000;
-        box-shadow: ${CONFIG.currentTheme === "Classic Autobot" ? "0 0 20px rgba(0,0,0,0.5)" : "0 0 30px rgba(0, 255, 65, 0.5)"
-      };
-        width: 90%;
-        max-width: 700px;
-        max-height: 90%;
-        overflow: auto;
+        box-shadow: ${CONFIG.currentTheme === "Classic Autobot" ? "0 0 20px rgba(0,0,0,0.5)" : "0 0 30px rgba(0, 255, 65, 0.5)"};
         font-family: ${theme.fontFamily};
       }
 
-      .resize-preview-wrapper {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border: 1px solid ${theme.accent};
-        background: rgba(0,0,0,0.2);
-        margin: 15px 0;
-        height: 300px;
-        overflow: hidden;
-      }
-
-  .resize-canvas-stack { position: relative; transform-origin: center center; display: inline-block; }
-      .resize-base-canvas, .resize-mask-canvas {
-        position: absolute; left: 0; top: 0;
-        image-rendering: pixelated;
-        image-rendering: -moz-crisp-edges;
-        image-rendering: crisp-edges;
-      }
-      .resize-mask-canvas { pointer-events: auto; }
-      .resize-tools { display:flex; gap:8px; align-items:center; margin-top:8px; font-size:12px; }
-      .resize-tools button { padding:6px 10px; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.06); color:#fff; cursor:pointer; }
-      .wplace-btn.active,
-      .wplace-btn[aria-pressed="true"] {
-        background: ${theme.highlight} !important;
-        color: ${theme.primary} !important;
-        border-color: ${theme.text} !important;
-        box-shadow: 0 0 8px rgba(0,0,0,0.25) inset, 0 0 6px rgba(0,0,0,0.2) !important;
-      }
-      .wplace-btn.active i,
-      .wplace-btn[aria-pressed="true"] i { filter: drop-shadow(0 0 3px ${theme.primary}); }
-      .mask-mode-group .wplace-btn.active,
-      .mask-mode-group .wplace-btn[aria-pressed="true"] {
-        background: ${theme.highlight};
-        color: ${theme.primary};
-        border-color: ${theme.text};
-        box-shadow: 0 0 8px rgba(0,0,0,0.25) inset, 0 0 6px rgba(0,0,0,0.2);
-      }
-
-      .resize-controls {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 15px;
-        align-items: center;
-      }
-
+      .resize-preview-wrapper { border: 1px solid ${theme.accent}; }
+      
       .resize-controls label {
         font-size: ${CONFIG.currentTheme === "Neon Retro" ? "8px" : "12px"};
         ${CONFIG.currentTheme === "Neon Retro" ? "text-transform: uppercase; letter-spacing: 1px;" : ""}
@@ -3928,517 +3625,55 @@
       }
 
       .resize-slider {
-        width: 100%;
         height: ${CONFIG.currentTheme === "Neon Retro" ? "8px" : "4px"};
         background: ${CONFIG.currentTheme === "Classic Autobot" ? "#ccc" : theme.secondary};
         border: ${CONFIG.currentTheme === "Neon Retro" ? `2px solid ${theme.text}` : "none"};
         border-radius: ${theme.borderRadius};
-        outline: none;
-        -webkit-appearance: none;
       }
 
-      ${CONFIG.currentTheme === "Neon Retro"
-        ? `
-      .resize-slider::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        width: 16px;
-        height: 16px;
-        background: ${theme.highlight};
-        border: 2px solid ${theme.text};
-        border-radius: 0;
-        cursor: pointer;
-        box-shadow: 0 0 5px ${theme.highlight};
-      }
+      ${CONFIG.currentTheme === "Neon Retro" ? `
+        .resize-slider::-webkit-slider-thumb {
+          width: 16px;
+          height: 16px;
+          background: ${theme.highlight};
+          border: 2px solid ${theme.text};
+          border-radius: 0;
+          box-shadow: 0 0 5px ${theme.highlight};
+        }
 
-      .resize-slider::-moz-range-thumb {
-        width: 16px;
-        height: 16px;
-        background: ${theme.highlight};
-        border: 2px solid ${theme.text};
-        border-radius: 0;
-        cursor: pointer;
-        box-shadow: 0 0 5px ${theme.highlight};
-      }`
-        : ""
+        .resize-slider::-moz-range-thumb {
+          width: 16px;
+          height: 16px;
+          background: ${theme.highlight};
+          border: 2px solid ${theme.text};
+          border-radius: 0;
+          box-shadow: 0 0 5px ${theme.highlight};
+        }
+      ` : ""}
+
+      .wplace-slider::-webkit-slider-thumb { background: ${theme.highlight}; }
+
+      ${CONFIG.currentTheme === "Neon Retro" ? `
+        input[type="checkbox"] {
+          width: 16px;
+          height: 16px;
+          border: 2px solid ${theme.text};
+          background: ${theme.secondary};
+        }
+        input[type="checkbox"]:checked { background: ${theme.success}; }
+        input[type="checkbox"]:checked::after { color: ${theme.primary}; }
+      ` : ""}
+
+      /* Additional theme-specific styles */
+      .wplace-btn.active,
+      .wplace-btn[aria-pressed="true"] {
+        background: ${theme.highlight} !important;
+        color: ${theme.primary} !important;
+        border-color: ${theme.text} !important;
       }
       
-      .resize-zoom-controls {
-        grid-column: 1 / -1;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-top: 15px;
-      }
-
-      .resize-buttons {
-        display: flex;
-        gap: 10px;
-        justify-content: center;
-        margin-top: 20px;
-      }
-
-      .resize-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        z-index: 9999;
-        display: none;
-      }
-      .wplace-color-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-        gap: 10px;
-        padding-top: 8px;
-        max-height: 300px;
-        overflow-y: auto;
-      }
-      .wplace-color-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 4px;
-      }
-      .wplace-color-item-name {
-        font-size: 9px;
-        color: #ccc;
-        text-align: center;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        width: 100%;
-      }
-      .wplace-color-swatch {
-        width: 22px;
-        height: 22px;
-        border: 1px solid rgba(255,255,255,0.2);
-        border-radius: 4px;
-        cursor: pointer;
-        transition: transform 0.1s ease, box-shadow 0.2s ease;
-        position: relative;
-        margin: 0 auto;
-      }
-      .wplace-color-swatch.unavailable {
-        border-color: #666;
-        border-style: dashed;
-        cursor: not-allowed;
-      }
-      .wplace-color-swatch:hover {
-        transform: scale(1.1);
-        z-index: 1;
-      }
-      .wplace-color-swatch:not(.active) {
-        opacity: 0.3;
-        filter: grayscale(80%);
-      }
-      .wplace-color-swatch.unavailable:not(.active) {
-        opacity: 0.2;
-        filter: grayscale(90%);
-      }
-      .wplace-color-swatch.active::after {
-        content: '✔';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        color: white;
-        font-size: 12px;
-        font-weight: bold;
-        text-shadow: 0 0 3px black;
-      }
-      .wplace-color-divider {
-        border: none;
-        height: 1px;
-        background: rgba(255,255,255,0.1);
-        margin: 8px 0;
-      }
-
-        .wplace-cooldown-control {
-            margin-top: 8px;
-        }
-        .wplace-cooldown-control label {
-            font-size: 11px;
-            margin-bottom: 4px;
-            display: block;
-        }
-        .wplace-slider-container {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .wplace-slider {
-            flex: 1;
-            -webkit-appearance: none;
-            appearance: none;
-            height: 4px;
-            background: #444;
-            border-radius: 2px;
-            outline: none;
-        }
-        .wplace-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 14px;
-            height: 14px;
-            background: ${theme.highlight};
-            border-radius: 50%;
-            cursor: pointer;
-        }
-
-
-      ${CONFIG.currentTheme === "Neon Retro"
-        ? `
-      input[type="checkbox"] {
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        width: 16px;
-        height: 16px;
-        border: 2px solid ${theme.text};
-        background: ${theme.secondary};
-        margin-right: 8px;
-        position: relative;
-        cursor: pointer;
-      }
-
-      input[type="checkbox"]:checked {
-        background: ${theme.success};
-      }
-
-      input[type="checkbox"]:checked::after {
-        content: '✓';
-        position: absolute;
-        top: -2px;
-        left: 1px;
-        color: ${theme.primary};
-        font-size: 12px;
-        font-weight: bold;
-      }
-
-      .fas, .fa {
-        filter: drop-shadow(0 0 3px currentColor);
-      }
-
-      .wplace-speed-control {
-        margin-top: 12px;
-        padding: 12px;
-        background: ${theme.secondary};
-        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.accent};
-        border-radius: ${theme.borderRadius};
-        backdrop-filter: ${theme.backdropFilter};
-      }
-
-      .wplace-speed-label {
-        display: flex;
-        align-items: center;
-        margin-bottom: 8px;
-        color: ${theme.text};
-        font-size: 13px;
-        font-weight: 600;
-      }
-
-      .wplace-speed-label i {
-        margin-right: 6px;
-        color: ${theme.highlight};
-      }
-
-      .wplace-speed-slider-container {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-      }
-
-      .wplace-speed-slider {
-        flex: 1;
-        height: 6px;
-        border-radius: 3px;
-        background: ${theme.primary};
-        outline: none;
-        cursor: pointer;
-        -webkit-appearance: none;
-        appearance: none;
-      }
-
-      .wplace-speed-slider::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        appearance: none;
-        width: 18px;
-        height: 18px;
-        border-radius: 50%;
-        background: ${theme.highlight};
-        cursor: pointer;
-        border: 2px solid ${theme.text};
-        box-shadow: ${theme.boxShadow};
-      }
-
-      .wplace-speed-slider::-moz-range-thumb {
-        width: 18px;
-        height: 18px;
-        border-radius: 50%;
-        background: ${theme.highlight};
-        cursor: pointer;
-        border: 2px solid ${theme.text};
-        box-shadow: ${theme.boxShadow};
-      }
-
-      .wplace-speed-display {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        min-width: 90px;
-        justify-content: flex-end;
-      }
-
-      #speedValue {
-        color: ${theme.highlight};
-        font-weight: 600;
-        font-size: 14px;
-      }
-
-      .wplace-speed-unit {
-        color: ${theme.text};
-        font-size: 11px;
-        opacity: 0.8;
-      }
-
-      #wplace-settings-container {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 10001;
-        min-width: 400px;
-        max-width: 500px;
-        background: ${theme.primary};
-        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.accent};
-        border-radius: ${theme.borderRadius};
-        box-shadow: ${theme.boxShadow};
-        backdrop-filter: ${theme.backdropFilter};
-      }
-
-      .wplace-settings {
-        padding: 16px;
-        max-height: 400px;
-        overflow-y: auto;
-      }
-
-      .wplace-setting-section {
-        margin-bottom: 20px;
-        padding: 12px;
-        background: ${theme.secondary};
-        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.accent};
-        border-radius: ${theme.borderRadius};
-      }
-
-      .wplace-setting-title {
-        display: flex;
-        align-items: center;
-        margin-bottom: 12px;
-        color: ${theme.text};
-        font-size: 14px;
-        font-weight: 600;
-      }
-
-      .wplace-setting-title i {
-        margin-right: 8px;
-        color: ${theme.highlight};
-      }
-
-      .wplace-setting-content {
-        color: ${theme.text};
-      }
-
-      .wplace-section {
-        margin-bottom: 20px;
-        padding: 15px;
-        background: ${theme.secondary};
-        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.accent};
-        border-radius: ${theme.borderRadius};
-      }
-
-      .wplace-section-title {
-        display: flex;
-        align-items: center;
-        margin-bottom: 15px;
-        color: ${theme.text};
-        font-size: 14px;
-        font-weight: 600;
-      }
-
-      .wplace-section-title i {
-        margin-right: 8px;
-        color: ${theme.highlight};
-      }
-
-      .wplace-speed-container {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        margin-bottom: 10px;
-      }
-
-      .wplace-slider {
-        flex: 1;
-        height: 6px;
-        background: ${theme.accent};
-        border-radius: 3px;
-        outline: none;
-        -webkit-appearance: none;
-      }
-
-      .wplace-slider::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        width: 18px;
-        height: 18px;
-        background: ${theme.highlight};
-        border-radius: 50%;
-        cursor: pointer;
-        border: 2px solid ${theme.primary};
-      }
-
-      .wplace-speed-display {
-        background: ${theme.accent};
-        padding: 5px 10px;
-        border-radius: 4px;
-        color: ${theme.text};
-        font-weight: 600;
-        min-width: 80px;
-        text-align: center;
-        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.highlight};
-      }
-
-      .wplace-select {
-        width: 100%;
-        padding: 8px 12px;
-        background: ${theme.secondary};
-        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.accent};
-        border-radius: ${theme.borderRadius};
-        color: ${theme.text};
-        font-size: 14px;
-        margin-bottom: 10px;
-      }
-
-      .wplace-select:focus {
-        outline: none;
-        border-color: ${theme.highlight};
-      }
-
-      .wplace-description {
-        color: ${theme.text};
-        font-size: 12px;
-        opacity: 0.8;
-        line-height: 1.4;
-      }
-
-      .wplace-theme-custom {
-        margin-top: 15px;
-        padding: 15px;
-        background: ${theme.accent};
-        border-radius: ${theme.borderRadius};
-        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.highlight};
-      }
-
-      .wplace-custom-group {
-        margin-bottom: 15px;
-      }
-
-      .wplace-custom-label {
-        display: flex;
-        align-items: center;
-        margin-bottom: 8px;
-        color: ${theme.text};
-        font-size: 13px;
-        font-weight: 600;
-      }
-
-      .wplace-custom-label i {
-        margin-right: 8px;
-        color: ${theme.highlight};
-        width: 16px;
-      }
-
-      .wplace-color-input-group {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-      }
-
-      .wplace-color-input {
-        width: 50px;
-        height: 30px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        background: transparent;
-      }
-
-      .wplace-color-text {
-        flex: 1;
-        padding: 6px 10px;
-        background: ${theme.secondary};
-        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.accent};
-        border-radius: 4px;
-        color: ${theme.text};
-        font-size: 12px;
-        font-family: monospace;
-      }
-
-      .wplace-animation-controls {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-      }
-
-      .wplace-checkbox-label {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: ${theme.text};
-        font-size: 12px;
-        cursor: pointer;
-      }
-
-      .wplace-checkbox-label input[type="checkbox"] {
-        accent-color: ${theme.highlight};
-      }
-
-      .wplace-slider-container {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-
-      .wplace-slider-container .wplace-slider {
-        flex: 1;
-      }
-
-      .wplace-slider-container span {
-        color: ${theme.text};
-        font-size: 12px;
-        font-weight: 600;
-        min-width: 40px;
-      }
-
-      .wplace-custom-actions {
-        display: flex;
-        gap: 10px;
-        margin-top: 20px;
-        border-top: 1px solid ${theme.accent};
-        padding-top: 15px;
-      }
-
-      .wplace-btn-secondary {
-        background: ${theme.accent};
-        color: ${theme.text};
-        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.highlight};
-      }
-
-      .wplace-btn-secondary:hover {
-        background: ${theme.secondary};
-      }`
-        : ""
-      }
+      .wplace-btn.active i,
+      .wplace-btn[aria-pressed="true"] i { filter: drop-shadow(0 0 3px ${theme.primary}); }
     `
     document.head.appendChild(style)
 
