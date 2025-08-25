@@ -4620,32 +4620,32 @@
 
     if (settingsBtn && closeSettingsBtn && applySettingsBtn) {
       settingsBtn.addEventListener("click", () => {
-        const isVisible = settingsContainer.style.display !== "none"
+        const isVisible = settingsContainer.classList.contains("show");
         if (isVisible) {
-          settingsContainer.style.animation = "settingsFadeOut 0.3s ease-out forwards"
+          settingsContainer.style.animation = "settingsFadeOut 0.3s ease-out forwards";
+          settingsContainer.classList.remove("show");
           setTimeout(() => {
-            settingsContainer.style.display = "none"
-            settingsContainer.style.animation = ""
-          }, 300)
+            settingsContainer.style.animation = "";
+          }, 300);
         } else {
-          settingsContainer.style.top = "50%"
-          settingsContainer.style.left = "50%"
-          settingsContainer.style.transform = "translate(-50%, -50%)"
-          settingsContainer.style.display = "block"
-          settingsContainer.style.animation = "settingsSlideIn 0.4s ease-out"
+          settingsContainer.style.top = "50%";
+          settingsContainer.style.left = "50%";
+          settingsContainer.style.transform = "translate(-50%, -50%)";
+          settingsContainer.classList.add("show");
+          settingsContainer.style.animation = "settingsSlideIn 0.4s ease-out";
         }
       })
 
       closeSettingsBtn.addEventListener("click", () => {
-        settingsContainer.style.animation = "settingsFadeOut 0.3s ease-out forwards"
+        settingsContainer.style.animation = "settingsFadeOut 0.3s ease-out forwards";
+        settingsContainer.classList.remove("show");
         setTimeout(() => {
-          settingsContainer.style.display = "none"
-          settingsContainer.style.animation = ""
-          settingsContainer.style.top = "50%"
-          settingsContainer.style.left = "50%"
-          settingsContainer.style.transform = "translate(-50%, -50%)"
-        }, 300)
-      })
+          settingsContainer.style.animation = "";
+          settingsContainer.style.top = "50%";
+          settingsContainer.style.left = "50%";
+          settingsContainer.style.transform = "translate(-50%, -50%)";
+        }, 300);
+      });
 
       applySettingsBtn.addEventListener("click", () => {
         // Sync advanced settings before save
