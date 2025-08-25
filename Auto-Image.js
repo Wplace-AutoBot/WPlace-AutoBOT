@@ -3455,168 +3455,82 @@ function applyTheme() {
     `;
 
     settingsContainer.innerHTML = `
-      <div class="wplace-settings-header" style="
-        background: ${theme.accent ? `${theme.accent}33` : 'rgba(255,255,255,0.1)'}; 
-        padding: 20px; 
-        border-bottom: 1px solid ${theme.accent || 'rgba(255,255,255,0.1)'}; 
-        cursor: move;
-        ${theme.animations?.scanline ? `
-          position: relative;
-          overflow: hidden;
-        ` : ''}
-      ">
-        ${theme.animations?.scanline ? `
-          <div style="
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, ${theme.neon || '#00ffff'}, transparent);
-            animation: scanline 2s linear infinite;
-          "></div>
-        ` : ''}
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <h3 style="
-            margin: 0; 
-            color: ${theme.text || 'white'}; 
-            font-size: 20px; 
-            font-weight: 300; 
-            display: flex; 
-            align-items: center; 
-            gap: 10px;
-            ${theme.animations?.glow ? `
-              text-shadow: 0 0 10px ${theme.highlight || theme.neon || '#00ffff'};
-            ` : ''}
-          ">
-            <i class="fas fa-cog" style="
-              font-size: 18px; 
-              animation: spin 2s linear infinite;
-              color: ${theme.highlight || theme.neon || '#00ffff'};
-            "></i>
+      <div class="wplace-settings-header">
+        <div class="wplace-settings-title-wrapper">
+          <h3 class="wplace-settings-title">
+            <i class="fas fa-cog wplace-settings-icon"></i>
             ${Utils.t("settings")}
           </h3>
-          <button id="closeSettingsBtn" style="
-            background: ${theme.accent ? `${theme.accent}66` : 'rgba(255,255,255,0.1)'};
-            color: ${theme.text || 'white'};
-            border: 1px solid ${theme.accent || 'rgba(255,255,255,0.2)'};
-            border-radius: ${theme.borderRadius === '0' ? '0' : '50%'};
-            width: 32px;
-            height: 32px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            font-size: 14px;
-            font-weight: 300;
-            ${theme.animations?.glow ? `
-              box-shadow: 0 0 10px ${theme.error || '#ff0000'}33;
-            ` : ''}
-          " onmouseover="
-            this.style.background='${theme.error || '#ff0000'}66'; 
-            this.style.transform='scale(1.1)';
-            ${theme.animations?.glow ? `this.style.boxShadow='0 0 20px ${theme.error || '#ff0000'}';` : ''}
-          " onmouseout="
-            this.style.background='${theme.accent ? `${theme.accent}66` : 'rgba(255,255,255,0.1)'}'; 
-            this.style.transform='scale(1)';
-            ${theme.animations?.glow ? `this.style.boxShadow='0 0 10px ${theme.error || '#ff0000'}33';` : ''}
-          ">✕</button>
+          <button id="closeSettingsBtn" class="wplace-settings-close-btn">✕</button>
         </div>
       </div>
 
-      <div style="padding: 25px; max-height: 70vh; overflow-y: auto;">
+      <div class="wplace-settings-content">
         
         <!-- Token Source Selection -->
-        <div style="margin-bottom: 25px;">
-          <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-key" style="color: #4facfe; font-size: 16px;"></i>
+        <div class="wplace-settings-section">
+          <label class="wplace-settings-section-label">
+            <i class="fas fa-key wplace-icon-key"></i>
             Token Source
           </label>
-          <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1);">
-            <select id="tokenSourceSelect" style="
-              width: 100%;
-              padding: 12px 16px;
-              background: rgba(255,255,255,0.15);
-              color: white;
-              border: 1px solid rgba(255,255,255,0.2);
-              border-radius: 8px;
-              font-size: 14px;
-              outline: none;
-              cursor: pointer;
-              transition: all 0.3s ease;
-              font-family: inherit;
-              box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            ">
-              <option value="generator" ${state.tokenSource === 'generator' ? 'selected' : ''} style="background: #2d3748; color: white; padding: 10px;">🤖 Automatic Token Generator (Recommended)</option>
-              <option value="hybrid" ${state.tokenSource === 'hybrid' ? 'selected' : ''} style="background: #2d3748; color: white; padding: 10px;">🔄 Generator + Auto Fallback</option>
-              <option value="manual" ${state.tokenSource === 'manual' ? 'selected' : ''} style="background: #2d3748; color: white; padding: 10px;">🎯 Manual Pixel Placement</option>
+          <div class="wplace-settings-section-wrapper">
+            <select id="tokenSourceSelect" class="wplace-settings-select">
+              <option value="generator" ${state.tokenSource === 'generator' ? 'selected' : ''} class="wplace-settings-option">🤖 Automatic Token Generator (Recommended)</option>
+              <option value="hybrid" ${state.tokenSource === 'hybrid' ? 'selected' : ''} class="wplace-settings-option">🔄 Generator + Auto Fallback</option>
+              <option value="manual" ${state.tokenSource === 'manual' ? 'selected' : ''} class="wplace-settings-option">🎯 Manual Pixel Placement</option>
             </select>
-            <p style="font-size: 12px; color: rgba(255,255,255,0.7); margin: 8px 0 0 0;">
+            <p class="wplace-settings-description">
               Generator mode creates tokens automatically. Hybrid mode falls back to manual when generator fails. Manual mode only uses pixel placement.
             </p>
           </div>
         </div>
 
         <!-- Automation Section -->
-        <div style="margin-bottom: 25px;">
-          <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-robot" style="color: #4facfe; font-size: 16px;"></i>
+        <div class="wplace-settings-section">
+          <label class="wplace-settings-section-label">
+            <i class="fas fa-robot wplace-icon-robot"></i>
             ${Utils.t("automation")}
           </label>
           <!-- Token generator is always enabled - settings moved to Token Source above -->
         </div>
 
         <!-- Overlay Settings Section -->
-        <div style="margin-bottom: 25px;">
-          <label style="display: block; margin-bottom: 12px; color: ${theme.text || 'white'}; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-eye" style="color: ${theme.highlight || '#48dbfb'}; font-size: 16px;"></i>
+        <div class="wplace-settings-section">
+          <label class="wplace-settings-section-label" style="color: ${theme.text || 'white'};">
+            <i class="fas fa-eye wplace-icon-eye" style="color: ${theme.highlight || '#48dbfb'};"></i>
             Overlay Settings
           </label>
-          <div style="
+          <div class="wplace-settings-section-wrapper wplace-overlay-wrapper" style="
             background: ${theme.accent ? `${theme.accent}20` : 'rgba(255,255,255,0.1)'}; 
             border-radius: ${theme.borderRadius || '12px'}; 
-            padding: 18px; 
             border: 1px solid ${theme.accent || 'rgba(255,255,255,0.1)'};
             ${theme.animations?.glow ? `
               box-shadow: 0 0 15px ${theme.accent || 'rgba(255,255,255,0.1)'}33;
             ` : ''}
           ">
               <!-- Opacity Slider -->
-              <div style="margin-bottom: 15px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                   <span style="font-weight: 500; font-size: 13px; color: ${theme.text || 'white'};">Overlay Opacity</span>
-                   <div id="overlayOpacityValue" style="
-                     min-width: 40px; 
-                     text-align: center; 
+              <div class="wplace-overlay-opacity-control">
+                <div class="wplace-overlay-opacity-header">
+                   <span class="wplace-overlay-opacity-label" style="color: ${theme.text || 'white'};">Overlay Opacity</span>
+                   <div id="overlayOpacityValue" class="wplace-overlay-opacity-value" style="
                      background: ${theme.secondary || 'rgba(0,0,0,0.2)'}; 
                      color: ${theme.text || 'white'};
-                     padding: 4px 8px; 
                      border-radius: ${theme.borderRadius === '0' ? '0' : '6px'}; 
-                     font-size: 12px;
                      border: 1px solid ${theme.accent || 'transparent'};
                    ">${Math.round(state.overlayOpacity * 100)}%</div>
                 </div>
-                <input type="range" id="overlayOpacitySlider" min="0.1" max="1" step="0.05" value="${state.overlayOpacity}" style="
-                  width: 100%; 
-                  -webkit-appearance: none; 
-                  height: 8px; 
+                <input type="range" id="overlayOpacitySlider" min="0.1" max="1" step="0.05" value="${state.overlayOpacity}" class="wplace-overlay-opacity-slider" style="
                   background: linear-gradient(to right, ${theme.highlight || '#48dbfb'} 0%, ${theme.purple || theme.neon || '#d3a4ff'} 100%); 
                   border-radius: ${theme.borderRadius === '0' ? '0' : '4px'}; 
-                  outline: none; 
-                  cursor: pointer;
                 ">
               </div>
               <!-- Blue Marble Toggle -->
-              <label for="enableBlueMarbleToggle" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+              <label for="enableBlueMarbleToggle" class="wplace-blue-marble-toggle">
                   <div>
-                      <span style="font-weight: 500; color: ${theme.text || 'white'};">Blue Marble Effect</span>
-                      <p style="font-size: 12px; color: ${theme.text ? `${theme.text}BB` : 'rgba(255,255,255,0.7)'}; margin: 4px 0 0 0;">Renders a dithered "shredded" overlay.</p>
+                      <span class="wplace-blue-marble-title" style="color: ${theme.text || 'white'};">Blue Marble Effect</span>
+                      <p class="wplace-blue-marble-description" style="color: ${theme.text ? `${theme.text}BB` : 'rgba(255,255,255,0.7)'};">Renders a dithered "shredded" overlay.</p>
                   </div>
-                  <input type="checkbox" id="enableBlueMarbleToggle" ${state.blueMarbleEnabled ? 'checked' : ''} style="
-                    cursor: pointer; 
-                    width: 20px; 
-                    height: 20px;
+                  <input type="checkbox" id="enableBlueMarbleToggle" ${state.blueMarbleEnabled ? 'checked' : ''} class="wplace-blue-marble-checkbox" style="
                     accent-color: ${theme.highlight || '#48dbfb'};
                   "/>
               </label>
@@ -3624,211 +3538,137 @@ function applyTheme() {
         </div>
 
         <!-- Speed Control Section -->
-        <div style="margin-bottom: 25px;">
-          <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-tachometer-alt" style="color: #4facfe; font-size: 16px;"></i>
+        <div class="wplace-settings-section">
+          <label class="wplace-settings-section-label">
+            <i class="fas fa-tachometer-alt wplace-icon-speed"></i>
             ${Utils.t("paintingSpeed")}
           </label>
           
           <!-- Batch Mode Selection -->
-          <div style="margin-bottom: 15px;">
-            <label style="display: block; margin-bottom: 8px; color: rgba(255,255,255,0.9); font-weight: 500; font-size: 14px;">
-              <i class="fas fa-dice" style="color: #f093fb; margin-right: 6px;"></i>
+          <div class="wplace-batch-mode-selection">
+            <label class="wplace-batch-mode-label">
+              <i class="fas fa-dice wplace-icon-dice"></i>
               Batch Mode
             </label>
-            <select id="batchModeSelect" style="
-              width: 100%;
-              padding: 10px 12px;
-              background: rgba(255,255,255,0.15);
-              color: white;
-              border: 1px solid rgba(255,255,255,0.2);
-              border-radius: 8px;
-              font-size: 13px;
-              outline: none;
-              cursor: pointer;
-            ">
-              <option value="normal" style="background: #2d3748; color: white;">📦 Normal (Fixed Size)</option>
-              <option value="random" style="background: #2d3748; color: white;">🎲 Random (Range)</option>
+            <select id="batchModeSelect" class="wplace-batch-mode-select">
+              <option value="normal" class="wplace-settings-option">📦 Normal (Fixed Size)</option>
+              <option value="random" class="wplace-settings-option">🎲 Random (Range)</option>
             </select>
           </div>
           
           <!-- Normal Mode: Fixed Size Slider -->
-          <div id="normalBatchControls" style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px;">
-            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
-              <input type="range" id="speedSlider" min="${CONFIG.PAINTING_SPEED.MIN}" max="${CONFIG.PAINTING_SPEED.MAX}" value="${CONFIG.PAINTING_SPEED.DEFAULT}"
-                style="
-                  flex: 1;
-                  height: 8px;
-                  background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
-                  border-radius: 4px;
-                  outline: none;
-                  -webkit-appearance: none;
-                  cursor: pointer;
-                ">
-              <div id="speedValue" style="
-                min-width: 100px;
-                text-align: center;
-                background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-                padding: 8px 12px;
-                border-radius: 8px;
-                color: white;
-                font-weight: bold;
-                font-size: 13px;
-                box-shadow: 0 3px 10px rgba(79, 172, 254, 0.3);
-                border: 1px solid rgba(255,255,255,0.2);
-              ">${CONFIG.PAINTING_SPEED.DEFAULT} (batch size)</div>
+          <div id="normalBatchControls" class="wplace-batch-controls wplace-normal-batch-controls">
+            <div class="wplace-speed-slider-container">
+              <input type="range" id="speedSlider" min="${CONFIG.PAINTING_SPEED.MIN}" max="${CONFIG.PAINTING_SPEED.MAX}" value="${CONFIG.PAINTING_SPEED.DEFAULT}" class="wplace-speed-slider">
+              <div id="speedValue" class="wplace-speed-value">${CONFIG.PAINTING_SPEED.DEFAULT} (batch size)</div>
             </div>
-            <div style="display: flex; justify-content: space-between; color: rgba(255,255,255,0.7); font-size: 11px; margin-top: 8px;">
-              <span><i class="fas fa-turtle"></i> ${CONFIG.PAINTING_SPEED.MIN}</span>
-              <span><i class="fas fa-rabbit"></i> ${CONFIG.PAINTING_SPEED.MAX}</span>
+            <div class="wplace-speed-labels">
+              <span class="wplace-speed-min"><i class="fas fa-turtle"></i> ${CONFIG.PAINTING_SPEED.MIN}</span>
+              <span class="wplace-speed-max"><i class="fas fa-rabbit"></i> ${CONFIG.PAINTING_SPEED.MAX}</span>
             </div>
           </div>
           
           <!-- Random Mode: Range Controls -->
-          <div id="randomBatchControls" style="display: none; background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px;">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+          <div id="randomBatchControls" class="wplace-batch-controls wplace-random-batch-controls">
+            <div class="wplace-random-batch-grid">
               <div>
-                <label style="display: block; color: rgba(255,255,255,0.8); font-size: 12px; margin-bottom: 8px;">
-                  <i class="fas fa-arrow-down" style="color: #4facfe; margin-right: 4px;"></i>
+                <label class="wplace-random-batch-label">
+                  <i class="fas fa-arrow-down wplace-icon-min"></i>
                   Minimum Batch Size
                 </label>
-                <input type="number" id="randomBatchMin" min="1" max="1000" value="${CONFIG.RANDOM_BATCH_RANGE.MIN}" style="
-                  width: 100%;
-                  padding: 10px 12px;
-                  background: rgba(255,255,255,0.1);
-                  color: white;
-                  border: 1px solid rgba(255,255,255,0.2);
-                  border-radius: 8px;
-                  font-size: 13px;
-                  outline: none;
-                ">
+                <input type="number" id="randomBatchMin" min="1" max="1000" value="${CONFIG.RANDOM_BATCH_RANGE.MIN}" class="wplace-random-batch-input">
               </div>
               <div>
-                <label style="display: block; color: rgba(255,255,255,0.8); font-size: 12px; margin-bottom: 8px;">
-                  <i class="fas fa-arrow-up" style="color: #00f2fe; margin-right: 4px;"></i>
+                <label class="wplace-random-batch-label">
+                  <i class="fas fa-arrow-up wplace-icon-max"></i>
                   Maximum Batch Size
                 </label>
-                <input type="number" id="randomBatchMax" min="1" max="1000" value="${CONFIG.RANDOM_BATCH_RANGE.MAX}" style="
-                  width: 100%;
-                  padding: 10px 12px;
-                  background: rgba(255,255,255,0.1);
-                  color: white;
-                  border: 1px solid rgba(255,255,255,0.2);
-                  border-radius: 8px;
-                  font-size: 13px;
-                  outline: none;
-                ">
+                <input type="number" id="randomBatchMax" min="1" max="1000" value="${CONFIG.RANDOM_BATCH_RANGE.MAX}" class="wplace-random-batch-input">
               </div>
             </div>
-            <p style="font-size: 11px; color: rgba(255,255,255,0.6); margin: 8px 0 0 0; text-align: center;">
+            <p class="wplace-random-batch-description">
               🎲 Random batch size between min and max values
             </p>
           </div>
           
           <!-- Speed Control Toggle -->
-          <label style="display: flex; align-items: center; gap: 8px; color: white;">
-            <input type="checkbox" id="enableSpeedToggle" ${CONFIG.PAINTING_SPEED_ENABLED ? 'checked' : ''} style="cursor: pointer;"/>
+          <label class="wplace-speed-control-toggle">
+            <input type="checkbox" id="enableSpeedToggle" ${CONFIG.PAINTING_SPEED_ENABLED ? 'checked' : ''} class="wplace-speed-checkbox"/>
             <span>Enable painting speed limit (batch size control)</span>
           </label>
         </div>
 
         <!-- Notifications Section -->
-        <div style="margin-bottom: 25px;">
-          <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-bell" style="color: #ffd166; font-size: 16px;"></i>
+        <div class="wplace-settings-section">
+          <label class="wplace-settings-section-label">
+            <i class="fas fa-bell wplace-icon-bell"></i>
             Desktop Notifications
           </label>
-          <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1); display:flex; flex-direction:column; gap:10px;">
-            <label style="display:flex; align-items:center; justify-content:space-between;">
+          <div class="wplace-settings-section-wrapper wplace-notifications-wrapper">
+            <label class="wplace-notification-toggle">
               <span>Enable notifications</span>
-              <input type="checkbox" id="notifEnabledToggle" ${state.notificationsEnabled ? 'checked' : ''} style="width:18px; height:18px; cursor:pointer;" />
+              <input type="checkbox" id="notifEnabledToggle" ${state.notificationsEnabled ? 'checked' : ''} class="wplace-notification-checkbox" />
             </label>
-            <label style="display:flex; align-items:center; justify-content:space-between;">
+            <label class="wplace-notification-toggle">
               <span>Notify when charges reach threshold</span>
-              <input type="checkbox" id="notifOnChargesToggle" ${state.notifyOnChargesReached ? 'checked' : ''} style="width:18px; height:18px; cursor:pointer;" />
+              <input type="checkbox" id="notifOnChargesToggle" ${state.notifyOnChargesReached ? 'checked' : ''} class="wplace-notification-checkbox" />
             </label>
-            <label style="display:flex; align-items:center; justify-content:space-between;">
+            <label class="wplace-notification-toggle">
               <span>Only when tab is not focused</span>
-              <input type="checkbox" id="notifOnlyUnfocusedToggle" ${state.notifyOnlyWhenUnfocused ? 'checked' : ''} style="width:18px; height:18px; cursor:pointer;" />
+              <input type="checkbox" id="notifOnlyUnfocusedToggle" ${state.notifyOnlyWhenUnfocused ? 'checked' : ''} class="wplace-notification-checkbox" />
             </label>
-            <div style="display:flex; align-items:center; gap:10px;">
+            <div class="wplace-notification-interval">
               <span>Repeat every</span>
-              <input type="number" id="notifIntervalInput" min="1" max="60" value="${state.notificationIntervalMinutes}" style="width:70px; padding:6px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color:#fff;" />
+              <input type="number" id="notifIntervalInput" min="1" max="60" value="${state.notificationIntervalMinutes}" class="wplace-notification-interval-input" />
               <span>minute(s)</span>
             </div>
-            <div style="display:flex; gap:10px;">
-              <button id="notifRequestPermBtn" class="wplace-btn wplace-btn-secondary" style="flex:1;"><i class="fas fa-unlock"></i><span>Grant Permission</span></button>
-              <button id="notifTestBtn" class="wplace-btn" style="flex:1;"><i class="fas fa-bell"></i><span>Test</span></button>
+            <div class="wplace-notification-buttons">
+              <button id="notifRequestPermBtn" class="wplace-btn wplace-btn-secondary wplace-notification-perm-btn"><i class="fas fa-unlock"></i><span>Grant Permission</span></button>
+              <button id="notifTestBtn" class="wplace-btn wplace-notification-test-btn"><i class="fas fa-bell"></i><span>Test</span></button>
             </div>
           </div>
         </div>
 
         <!-- Theme Selection Section -->
-        <div style="margin-bottom: 25px;">
-          <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-palette" style="color: #f093fb; font-size: 16px;"></i>
+        <div class="wplace-settings-section">
+          <label class="wplace-settings-section-label">
+            <i class="fas fa-palette wplace-icon-palette"></i>
             ${Utils.t("themeSettings")}
           </label>
-          <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1);">
-            <select id="themeSelect" style="
-              width: 100%;
-              padding: 12px 16px;
-              background: rgba(255,255,255,0.15);
-              color: white;
-              border: 1px solid rgba(255,255,255,0.2);
-              border-radius: 8px;
-              font-size: 14px;
-              outline: none;
-              cursor: pointer;
-              transition: all 0.3s ease;
-              font-family: inherit;
-              box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            ">
+          <div class="wplace-settings-section-wrapper">
+            <select id="themeSelect" class="wplace-settings-select">
               ${Object.keys(CONFIG.THEMES).map(themeName =>
-      `<option value="${themeName}" ${CONFIG.currentTheme === themeName ? 'selected' : ''} style="background: #2d3748; color: white; padding: 10px;">${themeName}</option>`
+      `<option value="${themeName}" ${CONFIG.currentTheme === themeName ? 'selected' : ''} class="wplace-settings-option">${themeName}</option>`
     ).join('')}
             </select>
           </div>
         </div>
 
         <!-- Language Selection Section -->
-        <div style="margin-bottom: 25px;">
-          <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-globe" style="color: #ffeaa7; font-size: 16px;"></i>
+        <div class="wplace-settings-section">
+          <label class="wplace-settings-section-label">
+            <i class="fas fa-globe wplace-icon-globe"></i>
             ${Utils.t("language")}
           </label>
-          <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1);">
-            <select id="languageSelect" style="
-              width: 100%;
-              padding: 12px 16px;
-              background: rgba(255,255,255,0.15);
-              color: white;
-              border: 1px solid rgba(255,255,255,0.2);
-              border-radius: 8px;
-              font-size: 14px;
-              outline: none;
-              cursor: pointer;
-              transition: all 0.3s ease;
-              font-family: inherit;
-              box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            ">
-              <option value="vi" ${state.language === 'vi' ? 'selected' : ''} style="background: #2d3748; color: white;">🇻🇳 Tiếng Việt</option>
-              <option value="id" ${state.language === 'id' ? 'selected' : ''} style="background: #2d3748; color: white;">🇮🇩 Bahasa Indonesia</option>
-              <option value="ru" ${state.language === 'ru' ? 'selected' : ''} style="background: #2d3748; color: white;">🇷🇺 Русский</option>
-              <option value="en" ${state.language === 'en' ? 'selected' : ''} style="background: #2d3748; color: white;">🇺🇸 English</option>
-              <option value="pt" ${state.language === 'pt' ? 'selected' : ''} style="background: #2d3748; color: white;">🇧🇷 Português</option>
-              <option value="fr" ${state.language === 'fr' ? 'selected' : ''} style="background: #2d3748; color: white;">🇫🇷 Français</option>
-              <option value="tr" ${state.language === 'tr' ? 'selected' : ''} style="background: #2d3748; color: white;">🇹🇷 Türkçe</option>
-              <option value="zh" ${state.language === 'zh' ? 'selected' : ''} style="background: #2d3748; color: white;">🇨🇳 简体中文</option>
-              <option value="zh-tw" ${state.language === 'zh-tw' ? 'selected' : ''} style="background: #2d3748; color: white;">🇹🇼 繁體中文</option>
-              <option value="ja" ${state.language === 'ja' ? 'selected' : ''} style="background: #2d3748; color: white;">🇯🇵 日本語</option>
-              <option value="ko" ${state.language === 'ko' ? 'selected' : ''} style="background: #2d3748; color: white;">🇰🇷 한국어</option>
+          <div class="wplace-settings-section-wrapper">
+            <select id="languageSelect" class="wplace-settings-select">
+              <option value="vi" ${state.language === 'vi' ? 'selected' : ''} class="wplace-settings-option">🇻🇳 Tiếng Việt</option>
+              <option value="id" ${state.language === 'id' ? 'selected' : ''} class="wplace-settings-option">🇮🇩 Bahasa Indonesia</option>
+              <option value="ru" ${state.language === 'ru' ? 'selected' : ''} class="wplace-settings-option">🇷🇺 Русский</option>
+              <option value="en" ${state.language === 'en' ? 'selected' : ''} class="wplace-settings-option">🇺🇸 English</option>
+              <option value="pt" ${state.language === 'pt' ? 'selected' : ''} class="wplace-settings-option">🇧🇷 Português</option>
+              <option value="fr" ${state.language === 'fr' ? 'selected' : ''} class="wplace-settings-option">🇫🇷 Français</option>
+              <option value="tr" ${state.language === 'tr' ? 'selected' : ''} class="wplace-settings-option">🇹🇷 Türkçe</option>
+              <option value="zh" ${state.language === 'zh' ? 'selected' : ''} class="wplace-settings-option">🇨🇳 简体中文</option>
+              <option value="zh-tw" ${state.language === 'zh-tw' ? 'selected' : ''} class="wplace-settings-option">🇹🇼 繁體中文</option>
+              <option value="ja" ${state.language === 'ja' ? 'selected' : ''} class="wplace-settings-option">🇯🇵 日本語</option>
+              <option value="ko" ${state.language === 'ko' ? 'selected' : ''} class="wplace-settings-option">🇰🇷 한국어</option>
               </select>
           </div>
         </div>
 
-        <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; margin-top: 10px;">
-             <button id="applySettingsBtn" style="
+        <div class="wplace-settings-footer">
+             <button id="applySettingsBtn" class="wplace-settings-apply-btn" style="
                 width: 100%;
                 ${CONFIG.CSS_CLASSES.BUTTON_PRIMARY}
              ">
@@ -3935,88 +3775,88 @@ function applyTheme() {
     const resizeContainer = document.createElement("div")
     resizeContainer.className = "resize-container"
     resizeContainer.innerHTML = `
-      <h3 style="margin-top: 0; color: ${theme.text}">${Utils.t("resizeImage")}</h3>
+      <h3 class="resize-dialog-title" style="color: ${theme.text}">${Utils.t("resizeImage")}</h3>
       <div class="resize-controls">
-        <label>
+        <label class="resize-control-label">
           Width: <span id="widthValue">0</span>px
           <input type="range" id="widthSlider" class="resize-slider" min="10" max="500" value="100">
         </label>
-        <label>
+        <label class="resize-control-label">
           Height: <span id="heightValue">0</span>px
           <input type="range" id="heightSlider" class="resize-slider" min="10" max="500" value="100">
         </label>
-        <label style="display: flex; align-items: center;">
+        <label class="resize-checkbox-label">
           <input type="checkbox" id="keepAspect" checked>
           Keep Aspect Ratio
         </label>
-        <label style="display: flex; align-items: center;">
+        <label class="resize-checkbox-label">
             <input type="checkbox" id="paintWhiteToggle" checked>
             Paint White Pixels
         </label>
         <div class="resize-zoom-controls">
-          <button id="zoomOutBtn" class="wplace-btn" title="Zoom Out" style="padding:4px 8px;"><i class="fas fa-search-minus"></i></button>
-          <input type="range" id="zoomSlider" class="resize-slider" min="0.1" max="20" value="1" step="0.05" style="max-width: 220px;">
-          <button id="zoomInBtn" class="wplace-btn" title="Zoom In" style="padding:4px 8px;"><i class="fas fa-search-plus"></i></button>
-          <button id="zoomFitBtn" class="wplace-btn" title="Fit to view" style="padding:4px 8px;">Fit</button>
-          <button id="zoomActualBtn" class="wplace-btn" title="Actual size (100%)" style="padding:4px 8px;">100%</button>
-          <button id="panModeBtn" class="wplace-btn" title="Pan (drag to move view)" style="padding:4px 8px;">
+          <button id="zoomOutBtn" class="wplace-btn resize-zoom-btn" title="Zoom Out"><i class="fas fa-search-minus"></i></button>
+          <input type="range" id="zoomSlider" class="resize-slider resize-zoom-slider" min="0.1" max="20" value="1" step="0.05">
+          <button id="zoomInBtn" class="wplace-btn resize-zoom-btn" title="Zoom In"><i class="fas fa-search-plus"></i></button>
+          <button id="zoomFitBtn" class="wplace-btn resize-zoom-btn" title="Fit to view">Fit</button>
+          <button id="zoomActualBtn" class="wplace-btn resize-zoom-btn" title="Actual size (100%)">100%</button>
+          <button id="panModeBtn" class="wplace-btn resize-zoom-btn" title="Pan (drag to move view)">
             <i class="fas fa-hand-paper"></i>
           </button>
-          <span id="zoomValue" style="margin-left:6px; min-width:48px; text-align:right; opacity:.85; font-size:12px;">100%</span>
-          <div id="cameraHelp" style="font-size:11px; opacity:.75; margin-left:auto;">
+          <span id="zoomValue" class="resize-zoom-value">100%</span>
+          <div id="cameraHelp" class="resize-camera-help">
             Drag to pan • Pinch to zoom • Double‑tap to zoom
           </div>
         </div>
       </div>
 
       <div class="resize-preview-wrapper">
-          <div id="resizePanStage" style="position:relative; width:100%; height:100%; overflow:hidden;">
-            <div id="resizeCanvasStack" class="resize-canvas-stack" style="position:absolute; left:0; top:0; transform-origin: top left;">
+          <div id="resizePanStage" class="resize-pan-stage">
+            <div id="resizeCanvasStack" class="resize-canvas-stack resize-canvas-positioned">
               <canvas id="resizeCanvas" class="resize-base-canvas"></canvas>
               <canvas id="maskCanvas" class="resize-mask-canvas"></canvas>
             </div>
           </div>
       </div>
       <div class="resize-tools">
-        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-          <div>
-              <div style="display:flex; align-items:center; gap:6px; justify-content:space-between;">
-                <label style="font-size:12px; opacity:.85;">Brush</label>
-                <div style="display:flex; align-items:center; gap:6px;">
-                  <input id="maskBrushSize" type="range" min="1" max="7" step="1" value="1" style="width:120px;">
-                  <span id="maskBrushSizeValue" style="font-size:12px; opacity:.85; min-width:18px; text-align:center;">1</span>
+        <div class="resize-tools-container">
+          <div class="resize-brush-controls">
+              <div class="resize-brush-control">
+                <label class="resize-tool-label">Brush</label>
+                <div class="resize-tool-input-group">
+                  <input id="maskBrushSize" type="range" min="1" max="7" step="1" value="1" class="resize-tool-slider">
+                  <span id="maskBrushSizeValue" class="resize-tool-value">1</span>
                 </div>
               </div>
-            <div style="display:flex; align-items:center; gap:6px; justify-content:space-between;">
-              <label style="font-size:12px; opacity:.85;">Row/col size</label>
-              <div style="display:flex; align-items:center; gap:6px;">
-                <input id="rowColSize" type="range" min="1" max="7" step="1" value="1" style="width:120px;">
-                <span id="rowColSizeValue" style="font-size:12px; opacity:.85; min-width:18px; text-align:center;">1</span>
+            <div class="resize-brush-control">
+              <label class="resize-tool-label">Row/col size</label>
+              <div class="resize-tool-input-group">
+                <input id="rowColSize" type="range" min="1" max="7" step="1" value="1" class="resize-tool-slider">
+                <span id="rowColSizeValue" class="resize-tool-value">1</span>
               </div>
             </div>
           </div>
-          <div style="display:flex; align-items:center; gap:6px;">
-            <label style="font-size:12px; opacity:.85;">Mode</label>
-            <div class="mask-mode-group" style="display:flex; gap:6px;">
-              <button id="maskModeIgnore" class="wplace-btn" style="padding:4px 8px; font-size:12px;">Ignore</button>
-              <button id="maskModeUnignore" class="wplace-btn" style="padding:4px 8px; font-size:12px;">Unignore</button>
-              <button id="maskModeToggle" class="wplace-btn wplace-btn-primary" style="padding:4px 8px; font-size:12px;">Toggle</button>
+          <div class="resize-mode-controls">
+            <label class="resize-tool-label">Mode</label>
+            <div class="mask-mode-group resize-mode-group">
+              <button id="maskModeIgnore" class="wplace-btn resize-mode-btn">Ignore</button>
+              <button id="maskModeUnignore" class="wplace-btn resize-mode-btn">Unignore</button>
+              <button id="maskModeToggle" class="wplace-btn wplace-btn-primary resize-mode-btn">Toggle</button>
             </div>
           </div>
-          <button id="clearIgnoredBtn" class="wplace-btn" title="Clear all ignored pixels" style="padding:4px 8px; font-size:12px;">Clear</button>
-          <button id="invertMaskBtn" class="wplace-btn" title="Invert mask" style="padding:4px 8px; font-size:12px;">Invert</button>
-          <span style="opacity:.8; font-size:12px;">Shift = Row • Alt = Column</span>
+          <button id="clearIgnoredBtn" class="wplace-btn resize-clear-btn" title="Clear all ignored pixels">Clear</button>
+          <button id="invertMaskBtn" class="wplace-btn resize-invert-btn" title="Invert mask">Invert</button>
+          <span class="resize-shortcut-help">Shift = Row • Alt = Column</span>
         </div>
       </div>
 
-      <div class="wplace-section" id="color-palette-section" style="margin-top: 15px;">
+      <div class="wplace-section resize-color-palette-section" id="color-palette-section">
           <div class="wplace-section-title">
               <i class="fas fa-palette"></i>&nbsp;Color Palette
           </div>
           <div class="wplace-controls">
               <div class="wplace-row single">
-                  <label style="display: flex; align-items: center; gap: 8px; font-size: 12px;">
-                      <input type="checkbox" id="showAllColorsToggle" style="cursor: pointer;">
+                  <label class="resize-color-toggle-label">
+                      <input type="checkbox" id="showAllColorsToggle" class="resize-color-checkbox">
                       <span>Show All Colors (including unavailable)</span>
                   </label>
               </div>
@@ -4028,50 +3868,50 @@ function applyTheme() {
           </div>
       </div>
 
-      <div class="wplace-section" id="advanced-color-section" style="margin-top: 15px;">
+      <div class="wplace-section resize-advanced-color-section" id="advanced-color-section">
         <div class="wplace-section-title">
           <i class="fas fa-flask"></i>&nbsp;Advanced Color Matching
         </div>
-        <div style="display:flex; flex-direction:column; gap:10px;">
-          <label style="display:flex; flex-direction:column; gap:4px; font-size:12px;">
-            <span style="font-weight:600;">Algorithm</span>
-            <select id="colorAlgorithmSelect" style="padding:6px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); color:#fff;">
+        <div class="resize-advanced-controls">
+          <label class="resize-advanced-label">
+            <span class="resize-advanced-label-text">Algorithm</span>
+            <select id="colorAlgorithmSelect" class="resize-advanced-select">
               <option value="lab" ${state.colorMatchingAlgorithm==='lab'?'selected':''}>Perceptual (Lab)</option>
             <option value="legacy" ${state.colorMatchingAlgorithm==='legacy'?'selected':''}>Legacy (RGB)</option>
             </select>
           </label>
-          <label style="display:flex; align-items:center; justify-content:space-between; font-size:12px;">
-            <div style="flex:1;">
-              <span style="font-weight:600;">Chroma Penalty</span>
-              <div style="margin-top:2px; opacity:0.65;">Preserve vivid colors (Lab only)</div>
+          <label class="resize-advanced-toggle">
+            <div class="resize-advanced-toggle-content">
+              <span class="resize-advanced-label-text">Chroma Penalty</span>
+              <div class="resize-advanced-description">Preserve vivid colors (Lab only)</div>
             </div>
-            <input type="checkbox" id="enableChromaPenaltyToggle" ${state.enableChromaPenalty?'checked':''} style="width:18px; height:18px; cursor:pointer;" />
+            <input type="checkbox" id="enableChromaPenaltyToggle" ${state.enableChromaPenalty?'checked':''} class="resize-advanced-checkbox" />
           </label>
-          <div>
-            <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:4px;">
+          <div class="resize-chroma-weight-control">
+            <div class="resize-chroma-weight-header">
               <span>Chroma Weight</span>
-              <span id="chromaWeightValue" style="background:rgba(255,255,255,0.08); padding:2px 6px; border-radius:4px;">${state.chromaPenaltyWeight}</span>
+              <span id="chromaWeightValue" class="resize-chroma-weight-value">${state.chromaPenaltyWeight}</span>
             </div>
-            <input type="range" id="chromaPenaltyWeightSlider" min="0" max="0.5" step="0.01" value="${state.chromaPenaltyWeight}" style="width:100%;" />
+            <input type="range" id="chromaPenaltyWeightSlider" min="0" max="0.5" step="0.01" value="${state.chromaPenaltyWeight}" class="resize-chroma-weight-slider" />
           </div>
-          <label style="display:flex; align-items:center; justify-content:space-between; font-size:12px;">
-            <div style="flex:1;">
-              <span style="font-weight:600;">Enable Dithering</span>
-              <div style="margin-top:2px; opacity:0.65;">Floyd–Steinberg error diffusion in preview and applied output</div>
+          <label class="resize-advanced-toggle">
+            <div class="resize-advanced-toggle-content">
+              <span class="resize-advanced-label-text">Enable Dithering</span>
+              <div class="resize-advanced-description">Floyd–Steinberg error diffusion in preview and applied output</div>
             </div>
-            <input type="checkbox" id="enableDitheringToggle" ${state.ditheringEnabled?'checked':''} style="width:18px; height:18px; cursor:pointer;" />
+            <input type="checkbox" id="enableDitheringToggle" ${state.ditheringEnabled?'checked':''} class="resize-advanced-checkbox" />
           </label>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-            <label style="display:flex; flex-direction:column; gap:4px; font-size:12px;">
-              <span style="font-weight:600;">Transparency</span>
-              <input type="number" id="transparencyThresholdInput" min="0" max="255" value="${state.customTransparencyThreshold}" style="padding:6px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); color:#fff;" />
+          <div class="resize-threshold-controls">
+            <label class="resize-threshold-label">
+              <span class="resize-advanced-label-text">Transparency</span>
+              <input type="number" id="transparencyThresholdInput" min="0" max="255" value="${state.customTransparencyThreshold}" class="resize-threshold-input" />
             </label>
-            <label style="display:flex; flex-direction:column; gap:4px; font-size:12px;">
-              <span style="font-weight:600;">White Thresh</span>
-              <input type="number" id="whiteThresholdInput" min="200" max="255" value="${state.customWhiteThreshold}" style="padding:6px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); color:#fff;" />
+            <label class="resize-threshold-label">
+              <span class="resize-advanced-label-text">White Thresh</span>
+              <input type="number" id="whiteThresholdInput" min="200" max="255" value="${state.customWhiteThreshold}" class="resize-threshold-input" />
             </label>
           </div>
-          <button id="resetAdvancedColorBtn" class="wplace-btn" style="background:linear-gradient(135deg,#ff6a6a,#ff4757); font-size:11px;">Reset Advanced</button>
+          <button id="resetAdvancedColorBtn" class="wplace-btn resize-reset-advanced-btn">Reset Advanced</button>
         </div>
       </div>
 

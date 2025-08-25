@@ -1153,3 +1153,597 @@
 .wplace-theme--neon .wplace-btn:hover:not(:disabled) {
   animation: pixelBlink 0.5s infinite;
 }
+
+/* ===================================== */
+/* Settings Dialog Styles               */
+/* ===================================== */
+
+/* Settings content container */
+.wplace-settings-content {
+  padding: 25px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+/* Settings section containers */
+.wplace-settings-section {
+  margin-bottom: 25px;
+}
+
+/* Section labels */
+.wplace-settings-section-label {
+  display: block;
+  margin-bottom: 12px;
+  color: white;
+  font-weight: 500;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Icon colors */
+.wplace-icon-key {
+  color: #4facfe;
+  font-size: 16px;
+}
+
+.wplace-icon-robot {
+  color: #4facfe;
+  font-size: 16px;
+}
+
+.wplace-icon-speed {
+  color: #4facfe;
+  font-size: 16px;
+}
+
+.wplace-icon-bell {
+  color: #ffd166;
+  font-size: 16px;
+}
+
+.wplace-icon-palette {
+  color: #f093fb;
+  font-size: 16px;
+}
+
+.wplace-icon-globe {
+  color: #ffeaa7;
+  font-size: 16px;
+}
+
+/* Section wrapper styling */
+.wplace-settings-section-wrapper {
+  background: rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 18px;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Select dropdowns */
+.wplace-settings-select {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.15);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.wplace-settings-option {
+  background: #2d3748;
+  color: white;
+  padding: 10px;
+}
+
+/* Settings description text */
+.wplace-settings-description {
+  font-size: 12px;
+  color: rgba(255,255,255,0.7);
+  margin: 8px 0 0 0;
+}
+
+/* Batch Mode Controls */
+.wplace-batch-mode-selection {
+  margin-bottom: 15px;
+}
+
+.wplace-batch-mode-label {
+  display: block;
+  margin-bottom: 8px;
+  color: rgba(255,255,255,0.9);
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.wplace-icon-dice {
+  color: #f093fb;
+  margin-right: 6px;
+}
+
+.wplace-batch-mode-select {
+  width: 100%;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.15);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  font-size: 13px;
+  outline: none;
+  cursor: pointer;
+}
+
+/* Batch Controls */
+.wplace-batch-controls {
+  background: rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 18px;
+  border: 1px solid rgba(255,255,255,0.1);
+  margin-bottom: 15px;
+}
+
+.wplace-random-batch-controls {
+  display: none;
+}
+
+/* Speed Slider Container */
+.wplace-speed-slider-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+.wplace-speed-slider {
+  flex: 1;
+  height: 8px;
+  background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+  border-radius: 4px;
+  outline: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.wplace-speed-value {
+  min-width: 100px;
+  text-align: center;
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+  font-size: 13px;
+  box-shadow: 0 3px 10px rgba(79, 172, 254, 0.3);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.wplace-speed-labels {
+  display: flex;
+  justify-content: space-between;
+  color: rgba(255,255,255,0.7);
+  font-size: 11px;
+  margin-top: 8px;
+}
+
+/* Random Batch Controls */
+.wplace-random-batch-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.wplace-random-batch-label {
+  display: block;
+  color: rgba(255,255,255,0.8);
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.wplace-icon-min {
+  color: #4facfe;
+  margin-right: 4px;
+}
+
+.wplace-icon-max {
+  color: #00f2fe;
+  margin-right: 4px;
+}
+
+.wplace-random-batch-input {
+  width: 100%;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.1);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  font-size: 13px;
+  outline: none;
+}
+
+.wplace-random-batch-description {
+  font-size: 11px;
+  color: rgba(255,255,255,0.6);
+  margin: 8px 0 0 0;
+  text-align: center;
+}
+
+/* Speed Control Toggle */
+.wplace-speed-control-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+}
+
+.wplace-speed-checkbox {
+  cursor: pointer;
+}
+
+/* Overlay Settings */
+.wplace-overlay-opacity-control {
+  margin-bottom: 15px;
+}
+
+.wplace-overlay-opacity-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.wplace-overlay-opacity-label {
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.wplace-overlay-opacity-value {
+  min-width: 40px;
+  text-align: center;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.wplace-overlay-opacity-slider {
+  width: 100%;
+  -webkit-appearance: none;
+  height: 8px;
+  outline: none;
+  cursor: pointer;
+}
+
+.wplace-blue-marble-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.wplace-blue-marble-title {
+  font-weight: 500;
+}
+
+.wplace-blue-marble-description {
+  font-size: 12px;
+  margin: 4px 0 0 0;
+}
+
+.wplace-blue-marble-checkbox {
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+}
+
+/* Notifications */
+.wplace-notifications-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.wplace-notification-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.wplace-notification-checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.wplace-notification-interval {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.wplace-notification-interval-input {
+  width: 70px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+}
+
+.wplace-notification-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.wplace-notification-perm-btn,
+.wplace-notification-test-btn {
+  flex: 1;
+}
+
+/* Settings Footer */
+.wplace-settings-footer {
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: 20px;
+  margin-top: 10px;
+}
+
+.wplace-settings-apply-btn {
+  width: 100%;
+}
+
+/* ===================================== */
+/* Resize Dialog Styles                 */
+/* ===================================== */
+
+/* Resize dialog title */
+.resize-dialog-title {
+  margin-top: 0;
+}
+
+/* Resize control labels */
+.resize-control-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.resize-checkbox-label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 14px;
+  gap: 8px;
+}
+
+/* Zoom controls */
+.resize-zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 15px;
+  flex-wrap: wrap;
+}
+
+.resize-zoom-btn {
+  padding: 4px 8px;
+}
+
+.resize-zoom-slider {
+  max-width: 220px;
+}
+
+.resize-zoom-value {
+  margin-left: 6px;
+  min-width: 48px;
+  text-align: right;
+  opacity: 0.85;
+  font-size: 12px;
+}
+
+.resize-camera-help {
+  font-size: 11px;
+  opacity: 0.75;
+  margin-left: auto;
+}
+
+/* Canvas positioning */
+.resize-pan-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.resize-canvas-positioned {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: top left;
+}
+
+/* Resize tools */
+.resize-tools-container {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.resize-brush-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.resize-brush-control {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: space-between;
+}
+
+.resize-tool-label {
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+.resize-tool-input-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.resize-tool-slider {
+  width: 120px;
+}
+
+.resize-tool-value {
+  font-size: 12px;
+  opacity: 0.85;
+  min-width: 18px;
+  text-align: center;
+}
+
+.resize-mode-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.resize-mode-group {
+  display: flex;
+  gap: 6px;
+}
+
+.resize-mode-btn,
+.resize-clear-btn,
+.resize-invert-btn {
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.resize-shortcut-help {
+  opacity: 0.8;
+  font-size: 12px;
+}
+
+/* Color palette section */
+.resize-color-palette-section {
+  margin-top: 15px;
+}
+
+.resize-color-toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.resize-color-checkbox {
+  cursor: pointer;
+}
+
+/* Advanced color section */
+.resize-advanced-color-section {
+  margin-top: 15px;
+}
+
+.resize-advanced-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.resize-advanced-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.resize-advanced-label-text {
+  font-weight: 600;
+}
+
+.resize-advanced-select {
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.05);
+  color: #fff;
+}
+
+.resize-advanced-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.resize-advanced-toggle-content {
+  flex: 1;
+}
+
+.resize-advanced-description {
+  margin-top: 2px;
+  opacity: 0.65;
+}
+
+.resize-advanced-checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.resize-chroma-weight-control {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.resize-chroma-weight-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  margin-bottom: 4px;
+}
+
+.resize-chroma-weight-value {
+  background: rgba(255,255,255,0.08);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.resize-chroma-weight-slider {
+  width: 100%;
+}
+
+.resize-threshold-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.resize-threshold-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.resize-threshold-input {
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.05);
+  color: #fff;
+}
+
+.resize-reset-advanced-btn {
+  background: linear-gradient(135deg, #ff6a6a, #ff4757);
+  font-size: 11px;
+}
