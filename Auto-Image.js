@@ -1843,6 +1843,7 @@
           }
           
           const overlay = this.ensureTurnstileOverlayContainer();
+          overlay.classList.remove('wplace-overlay-hidden');
           overlay.style.display = 'block';
           
           const host = overlay.querySelector('#turnstile-overlay-host');
@@ -1851,6 +1852,7 @@
           // Set a timeout for interactive mode
           const timeout = setTimeout(() => {
             console.warn('⏰ Interactive Turnstile widget timeout');
+            overlay.classList.add('wplace-overlay-hidden');
             overlay.style.display = 'none';
             resolve(null);
           }, 60000); // 60 seconds for user interaction
@@ -1862,7 +1864,8 @@
             theme: 'light',
             callback: (token) => {
               clearTimeout(timeout);
-              overlay.style.display = 'none';
+              overlay.classList.add('wplace-overlay-hidden');
+            overlay.style.display = 'none';
               console.log('✅ Interactive Turnstile completed successfully');
               
               if (typeof token === 'string' && token.length > 20) {
@@ -1874,7 +1877,8 @@
             },
             'error-callback': (error) => {
               clearTimeout(timeout);
-              overlay.style.display = 'none';
+              overlay.classList.add('wplace-overlay-hidden');
+            overlay.style.display = 'none';
               console.warn('❌ Interactive Turnstile error:', error);
               resolve(null);
             },
@@ -1885,6 +1889,7 @@
           
           if (!widgetId) {
             clearTimeout(timeout);
+            overlay.classList.add('wplace-overlay-hidden');
             overlay.style.display = 'none';
             console.warn('❌ Failed to create interactive Turnstile widget');
             resolve(null);
@@ -6879,31 +6884,27 @@
     try {
       console.log("🔧 Initializing Turnstile token generator...");
       updateUI("initializingToken", "default");
-      
-      // Pre-load Turnstile script first to avoid delays later
+
+      console.log("Attempting to load Turnstile script...");
       await Utils.loadTurnstile();
-      
+      console.log("Turnstile script loaded. Attempting to generate token...");
+
       const token = await handleCaptchaWithRetry();
       if (token) {
         setTurnstileToken(token);
         console.log("✅ Startup token generated successfully");
         updateUI("tokenReady", "success");
         Utils.showAlert("🔑 Token generator ready!", "success");
-        enableFileOperations(); // Enable file operations since initial setup is complete
+        enableFileOperations();
       } else {
-        console.warn("⚠️ Startup token generation failed, will retry when needed");
+        console.warn("⚠️ Startup token generation failed (no token received), will retry when needed");
         updateUI("tokenRetryLater", "warning");
-        // Still enable file operations even if initial token generation fails
-        // Users can load progress and use manual/hybrid modes
         enableFileOperations();
       }
     } catch (error) {
-      console.warn("⚠️ Startup token generation failed:", error);
+      console.error("❌ Critical error during Turnstile initialization:", error); // More specific error
       updateUI("tokenRetryLater", "warning");
-      // Still enable file operations even if initial setup fails
-      // Users can load progress and use manual/hybrid modes
       enableFileOperations();
-      // Don't show error alert for initialization failures, just log them
     }
   }
 
