@@ -1,338 +1,681 @@
-/* WPlace Auto-Image Bot - Complete CSS Styles */
-/* All styling separated from JavaScript */
+/* WPlace Auto-Image Bot - Unified CSS Styles (decoupled from JS)
+   Why: bring external CSS in-sync with the UI that Auto-Image.js renders,
+   fix layout (positions, widths, z-index), and ensure class names match JS
+   (e.g., .wplace-dragging) so buttons and panels behave correctly. */
 
-/* Main Container Base Styles */
+/* ========================= */
+/* Core animations (shared)  */
+/* ========================= */
+ @keyframes neonGlow {
+  0%,
+  100% {
+    text-shadow: 0 0 5px currentColor, 0 0 10px currentColor,
+      0 0 15px currentColor;
+  }
+  50% {
+    text-shadow: 0 0 2px currentColor, 0 0 5px currentColor,
+      0 0 8px currentColor;
+  }
+}
+
+ @keyframes pixelBlink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0.7;
+  }
+}
+
+ @keyframes scanline {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(400px);
+  }
+}
+
+ @keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(0, 255, 0, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 255, 0, 0);
+  }
+}
+
+ @keyframes slideIn {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+ @keyframes slideDown {
+  from {
+    transform: translateX(-50%) translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
+
+ @keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* ========================= */
+/* Main containers (fixed)   */
+/* Align with JS structure   */
+/* ========================= */
 #wplace-image-bot-container {
-  position: fixed !important;
-  top: 20px !important;
-  left: 20px !important;
-  z-index: 10000 !important;
-  max-width: 400px !important;
+  /* Why fixed sizes/positions: matches JS expectations and preserves two-panel layout */
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  width: 280px;
+  max-height: calc(100vh - 40px);
+  padding: 0;
+  z-index: 9998;
+  animation: slideIn 0.4s ease-out;
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: all 0.3s ease;
+  user-select: none;
+  display: none; /* JS will set display: block inline when ready */
+}
+
+#wplace-image-bot-container.wplace-dragging {
+  transition: none;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8),
+    0 0 0 2px rgba(255, 255, 255, 0.2);
+  transform: scale(1.02);
+  z-index: 9999;
+}
+
+#wplace-image-bot-container.wplace-compact {
+  width: 240px;
+}
+
+#wplace-image-bot-container.wplace-minimized {
+  width: 200px;
+  height: auto;
+  overflow: hidden;
+}
+
+/* Stats container sits to the right of main (280 + 30 = 330) */
+#wplace-stats-container {
+  position: fixed;
+  top: 20px;
+  left: 330px;
+  width: 280px;
+  max-height: calc(100vh - 40px);
+  padding: 0;
+  z-index: 9997;
+  animation: slideIn 0.4s ease-out;
+  overflow-y: auto;
+  transition: all 0.3s ease;
+  user-select: none;
   display: none;
 }
 
-/* Stats Container Positioning */
-#wplace-stats-container {
-  position: fixed !important;
-  top: 60px !important;
-  right: 20px !important;
-  z-index: 10001 !important;
-  max-width: 350px !important;
-  display: none !important;
+#wplace-stats-container.wplace-dragging {
+  transition: none;
 }
 
-/* Resize Dialog Containers */
-.resize-container {
-  position: fixed !important;
-  top: 50% !important;
-  left: 50% !important;
-  transform: translate(-50%, -50%) !important;
-  z-index: 100000 !important;
-  max-width: 90vw !important;
-  max-height: 90vh !important;
-  display: none !important;
+/* Back-compat for legacy class (some earlier CSS used this) */
+.wplace-drag-active {
+  transition: none !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8),
+    0 0 0 2px rgba(255, 255, 255, 0.2) !important;
+  transform: scale(1.02) !important;
+  z-index: 9999 !important;
 }
 
-.resize-overlay {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  background: rgba(0, 0, 0, 0.8) !important;
-  z-index: 99999 !important;
-  display: none !important;
+/* ========================= */
+/* Header and content blocks */
+/* ========================= */
+.wplace-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: move;
+  user-select: none;
+  transition: background 0.2s ease;
+  position: relative;
+  z-index: 2;
+  padding: 8px 12px;
 }
 
-/* CSS Custom Properties for Dynamic Values */
-:root {
-  /* Default Theme Colors */
-  --wplace-primary: #000000;
-  --wplace-secondary: #111111;
-  --wplace-accent: #775ce3;
-  --wplace-text: #ffffff;
-  --wplace-success: #00ff00;
-  --wplace-error: #ff0000;
-  --wplace-warning: #ffa500;
-  
-  /* Layout Properties */
-  --wplace-border-width: 1px;
-  --wplace-border-style: solid;
-  --wplace-border-radius: 16px;
-  --wplace-padding: 16px;
-  
-  /* Animation Properties */
-  --wplace-glow-enabled: 0;
-  --wplace-pixel-blink-enabled: 0;
-  --wplace-scanline-enabled: 0;
-  
-  /* Overlay Properties */
-  --wplace-overlay-opacity: 0.6;
+.wplace-header-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-/* Theme Variants */
-.theme-cyberpunk {
-  --wplace-primary: #0a0a0a;
-  --wplace-secondary: #1a1a2e;
-  --wplace-accent: #00ffff;
-  --wplace-text: #00ff00;
-  --wplace-glow-enabled: 1;
-  --wplace-pixel-blink-enabled: 1;
+.wplace-header-controls {
+  display: flex;
+  gap: 6px;
 }
 
-.theme-neon {
-  --wplace-primary: #0f0f23;
-  --wplace-secondary: #16213e;
-  --wplace-accent: #ff006e;
-  --wplace-text: #ffffff;
-  --wplace-glow-enabled: 1;
+.wplace-header-btn {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  background: rgba(255, 255, 255, 0.1);
+  color: inherit;
+  border: none;
+  border-radius: 4px;
+  width: 18px;
+  height: 18px;
+  font-size: 10px;
 }
 
-.theme-matrix {
-  --wplace-primary: #000000;
-  --wplace-secondary: #001100;
-  --wplace-accent: #00ff00;
-  --wplace-text: #00ff00;
-  --wplace-scanline-enabled: 1;
+.wplace-header-btn:hover {
+  transform: scale(1.1);
 }
 
-.theme-minimal {
-  --wplace-primary: #ffffff;
-  --wplace-secondary: #f5f5f5;
-  --wplace-accent: #007acc;
-  --wplace-text: #333333;
+.wplace-content {
+  display: block;
+  position: relative;
+  z-index: 2;
+  padding: 12px;
 }
 
-/* Base Animations */
-@keyframes neonGlow {
-  0%, 100% {
-    text-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor;
-  }
-  50% {
-    text-shadow: 0 0 2px currentColor, 0 0 5px currentColor, 0 0 8px currentColor;
-  }
+.wplace-content.wplace-hidden {
+  display: none;
 }
 
-@keyframes pixelBlink {
-  0%, 50% { opacity: 1; }
-  51%, 100% { opacity: 0.7; }
+/* Sections */
+.wplace-status-section {
+  margin-bottom: 12px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-@keyframes scanline {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(400px); }
+.wplace-section {
+  margin-bottom: 12px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-@keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.7); }
-  70% { box-shadow: 0 0 0 10px rgba(0, 255, 0, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0); }
+.wplace-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-@keyframes slideIn {
-  from { transform: translateY(-10px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+/* ========================= */
+/* Controls and buttons      */
+/* ========================= */
+.wplace-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-@keyframes slideDown {
-  from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
-  to { transform: translateX(-50%) translateY(0); opacity: 1; }
+.wplace-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
 }
 
-@keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+.wplace-row.single {
+  grid-template-columns: 1fr;
 }
 
-/* Conditional Animations Based on Theme */
-.theme-cyberpunk .wplace-header,
-.theme-neon .wplace-header {
-  animation: neonGlow 2s ease-in-out infinite alternate;
+.wplace-btn {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
 }
 
-.theme-cyberpunk .fas,
-.theme-cyberpunk .fa,
-.theme-neon .fas,
-.theme-neon .fa {
-  filter: drop-shadow(0 0 3px currentColor);
+.wplace-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s;
 }
 
-.theme-cyberpunk .wplace-btn:hover:not(:disabled),
-.theme-cyberpunk .status-error,
-.theme-cyberpunk .wplace-progress-bar::after {
-  animation: pixelBlink 0.5s infinite;
+.wplace-btn:hover::before {
+  left: 100%;
 }
 
-.theme-matrix::before {
+.wplace-btn:hover:not(:disabled) {
+  box-shadow: 0 0 15px currentColor;
+}
+
+.wplace-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.wplace-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.wplace-btn:disabled::before {
+  display: none;
+}
+
+.wplace-btn-overlay.active {
+  background: linear-gradient(135deg, #29b6f6 0%, #8e2de2 100%);
+  box-shadow: 0 0 15px #8e2de2;
+}
+
+/* ========================= */
+/* Stats and progress        */
+/* ========================= */
+.wplace-stats {
+  margin-bottom: 8px;
+}
+
+.wplace-stat-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 11px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.wplace-stat-item:last-child {
+  border-bottom: none;
+}
+
+.wplace-stat-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  opacity: 0.9;
+  font-size: 10px;
+}
+
+.wplace-stat-value {
+  font-weight: 600;
+}
+
+.wplace-colors-section {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.wplace-stat-colors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16px, 1fr));
+  gap: 4px;
+  margin-top: 8px;
+  padding: 4px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  max-height: 80px;
+  overflow-y: auto;
+}
+
+.wplace-stat-color-swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Progress */
+.wplace-progress {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  margin: 8px 0;
+  height: 6px;
+}
+
+.wplace-progress-bar {
+  position: relative;
+  height: 6px;
+  transition: width 0.5s ease;
+}
+
+.wplace-progress-bar::after {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--wplace-accent), transparent);
-  animation: scanline 3s linear infinite;
-  pointer-events: none;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: shimmer 2s infinite;
 }
 
-/* Turnstile Container Styles */
-.wplace-turnstile-hidden {
-  position: fixed !important;
-  left: -99999px !important;
-  top: -99999px !important;
-  width: 1px !important;
-  height: 1px !important;
-  pointer-events: none !important;
-  opacity: 0 !important;
-  visibility: hidden !important;
-  z-index: -99999 !important;
-  overflow: hidden !important;
-}
-
-.wplace-turnstile-overlay {
-  position: fixed !important;
-  bottom: 20px !important;
-  right: 20px !important;
-  z-index: 99999 !important;
-  background: rgba(0,0,0,0.9) !important;
-  border-radius: 12px !important;
-  padding: 20px !important;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.4) !important;
-  backdrop-filter: blur(10px) !important;
-  border: 1px solid rgba(255,255,255,0.2) !important;
-  color: var(--wplace-text) !important;
-  font-family: "Segoe UI", sans-serif !important;
-  min-width: 300px !important;
-  max-width: 400px !important;
-}
-
-.wplace-turnstile-title {
-  font: 600 12px/1.3 "Segoe UI", sans-serif !important;
-  margin-bottom: 8px !important;
-  opacity: 0.9 !important;
-  color: var(--wplace-text) !important;
-}
-
-.wplace-turnstile-host {
-  width: 100% !important;
-  min-height: 70px !important;
-}
-
-.wplace-turnstile-hide-btn {
-  position: absolute !important;
-  top: 6px !important;
-  right: 6px !important;
-  font-size: 11px !important;
-  background: transparent !important;
-  color: var(--wplace-text) !important;
-  border: 1px solid rgba(255,255,255,0.2) !important;
-  border-radius: 6px !important;
-  padding: 2px 6px !important;
-  cursor: pointer !important;
-}
-
-.wplace-turnstile-hide-btn:hover {
-  background: rgba(255,255,255,0.1) !important;
-}
-
-/* Alert System */
-.wplace-alert {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 12px 20px;
-  border-radius: 8px;
-  color: white;
-  font-weight: 600;
-  z-index: 10001;
-  max-width: 400px;
+/* ========================= */
+/* Status blocks             */
+/* ========================= */
+.wplace-status {
   text-align: center;
-  animation: slideDown 0.3s ease-out;
+  position: relative;
+  overflow: hidden;
+  padding: 6px;
+  border: 1px solid;
+  border-radius: 8px;
+  font-size: 11px;
 }
 
-.wplace-alert-success {
-  background: linear-gradient(135deg, #4caf50, #66bb6a);
-  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+.status-default {
+  background: rgba(255, 255, 255, 0.1);
 }
 
-.wplace-alert-error {
-  background: linear-gradient(135deg, #f44336, #ef5350);
-  box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+.status-success {
+  background: rgba(0, 255, 0, 0.1);
+  box-shadow: 0 0 15px currentColor;
 }
 
-.wplace-alert-warning {
-  background: linear-gradient(135deg, #ff9800, #ffb74d);
-  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+.status-error {
+  background: rgba(255, 0, 0, 0.1);
+  box-shadow: 0 0 15px currentColor;
 }
 
-.wplace-alert-info {
-  background: linear-gradient(135deg, #2196f3, #42a5f5);
-  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+.status-warning {
+  background: rgba(255, 165, 0, 0.1);
+  box-shadow: 0 0 15px currentColor;
 }
 
-/* Settings Container */
-.wplace-settings-container {
+/* ========================= */
+/* Resize dialog             */
+/* ========================= */
+.resize-container {
+  display: none;
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: var(--wplace-primary);
-  border: var(--wplace-border-width) var(--wplace-border-style) var(--wplace-accent);
-  border-radius: var(--wplace-border-radius);
-  padding: 0;
-  z-index: 100001;
-  display: none;
-  color: var(--wplace-text);
-  font-family: "Segoe UI", Roboto, sans-serif;
-  min-width: 400px;
-  max-width: 500px;
-  max-height: 80vh;
-  overflow-y: auto;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  z-index: 10000;
+  width: 90%;
+  max-width: 700px;
+  max-height: 90%;
+  overflow: auto;
 }
 
-.wplace-settings-container.show {
-  display: block;
-  animation: slideIn 0.3s ease-out;
-}
-
-/* Settings Header */
-.wplace-settings-header {
-  background: var(--wplace-secondary);
-  padding: var(--wplace-padding);
-  border-bottom: 1px solid var(--wplace-accent);
+.resize-preview-wrapper {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.2);
+  margin: 15px 0;
+  height: 300px;
+  overflow: hidden;
+}
+
+.resize-canvas-stack {
+  position: relative;
+  transform-origin: center center;
+  display: inline-block;
+}
+
+.resize-base-canvas,
+.resize-mask-canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+.resize-mask-canvas {
+  pointer-events: auto;
+}
+
+.resize-tools {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 8px;
+  font-size: 12px;
+}
+
+.resize-tools button {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  cursor: pointer;
+}
+
+.wplace-btn.active,
+.wplace-btn[aria-pressed='true'] {
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.25) inset,
+    0 0 6px rgba(0, 0, 0, 0.2) !important;
+}
+
+.mask-mode-group .wplace-btn.active,
+.mask-mode-group .wplace-btn[aria-pressed='true'] {
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.25) inset,
+    0 0 6px rgba(0, 0, 0, 0.2);
+}
+
+.resize-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
   align-items: center;
 }
 
-.wplace-settings-title {
-  color: var(--wplace-accent);
-  font-size: 18px;
-  font-weight: 600;
+.resize-slider {
+  width: 100%;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.resize-zoom-controls {
+  grid-column: 1 / -1;
   display: flex;
   align-items: center;
   gap: 10px;
+  margin-top: 15px;
 }
 
-.wplace-settings-close {
-  background: none;
-  border: none;
-  color: var(--wplace-text);
-  font-size: 18px;
+.resize-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.resize-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 9999;
+  display: none;
+}
+
+/* ========================= */
+/* Color grid                */
+/* ========================= */
+.wplace-color-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+  gap: 10px;
+  padding-top: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.wplace-color-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.wplace-color-item-name {
+  font-size: 9px;
+  color: #ccc;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+.wplace-color-swatch {
+  width: 22px;
+  height: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
   cursor: pointer;
-  opacity: 0.7;
-  transition: opacity 0.2s;
+  transition: transform 0.1s ease, box-shadow 0.2s ease;
+  position: relative;
+  margin: 0 auto;
 }
 
-.wplace-settings-close:hover {
-  opacity: 1;
+.wplace-color-swatch.unavailable {
+  border-color: #666;
+  border-style: dashed;
+  cursor: not-allowed;
 }
 
-/* Settings Content */
+.wplace-color-swatch:hover {
+  transform: scale(1.1);
+  z-index: 1;
+}
+
+.wplace-color-swatch:not(.active) {
+  opacity: 0.3;
+  filter: grayscale(80%);
+}
+
+.wplace-color-swatch.unavailable:not(.active) {
+  opacity: 0.2;
+  filter: grayscale(90%);
+}
+
+.wplace-color-swatch.active::after {
+  content: '✔';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  text-shadow: 0 0 3px black;
+}
+
+.wplace-color-divider {
+  border: none;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 8px 0;
+}
+
+/* ========================= */
+/* Cooldown controls         */
+/* ========================= */
+.wplace-cooldown-control {
+  margin-top: 8px;
+}
+
+.wplace-cooldown-control label {
+  font-size: 11px;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.wplace-slider-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wplace-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  background: #444;
+  border-radius: 2px;
+  outline: none;
+}
+
+.wplace-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+/* ========================= */
+/* Settings container (base) */
+/* ========================= */
+#wplace-settings-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10001;
+  min-width: 400px;
+  max-width: 500px;
+}
+
 .wplace-settings {
-  padding: var(--wplace-padding);
+  padding: 16px;
   max-height: 400px;
   overflow-y: auto;
 }
@@ -340,9 +683,6 @@
 .wplace-setting-section {
   margin-bottom: 20px;
   padding: 12px;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 8px;
 }
 
 .wplace-setting-title {
@@ -351,43 +691,36 @@
   margin-bottom: 12px;
   font-size: 14px;
   font-weight: 600;
-  color: var(--wplace-accent);
 }
 
 .wplace-setting-title i {
   margin-right: 8px;
 }
 
-/* Form Controls */
+/* ========================= */
+/* Form controls             */
+/* ========================= */
 .wplace-select {
   width: 100%;
   padding: 8px 12px;
   font-size: 14px;
   margin-bottom: 10px;
-  background: var(--wplace-secondary);
-  border: 1px solid var(--wplace-accent);
-  border-radius: 6px;
-  color: var(--wplace-text);
 }
 
 .wplace-select:focus {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(119, 92, 227, 0.3);
 }
 
 .wplace-description {
   font-size: 12px;
   opacity: 0.8;
   line-height: 1.4;
-  color: var(--wplace-text);
 }
 
-/* Speed Controls */
+/* Speed controls */
 .wplace-speed-control {
   margin-top: 12px;
   padding: 12px;
-  background: rgba(255,255,255,0.03);
-  border-radius: 8px;
 }
 
 .wplace-speed-label {
@@ -396,7 +729,6 @@
   margin-bottom: 8px;
   font-size: 13px;
   font-weight: 600;
-  color: var(--wplace-text);
 }
 
 .wplace-speed-label i {
@@ -417,7 +749,6 @@
   cursor: pointer;
   -webkit-appearance: none;
   appearance: none;
-  background: #444;
 }
 
 .wplace-speed-slider::-webkit-slider-thumb {
@@ -427,8 +758,7 @@
   height: 18px;
   border-radius: 50%;
   cursor: pointer;
-  border: 2px solid var(--wplace-accent);
-  background: var(--wplace-accent);
+  border: 2px solid;
 }
 
 .wplace-speed-slider::-moz-range-thumb {
@@ -436,8 +766,7 @@
   height: 18px;
   border-radius: 50%;
   cursor: pointer;
-  border: 2px solid var(--wplace-accent);
-  background: var(--wplace-accent);
+  border: 2px solid;
 }
 
 .wplace-speed-display {
@@ -446,194 +775,76 @@
   gap: 4px;
   min-width: 90px;
   justify-content: flex-end;
-  padding: 5px 10px;
-  border-radius: 4px;
-  font-weight: 600;
-  background: var(--wplace-secondary);
-  color: var(--wplace-text);
 }
 
-.wplace-speed-unit {
-  font-size: 11px;
-  opacity: 0.8;
+/* ========================= */
+/* Turnstile overlay         */
+/* ========================= */
+/* Hidden invisible widget host (token generator) */
+.wplace-turnstile-hidden {
+  position: fixed !important;
+  left: -99999px !important;
+  top: -99999px !important;
+  width: 1px !important;
+  height: 1px !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  z-index: -99999 !important;
+  overflow: hidden !important;
 }
 
-/* Theme Customization */
-.wplace-theme-custom {
-  margin-top: 15px;
-  padding: 15px;
-  background: rgba(255,255,255,0.03);
-  border-radius: 8px;
+/* Visible overlay (interactive fallback) */
+.wplace-turnstile-overlay {
+  position: fixed !important;
+  bottom: 20px !important;
+  right: 20px !important;
+  z-index: 99999 !important;
+  background: rgba(0, 0, 0, 0.9) !important;
+  border-radius: 12px !important;
+  padding: 20px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+  backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: #fff !important;
+  font-family: 'Segoe UI', sans-serif !important;
+  min-width: 300px !important;
+  max-width: 400px !important;
 }
 
-.wplace-custom-group {
-  margin-bottom: 15px;
-}
-
-.wplace-custom-label {
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--wplace-text);
-}
-
-.wplace-custom-label i {
-  margin-right: 8px;
-  width: 16px;
-}
-
-.wplace-color-input-group {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.wplace-color-input {
-  width: 50px;
-  height: 30px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  background: transparent;
-}
-
-.wplace-color-text {
-  flex: 1;
-  padding: 6px 10px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-family: monospace;
-  background: var(--wplace-secondary);
-  border: 1px solid var(--wplace-accent);
-  color: var(--wplace-text);
-}
-
-.wplace-animation-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.wplace-checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  cursor: pointer;
-  color: var(--wplace-text);
-}
-
-.wplace-custom-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
-  border-top: 1px solid rgba(255,255,255,0.1);
-  padding-top: 15px;
-}
-
-/* Overlay Styles */
-.wplace-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.8);
-  z-index: 100002;
-  display: none;
-}
-
-.wplace-overlay.show {
-  display: block;
-}
-
-/* Overlay visibility classes */
-.wplace-overlay-hidden {
-  display: none !important;
-}
-
-.wplace-overlay-visible {
-  display: block !important;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .wplace-settings-container {
-    min-width: 90vw;
-    max-width: 90vw;
-    margin: 20px;
-  }
-  
-  .wplace-turnstile-overlay {
-    bottom: 10px !important;
-    right: 10px !important;
-    left: 10px !important;
-    min-width: auto !important;
-  }
-  
-  .wplace-alert {
-    max-width: 90vw;
-    margin: 0 5vw;
-  }
-}
-
-/* Dark/Light mode support */
-@media (prefers-color-scheme: light) {
-  .theme-auto {
-    --wplace-primary: #ffffff;
-    --wplace-secondary: #f5f5f5;
-    --wplace-accent: #007acc;
-    --wplace-text: #333333;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  .theme-auto {
-    --wplace-primary: #1e1e1e;
-    --wplace-secondary: #2d2d30;
-    --wplace-accent: #775ce3;
-    --wplace-text: #ffffff;
-  }
-}
-
-/* =============================================== */
-/* EXTRACTED INLINE STYLES - PREVIOUSLY IN JS */
-/* =============================================== */
-
-/* Turnstile Overlay Styles - extracted from createTurnstileOverlay */
 .wplace-turnstile-title {
-  font: 600 12px/1.3 "Segoe UI", sans-serif;
-  margin-bottom: 8px;
-  opacity: 0.9;
-  color: var(--wplace-text, #ffffff);
+  font: 600 12px/1.3 'Segoe UI', sans-serif !important;
+  margin-bottom: 8px !important;
+  opacity: 0.9 !important;
+  color: #ffffff !important;
 }
 
 .wplace-turnstile-host {
-  width: 100%;
-  min-height: 70px;
+  width: 100% !important;
+  min-height: 70px !important;
 }
 
 .wplace-turnstile-hide-btn {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  font-size: 11px;
-  background: transparent;
-  color: var(--wplace-text, #ffffff);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 6px;
-  padding: 2px 6px;
-  cursor: pointer;
-  transition: background 0.2s ease;
+  position: absolute !important;
+  top: 6px !important;
+  right: 6px !important;
+  font-size: 11px !important;
+  background: transparent !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 6px !important;
+  padding: 2px 6px !important;
+  cursor: pointer !important;
+  transition: background 0.2s ease !important;
 }
 
 .wplace-turnstile-hide-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.1) !important;
 }
 
-/* Alert System Styles - extracted from showAlert */
+/* ========================= */
+/* Alert system (used by JS) */
+/* ========================= */
 .wplace-alert-base {
   position: fixed;
   top: 20px;
@@ -647,11 +858,10 @@
   max-width: 400px;
   text-align: center;
   animation: slideDown 0.3s ease-out;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   font-family: 'Segoe UI', sans-serif;
 }
 
-/* Alert type variants - extracted from showAlert colors object */
 .wplace-alert-info {
   background: linear-gradient(135deg, #3498db, #2980b9);
   box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
@@ -672,7 +882,84 @@
   box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
 }
 
-/* Settings Container Base Styles - extracted from showSettings */
+/* ========================= */
+/* Modal overlay helpers     */
+/* ========================= */
+.wplace-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 100002;
+  display: none;
+}
+
+.wplace-overlay.show {
+  display: block;
+}
+
+/* Overlay visibility helpers */
+.wplace-overlay-hidden {
+  display: none !important;
+}
+
+.wplace-overlay-visible {
+  display: block !important;
+}
+
+/* ========================= */
+/* Responsive tweaks         */
+/* ========================= */
+ @media (max-width: 768px) {
+  #wplace-image-bot-container {
+    left: 10px;
+    width: calc(100vw - 20px);
+    max-height: calc(100vh - 20px);
+  }
+
+  #wplace-stats-container {
+    display: none !important; /* hide secondary panel on small screens */
+  }
+
+  .wplace-alert-base {
+    max-width: 90vw;
+    margin: 0 5vw;
+  }
+
+  .wplace-turnstile-overlay {
+    bottom: 10px !important;
+    right: 10px !important;
+    left: 10px !important;
+    min-width: auto !important;
+  }
+}
+
+/* ========================= */
+/* Auto light/dark support   */
+/* ========================= */
+ @media (prefers-color-scheme: light) {
+  .theme-auto {
+    --wplace-primary: #ffffff;
+    --wplace-secondary: #f5f5f5;
+    --wplace-accent: #007acc;
+    --wplace-text: #333333;
+  }
+}
+
+ @media (prefers-color-scheme: dark) {
+  .theme-auto {
+    --wplace-primary: #1e1e1e;
+    --wplace-secondary: #2d2d30;
+    --wplace-accent: #775ce3;
+    --wplace-text: #ffffff;
+  }
+}
+
+/* ===================================== */
+/* Settings container variants (optional)*/
+/* ===================================== */
 .wplace-settings-container-base {
   position: fixed;
   top: 50%;
@@ -680,13 +967,13 @@
   transform: translate(-50%, -50%);
   z-index: 100001;
   display: none;
-  font-family: "Segoe UI", Roboto, sans-serif;
+  font-family: 'Segoe UI', Roboto, sans-serif;
   min-width: 400px;
   max-width: 500px;
   max-height: 80vh;
   overflow-y: auto;
   animation: slideIn 0.3s ease-out;
-  border: 1px solid var(--wplace-accent, rgba(255,255,255,0.1));
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
   padding: 0;
 }
@@ -695,63 +982,9 @@
   display: block;
 }
 
-/* Dynamic Theme Background Classes */
-.wplace-theme-classic {
-  background: linear-gradient(135deg, var(--wplace-primary, #000000) 0%, #1a1a1a 100%);
-}
-
-.wplace-theme-standard {
-  background: var(--wplace-primary, #000000);
-}
-
-/* Settings Container Theme Variations */
-.wplace-settings-cyberpunk {
-  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
-}
-
-.wplace-settings-neon {
-  background: linear-gradient(135deg, #0f0f23 0%, #16213e 50%, #240046 100%);
-}
-
-.wplace-settings-matrix {
-  background: linear-gradient(135deg, #000000 0%, #001100 50%, #002200 100%);
-}
-
-.wplace-settings-retro {
-  background: linear-gradient(135deg, #2c3e50 0%, #3498db 50%, #9b59b6 100%);
-}
-
-.wplace-settings-minimal {
-  background: linear-gradient(135deg, #ecf0f1 0%, #bdc3c7 100%);
-}
-
-.wplace-settings-synthwave {
-  background: linear-gradient(135deg, #1a0033 0%, #2d1b69 50%, #11998e 100%);
-}
-
-.wplace-settings-vapor {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-/* Color swatch states - extracted from updateColorGrid */
-.wplace-color-swatch.unavailable {
-  opacity: 0.4;
-  filter: grayscale(50%);
-}
-
-/* Stats container visibility - extracted from toggleStats */
-.wplace-stats-container.hidden {
-  display: none;
-}
-
-/* Additional utility classes for dynamic behavior */
-.wplace-drag-active {
-  transition: none !important;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8), 0 0 0 2px rgba(255, 255, 255, 0.2) !important;
-  transform: scale(1.02) !important;
-  z-index: 9999 !important;
-}
-
+/* ===================================== */
+/* Utility styles                         */
+/* ===================================== */
 .wplace-paint-effect {
   animation: pulse 0.5s ease-out;
 }
@@ -760,37 +993,6 @@
   background: rgba(255, 0, 0, 0.4) !important;
 }
 
-/* Animation modifier classes for conditional application */
-.wplace-glow-animation .wplace-header {
-  animation: neonGlow 2s ease-in-out infinite alternate;
-}
-
-.wplace-glow-animation .fas,
-.wplace-glow-animation .fa {
-  filter: drop-shadow(0 0 3px currentColor);
-}
-
-.wplace-blink-animation .wplace-btn:hover:not(:disabled) {
-  animation: pixelBlink 0.5s infinite;
-}
-
-.wplace-blink-animation .status-error {
-  animation: pixelBlink 0.5s infinite;
-}
-
-.wplace-blink-animation .wplace-progress-bar::after {
-  animation: pixelBlink 1s infinite;
-}
-
-.wplace-scanline-animation::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--wplace-neon, #00ffff), transparent);
-  animation: scanline 3s linear infinite;
-  z-index: 1;
-  pointer-events: none;
+.wplace-stats-container.hidden {
+  display: none;
 }

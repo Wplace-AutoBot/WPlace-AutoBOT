@@ -4493,12 +4493,7 @@
     }
 
     if (!statsContainer || !statsArea || !closeStatsBtn) {
-      console.error("Stats UI elements not found:", {
-        statsContainer: !!statsContainer,
-        statsArea: !!statsArea,
-        closeStatsBtn: !!closeStatsBtn,
-      })
-    }
+      // Note: base CSS now aligns with this layout: main panel at left:20px (width 280), stats at left:330px.
 
     const header = container.querySelector(".wplace-header")
 
