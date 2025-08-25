@@ -8,7 +8,7 @@
   left: 20px !important;
   z-index: 10000 !important;
   max-width: 400px !important;
-  display: none !important;
+  display: none;
 }
 
 /* Stats Container Positioning */
