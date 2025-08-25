@@ -3238,12 +3238,6 @@
     cssLink.setAttribute('data-wplace-theme', 'true');
     document.head.appendChild(cssLink);
 
-    // Link complete styles CSS file (includes extracted inline styles)
-    const completeCssLink = document.createElement('link');
-    completeCssLink.rel = 'stylesheet';
-    completeCssLink.href = './auto-image-complete-styles.css';
-    completeCssLink.setAttribute('data-wplace-complete', 'true');
-    document.head.appendChild(completeCssLink);
 
     // Apply theme-specific dynamic styles
     const style = document.createElement("style")
@@ -3790,6 +3784,7 @@
     settingsContainer.style.cssText += `
       min-width: 420px;
       max-width: 480px;
+      z-index: 99999;
       color: ${theme.text || 'white'};
       font-family: ${theme.fontFamily || "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"};
       box-shadow: ${theme.boxShadow || '0 20px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1)'};
