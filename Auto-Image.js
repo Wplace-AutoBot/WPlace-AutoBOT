@@ -4443,6 +4443,9 @@
     document.body.appendChild(statsContainer)
     document.body.appendChild(settingsContainer)
 
+    // Show the main container after all elements are appended
+    container.style.display = "block"
+
     const uploadBtn = container.querySelector("#uploadBtn")
     const resizeBtn = container.querySelector("#resizeBtn")
     const selectPosBtn = container.querySelector("#selectPosBtn")
@@ -4609,9 +4612,9 @@
       }
     }
     if (statsContainer && statsBtn) {
-      statsContainer.style.display = "block";
-      statsBtn.innerHTML = '<i class="fas fa-chart-line"></i>';
-      statsBtn.title = "Hide Stats";
+      // Stats container starts hidden - user clicks button to show
+      statsBtn.innerHTML = '<i class="fas fa-chart-bar"></i>';
+      statsBtn.title = "Show Stats";
     }
 
     const settingsBtn = container.querySelector("#settingsBtn")

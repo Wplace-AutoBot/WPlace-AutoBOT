@@ -8,6 +8,7 @@
   left: 20px !important;
   z-index: 10000 !important;
   max-width: 400px !important;
+  display: none !important;
 }
 
 /* Stats Container Positioning */
@@ -17,6 +18,7 @@
   right: 20px !important;
   z-index: 10001 !important;
   max-width: 350px !important;
+  display: none !important;
 }
 
 /* Resize Dialog Containers */
@@ -28,6 +30,7 @@
   z-index: 100000 !important;
   max-width: 90vw !important;
   max-height: 90vh !important;
+  display: none !important;
 }
 
 .resize-overlay {
