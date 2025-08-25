@@ -189,36 +189,38 @@
   }
 }
 
-  // Add this helper (place it after getCurrentTheme/switchTheme definitions)
-  function applyTheme() {
-    const theme = getCurrentTheme();
-    // Toggle theme class on documentElement so CSS vars cascade to our UI
-    document.documentElement.classList.remove('wplace-theme--classic', 'wplace-theme--neon');
-    document.documentElement.classList.add(
-      CONFIG.currentTheme === 'Neon Retro' ? 'wplace-theme--neon' : 'wplace-theme--classic'
-    );
+// Add this helper (place it after getCurrentTheme/switchTheme definitions)
+function applyTheme() {
+  const theme = getCurrentTheme();
+  // Toggle theme class on documentElement so CSS vars cascade to our UI
+  document.documentElement.classList.remove('wplace-theme--classic', 'wplace-theme--neon');
+  document.documentElement.classList.add(
+    CONFIG.currentTheme === 'Neon Retro' ? 'wplace-theme--neon' : 'wplace-theme--classic'
+  );
 
-    // Also set CSS variables explicitly in case you want runtime overrides
-    const root = document.documentElement;
-    const setVar = (k, v) => { try { root.style.setProperty(k, v); } catch {} };
+  // Also set CSS variables explicitly in case you want runtime overrides
+  const root = document.documentElement;
+  const setVar = (k, v) => { try { root.style.setProperty(k, v); } catch {} };
 
-    setVar('--wplace-primary', theme.primary);
-    setVar('--wplace-secondary', theme.secondary);
-    setVar('--wplace-accent', theme.accent);
-    setVar('--wplace-text', theme.text);
-    setVar('--wplace-highlight', theme.highlight);
-    setVar('--wplace-success', theme.success);
-    setVar('--wplace-error', theme.error);
-    setVar('--wplace-warning', theme.warning);
+  setVar('--wplace-primary', theme.primary);
+  setVar('--wplace-secondary', theme.secondary);
+  setVar('--wplace-accent', theme.accent);
+  setVar('--wplace-text', theme.text);
+  setVar('--wplace-highlight', theme.highlight);
+  setVar('--wplace-success', theme.success);
+  setVar('--wplace-error', theme.error);
+  setVar('--wplace-warning', theme.warning);
 
-    // Typography + look
-    setVar('--wplace-font', theme.fontFamily || "'Segoe UI', Roboto, sans-serif");
-    setVar('--wplace-radius', (('' + (theme.borderRadius || '12px'))));
-    setVar('--wplace-border-style', (('' + (theme.borderStyle || 'solid'))));
-    setVar('--wplace-border-width', (('' + (theme.borderWidth || '1px'))));
-    setVar('--wplace-backdrop', (('' + (theme.backdropFilter || 'blur(10px)'))));
-    setVar('--wplace-border-color', 'rgba(255,255,255,0.1)');
-  }
+  // Typography + look
+  setVar('--wplace-font', theme.fontFamily || "'Segoe UI', Roboto, sans-serif");
+  setVar('--wplace-radius', ('' + (theme.borderRadius || '12px')));
+  setVar('--wplace-border-style', (('' + (theme.borderStyle || 'solid'))));
+  setVar('--wplace-border-width', (('' + (theme.borderWidth || '1px'))));
+  setVar('--wplace-backdrop', (('' + (theme.backdropFilter || 'blur(10px)'))));
+  setVar('--wplace-border-color', 'rgba(255,255,255,0.1)');
+}
+
+  
 
   const saveThemePreference = () => {
     try {
@@ -3271,385 +3273,6 @@
     cssLink.href = 'https://staninna.github.io/WPlace-AutoBOT/auto-image-styles.css'; // TODO: Before merge change to https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/auto-image-styles.css
     cssLink.setAttribute('data-wplace-theme', 'true');
     document.head.appendChild(cssLink);
-
-
-    // Apply theme-specific dynamic styles
-    const style = document.createElement("style")
-    style.setAttribute("data-wplace-theme-dynamic", "true")
-
-    style.textContent = `
-      /* Dynamic theme-specific styles */
-      ${theme.animations.glow ? `
-        .wplace-header { animation: neonGlow 2s ease-in-out infinite alternate; }
-        .fas, .fa { filter: drop-shadow(0 0 3px currentColor); }
-      ` : ""}
-
-      ${theme.animations.pixelBlink ? `
-        .wplace-btn:hover:not(:disabled) { animation: pixelBlink 0.5s infinite; }
-        .status-error { animation: pixelBlink 0.5s infinite; }
-        .wplace-progress-bar::after { animation: pixelBlink 1s infinite; }
-      ` : ""}
-
-      ${theme.animations.scanline ? `
-        #wplace-image-bot-container::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          height: 2px;
-          background: linear-gradient(90deg, transparent, ${theme.neon}, transparent);
-          animation: scanline 3s linear infinite;
-          z-index: 1;
-          pointer-events: none;
-        }
-      ` : ""}
-
-      /* Theme-specific container styles */
-      #wplace-image-bot-container {
-        background: ${CONFIG.currentTheme === "Classic Autobot"
-          ? `linear-gradient(135deg, ${theme.primary} 0%, #1a1a1a 100%)`
-          : theme.primary
-        };
-        border: ${theme.borderWidth} ${theme.borderStyle} ${CONFIG.currentTheme === "Classic Autobot" ? theme.accent : theme.text};
-        border-radius: ${theme.borderRadius};
-        box-shadow: ${theme.boxShadow};
-        font-family: ${theme.fontFamily};
-        color: ${theme.text};
-        ${theme.backdropFilter ? `backdrop-filter: ${theme.backdropFilter};` : ""}
-        ${CONFIG.currentTheme === "Neon Retro" ? "image-rendering: pixelated;" : ""}
-      }
-
-      ${CONFIG.currentTheme === "Neon Retro" ? `
-        #wplace-image-bot-container::after {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background:
-            repeating-linear-gradient(
-              0deg,
-              transparent,
-              transparent 2px,
-              rgba(0, 255, 65, 0.03) 2px,
-              rgba(0, 255, 65, 0.03) 4px
-            );
-          pointer-events: none;
-          z-index: 1;
-        }
-      ` : ""}
-
-      #wplace-stats-container {
-        background: ${CONFIG.currentTheme === "Classic Autobot"
-          ? `linear-gradient(135deg, ${theme.primary} 0%, #1a1a1a 100%)`
-          : theme.primary
-        };
-        border: ${theme.borderWidth} ${theme.borderStyle} ${CONFIG.currentTheme === "Classic Autobot" ? theme.accent : theme.text};
-        border-radius: ${theme.borderRadius};
-        box-shadow: ${theme.boxShadow};
-        font-family: ${theme.fontFamily};
-        color: ${theme.text};
-        ${theme.backdropFilter ? `backdrop-filter: ${theme.backdropFilter};` : ""}
-        ${CONFIG.currentTheme === "Neon Retro" ? "image-rendering: pixelated;" : ""}
-      }
-
-      .wplace-header {
-        padding: ${CONFIG.currentTheme === "Neon Retro" ? "8px 12px" : "8px 12px"};
-        background: ${CONFIG.currentTheme === "Classic Autobot"
-          ? `linear-gradient(135deg, ${theme.secondary} 0%, #2a2a2a 100%)`
-          : theme.secondary
-        };
-        color: ${theme.highlight};
-        font-size: ${CONFIG.currentTheme === "Neon Retro" ? "11px" : "13px"};
-        font-weight: ${CONFIG.currentTheme === "Neon Retro" ? "normal" : "700"};
-        border-bottom: ${CONFIG.currentTheme === "Neon Retro" ? "2px" : "1px"} solid ${CONFIG.currentTheme === "Classic Autobot" ? "rgba(255,255,255,0.1)" : theme.text};
-        ${CONFIG.currentTheme === "Classic Autobot" ? "text-shadow: 0 1px 2px rgba(0,0,0,0.5);" : "text-transform: uppercase; letter-spacing: 1px;"}
-        font-family: ${theme.fontFamily};
-      }
-
-      .wplace-header-title { gap: ${CONFIG.currentTheme === "Neon Retro" ? "6px" : "6px"}; }
-      .wplace-header-controls { gap: ${CONFIG.currentTheme === "Neon Retro" ? "6px" : "6px"}; }
-
-      .wplace-header-btn {
-        background: ${CONFIG.currentTheme === "Classic Autobot" ? "rgba(255,255,255,0.1)" : theme.accent};
-        border: ${CONFIG.currentTheme === "Neon Retro" ? `2px solid ${theme.text}` : "none"};
-        color: ${theme.text};
-        border-radius: ${CONFIG.currentTheme === "Classic Autobot" ? "4px" : "0"};
-        width: ${CONFIG.currentTheme === "Classic Autobot" ? "18px" : "auto"};
-        height: ${CONFIG.currentTheme === "Classic Autobot" ? "18px" : "auto"};
-        padding: ${CONFIG.currentTheme === "Neon Retro" ? "4px 6px" : "0"};
-        font-size: ${CONFIG.currentTheme === "Neon Retro" ? "8px" : "10px"};
-        font-family: ${theme.fontFamily};
-        ${CONFIG.currentTheme === "Neon Retro" ? "image-rendering: pixelated;" : ""}
-      }
-      .wplace-header-btn:hover {
-        background: ${CONFIG.currentTheme === "Classic Autobot" ? theme.accent : theme.text};
-        color: ${CONFIG.currentTheme === "Classic Autobot" ? theme.text : theme.primary};
-        ${CONFIG.currentTheme === "Neon Retro" ? `box-shadow: 0 0 10px ${theme.text};` : ""}
-      }
-
-      .wplace-content { padding: ${CONFIG.currentTheme === "Neon Retro" ? "12px" : "12px"}; }
-      .wplace-section { border-radius: ${theme.borderRadius}; }
-      .wplace-section-title { color: ${theme.highlight}; }
-
-      .wplace-btn {
-        padding: ${CONFIG.currentTheme === "Neon Retro" ? "12px 8px" : "8px 12px"};
-        border: ${CONFIG.currentTheme === "Neon Retro" ? "2px solid" : "none"};
-        border-radius: ${theme.borderRadius};
-        font-weight: ${CONFIG.currentTheme === "Neon Retro" ? "normal" : "500"};
-        gap: ${CONFIG.currentTheme === "Neon Retro" ? "8px" : "6px"};
-        font-size: ${CONFIG.currentTheme === "Neon Retro" ? "8px" : "11px"};
-        font-family: ${theme.fontFamily};
-        ${CONFIG.currentTheme === "Neon Retro" ? "text-transform: uppercase; letter-spacing: 1px; image-rendering: pixelated;" : ""}
-        background: ${CONFIG.currentTheme === "Classic Autobot"
-          ? `linear-gradient(135deg, ${theme.accent} 0%, #4a4a4a 100%)`
-          : theme.accent
-        };
-        ${CONFIG.currentTheme === "Classic Autobot" ? "border: 1px solid rgba(255,255,255,0.1);" : ""}
-      }
-
-      ${CONFIG.currentTheme === "Classic Autobot" ? `
-        .wplace-btn::before {
-          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-          transition: left 0.5s ease;
-        }
-        .wplace-btn:hover:not(:disabled)::before { left: 100%; }
-        .wplace-btn:hover:not(:disabled) {
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-        }
-      ` : `
-        .wplace-btn:hover:not(:disabled) { box-shadow: 0 0 15px currentColor; }
-      `}
-
-      .wplace-btn-primary {
-        background: ${CONFIG.currentTheme === "Classic Autobot"
-          ? `linear-gradient(135deg, ${theme.accent} 0%, #6a5acd 100%)`
-          : theme.accent
-        };
-        color: ${theme.text};
-        ${CONFIG.currentTheme === "Neon Retro" ? `border-color: ${theme.text};` : ""}
-      }
-
-      .wplace-btn-upload {
-        background: ${CONFIG.currentTheme === "Classic Autobot"
-          ? `linear-gradient(135deg, ${theme.secondary} 0%, #4a4a4a 100%)`
-          : theme.purple
-        };
-        color: ${theme.text};
-        ${CONFIG.currentTheme === "Classic Autobot"
-          ? `border: 1px dashed ${theme.highlight};`
-          : `border-color: ${theme.text}; border-style: dashed;`
-        }
-      }
-
-      .wplace-btn-start {
-        background: ${CONFIG.currentTheme === "Classic Autobot"
-          ? `linear-gradient(135deg, ${theme.success} 0%, #228b22 100%)`
-          : theme.success
-        };
-        color: ${CONFIG.currentTheme === "Classic Autobot" ? "white" : theme.primary};
-        ${CONFIG.currentTheme === "Neon Retro" ? `border-color: ${theme.success};` : ""}
-      }
-
-      .wplace-btn-stop {
-        background: ${CONFIG.currentTheme === "Classic Autobot"
-          ? `linear-gradient(135deg, ${theme.error} 0%, #dc143c 100%)`
-          : theme.error
-        };
-        color: ${CONFIG.currentTheme === "Classic Autobot" ? "white" : theme.text};
-        ${CONFIG.currentTheme === "Neon Retro" ? `border-color: ${theme.error};` : ""}
-      }
-
-      .wplace-btn-select {
-        background: ${CONFIG.currentTheme === "Classic Autobot"
-          ? `linear-gradient(135deg, ${theme.highlight} 0%, #9370db 100%)`
-          : theme.highlight
-        };
-        color: ${CONFIG.currentTheme === "Classic Autobot" ? "white" : theme.primary};
-        ${CONFIG.currentTheme === "Neon Retro" ? `border-color: ${theme.highlight};` : ""}
-      }
-
-      .wplace-btn-file {
-        background: ${CONFIG.currentTheme === "Classic Autobot"
-          ? "linear-gradient(135deg, #ff8c00 0%, #ff7f50 100%)"
-          : theme.warning
-        };
-        color: ${CONFIG.currentTheme === "Classic Autobot" ? "white" : theme.primary};
-        ${CONFIG.currentTheme === "Neon Retro" ? `border-color: ${theme.warning};` : ""}
-      }
-
-      .wplace-btn:disabled { opacity: ${CONFIG.currentTheme === "Classic Autobot" ? "0.5" : "0.3"}; }
-
-      .wplace-stats {
-        background: ${CONFIG.currentTheme === "Classic Autobot" ? "rgba(255,255,255,0.03)" : theme.secondary};
-        padding: ${CONFIG.currentTheme === "Neon Retro" ? "12px" : "8px"};
-        border: ${CONFIG.currentTheme === "Neon Retro" ? `2px solid ${theme.text}` : "1px solid rgba(255,255,255,0.1)"};
-        border-radius: ${theme.borderRadius};
-        margin-bottom: ${CONFIG.currentTheme === "Neon Retro" ? "15px" : "8px"};
-        ${CONFIG.currentTheme === "Neon Retro" ? "box-shadow: inset 0 0 10px rgba(0, 255, 65, 0.1);" : ""}
-      }
-
-      .wplace-stat-item {
-        padding: ${CONFIG.currentTheme === "Neon Retro" ? "6px 0" : "4px 0"};
-        font-size: ${CONFIG.currentTheme === "Neon Retro" ? "8px" : "11px"};
-        ${CONFIG.currentTheme === "Neon Retro" ? "text-transform: uppercase; letter-spacing: 1px;" : ""}
-      }
-      .wplace-stat-label { font-size: ${CONFIG.currentTheme === "Neon Retro" ? "8px" : "10px"}; }
-      .wplace-stat-value { color: ${theme.highlight}; }
-
-      .wplace-progress {
-        background: ${CONFIG.currentTheme === "Classic Autobot" ? "rgba(0,0,0,0.3)" : theme.secondary};
-        border: ${CONFIG.currentTheme === "Neon Retro" ? `2px solid ${theme.text}` : "1px solid rgba(255,255,255,0.1)"};
-        border-radius: ${theme.borderRadius};
-        margin: ${CONFIG.currentTheme === "Neon Retro" ? "10px 0" : "8px 0"};
-        height: ${CONFIG.currentTheme === "Neon Retro" ? "16px" : "6px"};
-      }
-
-      ${CONFIG.currentTheme === "Neon Retro" ? `
-        .wplace-progress::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background:
-            repeating-linear-gradient(
-              45deg,
-              transparent,
-              transparent 2px,
-              rgba(0, 255, 65, 0.1) 2px,
-              rgba(0, 255, 65, 0.1) 4px
-            );
-          pointer-events: none;
-        }
-      ` : ""}
-
-      .wplace-progress-bar {
-        height: ${CONFIG.currentTheme === "Neon Retro" ? "100%" : "6px"};
-        background: ${CONFIG.currentTheme === "Classic Autobot"
-          ? `linear-gradient(135deg, ${theme.highlight} 0%, #9370db 100%)`
-          : `linear-gradient(90deg, ${theme.success}, ${theme.neon})`
-        };
-        transition: width ${CONFIG.currentTheme === "Neon Retro" ? "0.3s" : "0.5s"} ease;
-        ${CONFIG.currentTheme === "Neon Retro" ? `box-shadow: 0 0 10px ${theme.success};` : ""}
-      }
-
-      ${CONFIG.currentTheme === "Classic Autobot" ? `
-        .wplace-progress-bar::after {
-          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-          animation: shimmer 2s infinite;
-        }
-      ` : `
-        .wplace-progress-bar::after {
-          background: ${theme.text};
-        }
-      `}
-
-      .wplace-status {
-        padding: ${CONFIG.currentTheme === "Neon Retro" ? "10px" : "6px"};
-        border: ${CONFIG.currentTheme === "Neon Retro" ? "2px solid" : "1px solid"};
-        border-radius: ${theme.borderRadius};
-        font-size: ${CONFIG.currentTheme === "Neon Retro" ? "8px" : "11px"};
-        ${CONFIG.currentTheme === "Neon Retro" ? "text-transform: uppercase; letter-spacing: 1px;" : ""}
-      }
-
-      .status-default {
-        background: ${CONFIG.currentTheme === "Classic Autobot" ? "rgba(255,255,255,0.1)" : theme.accent};
-        border-color: ${theme.text};
-        color: ${theme.text};
-      }
-      .status-success {
-        background: ${CONFIG.currentTheme === "Classic Autobot" ? "rgba(0, 255, 0, 0.1)" : theme.success};
-        border-color: ${theme.success};
-        color: ${CONFIG.currentTheme === "Classic Autobot" ? theme.success : theme.primary};
-        box-shadow: 0 0 15px ${theme.success};
-      }
-      .status-error {
-        background: ${CONFIG.currentTheme === "Classic Autobot" ? "rgba(255, 0, 0, 0.1)" : theme.error};
-        border-color: ${theme.error};
-        color: ${CONFIG.currentTheme === "Classic Autobot" ? theme.error : theme.text};
-        box-shadow: 0 0 15px ${theme.error};
-      }
-      .status-warning {
-        background: ${CONFIG.currentTheme === "Classic Autobot" ? "rgba(255, 165, 0, 0.1)" : theme.warning};
-        border-color: ${theme.warning};
-        color: ${CONFIG.currentTheme === "Classic Autobot" ? "orange" : theme.primary};
-        box-shadow: 0 0 15px ${theme.warning};
-      }
-
-      /* Settings and other dynamic elements */
-      .resize-container {
-        background: ${theme.primary};
-        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.text};
-        border-radius: ${theme.borderRadius};
-        box-shadow: ${CONFIG.currentTheme === "Classic Autobot" ? "0 0 20px rgba(0,0,0,0.5)" : "0 0 30px rgba(0, 255, 65, 0.5)"};
-        font-family: ${theme.fontFamily};
-      }
-
-      .resize-preview-wrapper { border: 1px solid ${theme.accent}; }
-      
-      .resize-controls label {
-        font-size: ${CONFIG.currentTheme === "Neon Retro" ? "8px" : "12px"};
-        ${CONFIG.currentTheme === "Neon Retro" ? "text-transform: uppercase; letter-spacing: 1px;" : ""}
-        color: ${theme.text};
-      }
-
-      .resize-slider {
-        height: ${CONFIG.currentTheme === "Neon Retro" ? "8px" : "4px"};
-        background: ${CONFIG.currentTheme === "Classic Autobot" ? "#ccc" : theme.secondary};
-        border: ${CONFIG.currentTheme === "Neon Retro" ? `2px solid ${theme.text}` : "none"};
-        border-radius: ${theme.borderRadius};
-      }
-
-      ${CONFIG.currentTheme === "Neon Retro" ? `
-        .resize-slider::-webkit-slider-thumb {
-          width: 16px;
-          height: 16px;
-          background: ${theme.highlight};
-          border: 2px solid ${theme.text};
-          border-radius: 0;
-          box-shadow: 0 0 5px ${theme.highlight};
-        }
-
-        .resize-slider::-moz-range-thumb {
-          width: 16px;
-          height: 16px;
-          background: ${theme.highlight};
-          border: 2px solid ${theme.text};
-          border-radius: 0;
-          box-shadow: 0 0 5px ${theme.highlight};
-        }
-      ` : ""}
-
-      .wplace-slider::-webkit-slider-thumb { background: ${theme.highlight}; }
-
-      ${CONFIG.currentTheme === "Neon Retro" ? `
-        input[type="checkbox"] {
-          width: 16px;
-          height: 16px;
-          border: 2px solid ${theme.text};
-          background: ${theme.secondary};
-        }
-        input[type="checkbox"]:checked { background: ${theme.success}; }
-        input[type="checkbox"]:checked::after { color: ${theme.primary}; }
-      ` : ""}
-
-      /* Additional theme-specific styles */
-      .wplace-btn.active,
-      .wplace-btn[aria-pressed="true"] {
-        background: ${theme.highlight} !important;
-        color: ${theme.primary} !important;
-        border-color: ${theme.text} !important;
-      }
-      
-      .wplace-btn.active i,
-      .wplace-btn[aria-pressed="true"] i { filter: drop-shadow(0 0 3px ${theme.primary}); }
-    `
-    document.head.appendChild(style)
 
     const container = document.createElement("div")
     container.id = "wplace-image-bot-container"
@@ -6939,6 +6562,7 @@
 
   // Load theme preference immediately on startup before creating UI
   loadThemePreference()
+  applyTheme()
 
   createUI().then(() => {
     // Generate token automatically after UI is ready
