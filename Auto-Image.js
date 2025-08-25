@@ -3787,6 +3787,7 @@
     settingsContainer.className = 'wplace-settings-container-base';
     // Apply theme-specific background
     settingsContainer.style.background = themeBackground;
+    settingsContainer.style.cssText += `
       min-width: 420px;
       max-width: 480px;
       color: ${theme.text || 'white'};
@@ -3799,7 +3800,7 @@
         box-shadow: ${theme.boxShadow || '0 20px 40px rgba(0,0,0,0.3)'}, 
                    0 0 30px ${theme.highlight || theme.neon || '#00ffff'};
       ` : ''}
-    `
+    `;
 
     settingsContainer.innerHTML = `
       <div class="wplace-settings-header" style="
