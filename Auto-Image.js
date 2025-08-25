@@ -177,19 +177,47 @@
   const getCurrentTheme = () => CONFIG.THEMES[CONFIG.currentTheme]
 
   const switchTheme = (themeName) => {
-    if (CONFIG.THEMES[themeName]) {
-      CONFIG.currentTheme = themeName
-      saveThemePreference()
+  if (CONFIG.THEMES[themeName]) {
+    CONFIG.currentTheme = themeName
+    saveThemePreference()
 
-      // Remove existing theme styles
-      const existingStyle = document.querySelector('style[data-wplace-theme="true"]')
-      if (existingStyle) {
-        existingStyle.remove()
-      }
+    // APPLY THEME VARS/CLASS (new)
+    applyTheme()
 
-      // Recreate UI with new theme (cleanup is handled in createUI)
-      createUI()
-    }
+    // Recreate UI (kept for now)
+    createUI()
+  }
+}
+
+  // Add this helper (place it after getCurrentTheme/switchTheme definitions)
+  function applyTheme() {
+    const theme = getCurrentTheme();
+    // Toggle theme class on documentElement so CSS vars cascade to our UI
+    document.documentElement.classList.remove('wplace-theme--classic', 'wplace-theme--neon');
+    document.documentElement.classList.add(
+      CONFIG.currentTheme === 'Neon Retro' ? 'wplace-theme--neon' : 'wplace-theme--classic'
+    );
+
+    // Also set CSS variables explicitly in case you want runtime overrides
+    const root = document.documentElement;
+    const setVar = (k, v) => { try { root.style.setProperty(k, v); } catch {} };
+
+    setVar('--wplace-primary', theme.primary);
+    setVar('--wplace-secondary', theme.secondary);
+    setVar('--wplace-accent', theme.accent);
+    setVar('--wplace-text', theme.text);
+    setVar('--wplace-highlight', theme.highlight);
+    setVar('--wplace-success', theme.success);
+    setVar('--wplace-error', theme.error);
+    setVar('--wplace-warning', theme.warning);
+
+    // Typography + look
+    setVar('--wplace-font', theme.fontFamily || "'Segoe UI', Roboto, sans-serif");
+    setVar('--wplace-radius', (('' + (theme.borderRadius || '12px'))));
+    setVar('--wplace-border-style', (('' + (theme.borderStyle || 'solid'))));
+    setVar('--wplace-border-width', (('' + (theme.borderWidth || '1px'))));
+    setVar('--wplace-backdrop', (('' + (theme.backdropFilter || 'blur(10px)'))));
+    setVar('--wplace-border-color', 'rgba(255,255,255,0.1)');
   }
 
   const saveThemePreference = () => {
@@ -3223,6 +3251,7 @@
     loadLanguagePreference()
 
     const theme = getCurrentTheme()
+    applyTheme() // <- new: set CSS vars and theme class before building UI
 
     const fontAwesome = document.createElement("link")
     fontAwesome.rel = "stylesheet"
