@@ -1,0 +1,187 @@
+name: Continuous Deployment
+
+on:
+  push:
+    branches:
+      - "**"
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+  actions: read
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build_matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      json_branches: ${{ steps.generate-matrix.outputs.json_branches }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Generate Matrix
+        id: generate-matrix
+        run: |
+          branches=($(git branch -r | cut -c 3- | sed 's/origin\///g'))
+          json_branches=$(printf '%s\n' "${branches[@]}" | jq -R . | jq -s -c .)
+          echo "json_branches=${json_branches}" >> $GITHUB_OUTPUT
+
+  collect_files:
+    runs-on: ubuntu-latest
+    name: Collect Files
+    needs:
+      - build_matrix
+    strategy:
+      matrix:
+        branch: ${{ fromJSON(needs.build_matrix.outputs.json_branches) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.branch }}
+      - name: Collect all files
+        run: |
+          mkdir -p branch_files
+          # Copy all JS, CSS, and other relevant files
+          find . -name "*.js" -not -path "./.git/*" -not -path "./node_modules/*" -not -path "./.github/*" -exec cp {} branch_files/ \;
+          find . -name "*.css" -not -path "./.git/*" -not -path "./node_modules/*" -not -path "./.github/*" -exec cp {} branch_files/ \;
+          find . -name "*.json" -not -path "./.git/*" -not -path "./node_modules/*" -not -path "./.github/*" -not -name "package*.json" -exec cp {} branch_files/ \;
+          find . -name "*.html" -not -path "./.git/*" -not -path "./node_modules/*" -not -path "./.github/*" -exec cp {} branch_files/ \;
+          # Copy any other asset files you might need
+          find . -name "*.png" -o -name "*.jpg" -o -name "*.gif" -o -name "*.svg" | grep -v ".git" | grep -v "node_modules" | xargs -I {} cp {} branch_files/ 2>/dev/null || true
+          ls -la branch_files/
+      - uses: actions/upload-artifact@v3
+        with:
+          name: branch-${{ matrix.branch }}-${{ strategy.job-index }}
+          path: branch_files/
+
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    needs:
+      - build_matrix
+      - collect_files
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+      - run: gh run download ${{ github.run_id }} --dir branches
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create public folder structure
+        run: |
+          mkdir public
+          cd public
+          branches=$(echo '${{ needs.build_matrix.outputs.json_branches }}' | jq -r '.[]')
+          i=0
+          
+          # Create index.html header
+          cat > index.html << 'EOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>WPlace AutoBOT - Branch Files</title>
+              <style>
+                  body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
+                  .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+                  h1 { color: #333; text-align: center; margin-bottom: 30px; }
+                  .branch { margin: 15px 0; padding: 15px; background: #f8f9fa; border-left: 4px solid #007bff; border-radius: 5px; }
+                  .branch h3 { margin: 0 0 10px 0; color: #007bff; }
+                  .file-links a { display: inline-block; margin: 5px 10px 5px 0; padding: 5px 10px; background: #007bff; color: white; text-decoration: none; border-radius: 3px; font-size: 14px; }
+                  .file-links a:hover { background: #0056b3; }
+                  .bookmarklet { background: #e9ecef; padding: 10px; margin: 10px 0; border-radius: 5px; font-family: monospace; word-break: break-all; }
+                  .copy-btn { background: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin-left: 10px; }
+                  .copy-btn:hover { background: #1e7e34; }
+              </style>
+          </head>
+          <body>
+              <div class="container">
+                  <h1>🚀 WPlace AutoBOT - Branch Files</h1>
+                  <p>Access files from different branches. Click on file links or copy the bookmarklet code:</p>
+          EOF
+          
+          for branch in ${branches}
+          do
+            # Create branch directory
+            mkdir -p "$branch"
+            
+            # Find and move the branch files
+            find ../branches -name "branch-${branch}-*" -type d | head -1 | while read dir; do
+              if [ -d "$dir" ]; then
+                cp -r "$dir"/* "./$branch/"
+              fi
+            done
+            
+            # Add branch section to index.html
+            echo "<div class=\"branch\">" >> index.html
+            echo "<h3>📁 Branch: $branch</h3>" >> index.html
+            echo "<div class=\"file-links\">" >> index.html
+            
+            # List files in this branch
+            if [ -d "$branch" ]; then
+              for file in "$branch"/*; do
+                if [ -f "$file" ]; then
+                  filename=$(basename "$file")
+                  echo "<a href=\"./$branch/$filename\">$filename</a>" >> index.html
+                fi
+              done
+              
+              # Add bookmarklet examples for JS files
+              for jsfile in "$branch"/*.js; do
+                if [ -f "$jsfile" ]; then
+                  filename=$(basename "$jsfile")
+                  echo "</div>" >> index.html
+                  echo "<div class=\"bookmarklet\">Bookmarklet for $filename:<br>" >> index.html
+                  echo "<code>javascript:fetch(\"https://\${GITHUB_USERNAME}.github.io/\${REPO_NAME}/$branch/$filename\").then(t=>t.text()).then(eval);</code>" >> index.html
+                  echo "<button class=\"copy-btn\" onclick=\"copyToClipboard(this)\">Copy</button>" >> index.html
+                  echo "</div>" >> index.html
+                  echo "<div class=\"file-links\">" >> index.html
+                fi
+              done
+            fi
+            
+            echo "</div>" >> index.html
+            echo "</div>" >> index.html
+            
+            i=$((i+1))
+          done
+          
+          # Close HTML
+          cat >> index.html << 'EOF'
+              </div>
+              <script>
+                  function copyToClipboard(btn) {
+                      const code = btn.previousElementSibling.textContent;
+                      navigator.clipboard.writeText(code).then(() => {
+                          btn.textContent = 'Copied!';
+                          setTimeout(() => btn.textContent = 'Copy', 2000);
+                      });
+                  }
+              </script>
+          </body>
+          </html>
+          EOF
+          
+          echo "Generated file structure:"
+          ls -lR
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: ./public/
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
