@@ -95,4 +95,3 @@ javascript:fetch("https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBO
 <p align="center">
   <a href="#"><img src="https://komarev.com/ghpvc/?username=WPlace-AutoBOT&style=for-the-badge&label=Views:&color=gray"/></a>
 </p>
-```
