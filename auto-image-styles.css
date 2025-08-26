@@ -1890,9 +1890,7 @@
   padding: 20px;
   border-bottom: 1px solid #222222;
   cursor: move;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  position: relative;
 }
 
 .wplace-settings-header h3 {
@@ -1918,6 +1916,9 @@
 }
 
 .wplace-settings-close-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
   background: #22222266;
   color: #ffffff;
   border: 1px solid #222222;
