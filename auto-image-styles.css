@@ -840,7 +840,8 @@
   cursor: pointer;
   -webkit-appearance: none;
   appearance: none;
-  /* Theme-specific styling applied via theme files */
+  background: var(--wplace-slider-track-bg);
+  border-radius: 4px;
 }
 
 .wplace-speed-slider::-webkit-slider-thumb {
@@ -1179,7 +1180,8 @@
   outline: none;
   -webkit-appearance: none;
   cursor: pointer;
-  /* Theme-specific styling applied via theme files */
+  background: var(--wplace-slider-track-bg);
+  border-radius: 4px;
 }
 
 .wplace-speed-value {
@@ -1778,8 +1780,7 @@
   width: 100%;
   -webkit-appearance: none;
   height: 8px;
-  background: var(--wplace-slider-track-bg);
-  border-radius: 4px;
+  /* Theme-specific styling applied via theme files */
   outline: none;
   cursor: pointer;
 }
@@ -1873,7 +1874,8 @@
   outline: none;
   -webkit-appearance: none;
   cursor: pointer;
-  /* Theme-specific styling applied via theme files */
+  background: var(--wplace-slider-track-bg);
+  border-radius: 4px;
 }
 
 .wplace-speed-value {
