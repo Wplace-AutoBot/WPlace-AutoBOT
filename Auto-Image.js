@@ -222,7 +222,10 @@
     }
   }
 
-  // BILINGUAL TEXT STRINGS:)
+  // Simple translation cache
+  const translationCache = new Map();
+
+  // BILINGUAL TEXT STRINGS (FALLBACK):)
   const TEXT = {
     en: {
       title: "WPlace Auto-Image",
@@ -2074,12 +2077,47 @@
       return button
     },
 
-    t: (key, params = {}) => {
-      let text = TEXT[state.language]?.[key] || TEXT.en[key] || key
+    t: async (key, params = {}) => {
+      // Try to get from ngrok first, with caching
+      const cacheKey = `${state.language}_${key}`;
+      if (translationCache.has(cacheKey)) {
+        let text = translationCache.get(cacheKey);
+        Object.keys(params).forEach((param) => {
+          text = text.replace(`{${param}}`, params[param]);
+        });
+        return text;
+      }
+
+      // Try fetching from ngrok
+      try {
+        const response = await fetch(`TODO: /translations/${state.language}.json`, {
+          headers: {
+            "ngrok-skip-browser-warning": "69420"
+          }
+        });
+        
+        if (response.ok) {
+          const translations = await response.json();
+          if (translations[key]) {
+            // Cache the successful translation
+            translationCache.set(cacheKey, translations[key]);
+            let text = translations[key];
+            Object.keys(params).forEach((param) => {
+              text = text.replace(`{${param}}`, params[param]);
+            });
+            return text;
+          }
+        }
+      } catch (error) {
+        // Silently fail and use fallback
+      }
+
+      // Fallback to local TEXT
+      let text = TEXT[state.language]?.[key] || TEXT.en[key] || key;
       Object.keys(params).forEach((param) => {
-        text = text.replace(`{${param}}`, params[param])
-      })
-      return text
+        text = text.replace(`{${param}}`, params[param]);
+      });
+      return text;
     },
 
     showAlert: (message, type = "info") => {
