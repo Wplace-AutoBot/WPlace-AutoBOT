@@ -10,6 +10,7 @@
 /* Import theme files - classic is default */
 @import url('https://staninna.github.io/WPlace-AutoBOT/themes/classic.css');
 @import url('https://staninna.github.io/WPlace-AutoBOT/themes/neon.css');
+@import url('https://staninna.github.io/WPlace-AutoBOT/themes/ocean-depths.css');
 
 /* Default :root CSS variables for 100% classic theme compliance */
 /* These ensure the bot works perfectly even if theme files fail to load */
