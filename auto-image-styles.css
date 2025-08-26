@@ -7,10 +7,10 @@
 /* Theme tokens (CSS vars)   */
 /* ========================= */
 
-/* Default = Classic Autobot */
+/* Default = Classic Autobot - exact upstream main values */
 :root {
-  --wplace-primary: #000000;
-  --wplace-secondary: #111111;
+  --wplace-primary: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+  --wplace-secondary: linear-gradient(135deg, #111111 0%, #2a2a2a 100%);
   --wplace-accent: #222222;
   --wplace-text: #ffffff;
   --wplace-highlight: #775ce3;
@@ -21,15 +21,14 @@
   --wplace-radius: 12px;
   --wplace-border-style: solid;
   --wplace-border-width: 1px;
-  --wplace-border-color: rgba(255, 255, 255, 0.1);
-  --wplace-shadow: 0 8px 32px rgba(0, 0, 0, 0.6),
-    0 0 0 1px rgba(255, 255, 255, 0.1);
+  --wplace-border-color: #222222;
+  --wplace-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.1);
   --wplace-backdrop: blur(10px);
   --wplace-font: 'Segoe UI', Roboto, sans-serif;
 
   --wplace-z-overlay: 10000;
-  --wplace-z-alert: 10001;
-  --wplace-z-settings: 100001;
+  --wplace-z-alert: 10002;
+  --wplace-z-settings: 10002;
 
   /* feature toggles */
   --wplace-scanline: 0;
@@ -38,8 +37,8 @@
 
 /* Optional theme class hooks (you can switch these on body or html) */
 .wplace-theme--classic {
-  --wplace-primary: #000000;
-  --wplace-secondary: #111111;
+  --wplace-primary: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+  --wplace-secondary: linear-gradient(135deg, #111111 0%, #2a2a2a 100%);
   --wplace-accent: #222222;
   --wplace-text: #ffffff;
   --wplace-highlight: #775ce3;
@@ -48,8 +47,7 @@
   --wplace-warning: #ffaa00;
 
   --wplace-radius: 12px;
-  --wplace-shadow: 0 8px 32px rgba(0, 0, 0, 0.6),
-    0 0 0 1px rgba(255, 255, 255, 0.1);
+  --wplace-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.1);
   --wplace-backdrop: blur(10px);
   --wplace-font: 'Segoe UI', Roboto, sans-serif;
 
@@ -158,7 +156,6 @@
 /* Align with JS structure   */
 /* ========================= */
 #wplace-image-bot-container {
-  /* Why fixed sizes/positions: matches JS expectations and preserves two-panel layout */
   position: fixed;
   top: 20px;
   left: 20px;
@@ -171,16 +168,15 @@
   overflow-x: hidden;
   transition: all 0.3s ease;
   user-select: none;
-  display: none; /* JS will set display: block inline when ready */
-
-  /* Theme hooks */
-  background: var(--wplace-primary);
-  color: var(--wplace-text);
-  border-radius: var(--wplace-radius);
-  box-shadow: var(--wplace-shadow);
-  font-family: var(--wplace-font);
-  backdrop-filter: var(--wplace-backdrop);
-  border: var(--wplace-border-width) var(--wplace-border-style) var(--wplace-border-color);
+  
+  /* Exact upstream main styling */
+  background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+  color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.1);
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  backdrop-filter: blur(10px);
+  border: 1px solid #222222;
 }
 
 #wplace-image-bot-container.wplace-dragging {
@@ -215,14 +211,14 @@
   user-select: none;
   display: none;
 
-  /* Theme hooks */
-  background: var(--wplace-primary);
-  color: var(--wplace-text);
-  border-radius: var(--wplace-radius);
-  box-shadow: var(--wplace-shadow);
-  font-family: var(--wplace-font);
-  backdrop-filter: var(--wplace-backdrop);
-  border: var(--wplace-border-width) var(--wplace-border-style) var(--wplace-border-color);
+  /* Exact upstream main styling */
+  background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+  color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.1);
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  backdrop-filter: blur(10px);
+  border: 1px solid #222222;
 }
 
 #wplace-stats-container.wplace-dragging {
@@ -241,20 +237,21 @@
 /* Header and content blocks */
 /* ========================= */
 .wplace-header {
+  padding: 8px 12px;
+  background: var(--wplace-secondary);
+  color: var(--wplace-highlight);
+  font-size: 13px;
+  font-weight: 700;
   display: flex;
   justify-content: space-between;
   align-items: center;
   cursor: move;
   user-select: none;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
   transition: background 0.2s ease;
   position: relative;
   z-index: 2;
-  padding: 8px 12px;
-
-  /* Theme hooks */
-  background: var(--wplace-secondary);
-  color: var(--wplace-highlight);
-  border-bottom: var(--wplace-border-width) var(--wplace-border-style) var(--wplace-border-color);
 }
 
 .wplace-header-title {
@@ -269,27 +266,26 @@
 }
 
 .wplace-header-btn {
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: #ffffff;
   cursor: pointer;
+  border-radius: 4px;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  font-size: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
-  background: rgba(255, 255, 255, 0.1);
-  color: inherit;
-  border: none;
-  border-radius: 4px;
-  width: 18px;
-  height: 18px;
-  font-size: 10px;
-  /* Theme tweak */
-  background: var(--wplace-accent);
-  color: var(--wplace-text);
+  font-family: 'Segoe UI', Roboto, sans-serif;
 }
 
 .wplace-header-btn:hover {
+  background: #222222;
+  color: #ffffff;
   transform: scale(1.1);
-  background: var(--wplace-text);
-  color: var(--wplace-primary);
 }
 
 .wplace-content {
@@ -352,19 +348,24 @@
 }
 
 .wplace-btn {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 12px;
+  font-weight: 500;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 6px;
+  font-size: 11px;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
-  padding: 8px 12px;
-  border-radius: var(--wplace-radius);
-  border: none;
-  background: var(--wplace-accent);
-  color: var(--wplace-text);
-  font-family: var(--wplace-font);
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  
+  background: linear-gradient(135deg, #222222 0%, #4a4a4a 100%);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #ffffff;
 }
 
 .wplace-btn::before {
@@ -374,16 +375,17 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  transition: left 0.5s ease;
 }
 
-.wplace-btn:hover::before {
+.wplace-btn:hover:not(:disabled)::before {
   left: 100%;
 }
 
 .wplace-btn:hover:not(:disabled) {
-  box-shadow: 0 0 15px currentColor;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
 }
 
 .wplace-btn:active:not(:disabled) {
@@ -391,7 +393,7 @@
 }
 
 .wplace-btn:disabled {
-  opacity: 0.3;
+  opacity: 0.5;
   cursor: not-allowed;
   transform: none !important;
   box-shadow: none !important;
@@ -406,31 +408,36 @@
   box-shadow: 0 0 15px #8e2de2;
 }
 
-/* button variants via theme */
-.wplace-btn-start {
-  background: var(--wplace-success);
-  color: #000;
-}
-
-.wplace-btn-stop {
-  background: var(--wplace-error);
-  color: #fff;
-}
-
-.wplace-btn-select {
-  background: var(--wplace-highlight);
-  color: #000;
+/* button variants - exact upstream main colors */
+.wplace-btn-primary {
+  background: linear-gradient(135deg, #222222 0%, #6a5acd 100%);
+  color: #ffffff;
 }
 
 .wplace-btn-upload {
-  background: var(--wplace-secondary);
-  border: 1px dashed var(--wplace-highlight);
-  color: var(--wplace-text);
+  background: linear-gradient(135deg, #111111 0%, #4a4a4a 100%);
+  color: #ffffff;
+  border: 1px dashed #775ce3;
+}
+
+.wplace-btn-start {
+  background: linear-gradient(135deg, #00ff00 0%, #228b22 100%);
+  color: white;
+}
+
+.wplace-btn-stop {
+  background: linear-gradient(135deg, #ff0000 0%, #dc143c 100%);
+  color: white;
+}
+
+.wplace-btn-select {
+  background: linear-gradient(135deg, #775ce3 0%, #9370db 100%);
+  color: white;
 }
 
 .wplace-btn-file {
-  background: var(--wplace-warning);
-  color: #000;
+  background: linear-gradient(135deg, #ff8c00 0%, #ff7f50 100%);
+  color: white;
 }
 
 /* ========================= */
@@ -498,27 +505,30 @@
 /* Progress */
 .wplace-progress {
   width: 100%;
-  overflow: hidden;
-  position: relative;
-  background: var(--wplace-secondary);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: var(--wplace-radius);
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
   margin: 8px 0;
+  overflow: hidden;
   height: 6px;
+  position: relative;
 }
 
 .wplace-progress-bar {
-  position: relative;
   height: 6px;
+  background: linear-gradient(135deg, #775ce3 0%, #9370db 100%);
   transition: width 0.5s ease;
-  background: linear-gradient(135deg, var(--wplace-highlight) 0%, #9370db 100%);
+  position: relative;
 }
 
 .wplace-progress-bar::after {
   content: '';
   position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
   animation: shimmer 2s infinite;
 }
 
@@ -536,30 +546,30 @@
 }
 
 .status-default {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: var(--wplace-border-color);
-  color: var(--wplace-text);
+  background: rgba(255,255,255,0.1);
+  border-color: #ffffff;
+  color: #ffffff;
 }
 
 .status-success {
   background: rgba(0, 255, 0, 0.1);
-  border-color: var(--wplace-success);
-  color: var(--wplace-success);
-  box-shadow: 0 0 15px currentColor;
+  border-color: #00ff00;
+  color: #00ff00;
+  box-shadow: 0 0 15px #00ff00;
 }
 
 .status-error {
   background: rgba(255, 0, 0, 0.1);
-  border-color: var(--wplace-error);
-  color: var(--wplace-error);
-  box-shadow: 0 0 15px currentColor;
+  border-color: #ff0000;
+  color: #ff0000;
+  box-shadow: 0 0 15px #ff0000;
 }
 
 .status-warning {
   background: rgba(255, 165, 0, 0.1);
-  border-color: var(--wplace-warning);
-  color: var(--wplace-warning);
-  box-shadow: 0 0 15px currentColor;
+  border-color: #ffaa00;
+  color: orange;
+  box-shadow: 0 0 15px #ffaa00;
 }
 
 /* ========================= */
@@ -571,29 +581,28 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: var(--wplace-z-overlay);
+  background: #000000;
+  padding: 20px;
+  border: 1px solid #ffffff;
+  border-radius: 12px;
+  z-index: 10000;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
   width: 90%;
   max-width: 700px;
   max-height: 90%;
   overflow: auto;
-
-  /* Theme */
-  background: var(--wplace-primary);
-  border: var(--wplace-border-width) var(--wplace-border-style) var(--wplace-text);
-  border-radius: var(--wplace-radius);
-  box-shadow: var(--wplace-shadow);
-  font-family: var(--wplace-font);
+  font-family: 'Segoe UI', Roboto, sans-serif;
 }
 
 .resize-preview-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid #222222;
+  background: rgba(0,0,0,0.2);
   margin: 15px 0;
   height: 300px;
   overflow: hidden;
-  border: 1px solid var(--wplace-accent);
 }
 
 .resize-canvas-stack {
@@ -634,13 +643,22 @@
 }
 
 .wplace-btn.active,
-.wplace-btn[aria-pressed='true'] {
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.25) inset, 0 0 6px rgba(0, 0, 0, 0.2) !important;
+.wplace-btn[aria-pressed="true"] {
+  background: #775ce3 !important;
+  color: #000000 !important;
+  border-color: #ffffff !important;
+  box-shadow: 0 0 8px rgba(0,0,0,0.25) inset, 0 0 6px rgba(0,0,0,0.2) !important;
 }
 
+.wplace-btn.active i,
+.wplace-btn[aria-pressed="true"] i { filter: drop-shadow(0 0 3px #000000); }
+
 .mask-mode-group .wplace-btn.active,
-.mask-mode-group .wplace-btn[aria-pressed='true'] {
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.25) inset, 0 0 6px rgba(0, 0, 0, 0.2);
+.mask-mode-group .wplace-btn[aria-pressed="true"] {
+  background: #775ce3;
+  color: #000000;
+  border-color: #ffffff;
+  box-shadow: 0 0 8px rgba(0,0,0,0.25) inset, 0 0 6px rgba(0,0,0,0.2);
 }
 
 .resize-controls {
@@ -652,6 +670,10 @@
 
 .resize-slider {
   width: 100%;
+  height: 4px;
+  background: #ccc;
+  border: none;
+  border-radius: 12px;
   outline: none;
   -webkit-appearance: none;
 }
@@ -1746,4 +1768,79 @@
 .resize-reset-advanced-btn {
   background: linear-gradient(135deg, #ff6a6a, #ff4757);
   font-size: 11px;
+}
+
+/* ===================================== */
+/* Additional styles for exact upstream match */
+/* ===================================== */
+
+/* Overlay styles exact match */
+.resize-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 9999;
+  display: none;
+}
+
+/* Settings animations */
+@keyframes settingsSlideIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Font styling corrections */
+.resize-controls label {
+  font-size: 12px;
+  color: #ffffff;
+}
+
+.resize-dialog-title {
+  margin-top: 0;
+  color: #ffffff;
+}
+
+/* Ensure proper z-indexing */
+.resize-container {
+  z-index: 10000;
+}
+
+/* Missing button hover styles */
+.resize-tools button {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.06);
+  color: #fff;
+  cursor: pointer;
+}
+
+/* Canvas styling */
+.resize-canvas-stack {
+  position: relative;
+  transform-origin: center center;
+  display: inline-block;
+}
+
+.resize-base-canvas,
+.resize-mask-canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+.resize-mask-canvas {
+  pointer-events: auto;
 }
