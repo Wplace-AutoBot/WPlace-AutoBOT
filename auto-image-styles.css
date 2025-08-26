@@ -1644,6 +1644,62 @@
 
 /* Settings animations - removed duplicate, handled above */
 
+/* Settings Header Styling */
+.wplace-settings-header {
+  background: var(--wplace-accent);
+  padding: 20px;
+  border-bottom: 1px solid var(--wplace-border-color);
+  cursor: move;
+}
+
+.wplace-settings-title-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.wplace-settings-title {
+  margin: 0;
+  color: var(--wplace-text);
+  font-size: 20px;
+  font-weight: 300;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.wplace-settings-icon {
+  font-size: 18px;
+  color: var(--wplace-highlight);
+  animation: spin 2s linear infinite;
+}
+
+.wplace-settings-close-btn {
+  background: rgba(34, 34, 34, 0.4);
+  color: var(--wplace-text);
+  border: 1px solid var(--wplace-border-color);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  font-weight: 300;
+}
+
+.wplace-settings-close-btn:hover {
+  background: rgba(255, 0, 0, 0.4);
+  transform: scale(1.1);
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 /* Font styling corrections */
 .resize-controls label {
   font-size: 12px;
