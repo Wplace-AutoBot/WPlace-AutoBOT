@@ -85,6 +85,7 @@ javascript:fetch("https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBO
 - [x] Correct Color Pixel Skip
 - [x] Overlay(you dont need bluemarble anymore)
 - [x] Paint over multiple tiles
+- [x] Multi Account Auto Switcher Via Other Branch ; https://github.com/Wplace-AutoBot/WPlace-AutoBOT/tree/Acc-switch (Ram Efficient LOL)
 - [x] AutoCaptcha Solver With Turnstile Token Generator
 - [x] Advance Color Processing
 - [x] MultiLanguage Support
@@ -107,8 +108,6 @@ javascript:fetch("https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBO
 
 - [x] Making AutoFarm working
 - [ ] Merge both scripts into one
-- [ ] Multi Account Switcher(currently in development)
-- [ ] Multi Account Queue System
 - [x] Add Overlay system
 - [x] Add Cross Tiles Support
 - [x] Add AutoCaptcha Solver
