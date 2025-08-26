@@ -29,6 +29,50 @@
   /* Feature toggles */
   --wplace-scanline: 1;
   --wplace-pixel-blink: 1;
+
+  /* Icon colors - neon variants */
+  --wplace-icon-primary: #00ff41;
+  --wplace-icon-secondary: #39ff14;
+  --wplace-icon-palette: #ff6b35;
+  
+  /* Additional UI colors - neon variants */
+  --wplace-danger: #ff073a;
+  --wplace-danger-dark: #cc0531;
+  --wplace-muted-text: #00ff4180;
+  --wplace-highlight-secondary: #ffaa00;
+  
+  /* Text variants - neon style */
+  --wplace-text-secondary: #00ff41dd;
+  --wplace-text-muted: #00ff41bb;
+  --wplace-text-dim: #00ff4199;
+  --wplace-text-faded: #00ff41cc;
+  
+  /* Background variants - neon style */
+  --wplace-bg-input: rgba(0, 255, 65, 0.15);
+  --wplace-bg-subtle: rgba(0, 255, 65, 0.08);
+  --wplace-bg-faint: rgba(0, 255, 65, 0.05);
+  --wplace-bg-ghost: rgba(0, 255, 65, 0.03);
+  --wplace-bg-whisper: rgba(0, 255, 65, 0.02);
+  
+  /* Border variants - neon style */
+  --wplace-border-subtle: rgba(0, 255, 65, 0.4);
+  --wplace-border-faint: rgba(0, 255, 65, 0.25);
+  --wplace-border-ghost: rgba(0, 255, 65, 0.15);
+  --wplace-border-ultra-faint: rgba(0, 255, 65, 0.08);
+  
+  /* Shadow variants - neon style */
+  --wplace-shadow-drag: 0 12px 40px rgba(0, 255, 65, 0.6), 0 0 0 2px rgba(0, 255, 65, 0.8), 0 0 20px rgba(0, 255, 65, 0.3);
+  --wplace-shadow-notification: 0 4px 12px rgba(0, 255, 65, 0.4), 0 0 15px rgba(0, 255, 65, 0.2);
+  --wplace-shadow-slider-thumb: 0 3px 6px rgba(0, 255, 65, 0.5), 0 0 0 2px var(--wplace-icon-primary), 0 0 10px rgba(0, 255, 65, 0.3);
+  --wplace-shadow-slider-hover: 0 4px 8px rgba(0, 255, 65, 0.6), 0 0 0 3px var(--wplace-icon-primary), 0 0 15px rgba(0, 255, 65, 0.4);
+  
+  /* Animation colors - neon style */
+  --wplace-pulse-start: rgba(0, 255, 65, 0.8);
+  --wplace-pulse-mid: rgba(0, 255, 65, 0);
+  --wplace-pulse-end: rgba(0, 255, 65, 0);
+  
+  /* Slider colors - neon style */
+  --wplace-slider-thumb-bg: #00ff41;
 }
 
 /* Neon-specific styling overrides */

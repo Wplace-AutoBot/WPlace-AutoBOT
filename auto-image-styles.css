@@ -11,6 +11,82 @@
 @import url('https://staninna.github.io/WPlace-AutoBOT/themes/classic.css');
 @import url('https://staninna.github.io/WPlace-AutoBOT/themes/neon.css');
 
+/* Default :root CSS variables for 100% classic theme compliance */
+/* These ensure the bot works perfectly even if theme files fail to load */
+:root {
+  /* Classic theme colors - exact upstream main values */
+  --wplace-primary: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+  --wplace-secondary: linear-gradient(135deg, #111111 0%, #2a2a2a 100%);
+  --wplace-accent: #222222;
+  --wplace-text: #ffffff;
+  --wplace-highlight: #775ce3;
+  --wplace-highlight-secondary: #d3a4ff;
+  --wplace-success: #00ff00;
+  --wplace-error: #ff0000;
+  --wplace-warning: #ffaa00;
+
+  /* UI properties */
+  --wplace-radius: 12px;
+  --wplace-border-style: solid;
+  --wplace-border-width: 1px;
+  --wplace-border-color: #222222;
+  --wplace-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.1);
+  --wplace-backdrop: blur(10px);
+  --wplace-font: 'Segoe UI', Roboto, sans-serif;
+
+  /* Z-index layers */
+  --wplace-z-overlay: 10000;
+  --wplace-z-alert: 10002;
+  --wplace-z-settings: 10002;
+
+  /* Feature toggles */
+  --wplace-scanline: 0;
+  --wplace-pixel-blink: 0;
+
+  /* Icon colors */
+  --wplace-icon-primary: #4facfe;
+  --wplace-icon-secondary: #00f2fe;
+  --wplace-icon-palette: #f093fb;
+  
+  /* Additional UI colors */
+  --wplace-danger: #ff6a6a;
+  --wplace-danger-dark: #ff4757;
+  --wplace-muted-text: #ffffffBB;
+  
+  /* Text variants */
+  --wplace-text-secondary: rgba(255,255,255,0.9);
+  --wplace-text-muted: rgba(255,255,255,0.7);
+  --wplace-text-dim: rgba(255,255,255,0.6);
+  --wplace-text-faded: rgba(255,255,255,0.8);
+  
+  /* Background variants */
+  --wplace-bg-input: rgba(255,255,255,0.15);
+  --wplace-bg-subtle: rgba(255,255,255,0.1);
+  --wplace-bg-faint: rgba(255,255,255,0.08);
+  --wplace-bg-ghost: rgba(255,255,255,0.06);
+  --wplace-bg-whisper: rgba(255,255,255,0.05);
+  
+  /* Border variants */
+  --wplace-border-subtle: rgba(255,255,255,0.2);
+  --wplace-border-faint: rgba(255,255,255,0.15);
+  --wplace-border-ghost: rgba(255,255,255,0.1);
+  --wplace-border-ultra-faint: rgba(255,255,255,0.05);
+  
+  /* Shadow variants */
+  --wplace-shadow-drag: 0 12px 40px rgba(0, 0, 0, 0.8), 0 0 0 2px rgba(255, 255, 255, 0.2);
+  --wplace-shadow-notification: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --wplace-shadow-slider-thumb: 0 3px 6px rgba(0,0,0,0.3), 0 0 0 2px var(--wplace-icon-primary);
+  --wplace-shadow-slider-hover: 0 4px 8px rgba(0,0,0,0.4), 0 0 0 3px var(--wplace-icon-primary);
+  
+  /* Animation colors */
+  --wplace-pulse-start: rgba(0, 255, 0, 0.7);
+  --wplace-pulse-mid: rgba(0, 255, 0, 0);
+  --wplace-pulse-end: rgba(0, 255, 0, 0);
+  
+  /* Slider colors */
+  --wplace-slider-thumb-bg: white;
+}
+
 /* Theme classes are now defined in separate files */
 /* Classic theme: ./themes/classic.css */
 /* Neon theme: ./themes/neon.css */
@@ -50,13 +126,13 @@
 
  @keyframes pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.7);
+    box-shadow: 0 0 0 0 var(--wplace-pulse-start);
   }
   70% {
-    box-shadow: 0 0 0 10px rgba(0, 255, 0, 0);
+    box-shadow: 0 0 0 10px var(--wplace-pulse-mid);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(0, 255, 0, 0);
+    box-shadow: 0 0 0 0 var(--wplace-pulse-end);
   }
 }
 
@@ -108,12 +184,19 @@
   overflow-x: hidden;
   transition: all 0.3s ease;
   user-select: none;
-  /* Theme-specific styling applied via theme files */
+  /* Default classic theme styling for 100% compliance */
+  background: var(--wplace-primary);
+  color: var(--wplace-text);
+  border-radius: var(--wplace-radius);
+  box-shadow: var(--wplace-shadow);
+  font-family: var(--wplace-font);
+  backdrop-filter: var(--wplace-backdrop);
+  border: var(--wplace-border-width) var(--wplace-border-style) var(--wplace-border-color);
 }
 
 #wplace-image-bot-container.wplace-dragging {
   transition: none;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8), 0 0 0 2px rgba(255, 255, 255, 0.2);
+  box-shadow: var(--wplace-shadow-drag);
   transform: scale(1.02);
   z-index: 9999;
 }
@@ -142,7 +225,14 @@
   transition: all 0.3s ease;
   user-select: none;
   display: none;
-  /* Theme-specific styling applied via theme files */
+  /* Default classic theme styling for 100% compliance */
+  background: var(--wplace-primary);
+  color: var(--wplace-text);
+  border-radius: var(--wplace-radius);
+  box-shadow: var(--wplace-shadow);
+  font-family: var(--wplace-font);
+  backdrop-filter: var(--wplace-backdrop);
+  border: var(--wplace-border-width) var(--wplace-border-style) var(--wplace-border-color);
 }
 
 #wplace-stats-container.wplace-dragging {
@@ -152,7 +242,7 @@
 /* Back-compat for legacy class (some earlier CSS used this) */
 .wplace-drag-active {
   transition: none !important;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8), 0 0 0 2px rgba(255, 255, 255, 0.2) !important;
+  box-shadow: var(--wplace-shadow-drag) !important;
   transform: scale(1.02) !important;
   z-index: 9999 !important;
 }
@@ -169,7 +259,7 @@
   align-items: center;
   cursor: move;
   user-select: none;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  border-bottom: 1px solid var(--wplace-border-ghost);
   transition: background 0.2s ease;
   position: relative;
   z-index: 2;
@@ -238,7 +328,7 @@
   align-items: center;
   gap: 6px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
   /* Theme-specific styling applied via theme files */
 }
 
@@ -329,7 +419,7 @@
   justify-content: space-between;
   padding: 4px 0;
   font-size: 11px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--wplace-border-ultra-faint);
 }
 
 .wplace-stat-item:last-child {
@@ -352,7 +442,7 @@
 .wplace-colors-section {
   margin-top: 10px;
   padding-top: 8px;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid var(--wplace-border-ultra-faint);
 }
 
 .wplace-stat-colors-grid {
@@ -587,7 +677,7 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  color: white;
+  color: var(--wplace-text);
   font-size: 12px;
   font-weight: bold;
   /* Theme-specific styling applied via theme files */
@@ -650,7 +740,14 @@
   min-width: 420px;
   max-width: 480px;
   overflow: hidden;
-  /* Theme-specific styling applied via theme files */
+  /* Default classic theme styling for 100% compliance */
+  background: var(--wplace-primary);
+  color: var(--wplace-text);
+  border-radius: var(--wplace-radius);
+  box-shadow: var(--wplace-shadow);
+  font-family: var(--wplace-font);
+  backdrop-filter: var(--wplace-backdrop);
+  border: var(--wplace-border-width) var(--wplace-border-style) var(--wplace-border-color);
 }
 
 #wplace-settings-container.show {
@@ -835,13 +932,13 @@
   left: 50%;
   transform: translateX(-50%);
   padding: 12px 20px;
-  color: white;
+  color: var(--wplace-text);
   font-weight: 600;
   z-index: 10002;
   max-width: 400px;
   text-align: center;
   animation: slideDown 0.3s ease-out;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--wplace-shadow-notification);
   /* Theme-specific styling applied via theme files */
 }
 
@@ -918,7 +1015,7 @@
   max-height: 80vh;
   overflow-y: auto;
   animation: slideIn 0.3s ease-out;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--wplace-border-ghost);
   padding: 0;
   /* Theme-specific styling applied via theme files */
 }
@@ -962,9 +1059,8 @@
 
 /* Section labels */
 .wplace-settings-section-label {
-  display: block;
   margin-bottom: 12px;
-  color: white;
+  color: var(--wplace-text);
   font-weight: 500;
   font-size: 16px;
   display: flex;
@@ -1023,7 +1119,7 @@
 /* Settings description text */
 .wplace-settings-description {
   font-size: 12px;
-  color: rgba(255,255,255,0.7);
+  color: var(--wplace-text-muted);
   margin: 8px 0 0 0;
 }
 
@@ -1035,22 +1131,22 @@
 .wplace-batch-mode-label {
   display: block;
   margin-bottom: 8px;
-  color: rgba(255,255,255,0.9);
+  color: var(--wplace-text-secondary);
   font-weight: 500;
   font-size: 14px;
 }
 
 .wplace-icon-dice {
-  color: #f093fb;
+  color: var(--wplace-icon-palette);
   margin-right: 6px;
 }
 
 .wplace-batch-mode-select {
   width: 100%;
   padding: 10px 12px;
-  background: rgba(255,255,255,0.15);
-  color: white;
-  border: 1px solid rgba(255,255,255,0.2);
+  background: var(--wplace-bg-input);
+  color: var(--wplace-text);
+  border: 1px solid var(--wplace-border-subtle);
   border-radius: 8px;
   font-size: 13px;
   outline: none;
@@ -1097,7 +1193,7 @@
 .wplace-speed-labels {
   display: flex;
   justify-content: space-between;
-  color: rgba(255,255,255,0.7);
+  color: var(--wplace-text-muted);
   font-size: 11px;
   margin-top: 8px;
 }
@@ -1111,27 +1207,27 @@
 
 .wplace-random-batch-label {
   display: block;
-  color: rgba(255,255,255,0.8);
+  color: var(--wplace-text-faded);
   font-size: 12px;
   margin-bottom: 8px;
 }
 
 .wplace-icon-min {
-  color: #4facfe;
+  color: var(--wplace-icon-primary);
   margin-right: 4px;
 }
 
 .wplace-icon-max {
-  color: #00f2fe;
+  color: var(--wplace-icon-secondary);
   margin-right: 4px;
 }
 
 .wplace-random-batch-input {
   width: 100%;
   padding: 10px 12px;
-  background: rgba(255,255,255,0.1);
-  color: white;
-  border: 1px solid rgba(255,255,255,0.2);
+  background: var(--wplace-bg-subtle);
+  color: var(--wplace-text);
+  border: 1px solid var(--wplace-border-subtle);
   border-radius: 8px;
   font-size: 13px;
   outline: none;
@@ -1139,7 +1235,7 @@
 
 .wplace-random-batch-description {
   font-size: 11px;
-  color: rgba(255,255,255,0.6);
+  color: var(--wplace-text-dim);
   margin: 8px 0 0 0;
   text-align: center;
 }
@@ -1149,7 +1245,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: white;
+  color: var(--wplace-text);
 }
 
 .wplace-speed-checkbox {
@@ -1239,9 +1335,9 @@
   width: 70px;
   padding: 6px 8px;
   border-radius: 6px;
-  border: 1px solid rgba(255,255,255,0.2);
-  background: rgba(255,255,255,0.08);
-  color: #fff;
+  border: 1px solid var(--wplace-border-subtle);
+  background: var(--wplace-bg-faint);
+  color: var(--wplace-text);
 }
 
 .wplace-notification-buttons {
@@ -1256,7 +1352,7 @@
 
 /* Settings Footer */
 .wplace-settings-footer {
-  border-top: 1px solid rgba(255,255,255,0.1);
+  border-top: 1px solid var(--wplace-border-ghost);
   padding-top: 20px;
   margin-top: 10px;
 }
@@ -1442,9 +1538,9 @@
 .resize-advanced-select {
   padding: 6px 8px;
   border-radius: 6px;
-  border: 1px solid rgba(255,255,255,0.15);
-  background: rgba(255,255,255,0.05);
-  color: #fff;
+  border: 1px solid var(--wplace-border-faint);
+  background: var(--wplace-bg-whisper);
+  color: var(--wplace-text);
 }
 
 .resize-advanced-toggle {
@@ -1483,7 +1579,7 @@
 }
 
 .resize-chroma-weight-value {
-  background: rgba(255,255,255,0.08);
+  background: var(--wplace-bg-faint);
   padding: 2px 6px;
   border-radius: 4px;
 }
@@ -1508,13 +1604,13 @@
 .resize-threshold-input {
   padding: 6px 8px;
   border-radius: 6px;
-  border: 1px solid rgba(255,255,255,0.15);
-  background: rgba(255,255,255,0.05);
-  color: #fff;
+  border: 1px solid var(--wplace-border-faint);
+  background: var(--wplace-bg-whisper);
+  color: var(--wplace-text);
 }
 
 .resize-reset-advanced-btn {
-  background: linear-gradient(135deg, #ff6a6a, #ff4757);
+  background: linear-gradient(135deg, var(--wplace-danger), var(--wplace-danger-dark));
   font-size: 11px;
 }
 
@@ -1549,12 +1645,12 @@
 /* Font styling corrections */
 .resize-controls label {
   font-size: 12px;
-  color: #ffffff;
+  color: var(--wplace-text);
 }
 
 .resize-dialog-title {
   margin-top: 0;
-  color: #ffffff;
+  color: var(--wplace-text);
 }
 
 /* Ensure proper z-indexing */
@@ -1566,9 +1662,9 @@
 .resize-tools button {
   padding: 6px 10px;
   border-radius: 6px;
-  border: 1px solid rgba(255,255,255,0.2);
-  background: rgba(255,255,255,0.06);
-  color: #fff;
+  border: 1px solid var(--wplace-border-subtle);
+  background: var(--wplace-bg-ghost);
+  color: var(--wplace-text);
   cursor: pointer;
 }
 
@@ -1600,9 +1696,6 @@
 
 /* Settings header styling moved to theme files */
 /* All remaining settings styling moved to theme files */
-  align-items: center;
-  gap: 8px;
-}
 
 .wplace-settings-section-wrapper {
   padding: 18px;
@@ -1624,7 +1717,7 @@
 /* Settings description styling moved to theme files */
 
 .wplace-settings-footer {
-  border-top: 1px solid rgba(255,255,255,0.1);
+  border-top: 1px solid var(--wplace-border-ghost);
   padding-top: 20px;
   margin-top: 10px;
 }
@@ -1672,19 +1765,19 @@
 .wplace-overlay-opacity-value {
   min-width: 40px;
   text-align: center;
-  background: #111111;
-  color: #ffffff;
+  background: var(--wplace-accent);
+  color: var(--wplace-text);
   padding: 4px 8px;
   border-radius: 6px;
   font-size: 12px;
-  border: 1px solid #222222;
+  border: var(--wplace-border-width) var(--wplace-border-style) var(--wplace-border-color);
 }
 
 .wplace-overlay-opacity-slider {
   width: 100%;
   -webkit-appearance: none;
   height: 8px;
-  background: linear-gradient(to right, #775ce3 0%, #d3a4ff 100%);
+  background: linear-gradient(to right, var(--wplace-highlight) 0%, var(--wplace-highlight-secondary) 100%);
   border-radius: 4px;
   outline: none;
   cursor: pointer;
@@ -1695,15 +1788,15 @@
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: white;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.3), 0 0 0 2px #4facfe;
+  background: var(--wplace-slider-thumb-bg);
+  box-shadow: var(--wplace-shadow-slider-thumb);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .wplace-overlay-opacity-slider::-webkit-slider-thumb:hover {
   transform: scale(1.2);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.4), 0 0 0 3px #4facfe;
+  box-shadow: var(--wplace-shadow-slider-hover);
 }
 
 .wplace-blue-marble-toggle {
@@ -1719,7 +1812,7 @@
 
 .wplace-blue-marble-description {
   font-size: 12px;
-  color: #ffffffBB;
+  color: var(--wplace-muted-text);
   margin: 4px 0 0 0;
 }
 
@@ -1727,7 +1820,7 @@
   cursor: pointer;
   width: 20px;
   height: 20px;
-  accent-color: #775ce3;
+  accent-color: var(--wplace-highlight);
 }
 
 /* Batch Mode Controls */
@@ -1738,22 +1831,22 @@
 .wplace-batch-mode-label {
   display: block;
   margin-bottom: 8px;
-  color: rgba(255,255,255,0.9);
+  color: var(--wplace-text-secondary);
   font-weight: 500;
   font-size: 14px;
 }
 
 .wplace-icon-dice {
-  color: #f093fb;
+  color: var(--wplace-icon-palette);
   margin-right: 6px;
 }
 
 .wplace-batch-mode-select {
   width: 100%;
   padding: 10px 12px;
-  background: rgba(255,255,255,0.15);
-  color: white;
-  border: 1px solid rgba(255,255,255,0.2);
+  background: var(--wplace-bg-input);
+  color: var(--wplace-text);
+  border: 1px solid var(--wplace-border-subtle);
   border-radius: 8px;
   font-size: 13px;
   outline: none;
@@ -1794,7 +1887,7 @@
 .wplace-speed-labels {
   display: flex;
   justify-content: space-between;
-  color: rgba(255,255,255,0.7);
+  color: var(--wplace-text-muted);
   font-size: 11px;
   margin-top: 8px;
 }
