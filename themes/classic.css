@@ -62,6 +62,7 @@
   
   /* Slider colors */
   --wplace-slider-thumb-bg: white;
+  --wplace-slider-track-bg: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
 }
 
 /* Classic theme container styling */

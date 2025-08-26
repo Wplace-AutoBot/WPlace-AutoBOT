@@ -83,8 +83,9 @@
   --wplace-pulse-mid: rgba(0, 255, 0, 0);
   --wplace-pulse-end: rgba(0, 255, 0, 0);
   
-  /* Slider colors */
+  /* Slider colors - defaults for classic compatibility */
   --wplace-slider-thumb-bg: white;
+  --wplace-slider-track-bg: linear-gradient(to right, var(--wplace-icon-primary) 0%, var(--wplace-icon-secondary) 100%);
 }
 
 /* Theme classes are now defined in separate files */
@@ -1777,7 +1778,7 @@
   width: 100%;
   -webkit-appearance: none;
   height: 8px;
-  background: linear-gradient(to right, var(--wplace-highlight) 0%, var(--wplace-highlight-secondary) 100%);
+  background: var(--wplace-slider-track-bg);
   border-radius: 4px;
   outline: none;
   cursor: pointer;
