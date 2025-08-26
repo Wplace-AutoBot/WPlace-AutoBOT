@@ -362,6 +362,7 @@
   position: relative;
   overflow: hidden;
   font-family: 'Segoe UI', Roboto, sans-serif;
+  font-weight: 500;
   
   background: linear-gradient(135deg, #222222 0%, #4a4a4a 100%);
   border: 1px solid rgba(255,255,255,0.1);
@@ -417,7 +418,7 @@
 .wplace-btn-upload {
   background: linear-gradient(135deg, #111111 0%, #4a4a4a 100%);
   color: #ffffff;
-  border: 1px dashed #775ce3;
+  border: 1px dashed #775ce3 !important;
 }
 
 .wplace-btn-start {
@@ -829,18 +830,20 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: var(--wplace-z-alert);
-  min-width: 400px;
-  max-width: 500px;
-
-  /* Theme */
-  background: var(--wplace-primary);
-  color: var(--wplace-text);
-  font-family: var(--wplace-font);
-  border-radius: var(--wplace-radius);
-  box-shadow: var(--wplace-shadow);
-  backdrop-filter: var(--wplace-backdrop);
-  border: var(--wplace-border-width) var(--wplace-border-style) var(--wplace-border-color);
+  background: linear-gradient(135deg, rgb(0, 0, 0) 0%, rgb(17, 17, 17) 100%);
+  border: 1px solid rgb(34, 34, 34);
+  border-radius: 12px;
+  padding: 0px;
+  z-index: 10002;
+  display: none;
+  min-width: 420px;
+  max-width: 480px;
+  color: rgb(255, 255, 255);
+  font-family: "Segoe UI", Roboto, sans-serif;
+  box-shadow: rgba(0, 0, 0, 0.6) 0px 8px 32px, rgba(255, 255, 255, 0.1) 0px 0px 0px 1px;
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+  animation: 0.4s ease-out 0s 1 normal none running slideIn;
 }
 
 .wplace-settings {
@@ -1843,4 +1846,307 @@
 
 .resize-mask-canvas {
   pointer-events: auto;
+}
+
+/* Additional precision fixes for exact upstream main matching */
+.wplace-status.status-default {
+  color: #ffffff;
+  background: rgba(255,255,255,0.1);
+  border-color: #ffffff;
+}
+
+/* ===================================== */
+/* Settings Dialog - Exact Upstream Match */
+/* ===================================== */
+
+.wplace-settings-header {
+  background: #22222233;
+  padding: 20px;
+  border-bottom: 1px solid #222222;
+  cursor: move;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.wplace-settings-header h3 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 300;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.wplace-settings-header .fa-cog {
+  font-size: 18px;
+  animation: spin 2s linear infinite;
+  color: #775ce3;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.wplace-settings-close-btn {
+  background: #22222266;
+  color: #ffffff;
+  border: 1px solid #222222;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  font-weight: 300;
+}
+
+.wplace-settings-close-btn:hover {
+  background: #ff000066;
+  transform: scale(1.1);
+}
+
+.wplace-settings-content {
+  padding: 25px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.wplace-settings-section {
+  margin-bottom: 25px;
+}
+
+.wplace-settings-section-label {
+  display: block;
+  margin-bottom: 12px;
+  color: white;
+  font-weight: 500;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wplace-settings-section-wrapper {
+  background: rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 18px;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.wplace-settings-select {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.15);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.wplace-settings-select option {
+  background: #2d3748;
+  color: white;
+  padding: 10px;
+}
+
+.wplace-settings-description {
+  font-size: 12px;
+  color: rgba(255,255,255,0.7);
+  margin: 8px 0 0 0;
+}
+
+.wplace-settings-footer {
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: 20px;
+  margin-top: 10px;
+}
+
+.wplace-settings-apply-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+
+/* Icon colors for settings sections */
+.wplace-icon-key { color: #4facfe; font-size: 16px; }
+.wplace-icon-robot { color: #4facfe; font-size: 16px; }
+.wplace-icon-speed { color: #4facfe; font-size: 16px; }
+.wplace-icon-bell { color: #ffd166; font-size: 16px; }
+.wplace-icon-palette { color: #f093fb; font-size: 16px; }
+.wplace-icon-globe { color: #ffeaa7; font-size: 16px; }
+.wplace-icon-eye { color: #775ce3; font-size: 16px; }
+
+/* Overlay Settings Controls */
+.wplace-overlay-opacity-control {
+  margin-bottom: 15px;
+}
+
+.wplace-overlay-opacity-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.wplace-overlay-opacity-label {
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.wplace-overlay-opacity-value {
+  min-width: 40px;
+  text-align: center;
+  background: #111111;
+  color: #ffffff;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  border: 1px solid #222222;
+}
+
+.wplace-overlay-opacity-slider {
+  width: 100%;
+  -webkit-appearance: none;
+  height: 8px;
+  background: linear-gradient(to right, #775ce3 0%, #d3a4ff 100%);
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+}
+
+.wplace-overlay-opacity-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.3), 0 0 0 2px #4facfe;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.wplace-overlay-opacity-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.4), 0 0 0 3px #4facfe;
+}
+
+.wplace-blue-marble-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.wplace-blue-marble-title {
+  font-weight: 500;
+}
+
+.wplace-blue-marble-description {
+  font-size: 12px;
+  color: #ffffffBB;
+  margin: 4px 0 0 0;
+}
+
+.wplace-blue-marble-checkbox {
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+  accent-color: #775ce3;
+}
+
+/* Batch Mode Controls */
+.wplace-batch-mode-selection {
+  margin-bottom: 15px;
+}
+
+.wplace-batch-mode-label {
+  display: block;
+  margin-bottom: 8px;
+  color: rgba(255,255,255,0.9);
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.wplace-icon-dice {
+  color: #f093fb;
+  margin-right: 6px;
+}
+
+.wplace-batch-mode-select {
+  width: 100%;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.15);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  font-size: 13px;
+  outline: none;
+  cursor: pointer;
+}
+
+.wplace-batch-controls {
+  background: rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 18px;
+  border: 1px solid rgba(255,255,255,0.1);
+  margin-bottom: 15px;
+}
+
+.wplace-speed-slider-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+.wplace-speed-slider {
+  flex: 1;
+  height: 8px;
+  background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+  border-radius: 4px;
+  outline: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.wplace-speed-value {
+  min-width: 100px;
+  text-align: center;
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+  font-size: 13px;
+  box-shadow: 0 3px 10px rgba(79, 172, 254, 0.3);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.wplace-speed-labels {
+  display: flex;
+  justify-content: space-between;
+  color: rgba(255,255,255,0.7);
+  font-size: 11px;
+  margin-top: 8px;
 }
