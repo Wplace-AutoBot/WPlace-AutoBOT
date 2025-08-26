@@ -635,3 +635,12 @@
   color: white;
   border-radius: 8px;
 }
+
+/* Resize dialog styling for classic theme */
+:root .resize-container,
+.wplace-theme--classic .resize-container {
+  background: #000000;
+  border: 1px solid #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
