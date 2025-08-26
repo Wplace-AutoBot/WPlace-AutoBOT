@@ -346,3 +346,12 @@
     transform: translateY(400px);
   }
 }
+
+/* Resize dialog styling for neon theme */
+.wplace-theme--neon .resize-container {
+  background: #1a1a2e !important;
+  border: 3px solid #00ff41 !important;
+  border-radius: 0 !important;
+  box-shadow: 0 0 30px rgba(0, 255, 65, 0.5) !important;
+  font-family: 'Press Start 2P', monospace !important;
+}
