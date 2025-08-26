@@ -214,10 +214,16 @@
 function applyTheme() {
   const theme = getCurrentTheme();
   // Toggle theme class on documentElement so CSS vars cascade to our UI
-  document.documentElement.classList.remove('wplace-theme--classic', 'wplace-theme--neon');
-  document.documentElement.classList.add(
-    CONFIG.currentTheme === 'Neon Retro' ? 'wplace-theme--neon' : 'wplace-theme--classic'
-  );
+  document.documentElement.classList.remove('wplace-theme--classic', 'wplace-theme--classic-light', 'wplace-theme--neon');
+  
+  let themeClass = 'wplace-theme--classic'; // default
+  if (CONFIG.currentTheme === 'Neon Retro') {
+    themeClass = 'wplace-theme--neon';
+  } else if (CONFIG.currentTheme === 'Classic Light') {
+    themeClass = 'wplace-theme--classic-light';
+  }
+  
+  document.documentElement.classList.add(themeClass);
 
   // Also set CSS variables explicitly in case you want runtime overrides
   const root = document.documentElement;

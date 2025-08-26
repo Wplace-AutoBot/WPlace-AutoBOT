@@ -89,6 +89,21 @@
   border-radius: 12px !important;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
   font-family: 'Segoe UI', Roboto, sans-serif !important;
+  color: var(--wplace-text) !important;
+}
+
+/* Comprehensive text and element styling for light theme */
+.wplace-theme--classic-light * {
+  color: var(--wplace-text) !important;
+}
+
+.wplace-theme--classic-light .wplace-status,
+.wplace-theme--classic-light .wplace-stats,
+.wplace-theme--classic-light .wplace-section,
+.wplace-theme--classic-light .wplace-controls,
+.wplace-theme--classic-light .wplace-data-management,
+.wplace-theme--classic-light .wplace-cooldown-settings {
+  color: var(--wplace-text) !important;
 }
 
 /* Settings dialog */
