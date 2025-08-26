@@ -332,7 +332,7 @@
 :root .wplace-header-btn,
 .wplace-theme--classic .wplace-header-btn {
   background: rgba(255,255,255,0.1);
-  color: var(--wplace-text);
+  color: var(--wplace-highlight);
   border-radius: 4px;
   font-family: var(--wplace-font);
 }
@@ -593,6 +593,12 @@
 
 :root .wplace-speed-slider,
 .wplace-theme--classic .wplace-speed-slider {
+  background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+  border-radius: 4px;
+}
+
+:root .wplace-overlay-opacity-slider,
+.wplace-theme--classic .wplace-overlay-opacity-slider {
   background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
   border-radius: 4px;
 }

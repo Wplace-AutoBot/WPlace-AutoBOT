@@ -264,7 +264,10 @@
   transition: background 0.2s ease;
   position: relative;
   z-index: 2;
-  /* Theme-specific styling applied via theme files */
+  /* Default styling for 100% classic compliance */
+  background: var(--wplace-secondary);
+  color: var(--wplace-highlight);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 
 .wplace-header-title {
@@ -289,12 +292,18 @@
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
-  /* Theme-specific styling applied via theme files */
+  /* Default styling for 100% classic compliance */
+  background: rgba(255,255,255,0.1);
+  color: var(--wplace-text);
+  border-radius: 4px;
+  font-family: var(--wplace-font);
 }
 
 .wplace-header-btn:hover {
   transform: scale(1.1);
-  /* Theme-specific styling applied via theme files */
+  /* Default styling for 100% classic compliance */
+  background: var(--wplace-accent);
+  color: var(--wplace-text);
 }
 
 .wplace-content {
@@ -1633,17 +1642,7 @@
   /* Theme-specific styling applied via theme files */
 }
 
-/* Settings animations */
-@keyframes settingsSlideIn {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
-}
+/* Settings animations - removed duplicate, handled above */
 
 /* Font styling corrections */
 .resize-controls label {
