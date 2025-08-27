@@ -154,6 +154,23 @@
   color: var(--wplace-text) !important;
 }
 
+/* Color palette text labels */
+.wplace-theme--classic-light .wplace-stat-colors-grid * {
+  color: var(--wplace-text) !important;
+  font-weight: 500 !important;
+}
+
+.wplace-theme--classic-light .wplace-color-label {
+  color: var(--wplace-text) !important;
+  font-weight: 500 !important;
+  text-shadow: none !important;
+}
+
+.wplace-theme--classic-light .wplace-color-name {
+  color: var(--wplace-text) !important;
+  font-weight: 500 !important;
+}
+
 /* Resize dialog */
 .wplace-theme--classic-light .resize-container {
   background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
