@@ -3371,7 +3371,7 @@ function applyTheme() {
     // Link external CSS files
     const cssLink = document.createElement('link');
     cssLink.rel = 'stylesheet';
-    cssLink.href = 'https://staninna.github.io/WPlace-AutoBOT/auto-image-styles.css'; // TODO: Before merge change to https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/auto-image-styles.css
+    cssLink.href = 'https://staninna.github.io/WPlace-AutoBOT/decoupled-css/auto-image-styles.css'; // TODO: Before merge change to https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/auto-image-styles.css
     cssLink.setAttribute('data-wplace-theme', 'true');
     document.head.appendChild(cssLink);
 
