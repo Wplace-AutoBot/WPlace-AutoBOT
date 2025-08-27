@@ -871,7 +871,7 @@
     if (source === 'turnstile-capture' && token) {
       setTurnstileToken(token);
       if (document.querySelector("#statusText")?.textContent.includes("CAPTCHA")) {
-        Utils.showAlert("Token captured successfully! You can start the bot now.", "success");
+        Utils.showAlert(Utils.t("tokenCapturedSuccess"), "success");
         updateUI("colorsFound", "success", { count: state.availableColors.length });
       }
     }
@@ -991,7 +991,7 @@
       `;
 
       const title = document.createElement('div');
-      title.textContent = 'Cloudflare Turnstile — please complete the check if shown';
+      title.textContent = Utils.t('turnstileInstructions');
       title.style.cssText = 'font: 600 12px/1.3 "Segoe UI",sans-serif; margin-bottom: 8px; opacity: 0.9;';
 
       const host = document.createElement('div');
@@ -999,7 +999,7 @@
       host.style.cssText = 'width: 100%; min-height: 70px;';
 
       const hideBtn = document.createElement('button');
-      hideBtn.textContent = 'Hide';
+      hideBtn.textContent = Utils.t('hideTurnstileBtn');
       hideBtn.style.cssText = 'position:absolute; top:6px; right:6px; font-size:11px; background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.2); border-radius:6px; padding:2px 6px; cursor:pointer;';
       hideBtn.addEventListener('click', () => overlay.remove());
 
@@ -2150,7 +2150,7 @@
     },
     async requestPermission() {
       if (!("Notification" in window)) {
-        Utils.showAlert("Notifications are not supported in this browser.", "warning");
+        Utils.showAlert(Utils.t("notificationsNotSupported"), "warning");
         return "denied";
       }
       if (Notification.permission === "granted") return "granted";
@@ -2198,8 +2198,8 @@
         const shouldEdge = state._lastChargesBelow || force;
         const shouldRepeat = now - (state._lastChargesNotifyAt || 0) >= repeatMs;
         if (shouldEdge || shouldRepeat) {
-          const msg = `Charges ready: ${Math.floor(state.currentCharges)} / ${state.maxCharges}. Threshold: ${state.cooldownChargeThreshold}.`;
-          this.notify("WPlace — Charges Ready", msg, "wplace-notify-charges");
+          const msg = Utils.t("chargesReadyMessage", { current: Math.floor(state.currentCharges), max: state.maxCharges, threshold: state.cooldownChargeThreshold });
+          this.notify(Utils.t("chargesReadyNotification"), msg, "wplace-notify-charges");
           state._lastChargesNotifyAt = now;
         }
         state._lastChargesBelow = false;
@@ -2336,7 +2336,7 @@
     // Don't re-fetch colors here, use what was captured when user clicked upload
     if (!state.availableColors || state.availableColors.length === 0) {
       // If no colors have been captured yet, show message
-      colorsContainer.innerHTML = '<div style="text-align: center; color: #888; padding: 20px;">Upload an image first to capture available colors</div>';
+      colorsContainer.innerHTML = `<div style="text-align: center; color: #888; padding: 20px;">${Utils.t('uploadImageFirst')}</div>`;
       return;
     }
 
@@ -3729,10 +3729,10 @@
           <button id="settingsBtn" class="wplace-header-btn" title="${Utils.t("settings")}">
             <i class="fas fa-cog"></i>
           </button>
-          <button id="statsBtn" class="wplace-header-btn" title="Show Stats">
+          <button id="statsBtn" class="wplace-header-btn" title="${Utils.t('showStats')}">
             <i class="fas fa-chart-bar"></i>
           </button>
-          <button id="compactBtn" class="wplace-header-btn" title="Compact Mode">
+          <button id="compactBtn" class="wplace-header-btn" title="${Utils.t('compactMode')}">
             <i class="fas fa-compress"></i>
           </button>
           <button id="minimizeBtn" class="wplace-header-btn" title="${Utils.t("minimize")}">
@@ -3756,7 +3756,7 @@
           <div class="wplace-section-title">🖼️ Image Management</div>
           <div class="wplace-controls">
             <div class="wplace-row">
-              <button id="uploadBtn" class="wplace-btn wplace-btn-upload" disabled title="🔄 Waiting for initial setup to complete...">
+              <button id="uploadBtn" class="wplace-btn wplace-btn-upload" disabled title="${Utils.t('waitingSetupComplete')}">
                 <i class="fas fa-upload"></i>
                 <span>${Utils.t("uploadImage")}</span>
               </button>
@@ -3818,7 +3818,7 @@
                 <i class="fas fa-save"></i>
                 <span>${Utils.t("saveData")}</span>
               </button>
-              <button id="loadBtn" class="wplace-btn wplace-btn-primary" disabled title="🔄 Waiting for token generator to initialize...">
+              <button id="loadBtn" class="wplace-btn wplace-btn-primary" disabled title="${Utils.t('waitingTokenGenerator')}">
                 <i class="fas fa-folder-open"></i>
                 <span>${Utils.t("loadData")}</span>
               </button>
@@ -3828,7 +3828,7 @@
                 <i class="fas fa-download"></i>
                 <span>${Utils.t("saveToFile")}</span>
               </button>
-              <button id="loadFromFileBtn" class="wplace-btn wplace-btn-file" disabled title="🔄 Waiting for token generator to initialize...">
+              <button id="loadFromFileBtn" class="wplace-btn wplace-btn-file" disabled title="${Utils.t('waitingTokenGenerator')}">
                 <i class="fas fa-upload"></i>
                 <span>${Utils.t("loadFromFile")}</span>
               </button>
@@ -3846,13 +3846,13 @@
       <div class="wplace-header">
         <div class="wplace-header-title">
           <i class="fas fa-chart-bar"></i>
-          <span>Painting Stats</span>
+          <span>${Utils.t('paintingStats')}</span>
         </div>
         <div class="wplace-header-controls">
-          <button id="refreshChargesBtn" class="wplace-header-btn" title="Refresh Charges">
+          <button id="refreshChargesBtn" class="wplace-header-btn" title="${Utils.t('refreshCharges')}">
             <i class="fas fa-sync"></i>
           </button>
-          <button id="closeStatsBtn" class="wplace-header-btn" title="Close Stats">
+          <button id="closeStatsBtn" class="wplace-header-btn" title="${Utils.t('closeStats')}">
             <i class="fas fa-times"></i>
           </button>
         </div>
@@ -4177,7 +4177,7 @@
           <!-- Speed Control Toggle -->
           <label style="display: flex; align-items: center; gap: 8px; color: white;">
             <input type="checkbox" id="enableSpeedToggle" ${CONFIG.PAINTING_SPEED_ENABLED ? 'checked' : ''} style="cursor: pointer;"/>
-            <span>Enable painting speed limit (batch size control)</span>
+            <span>${Utils.t('enablePaintingSpeedLimit')}</span>
           </label>
         </div>
 
@@ -4189,25 +4189,25 @@
           </label>
           <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1); display:flex; flex-direction:column; gap:10px;">
             <label style="display:flex; align-items:center; justify-content:space-between;">
-              <span>Enable notifications</span>
+              <span>${Utils.t('enableNotifications')}</span>
               <input type="checkbox" id="notifEnabledToggle" ${state.notificationsEnabled ? 'checked' : ''} style="width:18px; height:18px; cursor:pointer;" />
             </label>
             <label style="display:flex; align-items:center; justify-content:space-between;">
-              <span>Notify when charges reach threshold</span>
+              <span>${Utils.t('notifyOnChargesThreshold')}</span>
               <input type="checkbox" id="notifOnChargesToggle" ${state.notifyOnChargesReached ? 'checked' : ''} style="width:18px; height:18px; cursor:pointer;" />
             </label>
             <label style="display:flex; align-items:center; justify-content:space-between;">
-              <span>Only when tab is not focused</span>
+              <span>${Utils.t('onlyWhenNotFocused')}</span>
               <input type="checkbox" id="notifOnlyUnfocusedToggle" ${state.notifyOnlyWhenUnfocused ? 'checked' : ''} style="width:18px; height:18px; cursor:pointer;" />
             </label>
             <div style="display:flex; align-items:center; gap:10px;">
-              <span>Repeat every</span>
+              <span>${Utils.t('repeatEvery')}</span>
               <input type="number" id="notifIntervalInput" min="1" max="60" value="${state.notificationIntervalMinutes}" style="width:70px; padding:6px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color:#fff;" />
-              <span>minute(s)</span>
+              <span>${Utils.t('minutesPl')}</span>
             </div>
             <div style="display:flex; gap:10px;">
-              <button id="notifRequestPermBtn" class="wplace-btn wplace-btn-secondary" style="flex:1;"><i class="fas fa-unlock"></i><span>Grant Permission</span></button>
-              <button id="notifTestBtn" class="wplace-btn" style="flex:1;"><i class="fas fa-bell"></i><span>Test</span></button>
+              <button id="notifRequestPermBtn" class="wplace-btn wplace-btn-secondary" style="flex:1;"><i class="fas fa-unlock"></i><span>${Utils.t('grantPermission')}</span></button>
+              <button id="notifTestBtn" class="wplace-btn" style="flex:1;"><i class="fas fa-bell"></i><span>${Utils.t('test')}</span></button>
             </div>
           </div>
         </div>
@@ -4404,12 +4404,12 @@
             Paint White Pixels
         </label>
         <div class="resize-zoom-controls">
-          <button id="zoomOutBtn" class="wplace-btn" title="Zoom Out" style="padding:4px 8px;"><i class="fas fa-search-minus"></i></button>
+          <button id="zoomOutBtn" class="wplace-btn" title="${Utils.t('zoomOut')}" style="padding:4px 8px;"><i class="fas fa-search-minus"></i></button>
           <input type="range" id="zoomSlider" class="resize-slider" min="0.1" max="20" value="1" step="0.05" style="max-width: 220px;">
-          <button id="zoomInBtn" class="wplace-btn" title="Zoom In" style="padding:4px 8px;"><i class="fas fa-search-plus"></i></button>
-          <button id="zoomFitBtn" class="wplace-btn" title="Fit to view" style="padding:4px 8px;">Fit</button>
-          <button id="zoomActualBtn" class="wplace-btn" title="Actual size (100%)" style="padding:4px 8px;">100%</button>
-          <button id="panModeBtn" class="wplace-btn" title="Pan (drag to move view)" style="padding:4px 8px;">
+          <button id="zoomInBtn" class="wplace-btn" title="${Utils.t('zoomIn')}" style="padding:4px 8px;"><i class="fas fa-search-plus"></i></button>
+          <button id="zoomFitBtn" class="wplace-btn" title="${Utils.t('fitToView')}" style="padding:4px 8px;">${Utils.t('fit')}</button>
+          <button id="zoomActualBtn" class="wplace-btn" title="${Utils.t('actualSize')}" style="padding:4px 8px;">${Utils.t('hundred')}</button>
+          <button id="panModeBtn" class="wplace-btn" title="${Utils.t('panMode')}" style="padding:4px 8px;">
             <i class="fas fa-hand-paper"></i>
           </button>
           <span id="zoomValue" style="margin-left:6px; min-width:48px; text-align:right; opacity:.85; font-size:12px;">100%</span>
@@ -4453,9 +4453,9 @@
               <button id="maskModeToggle" class="wplace-btn wplace-btn-primary" style="padding:4px 8px; font-size:12px;">Toggle</button>
             </div>
           </div>
-          <button id="clearIgnoredBtn" class="wplace-btn" title="Clear all ignored pixels" style="padding:4px 8px; font-size:12px;">Clear</button>
-          <button id="invertMaskBtn" class="wplace-btn" title="Invert mask" style="padding:4px 8px; font-size:12px;">Invert</button>
-          <span style="opacity:.8; font-size:12px;">Shift = Row • Alt = Column</span>
+          <button id="clearIgnoredBtn" class="wplace-btn" title="${Utils.t('clearIgnoredPixels')}" style="padding:4px 8px; font-size:12px;">${Utils.t('clear')}</button>
+          <button id="invertMaskBtn" class="wplace-btn" title="${Utils.t('invertMask')}" style="padding:4px 8px; font-size:12px;">${Utils.t('invert')}</button>
+          <span style="opacity:.8; font-size:12px;">${Utils.t('shiftRowAltColumn')}</span>
         </div>
       </div>
 
@@ -4467,7 +4467,7 @@
               <div class="wplace-row single">
                   <label style="display: flex; align-items: center; gap: 8px; font-size: 12px;">
                       <input type="checkbox" id="showAllColorsToggle" style="cursor: pointer;">
-                      <span>Show All Colors (including unavailable)</span>
+                      <span>${Utils.t('showAllColorsIncluding')}</span>
                   </label>
               </div>
               <div class="wplace-row">
@@ -4499,7 +4499,7 @@
           </label>
           <div>
             <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:4px;">
-              <span>Chroma Weight</span>
+              <span>${Utils.t('chromaWeight')}</span>
               <span id="chromaWeightValue" style="background:rgba(255,255,255,0.08); padding:2px 6px; border-radius:4px;">${state.chromaPenaltyWeight}</span>
             </div>
             <input type="range" id="chromaPenaltyWeightSlider" min="0" max="0.5" step="0.01" value="${state.chromaPenaltyWeight}" style="width:100%;" />
@@ -4528,15 +4528,15 @@
       <div class="resize-buttons">
         <button id="downloadPreviewBtn" class="wplace-btn wplace-btn-primary">
           <i class="fas fa-download"></i>
-          <span>Download Preview</span>
+          <span>${Utils.t('downloadPreview')}</span>
         </button>
         <button id="confirmResize" class="wplace-btn wplace-btn-start">
           <i class="fas fa-check"></i>
-          <span>Apply</span>
+          <span>${Utils.t('apply')}</span>
         </button>
         <button id="cancelResize" class="wplace-btn wplace-btn-stop">
           <i class="fas fa-times"></i>
-          <span>Cancel</span>
+          <span>${Utils.t('cancel')}</span>
         </button>
       </div>
     `
@@ -4805,7 +4805,7 @@
             'hybrid': 'Generator + Auto Fallback',
             'manual': 'Manual Pixel Placement'
           }
-          Utils.showAlert(`Token source set to: ${sourceNames[state.tokenSource]}`, "success")
+          Utils.showAlert(Utils.t('tokenSourceSet', {source: sourceNames[state.tokenSource]}), "success")
         })
       }
 
@@ -4833,7 +4833,7 @@
 
           saveBotSettings()
           console.log(`📦 Batch mode changed to: ${state.batchMode}`)
-          Utils.showAlert(`Batch mode set to: ${state.batchMode === 'random' ? 'Random Range' : 'Normal Fixed Size'}`, "success")
+          Utils.showAlert(Utils.t('batchModeSet', {mode: state.batchMode === 'random' ? Utils.t('randomRange') : Utils.t('normalFixedSize')}), "success")
         })
       }
 
@@ -4920,9 +4920,9 @@
         enableBlueMarbleToggle.addEventListener('click', async () => {
           state.blueMarbleEnabled = enableBlueMarbleToggle.checked;
           if (state.imageLoaded && overlayManager.imageBitmap) {
-            Utils.showAlert("Re-processing overlay...", "info");
+            Utils.showAlert(Utils.t('reprocessingOverlay'), "info");
             await overlayManager.processImageIntoChunks();
-            Utils.showAlert("Overlay updated!", "success");
+            Utils.showAlert(Utils.t('overlayUpdated'), "success");
           }
         });
       }
@@ -4935,13 +4935,13 @@
       if (notifPermBtn) {
         notifPermBtn.addEventListener("click", async () => {
           const perm = await NotificationManager.requestPermission();
-          if (perm === "granted") Utils.showAlert("Notifications enabled.", "success");
-          else Utils.showAlert("Notifications permission denied.", "warning");
+          if (perm === "granted") Utils.showAlert(Utils.t('notificationsEnabled'), "success");
+          else Utils.showAlert(Utils.t('notificationsPermissionDenied'), "warning");
         });
       }
       if (notifTestBtn) {
         notifTestBtn.addEventListener("click", () => {
-          NotificationManager.notify("WPlace — Test", "This is a test notification.", "wplace-notify-test", true);
+          NotificationManager.notify(Utils.t('testNotificationTitle'), Utils.t('testNotificationMessage'), "wplace-notify-test", true);
         });
       }
 
@@ -5009,7 +5009,7 @@
         const isEnabled = overlayManager.toggle();
         toggleOverlayBtn.classList.toggle('active', isEnabled);
         toggleOverlayBtn.setAttribute('aria-pressed', isEnabled ? 'true' : 'false');
-        Utils.showAlert(`Overlay ${isEnabled ? 'enabled' : 'disabled'}.`, 'info');
+        Utils.showAlert(isEnabled ? Utils.t('overlayEnabled') : Utils.t('overlayDisabled'), 'info');
       });
     }
 
@@ -5041,7 +5041,7 @@
           updateUI("autoSaved", "success")
           Utils.showAlert(Utils.t("autoSaved"), "success")
         } else {
-          Utils.showAlert("❌ Erro ao salvar progresso", "error")
+          Utils.showAlert(Utils.t('errorSavingProgress'), "error")
         }
       })
     }
@@ -5050,7 +5050,7 @@
       loadBtn.addEventListener("click", () => {
         // Check if initial setup is complete
         if (!state.initialSetupComplete) {
-          Utils.showAlert("🔄 Please wait for the initial setup to complete before loading progress.", "warning");
+          Utils.showAlert(Utils.t('pleaseWaitInitialSetup'), "warning");
           return;
         }
 
@@ -5092,7 +5092,7 @@
               startBtn.disabled = false
             }
           } else {
-            Utils.showAlert("❌ Erro ao carregar progresso", "error")
+            Utils.showAlert(Utils.t('errorLoadingProgress'), "error")
           }
         }
       })
@@ -5114,7 +5114,7 @@
       loadFromFileBtn.addEventListener("click", async () => {
         // Check if initial setup is complete
         if (!state.initialSetupComplete) {
-          Utils.showAlert("🔄 Please wait for the initial setup to complete before loading from file.", "warning");
+          Utils.showAlert(Utils.t('pleaseWaitFileSetup'), "warning");
           return;
         }
 
@@ -5202,7 +5202,7 @@
       if (state.colorsChecked) {
         colorSwatchesHTML = state.availableColors.map(color => {
           const rgbString = `rgb(${color.rgb.join(',')})`;
-          return `<div class="wplace-stat-color-swatch" style="background-color: ${rgbString};" title="ID: ${color.id}\nRGB: ${color.rgb.join(', ')}"></div>`;
+          return `<div class="wplace-stat-color-swatch" style="background-color: ${rgbString};" title="${Utils.t('colorTooltip', {id: color.id, rgb: color.rgb.join(', ')})}"></div>`;
         }).join('');
       }
 
@@ -5214,7 +5214,7 @@
             </div>
             ${state.colorsChecked ? `
             <div class="wplace-colors-section">
-                <div class="wplace-stat-label"><i class="fas fa-palette"></i> Available Colors (${state.availableColors.length})</div>
+                <div class="wplace-stat-label"><i class="fas fa-palette"></i> ${Utils.t('availableColors', {count: state.availableColors.length})}</div>
                 <div class="wplace-stat-colors-grid">
                     ${colorSwatchesHTML}
                 </div>
@@ -6157,7 +6157,7 @@
         if (state.imageLoaded && state.imageData.processor && state.colorsChecked) {
           showResizeDialog(state.imageData.processor)
         } else if (!state.colorsChecked) {
-          Utils.showAlert("Please upload an image first to capture available colors", "warning")
+          Utils.showAlert(Utils.t('uploadImageFirstColors'), "warning")
         }
       })
     }
@@ -6974,7 +6974,7 @@
     }
 
     // Show a notification that file operations are now available
-    Utils.showAlert("📂 File operations (Load/Upload) are now available!", "success");
+    Utils.showAlert(Utils.t('fileOperationsAvailable'), "success");
   }
 
   // Optimized token initialization with better timing and error handling
@@ -6999,7 +6999,7 @@
         setTurnstileToken(token);
         console.log("✅ Startup token generated successfully");
         updateUI("tokenReady", "success");
-        Utils.showAlert("🔑 Token generator ready!", "success");
+        Utils.showAlert(Utils.t('tokenGeneratorReady'), "success");
         enableFileOperations(); // Enable file operations since initial setup is complete
       } else {
         console.warn("⚠️ Startup token generation failed, will retry when needed");
@@ -7042,7 +7042,7 @@
       if (whiteInput) whiteInput.addEventListener('change', e => { const v=parseInt(e.target.value,10); if(!isNaN(v)&&v>=200&&v<=255){ state.customWhiteThreshold=v; CONFIG.WHITE_THRESHOLD=v; saveBotSettings(); _updateResizePreview(); }});
       if (ditherToggle) ditherToggle.addEventListener('change', e => { state.ditheringEnabled = e.target.checked; saveBotSettings(); _updateResizePreview(); });
       if (resetBtn) resetBtn.addEventListener('click', () => {
-        state.colorMatchingAlgorithm='lab'; state.enableChromaPenalty=true; state.chromaPenaltyWeight=0.15; state.customTransparencyThreshold=CONFIG.TRANSPARENCY_THRESHOLD=100; state.customWhiteThreshold=CONFIG.WHITE_THRESHOLD=250; saveBotSettings(); const a=document.getElementById('colorAlgorithmSelect'); if(a) a.value='lab'; const ct=document.getElementById('enableChromaPenaltyToggle'); if(ct) ct.checked=true; if(chromaSlider) chromaSlider.value=0.15; if(chromaValue) chromaValue.textContent='0.15'; if(transInput) transInput.value=100; if(whiteInput) whiteInput.value=250; _updateResizePreview(); Utils.showAlert('Advanced color settings reset.', 'success'); });
+        state.colorMatchingAlgorithm='lab'; state.enableChromaPenalty=true; state.chromaPenaltyWeight=0.15; state.customTransparencyThreshold=CONFIG.TRANSPARENCY_THRESHOLD=100; state.customWhiteThreshold=CONFIG.WHITE_THRESHOLD=250; saveBotSettings(); const a=document.getElementById('colorAlgorithmSelect'); if(a) a.value='lab'; const ct=document.getElementById('enableChromaPenaltyToggle'); if(ct) ct.checked=true; if(chromaSlider) chromaSlider.value=0.15; if(chromaValue) chromaValue.textContent='0.15'; if(transInput) transInput.value=100; if(whiteInput) whiteInput.value=250; _updateResizePreview(); Utils.showAlert(Utils.t('advancedColorSettingsReset'), 'success'); });
     };
     // Delay to ensure resize UI built
     setTimeout(advancedInit, 500);
