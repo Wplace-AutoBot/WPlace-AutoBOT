@@ -492,8 +492,8 @@
 /* Form controls and sliders for classic theme */
 :root .wplace-slider,
 .wplace-theme--classic .wplace-slider {
-  background: #444;
-  border-radius: 2px;
+  background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+  border-radius: 4px;
 }
 
 :root .wplace-slider::-webkit-slider-thumb,

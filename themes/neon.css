@@ -285,6 +285,16 @@
   text-shadow: 0 0 5px var(--wplace-text) !important;
 }
 
+/* Neon slider styling */
+.wplace-theme--neon .wplace-slider,
+.wplace-theme--neon .wplace-speed-slider,
+.wplace-theme--neon .wplace-overlay-opacity-slider {
+  background: var(--wplace-secondary) !important;
+  border: 1px solid var(--wplace-text) !important;
+  border-radius: 0 !important;
+  box-shadow: 0 0 10px rgba(0, 255, 65, 0.3) !important;
+}
+
 /* Scanline animation for neon theme */
 .wplace-theme--neon #wplace-image-bot-container::before {
   content: '';
@@ -300,6 +310,11 @@
   opacity: 0.7;
 }
 
+.wplace-theme--neon #wplace-stats-container {
+  position: relative;
+  overflow: hidden !important;
+}
+
 .wplace-theme--neon #wplace-stats-container::before {
   content: '';
   position: absolute;
@@ -310,7 +325,7 @@
   background: linear-gradient(90deg, transparent, var(--wplace-text), transparent);
   z-index: 1;
   pointer-events: none;
-  animation: scanline 4s linear infinite;
+  animation: scanlineStats 4s linear infinite;
   opacity: 0.7;
 }
 
@@ -344,6 +359,15 @@
   }
   100% {
     transform: translateY(400px);
+  }
+}
+
+@keyframes scanlineStats {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(300px);
   }
 }
 
