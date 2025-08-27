@@ -1,0 +1,48 @@
+name: Pages – per-branch static
+
+on:
+  push:
+    branches-ignore:
+      - gh-pages
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Sanitize branch name
+        id: br
+        shell: bash
+        run: |
+          SAFE="$(echo "${GITHUB_REF_NAME}" \
+            | tr '/:@ ' '----' \
+            | sed 's/[^A-Za-z0-9._-]/-/g')"
+          echo "safe=$SAFE" >> "$GITHUB_OUTPUT"
+
+      - name: Stage only static files
+        run: |
+          mkdir -p _site
+          rsync -a --prune-empty-dirs \
+            --include='*/' \
+            --include='*.html' \
+            --include='*.css' \
+            --include='*.js' \
+            --include='*.json' \
+            --exclude='*' \
+            ./ _site/
+
+      - name: Deploy to gh-pages/<branch>
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: _site
+          destination_dir: ${{ steps.br.outputs.safe }}
+          keep_files: true
+          commit_message: Deploy ${{ github.ref_name }}
