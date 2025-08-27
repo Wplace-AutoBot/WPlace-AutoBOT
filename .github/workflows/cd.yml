@@ -1,48 +1,76 @@
-name: Pages – per-branch static
+name: Pages – aggregate all branches
 
 on:
   push:
-    branches-ignore:
-      - gh-pages
+    branches: ["**"]
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
 
 jobs:
-  deploy:
+  aggregate_deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
     steps:
-      - name: Checkout
+      - name: Checkout (shallow)
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
-      - name: Sanitize branch name
-        id: br
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Aggregate files from all branches into ./public
         shell: bash
         run: |
-          SAFE="$(echo "${GITHUB_REF_NAME}" \
-            | tr '/:@ ' '----' \
-            | sed 's/[^A-Za-z0-9._-]/-/g')"
-          echo "safe=$SAFE" >> "$GITHUB_OUTPUT"
+          set -euo pipefail
+          mkdir -p public
 
-      - name: Stage only static files
-        run: |
-          mkdir -p _site
-          rsync -a --prune-empty-dirs \
-            --include='*/' \
-            --include='*.html' \
-            --include='*.css' \
-            --include='*.js' \
-            --include='*.json' \
-            --exclude='*' \
-            ./ _site/
+          # List remote branches (exclude HEAD pointer)
+          mapfile -t BRANCHES < <(git ls-remote --heads origin \
+            | awk '{print $2}' | sed 's@refs/heads/@@')
 
-      - name: Deploy to gh-pages/<branch>
-        uses: peaceiris/actions-gh-pages@v4
+          # Minimal index page
+          cat > public/index.html <<'HTML'
+          <!doctype html><meta charset="utf-8">
+          <title>Branches</title><h1>Branches</h1><ul>
+          HTML
+
+          for BR in "${BRANCHES[@]}"; do
+            SAFE=$(echo "$BR" | tr '/:@ ' '----' | sed 's/[^A-Za-z0-9._-]/-/g')
+            mkdir -p "public/$SAFE"
+
+            # Fetch that branch tip and export without checkout
+            git fetch --depth=1 origin "$BR"
+            git archive --format=tar FETCH_HEAD | tar -x -C "public/$SAFE"
+
+            # Keep only static assets; drop heavy/unneeded dirs
+            rm -rf "public/$SAFE/.git" "public/$SAFE/.github" "public/$SAFE/node_modules"
+            find "public/$SAFE" -type f ! \
+              \( -name '*.html' -o -name '*.js' -o -name '*.css' -o -name '*.json' -o \
+                 -name '*.png' -o -name '*.jpg' -o -name '*.jpeg' -o -name '*.gif' -o -name '*.svg' \) \
+              -delete
+            find "public/$SAFE" -type d -empty -delete
+
+            echo "<li><a href='./$SAFE/'>$BR</a></li>" >> public/index.html
+          done
+          echo "</ul>" >> public/index.html
+          echo "Built public/ for ${#BRANCHES[@]} branches."
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: gh-pages
-          publish_dir: _site
-          destination_dir: ${{ steps.br.outputs.safe }}
-          keep_files: true
-          commit_message: Deploy ${{ github.ref_name }}
+          path: public
+
+      - name: Deploy to GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v4
