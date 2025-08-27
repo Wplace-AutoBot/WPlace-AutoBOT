@@ -244,6 +244,11 @@
     state.language = "en"
     await loadTranslations("en")
   }
+  
+  // Always ensure English is loaded as fallback
+  if (!loadedTranslations["en"]) {
+    await loadTranslations("en")
+  }
 
   // Simple translation cache
   const translationCache = new Map();
@@ -1314,7 +1319,8 @@
       return button
     },
 
-    t: async (key, params = {}) => {
+    // Synchronous translation function for UI rendering
+    t: (key, params = {}) => {
       // Try to get from cache first
       const cacheKey = `${state.language}_${key}`;
       if (translationCache.has(cacheKey)) {
@@ -1325,7 +1331,7 @@
         return text;
       }
 
-      // Try dynamically loaded translations
+      // Try dynamically loaded translations (already loaded)
       if (loadedTranslations[state.language]?.[key]) {
         let text = loadedTranslations[state.language][key];
         // Cache for future use
@@ -1336,42 +1342,13 @@
         return text;
       }
 
-      // Try to load translations if not loaded yet
-      if (!loadedTranslations[state.language]) {
-        try {
-          const translations = await loadTranslations(state.language);
-          if (translations?.[key]) {
-            let text = translations[key];
-            translationCache.set(cacheKey, text);
-            Object.keys(params).forEach((param) => {
-              text = text.replace(`{${param}}`, params[param]);
-            });
-            return text;
-          }
-        } catch (error) {
-          console.warn(`Translation loading failed for ${state.language}:`, error);
-        }
-      }
-
       // Fallback to English if current language failed
-      if (state.language !== 'en') {
-        if (loadedTranslations['en']?.[key]) {
-          let text = loadedTranslations['en'][key];
-          Object.keys(params).forEach((param) => {
-            text = text.replace(`{${param}}`, params[param]);
-          });
-          return text;
-        }
-        
-        // Try to load English translations
-        const englishTranslations = await loadTranslations('en');
-        if (englishTranslations?.[key]) {
-          let text = englishTranslations[key];
-          Object.keys(params).forEach((param) => {
-            text = text.replace(`{${param}}`, params[param]);
-          });
-          return text;
-        }
+      if (state.language !== 'en' && loadedTranslations['en']?.[key]) {
+        let text = loadedTranslations['en'][key];
+        Object.keys(params).forEach((param) => {
+          text = text.replace(`{${param}}`, params[param]);
+        });
+        return text;
       }
 
       // Final fallback to emergency fallback or key
