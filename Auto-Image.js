@@ -146,6 +146,27 @@
           pixelBlink: false,
         },
       },
+      "Classic Light": {
+        primary: "#ffffff",
+        secondary: "#f8f9fa",
+        accent: "#e9ecef",
+        text: "#212529",
+        highlight: "#6f42c1",
+        success: "#28a745",
+        error: "#dc3545",
+        warning: "#ffc107",
+        fontFamily: "'Segoe UI', Roboto, sans-serif",
+        borderRadius: "12px",
+        borderStyle: "solid",
+        borderWidth: "1px",
+        boxShadow: "0 8px 32px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.08)",
+        backdropFilter: "blur(10px)",
+        animations: {
+          glow: false,
+          scanline: false,
+          pixelBlink: false,
+        },
+      },
       "Neon Retro": {
         primary: "#1a1a2e",
         secondary: "#16213e",
@@ -177,20 +198,56 @@
   const getCurrentTheme = () => CONFIG.THEMES[CONFIG.currentTheme]
 
   const switchTheme = (themeName) => {
-    if (CONFIG.THEMES[themeName]) {
-      CONFIG.currentTheme = themeName
-      saveThemePreference()
+  if (CONFIG.THEMES[themeName]) {
+    CONFIG.currentTheme = themeName
+    saveThemePreference()
 
-      // Remove existing theme styles
-      const existingStyle = document.querySelector('style[data-wplace-theme="true"]')
-      if (existingStyle) {
-        existingStyle.remove()
-      }
+    // APPLY THEME VARS/CLASS (new)
+    applyTheme()
 
-      // Recreate UI with new theme (cleanup is handled in createUI)
-      createUI()
-    }
+    // Recreate UI (kept for now)
+    createUI()
   }
+}
+
+// Add this helper (place it after getCurrentTheme/switchTheme definitions)
+function applyTheme() {
+  const theme = getCurrentTheme();
+  // Toggle theme class on documentElement so CSS vars cascade to our UI
+  document.documentElement.classList.remove('wplace-theme--classic', 'wplace-theme--classic-light', 'wplace-theme--neon');
+  
+  let themeClass = 'wplace-theme--classic'; // default
+  if (CONFIG.currentTheme === 'Neon Retro') {
+    themeClass = 'wplace-theme--neon';
+  } else if (CONFIG.currentTheme === 'Classic Light') {
+    themeClass = 'wplace-theme--classic-light';
+  }
+  
+  document.documentElement.classList.add(themeClass);
+
+  // Also set CSS variables explicitly in case you want runtime overrides
+  const root = document.documentElement;
+  const setVar = (k, v) => { try { root.style.setProperty(k, v); } catch {} };
+
+  setVar('--wplace-primary', theme.primary);
+  setVar('--wplace-secondary', theme.secondary);
+  setVar('--wplace-accent', theme.accent);
+  setVar('--wplace-text', theme.text);
+  setVar('--wplace-highlight', theme.highlight);
+  setVar('--wplace-success', theme.success);
+  setVar('--wplace-error', theme.error);
+  setVar('--wplace-warning', theme.warning);
+
+  // Typography + look
+  setVar('--wplace-font', theme.fontFamily || "'Segoe UI', Roboto, sans-serif");
+  setVar('--wplace-radius', ('' + (theme.borderRadius || '12px')));
+  setVar('--wplace-border-style', (('' + (theme.borderStyle || 'solid'))));
+  setVar('--wplace-border-width', (('' + (theme.borderWidth || '1px'))));
+  setVar('--wplace-backdrop', (('' + (theme.backdropFilter || 'blur(10px)'))));
+  setVar('--wplace-border-color', 'rgba(255,255,255,0.1)');
+}
+
+  
 
   const saveThemePreference = () => {
     try {
@@ -1700,18 +1757,7 @@
         }
         
         this._turnstileContainer = document.createElement('div');
-        this._turnstileContainer.style.cssText = `
-          position: fixed !important;
-          left: -99999px !important;
-          top: -99999px !important;
-          width: 1px !important;
-          height: 1px !important;
-          pointer-events: none !important;
-          opacity: 0 !important;
-          visibility: hidden !important;
-          z-index: -99999 !important;
-          overflow: hidden !important;
-        `;
+        this._turnstileContainer.className = 'wplace-turnstile-hidden';
         this._turnstileContainer.setAttribute('aria-hidden', 'true');
         this._turnstileContainer.id = 'turnstile-widget-container';
         document.body.appendChild(this._turnstileContainer);
@@ -1727,35 +1773,19 @@
 
       const overlay = document.createElement('div');
       overlay.id = 'turnstile-overlay-container';
-      overlay.style.cssText = `
-        position: fixed !important;
-        bottom: 20px !important;
-        right: 20px !important;
-        z-index: 99999 !important;
-        background: rgba(0,0,0,0.9) !important;
-        border-radius: 12px !important;
-        padding: 20px !important;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.4) !important;
-        backdrop-filter: blur(10px) !important;
-        border: 1px solid rgba(255,255,255,0.2) !important;
-        color: white !important;
-        font-family: 'Segoe UI', sans-serif !important;
-        display: none !important;
-        max-width: 350px !important;
-        min-width: 300px !important;
-      `;
+      overlay.className = 'wplace-turnstile-overlay wplace-overlay-hidden';
 
       const title = document.createElement('div');
       title.textContent = 'Cloudflare Turnstile — please complete the check if shown';
-      title.style.cssText = 'font: 600 12px/1.3 "Segoe UI",sans-serif; margin-bottom: 8px; opacity: 0.9;';
+      title.className = 'wplace-turnstile-title';
 
       const host = document.createElement('div');
       host.id = 'turnstile-overlay-host';
-      host.style.cssText = 'width: 100%; min-height: 70px;';
+      host.className = 'wplace-turnstile-host';
 
       const hideBtn = document.createElement('button');
       hideBtn.textContent = 'Hide';
-      hideBtn.style.cssText = 'position:absolute; top:6px; right:6px; font-size:11px; background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.2); border-radius:6px; padding:2px 6px; cursor:pointer;';
+      hideBtn.className = 'wplace-turnstile-hide-btn';
       hideBtn.addEventListener('click', () => overlay.remove());
 
       overlay.appendChild(title);
@@ -1870,6 +1900,7 @@
           }
           
           const overlay = this.ensureTurnstileOverlayContainer();
+          overlay.classList.remove('wplace-overlay-hidden');
           overlay.style.display = 'block';
           
           const host = overlay.querySelector('#turnstile-overlay-host');
@@ -1878,6 +1909,7 @@
           // Set a timeout for interactive mode
           const timeout = setTimeout(() => {
             console.warn('⏰ Interactive Turnstile widget timeout');
+            overlay.classList.add('wplace-overlay-hidden');
             overlay.style.display = 'none';
             resolve(null);
           }, 60000); // 60 seconds for user interaction
@@ -1889,7 +1921,8 @@
             theme: 'light',
             callback: (token) => {
               clearTimeout(timeout);
-              overlay.style.display = 'none';
+              overlay.classList.add('wplace-overlay-hidden');
+            overlay.style.display = 'none';
               console.log('✅ Interactive Turnstile completed successfully');
               
               if (typeof token === 'string' && token.length > 20) {
@@ -1901,7 +1934,8 @@
             },
             'error-callback': (error) => {
               clearTimeout(timeout);
-              overlay.style.display = 'none';
+              overlay.classList.add('wplace-overlay-hidden');
+            overlay.style.display = 'none';
               console.warn('❌ Interactive Turnstile error:', error);
               resolve(null);
             },
@@ -1912,6 +1946,7 @@
           
           if (!widgetId) {
             clearTimeout(timeout);
+            overlay.classList.add('wplace-overlay-hidden');
             overlay.style.display = 'none';
             console.warn('❌ Failed to create interactive Turnstile widget');
             resolve(null);
@@ -2084,40 +2119,7 @@
 
     showAlert: (message, type = "info") => {
       const alertDiv = document.createElement("div")
-      alertDiv.style.cssText = `
-        position: fixed;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        padding: 12px 20px;
-        border-radius: 8px;
-        color: white;
-        font-weight: 600;
-        z-index: 10001;
-        max-width: 400px;
-        text-align: center;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        animation: slideDown 0.3s ease-out;
-        font-family: 'Segoe UI', sans-serif;
-      `
-
-      const colors = {
-        info: "background: linear-gradient(135deg, #3498db, #2980b9);",
-        success: "background: linear-gradient(135deg, #27ae60, #229954);",
-        warning: "background: linear-gradient(135deg, #f39c12, #e67e22);",
-        error: "background: linear-gradient(135deg, #e74c3c, #c0392b);",
-      }
-
-      alertDiv.style.cssText += colors[type] || colors.info
-
-      const style = document.createElement("style")
-      style.textContent = `
-        @keyframes slideDown {
-          from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
-          to { transform: translateX(-50%) translateY(0); opacity: 1; }
-        }
-      `
-      document.head.appendChild(style)
+      alertDiv.className = `wplace-alert-base wplace-alert-${type}`
 
       alertDiv.textContent = message
       document.body.appendChild(alertDiv)
@@ -2126,7 +2128,6 @@
         alertDiv.style.animation = "slideDown 0.3s ease-out reverse"
         setTimeout(() => {
           document.body.removeChild(alertDiv)
-          document.head.removeChild(style)
         }, 300)
       }, 4000)
     },
@@ -3279,6 +3280,7 @@
     loadLanguagePreference()
 
     const theme = getCurrentTheme()
+    applyTheme() // <- new: set CSS vars and theme class before building UI
 
     const fontAwesome = document.createElement("link")
     fontAwesome.rel = "stylesheet"
@@ -3292,1155 +3294,12 @@
       document.head.appendChild(googleFonts)
     }
 
-    const style = document.createElement("style")
-    style.setAttribute("data-wplace-theme", "true")
-
-    style.textContent = `
-      ${theme.animations.glow
-        ? `
-      @keyframes neonGlow {
-        0%, 100% {
-          text-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor;
-        }
-        50% {
-          text-shadow: 0 0 2px currentColor, 0 0 5px currentColor, 0 0 8px currentColor;
-        }
-      }`
-        : ""
-      }
-
-      ${theme.animations.pixelBlink
-        ? `
-      @keyframes pixelBlink {
-        0%, 50% { opacity: 1; }
-        51%, 100% { opacity: 0.7; }
-      }`
-        : ""
-      }
-
-      ${theme.animations.scanline
-        ? `
-      @keyframes scanline {
-        0% { transform: translateY(-100%); }
-        100% { transform: translateY(400px); }
-      }`
-        : ""
-      }
-
-      @keyframes pulse {
-        0% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.7); }
-        70% { box-shadow: 0 0 0 10px rgba(0, 255, 0, 0); }
-        100% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0); }
-      }
-      @keyframes slideIn {
-        from { transform: translateY(-10px); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
-      }
-      @keyframes shimmer {
-        0% { transform: translateX(-100%); }
-        100% { transform: translateX(100%); }
-      }
-
-      #wplace-image-bot-container {
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        width: ${CONFIG.currentTheme === "Neon Retro" ? "280px" : "280px"};
-        max-height: calc(100vh - 40px);
-        background: ${CONFIG.currentTheme === "Classic Autobot"
-        ? `linear-gradient(135deg, ${theme.primary} 0%, #1a1a1a 100%)`
-        : theme.primary
-      };
-        border: ${theme.borderWidth} ${theme.borderStyle} ${CONFIG.currentTheme === "Classic Autobot" ? theme.accent : theme.text};
-        border-radius: ${theme.borderRadius};
-        padding: 0;
-        box-shadow: ${theme.boxShadow};
-        z-index: 9998;
-        font-family: ${theme.fontFamily};
-        color: ${theme.text};
-        animation: slideIn 0.4s ease-out;
-        overflow-y: auto; /* Allow scrolling for main panel */
-        overflow-x: hidden;
-        ${theme.backdropFilter ? `backdrop-filter: ${theme.backdropFilter};` : ""}
-        transition: all 0.3s ease;
-        user-select: none;
-        ${CONFIG.currentTheme === "Neon Retro" ? "image-rendering: pixelated;" : ""}
-      }
-
-      ${theme.animations.scanline
-        ? `
-      #wplace-image-bot-container::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 2px;
-        background: linear-gradient(90deg, transparent, ${theme.neon}, transparent);
-        animation: scanline 3s linear infinite;
-        z-index: 1;
-        pointer-events: none;
-      }`
-        : ""
-      }
-
-      ${CONFIG.currentTheme === "Neon Retro"
-        ? `
-      #wplace-image-bot-container::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background:
-          repeating-linear-gradient(
-            0deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 255, 65, 0.03) 2px,
-            rgba(0, 255, 65, 0.03) 4px
-          );
-        pointer-events: none;
-        z-index: 1;
-      }`
-        : ""
-      }
-
-      #wplace-image-bot-container.wplace-dragging {
-        transition: none;
-        box-shadow: 0 12px 40px rgba(0,0,0,0.8), 0 0 0 2px rgba(255,255,255,0.2);
-        transform: scale(1.02);
-        z-index: 9999;
-      }
-      #wplace-image-bot-container.wplace-minimized {
-        width: 200px;
-        height: auto;
-        overflow: hidden;
-      }
-      #wplace-image-bot-container.wplace-compact {
-        width: 240px;
-      }
-
-      /* Stats Container */
-      #wplace-stats-container {
-        position: fixed;
-        top: 20px;
-        left: 330px;
-        width: ${CONFIG.currentTheme === "Neon Retro" ? "280px" : "280px"};
-        max-height: calc(100vh - 40px);
-        background: ${CONFIG.currentTheme === "Classic Autobot"
-        ? `linear-gradient(135deg, ${theme.primary} 0%, #1a1a1a 100%)`
-        : theme.primary
-      };
-        border: ${theme.borderWidth} ${theme.borderStyle} ${CONFIG.currentTheme === "Classic Autobot" ? theme.accent : theme.text};
-        border-radius: ${theme.borderRadius};
-        padding: 0;
-        box-shadow: ${theme.boxShadow};
-        z-index: 9997;
-        font-family: ${theme.fontFamily};
-        color: ${theme.text};
-        animation: slideIn 0.4s ease-out;
-        overflow-y: auto; /* Make stats panel scrollable */
-        ${theme.backdropFilter ? `backdrop-filter: ${theme.backdropFilter};` : ""}
-        transition: all 0.3s ease;
-        user-select: none;
-        ${CONFIG.currentTheme === "Neon Retro" ? "image-rendering: pixelated;" : ""}
-      }
-
-      /* FIX: Disable transition during drag to prevent lag */
-      #wplace-stats-container.wplace-dragging {
-        transition: none;
-      }
-
-      .wplace-header {
-        padding: ${CONFIG.currentTheme === "Neon Retro" ? "8px 12px" : "8px 12px"};
-        background: ${CONFIG.currentTheme === "Classic Autobot"
-        ? `linear-gradient(135deg, ${theme.secondary} 0%, #2a2a2a 100%)`
-        : theme.secondary
-      };
-        color: ${theme.highlight};
-        font-size: ${CONFIG.currentTheme === "Neon Retro" ? "11px" : "13px"};
-        font-weight: ${CONFIG.currentTheme === "Neon Retro" ? "normal" : "700"};
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        cursor: move;
-        user-select: none;
-        border-bottom: ${CONFIG.currentTheme === "Neon Retro" ? "2px" : "1px"} solid ${CONFIG.currentTheme === "Classic Autobot" ? "rgba(255,255,255,0.1)" : theme.text};
-        ${CONFIG.currentTheme === "Classic Autobot" ? "text-shadow: 0 1px 2px rgba(0,0,0,0.5);" : "text-transform: uppercase; letter-spacing: 1px;"}
-        transition: background 0.2s ease;
-        position: relative;
-        z-index: 2;
-        ${theme.animations.glow ? "animation: neonGlow 2s ease-in-out infinite alternate;" : ""}
-      }
-
-      .wplace-header-title {
-        display: flex;
-        align-items: center;
-        gap: ${CONFIG.currentTheme === "Neon Retro" ? "6px" : "6px"};
-      }
-
-      .wplace-header-controls {
-        display: flex;
-        gap: ${CONFIG.currentTheme === "Neon Retro" ? "6px" : "6px"};
-      }
-
-      .wplace-header-btn {
-        background: ${CONFIG.currentTheme === "Classic Autobot" ? "rgba(255,255,255,0.1)" : theme.accent};
-        border: ${CONFIG.currentTheme === "Neon Retro" ? `2px solid ${theme.text}` : "none"};
-        color: ${theme.text};
-        cursor: pointer;
-        border-radius: ${CONFIG.currentTheme === "Classic Autobot" ? "4px" : "0"};
-        width: ${CONFIG.currentTheme === "Classic Autobot" ? "18px" : "auto"};
-        height: ${CONFIG.currentTheme === "Classic Autobot" ? "18px" : "auto"};
-        padding: ${CONFIG.currentTheme === "Neon Retro" ? "4px 6px" : "0"};
-        font-size: ${CONFIG.currentTheme === "Neon Retro" ? "8px" : "10px"};
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s;
-        font-family: ${theme.fontFamily};
-        ${CONFIG.currentTheme === "Neon Retro" ? "image-rendering: pixelated;" : ""}
-      }
-      .wplace-header-btn:hover {
-        background: ${CONFIG.currentTheme === "Classic Autobot" ? theme.accent : theme.text};
-        color: ${CONFIG.currentTheme === "Classic Autobot" ? theme.text : theme.primary};
-        transform: ${CONFIG.currentTheme === "Classic Autobot" ? "scale(1.1)" : "none"};
-        ${CONFIG.currentTheme === "Neon Retro" ? `box-shadow: 0 0 10px ${theme.text};` : ""}
-      }
-
-      .wplace-content {
-        padding: ${CONFIG.currentTheme === "Neon Retro" ? "12px" : "12px"};
-        display: block;
-        position: relative;
-        z-index: 2;
-      }
-      .wplace-content.wplace-hidden {
-        display: none;
-      }
-
-      .wplace-status-section {
-        margin-bottom: 12px;
-        padding: 8px;
-        background: rgba(255,255,255,0.03);
-        border-radius: ${theme.borderRadius};
-        border: 1px solid rgba(255,255,255,0.1);
-      }
-
-      .wplace-section {
-        margin-bottom: ${CONFIG.currentTheme === "Neon Retro" ? "12px" : "12px"};
-        padding: 12px;
-        background: rgba(255,255,255,0.03);
-        border-radius: ${theme.borderRadius};
-        border: 1px solid rgba(255,255,255,0.1);
-      }
-
-      .wplace-section-title {
-        font-size: 11px;
-        font-weight: 600;
-        margin-bottom: 8px;
-        color: ${theme.highlight};
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-
-      .wplace-controls {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-      }
-      .wplace-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-      }
-      .wplace-row.single {
-        grid-template-columns: 1fr;
-      }
-
-      .wplace-btn {
-        padding: ${CONFIG.currentTheme === "Neon Retro" ? "12px 8px" : "8px 12px"};
-        border: ${CONFIG.currentTheme === "Neon Retro" ? "2px solid" : "none"};
-        border-radius: ${theme.borderRadius};
-        font-weight: ${CONFIG.currentTheme === "Neon Retro" ? "normal" : "500"};
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: ${CONFIG.currentTheme === "Neon Retro" ? "8px" : "6px"};
-        font-size: ${CONFIG.currentTheme === "Neon Retro" ? "8px" : "11px"};
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-        font-family: ${theme.fontFamily};
-        ${CONFIG.currentTheme === "Neon Retro" ? "text-transform: uppercase; letter-spacing: 1px; image-rendering: pixelated;" : ""}
-        background: ${CONFIG.currentTheme === "Classic Autobot"
-        ? `linear-gradient(135deg, ${theme.accent} 0%, #4a4a4a 100%)`
-        : theme.accent
-      };
-        ${CONFIG.currentTheme === "Classic Autobot" ? "border: 1px solid rgba(255,255,255,0.1);" : ""}
-      }
-
-      ${CONFIG.currentTheme === "Classic Autobot"
-        ? `
-      .wplace-btn::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-        transition: left 0.5s ease;
-      }
-      .wplace-btn:hover:not(:disabled)::before {
-        left: 100%;
-      }`
-        : `
-      .wplace-btn::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-        transition: left 0.5s;
-      }
-      .wplace-btn:hover::before {
-        left: 100%;
-      }`
-      }
-
-      .wplace-btn:hover:not(:disabled) {
-        transform: ${CONFIG.currentTheme === "Classic Autobot" ? "translateY(-1px)" : "none"};
-        box-shadow: ${CONFIG.currentTheme === "Classic Autobot" ? "0 4px 12px rgba(0,0,0,0.4)" : "0 0 15px currentColor"
-      };
-        ${theme.animations.pixelBlink ? "animation: pixelBlink 0.5s infinite;" : ""}
-      }
-      .wplace-btn:active:not(:disabled) {
-        transform: translateY(0);
-      }
-
-      .wplace-btn-primary {
-        background: ${CONFIG.currentTheme === "Classic Autobot"
-        ? `linear-gradient(135deg, ${theme.accent} 0%, #6a5acd 100%)`
-        : theme.accent
-      };
-        color: ${theme.text};
-        ${CONFIG.currentTheme === "Neon Retro" ? `border-color: ${theme.text};` : ""}
-      }
-      .wplace-btn-upload {
-        background: ${CONFIG.currentTheme === "Classic Autobot"
-        ? `linear-gradient(135deg, ${theme.secondary} 0%, #4a4a4a 100%)`
-        : theme.purple
-      };
-        color: ${theme.text};
-        ${CONFIG.currentTheme === "Classic Autobot"
-        ? `border: 1px dashed ${theme.highlight};`
-        : `border-color: ${theme.text}; border-style: dashed;`
-      }
-      }
-      .wplace-btn-start {
-        background: ${CONFIG.currentTheme === "Classic Autobot"
-        ? `linear-gradient(135deg, ${theme.success} 0%, #228b22 100%)`
-        : theme.success
-      };
-        color: ${CONFIG.currentTheme === "Classic Autobot" ? "white" : theme.primary};
-        ${CONFIG.currentTheme === "Neon Retro" ? `border-color: ${theme.success};` : ""}
-      }
-      .wplace-btn-stop {
-        background: ${CONFIG.currentTheme === "Classic Autobot"
-        ? `linear-gradient(135deg, ${theme.error} 0%, #dc143c 100%)`
-        : theme.error
-      };
-        color: ${CONFIG.currentTheme === "Classic Autobot" ? "white" : theme.text};
-        ${CONFIG.currentTheme === "Neon Retro" ? `border-color: ${theme.error};` : ""}
-      }
-      .wplace-btn-select {
-        background: ${CONFIG.currentTheme === "Classic Autobot"
-        ? `linear-gradient(135deg, ${theme.highlight} 0%, #9370db 100%)`
-        : theme.highlight
-      };
-        color: ${CONFIG.currentTheme === "Classic Autobot" ? "white" : theme.primary};
-        ${CONFIG.currentTheme === "Neon Retro" ? `border-color: ${theme.highlight};` : ""}
-      }
-      .wplace-btn-file {
-        background: ${CONFIG.currentTheme === "Classic Autobot"
-        ? "linear-gradient(135deg, #ff8c00 0%, #ff7f50 100%)"
-        : theme.warning
-      };
-        color: ${CONFIG.currentTheme === "Classic Autobot" ? "white" : theme.primary};
-        ${CONFIG.currentTheme === "Neon Retro" ? `border-color: ${theme.warning};` : ""}
-      }
-      .wplace-btn:disabled {
-        opacity: ${CONFIG.currentTheme === "Classic Autobot" ? "0.5" : "0.3"};
-        cursor: not-allowed;
-        transform: none !important;
-        ${theme.animations.pixelBlink ? "animation: none !important;" : ""}
-        box-shadow: none !important;
-      }
-      .wplace-btn:disabled::before {
-        display: none;
-      }
-      
-      .wplace-btn-overlay.active {
-        background: linear-gradient(135deg, #29b6f6 0%, #8e2de2 100%);
-        box-shadow: 0 0 15px #8e2de2;
-      }
-
-      .wplace-stats {
-        background: ${CONFIG.currentTheme === "Classic Autobot" ? "rgba(255,255,255,0.03)" : theme.secondary};
-        padding: ${CONFIG.currentTheme === "Neon Retro" ? "12px" : "8px"};
-        border: ${CONFIG.currentTheme === "Neon Retro" ? `2px solid ${theme.text}` : "1px solid rgba(255,255,255,0.1)"};
-        border-radius: ${theme.borderRadius};
-        margin-bottom: ${CONFIG.currentTheme === "Neon Retro" ? "15px" : "8px"};
-        ${CONFIG.currentTheme === "Neon Retro" ? "box-shadow: inset 0 0 10px rgba(0, 255, 65, 0.1);" : ""}
-      }
-
-      .wplace-stat-item {
-        display: flex;
-        justify-content: space-between;
-        padding: ${CONFIG.currentTheme === "Neon Retro" ? "6px 0" : "4px 0"};
-        font-size: ${CONFIG.currentTheme === "Neon Retro" ? "8px" : "11px"};
-        border-bottom: 1px solid rgba(255,255,255,0.05);
-        ${CONFIG.currentTheme === "Neon Retro" ? "text-transform: uppercase; letter-spacing: 1px;" : ""}
-      }
-      .wplace-stat-item:last-child {
-        border-bottom: none;
-      }
-      .wplace-stat-label {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        opacity: 0.9;
-        font-size: ${CONFIG.currentTheme === "Neon Retro" ? "8px" : "10px"};
-      }
-      .wplace-stat-value {
-        font-weight: 600;
-        color: ${theme.highlight};
-      }
-
-      .wplace-colors-section {
-        margin-top: 10px;
-        padding-top: 8px;
-        border-top: 1px solid rgba(255,255,255,0.05);
-      }
-
-      .wplace-stat-colors-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(16px, 1fr));
-        gap: 4px;
-        margin-top: 8px;
-        padding: 4px;
-        background: rgba(0,0,0,0.2);
-        border-radius: 4px;
-        max-height: 80px; /* Limit height and allow scrolling */
-        overflow-y: auto;
-      }
-      
-      .wplace-stat-color-swatch {
-        width: 16px;
-        height: 16px;
-        border-radius: 3px;
-        border: 1px solid rgba(255,255,255,0.1);
-        box-shadow: inset 0 0 2px rgba(0,0,0,0.5);
-      }
-
-      .wplace-progress {
-        width: 100%;
-        background: ${CONFIG.currentTheme === "Classic Autobot" ? "rgba(0,0,0,0.3)" : theme.secondary};
-        border: ${CONFIG.currentTheme === "Neon Retro" ? `2px solid ${theme.text}` : "1px solid rgba(255,255,255,0.1)"};
-        border-radius: ${theme.borderRadius};
-        margin: ${CONFIG.currentTheme === "Neon Retro" ? "10px 0" : "8px 0"};
-        overflow: hidden;
-        height: ${CONFIG.currentTheme === "Neon Retro" ? "16px" : "6px"};
-        position: relative;
-      }
-
-      ${CONFIG.currentTheme === "Neon Retro"
-        ? `
-      .wplace-progress::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background:
-          repeating-linear-gradient(
-            45deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 255, 65, 0.1) 2px,
-            rgba(0, 255, 65, 0.1) 4px
-          );
-        pointer-events: none;
-      }`
-        : ""
-      }
-
-      .wplace-progress-bar {
-        height: ${CONFIG.currentTheme === "Neon Retro" ? "100%" : "6px"};
-        background: ${CONFIG.currentTheme === "Classic Autobot"
-        ? `linear-gradient(135deg, ${theme.highlight} 0%, #9370db 100%)`
-        : `linear-gradient(90deg, ${theme.success}, ${theme.neon})`
-      };
-        transition: width ${CONFIG.currentTheme === "Neon Retro" ? "0.3s" : "0.5s"} ease;
-        position: relative;
-        ${CONFIG.currentTheme === "Neon Retro" ? `box-shadow: 0 0 10px ${theme.success};` : ""}
-      }
-
-      ${CONFIG.currentTheme === "Classic Autobot"
-        ? `
-      .wplace-progress-bar::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-        animation: shimmer 2s infinite;
-      }`
-        : `
-      .wplace-progress-bar::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        right: 0;
-        width: 4px;
-        height: 100%;
-        background: ${theme.text};
-        animation: pixelBlink 1s infinite;
-      }`
-      }
-
-      .wplace-status {
-        padding: ${CONFIG.currentTheme === "Neon Retro" ? "10px" : "6px"};
-        border: ${CONFIG.currentTheme === "Neon Retro" ? "2px solid" : "1px solid"};
-        border-radius: ${theme.borderRadius};
-        text-align: center;
-        font-size: ${CONFIG.currentTheme === "Neon Retro" ? "8px" : "11px"};
-        ${CONFIG.currentTheme === "Neon Retro" ? "text-transform: uppercase; letter-spacing: 1px;" : ""}
-        position: relative;
-        overflow: hidden;
-      }
-
-      .status-default {
-        background: ${CONFIG.currentTheme === "Classic Autobot" ? "rgba(255,255,255,0.1)" : theme.accent};
-        border-color: ${theme.text};
-        color: ${theme.text};
-      }
-      .status-success {
-        background: ${CONFIG.currentTheme === "Classic Autobot" ? "rgba(0, 255, 0, 0.1)" : theme.success};
-        border-color: ${theme.success};
-        color: ${CONFIG.currentTheme === "Classic Autobot" ? theme.success : theme.primary};
-        box-shadow: 0 0 15px ${theme.success};
-      }
-      .status-error {
-        background: ${CONFIG.currentTheme === "Classic Autobot" ? "rgba(255, 0, 0, 0.1)" : theme.error};
-        border-color: ${theme.error};
-        color: ${CONFIG.currentTheme === "Classic Autobot" ? theme.error : theme.text};
-        box-shadow: 0 0 15px ${theme.error};
-        ${theme.animations.pixelBlink ? "animation: pixelBlink 0.5s infinite;" : ""}
-      }
-      .status-warning {
-        background: ${CONFIG.currentTheme === "Classic Autobot" ? "rgba(255, 165, 0, 0.1)" : theme.warning};
-        border-color: ${theme.warning};
-        color: ${CONFIG.currentTheme === "Classic Autobot" ? "orange" : theme.primary};
-        box-shadow: 0 0 15px ${theme.warning};
-      }
-
-      .resize-container {
-        display: none;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: ${theme.primary};
-        padding: 20px;
-        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.text};
-        border-radius: ${theme.borderRadius};
-        z-index: 10000;
-        box-shadow: ${CONFIG.currentTheme === "Classic Autobot" ? "0 0 20px rgba(0,0,0,0.5)" : "0 0 30px rgba(0, 255, 65, 0.5)"
-      };
-        width: 90%;
-        max-width: 700px;
-        max-height: 90%;
-        overflow: auto;
-        font-family: ${theme.fontFamily};
-      }
-
-      .resize-preview-wrapper {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border: 1px solid ${theme.accent};
-        background: rgba(0,0,0,0.2);
-        margin: 15px 0;
-        height: 300px;
-        overflow: hidden;
-      }
-
-  .resize-canvas-stack { position: relative; transform-origin: center center; display: inline-block; }
-      .resize-base-canvas, .resize-mask-canvas {
-        position: absolute; left: 0; top: 0;
-        image-rendering: pixelated;
-        image-rendering: -moz-crisp-edges;
-        image-rendering: crisp-edges;
-      }
-      .resize-mask-canvas { pointer-events: auto; }
-      .resize-tools { display:flex; gap:8px; align-items:center; margin-top:8px; font-size:12px; }
-      .resize-tools button { padding:6px 10px; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.06); color:#fff; cursor:pointer; }
-      .wplace-btn.active,
-      .wplace-btn[aria-pressed="true"] {
-        background: ${theme.highlight} !important;
-        color: ${theme.primary} !important;
-        border-color: ${theme.text} !important;
-        box-shadow: 0 0 8px rgba(0,0,0,0.25) inset, 0 0 6px rgba(0,0,0,0.2) !important;
-      }
-      .wplace-btn.active i,
-      .wplace-btn[aria-pressed="true"] i { filter: drop-shadow(0 0 3px ${theme.primary}); }
-      .mask-mode-group .wplace-btn.active,
-      .mask-mode-group .wplace-btn[aria-pressed="true"] {
-        background: ${theme.highlight};
-        color: ${theme.primary};
-        border-color: ${theme.text};
-        box-shadow: 0 0 8px rgba(0,0,0,0.25) inset, 0 0 6px rgba(0,0,0,0.2);
-      }
-
-      .resize-controls {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 15px;
-        align-items: center;
-      }
-
-      .resize-controls label {
-        font-size: ${CONFIG.currentTheme === "Neon Retro" ? "8px" : "12px"};
-        ${CONFIG.currentTheme === "Neon Retro" ? "text-transform: uppercase; letter-spacing: 1px;" : ""}
-        color: ${theme.text};
-      }
-
-      .resize-slider {
-        width: 100%;
-        height: ${CONFIG.currentTheme === "Neon Retro" ? "8px" : "4px"};
-        background: ${CONFIG.currentTheme === "Classic Autobot" ? "#ccc" : theme.secondary};
-        border: ${CONFIG.currentTheme === "Neon Retro" ? `2px solid ${theme.text}` : "none"};
-        border-radius: ${theme.borderRadius};
-        outline: none;
-        -webkit-appearance: none;
-      }
-
-      ${CONFIG.currentTheme === "Neon Retro"
-        ? `
-      .resize-slider::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        width: 16px;
-        height: 16px;
-        background: ${theme.highlight};
-        border: 2px solid ${theme.text};
-        border-radius: 0;
-        cursor: pointer;
-        box-shadow: 0 0 5px ${theme.highlight};
-      }
-
-      .resize-slider::-moz-range-thumb {
-        width: 16px;
-        height: 16px;
-        background: ${theme.highlight};
-        border: 2px solid ${theme.text};
-        border-radius: 0;
-        cursor: pointer;
-        box-shadow: 0 0 5px ${theme.highlight};
-      }`
-        : ""
-      }
-      
-      .resize-zoom-controls {
-        grid-column: 1 / -1;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-top: 15px;
-      }
-
-      .resize-buttons {
-        display: flex;
-        gap: 10px;
-        justify-content: center;
-        margin-top: 20px;
-      }
-
-      .resize-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        z-index: 9999;
-        display: none;
-      }
-      .wplace-color-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-        gap: 10px;
-        padding-top: 8px;
-        max-height: 300px;
-        overflow-y: auto;
-      }
-      .wplace-color-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 4px;
-      }
-      .wplace-color-item-name {
-        font-size: 9px;
-        color: #ccc;
-        text-align: center;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        width: 100%;
-      }
-      .wplace-color-swatch {
-        width: 22px;
-        height: 22px;
-        border: 1px solid rgba(255,255,255,0.2);
-        border-radius: 4px;
-        cursor: pointer;
-        transition: transform 0.1s ease, box-shadow 0.2s ease;
-        position: relative;
-        margin: 0 auto;
-      }
-      .wplace-color-swatch.unavailable {
-        border-color: #666;
-        border-style: dashed;
-        cursor: not-allowed;
-      }
-      .wplace-color-swatch:hover {
-        transform: scale(1.1);
-        z-index: 1;
-      }
-      .wplace-color-swatch:not(.active) {
-        opacity: 0.3;
-        filter: grayscale(80%);
-      }
-      .wplace-color-swatch.unavailable:not(.active) {
-        opacity: 0.2;
-        filter: grayscale(90%);
-      }
-      .wplace-color-swatch.active::after {
-        content: '✔';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        color: white;
-        font-size: 12px;
-        font-weight: bold;
-        text-shadow: 0 0 3px black;
-      }
-      .wplace-color-divider {
-        border: none;
-        height: 1px;
-        background: rgba(255,255,255,0.1);
-        margin: 8px 0;
-      }
-
-        .wplace-cooldown-control {
-            margin-top: 8px;
-        }
-        .wplace-cooldown-control label {
-            font-size: 11px;
-            margin-bottom: 4px;
-            display: block;
-        }
-        .wplace-slider-container {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .wplace-slider {
-            flex: 1;
-            -webkit-appearance: none;
-            appearance: none;
-            height: 4px;
-            background: #444;
-            border-radius: 2px;
-            outline: none;
-        }
-        .wplace-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 14px;
-            height: 14px;
-            background: ${theme.highlight};
-            border-radius: 50%;
-            cursor: pointer;
-        }
-
-
-      ${CONFIG.currentTheme === "Neon Retro"
-        ? `
-      input[type="checkbox"] {
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        width: 16px;
-        height: 16px;
-        border: 2px solid ${theme.text};
-        background: ${theme.secondary};
-        margin-right: 8px;
-        position: relative;
-        cursor: pointer;
-      }
-
-      input[type="checkbox"]:checked {
-        background: ${theme.success};
-      }
-
-      input[type="checkbox"]:checked::after {
-        content: '✓';
-        position: absolute;
-        top: -2px;
-        left: 1px;
-        color: ${theme.primary};
-        font-size: 12px;
-        font-weight: bold;
-      }
-
-      .fas, .fa {
-        filter: drop-shadow(0 0 3px currentColor);
-      }
-
-      .wplace-speed-control {
-        margin-top: 12px;
-        padding: 12px;
-        background: ${theme.secondary};
-        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.accent};
-        border-radius: ${theme.borderRadius};
-        backdrop-filter: ${theme.backdropFilter};
-      }
-
-      .wplace-speed-label {
-        display: flex;
-        align-items: center;
-        margin-bottom: 8px;
-        color: ${theme.text};
-        font-size: 13px;
-        font-weight: 600;
-      }
-
-      .wplace-speed-label i {
-        margin-right: 6px;
-        color: ${theme.highlight};
-      }
-
-      .wplace-speed-slider-container {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-      }
-
-      .wplace-speed-slider {
-        flex: 1;
-        height: 6px;
-        border-radius: 3px;
-        background: ${theme.primary};
-        outline: none;
-        cursor: pointer;
-        -webkit-appearance: none;
-        appearance: none;
-      }
-
-      .wplace-speed-slider::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        appearance: none;
-        width: 18px;
-        height: 18px;
-        border-radius: 50%;
-        background: ${theme.highlight};
-        cursor: pointer;
-        border: 2px solid ${theme.text};
-        box-shadow: ${theme.boxShadow};
-      }
-
-      .wplace-speed-slider::-moz-range-thumb {
-        width: 18px;
-        height: 18px;
-        border-radius: 50%;
-        background: ${theme.highlight};
-        cursor: pointer;
-        border: 2px solid ${theme.text};
-        box-shadow: ${theme.boxShadow};
-      }
-
-      .wplace-speed-display {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        min-width: 90px;
-        justify-content: flex-end;
-      }
-
-      #speedValue {
-        color: ${theme.highlight};
-        font-weight: 600;
-        font-size: 14px;
-      }
-
-      .wplace-speed-unit {
-        color: ${theme.text};
-        font-size: 11px;
-        opacity: 0.8;
-      }
-
-      #wplace-settings-container {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 10001;
-        min-width: 400px;
-        max-width: 500px;
-        background: ${theme.primary};
-        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.accent};
-        border-radius: ${theme.borderRadius};
-        box-shadow: ${theme.boxShadow};
-        backdrop-filter: ${theme.backdropFilter};
-      }
-
-      .wplace-settings {
-        padding: 16px;
-        max-height: 400px;
-        overflow-y: auto;
-      }
-
-      .wplace-setting-section {
-        margin-bottom: 20px;
-        padding: 12px;
-        background: ${theme.secondary};
-        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.accent};
-        border-radius: ${theme.borderRadius};
-      }
-
-      .wplace-setting-title {
-        display: flex;
-        align-items: center;
-        margin-bottom: 12px;
-        color: ${theme.text};
-        font-size: 14px;
-        font-weight: 600;
-      }
-
-      .wplace-setting-title i {
-        margin-right: 8px;
-        color: ${theme.highlight};
-      }
-
-      .wplace-setting-content {
-        color: ${theme.text};
-      }
-
-      .wplace-section {
-        margin-bottom: 20px;
-        padding: 15px;
-        background: ${theme.secondary};
-        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.accent};
-        border-radius: ${theme.borderRadius};
-      }
-
-      .wplace-section-title {
-        display: flex;
-        align-items: center;
-        margin-bottom: 15px;
-        color: ${theme.text};
-        font-size: 14px;
-        font-weight: 600;
-      }
-
-      .wplace-section-title i {
-        margin-right: 8px;
-        color: ${theme.highlight};
-      }
-
-      .wplace-speed-container {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        margin-bottom: 10px;
-      }
-
-      .wplace-slider {
-        flex: 1;
-        height: 6px;
-        background: ${theme.accent};
-        border-radius: 3px;
-        outline: none;
-        -webkit-appearance: none;
-      }
-
-      .wplace-slider::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        width: 18px;
-        height: 18px;
-        background: ${theme.highlight};
-        border-radius: 50%;
-        cursor: pointer;
-        border: 2px solid ${theme.primary};
-      }
-
-      .wplace-speed-display {
-        background: ${theme.accent};
-        padding: 5px 10px;
-        border-radius: 4px;
-        color: ${theme.text};
-        font-weight: 600;
-        min-width: 80px;
-        text-align: center;
-        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.highlight};
-      }
-
-      .wplace-select {
-        width: 100%;
-        padding: 8px 12px;
-        background: ${theme.secondary};
-        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.accent};
-        border-radius: ${theme.borderRadius};
-        color: ${theme.text};
-        font-size: 14px;
-        margin-bottom: 10px;
-      }
-
-      .wplace-select:focus {
-        outline: none;
-        border-color: ${theme.highlight};
-      }
-
-      .wplace-description {
-        color: ${theme.text};
-        font-size: 12px;
-        opacity: 0.8;
-        line-height: 1.4;
-      }
-
-      .wplace-theme-custom {
-        margin-top: 15px;
-        padding: 15px;
-        background: ${theme.accent};
-        border-radius: ${theme.borderRadius};
-        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.highlight};
-      }
-
-      .wplace-custom-group {
-        margin-bottom: 15px;
-      }
-
-      .wplace-custom-label {
-        display: flex;
-        align-items: center;
-        margin-bottom: 8px;
-        color: ${theme.text};
-        font-size: 13px;
-        font-weight: 600;
-      }
-
-      .wplace-custom-label i {
-        margin-right: 8px;
-        color: ${theme.highlight};
-        width: 16px;
-      }
-
-      .wplace-color-input-group {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-      }
-
-      .wplace-color-input {
-        width: 50px;
-        height: 30px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        background: transparent;
-      }
-
-      .wplace-color-text {
-        flex: 1;
-        padding: 6px 10px;
-        background: ${theme.secondary};
-        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.accent};
-        border-radius: 4px;
-        color: ${theme.text};
-        font-size: 12px;
-        font-family: monospace;
-      }
-
-      .wplace-animation-controls {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-      }
-
-      .wplace-checkbox-label {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: ${theme.text};
-        font-size: 12px;
-        cursor: pointer;
-      }
-
-      .wplace-checkbox-label input[type="checkbox"] {
-        accent-color: ${theme.highlight};
-      }
-
-      .wplace-slider-container {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-
-      .wplace-slider-container .wplace-slider {
-        flex: 1;
-      }
-
-      .wplace-slider-container span {
-        color: ${theme.text};
-        font-size: 12px;
-        font-weight: 600;
-        min-width: 40px;
-      }
-
-      .wplace-custom-actions {
-        display: flex;
-        gap: 10px;
-        margin-top: 20px;
-        border-top: 1px solid ${theme.accent};
-        padding-top: 15px;
-      }
-
-      .wplace-btn-secondary {
-        background: ${theme.accent};
-        color: ${theme.text};
-        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.highlight};
-      }
-
-      .wplace-btn-secondary:hover {
-        background: ${theme.secondary};
-      }`
-        : ""
-      }
-    `
-    document.head.appendChild(style)
+    // Link external CSS files
+    const cssLink = document.createElement('link');
+    cssLink.rel = 'stylesheet';
+    cssLink.href = 'https://staninna.github.io/WPlace-AutoBOT/auto-image-styles.css'; // TODO: Before merge change to https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/auto-image-styles.css
+    cssLink.setAttribute('data-wplace-theme', 'true');
+    document.head.appendChild(cssLink);
 
     const container = document.createElement("div")
     container.id = "wplace-image-bot-container"
@@ -4603,19 +3462,13 @@
       `linear-gradient(135deg, ${theme.primary} 0%, ${theme.secondary || theme.primary} 100%)` : 
       `linear-gradient(135deg, #667eea 0%, #764ba2 100%)`
     
-    settingsContainer.style.cssText = `
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: ${themeBackground};
-      border: ${theme.borderWidth || '1px'} ${theme.borderStyle || 'solid'} ${theme.accent || 'rgba(255,255,255,0.1)'};
-      border-radius: ${theme.borderRadius || '16px'};
-      padding: 0;
-      z-index: 10002;
-      display: none;
+    settingsContainer.className = 'wplace-settings-container-base';
+    // Apply theme-specific background
+    settingsContainer.style.background = themeBackground;
+    settingsContainer.style.cssText += `
       min-width: 420px;
       max-width: 480px;
+      z-index: 99999;
       color: ${theme.text || 'white'};
       font-family: ${theme.fontFamily || "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"};
       box-shadow: ${theme.boxShadow || '0 20px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1)'};
@@ -4626,171 +3479,85 @@
         box-shadow: ${theme.boxShadow || '0 20px 40px rgba(0,0,0,0.3)'}, 
                    0 0 30px ${theme.highlight || theme.neon || '#00ffff'};
       ` : ''}
-    `
+    `;
 
     settingsContainer.innerHTML = `
-      <div class="wplace-settings-header" style="
-        background: ${theme.accent ? `${theme.accent}33` : 'rgba(255,255,255,0.1)'}; 
-        padding: 20px; 
-        border-bottom: 1px solid ${theme.accent || 'rgba(255,255,255,0.1)'}; 
-        cursor: move;
-        ${theme.animations?.scanline ? `
-          position: relative;
-          overflow: hidden;
-        ` : ''}
-      ">
-        ${theme.animations?.scanline ? `
-          <div style="
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, ${theme.neon || '#00ffff'}, transparent);
-            animation: scanline 2s linear infinite;
-          "></div>
-        ` : ''}
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <h3 style="
-            margin: 0; 
-            color: ${theme.text || 'white'}; 
-            font-size: 20px; 
-            font-weight: 300; 
-            display: flex; 
-            align-items: center; 
-            gap: 10px;
-            ${theme.animations?.glow ? `
-              text-shadow: 0 0 10px ${theme.highlight || theme.neon || '#00ffff'};
-            ` : ''}
-          ">
-            <i class="fas fa-cog" style="
-              font-size: 18px; 
-              animation: spin 2s linear infinite;
-              color: ${theme.highlight || theme.neon || '#00ffff'};
-            "></i>
+      <div class="wplace-settings-header">
+        <div class="wplace-settings-title-wrapper">
+          <h3 class="wplace-settings-title">
+            <i class="fas fa-cog wplace-settings-icon"></i>
             ${Utils.t("settings")}
           </h3>
-          <button id="closeSettingsBtn" style="
-            background: ${theme.accent ? `${theme.accent}66` : 'rgba(255,255,255,0.1)'};
-            color: ${theme.text || 'white'};
-            border: 1px solid ${theme.accent || 'rgba(255,255,255,0.2)'};
-            border-radius: ${theme.borderRadius === '0' ? '0' : '50%'};
-            width: 32px;
-            height: 32px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            font-size: 14px;
-            font-weight: 300;
-            ${theme.animations?.glow ? `
-              box-shadow: 0 0 10px ${theme.error || '#ff0000'}33;
-            ` : ''}
-          " onmouseover="
-            this.style.background='${theme.error || '#ff0000'}66'; 
-            this.style.transform='scale(1.1)';
-            ${theme.animations?.glow ? `this.style.boxShadow='0 0 20px ${theme.error || '#ff0000'}';` : ''}
-          " onmouseout="
-            this.style.background='${theme.accent ? `${theme.accent}66` : 'rgba(255,255,255,0.1)'}'; 
-            this.style.transform='scale(1)';
-            ${theme.animations?.glow ? `this.style.boxShadow='0 0 10px ${theme.error || '#ff0000'}33';` : ''}
-          ">✕</button>
+          <button id="closeSettingsBtn" class="wplace-settings-close-btn">✕</button>
         </div>
       </div>
 
-      <div style="padding: 25px; max-height: 70vh; overflow-y: auto;">
+      <div class="wplace-settings-content">
         
         <!-- Token Source Selection -->
-        <div style="margin-bottom: 25px;">
-          <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-key" style="color: #4facfe; font-size: 16px;"></i>
+        <div class="wplace-settings-section">
+          <label class="wplace-settings-section-label">
+            <i class="fas fa-key wplace-icon-key"></i>
             Token Source
           </label>
-          <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1);">
-            <select id="tokenSourceSelect" style="
-              width: 100%;
-              padding: 12px 16px;
-              background: rgba(255,255,255,0.15);
-              color: white;
-              border: 1px solid rgba(255,255,255,0.2);
-              border-radius: 8px;
-              font-size: 14px;
-              outline: none;
-              cursor: pointer;
-              transition: all 0.3s ease;
-              font-family: inherit;
-              box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            ">
-              <option value="generator" ${state.tokenSource === 'generator' ? 'selected' : ''} style="background: #2d3748; color: white; padding: 10px;">🤖 Automatic Token Generator (Recommended)</option>
-              <option value="hybrid" ${state.tokenSource === 'hybrid' ? 'selected' : ''} style="background: #2d3748; color: white; padding: 10px;">🔄 Generator + Auto Fallback</option>
-              <option value="manual" ${state.tokenSource === 'manual' ? 'selected' : ''} style="background: #2d3748; color: white; padding: 10px;">🎯 Manual Pixel Placement</option>
+          <div class="wplace-settings-section-wrapper">
+            <select id="tokenSourceSelect" class="wplace-settings-select">
+              <option value="generator" ${state.tokenSource === 'generator' ? 'selected' : ''} class="wplace-settings-option">🤖 Automatic Token Generator (Recommended)</option>
+              <option value="hybrid" ${state.tokenSource === 'hybrid' ? 'selected' : ''} class="wplace-settings-option">🔄 Generator + Auto Fallback</option>
+              <option value="manual" ${state.tokenSource === 'manual' ? 'selected' : ''} class="wplace-settings-option">🎯 Manual Pixel Placement</option>
             </select>
-            <p style="font-size: 12px; color: rgba(255,255,255,0.7); margin: 8px 0 0 0;">
+            <p class="wplace-settings-description">
               Generator mode creates tokens automatically. Hybrid mode falls back to manual when generator fails. Manual mode only uses pixel placement.
             </p>
           </div>
         </div>
 
         <!-- Automation Section -->
-        <div style="margin-bottom: 25px;">
-          <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-robot" style="color: #4facfe; font-size: 16px;"></i>
+        <div class="wplace-settings-section">
+          <label class="wplace-settings-section-label">
+            <i class="fas fa-robot wplace-icon-robot"></i>
             ${Utils.t("automation")}
           </label>
           <!-- Token generator is always enabled - settings moved to Token Source above -->
         </div>
 
         <!-- Overlay Settings Section -->
-        <div style="margin-bottom: 25px;">
-          <label style="display: block; margin-bottom: 12px; color: ${theme.text || 'white'}; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-eye" style="color: ${theme.highlight || '#48dbfb'}; font-size: 16px;"></i>
+        <div class="wplace-settings-section">
+          <label class="wplace-settings-section-label" style="color: ${theme.text || 'white'};">
+            <i class="fas fa-eye wplace-icon-eye" style="color: ${theme.highlight || '#48dbfb'};"></i>
             Overlay Settings
           </label>
-          <div style="
+          <div class="wplace-settings-section-wrapper wplace-overlay-wrapper" style="
             background: ${theme.accent ? `${theme.accent}20` : 'rgba(255,255,255,0.1)'}; 
             border-radius: ${theme.borderRadius || '12px'}; 
-            padding: 18px; 
             border: 1px solid ${theme.accent || 'rgba(255,255,255,0.1)'};
             ${theme.animations?.glow ? `
               box-shadow: 0 0 15px ${theme.accent || 'rgba(255,255,255,0.1)'}33;
             ` : ''}
           ">
               <!-- Opacity Slider -->
-              <div style="margin-bottom: 15px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                   <span style="font-weight: 500; font-size: 13px; color: ${theme.text || 'white'};">Overlay Opacity</span>
-                   <div id="overlayOpacityValue" style="
-                     min-width: 40px; 
-                     text-align: center; 
+              <div class="wplace-overlay-opacity-control">
+                <div class="wplace-overlay-opacity-header">
+                   <span class="wplace-overlay-opacity-label" style="color: ${theme.text || 'white'};">Overlay Opacity</span>
+                   <div id="overlayOpacityValue" class="wplace-overlay-opacity-value" style="
                      background: ${theme.secondary || 'rgba(0,0,0,0.2)'}; 
                      color: ${theme.text || 'white'};
-                     padding: 4px 8px; 
                      border-radius: ${theme.borderRadius === '0' ? '0' : '6px'}; 
-                     font-size: 12px;
                      border: 1px solid ${theme.accent || 'transparent'};
                    ">${Math.round(state.overlayOpacity * 100)}%</div>
                 </div>
-                <input type="range" id="overlayOpacitySlider" min="0.1" max="1" step="0.05" value="${state.overlayOpacity}" style="
-                  width: 100%; 
-                  -webkit-appearance: none; 
-                  height: 8px; 
+                <input type="range" id="overlayOpacitySlider" min="0.1" max="1" step="0.05" value="${state.overlayOpacity}" class="wplace-overlay-opacity-slider" style="
                   background: linear-gradient(to right, ${theme.highlight || '#48dbfb'} 0%, ${theme.purple || theme.neon || '#d3a4ff'} 100%); 
                   border-radius: ${theme.borderRadius === '0' ? '0' : '4px'}; 
-                  outline: none; 
-                  cursor: pointer;
                 ">
               </div>
               <!-- Blue Marble Toggle -->
-              <label for="enableBlueMarbleToggle" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+              <label for="enableBlueMarbleToggle" class="wplace-blue-marble-toggle">
                   <div>
-                      <span style="font-weight: 500; color: ${theme.text || 'white'};">Blue Marble Effect</span>
-                      <p style="font-size: 12px; color: ${theme.text ? `${theme.text}BB` : 'rgba(255,255,255,0.7)'}; margin: 4px 0 0 0;">Renders a dithered "shredded" overlay.</p>
+                      <span class="wplace-blue-marble-title" style="color: ${theme.text || 'white'};">Blue Marble Effect</span>
+                      <p class="wplace-blue-marble-description" style="color: ${theme.text ? `${theme.text}BB` : 'rgba(255,255,255,0.7)'};">Renders a dithered "shredded" overlay.</p>
                   </div>
-                  <input type="checkbox" id="enableBlueMarbleToggle" ${state.blueMarbleEnabled ? 'checked' : ''} style="
-                    cursor: pointer; 
-                    width: 20px; 
-                    height: 20px;
+                  <input type="checkbox" id="enableBlueMarbleToggle" ${state.blueMarbleEnabled ? 'checked' : ''} class="wplace-blue-marble-checkbox" style="
                     accent-color: ${theme.highlight || '#48dbfb'};
                   "/>
               </label>
@@ -4798,211 +3565,137 @@
         </div>
 
         <!-- Speed Control Section -->
-        <div style="margin-bottom: 25px;">
-          <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-tachometer-alt" style="color: #4facfe; font-size: 16px;"></i>
+        <div class="wplace-settings-section">
+          <label class="wplace-settings-section-label">
+            <i class="fas fa-tachometer-alt wplace-icon-speed"></i>
             ${Utils.t("paintingSpeed")}
           </label>
           
           <!-- Batch Mode Selection -->
-          <div style="margin-bottom: 15px;">
-            <label style="display: block; margin-bottom: 8px; color: rgba(255,255,255,0.9); font-weight: 500; font-size: 14px;">
-              <i class="fas fa-dice" style="color: #f093fb; margin-right: 6px;"></i>
+          <div class="wplace-batch-mode-selection">
+            <label class="wplace-batch-mode-label">
+              <i class="fas fa-dice wplace-icon-dice"></i>
               Batch Mode
             </label>
-            <select id="batchModeSelect" style="
-              width: 100%;
-              padding: 10px 12px;
-              background: rgba(255,255,255,0.15);
-              color: white;
-              border: 1px solid rgba(255,255,255,0.2);
-              border-radius: 8px;
-              font-size: 13px;
-              outline: none;
-              cursor: pointer;
-            ">
-              <option value="normal" style="background: #2d3748; color: white;">📦 Normal (Fixed Size)</option>
-              <option value="random" style="background: #2d3748; color: white;">🎲 Random (Range)</option>
+            <select id="batchModeSelect" class="wplace-batch-mode-select">
+              <option value="normal" class="wplace-settings-option">📦 Normal (Fixed Size)</option>
+              <option value="random" class="wplace-settings-option">🎲 Random (Range)</option>
             </select>
           </div>
           
           <!-- Normal Mode: Fixed Size Slider -->
-          <div id="normalBatchControls" style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px;">
-            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
-              <input type="range" id="speedSlider" min="${CONFIG.PAINTING_SPEED.MIN}" max="${CONFIG.PAINTING_SPEED.MAX}" value="${CONFIG.PAINTING_SPEED.DEFAULT}"
-                style="
-                  flex: 1;
-                  height: 8px;
-                  background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
-                  border-radius: 4px;
-                  outline: none;
-                  -webkit-appearance: none;
-                  cursor: pointer;
-                ">
-              <div id="speedValue" style="
-                min-width: 100px;
-                text-align: center;
-                background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-                padding: 8px 12px;
-                border-radius: 8px;
-                color: white;
-                font-weight: bold;
-                font-size: 13px;
-                box-shadow: 0 3px 10px rgba(79, 172, 254, 0.3);
-                border: 1px solid rgba(255,255,255,0.2);
-              ">${CONFIG.PAINTING_SPEED.DEFAULT} (batch size)</div>
+          <div id="normalBatchControls" class="wplace-batch-controls wplace-normal-batch-controls">
+            <div class="wplace-speed-slider-container">
+              <input type="range" id="speedSlider" min="${CONFIG.PAINTING_SPEED.MIN}" max="${CONFIG.PAINTING_SPEED.MAX}" value="${CONFIG.PAINTING_SPEED.DEFAULT}" class="wplace-speed-slider">
+              <div id="speedValue" class="wplace-speed-value">${CONFIG.PAINTING_SPEED.DEFAULT} (batch size)</div>
             </div>
-            <div style="display: flex; justify-content: space-between; color: rgba(255,255,255,0.7); font-size: 11px; margin-top: 8px;">
-              <span><i class="fas fa-turtle"></i> ${CONFIG.PAINTING_SPEED.MIN}</span>
-              <span><i class="fas fa-rabbit"></i> ${CONFIG.PAINTING_SPEED.MAX}</span>
+            <div class="wplace-speed-labels">
+              <span class="wplace-speed-min"><i class="fas fa-turtle"></i> ${CONFIG.PAINTING_SPEED.MIN}</span>
+              <span class="wplace-speed-max"><i class="fas fa-rabbit"></i> ${CONFIG.PAINTING_SPEED.MAX}</span>
             </div>
           </div>
           
           <!-- Random Mode: Range Controls -->
-          <div id="randomBatchControls" style="display: none; background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px;">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+          <div id="randomBatchControls" class="wplace-batch-controls wplace-random-batch-controls">
+            <div class="wplace-random-batch-grid">
               <div>
-                <label style="display: block; color: rgba(255,255,255,0.8); font-size: 12px; margin-bottom: 8px;">
-                  <i class="fas fa-arrow-down" style="color: #4facfe; margin-right: 4px;"></i>
+                <label class="wplace-random-batch-label">
+                  <i class="fas fa-arrow-down wplace-icon-min"></i>
                   Minimum Batch Size
                 </label>
-                <input type="number" id="randomBatchMin" min="1" max="1000" value="${CONFIG.RANDOM_BATCH_RANGE.MIN}" style="
-                  width: 100%;
-                  padding: 10px 12px;
-                  background: rgba(255,255,255,0.1);
-                  color: white;
-                  border: 1px solid rgba(255,255,255,0.2);
-                  border-radius: 8px;
-                  font-size: 13px;
-                  outline: none;
-                ">
+                <input type="number" id="randomBatchMin" min="1" max="1000" value="${CONFIG.RANDOM_BATCH_RANGE.MIN}" class="wplace-random-batch-input">
               </div>
               <div>
-                <label style="display: block; color: rgba(255,255,255,0.8); font-size: 12px; margin-bottom: 8px;">
-                  <i class="fas fa-arrow-up" style="color: #00f2fe; margin-right: 4px;"></i>
+                <label class="wplace-random-batch-label">
+                  <i class="fas fa-arrow-up wplace-icon-max"></i>
                   Maximum Batch Size
                 </label>
-                <input type="number" id="randomBatchMax" min="1" max="1000" value="${CONFIG.RANDOM_BATCH_RANGE.MAX}" style="
-                  width: 100%;
-                  padding: 10px 12px;
-                  background: rgba(255,255,255,0.1);
-                  color: white;
-                  border: 1px solid rgba(255,255,255,0.2);
-                  border-radius: 8px;
-                  font-size: 13px;
-                  outline: none;
-                ">
+                <input type="number" id="randomBatchMax" min="1" max="1000" value="${CONFIG.RANDOM_BATCH_RANGE.MAX}" class="wplace-random-batch-input">
               </div>
             </div>
-            <p style="font-size: 11px; color: rgba(255,255,255,0.6); margin: 8px 0 0 0; text-align: center;">
+            <p class="wplace-random-batch-description">
               🎲 Random batch size between min and max values
             </p>
           </div>
           
           <!-- Speed Control Toggle -->
-          <label style="display: flex; align-items: center; gap: 8px; color: white;">
-            <input type="checkbox" id="enableSpeedToggle" ${CONFIG.PAINTING_SPEED_ENABLED ? 'checked' : ''} style="cursor: pointer;"/>
+          <label class="wplace-speed-control-toggle">
+            <input type="checkbox" id="enableSpeedToggle" ${CONFIG.PAINTING_SPEED_ENABLED ? 'checked' : ''} class="wplace-speed-checkbox"/>
             <span>Enable painting speed limit (batch size control)</span>
           </label>
         </div>
 
         <!-- Notifications Section -->
-        <div style="margin-bottom: 25px;">
-          <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-bell" style="color: #ffd166; font-size: 16px;"></i>
+        <div class="wplace-settings-section">
+          <label class="wplace-settings-section-label">
+            <i class="fas fa-bell wplace-icon-bell"></i>
             Desktop Notifications
           </label>
-          <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1); display:flex; flex-direction:column; gap:10px;">
-            <label style="display:flex; align-items:center; justify-content:space-between;">
+          <div class="wplace-settings-section-wrapper wplace-notifications-wrapper">
+            <label class="wplace-notification-toggle">
               <span>Enable notifications</span>
-              <input type="checkbox" id="notifEnabledToggle" ${state.notificationsEnabled ? 'checked' : ''} style="width:18px; height:18px; cursor:pointer;" />
+              <input type="checkbox" id="notifEnabledToggle" ${state.notificationsEnabled ? 'checked' : ''} class="wplace-notification-checkbox" />
             </label>
-            <label style="display:flex; align-items:center; justify-content:space-between;">
+            <label class="wplace-notification-toggle">
               <span>Notify when charges reach threshold</span>
-              <input type="checkbox" id="notifOnChargesToggle" ${state.notifyOnChargesReached ? 'checked' : ''} style="width:18px; height:18px; cursor:pointer;" />
+              <input type="checkbox" id="notifOnChargesToggle" ${state.notifyOnChargesReached ? 'checked' : ''} class="wplace-notification-checkbox" />
             </label>
-            <label style="display:flex; align-items:center; justify-content:space-between;">
+            <label class="wplace-notification-toggle">
               <span>Only when tab is not focused</span>
-              <input type="checkbox" id="notifOnlyUnfocusedToggle" ${state.notifyOnlyWhenUnfocused ? 'checked' : ''} style="width:18px; height:18px; cursor:pointer;" />
+              <input type="checkbox" id="notifOnlyUnfocusedToggle" ${state.notifyOnlyWhenUnfocused ? 'checked' : ''} class="wplace-notification-checkbox" />
             </label>
-            <div style="display:flex; align-items:center; gap:10px;">
+            <div class="wplace-notification-interval">
               <span>Repeat every</span>
-              <input type="number" id="notifIntervalInput" min="1" max="60" value="${state.notificationIntervalMinutes}" style="width:70px; padding:6px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color:#fff;" />
+              <input type="number" id="notifIntervalInput" min="1" max="60" value="${state.notificationIntervalMinutes}" class="wplace-notification-interval-input" />
               <span>minute(s)</span>
             </div>
-            <div style="display:flex; gap:10px;">
-              <button id="notifRequestPermBtn" class="wplace-btn wplace-btn-secondary" style="flex:1;"><i class="fas fa-unlock"></i><span>Grant Permission</span></button>
-              <button id="notifTestBtn" class="wplace-btn" style="flex:1;"><i class="fas fa-bell"></i><span>Test</span></button>
+            <div class="wplace-notification-buttons">
+              <button id="notifRequestPermBtn" class="wplace-btn wplace-btn-secondary wplace-notification-perm-btn"><i class="fas fa-unlock"></i><span>Grant Permission</span></button>
+              <button id="notifTestBtn" class="wplace-btn wplace-notification-test-btn"><i class="fas fa-bell"></i><span>Test</span></button>
             </div>
           </div>
         </div>
 
         <!-- Theme Selection Section -->
-        <div style="margin-bottom: 25px;">
-          <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-palette" style="color: #f093fb; font-size: 16px;"></i>
+        <div class="wplace-settings-section">
+          <label class="wplace-settings-section-label">
+            <i class="fas fa-palette wplace-icon-palette"></i>
             ${Utils.t("themeSettings")}
           </label>
-          <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1);">
-            <select id="themeSelect" style="
-              width: 100%;
-              padding: 12px 16px;
-              background: rgba(255,255,255,0.15);
-              color: white;
-              border: 1px solid rgba(255,255,255,0.2);
-              border-radius: 8px;
-              font-size: 14px;
-              outline: none;
-              cursor: pointer;
-              transition: all 0.3s ease;
-              font-family: inherit;
-              box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            ">
+          <div class="wplace-settings-section-wrapper">
+            <select id="themeSelect" class="wplace-settings-select">
               ${Object.keys(CONFIG.THEMES).map(themeName =>
-      `<option value="${themeName}" ${CONFIG.currentTheme === themeName ? 'selected' : ''} style="background: #2d3748; color: white; padding: 10px;">${themeName}</option>`
+      `<option value="${themeName}" ${CONFIG.currentTheme === themeName ? 'selected' : ''} class="wplace-settings-option">${themeName}</option>`
     ).join('')}
             </select>
           </div>
         </div>
 
         <!-- Language Selection Section -->
-        <div style="margin-bottom: 25px;">
-          <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-globe" style="color: #ffeaa7; font-size: 16px;"></i>
+        <div class="wplace-settings-section">
+          <label class="wplace-settings-section-label">
+            <i class="fas fa-globe wplace-icon-globe"></i>
             ${Utils.t("language")}
           </label>
-          <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1);">
-            <select id="languageSelect" style="
-              width: 100%;
-              padding: 12px 16px;
-              background: rgba(255,255,255,0.15);
-              color: white;
-              border: 1px solid rgba(255,255,255,0.2);
-              border-radius: 8px;
-              font-size: 14px;
-              outline: none;
-              cursor: pointer;
-              transition: all 0.3s ease;
-              font-family: inherit;
-              box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            ">
-              <option value="vi" ${state.language === 'vi' ? 'selected' : ''} style="background: #2d3748; color: white;">🇻🇳 Tiếng Việt</option>
-              <option value="id" ${state.language === 'id' ? 'selected' : ''} style="background: #2d3748; color: white;">🇮🇩 Bahasa Indonesia</option>
-              <option value="ru" ${state.language === 'ru' ? 'selected' : ''} style="background: #2d3748; color: white;">🇷🇺 Русский</option>
-              <option value="en" ${state.language === 'en' ? 'selected' : ''} style="background: #2d3748; color: white;">🇺🇸 English</option>
-              <option value="pt" ${state.language === 'pt' ? 'selected' : ''} style="background: #2d3748; color: white;">🇧🇷 Português</option>
-              <option value="fr" ${state.language === 'fr' ? 'selected' : ''} style="background: #2d3748; color: white;">🇫🇷 Français</option>
-              <option value="tr" ${state.language === 'tr' ? 'selected' : ''} style="background: #2d3748; color: white;">🇹🇷 Türkçe</option>
-              <option value="zh" ${state.language === 'zh' ? 'selected' : ''} style="background: #2d3748; color: white;">🇨🇳 简体中文</option>
-              <option value="zh-tw" ${state.language === 'zh-tw' ? 'selected' : ''} style="background: #2d3748; color: white;">🇹🇼 繁體中文</option>
-              <option value="ja" ${state.language === 'ja' ? 'selected' : ''} style="background: #2d3748; color: white;">🇯🇵 日本語</option>
-              <option value="ko" ${state.language === 'ko' ? 'selected' : ''} style="background: #2d3748; color: white;">🇰🇷 한국어</option>
+          <div class="wplace-settings-section-wrapper">
+            <select id="languageSelect" class="wplace-settings-select">
+              <option value="vi" ${state.language === 'vi' ? 'selected' : ''} class="wplace-settings-option">🇻🇳 Tiếng Việt</option>
+              <option value="id" ${state.language === 'id' ? 'selected' : ''} class="wplace-settings-option">🇮🇩 Bahasa Indonesia</option>
+              <option value="ru" ${state.language === 'ru' ? 'selected' : ''} class="wplace-settings-option">🇷🇺 Русский</option>
+              <option value="en" ${state.language === 'en' ? 'selected' : ''} class="wplace-settings-option">🇺🇸 English</option>
+              <option value="pt" ${state.language === 'pt' ? 'selected' : ''} class="wplace-settings-option">🇧🇷 Português</option>
+              <option value="fr" ${state.language === 'fr' ? 'selected' : ''} class="wplace-settings-option">🇫🇷 Français</option>
+              <option value="tr" ${state.language === 'tr' ? 'selected' : ''} class="wplace-settings-option">🇹🇷 Türkçe</option>
+              <option value="zh" ${state.language === 'zh' ? 'selected' : ''} class="wplace-settings-option">🇨🇳 简体中文</option>
+              <option value="zh-tw" ${state.language === 'zh-tw' ? 'selected' : ''} class="wplace-settings-option">🇹🇼 繁體中文</option>
+              <option value="ja" ${state.language === 'ja' ? 'selected' : ''} class="wplace-settings-option">🇯🇵 日本語</option>
+              <option value="ko" ${state.language === 'ko' ? 'selected' : ''} class="wplace-settings-option">🇰🇷 한국어</option>
               </select>
           </div>
         </div>
 
-        <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; margin-top: 10px;">
-             <button id="applySettingsBtn" style="
+        <div class="wplace-settings-footer">
+             <button id="applySettingsBtn" class="wplace-settings-apply-btn" style="
                 width: 100%;
                 ${CONFIG.CSS_CLASSES.BUTTON_PRIMARY}
              ">
@@ -5109,88 +3802,88 @@
     const resizeContainer = document.createElement("div")
     resizeContainer.className = "resize-container"
     resizeContainer.innerHTML = `
-      <h3 style="margin-top: 0; color: ${theme.text}">${Utils.t("resizeImage")}</h3>
+      <h3 class="resize-dialog-title" style="color: ${theme.text}">${Utils.t("resizeImage")}</h3>
       <div class="resize-controls">
-        <label>
+        <label class="resize-control-label">
           Width: <span id="widthValue">0</span>px
           <input type="range" id="widthSlider" class="resize-slider" min="10" max="500" value="100">
         </label>
-        <label>
+        <label class="resize-control-label">
           Height: <span id="heightValue">0</span>px
           <input type="range" id="heightSlider" class="resize-slider" min="10" max="500" value="100">
         </label>
-        <label style="display: flex; align-items: center;">
+        <label class="resize-checkbox-label">
           <input type="checkbox" id="keepAspect" checked>
           Keep Aspect Ratio
         </label>
-        <label style="display: flex; align-items: center;">
+        <label class="resize-checkbox-label">
             <input type="checkbox" id="paintWhiteToggle" checked>
             Paint White Pixels
         </label>
         <div class="resize-zoom-controls">
-          <button id="zoomOutBtn" class="wplace-btn" title="Zoom Out" style="padding:4px 8px;"><i class="fas fa-search-minus"></i></button>
-          <input type="range" id="zoomSlider" class="resize-slider" min="0.1" max="20" value="1" step="0.05" style="max-width: 220px;">
-          <button id="zoomInBtn" class="wplace-btn" title="Zoom In" style="padding:4px 8px;"><i class="fas fa-search-plus"></i></button>
-          <button id="zoomFitBtn" class="wplace-btn" title="Fit to view" style="padding:4px 8px;">Fit</button>
-          <button id="zoomActualBtn" class="wplace-btn" title="Actual size (100%)" style="padding:4px 8px;">100%</button>
-          <button id="panModeBtn" class="wplace-btn" title="Pan (drag to move view)" style="padding:4px 8px;">
+          <button id="zoomOutBtn" class="wplace-btn resize-zoom-btn" title="Zoom Out"><i class="fas fa-search-minus"></i></button>
+          <input type="range" id="zoomSlider" class="resize-slider resize-zoom-slider" min="0.1" max="20" value="1" step="0.05">
+          <button id="zoomInBtn" class="wplace-btn resize-zoom-btn" title="Zoom In"><i class="fas fa-search-plus"></i></button>
+          <button id="zoomFitBtn" class="wplace-btn resize-zoom-btn" title="Fit to view">Fit</button>
+          <button id="zoomActualBtn" class="wplace-btn resize-zoom-btn" title="Actual size (100%)">100%</button>
+          <button id="panModeBtn" class="wplace-btn resize-zoom-btn" title="Pan (drag to move view)">
             <i class="fas fa-hand-paper"></i>
           </button>
-          <span id="zoomValue" style="margin-left:6px; min-width:48px; text-align:right; opacity:.85; font-size:12px;">100%</span>
-          <div id="cameraHelp" style="font-size:11px; opacity:.75; margin-left:auto;">
+          <span id="zoomValue" class="resize-zoom-value">100%</span>
+          <div id="cameraHelp" class="resize-camera-help">
             Drag to pan • Pinch to zoom • Double‑tap to zoom
           </div>
         </div>
       </div>
 
       <div class="resize-preview-wrapper">
-          <div id="resizePanStage" style="position:relative; width:100%; height:100%; overflow:hidden;">
-            <div id="resizeCanvasStack" class="resize-canvas-stack" style="position:absolute; left:0; top:0; transform-origin: top left;">
+          <div id="resizePanStage" class="resize-pan-stage">
+            <div id="resizeCanvasStack" class="resize-canvas-stack resize-canvas-positioned">
               <canvas id="resizeCanvas" class="resize-base-canvas"></canvas>
               <canvas id="maskCanvas" class="resize-mask-canvas"></canvas>
             </div>
           </div>
       </div>
       <div class="resize-tools">
-        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-          <div>
-              <div style="display:flex; align-items:center; gap:6px; justify-content:space-between;">
-                <label style="font-size:12px; opacity:.85;">Brush</label>
-                <div style="display:flex; align-items:center; gap:6px;">
-                  <input id="maskBrushSize" type="range" min="1" max="7" step="1" value="1" style="width:120px;">
-                  <span id="maskBrushSizeValue" style="font-size:12px; opacity:.85; min-width:18px; text-align:center;">1</span>
+        <div class="resize-tools-container">
+          <div class="resize-brush-controls">
+              <div class="resize-brush-control">
+                <label class="resize-tool-label">Brush</label>
+                <div class="resize-tool-input-group">
+                  <input id="maskBrushSize" type="range" min="1" max="7" step="1" value="1" class="resize-tool-slider">
+                  <span id="maskBrushSizeValue" class="resize-tool-value">1</span>
                 </div>
               </div>
-            <div style="display:flex; align-items:center; gap:6px; justify-content:space-between;">
-              <label style="font-size:12px; opacity:.85;">Row/col size</label>
-              <div style="display:flex; align-items:center; gap:6px;">
-                <input id="rowColSize" type="range" min="1" max="7" step="1" value="1" style="width:120px;">
-                <span id="rowColSizeValue" style="font-size:12px; opacity:.85; min-width:18px; text-align:center;">1</span>
+            <div class="resize-brush-control">
+              <label class="resize-tool-label">Row/col size</label>
+              <div class="resize-tool-input-group">
+                <input id="rowColSize" type="range" min="1" max="7" step="1" value="1" class="resize-tool-slider">
+                <span id="rowColSizeValue" class="resize-tool-value">1</span>
               </div>
             </div>
           </div>
-          <div style="display:flex; align-items:center; gap:6px;">
-            <label style="font-size:12px; opacity:.85;">Mode</label>
-            <div class="mask-mode-group" style="display:flex; gap:6px;">
-              <button id="maskModeIgnore" class="wplace-btn" style="padding:4px 8px; font-size:12px;">Ignore</button>
-              <button id="maskModeUnignore" class="wplace-btn" style="padding:4px 8px; font-size:12px;">Unignore</button>
-              <button id="maskModeToggle" class="wplace-btn wplace-btn-primary" style="padding:4px 8px; font-size:12px;">Toggle</button>
+          <div class="resize-mode-controls">
+            <label class="resize-tool-label">Mode</label>
+            <div class="mask-mode-group resize-mode-group">
+              <button id="maskModeIgnore" class="wplace-btn resize-mode-btn">Ignore</button>
+              <button id="maskModeUnignore" class="wplace-btn resize-mode-btn">Unignore</button>
+              <button id="maskModeToggle" class="wplace-btn wplace-btn-primary resize-mode-btn">Toggle</button>
             </div>
           </div>
-          <button id="clearIgnoredBtn" class="wplace-btn" title="Clear all ignored pixels" style="padding:4px 8px; font-size:12px;">Clear</button>
-          <button id="invertMaskBtn" class="wplace-btn" title="Invert mask" style="padding:4px 8px; font-size:12px;">Invert</button>
-          <span style="opacity:.8; font-size:12px;">Shift = Row • Alt = Column</span>
+          <button id="clearIgnoredBtn" class="wplace-btn resize-clear-btn" title="Clear all ignored pixels">Clear</button>
+          <button id="invertMaskBtn" class="wplace-btn resize-invert-btn" title="Invert mask">Invert</button>
+          <span class="resize-shortcut-help">Shift = Row • Alt = Column</span>
         </div>
       </div>
 
-      <div class="wplace-section" id="color-palette-section" style="margin-top: 15px;">
+      <div class="wplace-section resize-color-palette-section" id="color-palette-section">
           <div class="wplace-section-title">
               <i class="fas fa-palette"></i>&nbsp;Color Palette
           </div>
           <div class="wplace-controls">
               <div class="wplace-row single">
-                  <label style="display: flex; align-items: center; gap: 8px; font-size: 12px;">
-                      <input type="checkbox" id="showAllColorsToggle" style="cursor: pointer;">
+                  <label class="resize-color-toggle-label">
+                      <input type="checkbox" id="showAllColorsToggle" class="resize-color-checkbox">
                       <span>Show All Colors (including unavailable)</span>
                   </label>
               </div>
@@ -5202,50 +3895,50 @@
           </div>
       </div>
 
-      <div class="wplace-section" id="advanced-color-section" style="margin-top: 15px;">
+      <div class="wplace-section resize-advanced-color-section" id="advanced-color-section">
         <div class="wplace-section-title">
           <i class="fas fa-flask"></i>&nbsp;Advanced Color Matching
         </div>
-        <div style="display:flex; flex-direction:column; gap:10px;">
-          <label style="display:flex; flex-direction:column; gap:4px; font-size:12px;">
-            <span style="font-weight:600;">Algorithm</span>
-            <select id="colorAlgorithmSelect" style="padding:6px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); color:#fff;">
+        <div class="resize-advanced-controls">
+          <label class="resize-advanced-label">
+            <span class="resize-advanced-label-text">Algorithm</span>
+            <select id="colorAlgorithmSelect" class="resize-advanced-select">
               <option value="lab" ${state.colorMatchingAlgorithm==='lab'?'selected':''}>Perceptual (Lab)</option>
             <option value="legacy" ${state.colorMatchingAlgorithm==='legacy'?'selected':''}>Legacy (RGB)</option>
             </select>
           </label>
-          <label style="display:flex; align-items:center; justify-content:space-between; font-size:12px;">
-            <div style="flex:1;">
-              <span style="font-weight:600;">Chroma Penalty</span>
-              <div style="margin-top:2px; opacity:0.65;">Preserve vivid colors (Lab only)</div>
+          <label class="resize-advanced-toggle">
+            <div class="resize-advanced-toggle-content">
+              <span class="resize-advanced-label-text">Chroma Penalty</span>
+              <div class="resize-advanced-description">Preserve vivid colors (Lab only)</div>
             </div>
-            <input type="checkbox" id="enableChromaPenaltyToggle" ${state.enableChromaPenalty?'checked':''} style="width:18px; height:18px; cursor:pointer;" />
+            <input type="checkbox" id="enableChromaPenaltyToggle" ${state.enableChromaPenalty?'checked':''} class="resize-advanced-checkbox" />
           </label>
-          <div>
-            <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:4px;">
+          <div class="resize-chroma-weight-control">
+            <div class="resize-chroma-weight-header">
               <span>Chroma Weight</span>
-              <span id="chromaWeightValue" style="background:rgba(255,255,255,0.08); padding:2px 6px; border-radius:4px;">${state.chromaPenaltyWeight}</span>
+              <span id="chromaWeightValue" class="resize-chroma-weight-value">${state.chromaPenaltyWeight}</span>
             </div>
-            <input type="range" id="chromaPenaltyWeightSlider" min="0" max="0.5" step="0.01" value="${state.chromaPenaltyWeight}" style="width:100%;" />
+            <input type="range" id="chromaPenaltyWeightSlider" min="0" max="0.5" step="0.01" value="${state.chromaPenaltyWeight}" class="resize-chroma-weight-slider" />
           </div>
-          <label style="display:flex; align-items:center; justify-content:space-between; font-size:12px;">
-            <div style="flex:1;">
-              <span style="font-weight:600;">Enable Dithering</span>
-              <div style="margin-top:2px; opacity:0.65;">Floyd–Steinberg error diffusion in preview and applied output</div>
+          <label class="resize-advanced-toggle">
+            <div class="resize-advanced-toggle-content">
+              <span class="resize-advanced-label-text">Enable Dithering</span>
+              <div class="resize-advanced-description">Floyd–Steinberg error diffusion in preview and applied output</div>
             </div>
-            <input type="checkbox" id="enableDitheringToggle" ${state.ditheringEnabled?'checked':''} style="width:18px; height:18px; cursor:pointer;" />
+            <input type="checkbox" id="enableDitheringToggle" ${state.ditheringEnabled?'checked':''} class="resize-advanced-checkbox" />
           </label>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-            <label style="display:flex; flex-direction:column; gap:4px; font-size:12px;">
-              <span style="font-weight:600;">Transparency</span>
-              <input type="number" id="transparencyThresholdInput" min="0" max="255" value="${state.customTransparencyThreshold}" style="padding:6px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); color:#fff;" />
+          <div class="resize-threshold-controls">
+            <label class="resize-threshold-label">
+              <span class="resize-advanced-label-text">Transparency</span>
+              <input type="number" id="transparencyThresholdInput" min="0" max="255" value="${state.customTransparencyThreshold}" class="resize-threshold-input" />
             </label>
-            <label style="display:flex; flex-direction:column; gap:4px; font-size:12px;">
-              <span style="font-weight:600;">White Thresh</span>
-              <input type="number" id="whiteThresholdInput" min="200" max="255" value="${state.customWhiteThreshold}" style="padding:6px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); color:#fff;" />
+            <label class="resize-threshold-label">
+              <span class="resize-advanced-label-text">White Thresh</span>
+              <input type="number" id="whiteThresholdInput" min="200" max="255" value="${state.customWhiteThreshold}" class="resize-threshold-input" />
             </label>
           </div>
-          <button id="resetAdvancedColorBtn" class="wplace-btn" style="background:linear-gradient(135deg,#ff6a6a,#ff4757); font-size:11px;">Reset Advanced</button>
+          <button id="resetAdvancedColorBtn" class="wplace-btn resize-reset-advanced-btn">Reset Advanced</button>
         </div>
       </div>
 
@@ -5273,6 +3966,9 @@
     document.body.appendChild(resizeContainer)
     document.body.appendChild(statsContainer)
     document.body.appendChild(settingsContainer)
+
+    // Show the main container after all elements are appended
+    container.style.display = "block"
 
     const uploadBtn = container.querySelector("#uploadBtn")
     const resizeBtn = container.querySelector("#resizeBtn")
@@ -5321,11 +4017,7 @@
     }
 
     if (!statsContainer || !statsArea || !closeStatsBtn) {
-      console.error("Stats UI elements not found:", {
-        statsContainer: !!statsContainer,
-        statsArea: !!statsArea,
-        closeStatsBtn: !!closeStatsBtn,
-      })
+      // Note: base CSS now aligns with this layout: main panel at left:20px (width 280), stats at left:330px.
     }
 
     const header = container.querySelector(".wplace-header")
@@ -5440,9 +4132,9 @@
       }
     }
     if (statsContainer && statsBtn) {
-      statsContainer.style.display = "block";
-      statsBtn.innerHTML = '<i class="fas fa-chart-line"></i>';
-      statsBtn.title = "Hide Stats";
+      // Stats container starts hidden - user clicks button to show
+      statsBtn.innerHTML = '<i class="fas fa-chart-bar"></i>';
+      statsBtn.title = "Show Stats";
     }
 
     const settingsBtn = container.querySelector("#settingsBtn")
@@ -5452,32 +4144,32 @@
 
     if (settingsBtn && closeSettingsBtn && applySettingsBtn) {
       settingsBtn.addEventListener("click", () => {
-        const isVisible = settingsContainer.style.display !== "none"
+        const isVisible = settingsContainer.classList.contains("show");
         if (isVisible) {
-          settingsContainer.style.animation = "settingsFadeOut 0.3s ease-out forwards"
+          settingsContainer.style.animation = "settingsFadeOut 0.3s ease-out forwards";
+          settingsContainer.classList.remove("show");
           setTimeout(() => {
-            settingsContainer.style.display = "none"
-            settingsContainer.style.animation = ""
-          }, 300)
+            settingsContainer.style.animation = "";
+          }, 300);
         } else {
-          settingsContainer.style.top = "50%"
-          settingsContainer.style.left = "50%"
-          settingsContainer.style.transform = "translate(-50%, -50%)"
-          settingsContainer.style.display = "block"
-          settingsContainer.style.animation = "settingsSlideIn 0.4s ease-out"
+          settingsContainer.style.top = "50%";
+          settingsContainer.style.left = "50%";
+          settingsContainer.style.transform = "translate(-50%, -50%)";
+          settingsContainer.classList.add("show");
+          settingsContainer.style.animation = "settingsSlideIn 0.4s ease-out";
         }
       })
 
       closeSettingsBtn.addEventListener("click", () => {
-        settingsContainer.style.animation = "settingsFadeOut 0.3s ease-out forwards"
+        settingsContainer.style.animation = "settingsFadeOut 0.3s ease-out forwards";
+        settingsContainer.classList.remove("show");
         setTimeout(() => {
-          settingsContainer.style.display = "none"
-          settingsContainer.style.animation = ""
-          settingsContainer.style.top = "50%"
-          settingsContainer.style.left = "50%"
-          settingsContainer.style.transform = "translate(-50%, -50%)"
-        }, 300)
-      })
+          settingsContainer.style.animation = "";
+          settingsContainer.style.top = "50%";
+          settingsContainer.style.left = "50%";
+          settingsContainer.style.transform = "translate(-50%, -50%)";
+        }, 300);
+      });
 
       applySettingsBtn.addEventListener("click", () => {
         // Sync advanced settings before save
@@ -7711,36 +6403,33 @@
     try {
       console.log("🔧 Initializing Turnstile token generator...");
       updateUI("initializingToken", "default");
-      
-      // Pre-load Turnstile script first to avoid delays later
+
+      console.log("Attempting to load Turnstile script...");
       await Utils.loadTurnstile();
-      
+      console.log("Turnstile script loaded. Attempting to generate token...");
+
       const token = await handleCaptchaWithRetry();
       if (token) {
         setTurnstileToken(token);
         console.log("✅ Startup token generated successfully");
         updateUI("tokenReady", "success");
         Utils.showAlert("🔑 Token generator ready!", "success");
-        enableFileOperations(); // Enable file operations since initial setup is complete
+        enableFileOperations();
       } else {
-        console.warn("⚠️ Startup token generation failed, will retry when needed");
+        console.warn("⚠️ Startup token generation failed (no token received), will retry when needed");
         updateUI("tokenRetryLater", "warning");
-        // Still enable file operations even if initial token generation fails
-        // Users can load progress and use manual/hybrid modes
         enableFileOperations();
       }
     } catch (error) {
-      console.warn("⚠️ Startup token generation failed:", error);
+      console.error("❌ Critical error during Turnstile initialization:", error); // More specific error
       updateUI("tokenRetryLater", "warning");
-      // Still enable file operations even if initial setup fails
-      // Users can load progress and use manual/hybrid modes
       enableFileOperations();
-      // Don't show error alert for initialization failures, just log them
     }
   }
 
   // Load theme preference immediately on startup before creating UI
   loadThemePreference()
+  applyTheme()
 
   createUI().then(() => {
     // Generate token automatically after UI is ready

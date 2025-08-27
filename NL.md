@@ -112,7 +112,7 @@ javascript:fetch("https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBO
 * [x] Ondersteuning voor kruistegels toevoegen
 * [x] AutoCaptcha-oplosser toevoegen
 * [x] Correcte kleur pixel overslaan toevoegen
-* [ ] CSS scheiden
+* [x] CSS scheiden
 
 ---
 
