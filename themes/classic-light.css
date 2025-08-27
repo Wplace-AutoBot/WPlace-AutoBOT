@@ -82,14 +82,32 @@
 }
 
 
-/* Stats container */
+/* Stats container with proper contrast */
 .wplace-theme--classic-light #wplace-stats-container {
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
-  border: 1px solid rgba(0, 0, 0, 0.15) !important;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+  border: 1px solid rgba(0, 0, 0, 0.2) !important;
   border-radius: 12px !important;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
   font-family: 'Segoe UI', Roboto, sans-serif !important;
   color: var(--wplace-text) !important;
+  position: fixed !important;
+  overflow: hidden !important;
+  z-index: 9998 !important;
+}
+
+/* Stats header styling */
+.wplace-theme--classic-light #wplace-stats-container .wplace-header {
+  background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%) !important;
+  color: var(--wplace-text) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2) !important;
+  text-shadow: none !important;
+  font-weight: 600 !important;
+}
+
+/* Stats title specific styling */
+.wplace-theme--classic-light #wplace-stats-container .wplace-header .wplace-stats-title {
+  color: var(--wplace-text) !important;
+  text-shadow: none !important;
 }
 
 /* Comprehensive text and element styling for light theme - scoped to bot containers only */
@@ -266,12 +284,13 @@
 }
 
 .wplace-theme--classic-light .wplace-stat-label {
-  color: white !important;
+  color: var(--wplace-text) !important;
   text-shadow: none !important;
+  font-weight: 500 !important;
 }
 
 .wplace-theme--classic-light .wplace-stat-value {
-  color: white !important;
+  color: var(--wplace-highlight) !important;
   text-shadow: none !important;
   font-weight: 600 !important;
 }
