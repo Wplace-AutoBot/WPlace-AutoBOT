@@ -20,6 +20,7 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
+
     steps:
       - name: Checkout (shallow)
         uses: actions/checkout@v4
@@ -29,42 +30,152 @@ jobs:
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
-      - name: Aggregate files from all branches into ./public
+      - name: Aggregate and build recursive directory pages
         shell: bash
         run: |
           set -euo pipefail
+
+          # jq for JSON escaping (present on runners, but ensure)
+          if ! command -v jq >/dev/null 2>&1; then
+            sudo apt-get update -y
+            sudo apt-get install -y jq
+          fi
+
+          REPO="${GITHUB_REPOSITORY#*/}"
+          SITE_ROOT="/${REPO}/"
+
           mkdir -p public
+          : > public/.nojekyll
 
-          # List remote branches (exclude HEAD pointer)
-          mapfile -t BRANCHES < <(git ls-remote --heads origin \
-            | awk '{print $2}' | sed 's@refs/heads/@@')
+          # Tiny favicon assets to avoid 404s
+          printf "%s" \
+            "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>🚀</text></svg>" \
+            > public/favicon.svg
 
-          # Minimal index page
+          # List remote branches
+          mapfile -t BRANCHES < <(
+            git ls-remote --heads origin | awk '{print $2}' \
+            | sed 's@refs/heads/@@'
+          )
+
+          # Landing page (no globals except window.__branches)
           cat > public/index.html <<'HTML'
-          <!doctype html><meta charset="utf-8">
-          <title>Branches</title><h1>Branches</h1><ul>
+          <!doctype html>
+          <meta charset="utf-8" />
+          <meta name="viewport" content="width=device-width,initial-scale=1" />
+          <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ctext y='14' font-size='14'%3E🚀%3C/text%3E%3C/svg%3E" />
+          <title>Branches</title>
+          <style>
+            body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;
+                 margin:24px;background:#0d1117;color:#e6edf3}
+            a{color:#58a6ff;text-decoration:none}
+            .card{background:#161b22;padding:16px;border-radius:8px;margin:12px 0}
+            input{background:#0b0f14;border:1px solid #30363d;color:#e6edf3;
+                  padding:8px 10px;border-radius:6px;width:100%;max-width:420px}
+          </style>
+          <h1>Branches</h1>
+          <input id="q" placeholder="Filter branches..." />
+          <div id="list"></div>
+          <script>window.__branches=window.__branches||[];</script>
           HTML
 
+          # Emit index.html for a directory
+          gen_index_dir() {
+            local DIR="$1" ROOT="$2" BR="$3"
+            local rel="${DIR#$ROOT}"
+            local title="Branch: ${BR}${rel:-/}"
+
+            {
+              echo "<!doctype html><meta charset='utf-8'/>"
+              echo "<meta name='viewport' content='width=device-width,initial-scale=1'/>"
+              echo "<link rel='icon' href=\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ctext y='14' font-size='14'%3E🚀%3C/text%3E%3C/svg%3E\" />"
+              echo "<title>${title}</title>"
+              echo "<style>body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;margin:24px;background:#0d1117;color:#e6edf3}a{color:#58a6ff;text-decoration:none}table{width:100%;border-collapse:collapse}th,td{padding:8px;border-bottom:1px solid #30363d}tr:hover{background:#161b22}</style>"
+              echo "<h1>${title}</h1>"
+              if [[ "$DIR" != "$ROOT" ]]; then
+                echo "<p><a href='../'>⬆ Up</a> • <a href='${SITE_ROOT}'>All branches</a></p>"
+              else
+                echo "<p><a href='${SITE_ROOT}'>All branches</a></p>"
+              fi
+              echo "<table><thead><tr><th>Name</th><th style='width:120px'>Size</th><th style='width:180px'>Modified</th></tr></thead><tbody>"
+
+              # Subdirectories
+              while IFS= read -r d; do
+                [[ -n "$d" ]] || continue
+                printf "<tr><td>📁 <a href='./%s/'>%s/</a></td><td>—</td><td>—</td></tr>\n" "$d" "$d"
+              done < <(find "$DIR" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort)
+
+              # Files
+              while IFS= read -r f; do
+                [[ -n "$f" ]] || continue
+                size=$(stat -c %s "$DIR/$f" 2>/dev/null || echo 0)
+                size_h=$(numfmt --to=iec --suffix=B "$size" 2>/dev/null || echo "$size")
+                mod=$(date -r "$DIR/$f" "+%Y-%m-%d %H:%M" 2>/dev/null || echo "")
+                printf "<tr><td>📄 <a href='./%s'>%s</a></td><td>%s</td><td>%s</td></tr>\n" "$f" "$f" "$size_h" "$mod"
+              done < <(find "$DIR" -mindepth 1 -maxdepth 1 -type f ! -name 'index.html' -printf '%f\n' | sort)
+
+              echo "</tbody></table>"
+              echo "<p style='opacity:.7'>Generated $(date -u '+%Y-%m-%d %H:%M UTC')</p>"
+            } > "$DIR/index.html"
+          }
+
+          # Build per-branch trees and indexes
           for BR in "${BRANCHES[@]}"; do
-            SAFE=$(echo "$BR" | tr '/:@ ' '----' | sed 's/[^A-Za-z0-9._-]/-/g')
+            SAFE="$(echo "$BR" | tr '/:@ ' '----' | sed 's/[^A-Za-z0-9._-]/-/g')"
             mkdir -p "public/$SAFE"
 
-            # Fetch that branch tip and export without checkout
             git fetch --depth=1 origin "$BR"
             git archive --format=tar FETCH_HEAD | tar -x -C "public/$SAFE"
 
-            # Keep only static assets; drop heavy/unneeded dirs
-            rm -rf "public/$SAFE/.git" "public/$SAFE/.github" "public/$SAFE/node_modules"
+            # Keep only static assets; prune empty dirs
+            rm -rf "public/$SAFE/.git" "public/$SAFE/.github" \
+                   "public/$SAFE/node_modules"
             find "public/$SAFE" -type f ! \
-              \( -name '*.html' -o -name '*.js' -o -name '*.css' -o -name '*.json' -o \
-                 -name '*.png' -o -name '*.jpg' -o -name '*.jpeg' -o -name '*.gif' -o -name '*.svg' \) \
+              \( -name '*.html' -o -name '*.js' -o -name '*.css' -o \
+                 -name '*.json' -o -name '*.png' -o -name '*.jpg' -o \
+                 -name '*.jpeg' -o -name '*.gif' -o -name '*.svg' \) \
               -delete
             find "public/$SAFE" -type d -empty -delete
 
-            echo "<li><a href='./$SAFE/'>$BR</a></li>" >> public/index.html
+            ROOT_DIR="public/$SAFE"
+            while IFS= read -r -d '' d; do
+              gen_index_dir "$d" "$ROOT_DIR" "$BR"
+            done < <(find "$ROOT_DIR" -type d -print0)
+
+            # Append to landing page (JSON-escaped)
+            SAFE_JSON=$(printf '%s' "$SAFE" | jq -Rr @json)
+            BR_JSON=$(printf '%s' "$BR" | jq -Rr @json)
+            echo "<script>window.__branches.push({safe:$SAFE_JSON,name:$BR_JSON});</script>" \
+              >> public/index.html
           done
-          echo "</ul>" >> public/index.html
-          echo "Built public/ for ${#BRANCHES[@]} branches."
+
+          # Finish landing page
+          cat >> public/index.html <<'HTML'
+          <script>
+            (() => {
+              const q = document.getElementById('q');
+              const listEl = document.getElementById('list');
+
+              function render(filter = '') {
+                listEl.innerHTML = '';
+                const qv = filter.toLowerCase();
+                for (const b of (window.__branches || []).filter(x =>
+                  x.name.toLowerCase().includes(qv)
+                )) {
+                  const div = document.createElement('div');
+                  div.className = 'card';
+                  div.innerHTML = `<strong>${b.name}</strong><div>
+                    <a href="./${b.safe}/">Open</a>
+                  </div>`;
+                  listEl.appendChild(div);
+                }
+              }
+
+              q.addEventListener('input', (e) => render(e.target.value));
+              render();
+            })();
+          </script>
+          HTML
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
