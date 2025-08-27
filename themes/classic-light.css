@@ -110,7 +110,8 @@
 .wplace-theme--classic-light .wplace-data-management .wplace-btn {
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
   border: 1px solid rgba(0, 0, 0, 0.2) !important;
-  color: var(--wplace-text) !important;
+  color: #212529 !important;
+  font-weight: 500 !important;
 }
 
 .wplace-theme--classic-light .wplace-data-management .wplace-btn:hover:not(:disabled) {
@@ -332,6 +333,18 @@
 .wplace-theme--classic-light .wplace-slider {
   background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%) !important;
   border-radius: 4px !important;
+}
+
+.wplace-theme--classic-light .wplace-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--wplace-slider-thumb-bg);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .wplace-theme--classic-light .wplace-speed-value {

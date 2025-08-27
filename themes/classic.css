@@ -498,7 +498,14 @@
 
 :root .wplace-slider::-webkit-slider-thumb,
 .wplace-theme--classic .wplace-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
+  background: var(--wplace-slider-thumb-bg);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 :root .wplace-speed-slider,

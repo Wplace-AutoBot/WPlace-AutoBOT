@@ -295,6 +295,27 @@
   box-shadow: 0 0 10px rgba(0, 255, 65, 0.3) !important;
 }
 
+.wplace-theme--neon .wplace-slider::-webkit-slider-thumb,
+.wplace-theme--neon .wplace-speed-slider::-webkit-slider-thumb,
+.wplace-theme--neon .wplace-overlay-opacity-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 0 !important;
+  background: var(--wplace-slider-thumb-bg) !important;
+  border: 2px solid var(--wplace-text) !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 8px rgba(0, 255, 65, 0.5) !important;
+}
+
+.wplace-theme--neon .wplace-slider::-webkit-slider-thumb:hover,
+.wplace-theme--neon .wplace-speed-slider::-webkit-slider-thumb:hover,
+.wplace-theme--neon .wplace-overlay-opacity-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 15px var(--wplace-text) !important;
+}
+
 /* Scanline animation for neon theme */
 .wplace-theme--neon #wplace-image-bot-container::before {
   content: '';
@@ -311,8 +332,9 @@
 }
 
 .wplace-theme--neon #wplace-stats-container {
-  position: relative;
+  position: fixed !important;
   overflow: hidden !important;
+  z-index: 9998 !important;
 }
 
 .wplace-theme--neon #wplace-stats-container::before {
