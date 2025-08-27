@@ -92,10 +92,7 @@
   color: var(--wplace-text) !important;
 }
 
-/* Comprehensive text and element styling for light theme */
-.wplace-theme--classic-light * {
-  color: var(--wplace-text) !important;
-}
+/* Comprehensive text and element styling for light theme - scoped to bot containers only */
 
 .wplace-theme--classic-light .wplace-status,
 .wplace-theme--classic-light .wplace-stats,
@@ -268,8 +265,13 @@
   text-shadow: none !important;
 }
 
+.wplace-theme--classic-light .wplace-stat-label {
+  color: white !important;
+  text-shadow: none !important;
+}
+
 .wplace-theme--classic-light .wplace-stat-value {
-  color: var(--wplace-highlight) !important;
+  color: white !important;
   text-shadow: none !important;
   font-weight: 600 !important;
 }
