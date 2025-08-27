@@ -211,6 +211,12 @@
     }
   }
 
+  // Simple translation cache
+  const translationCache = new Map();
+
+  // Dynamically loaded translations
+  let loadedTranslations = {};
+
   const loadLanguagePreference = async () => {
     const savedLanguage = localStorage.getItem("wplace_language")
 
@@ -249,12 +255,6 @@
   if (!loadedTranslations["en"]) {
     await loadTranslations("en")
   }
-
-  // Simple translation cache
-  const translationCache = new Map();
-
-  // Dynamically loaded translations
-  let loadedTranslations = {};
 
   // Available languages
   const AVAILABLE_LANGUAGES = ['en', 'ru', 'pt', 'vi', 'fr', 'id', 'tr', 'zh-CN', 'zh-TW', 'ja', 'ko', 'uk'];
