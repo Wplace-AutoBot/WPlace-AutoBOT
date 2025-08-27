@@ -212,13 +212,19 @@
   }
 
   const loadLanguagePreference = () => {
-    try {
-      const saved = localStorage.getItem("wplace_language")
-      if (saved && TEXT[saved]) {
-        state.language = saved
-      }
-    } catch (e) {
-      console.warn("Could not load language preference:", e)
+    const savedLanguage = localStorage.getItem("wplace_language")
+
+    const browserLocale = navigator.language
+    const browserLanguage = browserLocale.split("-")[0]
+
+    if (TEXT[savedLanguage]) {                                 // trying to load saved language
+      state.language = savedLanguage
+    } else if (TEXT[browserLocale]) {                          // trying to load full locale match (e.g. "zh-CN", "zh-TW" etc)
+      state.language = browserLocale
+      localStorage.setItem("wplace_language", browserLocale)
+    } else if (TEXT[browserLanguage]) {                        // trying to load base language match (e.g. "en" for "en-US" or "en-GB" etc)
+      state.language = browserLanguage
+      localStorage.setItem("wplace_language", browserLanguage) 
     }
   }
 
@@ -737,7 +743,7 @@
       automation: "Otomasyon",
       noChargesThreshold: "⌛ Hakların {threshold} seviyesine ulaşması bekleniyor. Şu anda {current}. Sonraki {time} içinde...",
     },
-    zh: {
+    "zh-CN": {
       title: "WPlace 自动图像",
       toggleOverlay: "切换覆盖层",
       scanColors: "扫描颜色",
@@ -813,7 +819,7 @@
       automation: "自动化",
       noChargesThreshold: "⌛ 等待次数达到 {threshold}。当前 {current}。下次在 {time}...",
     },
-    "zh-tw": {
+    "zh-TW": {
       title: "WPlace 自動圖像",
       toggleOverlay: "切換覆蓋層",
       scanColors: "掃描顏色",
@@ -1040,6 +1046,80 @@
       captchaFailed: "❌ 토큰 생성 실패. 폴백 시도...",
       automation: "자동화",
       noChargesThreshold: "⌛ 횟수가 {threshold} 에 도달할 때까지 대기 중. 현재 {current}. 다음 {time} 후...",
+    },
+    uk: {
+      title: "WPlace Авто-Зображення",
+      toggleOverlay: "Перемкнути оверлей",
+      scanColors: "Сканувати кольори",
+      uploadImage: "Завантажити зображення",
+      resizeImage: "Змінити розмір зображення",
+      selectPosition: "Вибрати позицію",
+      startPainting: "Почати малювання",
+      stopPainting: "Зупинити малювання",
+      checkingColors: "🔍 Перевірка доступних кольорів...",
+      noColorsFound: "❌ Відкрий палітру кольорів на сайті та спробуй ще раз!",
+      colorsFound: "✅ Знайдено {count} доступних кольорів. Готово до завантаження.",
+      loadingImage: "🖼️ Завантаження зображення...",
+      imageLoaded: "✅ Зображення завантажено. Валідних пікселів: {count}",
+      imageError: "❌ Помилка завантаження зображення",
+      selectPositionAlert: "Намалюй перший піксель у місці, де має починатися арт!",
+      waitingPosition: "👆 Очікування на малювання референсного пікселя...",
+      positionSet: "✅ Позицію успішно встановлено!",
+      positionTimeout: "❌ Час вибору позиції вичерпано",
+      startPaintingMsg: "🎨 Початок малювання...",
+      paintingProgress: "🧱 Прогрес: {painted}/{total} пікселів...",
+      noCharges: "⌛ Немає зарядів. Очікування {time}...",
+      paintingStopped: "⏹️ Малювання зупинено користувачем",
+      paintingComplete: "✅ Малювання завершено! Намальовано {count} пікселів.",
+      paintingError: "❌ Помилка під час малювання",
+      missingRequirements: "❌ Спершу завантаж зображення та вибери позицію",
+      progress: "Прогрес",
+      pixels: "Пікселі",
+      charges: "Заряди",
+      estimatedTime: "Орієнтовний час",
+      initMessage: "Натисни 'Завантажити зображення', щоб почати",
+      waitingInit: "Очікування ініціалізації...",
+      initializingToken: "🔧 Ініціалізація генератора токенів Turnstile...",
+      tokenReady: "✅ Генератор токенів готовий – можна починати малювання!",
+      tokenRetryLater: "⚠️ Генератор токенів повторить спробу за потреби",
+      resizeSuccess: "✅ Зображення змінено до {width}x{height}",
+      paintingPaused: "⏸️ Малювання призупинено на позиції X: {x}, Y: {y}",
+      captchaNeeded: "❗ Не вдалося згенерувати токен. Спробуй трохи пізніше.",
+      saveData: "Зберегти прогрес",
+      loadData: "Завантажити прогрес",
+      saveToFile: "Зберегти у файл",
+      loadFromFile: "Завантажити з файлу",
+      dataManager: "Менеджер даних",
+      autoSaved: "✅ Прогрес збережено автоматично",
+      dataLoaded: "✅ Прогрес успішно завантажено",
+      fileSaved: "✅ Прогрес успішно збережено у файл",
+      fileLoaded: "✅ Прогрес успішно завантажено з файлу",
+      noSavedData: "❌ Не знайдено збереженого прогресу",
+      savedDataFound: "✅ Знайдено збережений прогрес! Завантажити, щоб продовжити?",
+      savedDate: "Збережено: {date}",
+      clickLoadToContinue: "Натисни 'Завантажити прогрес', щоб продовжити.",
+      fileError: "❌ Помилка обробки файлу",
+      invalidFileFormat: "❌ Невірний формат файлу",
+      paintingSpeed: "Швидкість малювання",
+      pixelsPerSecond: "пікселів/секунда",
+      speedSetting: "Швидкість: {speed} пікселів/сек",
+      settings: "Налаштування",
+      botSettings: "Налаштування бота",
+      close: "Закрити",
+      language: "Мова",
+      themeSettings: "Налаштування теми",
+      themeSettingsDesc: "Вибери бажану колірну тему для інтерфейсу.",
+      languageSelectDesc: "Вибери бажану мову. Зміни набудуть чинності одразу.",
+      autoCaptcha: "Авто-CAPTCHA (Turnstile)",
+      autoCaptchaDesc: "Автоматично генерує токени Turnstile за допомогою вбудованого генератора. Використовує автоматизацію браузера у разі потреби.",
+      applySettings: "Застосувати налаштування",
+      settingsSaved: "✅ Налаштування успішно збережено!",
+      cooldownSettings: "Налаштування відновлення",
+      waitCharges: "Очікувати, доки кількість зарядів досягне",
+      captchaSolving: "🔑 Генерація токена Turnstile...",
+      captchaFailed: "❌ Не вдалося згенерувати токен Turnstile. Використовую запасний метод...",
+      automation: "Автоматизація",
+      noChargesThreshold: "⌛ Очікування, доки заряди досягнуть {threshold}. Зараз {current}. Наступне через {time}...",
     },
   }
 
@@ -1622,18 +1702,6 @@
       }
     }
   });
-
-  async function detectLanguage() {
-    try {
-      const response = await fetch("https://backend.wplace.live/me", {
-        credentials: "include",
-      })
-      const data = await response.json()
-      state.language = data.language === "pt" ? "pt" : "en"
-    } catch {
-      state.language = navigator.language.startsWith("pt") ? "pt" : "en"
-    }
-  }
 
   // UTILITY FUNCTIONS
   const Utils = {
@@ -3299,8 +3367,6 @@
 
 
   async function createUI() {
-    await detectLanguage()
-
     const existingContainer = document.getElementById("wplace-image-bot-container")
     const existingStats = document.getElementById("wplace-stats-container")
     const existingSettings = document.getElementById("wplace-settings-container")
@@ -5027,12 +5093,13 @@
               <option value="vi" ${state.language === 'vi' ? 'selected' : ''} style="background: #2d3748; color: white;">🇻🇳 Tiếng Việt</option>
               <option value="id" ${state.language === 'id' ? 'selected' : ''} style="background: #2d3748; color: white;">🇮🇩 Bahasa Indonesia</option>
               <option value="ru" ${state.language === 'ru' ? 'selected' : ''} style="background: #2d3748; color: white;">🇷🇺 Русский</option>
+              <option value="uk" ${state.language === 'uk' ? 'selected' : ''} style="background: #2d3748; color: white;">🇺🇦 Українська</option>
               <option value="en" ${state.language === 'en' ? 'selected' : ''} style="background: #2d3748; color: white;">🇺🇸 English</option>
               <option value="pt" ${state.language === 'pt' ? 'selected' : ''} style="background: #2d3748; color: white;">🇧🇷 Português</option>
               <option value="fr" ${state.language === 'fr' ? 'selected' : ''} style="background: #2d3748; color: white;">🇫🇷 Français</option>
               <option value="tr" ${state.language === 'tr' ? 'selected' : ''} style="background: #2d3748; color: white;">🇹🇷 Türkçe</option>
-              <option value="zh" ${state.language === 'zh' ? 'selected' : ''} style="background: #2d3748; color: white;">🇨🇳 简体中文</option>
-              <option value="zh-tw" ${state.language === 'zh-tw' ? 'selected' : ''} style="background: #2d3748; color: white;">🇹🇼 繁體中文</option>
+              <option value="zh-CN" ${state.language === 'zh-CN' ? 'selected' : ''} style="background: #2d3748; color: white;">🇨🇳 简体中文</option>
+              <option value="zh-TW" ${state.language === 'zh-TW' ? 'selected' : ''} style="background: #2d3748; color: white;">🇹🇼 繁體中文</option>
               <option value="ja" ${state.language === 'ja' ? 'selected' : ''} style="background: #2d3748; color: white;">🇯🇵 日本語</option>
               <option value="ko" ${state.language === 'ko' ? 'selected' : ''} style="background: #2d3748; color: white;">🇰🇷 한국어</option>
               </select>
