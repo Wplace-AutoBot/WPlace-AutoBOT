@@ -142,6 +142,16 @@
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.08) !important;
   font-family: 'Segoe UI', Roboto, sans-serif !important;
   backdrop-filter: blur(10px) !important;
+  color: var(--wplace-text) !important;
+}
+
+/* Settings dialog text elements */
+.wplace-theme--classic-light #wplace-settings-container * {
+  color: var(--wplace-text) !important;
+}
+
+.wplace-theme--classic-light #wplace-settings-container .wplace-settings-section-wrapper * {
+  color: var(--wplace-text) !important;
 }
 
 /* Resize dialog */
