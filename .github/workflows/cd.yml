@@ -20,6 +20,7 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
+
     steps:
       - name: Checkout (shallow)
         uses: actions/checkout@v4
@@ -34,6 +35,12 @@ jobs:
         run: |
           set -euo pipefail
 
+          # Ensure jq is available (usually preinstalled)
+          if ! command -v jq >/dev/null 2>&1; then
+            sudo apt-get update -y
+            sudo apt-get install -y jq
+          fi
+
           OWNER="${GITHUB_REPOSITORY%/*}"
           REPO="${GITHUB_REPOSITORY#*/}"
           SITE_ROOT="/${REPO}/"
@@ -41,13 +48,14 @@ jobs:
           mkdir -p public
           : > public/.nojekyll
 
-          # List remote branches
+          # List remote branches (exclude symbolic HEAD)
           mapfile -t BRANCHES < <(
-            git ls-remote --heads origin | awk '{print $2}' \
+            git ls-remote --heads origin \
+              | awk '{print $2}' \
               | sed 's@refs/heads/@@'
           )
 
-          # Top-level landing page
+          # Landing page shell
           cat > public/index.html <<'HTML'
           <!doctype html>
           <meta charset="utf-8" />
@@ -66,17 +74,16 @@ jobs:
           <div id="list"></div>
           <script>
             const q=document.getElementById('q'),list=document.getElementById('list');
-            const branches = [];
+            const branches=[];
           </script>
           HTML
 
-          # Helper to create an index.html for every directory
+          # Function to emit an index.html for a directory
           gen_index_dir() {
             local DIR="$1" ROOT="$2" BR="$3" SAFE="$4"
             local rel="${DIR#$ROOT}"               # "" or "/sub/dir"
             local title="Branch: ${BR}${rel:-/}"
 
-            # Collect entries
             mapfile -t SUBDIRS < <(find "$DIR" -mindepth 1 -maxdepth 1 -type d \
               -printf '%f\n' | sort)
             mapfile -t FILES < <(find "$DIR" -mindepth 1 -maxdepth 1 -type f \
@@ -108,16 +115,16 @@ jobs:
             } > "$DIR/index.html"
           }
 
-          # Process each branch
+          # Build trees and index entries per branch
           for BR in "${BRANCHES[@]}"; do
             SAFE="$(echo "$BR" | tr '/:@ ' '----' | sed 's/[^A-Za-z0-9._-]/-/g')"
             mkdir -p "public/$SAFE"
 
-            # Fetch and extract content without checkout
+            # Export branch contents without checkout
             git fetch --depth=1 origin "$BR"
             git archive --format=tar FETCH_HEAD | tar -x -C "public/$SAFE"
 
-            # Keep only static assets, then remove empty dirs
+            # Keep only static assets, then prune empties
             rm -rf "public/$SAFE/.git" "public/$SAFE/.github" "public/$SAFE/node_modules"
             find "public/$SAFE" -type f ! \
               \( -name '*.html' -o -name '*.js' -o -name '*.css' -o -name '*.json' -o \
@@ -125,17 +132,20 @@ jobs:
                  -name '*.svg' \) -delete
             find "public/$SAFE" -type d -empty -delete
 
-            # Generate index.html for every directory (recursive)
+            # Generate index.html for every directory in this branch
             ROOT_DIR="public/$SAFE"
             while IFS= read -r -d '' d; do
               gen_index_dir "$d" "$ROOT_DIR" "$BR" "$SAFE"
             done < <(find "$ROOT_DIR" -type d -print0)
 
-            # Add branch to landing page list
-            echo "<script>branches.push({safe:${JSON.stringify:-}('${SAFE}'),name:${JSON.stringify:-}('${BR}')});</script>" >> public/index.html
+            # Append to landing page using JSON-escaped values
+            SAFE_JSON=$(printf '%s' "$SAFE" | jq -Rr @json)
+            BR_JSON=$(printf '%s' "$BR" | jq -Rr @json)
+            echo "<script>branches.push({safe:$SAFE_JSON,name:$BR_JSON});</script>" \
+              >> public/index.html
           done
 
-          # Finish landing page with JS to render branch cards
+          # Finish landing page
           cat >> public/index.html <<'HTML'
           <script>
             const list = document.getElementById('list');
