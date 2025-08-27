@@ -217,6 +217,36 @@
   // Dynamically loaded translations
   let loadedTranslations = {};
 
+  // Available languages
+  const AVAILABLE_LANGUAGES = ['en', 'ru', 'pt', 'vi', 'fr', 'id', 'tr', 'zh-CN', 'zh-TW', 'ja', 'ko', 'uk'];
+
+  // Function to load translations from JSON file
+  const loadTranslations = async (language) => {
+    if (loadedTranslations[language]) {
+      return loadedTranslations[language];
+    }
+
+    // Load translations from CDN
+    const url = `https://staninna.github.io/WPlace-AutoBOT/decoupled-translations/lang/${language}.json`;
+    
+    try {
+      console.log(`🔄 Loading ${language} translations from CDN...`);
+      const response = await fetch(url);
+      if (response.ok) {
+        const translations = await response.json();
+        loadedTranslations[language] = translations;
+        console.log(`📚 Loaded ${language} translations successfully from CDN`);
+        return translations;
+      } else {
+        console.warn(`❌ CDN returned HTTP ${response.status}: ${response.statusText} for ${language} translations`);
+      }
+    } catch (error) {
+      console.error(`❌ Failed to load ${language} translations from CDN:`, error);
+    }
+    
+    return null;
+  };
+
   const loadLanguagePreference = async () => {
     const savedLanguage = localStorage.getItem("wplace_language")
 
@@ -255,36 +285,6 @@
   if (!loadedTranslations["en"]) {
     await loadTranslations("en")
   }
-
-  // Available languages
-  const AVAILABLE_LANGUAGES = ['en', 'ru', 'pt', 'vi', 'fr', 'id', 'tr', 'zh-CN', 'zh-TW', 'ja', 'ko', 'uk'];
-
-  // Function to load translations from JSON file
-  const loadTranslations = async (language) => {
-    if (loadedTranslations[language]) {
-      return loadedTranslations[language];
-    }
-
-    // Load translations from CDN
-    const url = `https://staninna.github.io/WPlace-AutoBOT/decoupled-translations/lang/${language}.json`;
-    
-    try {
-      console.log(`🔄 Loading ${language} translations from CDN...`);
-      const response = await fetch(url);
-      if (response.ok) {
-        const translations = await response.json();
-        loadedTranslations[language] = translations;
-        console.log(`📚 Loaded ${language} translations successfully from CDN`);
-        return translations;
-      } else {
-        console.warn(`❌ CDN returned HTTP ${response.status}: ${response.statusText} for ${language} translations`);
-      }
-    } catch (error) {
-      console.error(`❌ Failed to load ${language} translations from CDN:`, error);
-    }
-    
-    return null;
-  };
 
   // Emergency fallback TEXT (minimal)
   const FALLBACK_TEXT = {
