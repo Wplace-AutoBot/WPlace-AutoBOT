@@ -2409,15 +2409,15 @@
     },
 
     calculateEstimatedTime: (remainingPixels, charges, cooldown) => {
-      if (remainingPixels <= 0) return 0
+      if (remainingPixels <= 0) return 0;
 
-      const paintingSpeedDelay = state.paintingSpeed > 0 ? (1000 / state.paintingSpeed) : 1000
-      const timeFromSpeed = remainingPixels * paintingSpeedDelay
+      const paintingSpeedDelay = state.paintingSpeed > 0 ? (1000 / state.paintingSpeed) : 1000;
+      const timeFromSpeed = remainingPixels * paintingSpeedDelay;
 
-      const cyclesNeeded = Math.ceil(remainingPixels / Math.max(charges, 1))
-      const timeFromCharges = cyclesNeeded * cooldown
+      const cyclesNeeded = Math.ceil(remainingPixels / Math.max(charges, 1));
+      const timeFromCharges = cyclesNeeded * cooldown;
 
-      return Math.max(timeFromSpeed, timeFromCharges)
+      return timeFromSpeed + timeFromCharges; // combine instead of taking max
     },
 
     // --- Painted pixel tracking helpers ---
