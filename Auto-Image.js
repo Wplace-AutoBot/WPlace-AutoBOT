@@ -3125,6 +3125,19 @@ function applyTheme() {
     updateActiveColorPalette();
   }
 
+  function unselectAllPaidColors() {
+    const swatches = document.querySelectorAll('.wplace-color-swatch');
+    if (swatches) {
+      swatches.forEach(swatch => {
+        const colorId = parseInt(swatch.getAttribute('data-color-id'), 10);
+        if (!isNaN(colorId) && colorId>= 32) {
+          swatch.classList.toggle('active', false);
+        }
+      });
+    }
+    updateActiveColorPalette();
+  }
+  
   function initializeColorPalette(container) {
     const colorsContainer = container.querySelector('#colors-container');
     const showAllToggle = container.querySelector('#showAllColorsToggle');
@@ -3215,6 +3228,7 @@ function applyTheme() {
 
     container.querySelector('#selectAllBtn')?.addEventListener('click', () => toggleAllColors(true, showAllToggle?.checked));
     container.querySelector('#unselectAllBtn')?.addEventListener('click', () => toggleAllColors(false, showAllToggle?.checked));
+    container.querySelector('#unselectPaidBtn')?.addEventListener('click', () => unselectAllPaidColors());
   }
   async function handleCaptcha() {
     const startTime = performance.now();
@@ -3965,6 +3979,7 @@ function applyTheme() {
               <div class="wplace-row">
                   <button id="selectAllBtn" class="wplace-btn">Select All</button>
                   <button id="unselectAllBtn" class="wplace-btn">Unselect All</button>
+                  <button id="unselectPaidBtn" class="wplace-btn">Unselect Paid</button>
               </div>
               <div id="colors-container" class="wplace-color-grid"></div>
           </div>
