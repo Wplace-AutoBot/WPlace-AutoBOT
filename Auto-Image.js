@@ -269,13 +269,19 @@ function applyTheme() {
   }
 
   const loadLanguagePreference = () => {
-    try {
-      const saved = localStorage.getItem("wplace_language")
-      if (saved && TEXT[saved]) {
-        state.language = saved
-      }
-    } catch (e) {
-      console.warn("Could not load language preference:", e)
+    const savedLanguage = localStorage.getItem("wplace_language")
+
+    const browserLocale = navigator.language
+    const browserLanguage = browserLocale.split("-")[0]
+
+    if (TEXT[savedLanguage]) {                                 // trying to load saved language
+      state.language = savedLanguage
+    } else if (TEXT[browserLocale]) {                          // trying to load full locale match (e.g. "zh-CN", "zh-TW" etc)
+      state.language = browserLocale
+      localStorage.setItem("wplace_language", browserLocale)
+    } else if (TEXT[browserLanguage]) {                        // trying to load base language match (e.g. "en" for "en-US" or "en-GB" etc)
+      state.language = browserLanguage
+      localStorage.setItem("wplace_language", browserLanguage) 
     }
   }
 
@@ -861,18 +867,6 @@ function applyTheme() {
       }
     }
   });
-
-  async function detectLanguage() {
-    try {
-      const response = await fetch("https://backend.wplace.live/me", {
-        credentials: "include",
-      })
-      const data = await response.json()
-      state.language = data.language === "pt" ? "pt" : "en"
-    } catch {
-      state.language = navigator.language.startsWith("pt") ? "pt" : "en"
-    }
-  }
 
   // UTILITY FUNCTIONS
   const Utils = {
@@ -2447,8 +2441,6 @@ function applyTheme() {
 
 
   async function createUI() {
-    await detectLanguage()
-
     const existingContainer = document.getElementById("wplace-image-bot-container")
     const existingStats = document.getElementById("wplace-stats-container")
     const existingSettings = document.getElementById("wplace-settings-container")
@@ -2872,8 +2864,8 @@ function applyTheme() {
               <option value="pt" ${state.language === 'pt' ? 'selected' : ''} class="wplace-settings-option">🇧🇷 Português</option>
               <option value="fr" ${state.language === 'fr' ? 'selected' : ''} class="wplace-settings-option">🇫🇷 Français</option>
               <option value="tr" ${state.language === 'tr' ? 'selected' : ''} class="wplace-settings-option">🇹🇷 Türkçe</option>
-              <option value="zh" ${state.language === 'zh' ? 'selected' : ''} class="wplace-settings-option">🇨🇳 简体中文</option>
-              <option value="zh-tw" ${state.language === 'zh-tw' ? 'selected' : ''} class="wplace-settings-option">🇹🇼 繁體中文</option>
+              <option value="zh-CN" ${state.language === 'zh-CN' ? 'selected' : ''} class="wplace-settings-option">🇨🇳 简体中文</option>
+              <option value="zh-TW" ${state.language === 'zh-TW' ? 'selected' : ''} class="wplace-settings-option">🇹🇼 繁體中文</option>
               <option value="ja" ${state.language === 'ja' ? 'selected' : ''} class="wplace-settings-option">🇯🇵 日本語</option>
               <option value="ko" ${state.language === 'ko' ? 'selected' : ''} class="wplace-settings-option">🇰🇷 한국어</option>
               </select>

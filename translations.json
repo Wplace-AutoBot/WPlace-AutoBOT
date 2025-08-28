@@ -509,7 +509,7 @@
     "automation": "Otomasyon",
     "noChargesThreshold": "⌛ Hakların {threshold} seviyesine ulaşması bekleniyor. Şu anda {current}. Sonraki {time} içinde..."
   },
-  "zh": {
+  "zh-CN": {
     "title": "WPlace 自动图像",
     "toggleOverlay": "切换覆盖层",
     "scanColors": "扫描颜色",
@@ -585,7 +585,7 @@
     "automation": "自动化",
     "noChargesThreshold": "⌛ 等待次数达到 {threshold}。当前 {current}。下次在 {time}..."
   },
-  "zh-tw": {
+  "zh-TW": {
     "title": "WPlace 自動圖像",
     "toggleOverlay": "切換覆蓋層",
     "scanColors": "掃描顏色",
