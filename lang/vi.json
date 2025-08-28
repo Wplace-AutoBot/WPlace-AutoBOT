@@ -65,6 +65,8 @@
   "autoCaptchaDesc": "Tự động cố gắng giải CAPTCHA bằng cách mô phỏng việc đặt pixel thủ công khi token hết hạn.",
   "applySettings": "Áp dụng cài đặt",
   "settingsSaved": "✅ Đã lưu cài đặt thành công!",
+  "speedOn": "Bật",
+  "speedOff": "Tắt",
   "cooldownSettings": "Cài đặt thời gian chờ",
   "waitCharges": "Chờ cho đến khi số lần sạc đạt",
   "captchaSolving": "🤖 Đang cố gắng giải CAPTCHA...",

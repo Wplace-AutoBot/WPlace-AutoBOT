@@ -65,6 +65,8 @@
   "autoCaptchaDesc": "Tenta resolver o CAPTCHA automaticamente simulando a colocação manual de um pixel quando o token expira.",
   "applySettings": "Aplicar Configurações",
   "settingsSaved": "✅ Configurações salvas com sucesso!",
+  "speedOn": "Ligado",
+  "speedOff": "Desligado",
   "cooldownSettings": "Configurações de Cooldown",
   "waitCharges": "Aguardar até as cargas atingirem",
   "captchaSolving": "🤖 Tentando resolver o CAPTCHA...",

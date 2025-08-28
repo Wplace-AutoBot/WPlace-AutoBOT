@@ -65,6 +65,8 @@
   "autoCaptchaDesc": "Génère automatiquement des jetons Turnstile en utilisant le générateur intégré. Se replie sur l'automatisation du navigateur si nécessaire.",
   "applySettings": "Appliquer les paramètres",
   "settingsSaved": "✅ Paramètres enregistrés avec succès !",
+  "speedOn": "Activé",
+  "speedOff": "Désactivé",
   "cooldownSettings": "Paramètres de recharge",
   "waitCharges": "Attendre que les charges atteignent",
   "captchaSolving": "🔑 Génération du jeton Turnstile...",
@@ -111,7 +113,7 @@
   "downloadPreview": "Télécharger l'Aperçu",
   "apply": "Appliquer",
   "cancel": "Annuler",
-  "fit": "Ajuster"
+  "fit": "Ajuster",
   "hundred": "100%",
   "clear": "Effacer",
   "invert": "Inverser",

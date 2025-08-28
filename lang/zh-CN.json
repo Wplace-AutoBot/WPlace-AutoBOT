@@ -48,7 +48,7 @@
   "noSavedData": "❌ 未找到已保存进度",
   "savedDataFound": "✅ 找到已保存进度！是否加载继续？",
   "savedDate": "保存时间: {date}",
-  "clickLoadToContinue": "点击"加载进度"继续。",
+  "clickLoadToContinue": "点击\"加载进度\"继续。",
   "fileError": "❌ 处理文件时出错",
   "invalidFileFormat": "❌ 文件格式无效",
   "paintingSpeed": "绘制速度",

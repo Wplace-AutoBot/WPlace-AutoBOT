@@ -65,6 +65,8 @@
   "autoCaptchaDesc": "CAPTCHA süresi dolduğunda manuel piksel yerleştirmeyi taklit ederek otomatik çözmeyi dener.",
   "applySettings": "Ayarları Uygula",
   "settingsSaved": "✅ Ayarlar başarıyla kaydedildi!",
+  "speedOn": "Açık",
+  "speedOff": "Kapalı",
   "cooldownSettings": "Bekleme Süresi Ayarları",
   "waitCharges": "Haklar şu seviyeye ulaşana kadar bekle",
   "captchaSolving": "🤖 CAPTCHA çözülmeye çalışılıyor...",

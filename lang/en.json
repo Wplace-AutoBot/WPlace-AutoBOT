@@ -65,6 +65,8 @@
   "autoCaptchaDesc": "Automatically generates Turnstile tokens using integrated generator. Falls back to browser automation if needed.",
   "applySettings": "Apply Settings",
   "settingsSaved": "✅ Settings saved successfully!",
+  "speedOn": "On",
+  "speedOff": "Off",
   "cooldownSettings": "Cooldown Settings",
   "waitCharges": "Wait until charges reach",
   "captchaSolving": "🔑 Generating Turnstile token...",

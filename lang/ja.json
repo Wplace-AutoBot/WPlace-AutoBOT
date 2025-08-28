@@ -77,7 +77,7 @@
   "notificationsNotSupported": "このブラウザでは通知がサポートされていません。",
   "chargesReadyNotification": "WPlace — チャージ準備完了",
   "chargesReadyMessage": "チャージ準備完了: {current} / {max}。しきい値: {threshold}。",
-  "testNotificationTitle": "WPlace — テスト"
+  "testNotificationTitle": "WPlace — テスト",
   "testNotificationMessage": "これはテスト通知です。",
   "showStats": "統計表示",
   "compactMode": "コンパクトモード",
@@ -105,15 +105,15 @@
   "notifyOnChargesThreshold": "チャージがしきい値に達したら通知",
   "onlyWhenNotFocused": "タブが非アクティブの時のみ",
   "repeatEvery": "繰り返し間隔",
-  "minutesPl": "分"
+  "minutesPl": "分",
   "grantPermission": "許可を与える",
-  "test": "テスト"
+  "test": "テスト",
   "showAllColorsIncluding": "すべての色を表示（利用不可含む）",
   "chromaWeight": "彩度重み",
   "downloadPreview": "プレビューダウンロード",
   "apply": "適用",
   "cancel": "キャンセル",
-  "fit": "フィット"
+  "fit": "フィット",
   "hundred": "100%",
   "clear": "クリア",
   "invert": "反転",
