@@ -21,10 +21,10 @@
     COOLDOWN_CHARGE_THRESHOLD: 1, // Default wait threshold
     // Desktop Notifications (defaults)
     NOTIFICATIONS: {
-      ENABLED: true,
-      ON_CHARGES_REACHED: true,
-      ONLY_WHEN_UNFOCUSED: true,
-      REPEAT_MINUTES: 5, // repeat reminder while threshold condition holds
+        ENABLED: true,
+        ON_CHARGES_REACHED: true,
+        ONLY_WHEN_UNFOCUSED: true,
+        REPEAT_MINUTES: 5, // repeat reminder while threshold condition holds
     },
     OVERLAY: {
       OPACITY_DEFAULT: 0.6,
@@ -146,6 +146,27 @@
           pixelBlink: false,
         },
       },
+      "Classic Light": {
+        primary: "#ffffff",
+        secondary: "#f8f9fa",
+        accent: "#e9ecef",
+        text: "#212529",
+        highlight: "#6f42c1",
+        success: "#28a745",
+        error: "#dc3545",
+        warning: "#ffc107",
+        fontFamily: "'Segoe UI', Roboto, sans-serif",
+        borderRadius: "12px",
+        borderStyle: "solid",
+        borderWidth: "1px",
+        boxShadow: "0 8px 32px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.08)",
+        backdropFilter: "blur(10px)",
+        animations: {
+          glow: false,
+          scanline: false,
+          pixelBlink: false,
+        },
+      },
       "Neon Retro": {
         primary: "#1a1a2e",
         secondary: "#16213e",
@@ -177,20 +198,56 @@
   const getCurrentTheme = () => CONFIG.THEMES[CONFIG.currentTheme]
 
   const switchTheme = (themeName) => {
-    if (CONFIG.THEMES[themeName]) {
-      CONFIG.currentTheme = themeName
-      saveThemePreference()
+  if (CONFIG.THEMES[themeName]) {
+    CONFIG.currentTheme = themeName
+    saveThemePreference()
 
-      // Remove existing theme styles
-      const existingStyle = document.querySelector('style[data-wplace-theme="true"]')
-      if (existingStyle) {
-        existingStyle.remove()
-      }
+    // APPLY THEME VARS/CLASS (new)
+    applyTheme()
 
-      // Recreate UI with new theme (cleanup is handled in createUI)
-      createUI()
-    }
+    // Recreate UI (kept for now)
+    createUI()
   }
+}
+
+// Add this helper (place it after getCurrentTheme/switchTheme definitions)
+function applyTheme() {
+  const theme = getCurrentTheme();
+  // Toggle theme class on documentElement so CSS vars cascade to our UI
+  document.documentElement.classList.remove('wplace-theme--classic', 'wplace-theme--classic-light', 'wplace-theme--neon');
+  
+  let themeClass = 'wplace-theme--classic'; // default
+  if (CONFIG.currentTheme === 'Neon Retro') {
+    themeClass = 'wplace-theme--neon';
+  } else if (CONFIG.currentTheme === 'Classic Light') {
+    themeClass = 'wplace-theme--classic-light';
+  }
+  
+  document.documentElement.classList.add(themeClass);
+
+  // Also set CSS variables explicitly in case you want runtime overrides
+  const root = document.documentElement;
+  const setVar = (k, v) => { try { root.style.setProperty(k, v); } catch {} };
+
+  setVar('--wplace-primary', theme.primary);
+  setVar('--wplace-secondary', theme.secondary);
+  setVar('--wplace-accent', theme.accent);
+  setVar('--wplace-text', theme.text);
+  setVar('--wplace-highlight', theme.highlight);
+  setVar('--wplace-success', theme.success);
+  setVar('--wplace-error', theme.error);
+  setVar('--wplace-warning', theme.warning);
+
+  // Typography + look
+  setVar('--wplace-font', theme.fontFamily || "'Segoe UI', Roboto, sans-serif");
+  setVar('--wplace-radius', ('' + (theme.borderRadius || '12px')));
+  setVar('--wplace-border-style', (('' + (theme.borderStyle || 'solid'))));
+  setVar('--wplace-border-width', (('' + (theme.borderWidth || '1px'))));
+  setVar('--wplace-backdrop', (('' + (theme.backdropFilter || 'blur(10px)'))));
+  setVar('--wplace-border-color', 'rgba(255,255,255,0.1)');
+}
+
+  
 
   const saveThemePreference = () => {
     try {
@@ -329,28 +386,28 @@
     initialSetupComplete: false, // Track if initial startup setup is complete (only happens once)
     overlayOpacity: CONFIG.OVERLAY.OPACITY_DEFAULT,
     blueMarbleEnabled: CONFIG.OVERLAY.BLUE_MARBLE_DEFAULT,
-    ditheringEnabled: true,
-    // Advanced color matching settings
-    colorMatchingAlgorithm: 'lab',
-    enableChromaPenalty: true,
-    chromaPenaltyWeight: 0.15,
-    customTransparencyThreshold: CONFIG.TRANSPARENCY_THRESHOLD,
-    customWhiteThreshold: CONFIG.WHITE_THRESHOLD,
-    resizeSettings: null,
-    originalImage: null,
-    resizeIgnoreMask: null,
-    // Notification prefs and runtime bookkeeping
-    notificationsEnabled: CONFIG.NOTIFICATIONS.ENABLED,
-    notifyOnChargesReached: CONFIG.NOTIFICATIONS.ON_CHARGES_REACHED,
-    notifyOnlyWhenUnfocused: CONFIG.NOTIFICATIONS.ONLY_WHEN_UNFOCUSED,
-    notificationIntervalMinutes: CONFIG.NOTIFICATIONS.REPEAT_MINUTES,
-    _lastChargesNotifyAt: 0,
-    _lastChargesBelow: true,
-    // Smart save tracking
-    _lastSavePixelCount: 0,
-    _lastSaveTime: 0,
-    _saveInProgress: false,
-    paintedMap: null,
+  ditheringEnabled: true,
+  // Advanced color matching settings
+  colorMatchingAlgorithm: 'lab',
+  enableChromaPenalty: true,
+  chromaPenaltyWeight: 0.15,
+  customTransparencyThreshold: CONFIG.TRANSPARENCY_THRESHOLD,
+  customWhiteThreshold: CONFIG.WHITE_THRESHOLD,
+  resizeSettings: null,
+  originalImage: null,
+  resizeIgnoreMask: null,
+  // Notification prefs and runtime bookkeeping
+  notificationsEnabled: CONFIG.NOTIFICATIONS.ENABLED,
+  notifyOnChargesReached: CONFIG.NOTIFICATIONS.ON_CHARGES_REACHED,
+  notifyOnlyWhenUnfocused: CONFIG.NOTIFICATIONS.ONLY_WHEN_UNFOCUSED,
+  notificationIntervalMinutes: CONFIG.NOTIFICATIONS.REPEAT_MINUTES,
+  _lastChargesNotifyAt: 0,
+  _lastChargesBelow: true,
+  // Smart save tracking
+  _lastSavePixelCount: 0,
+  _lastSaveTime: 0,
+  _saveInProgress: false,
+  paintedMap: null,
   }
 
   let _updateResizePreview = () => { };
@@ -383,8 +440,8 @@
       this.disable();
       this.imageBitmap = null;
       this.chunkedTiles.clear();
-      this.originalTiles.clear();
-      this.originalTilesData.clear();
+  this.originalTiles.clear();
+  this.originalTilesData.clear();
       this.lastProcessedHash = null;
       if (this.processPromise) {
         this.processPromise = null;
@@ -451,7 +508,7 @@
     async _doProcessImageIntoChunks() {
       const startTime = performance.now();
       this.chunkedTiles.clear();
-
+      
       const { width: imageWidth, height: imageHeight } = this.imageBitmap;
       const { x: startPixelX, y: startPixelY } = this.startCoords.pixel;
       const { x: startRegionX, y: startRegionY } = this.startCoords.region;
@@ -480,7 +537,7 @@
       // Process tiles in batches with yielding
       for (let i = 0; i < tilesToProcess.length; i += batchSize) {
         const batch = tilesToProcess.slice(i, i + batchSize);
-
+        
         await Promise.all(batch.map(async ({ tx, ty }) => {
           const tileKey = `${tx},${ty}`;
           const chunkBitmap = await this._processTile(tx, ty, imageWidth, imageHeight, startPixelX, startPixelY, startRegionX, startRegionY);
@@ -528,18 +585,18 @@
       if (state.blueMarbleEnabled) {
         const imageData = chunkCtx.getImageData(dX, dY, sW, sH);
         const data = imageData.data;
-
+        
         // Faster pixel manipulation using typed arrays
         for (let i = 0; i < data.length; i += 4) {
           const pixelIndex = i / 4;
           const pixelY = Math.floor(pixelIndex / sW);
           const pixelX = pixelIndex % sW;
-
+          
           if ((pixelX + pixelY) % 2 === 0 && data[i + 3] > 0) {
             data[i + 3] = 0; // Set alpha to 0
           }
         }
-
+        
         chunkCtx.putImageData(imageData, dX, dY);
       }
 
@@ -668,7 +725,7 @@
       const originalBitmap = await createImageBitmap(originalBlob);
       const canvas = new OffscreenCanvas(originalBitmap.width, originalBitmap.height);
       const ctx = canvas.getContext('2d');
-
+      
       // Disable antialiasing for pixel-perfect rendering
       ctx.imageSmoothingEnabled = false;
 
@@ -681,7 +738,7 @@
       ctx.drawImage(overlayBitmap, 0, 0);
 
       // Use faster blob conversion with compression settings
-      return await canvas.convertToBlob({
+      return await canvas.convertToBlob({ 
         type: 'image/png',
         quality: 0.95 // Slight compression for faster processing
       });
@@ -738,7 +795,7 @@
     }
 
     tokenGenerationInProgress = true;
-
+    
     try {
       console.log("🔄 Token expired or missing, generating new one...");
       const token = await handleCaptchaWithRetry();
@@ -877,6 +934,18 @@
     }
   });
 
+  async function detectLanguage() {
+    try {
+      const response = await fetch("https://backend.wplace.live/me", {
+        credentials: "include",
+      })
+      const data = await response.json()
+      state.language = data.language === "pt" ? "pt" : "en"
+    } catch {
+      state.language = navigator.language.startsWith("pt") ? "pt" : "en"
+    }
+  }
+
   // UTILITY FUNCTIONS
   const Utils = {
     sleep: (ms) => new Promise((r) => setTimeout(r, ms)),
@@ -904,7 +973,7 @@
         this.turnstileLoaded = true;
         return Promise.resolve();
       }
-
+      
       return new Promise((resolve, reject) => {
         // Avoid adding the script twice
         if (document.querySelector('script[src^="https://challenges.cloudflare.com/turnstile/v0/api.js"]')) {
@@ -918,7 +987,7 @@
           };
           return checkReady();
         }
-
+        
         const script = document.createElement('script');
         script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
         script.async = true;
@@ -943,20 +1012,9 @@
         if (this._turnstileContainer) {
           this._turnstileContainer.remove();
         }
-
+        
         this._turnstileContainer = document.createElement('div');
-        this._turnstileContainer.style.cssText = `
-          position: fixed !important;
-          left: -99999px !important;
-          top: -99999px !important;
-          width: 1px !important;
-          height: 1px !important;
-          pointer-events: none !important;
-          opacity: 0 !important;
-          visibility: hidden !important;
-          z-index: -99999 !important;
-          overflow: hidden !important;
-        `;
+        this._turnstileContainer.className = 'wplace-turnstile-hidden';
         this._turnstileContainer.setAttribute('aria-hidden', 'true');
         this._turnstileContainer.id = 'turnstile-widget-container';
         document.body.appendChild(this._turnstileContainer);
@@ -972,23 +1030,7 @@
 
       const overlay = document.createElement('div');
       overlay.id = 'turnstile-overlay-container';
-      overlay.style.cssText = `
-        position: fixed !important;
-        bottom: 20px !important;
-        right: 20px !important;
-        z-index: 99999 !important;
-        background: rgba(0,0,0,0.9) !important;
-        border-radius: 12px !important;
-        padding: 20px !important;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.4) !important;
-        backdrop-filter: blur(10px) !important;
-        border: 1px solid rgba(255,255,255,0.2) !important;
-        color: white !important;
-        font-family: 'Segoe UI', sans-serif !important;
-        display: none !important;
-        max-width: 350px !important;
-        min-width: 300px !important;
-      `;
+      overlay.className = 'wplace-turnstile-overlay wplace-overlay-hidden';
 
       const title = document.createElement('div');
       title.textContent = Utils.t('turnstileInstructions');
@@ -996,11 +1038,11 @@
 
       const host = document.createElement('div');
       host.id = 'turnstile-overlay-host';
-      host.style.cssText = 'width: 100%; min-height: 70px;';
+      host.className = 'wplace-turnstile-host';
 
       const hideBtn = document.createElement('button');
       hideBtn.textContent = Utils.t('hideTurnstileBtn');
-      hideBtn.style.cssText = 'position:absolute; top:6px; right:6px; font-size:11px; background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.2); border-radius:6px; padding:2px 6px; cursor:pointer;';
+      hideBtn.className = 'wplace-turnstile-hide-btn';
       hideBtn.addEventListener('click', () => overlay.remove());
 
       overlay.appendChild(title);
@@ -1047,24 +1089,24 @@
         try {
           // Force cleanup of any existing widget
           if (this._turnstileWidgetId && window.turnstile?.remove) {
-            try {
-              window.turnstile.remove(this._turnstileWidgetId);
+            try { 
+              window.turnstile.remove(this._turnstileWidgetId); 
               console.log('🧹 Cleaned up existing Turnstile widget');
             } catch (e) {
               console.warn('⚠️ Widget cleanup warning:', e.message);
             }
           }
-
+          
           const container = this.ensureTurnstileContainer();
           container.innerHTML = '';
-
+          
           // Verify Turnstile is available
           if (!window.turnstile?.render) {
             console.error('❌ Turnstile not available for rendering');
             resolve(null);
             return;
           }
-
+          
           console.log('🔧 Creating invisible Turnstile widget...');
           const widgetId = window.turnstile.render(container, {
             sitekey,
@@ -1079,10 +1121,10 @@
             'error-callback': () => resolve(null),
             'timeout-callback': () => resolve(null)
           });
-
+          
           this._turnstileWidgetId = widgetId;
           this._lastSitekey = sitekey;
-
+          
           if (!widgetId) {
             return resolve(null);
           }
@@ -1102,31 +1144,33 @@
     async createTurnstileWidgetInteractive(sitekey, action) {
       // Create a visible widget that users can interact with if needed
       console.log('🔄 Creating interactive Turnstile widget (visible)');
-
+      
       return new Promise((resolve) => {
         try {
           // Force cleanup of any existing widget
           if (this._turnstileWidgetId && window.turnstile?.remove) {
-            try {
-              window.turnstile.remove(this._turnstileWidgetId);
+            try { 
+              window.turnstile.remove(this._turnstileWidgetId); 
             } catch (e) {
               console.warn('⚠️ Widget cleanup warning:', e.message);
             }
           }
-
+          
           const overlay = this.ensureTurnstileOverlayContainer();
+          overlay.classList.remove('wplace-overlay-hidden');
           overlay.style.display = 'block';
-
+          
           const host = overlay.querySelector('#turnstile-overlay-host');
           host.innerHTML = '';
-
+          
           // Set a timeout for interactive mode
           const timeout = setTimeout(() => {
             console.warn('⏰ Interactive Turnstile widget timeout');
+            overlay.classList.add('wplace-overlay-hidden');
             overlay.style.display = 'none';
             resolve(null);
           }, 60000); // 60 seconds for user interaction
-
+          
           const widgetId = window.turnstile.render(host, {
             sitekey,
             action,
@@ -1134,9 +1178,10 @@
             theme: 'light',
             callback: (token) => {
               clearTimeout(timeout);
-              overlay.style.display = 'none';
+              overlay.classList.add('wplace-overlay-hidden');
+            overlay.style.display = 'none';
               console.log('✅ Interactive Turnstile completed successfully');
-
+              
               if (typeof token === 'string' && token.length > 20) {
                 resolve(token);
               } else {
@@ -1146,17 +1191,19 @@
             },
             'error-callback': (error) => {
               clearTimeout(timeout);
-              overlay.style.display = 'none';
+              overlay.classList.add('wplace-overlay-hidden');
+            overlay.style.display = 'none';
               console.warn('❌ Interactive Turnstile error:', error);
               resolve(null);
             },
           });
-
+          
           this._turnstileWidgetId = widgetId;
           this._lastSitekey = sitekey;
-
+          
           if (!widgetId) {
             clearTimeout(timeout);
+            overlay.classList.add('wplace-overlay-hidden');
             overlay.style.display = 'none';
             console.warn('❌ Failed to create interactive Turnstile widget');
             resolve(null);
@@ -1183,15 +1230,15 @@
           console.warn('Failed to cleanup Turnstile widget:', e);
         }
       }
-
+      
       if (this._turnstileContainer && document.body.contains(this._turnstileContainer)) {
         this._turnstileContainer.remove();
       }
-
+      
       if (this._turnstileOverlay && document.body.contains(this._turnstileOverlay)) {
         this._turnstileOverlay.remove();
       }
-
+      
       this._turnstileWidgetId = null;
       this._turnstileContainer = null;
       this._turnstileOverlay = null;
@@ -1269,11 +1316,11 @@
           this._cachedSitekey = testSitekey;
           return testSitekey;
         }
-
+        
       } catch (error) {
         console.warn('Error detecting sitekey:', error);
       }
-
+      
       console.log("🔍 Using fallback sitekey:", fallback);
       this._cachedSitekey = fallback;
       return fallback;
@@ -1361,40 +1408,7 @@
 
     showAlert: (message, type = "info") => {
       const alertDiv = document.createElement("div")
-      alertDiv.style.cssText = `
-        position: fixed;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        padding: 12px 20px;
-        border-radius: 8px;
-        color: white;
-        font-weight: 600;
-        z-index: 10001;
-        max-width: 400px;
-        text-align: center;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        animation: slideDown 0.3s ease-out;
-        font-family: 'Segoe UI', sans-serif;
-      `
-
-      const colors = {
-        info: "background: linear-gradient(135deg, #3498db, #2980b9);",
-        success: "background: linear-gradient(135deg, #27ae60, #229954);",
-        warning: "background: linear-gradient(135deg, #f39c12, #e67e22);",
-        error: "background: linear-gradient(135deg, #e74c3c, #c0392b);",
-      }
-
-      alertDiv.style.cssText += colors[type] || colors.info
-
-      const style = document.createElement("style")
-      style.textContent = `
-        @keyframes slideDown {
-          from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
-          to { transform: translateX(-50%) translateY(0); opacity: 1; }
-        }
-      `
-      document.head.appendChild(style)
+      alertDiv.className = `wplace-alert-base wplace-alert-${type}`
 
       alertDiv.textContent = message
       document.body.appendChild(alertDiv)
@@ -1403,7 +1417,6 @@
         alertDiv.style.animation = "slideDown 0.3s ease-out reverse"
         setTimeout(() => {
           document.body.removeChild(alertDiv)
-          document.head.removeChild(style)
         }, 300)
       }, 4000)
     },
@@ -1445,7 +1458,7 @@
       // Use provided palette or derive from COLOR_MAP
       if (!palette || palette.length === 0) {
         palette = Object.values(CONFIG.COLOR_MAP)
-            .filter(c => c.rgb)
+          .filter(c => c.rgb)
             .map(c => [c.rgb.r, c.rgb.g, c.rgb.b]);
       }
       if (state.colorMatchingAlgorithm === 'legacy') {
@@ -1499,17 +1512,17 @@
     },
 
     createImageUploader: () =>
-        new Promise((resolve) => {
-          const input = document.createElement("input")
-          input.type = "file"
-          input.accept = "image/png,image/jpeg"
-          input.onchange = () => {
-            const fr = new FileReader()
-            fr.onload = () => resolve(fr.result)
-            fr.readAsDataURL(input.files[0])
-          }
-          input.click()
-        }),
+      new Promise((resolve) => {
+        const input = document.createElement("input")
+        input.type = "file"
+        input.accept = "image/png,image/jpeg"
+        input.onchange = () => {
+          const fr = new FileReader()
+          fr.onload = () => resolve(fr.result)
+          fr.readAsDataURL(input.files[0])
+        }
+        input.click()
+      }),
 
     createFileDownloader: (data, filename) => {
       const blob = new Blob([data], { type: "application/json" })
@@ -1524,30 +1537,30 @@
     },
 
     createFileUploader: () =>
-        new Promise((resolve, reject) => {
-          const input = document.createElement("input")
-          input.type = "file"
-          input.accept = ".json"
-          input.onchange = (e) => {
-            const file = e.target.files[0]
-            if (file) {
-              const reader = new FileReader()
-              reader.onload = () => {
-                try {
-                  const data = JSON.parse(reader.result)
-                  resolve(data)
-                } catch (error) {
-                  reject(new Error("Invalid JSON file"))
-                }
+      new Promise((resolve, reject) => {
+        const input = document.createElement("input")
+        input.type = "file"
+        input.accept = ".json"
+        input.onchange = (e) => {
+          const file = e.target.files[0]
+          if (file) {
+            const reader = new FileReader()
+            reader.onload = () => {
+              try {
+                const data = JSON.parse(reader.result)
+                resolve(data)
+              } catch (error) {
+                reject(new Error("Invalid JSON file"))
               }
-              reader.onerror = () => reject(new Error("File reading error"))
-              reader.readAsText(file)
-            } else {
-              reject(new Error("No file selected"))
             }
+            reader.onerror = () => reject(new Error("File reading error"))
+            reader.readAsText(file)
+          } else {
+            reject(new Error("No file selected"))
           }
-          input.click()
-        }),
+        }
+        input.click()
+      }),
 
     extractAvailableColors: () => {
       const colorElements = document.querySelectorAll('[id^="color-"]')
@@ -1618,15 +1631,15 @@
     },
 
     calculateEstimatedTime: (remainingPixels, charges, cooldown) => {
-      if (remainingPixels <= 0) return 0
+      if (remainingPixels <= 0) return 0;
 
-      const paintingSpeedDelay = state.paintingSpeed > 0 ? (1000 / state.paintingSpeed) : 1000
-      const timeFromSpeed = remainingPixels * paintingSpeedDelay
+      const paintingSpeedDelay = state.paintingSpeed > 0 ? (1000 / state.paintingSpeed) : 1000;
+      const timeFromSpeed = remainingPixels * paintingSpeedDelay;
 
-      const cyclesNeeded = Math.ceil(remainingPixels / Math.max(charges, 1))
-      const timeFromCharges = cyclesNeeded * cooldown
+      const cyclesNeeded = Math.ceil(remainingPixels / Math.max(charges, 1));
+      const timeFromCharges = cyclesNeeded * cooldown;
 
-      return Math.max(timeFromSpeed, timeFromCharges)
+      return timeFromSpeed + timeFromCharges; // combine instead of taking max
     },
 
     // --- Painted pixel tracking helpers ---
@@ -1640,8 +1653,8 @@
     markPixelPainted: (x, y, regionX = 0, regionY = 0) => {
       const actualX = x + regionX;
       const actualY = y + regionY;
-
-      if (state.paintedMap && state.paintedMap[actualY] &&
+      
+      if (state.paintedMap && state.paintedMap[actualY] && 
           actualX >= 0 && actualX < state.paintedMap[actualY].length) {
         state.paintedMap[actualY][actualX] = true;
       }
@@ -1650,8 +1663,8 @@
     isPixelPainted: (x, y, regionX = 0, regionY = 0) => {
       const actualX = x + regionX;
       const actualY = y + regionY;
-
-      if (state.paintedMap && state.paintedMap[actualY] &&
+      
+      if (state.paintedMap && state.paintedMap[actualY] && 
           actualX >= 0 && actualX < state.paintedMap[actualY].length) {
         return state.paintedMap[actualY][actualX];
       }
@@ -1663,28 +1676,28 @@
       const now = Date.now();
       const pixelsSinceLastSave = state.paintedPixels - state._lastSavePixelCount;
       const timeSinceLastSave = now - state._lastSaveTime;
-
+      
       // Save conditions:
       // 1. Every 25 pixels (reduced from 50 for more frequent saves)
       // 2. At least 30 seconds since last save (prevent spam)
       // 3. Not already saving
-      return !state._saveInProgress &&
-          pixelsSinceLastSave >= 25 &&
-          timeSinceLastSave >= 30000;
+      return !state._saveInProgress && 
+             pixelsSinceLastSave >= 25 && 
+             timeSinceLastSave >= 30000;
     },
 
     performSmartSave: () => {
       if (!Utils.shouldAutoSave()) return false;
-
+      
       state._saveInProgress = true;
       const success = Utils.saveProgress();
-
+      
       if (success) {
         state._lastSavePixelCount = state.paintedPixels;
         state._lastSaveTime = Date.now();
         console.log(`💾 Auto-saved at ${state.paintedPixels} pixels`);
       }
-
+      
       state._saveInProgress = false;
       return success;
     },
@@ -1738,7 +1751,7 @@
     migrateProgressToV2: (saved) => {
       if (!saved) return saved;
       const isV1 = !saved.version || saved.version === '1' || saved.version === '1.0' || saved.version === '1.1';
-      if (!isV1) return saved;
+      if (!isV1) return saved; 
 
       try {
         const migrated = { ...saved };
@@ -1783,7 +1796,7 @@
       }
     },
 
-    saveProgress: () => {
+  saveProgress: () => {
       try {
         // Pack painted map if available
         let paintedMapPacked = null;
@@ -1812,13 +1825,13 @@
             availableColors: state.availableColors,
           },
           imageData: state.imageData
-              ? {
-                width: state.imageData.width,
-                height: state.imageData.height,
-                pixels: Array.from(state.imageData.pixels),
-                totalPixels: state.imageData.totalPixels,
-              }
-              : null,
+            ? {
+              width: state.imageData.width,
+              height: state.imageData.height,
+              pixels: Array.from(state.imageData.pixels),
+              totalPixels: state.imageData.totalPixels,
+            }
+            : null,
           paintedMapPacked: paintedMapPacked,
         }
 
@@ -1888,7 +1901,7 @@
             const imageData = new ImageData(state.imageData.pixels, state.imageData.width, state.imageData.height);
             ctx.putImageData(imageData, 0, 0);
             const proc = new ImageProcessor('');
-            proc.img = canvas;
+            proc.img = canvas; 
             proc.canvas = canvas;
             proc.ctx = ctx;
             state.imageData.processor = proc;
@@ -1912,7 +1925,7 @@
       }
     },
 
-    saveProgressToFile: () => {
+  saveProgressToFile: () => {
       try {
         // Pack painted map if available
         let paintedMapPacked = null;
@@ -1941,13 +1954,13 @@
             availableColors: state.availableColors,
           },
           imageData: state.imageData
-              ? {
-                width: state.imageData.width,
-                height: state.imageData.height,
-                pixels: Array.from(state.imageData.pixels),
-                totalPixels: state.imageData.totalPixels,
-              }
-              : null,
+            ? {
+              width: state.imageData.width,
+              height: state.imageData.height,
+              pixels: Array.from(state.imageData.pixels),
+              totalPixels: state.imageData.totalPixels,
+            }
+            : null,
           paintedMapPacked: paintedMapPacked,
         }
 
@@ -1960,7 +1973,7 @@
       }
     },
 
-    loadProgressFromFile: async () => {
+  loadProgressFromFile: async () => {
       try {
         const data = await Utils.createFileUploader()
         if (!data || !data.state) {
@@ -1974,7 +1987,7 @@
         } else {
           migrated = Utils.migrateProgressToV21(data) || data;
         }
-        const success = Utils.restoreProgress(migrated)
+    const success = Utils.restoreProgress(migrated)
         return success
       } catch (error) {
         console.error("Error loading from file:", error)
@@ -1991,9 +2004,9 @@
       try {
         // Recreate ImageBitmap from loaded pixel data
         const imageData = new ImageData(
-            state.imageData.pixels,
-            state.imageData.width,
-            state.imageData.height
+          state.imageData.pixels,
+          state.imageData.width,
+          state.imageData.height
         );
 
         const canvas = new OffscreenCanvas(state.imageData.width, state.imageData.height);
@@ -2336,7 +2349,7 @@
     // Don't re-fetch colors here, use what was captured when user clicked upload
     if (!state.availableColors || state.availableColors.length === 0) {
       // If no colors have been captured yet, show message
-      colorsContainer.innerHTML = `<div style="text-align: center; color: #888; padding: 20px;">${Utils.t('uploadImageFirst')}</div>`;
+      colorsContainer.innerHTML = `<div class="wplace-colors-placeholder">${Utils.t('uploadImageFirst')}</div>`;
       return;
     }
 
@@ -2355,7 +2368,7 @@
 
         // Check if this color is available in the captured colors
         const isAvailable = state.availableColors.some(c =>
-            c.rgb[0] === rgb.r && c.rgb[1] === rgb.g && c.rgb[2] === rgb.b
+          c.rgb[0] === rgb.r && c.rgb[1] === rgb.g && c.rgb[2] === rgb.b
         );
 
         // If not showing all colors and this color is not available, skip it
@@ -2420,29 +2433,29 @@
   }
   async function handleCaptcha() {
     const startTime = performance.now();
-
+    
     // Check user's token source preference
     if (state.tokenSource === "manual") {
       console.log("🎯 Manual token source selected - using pixel placement automation");
       return await handleCaptchaFallback();
     }
-
+    
     // Generator mode (pure) or Hybrid mode - try generator first
     try {
       // Use optimized token generation with automatic sitekey detection
       const sitekey = Utils.detectSitekey();
       console.log("🔑 Generating Turnstile token for sitekey:", sitekey);
       console.log('🧭 UA:', navigator.userAgent.substring(0, 50) + '...', 'Platform:', navigator.platform);
-
+      
       // Add additional checks before token generation
       if (!window.turnstile) {
         await Utils.loadTurnstile();
       }
-
+      
       const token = await Utils.generatePaintToken(sitekey);
-
+      
       console.log(`🔍 Token received - Type: ${typeof token}, Value: ${token ? (typeof token === 'string' ? (token.length > 50 ? token.substring(0, 50) + '...' : token) : JSON.stringify(token)) : 'null/undefined'}, Length: ${token?.length || 0}`);
-
+      
       if (typeof token === 'string' && token.length > 20) {
         const duration = Math.round(performance.now() - startTime);
         console.log(`✅ Turnstile token generated successfully in ${duration}ms`);
@@ -2453,7 +2466,7 @@
     } catch (error) {
       const duration = Math.round(performance.now() - startTime);
       console.error(`❌ Turnstile token generation failed after ${duration}ms:`, error);
-
+      
       // Fallback to manual pixel placement for hybrid mode
       if (state.tokenSource === "hybrid") {
         console.log("🔄 Hybrid mode: Generator failed, automatically switching to manual pixel placement...");
@@ -2538,6 +2551,8 @@
 
 
   async function createUI() {
+    await detectLanguage()
+
     const existingContainer = document.getElementById("wplace-image-bot-container")
     const existingStats = document.getElementById("wplace-stats-container")
     const existingSettings = document.getElementById("wplace-settings-container")
@@ -2554,6 +2569,7 @@
     await loadLanguagePreference()
 
     const theme = getCurrentTheme()
+    applyTheme() // <- new: set CSS vars and theme class before building UI
 
     const fontAwesome = document.createElement("link")
     fontAwesome.rel = "stylesheet"
@@ -2567,1155 +2583,12 @@
       document.head.appendChild(googleFonts)
     }
 
-    const style = document.createElement("style")
-    style.setAttribute("data-wplace-theme", "true")
-
-    style.textContent = `
-      ${theme.animations.glow
-        ? `
-      @keyframes neonGlow {
-        0%, 100% {
-          text-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor;
-        }
-        50% {
-          text-shadow: 0 0 2px currentColor, 0 0 5px currentColor, 0 0 8px currentColor;
-        }
-      }`
-        : ""
-    }
-
-      ${theme.animations.pixelBlink
-        ? `
-      @keyframes pixelBlink {
-        0%, 50% { opacity: 1; }
-        51%, 100% { opacity: 0.7; }
-      }`
-        : ""
-    }
-
-      ${theme.animations.scanline
-        ? `
-      @keyframes scanline {
-        0% { transform: translateY(-100%); }
-        100% { transform: translateY(400px); }
-      }`
-        : ""
-    }
-
-      @keyframes pulse {
-        0% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.7); }
-        70% { box-shadow: 0 0 0 10px rgba(0, 255, 0, 0); }
-        100% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0); }
-      }
-      @keyframes slideIn {
-        from { transform: translateY(-10px); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
-      }
-      @keyframes shimmer {
-        0% { transform: translateX(-100%); }
-        100% { transform: translateX(100%); }
-      }
-
-      #wplace-image-bot-container {
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        width: ${CONFIG.currentTheme === "Neon Retro" ? "280px" : "280px"};
-        max-height: calc(100vh - 40px);
-        background: ${CONFIG.currentTheme === "Classic Autobot"
-        ? `linear-gradient(135deg, ${theme.primary} 0%, #1a1a1a 100%)`
-        : theme.primary
-    };
-        border: ${theme.borderWidth} ${theme.borderStyle} ${CONFIG.currentTheme === "Classic Autobot" ? theme.accent : theme.text};
-        border-radius: ${theme.borderRadius};
-        padding: 0;
-        box-shadow: ${theme.boxShadow};
-        z-index: 9998;
-        font-family: ${theme.fontFamily};
-        color: ${theme.text};
-        animation: slideIn 0.4s ease-out;
-        overflow-y: auto; /* Allow scrolling for main panel */
-        overflow-x: hidden;
-        ${theme.backdropFilter ? `backdrop-filter: ${theme.backdropFilter};` : ""}
-        transition: all 0.3s ease;
-        user-select: none;
-        ${CONFIG.currentTheme === "Neon Retro" ? "image-rendering: pixelated;" : ""}
-      }
-
-      ${theme.animations.scanline
-        ? `
-      #wplace-image-bot-container::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 2px;
-        background: linear-gradient(90deg, transparent, ${theme.neon}, transparent);
-        animation: scanline 3s linear infinite;
-        z-index: 1;
-        pointer-events: none;
-      }`
-        : ""
-    }
-
-      ${CONFIG.currentTheme === "Neon Retro"
-        ? `
-      #wplace-image-bot-container::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background:
-          repeating-linear-gradient(
-            0deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 255, 65, 0.03) 2px,
-            rgba(0, 255, 65, 0.03) 4px
-          );
-        pointer-events: none;
-        z-index: 1;
-      }`
-        : ""
-    }
-
-      #wplace-image-bot-container.wplace-dragging {
-        transition: none;
-        box-shadow: 0 12px 40px rgba(0,0,0,0.8), 0 0 0 2px rgba(255,255,255,0.2);
-        transform: scale(1.02);
-        z-index: 9999;
-      }
-      #wplace-image-bot-container.wplace-minimized {
-        width: 200px;
-        height: auto;
-        overflow: hidden;
-      }
-      #wplace-image-bot-container.wplace-compact {
-        width: 240px;
-      }
-
-      /* Stats Container */
-      #wplace-stats-container {
-        position: fixed;
-        top: 20px;
-        left: 330px;
-        width: ${CONFIG.currentTheme === "Neon Retro" ? "280px" : "280px"};
-        max-height: calc(100vh - 40px);
-        background: ${CONFIG.currentTheme === "Classic Autobot"
-        ? `linear-gradient(135deg, ${theme.primary} 0%, #1a1a1a 100%)`
-        : theme.primary
-    };
-        border: ${theme.borderWidth} ${theme.borderStyle} ${CONFIG.currentTheme === "Classic Autobot" ? theme.accent : theme.text};
-        border-radius: ${theme.borderRadius};
-        padding: 0;
-        box-shadow: ${theme.boxShadow};
-        z-index: 9997;
-        font-family: ${theme.fontFamily};
-        color: ${theme.text};
-        animation: slideIn 0.4s ease-out;
-        overflow-y: auto; /* Make stats panel scrollable */
-        ${theme.backdropFilter ? `backdrop-filter: ${theme.backdropFilter};` : ""}
-        transition: all 0.3s ease;
-        user-select: none;
-        ${CONFIG.currentTheme === "Neon Retro" ? "image-rendering: pixelated;" : ""}
-      }
-
-      /* FIX: Disable transition during drag to prevent lag */
-      #wplace-stats-container.wplace-dragging {
-        transition: none;
-      }
-
-      .wplace-header {
-        padding: ${CONFIG.currentTheme === "Neon Retro" ? "8px 12px" : "8px 12px"};
-        background: ${CONFIG.currentTheme === "Classic Autobot"
-        ? `linear-gradient(135deg, ${theme.secondary} 0%, #2a2a2a 100%)`
-        : theme.secondary
-    };
-        color: ${theme.highlight};
-        font-size: ${CONFIG.currentTheme === "Neon Retro" ? "11px" : "13px"};
-        font-weight: ${CONFIG.currentTheme === "Neon Retro" ? "normal" : "700"};
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        cursor: move;
-        user-select: none;
-        border-bottom: ${CONFIG.currentTheme === "Neon Retro" ? "2px" : "1px"} solid ${CONFIG.currentTheme === "Classic Autobot" ? "rgba(255,255,255,0.1)" : theme.text};
-        ${CONFIG.currentTheme === "Classic Autobot" ? "text-shadow: 0 1px 2px rgba(0,0,0,0.5);" : "text-transform: uppercase; letter-spacing: 1px;"}
-        transition: background 0.2s ease;
-        position: relative;
-        z-index: 2;
-        ${theme.animations.glow ? "animation: neonGlow 2s ease-in-out infinite alternate;" : ""}
-      }
-
-      .wplace-header-title {
-        display: flex;
-        align-items: center;
-        gap: ${CONFIG.currentTheme === "Neon Retro" ? "6px" : "6px"};
-      }
-
-      .wplace-header-controls {
-        display: flex;
-        gap: ${CONFIG.currentTheme === "Neon Retro" ? "6px" : "6px"};
-      }
-
-      .wplace-header-btn {
-        background: ${CONFIG.currentTheme === "Classic Autobot" ? "rgba(255,255,255,0.1)" : theme.accent};
-        border: ${CONFIG.currentTheme === "Neon Retro" ? `2px solid ${theme.text}` : "none"};
-        color: ${theme.text};
-        cursor: pointer;
-        border-radius: ${CONFIG.currentTheme === "Classic Autobot" ? "4px" : "0"};
-        width: ${CONFIG.currentTheme === "Classic Autobot" ? "18px" : "auto"};
-        height: ${CONFIG.currentTheme === "Classic Autobot" ? "18px" : "auto"};
-        padding: ${CONFIG.currentTheme === "Neon Retro" ? "4px 6px" : "0"};
-        font-size: ${CONFIG.currentTheme === "Neon Retro" ? "8px" : "10px"};
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s;
-        font-family: ${theme.fontFamily};
-        ${CONFIG.currentTheme === "Neon Retro" ? "image-rendering: pixelated;" : ""}
-      }
-      .wplace-header-btn:hover {
-        background: ${CONFIG.currentTheme === "Classic Autobot" ? theme.accent : theme.text};
-        color: ${CONFIG.currentTheme === "Classic Autobot" ? theme.text : theme.primary};
-        transform: ${CONFIG.currentTheme === "Classic Autobot" ? "scale(1.1)" : "none"};
-        ${CONFIG.currentTheme === "Neon Retro" ? `box-shadow: 0 0 10px ${theme.text};` : ""}
-      }
-
-      .wplace-content {
-        padding: ${CONFIG.currentTheme === "Neon Retro" ? "12px" : "12px"};
-        display: block;
-        position: relative;
-        z-index: 2;
-      }
-      .wplace-content.wplace-hidden {
-        display: none;
-      }
-
-      .wplace-status-section {
-        margin-bottom: 12px;
-        padding: 8px;
-        background: rgba(255,255,255,0.03);
-        border-radius: ${theme.borderRadius};
-        border: 1px solid rgba(255,255,255,0.1);
-      }
-
-      .wplace-section {
-        margin-bottom: ${CONFIG.currentTheme === "Neon Retro" ? "12px" : "12px"};
-        padding: 12px;
-        background: rgba(255,255,255,0.03);
-        border-radius: ${theme.borderRadius};
-        border: 1px solid rgba(255,255,255,0.1);
-      }
-
-      .wplace-section-title {
-        font-size: 11px;
-        font-weight: 600;
-        margin-bottom: 8px;
-        color: ${theme.highlight};
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-
-      .wplace-controls {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-      }
-      .wplace-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-      }
-      .wplace-row.single {
-        grid-template-columns: 1fr;
-      }
-
-      .wplace-btn {
-        padding: ${CONFIG.currentTheme === "Neon Retro" ? "12px 8px" : "8px 12px"};
-        border: ${CONFIG.currentTheme === "Neon Retro" ? "2px solid" : "none"};
-        border-radius: ${theme.borderRadius};
-        font-weight: ${CONFIG.currentTheme === "Neon Retro" ? "normal" : "500"};
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: ${CONFIG.currentTheme === "Neon Retro" ? "8px" : "6px"};
-        font-size: ${CONFIG.currentTheme === "Neon Retro" ? "8px" : "11px"};
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-        font-family: ${theme.fontFamily};
-        ${CONFIG.currentTheme === "Neon Retro" ? "text-transform: uppercase; letter-spacing: 1px; image-rendering: pixelated;" : ""}
-        background: ${CONFIG.currentTheme === "Classic Autobot"
-        ? `linear-gradient(135deg, ${theme.accent} 0%, #4a4a4a 100%)`
-        : theme.accent
-    };
-        ${CONFIG.currentTheme === "Classic Autobot" ? "border: 1px solid rgba(255,255,255,0.1);" : ""}
-      }
-
-      ${CONFIG.currentTheme === "Classic Autobot"
-        ? `
-      .wplace-btn::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-        transition: left 0.5s ease;
-      }
-      .wplace-btn:hover:not(:disabled)::before {
-        left: 100%;
-      }`
-        : `
-      .wplace-btn::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-        transition: left 0.5s;
-      }
-      .wplace-btn:hover::before {
-        left: 100%;
-      }`
-    }
-
-      .wplace-btn:hover:not(:disabled) {
-        transform: ${CONFIG.currentTheme === "Classic Autobot" ? "translateY(-1px)" : "none"};
-        box-shadow: ${CONFIG.currentTheme === "Classic Autobot" ? "0 4px 12px rgba(0,0,0,0.4)" : "0 0 15px currentColor"
-    };
-        ${theme.animations.pixelBlink ? "animation: pixelBlink 0.5s infinite;" : ""}
-      }
-      .wplace-btn:active:not(:disabled) {
-        transform: translateY(0);
-      }
-
-      .wplace-btn-primary {
-        background: ${CONFIG.currentTheme === "Classic Autobot"
-        ? `linear-gradient(135deg, ${theme.accent} 0%, #6a5acd 100%)`
-        : theme.accent
-    };
-        color: ${theme.text};
-        ${CONFIG.currentTheme === "Neon Retro" ? `border-color: ${theme.text};` : ""}
-      }
-      .wplace-btn-upload {
-        background: ${CONFIG.currentTheme === "Classic Autobot"
-        ? `linear-gradient(135deg, ${theme.secondary} 0%, #4a4a4a 100%)`
-        : theme.purple
-    };
-        color: ${theme.text};
-        ${CONFIG.currentTheme === "Classic Autobot"
-        ? `border: 1px dashed ${theme.highlight};`
-        : `border-color: ${theme.text}; border-style: dashed;`
-    }
-      }
-      .wplace-btn-start {
-        background: ${CONFIG.currentTheme === "Classic Autobot"
-        ? `linear-gradient(135deg, ${theme.success} 0%, #228b22 100%)`
-        : theme.success
-    };
-        color: ${CONFIG.currentTheme === "Classic Autobot" ? "white" : theme.primary};
-        ${CONFIG.currentTheme === "Neon Retro" ? `border-color: ${theme.success};` : ""}
-      }
-      .wplace-btn-stop {
-        background: ${CONFIG.currentTheme === "Classic Autobot"
-        ? `linear-gradient(135deg, ${theme.error} 0%, #dc143c 100%)`
-        : theme.error
-    };
-        color: ${CONFIG.currentTheme === "Classic Autobot" ? "white" : theme.text};
-        ${CONFIG.currentTheme === "Neon Retro" ? `border-color: ${theme.error};` : ""}
-      }
-      .wplace-btn-select {
-        background: ${CONFIG.currentTheme === "Classic Autobot"
-        ? `linear-gradient(135deg, ${theme.highlight} 0%, #9370db 100%)`
-        : theme.highlight
-    };
-        color: ${CONFIG.currentTheme === "Classic Autobot" ? "white" : theme.primary};
-        ${CONFIG.currentTheme === "Neon Retro" ? `border-color: ${theme.highlight};` : ""}
-      }
-      .wplace-btn-file {
-        background: ${CONFIG.currentTheme === "Classic Autobot"
-        ? "linear-gradient(135deg, #ff8c00 0%, #ff7f50 100%)"
-        : theme.warning
-    };
-        color: ${CONFIG.currentTheme === "Classic Autobot" ? "white" : theme.primary};
-        ${CONFIG.currentTheme === "Neon Retro" ? `border-color: ${theme.warning};` : ""}
-      }
-      .wplace-btn:disabled {
-        opacity: ${CONFIG.currentTheme === "Classic Autobot" ? "0.5" : "0.3"};
-        cursor: not-allowed;
-        transform: none !important;
-        ${theme.animations.pixelBlink ? "animation: none !important;" : ""}
-        box-shadow: none !important;
-      }
-      .wplace-btn:disabled::before {
-        display: none;
-      }
-      
-      .wplace-btn-overlay.active {
-        background: linear-gradient(135deg, #29b6f6 0%, #8e2de2 100%);
-        box-shadow: 0 0 15px #8e2de2;
-      }
-
-      .wplace-stats {
-        background: ${CONFIG.currentTheme === "Classic Autobot" ? "rgba(255,255,255,0.03)" : theme.secondary};
-        padding: ${CONFIG.currentTheme === "Neon Retro" ? "12px" : "8px"};
-        border: ${CONFIG.currentTheme === "Neon Retro" ? `2px solid ${theme.text}` : "1px solid rgba(255,255,255,0.1)"};
-        border-radius: ${theme.borderRadius};
-        margin-bottom: ${CONFIG.currentTheme === "Neon Retro" ? "15px" : "8px"};
-        ${CONFIG.currentTheme === "Neon Retro" ? "box-shadow: inset 0 0 10px rgba(0, 255, 65, 0.1);" : ""}
-      }
-
-      .wplace-stat-item {
-        display: flex;
-        justify-content: space-between;
-        padding: ${CONFIG.currentTheme === "Neon Retro" ? "6px 0" : "4px 0"};
-        font-size: ${CONFIG.currentTheme === "Neon Retro" ? "8px" : "11px"};
-        border-bottom: 1px solid rgba(255,255,255,0.05);
-        ${CONFIG.currentTheme === "Neon Retro" ? "text-transform: uppercase; letter-spacing: 1px;" : ""}
-      }
-      .wplace-stat-item:last-child {
-        border-bottom: none;
-      }
-      .wplace-stat-label {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        opacity: 0.9;
-        font-size: ${CONFIG.currentTheme === "Neon Retro" ? "8px" : "10px"};
-      }
-      .wplace-stat-value {
-        font-weight: 600;
-        color: ${theme.highlight};
-      }
-
-      .wplace-colors-section {
-        margin-top: 10px;
-        padding-top: 8px;
-        border-top: 1px solid rgba(255,255,255,0.05);
-      }
-
-      .wplace-stat-colors-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(16px, 1fr));
-        gap: 4px;
-        margin-top: 8px;
-        padding: 4px;
-        background: rgba(0,0,0,0.2);
-        border-radius: 4px;
-        max-height: 80px; /* Limit height and allow scrolling */
-        overflow-y: auto;
-      }
-      
-      .wplace-stat-color-swatch {
-        width: 16px;
-        height: 16px;
-        border-radius: 3px;
-        border: 1px solid rgba(255,255,255,0.1);
-        box-shadow: inset 0 0 2px rgba(0,0,0,0.5);
-      }
-
-      .wplace-progress {
-        width: 100%;
-        background: ${CONFIG.currentTheme === "Classic Autobot" ? "rgba(0,0,0,0.3)" : theme.secondary};
-        border: ${CONFIG.currentTheme === "Neon Retro" ? `2px solid ${theme.text}` : "1px solid rgba(255,255,255,0.1)"};
-        border-radius: ${theme.borderRadius};
-        margin: ${CONFIG.currentTheme === "Neon Retro" ? "10px 0" : "8px 0"};
-        overflow: hidden;
-        height: ${CONFIG.currentTheme === "Neon Retro" ? "16px" : "6px"};
-        position: relative;
-      }
-
-      ${CONFIG.currentTheme === "Neon Retro"
-        ? `
-      .wplace-progress::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background:
-          repeating-linear-gradient(
-            45deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 255, 65, 0.1) 2px,
-            rgba(0, 255, 65, 0.1) 4px
-          );
-        pointer-events: none;
-      }`
-        : ""
-    }
-
-      .wplace-progress-bar {
-        height: ${CONFIG.currentTheme === "Neon Retro" ? "100%" : "6px"};
-        background: ${CONFIG.currentTheme === "Classic Autobot"
-        ? `linear-gradient(135deg, ${theme.highlight} 0%, #9370db 100%)`
-        : `linear-gradient(90deg, ${theme.success}, ${theme.neon})`
-    };
-        transition: width ${CONFIG.currentTheme === "Neon Retro" ? "0.3s" : "0.5s"} ease;
-        position: relative;
-        ${CONFIG.currentTheme === "Neon Retro" ? `box-shadow: 0 0 10px ${theme.success};` : ""}
-      }
-
-      ${CONFIG.currentTheme === "Classic Autobot"
-        ? `
-      .wplace-progress-bar::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-        animation: shimmer 2s infinite;
-      }`
-        : `
-      .wplace-progress-bar::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        right: 0;
-        width: 4px;
-        height: 100%;
-        background: ${theme.text};
-        animation: pixelBlink 1s infinite;
-      }`
-    }
-
-      .wplace-status {
-        padding: ${CONFIG.currentTheme === "Neon Retro" ? "10px" : "6px"};
-        border: ${CONFIG.currentTheme === "Neon Retro" ? "2px solid" : "1px solid"};
-        border-radius: ${theme.borderRadius};
-        text-align: center;
-        font-size: ${CONFIG.currentTheme === "Neon Retro" ? "8px" : "11px"};
-        ${CONFIG.currentTheme === "Neon Retro" ? "text-transform: uppercase; letter-spacing: 1px;" : ""}
-        position: relative;
-        overflow: hidden;
-      }
-
-      .status-default {
-        background: ${CONFIG.currentTheme === "Classic Autobot" ? "rgba(255,255,255,0.1)" : theme.accent};
-        border-color: ${theme.text};
-        color: ${theme.text};
-      }
-      .status-success {
-        background: ${CONFIG.currentTheme === "Classic Autobot" ? "rgba(0, 255, 0, 0.1)" : theme.success};
-        border-color: ${theme.success};
-        color: ${CONFIG.currentTheme === "Classic Autobot" ? theme.success : theme.primary};
-        box-shadow: 0 0 15px ${theme.success};
-      }
-      .status-error {
-        background: ${CONFIG.currentTheme === "Classic Autobot" ? "rgba(255, 0, 0, 0.1)" : theme.error};
-        border-color: ${theme.error};
-        color: ${CONFIG.currentTheme === "Classic Autobot" ? theme.error : theme.text};
-        box-shadow: 0 0 15px ${theme.error};
-        ${theme.animations.pixelBlink ? "animation: pixelBlink 0.5s infinite;" : ""}
-      }
-      .status-warning {
-        background: ${CONFIG.currentTheme === "Classic Autobot" ? "rgba(255, 165, 0, 0.1)" : theme.warning};
-        border-color: ${theme.warning};
-        color: ${CONFIG.currentTheme === "Classic Autobot" ? "orange" : theme.primary};
-        box-shadow: 0 0 15px ${theme.warning};
-      }
-
-      .resize-container {
-        display: none;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: ${theme.primary};
-        padding: 20px;
-        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.text};
-        border-radius: ${theme.borderRadius};
-        z-index: 10000;
-        box-shadow: ${CONFIG.currentTheme === "Classic Autobot" ? "0 0 20px rgba(0,0,0,0.5)" : "0 0 30px rgba(0, 255, 65, 0.5)"
-    };
-        width: 90%;
-        max-width: 700px;
-        max-height: 90%;
-        overflow: auto;
-        font-family: ${theme.fontFamily};
-      }
-
-      .resize-preview-wrapper {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border: 1px solid ${theme.accent};
-        background: rgba(0,0,0,0.2);
-        margin: 15px 0;
-        height: 300px;
-        overflow: hidden;
-      }
-
-  .resize-canvas-stack { position: relative; transform-origin: center center; display: inline-block; }
-      .resize-base-canvas, .resize-mask-canvas {
-        position: absolute; left: 0; top: 0;
-        image-rendering: pixelated;
-        image-rendering: -moz-crisp-edges;
-        image-rendering: crisp-edges;
-      }
-      .resize-mask-canvas { pointer-events: auto; }
-      .resize-tools { display:flex; gap:8px; align-items:center; margin-top:8px; font-size:12px; }
-      .resize-tools button { padding:6px 10px; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.06); color:#fff; cursor:pointer; }
-      .wplace-btn.active,
-      .wplace-btn[aria-pressed="true"] {
-        background: ${theme.highlight} !important;
-        color: ${theme.primary} !important;
-        border-color: ${theme.text} !important;
-        box-shadow: 0 0 8px rgba(0,0,0,0.25) inset, 0 0 6px rgba(0,0,0,0.2) !important;
-      }
-      .wplace-btn.active i,
-      .wplace-btn[aria-pressed="true"] i { filter: drop-shadow(0 0 3px ${theme.primary}); }
-      .mask-mode-group .wplace-btn.active,
-      .mask-mode-group .wplace-btn[aria-pressed="true"] {
-        background: ${theme.highlight};
-        color: ${theme.primary};
-        border-color: ${theme.text};
-        box-shadow: 0 0 8px rgba(0,0,0,0.25) inset, 0 0 6px rgba(0,0,0,0.2);
-      }
-
-      .resize-controls {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 15px;
-        align-items: center;
-      }
-
-      .resize-controls label {
-        font-size: ${CONFIG.currentTheme === "Neon Retro" ? "8px" : "12px"};
-        ${CONFIG.currentTheme === "Neon Retro" ? "text-transform: uppercase; letter-spacing: 1px;" : ""}
-        color: ${theme.text};
-      }
-
-      .resize-slider {
-        width: 100%;
-        height: ${CONFIG.currentTheme === "Neon Retro" ? "8px" : "4px"};
-        background: ${CONFIG.currentTheme === "Classic Autobot" ? "#ccc" : theme.secondary};
-        border: ${CONFIG.currentTheme === "Neon Retro" ? `2px solid ${theme.text}` : "none"};
-        border-radius: ${theme.borderRadius};
-        outline: none;
-        -webkit-appearance: none;
-      }
-
-      ${CONFIG.currentTheme === "Neon Retro"
-        ? `
-      .resize-slider::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        width: 16px;
-        height: 16px;
-        background: ${theme.highlight};
-        border: 2px solid ${theme.text};
-        border-radius: 0;
-        cursor: pointer;
-        box-shadow: 0 0 5px ${theme.highlight};
-      }
-
-      .resize-slider::-moz-range-thumb {
-        width: 16px;
-        height: 16px;
-        background: ${theme.highlight};
-        border: 2px solid ${theme.text};
-        border-radius: 0;
-        cursor: pointer;
-        box-shadow: 0 0 5px ${theme.highlight};
-      }`
-        : ""
-    }
-      
-      .resize-zoom-controls {
-        grid-column: 1 / -1;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-top: 15px;
-      }
-
-      .resize-buttons {
-        display: flex;
-        gap: 10px;
-        justify-content: center;
-        margin-top: 20px;
-      }
-
-      .resize-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        z-index: 9999;
-        display: none;
-      }
-      .wplace-color-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-        gap: 10px;
-        padding-top: 8px;
-        max-height: 300px;
-        overflow-y: auto;
-      }
-      .wplace-color-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 4px;
-      }
-      .wplace-color-item-name {
-        font-size: 9px;
-        color: #ccc;
-        text-align: center;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        width: 100%;
-      }
-      .wplace-color-swatch {
-        width: 22px;
-        height: 22px;
-        border: 1px solid rgba(255,255,255,0.2);
-        border-radius: 4px;
-        cursor: pointer;
-        transition: transform 0.1s ease, box-shadow 0.2s ease;
-        position: relative;
-        margin: 0 auto;
-      }
-      .wplace-color-swatch.unavailable {
-        border-color: #666;
-        border-style: dashed;
-        cursor: not-allowed;
-      }
-      .wplace-color-swatch:hover {
-        transform: scale(1.1);
-        z-index: 1;
-      }
-      .wplace-color-swatch:not(.active) {
-        opacity: 0.3;
-        filter: grayscale(80%);
-      }
-      .wplace-color-swatch.unavailable:not(.active) {
-        opacity: 0.2;
-        filter: grayscale(90%);
-      }
-      .wplace-color-swatch.active::after {
-        content: '✔';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        color: white;
-        font-size: 12px;
-        font-weight: bold;
-        text-shadow: 0 0 3px black;
-      }
-      .wplace-color-divider {
-        border: none;
-        height: 1px;
-        background: rgba(255,255,255,0.1);
-        margin: 8px 0;
-      }
-
-        .wplace-cooldown-control {
-            margin-top: 8px;
-        }
-        .wplace-cooldown-control label {
-            font-size: 11px;
-            margin-bottom: 4px;
-            display: block;
-        }
-        .wplace-slider-container {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .wplace-slider {
-            flex: 1;
-            -webkit-appearance: none;
-            appearance: none;
-            height: 4px;
-            background: #444;
-            border-radius: 2px;
-            outline: none;
-        }
-        .wplace-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 14px;
-            height: 14px;
-            background: ${theme.highlight};
-            border-radius: 50%;
-            cursor: pointer;
-        }
-
-
-      ${CONFIG.currentTheme === "Neon Retro"
-        ? `
-      input[type="checkbox"] {
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        width: 16px;
-        height: 16px;
-        border: 2px solid ${theme.text};
-        background: ${theme.secondary};
-        margin-right: 8px;
-        position: relative;
-        cursor: pointer;
-      }
-
-      input[type="checkbox"]:checked {
-        background: ${theme.success};
-      }
-
-      input[type="checkbox"]:checked::after {
-        content: '✓';
-        position: absolute;
-        top: -2px;
-        left: 1px;
-        color: ${theme.primary};
-        font-size: 12px;
-        font-weight: bold;
-      }
-
-      .fas, .fa {
-        filter: drop-shadow(0 0 3px currentColor);
-      }
-
-      .wplace-speed-control {
-        margin-top: 12px;
-        padding: 12px;
-        background: ${theme.secondary};
-        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.accent};
-        border-radius: ${theme.borderRadius};
-        backdrop-filter: ${theme.backdropFilter};
-      }
-
-      .wplace-speed-label {
-        display: flex;
-        align-items: center;
-        margin-bottom: 8px;
-        color: ${theme.text};
-        font-size: 13px;
-        font-weight: 600;
-      }
-
-      .wplace-speed-label i {
-        margin-right: 6px;
-        color: ${theme.highlight};
-      }
-
-      .wplace-speed-slider-container {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-      }
-
-      .wplace-speed-slider {
-        flex: 1;
-        height: 6px;
-        border-radius: 3px;
-        background: ${theme.primary};
-        outline: none;
-        cursor: pointer;
-        -webkit-appearance: none;
-        appearance: none;
-      }
-
-      .wplace-speed-slider::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        appearance: none;
-        width: 18px;
-        height: 18px;
-        border-radius: 50%;
-        background: ${theme.highlight};
-        cursor: pointer;
-        border: 2px solid ${theme.text};
-        box-shadow: ${theme.boxShadow};
-      }
-
-      .wplace-speed-slider::-moz-range-thumb {
-        width: 18px;
-        height: 18px;
-        border-radius: 50%;
-        background: ${theme.highlight};
-        cursor: pointer;
-        border: 2px solid ${theme.text};
-        box-shadow: ${theme.boxShadow};
-      }
-
-      .wplace-speed-display {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        min-width: 90px;
-        justify-content: flex-end;
-      }
-
-      #speedValue {
-        color: ${theme.highlight};
-        font-weight: 600;
-        font-size: 14px;
-      }
-
-      .wplace-speed-unit {
-        color: ${theme.text};
-        font-size: 11px;
-        opacity: 0.8;
-      }
-
-      #wplace-settings-container {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 10001;
-        min-width: 400px;
-        max-width: 500px;
-        background: ${theme.primary};
-        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.accent};
-        border-radius: ${theme.borderRadius};
-        box-shadow: ${theme.boxShadow};
-        backdrop-filter: ${theme.backdropFilter};
-      }
-
-      .wplace-settings {
-        padding: 16px;
-        max-height: 400px;
-        overflow-y: auto;
-      }
-
-      .wplace-setting-section {
-        margin-bottom: 20px;
-        padding: 12px;
-        background: ${theme.secondary};
-        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.accent};
-        border-radius: ${theme.borderRadius};
-      }
-
-      .wplace-setting-title {
-        display: flex;
-        align-items: center;
-        margin-bottom: 12px;
-        color: ${theme.text};
-        font-size: 14px;
-        font-weight: 600;
-      }
-
-      .wplace-setting-title i {
-        margin-right: 8px;
-        color: ${theme.highlight};
-      }
-
-      .wplace-setting-content {
-        color: ${theme.text};
-      }
-
-      .wplace-section {
-        margin-bottom: 20px;
-        padding: 15px;
-        background: ${theme.secondary};
-        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.accent};
-        border-radius: ${theme.borderRadius};
-      }
-
-      .wplace-section-title {
-        display: flex;
-        align-items: center;
-        margin-bottom: 15px;
-        color: ${theme.text};
-        font-size: 14px;
-        font-weight: 600;
-      }
-
-      .wplace-section-title i {
-        margin-right: 8px;
-        color: ${theme.highlight};
-      }
-
-      .wplace-speed-container {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        margin-bottom: 10px;
-      }
-
-      .wplace-slider {
-        flex: 1;
-        height: 6px;
-        background: ${theme.accent};
-        border-radius: 3px;
-        outline: none;
-        -webkit-appearance: none;
-      }
-
-      .wplace-slider::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        width: 18px;
-        height: 18px;
-        background: ${theme.highlight};
-        border-radius: 50%;
-        cursor: pointer;
-        border: 2px solid ${theme.primary};
-      }
-
-      .wplace-speed-display {
-        background: ${theme.accent};
-        padding: 5px 10px;
-        border-radius: 4px;
-        color: ${theme.text};
-        font-weight: 600;
-        min-width: 80px;
-        text-align: center;
-        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.highlight};
-      }
-
-      .wplace-select {
-        width: 100%;
-        padding: 8px 12px;
-        background: ${theme.secondary};
-        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.accent};
-        border-radius: ${theme.borderRadius};
-        color: ${theme.text};
-        font-size: 14px;
-        margin-bottom: 10px;
-      }
-
-      .wplace-select:focus {
-        outline: none;
-        border-color: ${theme.highlight};
-      }
-
-      .wplace-description {
-        color: ${theme.text};
-        font-size: 12px;
-        opacity: 0.8;
-        line-height: 1.4;
-      }
-
-      .wplace-theme-custom {
-        margin-top: 15px;
-        padding: 15px;
-        background: ${theme.accent};
-        border-radius: ${theme.borderRadius};
-        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.highlight};
-      }
-
-      .wplace-custom-group {
-        margin-bottom: 15px;
-      }
-
-      .wplace-custom-label {
-        display: flex;
-        align-items: center;
-        margin-bottom: 8px;
-        color: ${theme.text};
-        font-size: 13px;
-        font-weight: 600;
-      }
-
-      .wplace-custom-label i {
-        margin-right: 8px;
-        color: ${theme.highlight};
-        width: 16px;
-      }
-
-      .wplace-color-input-group {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-      }
-
-      .wplace-color-input {
-        width: 50px;
-        height: 30px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        background: transparent;
-      }
-
-      .wplace-color-text {
-        flex: 1;
-        padding: 6px 10px;
-        background: ${theme.secondary};
-        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.accent};
-        border-radius: 4px;
-        color: ${theme.text};
-        font-size: 12px;
-        font-family: monospace;
-      }
-
-      .wplace-animation-controls {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-      }
-
-      .wplace-checkbox-label {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: ${theme.text};
-        font-size: 12px;
-        cursor: pointer;
-      }
-
-      .wplace-checkbox-label input[type="checkbox"] {
-        accent-color: ${theme.highlight};
-      }
-
-      .wplace-slider-container {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-
-      .wplace-slider-container .wplace-slider {
-        flex: 1;
-      }
-
-      .wplace-slider-container span {
-        color: ${theme.text};
-        font-size: 12px;
-        font-weight: 600;
-        min-width: 40px;
-      }
-
-      .wplace-custom-actions {
-        display: flex;
-        gap: 10px;
-        margin-top: 20px;
-        border-top: 1px solid ${theme.accent};
-        padding-top: 15px;
-      }
-
-      .wplace-btn-secondary {
-        background: ${theme.accent};
-        color: ${theme.text};
-        border: ${theme.borderWidth} ${theme.borderStyle} ${theme.highlight};
-      }
-
-      .wplace-btn-secondary:hover {
-        background: ${theme.secondary};
-      }`
-        : ""
-    }
-    `
-    document.head.appendChild(style)
+    // Link external CSS files
+    const cssLink = document.createElement('link');
+    cssLink.rel = 'stylesheet';
+    cssLink.href = 'https://staninna.github.io/WPlace-AutoBOT/decoupled-css/auto-image-styles.css'; // TODO: Before merge change to https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/auto-image-styles.css
+    cssLink.setAttribute('data-wplace-theme', 'true');
+    document.head.appendChild(cssLink);
 
     const container = document.createElement("div")
     container.id = "wplace-image-bot-container"
@@ -3804,7 +2677,7 @@
                 <label id="cooldownLabel">${Utils.t("waitCharges")}:</label>
                 <div class="wplace-slider-container">
                     <input type="range" id="cooldownSlider" class="wplace-slider" min="1" max="1" value="${state.cooldownChargeThreshold}">
-                    <span id="cooldownValue" style="font-weight:bold; min-width: 20px; text-align: center;">${state.cooldownChargeThreshold}</span>
+                    <span id="cooldownValue" class="wplace-cooldown-value">${state.cooldownChargeThreshold}</span>
                 </div>
             </div>
         </div>
@@ -3872,25 +2745,19 @@
     // Use the theme variable already declared at the top of createUI function
     const settingsContainer = document.createElement("div")
     settingsContainer.id = "wplace-settings-container"
-
+    
     // Apply theme-based styling
-    const themeBackground = theme.primary ?
-        `linear-gradient(135deg, ${theme.primary} 0%, ${theme.secondary || theme.primary} 100%)` :
-        `linear-gradient(135deg, #667eea 0%, #764ba2 100%)`
-
-    settingsContainer.style.cssText = `
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: ${themeBackground};
-      border: ${theme.borderWidth || '1px'} ${theme.borderStyle || 'solid'} ${theme.accent || 'rgba(255,255,255,0.1)'};
-      border-radius: ${theme.borderRadius || '16px'};
-      padding: 0;
-      z-index: 10002;
-      display: none;
+    const themeBackground = theme.primary ? 
+      `linear-gradient(135deg, ${theme.primary} 0%, ${theme.secondary || theme.primary} 100%)` : 
+      `linear-gradient(135deg, #667eea 0%, #764ba2 100%)`
+    
+    settingsContainer.className = 'wplace-settings-container-base';
+    // Apply theme-specific background
+    settingsContainer.style.background = themeBackground;
+    settingsContainer.style.cssText += `
       min-width: 420px;
       max-width: 480px;
+      z-index: 99999;
       color: ${theme.text || 'white'};
       font-family: ${theme.fontFamily || "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"};
       box-shadow: ${theme.boxShadow || '0 20px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1)'};
@@ -3901,171 +2768,85 @@
         box-shadow: ${theme.boxShadow || '0 20px 40px rgba(0,0,0,0.3)'}, 
                    0 0 30px ${theme.highlight || theme.neon || '#00ffff'};
       ` : ''}
-    `
+    `;
 
     settingsContainer.innerHTML = `
-      <div class="wplace-settings-header" style="
-        background: ${theme.accent ? `${theme.accent}33` : 'rgba(255,255,255,0.1)'}; 
-        padding: 20px; 
-        border-bottom: 1px solid ${theme.accent || 'rgba(255,255,255,0.1)'}; 
-        cursor: move;
-        ${theme.animations?.scanline ? `
-          position: relative;
-          overflow: hidden;
-        ` : ''}
-      ">
-        ${theme.animations?.scanline ? `
-          <div style="
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, ${theme.neon || '#00ffff'}, transparent);
-            animation: scanline 2s linear infinite;
-          "></div>
-        ` : ''}
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <h3 style="
-            margin: 0; 
-            color: ${theme.text || 'white'}; 
-            font-size: 20px; 
-            font-weight: 300; 
-            display: flex; 
-            align-items: center; 
-            gap: 10px;
-            ${theme.animations?.glow ? `
-              text-shadow: 0 0 10px ${theme.highlight || theme.neon || '#00ffff'};
-            ` : ''}
-          ">
-            <i class="fas fa-cog" style="
-              font-size: 18px; 
-              animation: spin 2s linear infinite;
-              color: ${theme.highlight || theme.neon || '#00ffff'};
-            "></i>
+      <div class="wplace-settings-header">
+        <div class="wplace-settings-title-wrapper">
+          <h3 class="wplace-settings-title">
+            <i class="fas fa-cog wplace-settings-icon"></i>
             ${Utils.t("settings")}
           </h3>
-          <button id="closeSettingsBtn" style="
-            background: ${theme.accent ? `${theme.accent}66` : 'rgba(255,255,255,0.1)'};
-            color: ${theme.text || 'white'};
-            border: 1px solid ${theme.accent || 'rgba(255,255,255,0.2)'};
-            border-radius: ${theme.borderRadius === '0' ? '0' : '50%'};
-            width: 32px;
-            height: 32px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            font-size: 14px;
-            font-weight: 300;
-            ${theme.animations?.glow ? `
-              box-shadow: 0 0 10px ${theme.error || '#ff0000'}33;
-            ` : ''}
-          " onmouseover="
-            this.style.background='${theme.error || '#ff0000'}66'; 
-            this.style.transform='scale(1.1)';
-            ${theme.animations?.glow ? `this.style.boxShadow='0 0 20px ${theme.error || '#ff0000'}';` : ''}
-          " onmouseout="
-            this.style.background='${theme.accent ? `${theme.accent}66` : 'rgba(255,255,255,0.1)'}'; 
-            this.style.transform='scale(1)';
-            ${theme.animations?.glow ? `this.style.boxShadow='0 0 10px ${theme.error || '#ff0000'}33';` : ''}
-          ">✕</button>
+          <button id="closeSettingsBtn" class="wplace-settings-close-btn">✕</button>
         </div>
       </div>
 
-      <div style="padding: 25px; max-height: 70vh; overflow-y: auto;">
+      <div class="wplace-settings-content">
         
         <!-- Token Source Selection -->
-        <div style="margin-bottom: 25px;">
-          <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-key" style="color: #4facfe; font-size: 16px;"></i>
+        <div class="wplace-settings-section">
+          <label class="wplace-settings-section-label">
+            <i class="fas fa-key wplace-icon-key"></i>
             Token Source
           </label>
-          <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1);">
-            <select id="tokenSourceSelect" style="
-              width: 100%;
-              padding: 12px 16px;
-              background: rgba(255,255,255,0.15);
-              color: white;
-              border: 1px solid rgba(255,255,255,0.2);
-              border-radius: 8px;
-              font-size: 14px;
-              outline: none;
-              cursor: pointer;
-              transition: all 0.3s ease;
-              font-family: inherit;
-              box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            ">
-              <option value="generator" ${state.tokenSource === 'generator' ? 'selected' : ''} style="background: #2d3748; color: white; padding: 10px;">🤖 Automatic Token Generator (Recommended)</option>
-              <option value="hybrid" ${state.tokenSource === 'hybrid' ? 'selected' : ''} style="background: #2d3748; color: white; padding: 10px;">🔄 Generator + Auto Fallback</option>
-              <option value="manual" ${state.tokenSource === 'manual' ? 'selected' : ''} style="background: #2d3748; color: white; padding: 10px;">🎯 Manual Pixel Placement</option>
+          <div class="wplace-settings-section-wrapper">
+            <select id="tokenSourceSelect" class="wplace-settings-select">
+              <option value="generator" ${state.tokenSource === 'generator' ? 'selected' : ''} class="wplace-settings-option">🤖 Automatic Token Generator (Recommended)</option>
+              <option value="hybrid" ${state.tokenSource === 'hybrid' ? 'selected' : ''} class="wplace-settings-option">🔄 Generator + Auto Fallback</option>
+              <option value="manual" ${state.tokenSource === 'manual' ? 'selected' : ''} class="wplace-settings-option">🎯 Manual Pixel Placement</option>
             </select>
-            <p style="font-size: 12px; color: rgba(255,255,255,0.7); margin: 8px 0 0 0;">
+            <p class="wplace-settings-description">
               Generator mode creates tokens automatically. Hybrid mode falls back to manual when generator fails. Manual mode only uses pixel placement.
             </p>
           </div>
         </div>
 
         <!-- Automation Section -->
-        <div style="margin-bottom: 25px;">
-          <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-robot" style="color: #4facfe; font-size: 16px;"></i>
+        <div class="wplace-settings-section">
+          <label class="wplace-settings-section-label">
+            <i class="fas fa-robot wplace-icon-robot"></i>
             ${Utils.t("automation")}
           </label>
           <!-- Token generator is always enabled - settings moved to Token Source above -->
         </div>
 
         <!-- Overlay Settings Section -->
-        <div style="margin-bottom: 25px;">
-          <label style="display: block; margin-bottom: 12px; color: ${theme.text || 'white'}; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-eye" style="color: ${theme.highlight || '#48dbfb'}; font-size: 16px;"></i>
+        <div class="wplace-settings-section">
+          <label class="wplace-settings-section-label" style="color: ${theme.text || 'white'};">
+            <i class="fas fa-eye wplace-icon-eye" style="color: ${theme.highlight || '#48dbfb'};"></i>
             Overlay Settings
           </label>
-          <div style="
+          <div class="wplace-settings-section-wrapper wplace-overlay-wrapper" style="
             background: ${theme.accent ? `${theme.accent}20` : 'rgba(255,255,255,0.1)'}; 
             border-radius: ${theme.borderRadius || '12px'}; 
-            padding: 18px; 
             border: 1px solid ${theme.accent || 'rgba(255,255,255,0.1)'};
             ${theme.animations?.glow ? `
               box-shadow: 0 0 15px ${theme.accent || 'rgba(255,255,255,0.1)'}33;
             ` : ''}
           ">
               <!-- Opacity Slider -->
-              <div style="margin-bottom: 15px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                   <span style="font-weight: 500; font-size: 13px; color: ${theme.text || 'white'};">Overlay Opacity</span>
-                   <div id="overlayOpacityValue" style="
-                     min-width: 40px; 
-                     text-align: center; 
+              <div class="wplace-overlay-opacity-control">
+                <div class="wplace-overlay-opacity-header">
+                   <span class="wplace-overlay-opacity-label" style="color: ${theme.text || 'white'};">Overlay Opacity</span>
+                   <div id="overlayOpacityValue" class="wplace-overlay-opacity-value" style="
                      background: ${theme.secondary || 'rgba(0,0,0,0.2)'}; 
                      color: ${theme.text || 'white'};
-                     padding: 4px 8px; 
                      border-radius: ${theme.borderRadius === '0' ? '0' : '6px'}; 
-                     font-size: 12px;
                      border: 1px solid ${theme.accent || 'transparent'};
                    ">${Math.round(state.overlayOpacity * 100)}%</div>
                 </div>
-                <input type="range" id="overlayOpacitySlider" min="0.1" max="1" step="0.05" value="${state.overlayOpacity}" style="
-                  width: 100%; 
-                  -webkit-appearance: none; 
-                  height: 8px; 
+                <input type="range" id="overlayOpacitySlider" min="0.1" max="1" step="0.05" value="${state.overlayOpacity}" class="wplace-overlay-opacity-slider" style="
                   background: linear-gradient(to right, ${theme.highlight || '#48dbfb'} 0%, ${theme.purple || theme.neon || '#d3a4ff'} 100%); 
                   border-radius: ${theme.borderRadius === '0' ? '0' : '4px'}; 
-                  outline: none; 
-                  cursor: pointer;
                 ">
               </div>
               <!-- Blue Marble Toggle -->
-              <label for="enableBlueMarbleToggle" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+              <label for="enableBlueMarbleToggle" class="wplace-blue-marble-toggle">
                   <div>
-                      <span style="font-weight: 500; color: ${theme.text || 'white'};">Blue Marble Effect</span>
-                      <p style="font-size: 12px; color: ${theme.text ? `${theme.text}BB` : 'rgba(255,255,255,0.7)'}; margin: 4px 0 0 0;">Renders a dithered "shredded" overlay.</p>
+                      <span class="wplace-blue-marble-title" style="color: ${theme.text || 'white'};">Blue Marble Effect</span>
+                      <p class="wplace-blue-marble-description" style="color: ${theme.text ? `${theme.text}BB` : 'rgba(255,255,255,0.7)'};">Renders a dithered "shredded" overlay.</p>
                   </div>
-                  <input type="checkbox" id="enableBlueMarbleToggle" ${state.blueMarbleEnabled ? 'checked' : ''} style="
-                    cursor: pointer; 
-                    width: 20px; 
-                    height: 20px;
+                  <input type="checkbox" id="enableBlueMarbleToggle" ${state.blueMarbleEnabled ? 'checked' : ''} class="wplace-blue-marble-checkbox" style="
                     accent-color: ${theme.highlight || '#48dbfb'};
                   "/>
               </label>
@@ -4073,212 +2854,138 @@
         </div>
 
         <!-- Speed Control Section -->
-        <div style="margin-bottom: 25px;">
-          <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-tachometer-alt" style="color: #4facfe; font-size: 16px;"></i>
+        <div class="wplace-settings-section">
+          <label class="wplace-settings-section-label">
+            <i class="fas fa-tachometer-alt wplace-icon-speed"></i>
             ${Utils.t("paintingSpeed")}
           </label>
           
           <!-- Batch Mode Selection -->
-          <div style="margin-bottom: 15px;">
-            <label style="display: block; margin-bottom: 8px; color: rgba(255,255,255,0.9); font-weight: 500; font-size: 14px;">
-              <i class="fas fa-dice" style="color: #f093fb; margin-right: 6px;"></i>
+          <div class="wplace-batch-mode-selection">
+            <label class="wplace-batch-mode-label">
+              <i class="fas fa-dice wplace-icon-dice"></i>
               Batch Mode
             </label>
-            <select id="batchModeSelect" style="
-              width: 100%;
-              padding: 10px 12px;
-              background: rgba(255,255,255,0.15);
-              color: white;
-              border: 1px solid rgba(255,255,255,0.2);
-              border-radius: 8px;
-              font-size: 13px;
-              outline: none;
-              cursor: pointer;
-            ">
-              <option value="normal" style="background: #2d3748; color: white;">📦 Normal (Fixed Size)</option>
-              <option value="random" style="background: #2d3748; color: white;">🎲 Random (Range)</option>
+            <select id="batchModeSelect" class="wplace-batch-mode-select">
+              <option value="normal" class="wplace-settings-option">📦 Normal (Fixed Size)</option>
+              <option value="random" class="wplace-settings-option">🎲 Random (Range)</option>
             </select>
           </div>
           
           <!-- Normal Mode: Fixed Size Slider -->
-          <div id="normalBatchControls" style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px;">
-            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
-              <input type="range" id="speedSlider" min="${CONFIG.PAINTING_SPEED.MIN}" max="${CONFIG.PAINTING_SPEED.MAX}" value="${CONFIG.PAINTING_SPEED.DEFAULT}"
-                style="
-                  flex: 1;
-                  height: 8px;
-                  background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
-                  border-radius: 4px;
-                  outline: none;
-                  -webkit-appearance: none;
-                  cursor: pointer;
-                ">
-              <div id="speedValue" style="
-                min-width: 100px;
-                text-align: center;
-                background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-                padding: 8px 12px;
-                border-radius: 8px;
-                color: white;
-                font-weight: bold;
-                font-size: 13px;
-                box-shadow: 0 3px 10px rgba(79, 172, 254, 0.3);
-                border: 1px solid rgba(255,255,255,0.2);
-              ">${CONFIG.PAINTING_SPEED.DEFAULT} (batch size)</div>
+          <div id="normalBatchControls" class="wplace-batch-controls wplace-normal-batch-controls">
+            <div class="wplace-speed-slider-container">
+              <input type="range" id="speedSlider" min="${CONFIG.PAINTING_SPEED.MIN}" max="${CONFIG.PAINTING_SPEED.MAX}" value="${CONFIG.PAINTING_SPEED.DEFAULT}" class="wplace-speed-slider">
+              <div id="speedValue" class="wplace-speed-value">${CONFIG.PAINTING_SPEED.DEFAULT} (batch size)</div>
             </div>
-            <div style="display: flex; justify-content: space-between; color: rgba(255,255,255,0.7); font-size: 11px; margin-top: 8px;">
-              <span><i class="fas fa-turtle"></i> ${CONFIG.PAINTING_SPEED.MIN}</span>
-              <span><i class="fas fa-rabbit"></i> ${CONFIG.PAINTING_SPEED.MAX}</span>
+            <div class="wplace-speed-labels">
+              <span class="wplace-speed-min"><i class="fas fa-turtle"></i> ${CONFIG.PAINTING_SPEED.MIN}</span>
+              <span class="wplace-speed-max"><i class="fas fa-rabbit"></i> ${CONFIG.PAINTING_SPEED.MAX}</span>
             </div>
           </div>
           
           <!-- Random Mode: Range Controls -->
-          <div id="randomBatchControls" style="display: none; background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px;">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+          <div id="randomBatchControls" class="wplace-batch-controls wplace-random-batch-controls">
+            <div class="wplace-random-batch-grid">
               <div>
-                <label style="display: block; color: rgba(255,255,255,0.8); font-size: 12px; margin-bottom: 8px;">
-                  <i class="fas fa-arrow-down" style="color: #4facfe; margin-right: 4px;"></i>
+                <label class="wplace-random-batch-label">
+                  <i class="fas fa-arrow-down wplace-icon-min"></i>
                   Minimum Batch Size
                 </label>
-                <input type="number" id="randomBatchMin" min="1" max="1000" value="${CONFIG.RANDOM_BATCH_RANGE.MIN}" style="
-                  width: 100%;
-                  padding: 10px 12px;
-                  background: rgba(255,255,255,0.1);
-                  color: white;
-                  border: 1px solid rgba(255,255,255,0.2);
-                  border-radius: 8px;
-                  font-size: 13px;
-                  outline: none;
-                ">
+                <input type="number" id="randomBatchMin" min="1" max="1000" value="${CONFIG.RANDOM_BATCH_RANGE.MIN}" class="wplace-random-batch-input">
               </div>
               <div>
-                <label style="display: block; color: rgba(255,255,255,0.8); font-size: 12px; margin-bottom: 8px;">
-                  <i class="fas fa-arrow-up" style="color: #00f2fe; margin-right: 4px;"></i>
+                <label class="wplace-random-batch-label">
+                  <i class="fas fa-arrow-up wplace-icon-max"></i>
                   Maximum Batch Size
                 </label>
-                <input type="number" id="randomBatchMax" min="1" max="1000" value="${CONFIG.RANDOM_BATCH_RANGE.MAX}" style="
-                  width: 100%;
-                  padding: 10px 12px;
-                  background: rgba(255,255,255,0.1);
-                  color: white;
-                  border: 1px solid rgba(255,255,255,0.2);
-                  border-radius: 8px;
-                  font-size: 13px;
-                  outline: none;
-                ">
+                <input type="number" id="randomBatchMax" min="1" max="1000" value="${CONFIG.RANDOM_BATCH_RANGE.MAX}" class="wplace-random-batch-input">
               </div>
             </div>
-            <p style="font-size: 11px; color: rgba(255,255,255,0.6); margin: 8px 0 0 0; text-align: center;">
+            <p class="wplace-random-batch-description">
               🎲 Random batch size between min and max values
             </p>
           </div>
           
           <!-- Speed Control Toggle -->
-          <label style="display: flex; align-items: center; gap: 8px; color: white;">
-            <input type="checkbox" id="enableSpeedToggle" ${CONFIG.PAINTING_SPEED_ENABLED ? 'checked' : ''} style="cursor: pointer;"/>
+          <label class="wplace-speed-control-toggle">
+            <input type="checkbox" id="enableSpeedToggle" ${CONFIG.PAINTING_SPEED_ENABLED ? 'checked' : ''} class="wplace-speed-checkbox"/>
             <span>${Utils.t('enablePaintingSpeedLimit')}</span>
           </label>
         </div>
 
         <!-- Notifications Section -->
-        <div style="margin-bottom: 25px;">
-          <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-bell" style="color: #ffd166; font-size: 16px;"></i>
+        <div class="wplace-settings-section">
+          <label class="wplace-settings-section-label">
+            <i class="fas fa-bell wplace-icon-bell"></i>
             Desktop Notifications
           </label>
-          <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1); display:flex; flex-direction:column; gap:10px;">
-            <label style="display:flex; align-items:center; justify-content:space-between;">
+          <div class="wplace-settings-section-wrapper wplace-notifications-wrapper">
+            <label class="wplace-notification-toggle">
               <span>${Utils.t('enableNotifications')}</span>
-              <input type="checkbox" id="notifEnabledToggle" ${state.notificationsEnabled ? 'checked' : ''} style="width:18px; height:18px; cursor:pointer;" />
+              <input type="checkbox" id="notifEnabledToggle" ${state.notificationsEnabled ? 'checked' : ''} class="wplace-notification-checkbox" />
             </label>
-            <label style="display:flex; align-items:center; justify-content:space-between;">
+            <label class="wplace-notification-toggle">
               <span>${Utils.t('notifyOnChargesThreshold')}</span>
-              <input type="checkbox" id="notifOnChargesToggle" ${state.notifyOnChargesReached ? 'checked' : ''} style="width:18px; height:18px; cursor:pointer;" />
+              <input type="checkbox" id="notifOnChargesToggle" ${state.notifyOnChargesReached ? 'checked' : ''} class="wplace-notification-checkbox" />
             </label>
-            <label style="display:flex; align-items:center; justify-content:space-between;">
+            <label class="wplace-notification-toggle">
               <span>${Utils.t('onlyWhenNotFocused')}</span>
-              <input type="checkbox" id="notifOnlyUnfocusedToggle" ${state.notifyOnlyWhenUnfocused ? 'checked' : ''} style="width:18px; height:18px; cursor:pointer;" />
+              <input type="checkbox" id="notifOnlyUnfocusedToggle" ${state.notifyOnlyWhenUnfocused ? 'checked' : ''} class="wplace-notification-checkbox" />
             </label>
-            <div style="display:flex; align-items:center; gap:10px;">
+            <div class="wplace-notification-interval">
               <span>${Utils.t('repeatEvery')}</span>
-              <input type="number" id="notifIntervalInput" min="1" max="60" value="${state.notificationIntervalMinutes}" style="width:70px; padding:6px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color:#fff;" />
+              <input type="number" id="notifIntervalInput" min="1" max="60" value="${state.notificationIntervalMinutes}" class="wplace-notification-interval-input" />
               <span>${Utils.t('minutesPl')}</span>
             </div>
-            <div style="display:flex; gap:10px;">
-              <button id="notifRequestPermBtn" class="wplace-btn wplace-btn-secondary" style="flex:1;"><i class="fas fa-unlock"></i><span>${Utils.t('grantPermission')}</span></button>
-              <button id="notifTestBtn" class="wplace-btn" style="flex:1;"><i class="fas fa-bell"></i><span>${Utils.t('test')}</span></button>
+            <div class="wplace-notification-buttons">
+              <button id="notifRequestPermBtn" class="wplace-btn wplace-btn-secondary wplace-notification-perm-btn"><i class="fas fa-unlock"></i><span>${Utils.t('grantPermission')}</span></button>
+              <button id="notifTestBtn" class="wplace-btn wplace-notification-test-btn"><i class="fas fa-bell"></i><span>${Utils.t('test')}</span></button>
             </div>
           </div>
         </div>
 
         <!-- Theme Selection Section -->
-        <div style="margin-bottom: 25px;">
-          <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-palette" style="color: #f093fb; font-size: 16px;"></i>
+        <div class="wplace-settings-section">
+          <label class="wplace-settings-section-label">
+            <i class="fas fa-palette wplace-icon-palette"></i>
             ${Utils.t("themeSettings")}
           </label>
-          <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1);">
-            <select id="themeSelect" style="
-              width: 100%;
-              padding: 12px 16px;
-              background: rgba(255,255,255,0.15);
-              color: white;
-              border: 1px solid rgba(255,255,255,0.2);
-              border-radius: 8px;
-              font-size: 14px;
-              outline: none;
-              cursor: pointer;
-              transition: all 0.3s ease;
-              font-family: inherit;
-              box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            ">
+          <div class="wplace-settings-section-wrapper">
+            <select id="themeSelect" class="wplace-settings-select">
               ${Object.keys(CONFIG.THEMES).map(themeName =>
-        `<option value="${themeName}" ${CONFIG.currentTheme === themeName ? 'selected' : ''} style="background: #2d3748; color: white; padding: 10px;">${themeName}</option>`
+      `<option value="${themeName}" ${CONFIG.currentTheme === themeName ? 'selected' : ''} class="wplace-settings-option">${themeName}</option>`
     ).join('')}
             </select>
           </div>
         </div>
 
         <!-- Language Selection Section -->
-        <div style="margin-bottom: 25px;">
-          <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-globe" style="color: #ffeaa7; font-size: 16px;"></i>
+        <div class="wplace-settings-section">
+          <label class="wplace-settings-section-label">
+            <i class="fas fa-globe wplace-icon-globe"></i>
             ${Utils.t("language")}
           </label>
-          <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1);">
-            <select id="languageSelect" style="
-              width: 100%;
-              padding: 12px 16px;
-              background: rgba(255,255,255,0.15);
-              color: white;
-              border: 1px solid rgba(255,255,255,0.2);
-              border-radius: 8px;
-              font-size: 14px;
-              outline: none;
-              cursor: pointer;
-              transition: all 0.3s ease;
-              font-family: inherit;
-              box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            ">
-              <option value="vi" ${state.language === 'vi' ? 'selected' : ''} style="background: #2d3748; color: white;">🇻🇳 Tiếng Việt</option>
-              <option value="id" ${state.language === 'id' ? 'selected' : ''} style="background: #2d3748; color: white;">🇮🇩 Bahasa Indonesia</option>
-              <option value="ru" ${state.language === 'ru' ? 'selected' : ''} style="background: #2d3748; color: white;">🇷🇺 Русский</option>
-              <option value="uk" ${state.language === 'uk' ? 'selected' : ''} style="background: #2d3748; color: white;">🇺🇦 Українська</option>
-              <option value="en" ${state.language === 'en' ? 'selected' : ''} style="background: #2d3748; color: white;">🇺🇸 English</option>
-              <option value="pt" ${state.language === 'pt' ? 'selected' : ''} style="background: #2d3748; color: white;">🇧🇷 Português</option>
-              <option value="fr" ${state.language === 'fr' ? 'selected' : ''} style="background: #2d3748; color: white;">🇫🇷 Français</option>
-              <option value="tr" ${state.language === 'tr' ? 'selected' : ''} style="background: #2d3748; color: white;">🇹🇷 Türkçe</option>
-              <option value="zh-CN" ${state.language === 'zh-CN' ? 'selected' : ''} style="background: #2d3748; color: white;">🇨🇳 简体中文</option>
-              <option value="zh-TW" ${state.language === 'zh-TW' ? 'selected' : ''} style="background: #2d3748; color: white;">🇹🇼 繁體中文</option>
-              <option value="ja" ${state.language === 'ja' ? 'selected' : ''} style="background: #2d3748; color: white;">🇯🇵 日本語</option>
-              <option value="ko" ${state.language === 'ko' ? 'selected' : ''} style="background: #2d3748; color: white;">🇰🇷 한국어</option>
+          <div class="wplace-settings-section-wrapper">
+            <select id="languageSelect" class="wplace-settings-select">
+              <option value="vi" ${state.language === 'vi' ? 'selected' : ''} class="wplace-settings-option">🇻🇳 Tiếng Việt</option>
+              <option value="id" ${state.language === 'id' ? 'selected' : ''} class="wplace-settings-option">🇮🇩 Bahasa Indonesia</option>
+              <option value="ru" ${state.language === 'ru' ? 'selected' : ''} class="wplace-settings-option">🇷🇺 Русский</option>
+              <option value="uk" ${state.language === 'uk' ? 'selected' : ''} class="wplace-settings-option">🇺🇦 Українська</option>
+              <option value="en" ${state.language === 'en' ? 'selected' : ''} class="wplace-settings-option">🇺🇸 English</option>
+              <option value="pt" ${state.language === 'pt' ? 'selected' : ''} class="wplace-settings-option">🇧🇷 Português</option>
+              <option value="fr" ${state.language === 'fr' ? 'selected' : ''} class="wplace-settings-option">🇫🇷 Français</option>
+              <option value="tr" ${state.language === 'tr' ? 'selected' : ''} class="wplace-settings-option">🇹🇷 Türkçe</option>
+              <option value="zh" ${state.language === 'zh' ? 'selected' : ''} class="wplace-settings-option">🇨🇳 简体中文</option>
+              <option value="zh-tw" ${state.language === 'zh-tw' ? 'selected' : ''} class="wplace-settings-option">🇹🇼 繁體中文</option>
+              <option value="ja" ${state.language === 'ja' ? 'selected' : ''} class="wplace-settings-option">🇯🇵 日本語</option>
+              <option value="ko" ${state.language === 'ko' ? 'selected' : ''} class="wplace-settings-option">🇰🇷 한국어</option>
               </select>
           </div>
         </div>
 
-        <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; margin-top: 10px;">
-             <button id="applySettingsBtn" style="
+        <div class="wplace-settings-footer">
+             <button id="applySettingsBtn" class="wplace-settings-apply-btn" style="
                 width: 100%;
                 ${CONFIG.CSS_CLASSES.BUTTON_PRIMARY}
              ">
@@ -4385,88 +3092,85 @@
     const resizeContainer = document.createElement("div")
     resizeContainer.className = "resize-container"
     resizeContainer.innerHTML = `
-      <h3 style="margin-top: 0; color: ${theme.text}">${Utils.t("resizeImage")}</h3>
+      <h3 class="resize-dialog-title" style="color: ${theme.text}">${Utils.t("resizeImage")}</h3>
       <div class="resize-controls">
-        <label>
+        <label class="resize-control-label">
           Width: <span id="widthValue">0</span>px
           <input type="range" id="widthSlider" class="resize-slider" min="10" max="500" value="100">
         </label>
-        <label>
+        <label class="resize-control-label">
           Height: <span id="heightValue">0</span>px
           <input type="range" id="heightSlider" class="resize-slider" min="10" max="500" value="100">
         </label>
-        <label style="display: flex; align-items: center;">
+        <label class="resize-checkbox-label">
           <input type="checkbox" id="keepAspect" checked>
           Keep Aspect Ratio
         </label>
-        <label style="display: flex; align-items: center;">
+        <label class="resize-checkbox-label">
             <input type="checkbox" id="paintWhiteToggle" checked>
             Paint White Pixels
         </label>
         <div class="resize-zoom-controls">
-          <button id="zoomOutBtn" class="wplace-btn" title="${Utils.t('zoomOut')}" style="padding:4px 8px;"><i class="fas fa-search-minus"></i></button>
-          <input type="range" id="zoomSlider" class="resize-slider" min="0.1" max="20" value="1" step="0.05" style="max-width: 220px;">
-          <button id="zoomInBtn" class="wplace-btn" title="${Utils.t('zoomIn')}" style="padding:4px 8px;"><i class="fas fa-search-plus"></i></button>
-          <button id="zoomFitBtn" class="wplace-btn" title="${Utils.t('fitToView')}" style="padding:4px 8px;">${Utils.t('fit')}</button>
-          <button id="zoomActualBtn" class="wplace-btn" title="${Utils.t('actualSize')}" style="padding:4px 8px;">${Utils.t('hundred')}</button>
-          <button id="panModeBtn" class="wplace-btn" title="${Utils.t('panMode')}" style="padding:4px 8px;">
+          <button id="zoomOutBtn" class="wplace-btn resize-zoom-btn" title="${Utils.t('zoomOut')}"><i class="fas fa-search-minus"></i></button>
+          <input type="range" id="zoomSlider" class="resize-slider resize-zoom-slider" min="0.1" max="20" value="1" step="0.05">
+          <button id="zoomInBtn" class="wplace-btn resize-zoom-btn" title="${Utils.t('zoomIn')}"><i class="fas fa-search-plus"></i></button>
+          <button id="zoomFitBtn" class="wplace-btn resize-zoom-btn" title="${Utils.t('fitToView')}">${Utils.t('fit')}</button>
+          <button id="zoomActualBtn" class="wplace-btn resize-zoom-btn" title="${Utils.t('actualSize')}">${Utils.t('hundred')}</button>
+          <button id="panModeBtn" class="wplace-btn resize-zoom-btn" title="${Utils.t('panMode')}">
             <i class="fas fa-hand-paper"></i>
           </button>
-          <span id="zoomValue" style="margin-left:6px; min-width:48px; text-align:right; opacity:.85; font-size:12px;">100%</span>
-          <div id="cameraHelp" style="font-size:11px; opacity:.75; margin-left:auto;">
+          <span id="zoomValue" class="resize-zoom-value">100%</span>
+          <div id="cameraHelp" class="resize-camera-help">
             Drag to pan • Pinch to zoom • Double‑tap to zoom
           </div>
         </div>
       </div>
 
       <div class="resize-preview-wrapper">
-          <div id="resizePanStage" style="position:relative; width:100%; height:100%; overflow:hidden;">
-            <div id="resizeCanvasStack" class="resize-canvas-stack" style="position:absolute; left:0; top:0; transform-origin: top left;">
+          <div id="resizePanStage" class="resize-pan-stage">
+            <div id="resizeCanvasStack" class="resize-canvas-stack resize-canvas-positioned">
               <canvas id="resizeCanvas" class="resize-base-canvas"></canvas>
               <canvas id="maskCanvas" class="resize-mask-canvas"></canvas>
             </div>
           </div>
       </div>
       <div class="resize-tools">
-        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-          <div>
-              <div style="display:flex; align-items:center; gap:6px; justify-content:space-between;">
-                <label style="font-size:12px; opacity:.85;">Brush</label>
-                <div style="display:flex; align-items:center; gap:6px;">
-                  <input id="maskBrushSize" type="range" min="1" max="7" step="1" value="1" style="width:120px;">
-                  <span id="maskBrushSizeValue" style="font-size:12px; opacity:.85; min-width:18px; text-align:center;">1</span>
+        <div class="resize-tools-container">
+          <div class="resize-brush-controls">
+              <div class="resize-brush-control">
+                <label class="resize-tool-label">Brush</label>
+                <div class="resize-tool-input-group">
+                  <input id="maskBrushSize" type="range" min="1" max="7" step="1" value="1" class="resize-tool-slider">
+                  <span id="maskBrushSizeValue" class="resize-tool-value">1</span>
                 </div>
               </div>
-            <div style="display:flex; align-items:center; gap:6px; justify-content:space-between;">
-              <label style="font-size:12px; opacity:.85;">Row/col size</label>
-              <div style="display:flex; align-items:center; gap:6px;">
-                <input id="rowColSize" type="range" min="1" max="7" step="1" value="1" style="width:120px;">
-                <span id="rowColSizeValue" style="font-size:12px; opacity:.85; min-width:18px; text-align:center;">1</span>
+            <div class="resize-brush-control">
+              <label class="resize-tool-label">Row/col size</label>
+              <div class="resize-tool-input-group">
+                <input id="rowColSize" type="range" min="1" max="7" step="1" value="1" class="resize-tool-slider">
+                <span id="rowColSizeValue" class="resize-tool-value">1</span>
               </div>
             </div>
           </div>
-          <div style="display:flex; align-items:center; gap:6px;">
-            <label style="font-size:12px; opacity:.85;">Mode</label>
-            <div class="mask-mode-group" style="display:flex; gap:6px;">
-              <button id="maskModeIgnore" class="wplace-btn" style="padding:4px 8px; font-size:12px;">Ignore</button>
-              <button id="maskModeUnignore" class="wplace-btn" style="padding:4px 8px; font-size:12px;">Unignore</button>
-              <button id="maskModeToggle" class="wplace-btn wplace-btn-primary" style="padding:4px 8px; font-size:12px;">Toggle</button>
+          <div class="resize-mode-controls">
+            <label class="resize-tool-label">Mode</label>
+            <div class="mask-mode-group resize-mode-group">
+              <button id="maskModeIgnore" class="wplace-btn resize-mode-btn">Ignore</button>
+              <button id="maskModeUnignore" class="wplace-btn resize-mode-btn">Unignore</button>
+              <button id="maskModeToggle" class="wplace-btn wplace-btn-primary resize-mode-btn">Toggle</button>
             </div>
           </div>
-          <button id="clearIgnoredBtn" class="wplace-btn" title="${Utils.t('clearIgnoredPixels')}" style="padding:4px 8px; font-size:12px;">${Utils.t('clear')}</button>
-          <button id="invertMaskBtn" class="wplace-btn" title="${Utils.t('invertMask')}" style="padding:4px 8px; font-size:12px;">${Utils.t('invert')}</button>
-          <span style="opacity:.8; font-size:12px;">${Utils.t('shiftRowAltColumn')}</span>
         </div>
       </div>
 
-      <div class="wplace-section" id="color-palette-section" style="margin-top: 15px;">
+      <div class="wplace-section resize-color-palette-section" id="color-palette-section">
           <div class="wplace-section-title">
               <i class="fas fa-palette"></i>&nbsp;Color Palette
           </div>
           <div class="wplace-controls">
               <div class="wplace-row single">
-                  <label style="display: flex; align-items: center; gap: 8px; font-size: 12px;">
-                      <input type="checkbox" id="showAllColorsToggle" style="cursor: pointer;">
+                  <label class="resize-color-toggle-label">
+                      <input type="checkbox" id="showAllColorsToggle" class="resize-color-checkbox">
                       <span>${Utils.t('showAllColorsIncluding')}</span>
                   </label>
               </div>
@@ -4478,50 +3182,50 @@
           </div>
       </div>
 
-      <div class="wplace-section" id="advanced-color-section" style="margin-top: 15px;">
+      <div class="wplace-section resize-advanced-color-section" id="advanced-color-section">
         <div class="wplace-section-title">
           <i class="fas fa-flask"></i>&nbsp;Advanced Color Matching
         </div>
-        <div style="display:flex; flex-direction:column; gap:10px;">
-          <label style="display:flex; flex-direction:column; gap:4px; font-size:12px;">
-            <span style="font-weight:600;">Algorithm</span>
-            <select id="colorAlgorithmSelect" style="padding:6px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); color:#fff;">
+        <div class="resize-advanced-controls">
+          <label class="resize-advanced-label">
+            <span class="resize-advanced-label-text">Algorithm</span>
+            <select id="colorAlgorithmSelect" class="resize-advanced-select">
               <option value="lab" ${state.colorMatchingAlgorithm==='lab'?'selected':''}>Perceptual (Lab)</option>
             <option value="legacy" ${state.colorMatchingAlgorithm==='legacy'?'selected':''}>Legacy (RGB)</option>
             </select>
           </label>
-          <label style="display:flex; align-items:center; justify-content:space-between; font-size:12px;">
-            <div style="flex:1;">
-              <span style="font-weight:600;">Chroma Penalty</span>
-              <div style="margin-top:2px; opacity:0.65;">Preserve vivid colors (Lab only)</div>
+          <label class="resize-advanced-toggle">
+            <div class="resize-advanced-toggle-content">
+              <span class="resize-advanced-label-text">Chroma Penalty</span>
+              <div class="resize-advanced-description">Preserve vivid colors (Lab only)</div>
             </div>
-            <input type="checkbox" id="enableChromaPenaltyToggle" ${state.enableChromaPenalty?'checked':''} style="width:18px; height:18px; cursor:pointer;" />
+            <input type="checkbox" id="enableChromaPenaltyToggle" ${state.enableChromaPenalty?'checked':''} class="resize-advanced-checkbox" />
           </label>
-          <div>
-            <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:4px;">
+          <div class="resize-chroma-weight-control">
+            <div class="resize-chroma-weight-header">
               <span>${Utils.t('chromaWeight')}</span>
-              <span id="chromaWeightValue" style="background:rgba(255,255,255,0.08); padding:2px 6px; border-radius:4px;">${state.chromaPenaltyWeight}</span>
+              <span id="chromaWeightValue" class="resize-chroma-weight-value">${state.chromaPenaltyWeight}</span>
             </div>
-            <input type="range" id="chromaPenaltyWeightSlider" min="0" max="0.5" step="0.01" value="${state.chromaPenaltyWeight}" style="width:100%;" />
+            <input type="range" id="chromaPenaltyWeightSlider" min="0" max="0.5" step="0.01" value="${state.chromaPenaltyWeight}" class="resize-chroma-weight-slider" />
           </div>
-          <label style="display:flex; align-items:center; justify-content:space-between; font-size:12px;">
-            <div style="flex:1;">
-              <span style="font-weight:600;">Enable Dithering</span>
-              <div style="margin-top:2px; opacity:0.65;">Floyd–Steinberg error diffusion in preview and applied output</div>
+          <label class="resize-advanced-toggle">
+            <div class="resize-advanced-toggle-content">
+              <span class="resize-advanced-label-text">Enable Dithering</span>
+              <div class="resize-advanced-description">Floyd–Steinberg error diffusion in preview and applied output</div>
             </div>
-            <input type="checkbox" id="enableDitheringToggle" ${state.ditheringEnabled?'checked':''} style="width:18px; height:18px; cursor:pointer;" />
+            <input type="checkbox" id="enableDitheringToggle" ${state.ditheringEnabled?'checked':''} class="resize-advanced-checkbox" />
           </label>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-            <label style="display:flex; flex-direction:column; gap:4px; font-size:12px;">
-              <span style="font-weight:600;">Transparency</span>
-              <input type="number" id="transparencyThresholdInput" min="0" max="255" value="${state.customTransparencyThreshold}" style="padding:6px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); color:#fff;" />
+          <div class="resize-threshold-controls">
+            <label class="resize-threshold-label">
+              <span class="resize-advanced-label-text">Transparency</span>
+              <input type="number" id="transparencyThresholdInput" min="0" max="255" value="${state.customTransparencyThreshold}" class="resize-threshold-input" />
             </label>
-            <label style="display:flex; flex-direction:column; gap:4px; font-size:12px;">
-              <span style="font-weight:600;">White Thresh</span>
-              <input type="number" id="whiteThresholdInput" min="200" max="255" value="${state.customWhiteThreshold}" style="padding:6px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); color:#fff;" />
+            <label class="resize-threshold-label">
+              <span class="resize-advanced-label-text">White Thresh</span>
+              <input type="number" id="whiteThresholdInput" min="200" max="255" value="${state.customWhiteThreshold}" class="resize-threshold-input" />
             </label>
           </div>
-          <button id="resetAdvancedColorBtn" class="wplace-btn" style="background:linear-gradient(135deg,#ff6a6a,#ff4757); font-size:11px;">Reset Advanced</button>
+          <button id="resetAdvancedColorBtn" class="wplace-btn resize-reset-advanced-btn">Reset Advanced</button>
         </div>
       </div>
 
@@ -4550,6 +3254,9 @@
     document.body.appendChild(statsContainer)
     document.body.appendChild(settingsContainer)
 
+    // Show the main container after all elements are appended
+    container.style.display = "block"
+
     const uploadBtn = container.querySelector("#uploadBtn")
     const resizeBtn = container.querySelector("#resizeBtn")
     const selectPosBtn = container.querySelector("#selectPosBtn")
@@ -4559,7 +3266,7 @@
     const loadBtn = container.querySelector("#loadBtn")
     const saveToFileBtn = container.querySelector("#saveToFileBtn")
     const loadFromFileBtn = container.querySelector("#loadFromFileBtn")
-
+    
     // Disable load/upload buttons until initial setup is complete (startup only)
     if (loadBtn) {
       loadBtn.disabled = !state.initialSetupComplete;
@@ -4573,7 +3280,7 @@
       uploadBtn.disabled = !state.initialSetupComplete;
       uploadBtn.title = state.initialSetupComplete ? "" : "🔄 Waiting for initial setup to complete...";
     }
-
+    
     const minimizeBtn = container.querySelector("#minimizeBtn")
     const compactBtn = container.querySelector("#compactBtn")
     const statsBtn = container.querySelector("#statsBtn")
@@ -4597,11 +3304,7 @@
     }
 
     if (!statsContainer || !statsArea || !closeStatsBtn) {
-      console.error("Stats UI elements not found:", {
-        statsContainer: !!statsContainer,
-        statsArea: !!statsArea,
-        closeStatsBtn: !!closeStatsBtn,
-      })
+      // Note: base CSS now aligns with this layout: main panel at left:20px (width 280), stats at left:330px.
     }
 
     const header = container.querySelector(".wplace-header")
@@ -4610,9 +3313,9 @@
 
     function makeDraggable(element) {
       let pos1 = 0,
-          pos2 = 0,
-          pos3 = 0,
-          pos4 = 0
+        pos2 = 0,
+        pos3 = 0,
+        pos4 = 0
       let isDragging = false
       const header = element.querySelector(".wplace-header") || element.querySelector(".wplace-settings-header")
 
@@ -4716,9 +3419,9 @@
       }
     }
     if (statsContainer && statsBtn) {
-      statsContainer.style.display = "block";
-      statsBtn.innerHTML = '<i class="fas fa-chart-line"></i>';
-      statsBtn.title = Utils.t('hideStats');
+      // Stats container starts hidden - user clicks button to show
+      statsBtn.innerHTML = '<i class="fas fa-chart-bar"></i>';
+      statsBtn.title = Utils.t('showStats');
     }
 
     const settingsBtn = container.querySelector("#settingsBtn")
@@ -4728,32 +3431,32 @@
 
     if (settingsBtn && closeSettingsBtn && applySettingsBtn) {
       settingsBtn.addEventListener("click", () => {
-        const isVisible = settingsContainer.style.display !== "none"
+        const isVisible = settingsContainer.classList.contains("show");
         if (isVisible) {
-          settingsContainer.style.animation = "settingsFadeOut 0.3s ease-out forwards"
+          settingsContainer.style.animation = "settingsFadeOut 0.3s ease-out forwards";
+          settingsContainer.classList.remove("show");
           setTimeout(() => {
-            settingsContainer.style.display = "none"
-            settingsContainer.style.animation = ""
-          }, 300)
+            settingsContainer.style.animation = "";
+          }, 300);
         } else {
-          settingsContainer.style.top = "50%"
-          settingsContainer.style.left = "50%"
-          settingsContainer.style.transform = "translate(-50%, -50%)"
-          settingsContainer.style.display = "block"
-          settingsContainer.style.animation = "settingsSlideIn 0.4s ease-out"
+          settingsContainer.style.top = "50%";
+          settingsContainer.style.left = "50%";
+          settingsContainer.style.transform = "translate(-50%, -50%)";
+          settingsContainer.classList.add("show");
+          settingsContainer.style.animation = "settingsSlideIn 0.4s ease-out";
         }
       })
 
       closeSettingsBtn.addEventListener("click", () => {
-        settingsContainer.style.animation = "settingsFadeOut 0.3s ease-out forwards"
+        settingsContainer.style.animation = "settingsFadeOut 0.3s ease-out forwards";
+        settingsContainer.classList.remove("show");
         setTimeout(() => {
-          settingsContainer.style.display = "none"
-          settingsContainer.style.animation = ""
-          settingsContainer.style.top = "50%"
-          settingsContainer.style.left = "50%"
-          settingsContainer.style.transform = "translate(-50%, -50%)"
-        }, 300)
-      })
+          settingsContainer.style.animation = "";
+          settingsContainer.style.top = "50%";
+          settingsContainer.style.left = "50%";
+          settingsContainer.style.transform = "translate(-50%, -50%)";
+        }, 300);
+      });
 
       applySettingsBtn.addEventListener("click", () => {
         // Sync advanced settings before save
@@ -4783,8 +3486,8 @@
         if (notifOnChargesToggle) state.notifyOnChargesReached = !!notifOnChargesToggle.checked;
         if (notifOnlyUnfocusedToggle) state.notifyOnlyWhenUnfocused = !!notifOnlyUnfocusedToggle.checked;
         if (notifIntervalInput) {
-          const v = parseInt(notifIntervalInput.value, 10);
-          if (!isNaN(v) && v >= 1 && v <= 60) state.notificationIntervalMinutes = v;
+            const v = parseInt(notifIntervalInput.value, 10);
+            if (!isNaN(v) && v >= 1 && v <= 60) state.notificationIntervalMinutes = v;
         }
         saveBotSettings();
         Utils.showAlert(Utils.t("settingsSaved"), "success");
@@ -4815,11 +3518,11 @@
       const randomBatchControls = settingsContainer.querySelector("#randomBatchControls")
       const randomBatchMin = settingsContainer.querySelector("#randomBatchMin")
       const randomBatchMax = settingsContainer.querySelector("#randomBatchMax")
-
+      
       if (batchModeSelect) {
         batchModeSelect.addEventListener("change", (e) => {
           state.batchMode = e.target.value
-
+          
           // Switch between normal and random controls
           if (normalBatchControls && randomBatchControls) {
             if (e.target.value === 'random') {
@@ -4830,13 +3533,13 @@
               randomBatchControls.style.display = 'none'
             }
           }
-
+          
           saveBotSettings()
           console.log(`📦 Batch mode changed to: ${state.batchMode}`)
           Utils.showAlert(Utils.t('batchModeSet', {mode: state.batchMode === 'random' ? Utils.t('randomRange') : Utils.t('normalFixedSize')}), "success")
         })
       }
-
+      
       if (randomBatchMin) {
         randomBatchMin.addEventListener("input", (e) => {
           const min = parseInt(e.target.value)
@@ -4851,7 +3554,7 @@
           }
         })
       }
-
+      
       if (randomBatchMax) {
         randomBatchMax.addEventListener("input", (e) => {
           const max = parseInt(e.target.value)
@@ -4927,7 +3630,7 @@
         });
       }
 
-      // (Advanced color listeners moved outside to work with resize dialog)
+  // (Advanced color listeners moved outside to work with resize dialog)
       // (Advanced color listeners moved outside to work with resize dialog)
       // Notifications listeners
       const notifPermBtn = settingsContainer.querySelector("#notifRequestPermBtn");
@@ -4953,23 +3656,23 @@
     const heightValue = resizeContainer.querySelector("#heightValue")
     const keepAspect = resizeContainer.querySelector("#keepAspect")
     const paintWhiteToggle = resizeContainer.querySelector("#paintWhiteToggle");
-    const zoomSlider = resizeContainer.querySelector("#zoomSlider");
-    const zoomValue = resizeContainer.querySelector('#zoomValue');
-    const zoomInBtn = resizeContainer.querySelector('#zoomInBtn');
-    const zoomOutBtn = resizeContainer.querySelector('#zoomOutBtn');
-    const zoomFitBtn = resizeContainer.querySelector('#zoomFitBtn');
-    const zoomActualBtn = resizeContainer.querySelector('#zoomActualBtn');
-    const panModeBtn = resizeContainer.querySelector('#panModeBtn');
-    const panStage = resizeContainer.querySelector('#resizePanStage');
-    const canvasStack = resizeContainer.querySelector('#resizeCanvasStack');
-    const baseCanvas = resizeContainer.querySelector('#resizeCanvas');
-    const maskCanvas = resizeContainer.querySelector('#maskCanvas');
-    const baseCtx = baseCanvas.getContext('2d');
-    const maskCtx = maskCanvas.getContext('2d');
+  const zoomSlider = resizeContainer.querySelector("#zoomSlider");
+  const zoomValue = resizeContainer.querySelector('#zoomValue');
+  const zoomInBtn = resizeContainer.querySelector('#zoomInBtn');
+  const zoomOutBtn = resizeContainer.querySelector('#zoomOutBtn');
+  const zoomFitBtn = resizeContainer.querySelector('#zoomFitBtn');
+  const zoomActualBtn = resizeContainer.querySelector('#zoomActualBtn');
+  const panModeBtn = resizeContainer.querySelector('#panModeBtn');
+  const panStage = resizeContainer.querySelector('#resizePanStage');
+  const canvasStack = resizeContainer.querySelector('#resizeCanvasStack');
+  const baseCanvas = resizeContainer.querySelector('#resizeCanvas');
+  const maskCanvas = resizeContainer.querySelector('#maskCanvas');
+  const baseCtx = baseCanvas.getContext('2d');
+  const maskCtx = maskCanvas.getContext('2d');
     const confirmResize = resizeContainer.querySelector("#confirmResize")
     const cancelResize = resizeContainer.querySelector("#cancelResize")
-    const downloadPreviewBtn = resizeContainer.querySelector("#downloadPreviewBtn");
-    const clearIgnoredBtn = resizeContainer.querySelector('#clearIgnoredBtn');
+  const downloadPreviewBtn = resizeContainer.querySelector("#downloadPreviewBtn");
+  const clearIgnoredBtn = resizeContainer.querySelector('#clearIgnoredBtn');
 
     if (compactBtn) {
       compactBtn.addEventListener("click", () => {
@@ -5053,7 +3756,7 @@
           Utils.showAlert(Utils.t('pleaseWaitInitialSetup'), "warning");
           return;
         }
-
+        
         const savedData = Utils.loadProgress()
         if (!savedData) {
           updateUI("noSavedData", "warning")
@@ -5062,9 +3765,9 @@
         }
 
         const confirmLoad = confirm(
-            `${Utils.t("savedDataFound")}\n\n` +
-            `Saved: ${new Date(savedData.timestamp).toLocaleString()}\n` +
-            `Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels`,
+          `${Utils.t("savedDataFound")}\n\n` +
+          `Saved: ${new Date(savedData.timestamp).toLocaleString()}\n` +
+          `Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels`,
         )
 
         if (confirmLoad) {
@@ -5117,7 +3820,7 @@
           Utils.showAlert(Utils.t('pleaseWaitFileSetup'), "warning");
           return;
         }
-
+        
         try {
           const success = await Utils.loadProgressFromFile()
           if (success) {
@@ -5245,31 +3948,31 @@
       }
       const aspectRatio = width / height;
 
-      const rs = state.resizeSettings;
-      widthSlider.max = width * 2;
-      heightSlider.max = height * 2;
-      let initialW = width;
-      let initialH = height;
-      if (rs && Number.isFinite(rs.width) && Number.isFinite(rs.height) && rs.width > 0 && rs.height > 0) {
-        initialW = rs.width;
-        initialH = rs.height;
-      }
-      // Clamp to slider ranges
-      initialW = Math.max(parseInt(widthSlider.min, 10) || 10, Math.min(initialW, parseInt(widthSlider.max, 10)));
-      initialH = Math.max(parseInt(heightSlider.min, 10) || 10, Math.min(initialH, parseInt(heightSlider.max, 10)));
-      widthSlider.value = initialW;
-      heightSlider.value = initialH;
-      widthValue.textContent = initialW;
-      heightValue.textContent = initialH;
-      zoomSlider.value = 1;
-      if (zoomValue) zoomValue.textContent = '100%';
+  const rs = state.resizeSettings;
+  widthSlider.max = width * 2;
+  heightSlider.max = height * 2;
+  let initialW = width;
+  let initialH = height;
+  if (rs && Number.isFinite(rs.width) && Number.isFinite(rs.height) && rs.width > 0 && rs.height > 0) {
+    initialW = rs.width;
+    initialH = rs.height;
+  }
+  // Clamp to slider ranges
+  initialW = Math.max(parseInt(widthSlider.min, 10) || 10, Math.min(initialW, parseInt(widthSlider.max, 10)));
+  initialH = Math.max(parseInt(heightSlider.min, 10) || 10, Math.min(initialH, parseInt(heightSlider.max, 10)));
+  widthSlider.value = initialW;
+  heightSlider.value = initialH;
+  widthValue.textContent = initialW;
+  heightValue.textContent = initialH;
+  zoomSlider.value = 1;
+  if (zoomValue) zoomValue.textContent = '100%';
       paintWhiteToggle.checked = state.paintWhitePixels;
 
       let _previewTimer = null;
       let _previewJobId = 0;
       let _isDraggingSize = false;
       let _zoomLevel = 1;
-      let _ditherWorkBuf = null;
+      let _ditherWorkBuf = null; 
       let _ditherEligibleBuf = null;
       const ensureDitherBuffers = (n) => {
         if (!_ditherWorkBuf || _ditherWorkBuf.length !== n * 3) _ditherWorkBuf = new Float32Array(n * 3);
@@ -5332,9 +4035,9 @@
         widthValue.textContent = newWidth;
         heightValue.textContent = newHeight;
 
-        ensureMaskSize(newWidth, newHeight);
-        canvasStack.style.width = newWidth + 'px';
-        canvasStack.style.height = newHeight + 'px';
+  ensureMaskSize(newWidth, newHeight);
+  canvasStack.style.width = newWidth + 'px';
+  canvasStack.style.height = newHeight + 'px';
         baseCtx.imageSmoothingEnabled = false;
         if (!state.availableColors || state.availableColors.length === 0) {
           if (baseProcessor !== processor && (!baseProcessor.img || !baseProcessor.canvas)) {
@@ -5348,7 +4051,7 @@
           updateZoomLayout();
           return;
         }
-        if (baseProcessor !== processor && (!baseProcessor.img || !baseProcessor.canvas)) {
+  if (baseProcessor !== processor && (!baseProcessor.img || !baseProcessor.canvas)) {
           await baseProcessor.load();
         }
         baseCtx.clearRect(0,0,newWidth,newHeight);
@@ -5356,7 +4059,7 @@
         const imgData = baseCtx.getImageData(0, 0, newWidth, newHeight);
         const data = imgData.data;
 
-        const tThresh = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
+  const tThresh = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
 
         const applyFSDither = () => {
           const w = newWidth, h = newHeight;
@@ -5433,9 +4136,9 @@
 
         if (jobId !== _previewJobId) return;
         baseCtx.putImageData(imgData, 0, 0);
-        maskCtx.clearRect(0,0,maskCanvas.width,maskCanvas.height);
-        if (_maskImageData) maskCtx.putImageData(_maskImageData, 0, 0);
-        updateZoomLayout();
+  maskCtx.clearRect(0,0,maskCanvas.width,maskCanvas.height);
+  if (_maskImageData) maskCtx.putImageData(_maskImageData, 0, 0);
+  updateZoomLayout();
       };
 
       const onWidthInput = () => {
@@ -5443,13 +4146,13 @@
           heightSlider.value = Math.round(parseInt(widthSlider.value, 10) / aspectRatio);
         }
         _updateResizePreview();
-        const curW = parseInt(widthSlider.value, 10);
-        const curH = parseInt(heightSlider.value, 10);
-        state.resizeSettings = { baseWidth: width, baseHeight: height, width: curW, height: curH };
-        saveBotSettings();
+  const curW = parseInt(widthSlider.value, 10);
+  const curH = parseInt(heightSlider.value, 10);
+  state.resizeSettings = { baseWidth: width, baseHeight: height, width: curW, height: curH };
+  saveBotSettings();
         // Auto-fit after size changes
         const fit = (typeof computeFitZoom === 'function') ? computeFitZoom() : 1;
-        if (!isNaN(fit) && isFinite(fit)) applyZoom(fit);
+  if (!isNaN(fit) && isFinite(fit)) applyZoom(fit);
       };
 
       const onHeightInput = () => {
@@ -5457,13 +4160,13 @@
           widthSlider.value = Math.round(parseInt(heightSlider.value, 10) * aspectRatio);
         }
         _updateResizePreview();
-        const curW = parseInt(widthSlider.value, 10);
-        const curH = parseInt(heightSlider.value, 10);
-        state.resizeSettings = { baseWidth: width, baseHeight: height, width: curW, height: curH };
-        saveBotSettings();
+  const curW = parseInt(widthSlider.value, 10);
+  const curH = parseInt(heightSlider.value, 10);
+  state.resizeSettings = { baseWidth: width, baseHeight: height, width: curW, height: curH };
+  saveBotSettings();
         // Auto-fit after size changes
         const fit = (typeof computeFitZoom === 'function') ? computeFitZoom() : 1;
-        if (!isNaN(fit) && isFinite(fit)) applyZoom(fit);
+  if (!isNaN(fit) && isFinite(fit)) applyZoom(fit);
       };
 
       paintWhiteToggle.onchange = (e) => {
@@ -5518,8 +4221,8 @@
       zoomSlider.addEventListener('input', () => {
         applyZoom(parseFloat(zoomSlider.value));
       });
-      if (zoomInBtn) zoomInBtn.addEventListener('click', () => applyZoom(parseFloat(zoomSlider.value) + 0.1));
-      if (zoomOutBtn) zoomOutBtn.addEventListener('click', () => applyZoom(parseFloat(zoomSlider.value) - 0.1));
+  if (zoomInBtn) zoomInBtn.addEventListener('click', () => applyZoom(parseFloat(zoomSlider.value) + 0.1));
+  if (zoomOutBtn) zoomOutBtn.addEventListener('click', () => applyZoom(parseFloat(zoomSlider.value) - 0.1));
       const computeFitZoom = () => {
         const wrapRect = panStage?.getBoundingClientRect();
         if (!wrapRect) return 1;
@@ -5530,8 +4233,8 @@
         const scaleY = (wrapRect.height - margin) / h;
         return Math.max(0.05, Math.min(20, Math.min(scaleX, scaleY)));
       };
-      if (zoomFitBtn) zoomFitBtn.addEventListener('click', () => { applyZoom(computeFitZoom()); centerInView(); });
-      if (zoomActualBtn) zoomActualBtn.addEventListener('click', () => { applyZoom(1); centerInView(); });
+  if (zoomFitBtn) zoomFitBtn.addEventListener('click', () => { applyZoom(computeFitZoom()); centerInView(); });
+  if (zoomActualBtn) zoomActualBtn.addEventListener('click', () => { applyZoom(1); centerInView(); });
 
       const centerInView = () => {
         if (!panStage) return;
@@ -5543,12 +4246,12 @@
         applyPan();
       };
 
-      let isPanning = false; let startX = 0, startY = 0, startPanX = 0, startPanY = 0;
-      let allowPan = false; // Space key
-      let panMode = false;  // Explicit pan mode toggle for touch/one-button mice
+  let isPanning = false; let startX = 0, startY = 0, startPanX = 0, startPanY = 0;
+  let allowPan = false; // Space key
+  let panMode = false;  // Explicit pan mode toggle for touch/one-button mice
       const isPanMouseButton = (e) => e.button === 1 || e.button === 2;
-      const setCursor = (val) => { if (panStage) panStage.style.cursor = val; };
-      const isPanActive = (e) => panMode || allowPan || isPanMouseButton(e);
+  const setCursor = (val) => { if (panStage) panStage.style.cursor = val; };
+  const isPanActive = (e) => panMode || allowPan || isPanMouseButton(e);
       const updatePanModeBtn = () => {
         if (!panModeBtn) return;
         panModeBtn.classList.toggle('active', panMode);
@@ -5574,7 +4277,7 @@
           panX = startPanX + dx; panY = startPanY + dy; applyPan();
         });
         window.addEventListener('mouseup', () => { if (isPanning) { isPanning = false; setCursor(allowPan ? 'grab' : ''); }});
-        panStage.addEventListener('wheel', (e) => {
+  panStage.addEventListener('wheel', (e) => {
           if (!e.ctrlKey && !e.metaKey) return;
           e.preventDefault();
           const rect = panStage.getBoundingClientRect();
@@ -5660,8 +4363,8 @@
       heightSlider.addEventListener('pointerdown', markDragStart);
       widthSlider.addEventListener('pointerup', markDragEnd);
       heightSlider.addEventListener('pointerup', markDragEnd);
-      widthSlider.addEventListener("input", () => { onWidthInput(); schedulePreview(); });
-      heightSlider.addEventListener("input", () => { onHeightInput(); schedulePreview(); });
+  widthSlider.addEventListener("input", () => { onWidthInput(); schedulePreview(); });
+  heightSlider.addEventListener("input", () => { onHeightInput(); schedulePreview(); });
 
       // Mask painting UX: brush size, modes, row/column fills, and precise coords
       let draggingMask = false;
@@ -5703,11 +4406,11 @@
         rowColSizeValEl.textContent = rowColSizeEl.value;
         rowColSize = parseInt(rowColSizeEl.value, 10) || 1;
       }
-      if (btnIgnore) btnIgnore.addEventListener('click', () => setMode('ignore'));
-      if (btnUnignore) btnUnignore.addEventListener('click', () => setMode('unignore'));
-      if (btnToggle) btnToggle.addEventListener('click', () => setMode('toggle'));
-      // Initialize button state (default to toggle mode)
-      updateModeButtons();
+  if (btnIgnore) btnIgnore.addEventListener('click', () => setMode('ignore'));
+  if (btnUnignore) btnUnignore.addEventListener('click', () => setMode('unignore'));
+  if (btnToggle) btnToggle.addEventListener('click', () => setMode('toggle'));
+  // Initialize button state (default to toggle mode)
+  updateModeButtons();
 
       const mapClientToPixel = (clientX, clientY) => {
         // Compute without rounding until final step to avoid drift at higher zoom
@@ -5762,12 +4465,12 @@
         const w = baseCanvas.width, h = baseCanvas.height;
         ensureMask(w, h);
         if (y < 0 || y >= h) return;
-
+        
         // Paint multiple rows based on rowColSize
         const halfSize = Math.floor(rowColSize / 2);
         const startY = Math.max(0, y - halfSize);
         const endY = Math.min(h - 1, y + halfSize);
-
+        
         for (let rowY = startY; rowY <= endY; rowY++) {
           for (let x = 0; x < w; x++) {
             const idx = rowY * w + x;
@@ -5794,12 +4497,12 @@
         const w = baseCanvas.width, h = baseCanvas.height;
         ensureMask(w, h);
         if (x < 0 || x >= w) return;
-
+        
         // Paint multiple columns based on rowColSize
         const halfSize = Math.floor(rowColSize / 2);
         const startX = Math.max(0, x - halfSize);
         const endX = Math.min(w - 1, x + halfSize);
-
+        
         for (let colX = startX; colX <= endX; colX++) {
           for (let y = 0; y < h; y++) {
             const idx = y * w + colX;
@@ -5845,14 +4548,14 @@
         redrawMaskOverlay();
       };
 
-      maskCanvas.addEventListener('mousedown', (e) => {
+  maskCanvas.addEventListener('mousedown', (e) => {
         if (e.button === 1 || e.button === 2 || allowPan) return; // let pan handler manage
         draggingMask = true; handlePaint(e);
       });
-      // Avoid hijacking touch gestures for panning/zooming
-      maskCanvas.addEventListener('touchstart', (e) => { /* let panStage handle */ }, { passive: true });
-      maskCanvas.addEventListener('touchmove', (e) => { /* let panStage handle */ }, { passive: true });
-      maskCanvas.addEventListener('touchend', (e) => { /* let panStage handle */ }, { passive: true });
+  // Avoid hijacking touch gestures for panning/zooming
+  maskCanvas.addEventListener('touchstart', (e) => { /* let panStage handle */ }, { passive: true });
+  maskCanvas.addEventListener('touchmove', (e) => { /* let panStage handle */ }, { passive: true });
+  maskCanvas.addEventListener('touchend', (e) => { /* let panStage handle */ }, { passive: true });
       window.addEventListener('mousemove', (e) => { if (draggingMask) handlePaint(e); });
       window.addEventListener('mouseup', () => { if (draggingMask) { draggingMask = false; saveBotSettings(); }});
 
@@ -5883,15 +4586,15 @@
         tempCanvas.width = newWidth;
         tempCanvas.height = newHeight;
         tempCtx.imageSmoothingEnabled = false;
-        if (baseProcessor !== processor && (!baseProcessor.img || !baseProcessor.canvas)) {
+  if (baseProcessor !== processor && (!baseProcessor.img || !baseProcessor.canvas)) {
           await baseProcessor.load();
         }
         tempCtx.drawImage(baseProcessor.img, 0, 0, newWidth, newHeight);
-        const imgData = tempCtx.getImageData(0, 0, newWidth, newHeight);
+  const imgData = tempCtx.getImageData(0, 0, newWidth, newHeight);
         const data = imgData.data;
         const tThresh2 = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
         let totalValidPixels = 0;
-        const mask = (state.resizeIgnoreMask && state.resizeIgnoreMask.length === newWidth * newHeight) ? state.resizeIgnoreMask : null;
+  const mask = (state.resizeIgnoreMask && state.resizeIgnoreMask.length === newWidth * newHeight) ? state.resizeIgnoreMask : null;
 
         const applyFSDitherFinal = async () => {
           const w = newWidth, h = newHeight;
@@ -5986,16 +4689,16 @@
         state.totalPixels = totalValidPixels;
         state.paintedPixels = 0;
 
-        state.resizeSettings = { baseWidth: width, baseHeight: height, width: newWidth, height: newHeight };
+  state.resizeSettings = { baseWidth: width, baseHeight: height, width: newWidth, height: newHeight };
         saveBotSettings();
 
         const finalImageBitmap = await createImageBitmap(tempCanvas);
         await overlayManager.setImage(finalImageBitmap);
-        overlayManager.enable();
-        toggleOverlayBtn.classList.add('active');
-        toggleOverlayBtn.setAttribute('aria-pressed', 'true');
+  overlayManager.enable();
+  toggleOverlayBtn.classList.add('active');
+  toggleOverlayBtn.setAttribute('aria-pressed', 'true');
 
-        // Keep state.imageData.processor as the original-based source; painting uses paletted pixels already stored
+  // Keep state.imageData.processor as the original-based source; painting uses paletted pixels already stored
 
         updateStats();
         updateUI("resizeSuccess", "success", { width: newWidth, height: newHeight });
@@ -6046,7 +4749,7 @@
     }
 
     function closeResizeDialog() {
-      try { if (typeof _resizeDialogCleanup === 'function') { _resizeDialogCleanup(); } } catch {}
+  try { if (typeof _resizeDialogCleanup === 'function') { _resizeDialogCleanup(); } } catch {}
       resizeOverlay.style.display = "none";
       resizeContainer.style.display = "none";
       _updateResizePreview = () => { };
@@ -6054,7 +4757,7 @@
       try { if (_previewTimer) { clearTimeout(_previewTimer); _previewTimer = null; } } catch {}
       _maskImageData = null; _maskData = null; _dirty = null;
       _ditherWorkBuf = null; _ditherEligibleBuf = null;
-      _resizeDialogCleanup = null;
+  _resizeDialogCleanup = null;
     }
 
     if (uploadBtn) {
@@ -6113,10 +4816,10 @@
           state.paintedPixels = 0
           state.imageLoaded = true
           state.lastPosition = { x: 0, y: 0 }
-
+          
           // Initialize painted map for tracking
           Utils.initializePaintedMap(width, height);
-
+          
           // New image: clear previous resize settings
           state.resizeSettings = null;
           // Also clear any previous ignore mask
@@ -6176,9 +4879,9 @@
 
         const tempFetch = async (url, options) => {
           if (
-              typeof url === "string" &&
-              url.includes("https://backend.wplace.live/s0/pixel/") &&
-              options?.method?.toUpperCase() === "POST"
+            typeof url === "string" &&
+            url.includes("https://backend.wplace.live/s0/pixel/") &&
+            options?.method?.toUpperCase() === "POST"
           ) {
             try {
               const response = await originalFetch(url, options)
@@ -6304,11 +5007,11 @@
         const progress = Math.round((savedData.state.paintedPixels / savedData.state.totalPixels) * 100)
 
         Utils.showAlert(
-            `${Utils.t("savedDataFound")}\n\n` +
-            `Saved: ${savedDate}\n` +
-            `Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels (${progress}%)\n` +
-            `${Utils.t("clickLoadToContinue")}`,
-            "info",
+          `${Utils.t("savedDataFound")}\n\n` +
+          `Saved: ${savedDate}\n` +
+          `Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels (${progress}%)\n` +
+          `${Utils.t("clickLoadToContinue")}`,
+          "info",
         )
       }
     }
@@ -6379,7 +5082,7 @@
             break outerLoop
           }
 
-
+          
           const idx = (y * width + x) * 4
           const r = pixels[idx]
           const g = pixels[idx + 1]
@@ -6414,15 +5117,15 @@
           let pixelY = absY % 1000;
 
           if (!pixelBatch ||
-              pixelBatch.regionX !== regionX + adderX ||
-              pixelBatch.regionY !== regionY + adderY) {
+            pixelBatch.regionX !== regionX + adderX ||
+            pixelBatch.regionY !== regionY + adderY) {
 
             if (pixelBatch && pixelBatch.pixels.length > 0) {
               console.log(`🌍 Sending region-change batch with ${pixelBatch.pixels.length} pixels (switching to region ${regionX + adderX},${regionY + adderY})`);
               const success = await sendBatchWithRetry(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
-
+              
               if (success) {
-                pixelBatch.pixels.forEach((p) => {
+                pixelBatch.pixels.forEach((p) => { 
                   state.paintedPixels++;
                   // Mark pixel as painted in map
                   Utils.markPixelPainted(p.x, p.y, pixelBatch.regionX, pixelBatch.regionY);
@@ -6458,7 +5161,7 @@
             };
           }
 
-
+          
           try {
             const tileRegionX = pixelBatch ? (pixelBatch.regionX) : (regionX + adderX);
             const tileRegionY = pixelBatch ? (pixelBatch.regionY) : (regionY + adderY);
@@ -6546,13 +5249,13 @@
               current: state.currentCharges
             });
             await updateStats();
-
+            
             // Allow auto save during cooldown
             Utils.performSmartSave();
-
+            
             await Utils.sleep(state.cooldown);
           }
-
+          
           // Disable save button again after exiting wait loop (back to normal painting)
           if (!state.stopFlag) {
             saveBtn.disabled = true;
@@ -6574,7 +5277,7 @@
           state.currentCharges -= pixelBatch.pixels.length;
           // Final save with painted map
           Utils.saveProgress();
-
+          
           if (CONFIG.PAINTING_SPEED_ENABLED && state.paintingSpeed > 0 && pixelBatch.pixels.length > 0) {
             const delayPerPixel = 1000 / state.paintingSpeed // ms per pixel
             const totalDelay = Math.max(100, delayPerPixel * pixelBatch.pixels.length) // minimum 100ms
@@ -6622,7 +5325,7 @@
   // Helper function to calculate batch size based on mode
   function calculateBatchSize() {
     let targetBatchSize;
-
+    
     if (state.batchMode === 'random') {
       // Generate random batch size within the specified range
       const min = Math.max(1, state.randomBatchMin);
@@ -6633,11 +5336,11 @@
       // Normal mode - use the fixed paintingSpeed value
       targetBatchSize = state.paintingSpeed;
     }
-
+    
     // Always limit by available charges
     const maxAllowed = Math.floor(state.currentCharges);
     const finalBatchSize = Math.min(targetBatchSize, maxAllowed);
-
+    
     return finalBatchSize;
   }
 
@@ -6647,9 +5350,9 @@
     while (attempt < maxRetries && !state.stopFlag) {
       attempt++;
       console.log(`🔄 Attempting to send batch (attempt ${attempt}/${maxRetries}) for region ${regionX},${regionY} with ${pixels.length} pixels`);
-
+      
       const result = await sendPixelBatch(pixels, regionX, regionY);
-
+      
       if (result === true) {
         console.log(`✅ Batch succeeded on attempt ${attempt}`);
         return true;
@@ -6675,19 +5378,19 @@
         await Utils.sleep(baseDelay + jitter);
       }
     }
-
+    
     if (attempt >= maxRetries) {
       console.error(`❌ Batch failed after ${maxRetries} attempts (MAX_BATCH_RETRIES=${MAX_BATCH_RETRIES}). This will stop painting to prevent infinite loops.`);
       updateUI("paintingError", "error");
       return false;
     }
-
+    
     return false;
   }
 
   async function sendPixelBatch(pixelBatch, regionX, regionY) {
     let token = turnstileToken;
-
+    
     // Generate new token if we don't have one
     if (!token) {
       try {
@@ -6724,13 +5427,13 @@
         let data = null
         try { data = await res.json() } catch (_) { }
         console.error("❌ 403 Forbidden. Turnstile token might be invalid or expired.")
-
+        
         // Try to generate a new token and retry once
         try {
           console.log("🔄 Regenerating Turnstile token after 403...");
           token = await handleCaptcha();
           turnstileToken = token;
-
+          
           // Retry the request with new token
           const retryPayload = { coords, colors, t: token };
           const retryRes = await fetch(`https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`, {
@@ -6739,16 +5442,16 @@
             credentials: "include",
             body: JSON.stringify(retryPayload),
           });
-
+          
           if (retryRes.status === 403) {
             turnstileToken = null;
             tokenPromise = new Promise((resolve) => { _resolveToken = resolve });
             return "token_error";
           }
-
+          
           const retryData = await retryRes.json();
           return retryData?.painted === pixelBatch.length;
-
+          
         } catch (retryError) {
           console.error("❌ Token regeneration failed:", retryError);
           turnstileToken = null;
@@ -6756,7 +5459,7 @@
           return "token_error";
         }
       }
-
+      
       const data = await res.json()
       return data?.painted === pixelBatch.length
     } catch (e) {
@@ -6778,19 +5481,19 @@
         minimized: state.minimized,
         overlayOpacity: state.overlayOpacity,
         blueMarbleEnabled: document.getElementById('enableBlueMarbleToggle')?.checked,
-        ditheringEnabled: state.ditheringEnabled,
-        colorMatchingAlgorithm: state.colorMatchingAlgorithm,
-        enableChromaPenalty: state.enableChromaPenalty,
-        chromaPenaltyWeight: state.chromaPenaltyWeight,
-        customTransparencyThreshold: state.customTransparencyThreshold,
-        customWhiteThreshold: state.customWhiteThreshold,
-        paintWhitePixels: state.paintWhitePixels,
-        resizeSettings: state.resizeSettings,
-        originalImage: state.originalImage,
-        // Save ignore mask (as base64) with its dimensions
-        resizeIgnoreMask: (state.resizeIgnoreMask && state.resizeSettings && state.resizeSettings.width * state.resizeSettings.height === state.resizeIgnoreMask.length)
-            ? { w: state.resizeSettings.width, h: state.resizeSettings.height, data: btoa(String.fromCharCode(...state.resizeIgnoreMask)) }
-            : null,
+  ditheringEnabled: state.ditheringEnabled,
+  colorMatchingAlgorithm: state.colorMatchingAlgorithm,
+  enableChromaPenalty: state.enableChromaPenalty,
+  chromaPenaltyWeight: state.chromaPenaltyWeight,
+  customTransparencyThreshold: state.customTransparencyThreshold,
+  customWhiteThreshold: state.customWhiteThreshold,
+  paintWhitePixels: state.paintWhitePixels,
+  resizeSettings: state.resizeSettings,
+  originalImage: state.originalImage,
+  // Save ignore mask (as base64) with its dimensions
+  resizeIgnoreMask: (state.resizeIgnoreMask && state.resizeSettings && state.resizeSettings.width * state.resizeSettings.height === state.resizeIgnoreMask.length)
+    ? { w: state.resizeSettings.width, h: state.resizeSettings.height, data: btoa(String.fromCharCode(...state.resizeIgnoreMask)) }
+    : null,
         // Notifications
         notificationsEnabled: state.notificationsEnabled,
         notifyOnChargesReached: state.notifyOnChargesReached,
@@ -6823,31 +5526,31 @@
       CONFIG.AUTO_CAPTCHA_ENABLED = settings.autoCaptchaEnabled ?? false;
       state.overlayOpacity = settings.overlayOpacity ?? CONFIG.OVERLAY.OPACITY_DEFAULT;
       state.blueMarbleEnabled = settings.blueMarbleEnabled ?? CONFIG.OVERLAY.BLUE_MARBLE_DEFAULT;
-      state.ditheringEnabled = settings.ditheringEnabled ?? false;
-      state.colorMatchingAlgorithm = settings.colorMatchingAlgorithm || 'lab';
-      state.enableChromaPenalty = settings.enableChromaPenalty ?? true;
-      state.chromaPenaltyWeight = settings.chromaPenaltyWeight ?? 0.15;
-      state.customTransparencyThreshold = settings.customTransparencyThreshold ?? CONFIG.TRANSPARENCY_THRESHOLD;
-      state.customWhiteThreshold = settings.customWhiteThreshold ?? CONFIG.WHITE_THRESHOLD;
-      state.paintWhitePixels = settings.paintWhitePixels ?? true;
-      state.resizeSettings = settings.resizeSettings ?? null;
-      state.originalImage = settings.originalImage ?? null;
+  state.ditheringEnabled = settings.ditheringEnabled ?? false;
+  state.colorMatchingAlgorithm = settings.colorMatchingAlgorithm || 'lab';
+  state.enableChromaPenalty = settings.enableChromaPenalty ?? true;
+  state.chromaPenaltyWeight = settings.chromaPenaltyWeight ?? 0.15;
+  state.customTransparencyThreshold = settings.customTransparencyThreshold ?? CONFIG.TRANSPARENCY_THRESHOLD;
+  state.customWhiteThreshold = settings.customWhiteThreshold ?? CONFIG.WHITE_THRESHOLD;
+  state.paintWhitePixels = settings.paintWhitePixels ?? true;
+  state.resizeSettings = settings.resizeSettings ?? null;
+  state.originalImage = settings.originalImage ?? null;
       // Notifications
       state.notificationsEnabled = settings.notificationsEnabled ?? CONFIG.NOTIFICATIONS.ENABLED;
       state.notifyOnChargesReached = settings.notifyOnChargesReached ?? CONFIG.NOTIFICATIONS.ON_CHARGES_REACHED;
       state.notifyOnlyWhenUnfocused = settings.notifyOnlyWhenUnfocused ?? CONFIG.NOTIFICATIONS.ONLY_WHEN_UNFOCUSED;
       state.notificationIntervalMinutes = settings.notificationIntervalMinutes ?? CONFIG.NOTIFICATIONS.REPEAT_MINUTES;
-      // Restore ignore mask if dims match current resizeSettings
-      if (settings.resizeIgnoreMask && settings.resizeIgnoreMask.data && state.resizeSettings && settings.resizeIgnoreMask.w === state.resizeSettings.width && settings.resizeIgnoreMask.h === state.resizeSettings.height) {
-        try {
-          const bin = atob(settings.resizeIgnoreMask.data);
-          const arr = new Uint8Array(bin.length);
-          for (let i=0;i<bin.length;i++) arr[i] = bin.charCodeAt(i);
-          state.resizeIgnoreMask = arr;
-        } catch { state.resizeIgnoreMask = null; }
-      } else {
-        state.resizeIgnoreMask = null;
-      }
+  // Restore ignore mask if dims match current resizeSettings
+  if (settings.resizeIgnoreMask && settings.resizeIgnoreMask.data && state.resizeSettings && settings.resizeIgnoreMask.w === state.resizeSettings.width && settings.resizeIgnoreMask.h === state.resizeSettings.height) {
+    try {
+      const bin = atob(settings.resizeIgnoreMask.data);
+      const arr = new Uint8Array(bin.length);
+      for (let i=0;i<bin.length;i++) arr[i] = bin.charCodeAt(i);
+      state.resizeIgnoreMask = arr;
+    } catch { state.resizeIgnoreMask = null; }
+  } else {
+    state.resizeIgnoreMask = null;
+  }
 
       const speedSlider = document.getElementById('speedSlider');
       if (speedSlider) speedSlider.value = state.paintingSpeed;
@@ -6860,10 +5563,10 @@
       // Batch mode UI initialization
       const batchModeSelect = document.getElementById('batchModeSelect');
       if (batchModeSelect) batchModeSelect.value = state.batchMode;
-
+      
       const normalBatchControls = document.getElementById('normalBatchControls');
       const randomBatchControls = document.getElementById('randomBatchControls');
-
+      
       // Show/hide appropriate controls based on batch mode
       if (normalBatchControls && randomBatchControls) {
         if (state.batchMode === 'random') {
@@ -6874,10 +5577,10 @@
           randomBatchControls.style.display = 'none';
         }
       }
-
+      
       const randomBatchMin = document.getElementById('randomBatchMin');
       if (randomBatchMin) randomBatchMin.value = state.randomBatchMin;
-
+      
       const randomBatchMax = document.getElementById('randomBatchMax');
       if (randomBatchMax) randomBatchMax.value = state.randomBatchMax;
 
@@ -6885,7 +5588,7 @@
 
       const cooldownSlider = document.getElementById('cooldownSlider');
       if (cooldownSlider) cooldownSlider.value = state.cooldownChargeThreshold;
-      const cooldownValue = document.getElementById('cooldownValue');
+      const cooldownValue = document.getElementById('cooldownValue'); 
       if (cooldownValue) cooldownValue.textContent = state.cooldownChargeThreshold;
 
       const overlayOpacitySlider = document.getElementById('overlayOpacitySlider');
@@ -6894,21 +5597,21 @@
       if (overlayOpacityValue) overlayOpacityValue.textContent = `${Math.round(state.overlayOpacity * 100)}%`;
       const enableBlueMarbleToggle = document.getElementById('enableBlueMarbleToggle');
       if (enableBlueMarbleToggle) enableBlueMarbleToggle.checked = state.blueMarbleEnabled;
-
+  
       const tokenSourceSelect = document.getElementById('tokenSourceSelect');
       if (tokenSourceSelect) tokenSourceSelect.value = state.tokenSource;
-
-      const colorAlgorithmSelect = document.getElementById('colorAlgorithmSelect');
-      if (colorAlgorithmSelect) colorAlgorithmSelect.value = state.colorMatchingAlgorithm;
-      const enableChromaPenaltyToggle = document.getElementById('enableChromaPenaltyToggle');
-      if (enableChromaPenaltyToggle) enableChromaPenaltyToggle.checked = state.enableChromaPenalty;
-      const chromaPenaltyWeightSlider = document.getElementById('chromaPenaltyWeightSlider');
-      if (chromaPenaltyWeightSlider) chromaPenaltyWeightSlider.value = state.chromaPenaltyWeight;
-      const chromaWeightValue = document.getElementById('chromaWeightValue');
-      if (chromaWeightValue) chromaWeightValue.textContent = state.chromaPenaltyWeight;
-      const transparencyThresholdInput = document.getElementById('transparencyThresholdInput');
-      if (transparencyThresholdInput) transparencyThresholdInput.value = state.customTransparencyThreshold;
-      const whiteThresholdInput = document.getElementById('whiteThresholdInput');
+  
+  const colorAlgorithmSelect = document.getElementById('colorAlgorithmSelect');
+  if (colorAlgorithmSelect) colorAlgorithmSelect.value = state.colorMatchingAlgorithm;
+  const enableChromaPenaltyToggle = document.getElementById('enableChromaPenaltyToggle');
+  if (enableChromaPenaltyToggle) enableChromaPenaltyToggle.checked = state.enableChromaPenalty;
+  const chromaPenaltyWeightSlider = document.getElementById('chromaPenaltyWeightSlider');
+  if (chromaPenaltyWeightSlider) chromaPenaltyWeightSlider.value = state.chromaPenaltyWeight;
+  const chromaWeightValue = document.getElementById('chromaWeightValue');
+  if (chromaWeightValue) chromaWeightValue.textContent = state.chromaPenaltyWeight;
+  const transparencyThresholdInput = document.getElementById('transparencyThresholdInput');
+  if (transparencyThresholdInput) transparencyThresholdInput.value = state.customTransparencyThreshold;
+  const whiteThresholdInput = document.getElementById('whiteThresholdInput');
       if (whiteThresholdInput) whiteThresholdInput.value = state.customWhiteThreshold;
       // Notifications UI
       const notifEnabledToggle = document.getElementById('notifEnabledToggle');
@@ -6935,11 +5638,11 @@
   // Function to enable file operations after initial startup setup is complete
   function enableFileOperations() {
     state.initialSetupComplete = true;
-
+    
     const loadBtn = document.querySelector("#loadBtn");
     const loadFromFileBtn = document.querySelector("#loadFromFileBtn");
     const uploadBtn = document.querySelector("#uploadBtn");
-
+    
     if (loadBtn) {
       loadBtn.disabled = false;
       loadBtn.title = "";
@@ -6950,7 +5653,7 @@
       }, 600);
       console.log("✅ Load Progress button enabled after initial setup");
     }
-
+    
     if (loadFromFileBtn) {
       loadFromFileBtn.disabled = false;
       loadFromFileBtn.title = "";
@@ -6961,7 +5664,7 @@
       }, 600);
       console.log("✅ Load from File button enabled after initial setup");
     }
-
+    
     if (uploadBtn) {
       uploadBtn.disabled = false;
       uploadBtn.title = "";
@@ -6972,7 +5675,7 @@
       }, 600);
       console.log("✅ Upload Image button enabled after initial setup");
     }
-
+    
     // Show a notification that file operations are now available
     Utils.showAlert(Utils.t('fileOperationsAvailable'), "success");
   }
@@ -6991,8 +5694,9 @@
       console.log("🔧 Initializing Turnstile token generator...");
       updateUI("initializingToken", "default");
 
-      // Pre-load Turnstile script first to avoid delays later
+      console.log("Attempting to load Turnstile script...");
       await Utils.loadTurnstile();
+      console.log("Turnstile script loaded. Attempting to generate token...");
 
       const token = await handleCaptchaWithRetry();
       if (token) {
@@ -7002,24 +5706,20 @@
         Utils.showAlert(Utils.t('tokenGeneratorReady'), "success");
         enableFileOperations(); // Enable file operations since initial setup is complete
       } else {
-        console.warn("⚠️ Startup token generation failed, will retry when needed");
+        console.warn("⚠️ Startup token generation failed (no token received), will retry when needed");
         updateUI("tokenRetryLater", "warning");
-        // Still enable file operations even if initial token generation fails
-        // Users can load progress and use manual/hybrid modes
         enableFileOperations();
       }
     } catch (error) {
-      console.warn("⚠️ Startup token generation failed:", error);
+      console.error("❌ Critical error during Turnstile initialization:", error); // More specific error
       updateUI("tokenRetryLater", "warning");
-      // Still enable file operations even if initial setup fails
-      // Users can load progress and use manual/hybrid modes
       enableFileOperations();
-      // Don't show error alert for initialization failures, just log them
     }
   }
 
   // Load theme preference immediately on startup before creating UI
   loadThemePreference()
+  applyTheme()
 
   createUI().then(() => {
     // Generate token automatically after UI is ready
@@ -7032,21 +5732,21 @@
       const resetBtn = document.getElementById('resetAdvancedColorBtn');
       const algoSelect = document.getElementById('colorAlgorithmSelect');
       const chromaToggle = document.getElementById('enableChromaPenaltyToggle');
-      const transInput = document.getElementById('transparencyThresholdInput');
+  const transInput = document.getElementById('transparencyThresholdInput');
       const whiteInput = document.getElementById('whiteThresholdInput');
-      const ditherToggle = document.getElementById('enableDitheringToggle');
+  const ditherToggle = document.getElementById('enableDitheringToggle');
       if (algoSelect) algoSelect.addEventListener('change', e => { state.colorMatchingAlgorithm = e.target.value; saveBotSettings(); _updateResizePreview(); });
       if (chromaToggle) chromaToggle.addEventListener('change', e => { state.enableChromaPenalty = e.target.checked; saveBotSettings(); _updateResizePreview(); });
       if (chromaSlider && chromaValue) chromaSlider.addEventListener('input', e => { state.chromaPenaltyWeight = parseFloat(e.target.value)||0.15; chromaValue.textContent = state.chromaPenaltyWeight.toFixed(2); saveBotSettings(); _updateResizePreview(); });
       if (transInput) transInput.addEventListener('change', e => { const v=parseInt(e.target.value,10); if(!isNaN(v)&&v>=0&&v<=255){ state.customTransparencyThreshold=v; CONFIG.TRANSPARENCY_THRESHOLD=v; saveBotSettings(); _updateResizePreview(); }});
       if (whiteInput) whiteInput.addEventListener('change', e => { const v=parseInt(e.target.value,10); if(!isNaN(v)&&v>=200&&v<=255){ state.customWhiteThreshold=v; CONFIG.WHITE_THRESHOLD=v; saveBotSettings(); _updateResizePreview(); }});
-      if (ditherToggle) ditherToggle.addEventListener('change', e => { state.ditheringEnabled = e.target.checked; saveBotSettings(); _updateResizePreview(); });
+  if (ditherToggle) ditherToggle.addEventListener('change', e => { state.ditheringEnabled = e.target.checked; saveBotSettings(); _updateResizePreview(); });
       if (resetBtn) resetBtn.addEventListener('click', () => {
         state.colorMatchingAlgorithm='lab'; state.enableChromaPenalty=true; state.chromaPenaltyWeight=0.15; state.customTransparencyThreshold=CONFIG.TRANSPARENCY_THRESHOLD=100; state.customWhiteThreshold=CONFIG.WHITE_THRESHOLD=250; saveBotSettings(); const a=document.getElementById('colorAlgorithmSelect'); if(a) a.value='lab'; const ct=document.getElementById('enableChromaPenaltyToggle'); if(ct) ct.checked=true; if(chromaSlider) chromaSlider.value=0.15; if(chromaValue) chromaValue.textContent='0.15'; if(transInput) transInput.value=100; if(whiteInput) whiteInput.value=250; _updateResizePreview(); Utils.showAlert(Utils.t('advancedColorSettingsReset'), 'success'); });
     };
     // Delay to ensure resize UI built
     setTimeout(advancedInit, 500);
-
+    
     // Add cleanup on page unload
     window.addEventListener('beforeunload', () => {
       Utils.cleanupTurnstile();
