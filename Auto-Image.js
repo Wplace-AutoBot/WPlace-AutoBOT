@@ -3976,7 +3976,7 @@ function applyTheme() {
                       <span>Show All Colors (including unavailable)</span>
                   </label>
               </div>
-              <div class="wplace-row">
+              <div class="wplace-row" style="display: flex;">
                   <button id="selectAllBtn" class="wplace-btn">Select All</button>
                   <button id="unselectAllBtn" class="wplace-btn">Unselect All</button>
                   <button id="unselectPaidBtn" class="wplace-btn">Unselect Paid</button>
