@@ -133,5 +133,9 @@
   "turnstileInstructions": "Cloudflare Turnstile — 表示された場合は確認を完了してください",
   "uploadImageFirstColors": "利用可能な色を取得するために最初に画像をアップロードしてください",
   "availableColors": "利用可能な色 ({count})",
-  "colorTooltip": "ID: {id}\nRGB: {rgb}"
+  "colorTooltip": "ID: {id}\nRGB: {rgb}",
+  "expandMode": "展開モード",
+  "minimize": "最小化",
+  "restore": "復元",
+  "hideStats": "統計を非表示"
 }

@@ -130,5 +130,9 @@
   "turnstileInstructions": "Cloudflare Turnstile — пожалуйста, завершите проверку, если она показана",
   "uploadImageFirstColors": "Пожалуйста, сначала загрузите изображение для захвата доступных цветов",
   "availableColors": "Доступные цвета ({count})",
-  "colorTooltip": "ID: {id}\nRGB: {rgb}"
+  "colorTooltip": "ID: {id}\nRGB: {rgb}",
+  "expandMode": "Режим расширения",
+  "minimize": "Свернуть",
+  "restore": "Восстановить",
+  "hideStats": "Скрыть статистику"
 }

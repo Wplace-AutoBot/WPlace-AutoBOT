@@ -4685,18 +4685,18 @@
         if (isVisible) {
           statsContainer.style.display = "none"
           statsBtn.innerHTML = '<i class="fas fa-chart-bar"></i>'
-          statsBtn.title = "Show Stats"
+          statsBtn.title = Utils.t('showStats')
         } else {
           statsContainer.style.display = "block"
           statsBtn.innerHTML = '<i class="fas fa-chart-line"></i>'
-          statsBtn.title = "Hide Stats"
+          statsBtn.title = Utils.t('hideStats')
         }
       })
 
       closeStatsBtn.addEventListener("click", () => {
         statsContainer.style.display = "none"
         statsBtn.innerHTML = '<i class="fas fa-chart-bar"></i>'
-        statsBtn.title = "Show Stats"
+        statsBtn.title = Utils.t('showStats')
       })
 
       if (refreshChargesBtn) {
@@ -4718,7 +4718,7 @@
     if (statsContainer && statsBtn) {
       statsContainer.style.display = "block";
       statsBtn.innerHTML = '<i class="fas fa-chart-line"></i>';
-      statsBtn.title = "Hide Stats";
+      statsBtn.title = Utils.t('hideStats');
     }
 
     const settingsBtn = container.querySelector("#settingsBtn")
@@ -4978,10 +4978,10 @@
 
         if (isCompact) {
           compactBtn.innerHTML = '<i class="fas fa-expand"></i>'
-          compactBtn.title = "Expand Mode"
+          compactBtn.title = Utils.t('expandMode')
         } else {
           compactBtn.innerHTML = '<i class="fas fa-compress"></i>'
-          compactBtn.title = "Compact Mode"
+          compactBtn.title = Utils.t('compactMode')
         }
       })
     }
@@ -4993,12 +4993,12 @@
           container.classList.add("wplace-minimized")
           content.classList.add("wplace-hidden")
           minimizeBtn.innerHTML = '<i class="fas fa-expand"></i>'
-          minimizeBtn.title = "Restore"
+          minimizeBtn.title = Utils.t('restore')
         } else {
           container.classList.remove("wplace-minimized")
           content.classList.remove("wplace-hidden")
           minimizeBtn.innerHTML = '<i class="fas fa-minus"></i>'
-          minimizeBtn.title = "Minimize"
+          minimizeBtn.title = Utils.t('minimize')
         }
         saveBotSettings()
       })
@@ -5018,14 +5018,14 @@
       content.classList.add("wplace-hidden")
       if (minimizeBtn) {
         minimizeBtn.innerHTML = '<i class="fas fa-expand"></i>'
-        minimizeBtn.title = "Restore"
+        minimizeBtn.title = Utils.t('restore')
       }
     } else {
       container.classList.remove("wplace-minimized")
       content.classList.remove("wplace-hidden")
       if (minimizeBtn) {
         minimizeBtn.innerHTML = '<i class="fas fa-minus"></i>'
-        minimizeBtn.title = "Minimize"
+        minimizeBtn.title = Utils.t('minimize')
       }
     }
 

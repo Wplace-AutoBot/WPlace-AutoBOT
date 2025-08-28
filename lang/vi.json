@@ -75,7 +75,7 @@
   "notificationsNotSupported": "Thông báo không được hỗ trợ trong trình duyệt này.",
   "chargesReadyNotification": "WPlace — Điện tích sẵn sàng",
   "chargesReadyMessage": "Điện tích sẵn sàng: {current} / {max}. Ngưỡng: {threshold}.",
-  "testNotificationTitle": "WPlace — Thử nghiệm"
+  "testNotificationTitle": "WPlace — Thử nghiệm",
   "testNotificationMessage": "Đây là thông báo thử nghiệm.",
   "showStats": "Hiển thị thống kê",
   "compactMode": "Chế độ gọn",
@@ -103,15 +103,15 @@
   "notifyOnChargesThreshold": "Thông báo khi điện tích đạt ngưỡng",
   "onlyWhenNotFocused": "Chỉ khi tab không được chọn",
   "repeatEvery": "Lặp lại mỗi",
-  "minutesPl": "phút"
+  "minutesPl": "phút",
   "grantPermission": "Cấp quyền",
-  "test": "Thử nghiệm"
+  "test": "Thử nghiệm",
   "showAllColorsIncluding": "Hiển thị tất cả màu (bao gồm không có sẵn)",
   "chromaWeight": "Trọng số độ bão hòa",
   "downloadPreview": "Tải xuống xem trước",
   "apply": "Áp dụng",
   "cancel": "Hủy",
-  "fit": "Vừa khung"
+  "fit": "Vừa khung",
   "hundred": "100%",
   "clear": "Xóa",
   "invert": "Đảo ngược",
@@ -131,5 +131,9 @@
   "turnstileInstructions": "Cloudflare Turnstile — vui lòng hoàn thành kiểm tra nếu được hiển thị",
   "uploadImageFirstColors": "Vui lòng tải lên hình ảnh trước để bắt màu có sẵn",
   "availableColors": "Màu có sẵn ({count})",
-  "colorTooltip": "ID: {id}\nRGB: {rgb}"
+  "colorTooltip": "ID: {id}\nRGB: {rgb}",
+  "expandMode": "Chế độ mở rộng",
+  "minimize": "Thu nhỏ",
+  "restore": "Khôi phục",
+  "hideStats": "Ẩn thống kê"
 }
