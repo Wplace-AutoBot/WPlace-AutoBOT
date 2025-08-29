@@ -16,19 +16,19 @@
       MIN: 3, // Random range minimum
       MAX: 20, // Random range maximum
     },
-    PAINTING_SPEED_ENABLED: false, // Off by default
+    PAINTING_SPEED_ENABLED: true, // On by default
     AUTO_CAPTCHA_ENABLED: true, // Turnstile generator enabled by default
     TOKEN_SOURCE: 'generator', // "generator", "manual", or "hybrid" - default to generator
     COOLDOWN_CHARGE_THRESHOLD: 1, // Default wait threshold
     // Desktop Notifications (defaults)
     NOTIFICATIONS: {
-      ENABLED: true,
+      ENABLED: false,
       ON_CHARGES_REACHED: true,
       ONLY_WHEN_UNFOCUSED: true,
       REPEAT_MINUTES: 5, // repeat reminder while threshold condition holds
     },
     OVERLAY: {
-      OPACITY_DEFAULT: 0.6,
+      OPACITY_DEFAULT: 0.2,
       BLUE_MARBLE_DEFAULT: false,
       ditheringEnabled: false,
     },
@@ -238,22 +238,22 @@
       } catch {}
     };
 
-    setVar('--wplace-primary', theme.primary);
-    setVar('--wplace-secondary', theme.secondary);
-    setVar('--wplace-accent', theme.accent);
-    setVar('--wplace-text', theme.text);
-    setVar('--wplace-highlight', theme.highlight);
-    setVar('--wplace-success', theme.success);
-    setVar('--wplace-error', theme.error);
-    setVar('--wplace-warning', theme.warning);
-
-    // Typography + look
-    setVar('--wplace-font', theme.fontFamily || "'Segoe UI', Roboto, sans-serif");
-    setVar('--wplace-radius', '' + (theme.borderRadius || '12px'));
-    setVar('--wplace-border-style', '' + (theme.borderStyle || 'solid'));
-    setVar('--wplace-border-width', '' + (theme.borderWidth || '1px'));
-    setVar('--wplace-backdrop', '' + (theme.backdropFilter || 'blur(10px)'));
-    setVar('--wplace-border-color', 'rgba(255,255,255,0.1)');
+    // setVar('--wplace-primary', theme.primary);
+    // setVar('--wplace-secondary', theme.secondary);
+    // setVar('--wplace-accent', theme.accent);
+    // setVar('--wplace-text', theme.text);
+    // setVar('--wplace-highlight', theme.highlight);
+    // setVar('--wplace-success', theme.success);
+    // setVar('--wplace-error', theme.error);
+    // setVar('--wplace-warning', theme.warning);
+    //
+    // // Typography + look
+    // setVar('--wplace-font', theme.fontFamily || "'Segoe UI', Roboto, sans-serif");
+    // setVar('--wplace-radius', '' + (theme.borderRadius || '12px'));
+    // setVar('--wplace-border-style', '' + (theme.borderStyle || 'solid'));
+    // setVar('--wplace-border-width', '' + (theme.borderWidth || '1px'));
+    // setVar('--wplace-backdrop', '' + (theme.backdropFilter || 'blur(10px)'));
+    // setVar('--wplace-border-color', 'rgba(255,255,255,0.1)');
   }
 
   const saveThemePreference = () => {
@@ -470,12 +470,11 @@
   const FALLBACK_TEXT = {
     en: {
       title: 'WPlace Auto-Image',
-      settings: 'Settings',
-      close: 'Close',
-      language: 'Language',
-      loadingError: 'Loading translations failed, using fallback',
+      toggleOverlay: 'Toggle Overlay',
       scanColors: 'Scan Colors',
       uploadImage: 'Upload Image',
+      resizeImage: 'Resize Image',
+      selectPosition: 'Select Position',
       startPainting: 'Start Painting',
       stopPainting: 'Stop Painting',
       progress: 'Progress',
@@ -522,6 +521,8 @@
     availableColors: [],
     activeColorPalette: [], // User-selected colors for conversion
     paintWhitePixels: true, // Default to ON
+    fullChargeData: null,
+    fullChargeInterval: null,
     paintTransparentPixels: false, // Default to OFF
     currentCharges: 0,
     maxCharges: 1, // Default max charges
@@ -541,6 +542,7 @@
     randomBatchMin: CONFIG.RANDOM_BATCH_RANGE.MIN, // Random range minimum
     randomBatchMax: CONFIG.RANDOM_BATCH_RANGE.MAX, // Random range maximum
     cooldownChargeThreshold: CONFIG.COOLDOWN_CHARGE_THRESHOLD,
+    chargesThresholdInterval: null,
     tokenSource: CONFIG.TOKEN_SOURCE, // "generator" or "manual"
     initialSetupComplete: false, // Track if initial startup setup is complete (only happens once)
     overlayOpacity: CONFIG.OVERLAY.OPACITY_DEFAULT,
@@ -555,6 +557,12 @@
     resizeSettings: null,
     originalImage: null,
     resizeIgnoreMask: null,
+    // Coordinate generation settings
+    coordinateMode: 'rows',
+    coordinateDirection: 'bottom-left',
+    coordinateSnake: true,
+    blockWidth: 6,
+    blockHeight: 2,
     // Notification prefs and runtime bookkeeping
     notificationsEnabled: CONFIG.NOTIFICATIONS.ENABLED,
     notifyOnChargesReached: CONFIG.NOTIFICATIONS.ON_CHARGES_REACHED,
@@ -1159,6 +1167,14 @@
   const Utils = {
     sleep: (ms) => new Promise((r) => setTimeout(r, ms)),
 
+    dynamicSleep: async function (getRemainingMsFn, interval = 500) {
+      let remaining = getRemainingMsFn();
+      while (remaining > 0) {
+        await this.sleep(Math.min(interval, remaining));
+        remaining = getRemainingMsFn();
+      }
+    },
+
     waitForSelector: async (selector, interval = 200, timeout = 5000) => {
       const start = Date.now();
       while (Date.now() - start < timeout) {
@@ -1169,6 +1185,16 @@
       return null;
     },
 
+    msToTimeText(ms) {
+      const totalSeconds = Math.ceil(ms / 1000);
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+
+      if (hours > 0) return `${hours}h ${minutes}m ${seconds}s`;
+      if (minutes > 0) return `${minutes}m ${seconds}s`;
+      return `${seconds}s`;
+    },
     // Turnstile Generator Integration - Optimized with widget reuse and proper cleanup
     turnstileLoaded: false,
     _turnstileContainer: null,
@@ -2059,6 +2085,35 @@
       }
     },
 
+    migrateProgressToV22: (data) => {
+      try {
+        const migrated = { ...data };
+        migrated.version = '2.2';
+
+        // Добавляем новые поля с значениями по умолчанию
+        if (!migrated.state.coordinateMode) {
+          migrated.state.coordinateMode = 'rows';
+        }
+        if (!migrated.state.coordinateDirection) {
+          migrated.state.coordinateDirection = 'bottom-left';
+        }
+        if (!migrated.state.coordinateSnake) {
+          migrated.state.coordinateSnake = true;
+        }
+        if (!migrated.state.blockWidth) {
+          migrated.state.blockWidth = 6;
+        }
+        if (!migrated.state.blockHeight) {
+          migrated.state.blockHeight = 2;
+        }
+
+        return migrated;
+      } catch (e) {
+        console.warn('Migration to v2.2 failed, using original data:', e);
+        return data;
+      }
+    },
+
     saveProgress: () => {
       try {
         // Pack painted map if available
@@ -2080,7 +2135,7 @@
 
         const progressData = {
           timestamp: Date.now(),
-          version: '2.1',
+          version: '2.2',
           state: {
             totalPixels: state.totalPixels,
             paintedPixels: state.paintedPixels,
@@ -2090,6 +2145,12 @@
             imageLoaded: state.imageLoaded,
             colorsChecked: state.colorsChecked,
             availableColors: state.availableColors,
+            // Добавляем настройки генерации координат
+            coordinateMode: state.coordinateMode,
+            coordinateDirection: state.coordinateDirection,
+            coordinateSnake: state.coordinateSnake,
+            blockWidth: state.blockWidth,
+            blockHeight: state.blockHeight,
           },
           imageData: state.imageData
             ? {
@@ -2117,13 +2178,18 @@
         let data = JSON.parse(saved);
         const ver = data.version;
         let migrated = data;
-        if (ver === '2.1') {
+
+        // Миграция для новых версий
+        if (ver === '2.2') {
           // already latest
+        } else if (ver === '2.1') {
+          migrated = Utils.migrateProgressToV22(data);
         } else if (ver === '2' || ver === '2.0') {
-          migrated = Utils.migrateProgressToV21(data);
+          migrated = Utils.migrateProgressToV22(Utils.migrateProgressToV21(data));
         } else {
-          migrated = Utils.migrateProgressToV21(data);
+          migrated = Utils.migrateProgressToV22(Utils.migrateProgressToV21(data));
         }
+
         if (migrated && migrated !== data) {
           try {
             localStorage.setItem('wplace-bot-progress', JSON.stringify(migrated));
@@ -2144,6 +2210,12 @@
         state.paintedMap = null;
         state._lastSavePixelCount = 0;
         state._lastSaveTime = 0;
+        // Сбрасываем настройки генерации координат к значениям по умолчанию
+        state.coordinateMode = 'rows';
+        state.coordinateDirection = 'bottom-left';
+        state.coordinateSnake = true;
+        state.blockWidth = 6;
+        state.blockHeight = 2;
         console.log('📋 Progress and painted map cleared');
         return true;
       } catch (error) {
@@ -2155,6 +2227,23 @@
     restoreProgress: (savedData) => {
       try {
         Object.assign(state, savedData.state);
+
+        // Восстанавливаем настройки генерации координат
+        if (savedData.state.coordinateMode) {
+          state.coordinateMode = savedData.state.coordinateMode;
+        }
+        if (savedData.state.coordinateDirection) {
+          state.coordinateDirection = savedData.state.coordinateDirection;
+        }
+        if (savedData.state.coordinateSnake !== undefined) {
+          state.coordinateSnake = savedData.state.coordinateSnake;
+        }
+        if (savedData.state.blockWidth) {
+          state.blockWidth = savedData.state.blockWidth;
+        }
+        if (savedData.state.blockHeight) {
+          state.blockHeight = savedData.state.blockHeight;
+        }
 
         if (savedData.imageData) {
           state.imageData = {
@@ -2241,7 +2330,10 @@
           paintedMapPacked: paintedMapPacked,
         };
 
-        const filename = `wplace-bot-progress-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`;
+        const filename = `wplace-bot-progress-${new Date()
+          .toISOString()
+          .slice(0, 19)
+          .replace(/:/g, '-')}.json`;
         Utils.createFileDownloader(JSON.stringify(progressData, null, 2), filename);
         return true;
       } catch (error) {
@@ -2387,7 +2479,11 @@
       try {
         await ensureToken();
         if (!turnstileToken) return 'token_error';
-        const payload = { coords: [pixelX, pixelY], colors: [color], t: turnstileToken };
+        const payload = {
+          coords: [pixelX, pixelY],
+          colors: [color],
+          t: turnstileToken,
+        };
         const res = await fetch(`https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
@@ -2411,23 +2507,32 @@
     },
 
     async getCharges() {
+      const defaultResult = {
+        charges: 0,
+        max: 1,
+        cooldown: CONFIG.COOLDOWN_DEFAULT,
+      };
+
       try {
         const res = await fetch('https://backend.wplace.live/me', {
           credentials: 'include',
         });
+
+        if (!res.ok) {
+          console.error(`Failed to get charges: HTTP ${res.status}`);
+          return defaultResult;
+        }
+
         const data = await res.json();
+
         return {
-          charges: data.charges?.count || 0,
-          max: data.charges?.max || 1,
-          cooldown: data.charges?.next || CONFIG.COOLDOWN_DEFAULT,
+          charges: data.charges?.count ?? 0,
+          max: data.charges?.max ?? 1,
+          cooldown: data.charges?.cooldownMs ?? CONFIG.COOLDOWN_DEFAULT,
         };
       } catch (e) {
         console.error('Failed to get charges:', e);
-        return {
-          charges: 0,
-          max: 1,
-          cooldown: CONFIG.COOLDOWN_DEFAULT,
-        };
+        return defaultResult;
       }
     },
   };
@@ -2539,7 +2644,9 @@
 
   function findClosestColor(targetRgb, availableColors) {
     if (!availableColors || availableColors.length === 0) return 1;
-    const cacheKey = `${targetRgb[0]},${targetRgb[1]},${targetRgb[2]}|${state.colorMatchingAlgorithm}|${state.enableChromaPenalty ? 'c' : 'nc'}|${state.chromaPenaltyWeight}`;
+    const cacheKey = `${targetRgb[0]},${targetRgb[1]},${targetRgb[2]}|${
+      state.colorMatchingAlgorithm
+    }|${state.enableChromaPenalty ? 'c' : 'nc'}|${state.chromaPenaltyWeight}`;
     if (colorCache.has(cacheKey)) return colorCache.get(cacheKey);
 
     const whiteThreshold = state.customWhiteThreshold || CONFIG.WHITE_THRESHOLD;
@@ -2706,7 +2813,9 @@
 
         if (isAvailable) availableCount++;
 
-        const colorItem = Utils.createElement('div', { className: 'wplace-color-item' });
+        const colorItem = Utils.createElement('div', {
+          className: 'wplace-color-item',
+        });
         const swatch = Utils.createElement('button', {
           className: `wplace-color-swatch ${!isAvailable ? 'unavailable' : ''}`,
           title: `${name} (ID: ${id})${!isAvailable ? ' (Unavailable)' : ''}`,
@@ -2799,7 +2908,15 @@
       const token = await Utils.generatePaintToken(sitekey);
 
       console.log(
-        `🔍 Token received - Type: ${typeof token}, Value: ${token ? (typeof token === 'string' ? (token.length > 50 ? token.substring(0, 50) + '...' : token) : JSON.stringify(token)) : 'null/undefined'}, Length: ${token?.length || 0}`
+        `🔍 Token received - Type: ${typeof token}, Value: ${
+          token
+            ? typeof token === 'string'
+              ? token.length > 50
+                ? token.substring(0, 50) + '...'
+                : token
+              : JSON.stringify(token)
+            : 'null/undefined'
+        }, Length: ${token?.length || 0}`
       );
 
       if (typeof token === 'string' && token.length > 20) {
@@ -2808,7 +2925,9 @@
         return token;
       } else {
         throw new Error(
-          `Invalid or empty token received - Type: ${typeof token}, Value: ${JSON.stringify(token)}, Length: ${token?.length || 0}`
+          `Invalid or empty token received - Type: ${typeof token}, Value: ${JSON.stringify(
+            token
+          )}, Length: ${token?.length || 0}`
         );
       }
     } catch (error) {
@@ -2868,14 +2987,26 @@
           const centerY = Math.round(rect.top + rect.height / 2);
 
           canvas.dispatchEvent(
-            new MouseEvent('mousemove', { clientX: centerX, clientY: centerY, bubbles: true })
+            new MouseEvent('mousemove', {
+              clientX: centerX,
+              clientY: centerY,
+              bubbles: true,
+            })
           );
           canvas.dispatchEvent(
-            new KeyboardEvent('keydown', { key: ' ', code: 'Space', bubbles: true })
+            new KeyboardEvent('keydown', {
+              key: ' ',
+              code: 'Space',
+              bubbles: true,
+            })
           );
           await Utils.sleep(50);
           canvas.dispatchEvent(
-            new KeyboardEvent('keyup', { key: ' ', code: 'Space', bubbles: true })
+            new KeyboardEvent('keyup', {
+              key: ' ',
+              code: 'Space',
+              bubbles: true,
+            })
           );
           await Utils.sleep(500);
 
@@ -2950,7 +3081,7 @@
     // Link external CSS files
     const cssLink = document.createElement('link');
     cssLink.rel = 'stylesheet';
-    cssLink.href = 'https://staninna.github.io/WPlace-AutoBOT/decoupled-css/auto-image-styles.css'; // TODO: Before merge change to https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/auto-image-styles.css
+    cssLink.href = 'https://skalsech.github.io/WPlace-AutoBOT/my_main/auto-image-styles.css';
     cssLink.setAttribute('data-wplace-theme', 'true');
     document.head.appendChild(cssLink);
 
@@ -3098,7 +3229,9 @@
         <div class="wplace-stats">
           <div id="statsArea">
             <div class="wplace-stat-item">
-              <div class="wplace-stat-label"><i class="fas fa-info-circle"></i> ${Utils.t('initMessage')}</div>
+              <div class="wplace-stat-label"><i class="fas fa-info-circle"></i> ${Utils.t(
+                'initMessage'
+              )}</div>
             </div>
           </div>
         </div>
@@ -3187,6 +3320,7 @@
           <div class="wplace-settings-section-wrapper wplace-overlay-wrapper" style="
             background: ${theme.accent ? `${theme.accent}20` : 'rgba(255,255,255,0.1)'}; 
             border-radius: ${theme.borderRadius || '12px'}; 
+            padding: 18px; 
             border: 1px solid ${theme.accent || 'rgba(255,255,255,0.1)'};
             ${
               theme.animations?.glow
@@ -3203,7 +3337,9 @@
                    <div id="overlayOpacityValue" class="wplace-overlay-opacity-value" style="
                      background: ${theme.secondary || 'rgba(0,0,0,0.2)'}; 
                      color: ${theme.text || 'white'};
+                     padding: 4px 8px; 
                      border-radius: ${theme.borderRadius === '0' ? '0' : '6px'}; 
+                     font-size: 12px;
                      border: 1px solid ${theme.accent || 'transparent'};
                    ">${Math.round(state.overlayOpacity * 100)}%</div>
                 </div>
@@ -3305,6 +3441,121 @@
             <span>${Utils.t('enablePaintingSpeedLimit')}</span>
           </label>
         </div>
+        
+        <!-- Coordinate Generation Section -->
+        <div style="margin-bottom: 25px;">
+          <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-route" style="color: #4facfe; font-size: 16px;"></i>
+            Coordinate Generation
+          </label>
+          
+          <!-- Mode Selection -->
+          <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 8px; color: rgba(255,255,255,0.9); font-weight: 500; font-size: 14px;">
+              <i class="fas fa-th" style="color: #f093fb; margin-right: 6px;"></i>
+              Generation Mode
+            </label>
+            <select id="coordinateModeSelect" style="
+              width: 100%;
+              padding: 10px 12px;
+              background: rgba(255,255,255,0.15);
+              color: white;
+              border: 1px solid rgba(255,255,255,0.2);
+              border-radius: 8px;
+              font-size: 13px;
+              outline: none;
+              cursor: pointer;
+            ">
+              <option value="rows" style="background: #2d3748; color: white;">📏 Rows (Horizontal Lines)</option>
+              <option value="columns" style="background: #2d3748; color: white;">📐 Columns (Vertical Lines)</option>
+              <option value="circle-out" style="background: #2d3748; color: white;">⭕ Circle Out (Center → Edges)</option>
+              <option value="circle-in" style="background: #2d3748; color: white;">⭕ Circle In (Edges → Center)</option>
+              <option value="blocks" style="background: #2d3748; color: white;">🟫 Blocks (Ordered)</option>
+              <option value="shuffle-blocks" style="background: #2d3748; color: white;">🎲 Shuffle Blocks (Random)</option>
+            </select>
+          </div>
+          
+          <!-- Direction Selection (only for rows/columns) -->
+          <div id="directionControls" style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 8px; color: rgba(255,255,255,0.9); font-weight: 500; font-size: 14px;">
+              <i class="fas fa-compass" style="color: #00f2fe; margin-right: 6px;"></i>
+              Starting Direction
+            </label>
+            <select id="coordinateDirectionSelect" style="
+              width: 100%;
+              padding: 10px 12px;
+              background: rgba(255,255,255,0.15);
+              color: white;
+              border: 1px solid rgba(255,255,255,0.2);
+              border-radius: 8px;
+              font-size: 13px;
+              outline: none;
+              cursor: pointer;
+            ">
+              <option value="top-left" style="background: #2d3748; color: white;">↖️ Top-Left</option>
+              <option value="top-right" style="background: #2d3748; color: white;">↗️ Top-Right</option>
+              <option value="bottom-left" style="background: #2d3748; color: white;">↙️ Bottom-Left</option>
+              <option value="bottom-right" style="background: #2d3748; color: white;">↘️ Bottom-Right</option>
+            </select>
+          </div>
+          
+          <!-- Snake Pattern Toggle (only for rows/columns) -->
+          <div id="snakeControls" style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px;">
+            <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+              <div>
+                <span style="font-weight: 500; color: white;">Snake Pattern</span>
+                <p style="font-size: 12px; color: rgba(255,255,255,0.7); margin: 4px 0 0 0;">Alternate direction for each row/column (zigzag pattern)</p>
+              </div>
+              <input type="checkbox" id="coordinateSnakeToggle" style="
+                cursor: pointer; 
+                width: 20px; 
+                height: 20px;
+                accent-color: #4facfe;
+              "/>
+            </label>
+          </div>
+          
+          <!-- Block Size Controls (only for blocks/shuffle-blocks) -->
+          <div id="blockControls" style="display: none; background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+              <div>
+                <label style="display: block; color: rgba(255,255,255,0.8); font-size: 12px; margin-bottom: 8px;">
+                  <i class="fas fa-arrows-alt-h" style="color: #4facfe; margin-right: 4px;"></i>
+                  Block Width
+                </label>
+                <input type="number" id="blockWidthInput" min="1" max="50" value="6" style="
+                  width: 100%;
+                  padding: 10px 12px;
+                  background: rgba(255,255,255,0.1);
+                  color: white;
+                  border: 1px solid rgba(255,255,255,0.2);
+                  border-radius: 8px;
+                  font-size: 13px;
+                  outline: none;
+                ">
+              </div>
+              <div>
+                <label style="display: block; color: rgba(255,255,255,0.8); font-size: 12px; margin-bottom: 8px;">
+                  <i class="fas fa-arrows-alt-v" style="color: #00f2fe; margin-right: 4px;"></i>
+                  Block Height
+                </label>
+                <input type="number" id="blockHeightInput" min="1" max="50" value="2" style="
+                  width: 100%;
+                  padding: 10px 12px;
+                  background: rgba(255,255,255,0.1);
+                  color: white;
+                  border: 1px solid rgba(255,255,255,0.2);
+                  border-radius: 8px;
+                  font-size: 13px;
+                  outline: none;
+                ">
+              </div>
+            </div>
+            <p style="font-size: 11px; color: rgba(255,255,255,0.6); margin: 8px 0 0 0; text-align: center;">
+              🧱 Block dimensions for block-based generation modes
+            </p>
+          </div>
+        </div>
 
         <!-- Notifications Section -->
         <div class="wplace-settings-section">
@@ -3378,17 +3629,16 @@
               </select>
           </div>
         </div>
+      </div>
 
         <div class="wplace-settings-footer">
              <button id="applySettingsBtn" class="wplace-settings-apply-btn" style="
-                width: 100%;
+              width: 100%;
                 ${CONFIG.CSS_CLASSES.BUTTON_PRIMARY}
-             ">
+          ">
                  <i class="fas fa-check"></i> ${Utils.t('applySettings')}
-             </button>
+          </button>
         </div>
-
-      </div>
 
       <style>
         @keyframes spin {
@@ -3666,6 +3916,21 @@
     const loadBtn = container.querySelector('#loadBtn');
     const saveToFileBtn = container.querySelector('#saveToFileBtn');
     const loadFromFileBtn = container.querySelector('#loadFromFileBtn');
+
+    container.querySelectorAll('.wplace-section-title').forEach((title) => {
+      // добавляем стрелку справа, если её нет
+      if (!title.querySelector('i.arrow')) {
+        const arrow = document.createElement('i');
+        arrow.className = 'fas fa-chevron-down arrow'; // FontAwesome стрелка вниз
+        title.appendChild(arrow);
+      }
+
+      // клик для сворачивания/разворачивания
+      title.addEventListener('click', () => {
+        const section = title.parentElement;
+        section.classList.toggle('collapsed');
+      });
+    });
 
     // Disable load/upload buttons until initial setup is complete (startup only)
     if (loadBtn) {
@@ -4117,6 +4382,88 @@
     const downloadPreviewBtn = resizeContainer.querySelector('#downloadPreviewBtn');
     const clearIgnoredBtn = resizeContainer.querySelector('#clearIgnoredBtn');
 
+    // Coordinate generation controls with smart visibility
+    const coordinateModeSelect = settingsContainer.querySelector('#coordinateModeSelect');
+    const coordinateDirectionSelect = settingsContainer.querySelector('#coordinateDirectionSelect');
+    const coordinateSnakeToggle = settingsContainer.querySelector('#coordinateSnakeToggle');
+    const directionControls = settingsContainer.querySelector('#directionControls');
+    const snakeControls = settingsContainer.querySelector('#snakeControls');
+    const blockControls = settingsContainer.querySelector('#blockControls');
+    const blockWidthInput = settingsContainer.querySelector('#blockWidthInput');
+    const blockHeightInput = settingsContainer.querySelector('#blockHeightInput');
+
+    // Function to update UI visibility based on selected mode
+    const updateCoordinateUI = () => {
+      const mode = coordinateModeSelect.value;
+      const isLinear = mode === 'rows' || mode === 'columns';
+      const isBlock = mode === 'blocks' || mode === 'shuffle-blocks';
+
+      // Show/hide direction and snake controls for linear modes
+      if (directionControls) directionControls.style.display = isLinear ? 'block' : 'none';
+      if (snakeControls) snakeControls.style.display = isLinear ? 'block' : 'none';
+
+      // Show/hide block size controls for block modes
+      if (blockControls) blockControls.style.display = isBlock ? 'block' : 'none';
+    };
+
+    if (coordinateModeSelect) {
+      coordinateModeSelect.value = state.coordinateMode || 'rows';
+      coordinateModeSelect.addEventListener('change', (e) => {
+        state.coordinateMode = e.target.value;
+        updateCoordinateUI();
+        saveBotSettings();
+        console.log(`🔄 Coordinate mode changed to: ${state.coordinateMode}`);
+        Utils.showAlert(`Coordinate mode set to: ${state.coordinateMode}`, 'success');
+      });
+      // Initial UI update
+      updateCoordinateUI();
+    }
+
+    if (coordinateDirectionSelect) {
+      coordinateDirectionSelect.value = state.coordinateDirection || 'bottom-left';
+      coordinateDirectionSelect.addEventListener('change', (e) => {
+        state.coordinateDirection = e.target.value;
+        saveBotSettings();
+        console.log(`🧭 Coordinate direction changed to: ${state.coordinateDirection}`);
+        Utils.showAlert(`Coordinate direction set to: ${state.coordinateDirection}`, 'success');
+      });
+    }
+
+    if (coordinateSnakeToggle) {
+      coordinateSnakeToggle.checked = state.coordinateSnake !== false;
+      coordinateSnakeToggle.addEventListener('change', (e) => {
+        state.coordinateSnake = e.target.checked;
+        saveBotSettings();
+        console.log(`🐍 Snake pattern ${state.coordinateSnake ? 'enabled' : 'disabled'}`);
+        Utils.showAlert(
+          `Snake pattern ${state.coordinateSnake ? 'enabled' : 'disabled'}`,
+          'success'
+        );
+      });
+    }
+
+    if (blockWidthInput) {
+      blockWidthInput.value = state.blockWidth || 6;
+      blockWidthInput.addEventListener('input', (e) => {
+        const width = parseInt(e.target.value);
+        if (width >= 1 && width <= 50) {
+          state.blockWidth = width;
+          saveBotSettings();
+        }
+      });
+    }
+
+    if (blockHeightInput) {
+      blockHeightInput.value = state.blockHeight || 2;
+      blockHeightInput.addEventListener('change', (e) => {
+        const height = parseInt(e.target.value);
+        if (height >= 1 && height <= 50) {
+          state.blockHeight = height;
+          saveBotSettings();
+        }
+      });
+    }
+
     if (compactBtn) {
       compactBtn.addEventListener('click', () => {
         container.classList.toggle('wplace-compact');
@@ -4300,22 +4647,71 @@
       });
     }
 
-    updateUI = (messageKey, type = 'default', params = {}) => {
+    updateUI = (messageKey, type = 'default', params = {}, silent = false) => {
       const message = Utils.t(messageKey, params);
       statusText.textContent = message;
       statusText.className = `wplace-status status-${type}`;
-      statusText.style.animation = 'none';
-      void statusText.offsetWidth;
-      statusText.style.animation = 'slideIn 0.3s ease-out';
+
+      if (!silent) {
+        // Запускаем анимацию только если silent = false
+        statusText.style.animation = 'none';
+        void statusText.offsetWidth; // трюк для перезапуска анимации
+        statusText.style.animation = 'slideIn 0.3s ease-out';
+      }
     };
 
+    function updateFullChargeDisplay() {
+      const fullChargeEl = document.getElementById('wplace-stat-fullcharge-value');
+      if (!fullChargeEl) return;
+      if (!state.fullChargeData) {
+        fullChargeEl.textContent = '--:--:--';
+        return;
+      }
+
+      const { current, max, cooldownMs, startTime } = state.fullChargeData;
+      const elapsed = Date.now() - startTime;
+      const remainingMs = Math.max(0, (max - current) * cooldownMs - elapsed);
+
+      let timeText = Utils.msToTimeText(remainingMs);
+
+      const chargesGained = Math.ceil(elapsed / cooldownMs);
+      const currentCharges = Math.min(current + chargesGained, max);
+
+      state.currentCharges = Math.floor(currentCharges);
+      const chargesEl = document.getElementById('wplace-stat-charges-value');
+      const secondsInMinute = Math.ceil(remainingMs / 1000) % 60;
+      if (chargesEl && (secondsInMinute == 0 || secondsInMinute == 30)) {
+        chargesEl.innerHTML = `<span">${Math.floor(state.currentCharges)} / ${state.maxCharges}</span>`;
+      }
+      if (currentCharges >= max) {
+        fullChargeEl.innerHTML = `<span style="color:#10b981;">FULL</span>`;
+        clearInterval(state.fullChargeInterval);
+        state.fullChargeInterval = null;
+      } else {
+        fullChargeEl.innerHTML = `
+          <span style="color:#f59e0b;">${timeText}</span>
+        `;
+      }
+    }
+
     updateStats = async () => {
-      const { charges, cooldown, max } = await WPlaceService.getCharges();
+      const { charges, max, cooldown } = await WPlaceService.getCharges();
       state.currentCharges = Math.floor(charges);
       state.cooldown = cooldown;
       state.maxCharges = Math.floor(max) > 1 ? Math.floor(max) : state.maxCharges;
+
+      state.fullChargeData = {
+        current: charges,
+        max: max,
+        cooldownMs: cooldown,
+        startTime: Date.now(),
+      };
       // Evaluate notifications every time we refresh server-side charges
       NotificationManager.maybeNotifyChargesReached();
+
+      if (state.fullChargeInterval) clearInterval(state.fullChargeInterval);
+      state.fullChargeInterval = setInterval(updateFullChargeDisplay, 1000);
+      updateFullChargeDisplay();
 
       if (cooldownSlider.max != state.maxCharges) {
         cooldownSlider.max = state.maxCharges;
@@ -4334,19 +4730,23 @@
         progressBar.style.width = `${progress}%`;
 
         imageStatsHTML = `
-                <div class="wplace-stat-item">
-                <div class="wplace-stat-label"><i class="fas fa-image"></i> ${Utils.t('progress')}</div>
-                <div class="wplace-stat-value">${progress}%</div>
-                </div>
-                <div class="wplace-stat-item">
-                <div class="wplace-stat-label"><i class="fas fa-paint-brush"></i> ${Utils.t('pixels')}</div>
-                <div class="wplace-stat-value">${state.paintedPixels}/${state.totalPixels}</div>
-                </div>
-                <div class="wplace-stat-item">
-                <div class="wplace-stat-label"><i class="fas fa-clock"></i> ${Utils.t('estimatedTime')}</div>
-                <div class="wplace-stat-value">${Utils.formatTime(state.estimatedTime)}</div>
-                </div>
-            `;
+          <div class="wplace-stat-item">
+            <div class="wplace-stat-label"><i class="fas fa-image"></i> ${Utils.t('progress')}</div>
+            <div class="wplace-stat-value">${progress}%</div>
+          </div>
+          <div class="wplace-stat-item">
+            <div class="wplace-stat-label"><i class="fas fa-paint-brush"></i> ${Utils.t(
+              'pixels'
+            )}</div>
+            <div class="wplace-stat-value">${state.paintedPixels}/${state.totalPixels}</div>
+          </div>
+          <div class="wplace-stat-item">
+            <div class="wplace-stat-label"><i class="fas fa-clock"></i> ${Utils.t(
+              'estimatedTime'
+            )}</div>
+            <div class="wplace-stat-value">${Utils.formatTime(state.estimatedTime)}</div>
+          </div>
+        `;
       }
 
       let colorSwatchesHTML = '';
@@ -4359,11 +4759,29 @@
           .join('');
       }
 
+      let fullChargeValue = '';
+      const fullChargeEl = document.getElementById('wplace-stat-fullcharge-value');
+      if (fullChargeEl) {
+        fullChargeValue = fullChargeEl.innerHTML;
+      }
+
       statsArea.innerHTML = `
             ${imageStatsHTML}
             <div class="wplace-stat-item">
-            <div class="wplace-stat-label"><i class="fas fa-bolt"></i> ${Utils.t('charges')}</div>
-            <div class="wplace-stat-value">${Math.floor(state.currentCharges)} / ${state.maxCharges}</div>
+              <div class="wplace-stat-label">
+                <i class="fas fa-bolt"></i> ${Utils.t('charges')}
+              </div>
+              <div class="wplace-stat-value" id="wplace-stat-charges-value">
+                ${Math.floor(state.currentCharges)} / ${state.maxCharges}
+              </div>
+            </div>
+            <div class="wplace-stat-item">
+              <div class="wplace-stat-label">
+                <i class="fas fa-battery-half"></i> ${Utils.t('fullChargeIn')}
+              </div>
+              <div class="wplace-stat-value" id="wplace-stat-fullcharge-value">
+                ${fullChargeValue || '--:--:--'}
+              </div>
             </div>
             ${
               state.colorsChecked
@@ -4647,7 +5065,12 @@
         _updateResizePreview();
         const curW = parseInt(widthSlider.value, 10);
         const curH = parseInt(heightSlider.value, 10);
-        state.resizeSettings = { baseWidth: width, baseHeight: height, width: curW, height: curH };
+        state.resizeSettings = {
+          baseWidth: width,
+          baseHeight: height,
+          width: curW,
+          height: curH,
+        };
         saveBotSettings();
         // Auto-fit after size changes
         const fit = typeof computeFitZoom === 'function' ? computeFitZoom() : 1;
@@ -4661,7 +5084,12 @@
         _updateResizePreview();
         const curW = parseInt(widthSlider.value, 10);
         const curH = parseInt(heightSlider.value, 10);
-        state.resizeSettings = { baseWidth: width, baseHeight: height, width: curW, height: curH };
+        state.resizeSettings = {
+          baseWidth: width,
+          baseHeight: height,
+          width: curW,
+          height: curH,
+        };
         saveBotSettings();
         // Auto-fit after size changes
         const fit = typeof computeFitZoom === 'function' ? computeFitZoom() : 1;
@@ -4683,7 +5111,10 @@
       let panX = 0,
         panY = 0;
       const clampPan = () => {
-        const wrapRect = panStage?.getBoundingClientRect() || { width: 0, height: 0 };
+        const wrapRect = panStage?.getBoundingClientRect() || {
+          width: 0,
+          height: 0,
+        };
         const w = (baseCanvas.width || 1) * _zoomLevel;
         const h = (baseCanvas.height || 1) * _zoomLevel;
         if (w <= wrapRect.width) {
@@ -4704,7 +5135,9 @@
         if (_panRaf) return;
         _panRaf = requestAnimationFrame(() => {
           clampPan();
-          canvasStack.style.transform = `translate3d(${Math.round(panX)}px, ${Math.round(panY)}px, 0) scale(${_zoomLevel})`;
+          canvasStack.style.transform = `translate3d(${Math.round(
+            panX
+          )}px, ${Math.round(panY)}px, 0) scale(${_zoomLevel})`;
           _panRaf = 0;
         });
       };
@@ -5392,7 +5825,10 @@
         // Keep state.imageData.processor as the original-based source; painting uses paletted pixels already stored
 
         updateStats();
-        updateUI('resizeSuccess', 'success', { width: newWidth, height: newHeight });
+        updateUI('resizeSuccess', 'success', {
+          width: newWidth,
+          height: newHeight,
+        });
         closeResizeDialog();
       };
 
@@ -5502,7 +5938,9 @@
           updateUI('loadingImage', 'default');
           const imageSrc = await Utils.createImageUploader();
           if (!imageSrc) {
-            updateUI('colorsFound', 'success', { count: state.availableColors.length });
+            updateUI('colorsFound', 'success', {
+              count: state.availableColors.length,
+            });
             return;
           }
 
@@ -5798,162 +6236,296 @@
     let pixelBatch = null;
     let skippedPixels = { transparent: 0, white: 0, alreadyPainted: 0 };
 
-    try {
-      outerLoop: for (let y = startRow; y < height; y++) {
-        for (let x = y === startRow ? startCol : 0; x < width; x++) {
-          if (state.stopFlag) {
-            if (pixelBatch && pixelBatch.pixels.length > 0) {
-              console.log(
-                `🎯 Sending final batch before stop with ${pixelBatch.pixels.length} pixels`
-              );
-              const success = await sendBatchWithRetry(
-                pixelBatch.pixels,
-                pixelBatch.regionX,
-                pixelBatch.regionY
-              );
-              if (success) {
-                pixelBatch.pixels.forEach(() => {
-                  state.paintedPixels++;
-                });
-                state.currentCharges -= pixelBatch.pixels.length;
-                updateStats();
-              }
+    function getRemainingMsToThreshold(threshold) {
+      if (!state.fullChargeData) return state.cooldown; // fallback
+
+      const { current, cooldownMs, startTime } = state.fullChargeData;
+
+      const elapsed = Date.now() - startTime;
+      const remainingCharges = Math.max(0, threshold - current);
+      const remainingMs = remainingCharges * cooldownMs - elapsed;
+      return remainingMs;
+    }
+
+    function startChargesThresholdTicker() {
+      if (!state.fullChargeData) return;
+
+      // Если уже есть интервал, очищаем
+      if (state.chargesThresholdInterval) {
+        clearInterval(state.chargesThresholdInterval);
+      }
+      if (state.stopFlag) return;
+
+      // Вызываем сразу для мгновенного обновления
+      updateChargesThresholdUI();
+
+      state.chargesThresholdInterval = setInterval(() => {
+        updateChargesThresholdUI();
+      }, 1000);
+    }
+
+    function updateChargesThresholdUI() {
+      if (!state.fullChargeData) return;
+      const threshold = state.cooldownChargeThreshold;
+
+      const remainingMs = getRemainingMsToThreshold(state.cooldownChargeThreshold);
+
+      if (remainingMs <= 999) {
+        if (state.chargesThresholdInterval) {
+          clearInterval(state.chargesThresholdInterval);
+        }
+        updateUI('startPaintingMsg', 'success');
+        return; // Уже достигли порога
+      }
+
+      let timeText = Utils.msToTimeText(remainingMs);
+
+      updateUI(
+        'noChargesThreshold',
+        'warning',
+        {
+          threshold,
+          time: timeText,
+        },
+        true
+      );
+    }
+
+    function generateCoordinates(
+      width,
+      height,
+      mode = 'rows',
+      direction = 'top-left',
+      snake = false,
+      blockWidth = 6,
+      blockHeight = 2
+    ) {
+      const coords = [];
+      console.log(
+        'Generating coordinates with \n  mode:',
+        mode,
+        '\n  direction:',
+        direction,
+        '\n  snake:',
+        snake,
+        '\n  blockWidth:',
+        blockWidth,
+        '\n  blockHeight:',
+        blockHeight
+      );
+      // --------- стандартные 4 угла ----------
+      let xStart, xEnd, xStep;
+      let yStart, yEnd, yStep;
+      switch (direction) {
+        case 'top-left':
+          xStart = 0;
+          xEnd = width;
+          xStep = 1;
+          yStart = 0;
+          yEnd = height;
+          yStep = 1;
+          break;
+        case 'top-right':
+          xStart = width - 1;
+          xEnd = -1;
+          xStep = -1;
+          yStart = 0;
+          yEnd = height;
+          yStep = 1;
+          break;
+        case 'bottom-left':
+          xStart = 0;
+          xEnd = width;
+          xStep = 1;
+          yStart = height - 1;
+          yEnd = -1;
+          yStep = -1;
+          break;
+        case 'bottom-right':
+          xStart = width - 1;
+          xEnd = -1;
+          xStep = -1;
+          yStart = height - 1;
+          yEnd = -1;
+          yStep = -1;
+          break;
+        default:
+          throw new Error(`Unknown direction: ${direction}`);
+      }
+
+      // --------- режимы обхода ----------
+      if (mode === 'rows') {
+        for (let y = yStart; y !== yEnd; y += yStep) {
+          if (snake && (y - yStart) % 2 !== 0) {
+            for (let x = xEnd - xStep; x !== xStart - xStep; x -= xStep) {
+              coords.push([x, y]);
             }
-            state.lastPosition = { x, y };
-            updateUI('paintingPaused', 'warning', { x, y });
-            break outerLoop;
-          }
-
-          const idx = (y * width + x) * 4;
-          const r = pixels[idx];
-          const g = pixels[idx + 1];
-          const b = pixels[idx + 2];
-          const alpha = pixels[idx + 3];
-
-          const tThresh2 = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
-          if (
-            (!state.paintTransparentPixels && alpha < tThresh2) ||
-            (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b))
-          ) {
-            if (!state.paintTransparentPixels && alpha < tThresh2) {
-              skippedPixels.transparent++;
-            } else {
-              skippedPixels.white++;
-            }
-            continue;
-          }
-
-          let targetRgb;
-          if (Utils.isWhitePixel(r, g, b)) {
-            targetRgb = [255, 255, 255];
           } else {
-            targetRgb = Utils.findClosestPaletteColor(r, g, b, state.activeColorPalette);
+            for (let x = xStart; x !== xEnd; x += xStep) {
+              coords.push([x, y]);
+            }
           }
+        }
+      } else if (mode === 'columns') {
+        for (let x = xStart; x !== xEnd; x += xStep) {
+          if (snake && (x - xStart) % 2 !== 0) {
+            for (let y = yEnd - yStep; y !== yStart - yStep; y -= yStep) {
+              coords.push([x, y]);
+            }
+          } else {
+            for (let y = yStart; y !== yEnd; y += yStep) {
+              coords.push([x, y]);
+            }
+          }
+        }
+      } else if (mode === 'circle-out') {
+        const cx = Math.floor(width / 2);
+        const cy = Math.floor(height / 2);
+        const maxRadius = Math.ceil(Math.sqrt(cx * cx + cy * cy));
 
-          const colorId = findClosestColor([r, g, b], state.availableColors);
-
-          let absX = startX + x;
-          let absY = startY + y;
-
-          let adderX = Math.floor(absX / 1000);
-          let adderY = Math.floor(absY / 1000);
-          let pixelX = absX % 1000;
-          let pixelY = absY % 1000;
-
-          if (
-            !pixelBatch ||
-            pixelBatch.regionX !== regionX + adderX ||
-            pixelBatch.regionY !== regionY + adderY
-          ) {
-            if (pixelBatch && pixelBatch.pixels.length > 0) {
-              console.log(
-                `🌍 Sending region-change batch with ${pixelBatch.pixels.length} pixels (switching to region ${regionX + adderX},${regionY + adderY})`
-              );
-              const success = await sendBatchWithRetry(
-                pixelBatch.pixels,
-                pixelBatch.regionX,
-                pixelBatch.regionY
-              );
-
-              if (success) {
-                pixelBatch.pixels.forEach((p) => {
-                  state.paintedPixels++;
-                  // Mark pixel as painted in map
-                  Utils.markPixelPainted(p.x, p.y, pixelBatch.regionX, pixelBatch.regionY);
-                });
-                state.currentCharges -= pixelBatch.pixels.length;
-                updateUI('paintingProgress', 'default', {
-                  painted: state.paintedPixels,
-                  total: state.totalPixels,
-                });
-
-                // Use smart save instead of fixed interval
-                Utils.performSmartSave();
-
-                if (
-                  CONFIG.PAINTING_SPEED_ENABLED &&
-                  state.paintingSpeed > 0 &&
-                  pixelBatch.pixels.length > 0
-                ) {
-                  // paintingSpeed now represents batch size, so add a small delay based on batch size
-                  const batchDelayFactor = Math.max(1, 100 / state.paintingSpeed); // Larger batches = less delay
-                  const totalDelay = Math.max(100, batchDelayFactor * pixelBatch.pixels.length);
-                  await Utils.sleep(totalDelay);
-                }
-                updateStats();
-              } else {
-                // If batch failed after all retries, stop painting to prevent infinite loops
-                console.error(`❌ Batch failed permanently after retries. Stopping painting.`);
-                state.stopFlag = true;
-                break outerLoop;
+        for (let r = 0; r <= maxRadius; r++) {
+          for (let y = cy - r; y <= cy + r; y++) {
+            for (let x = cx - r; x <= cx + r; x++) {
+              if (x >= 0 && x < width && y >= 0 && y < height) {
+                const dist = Math.max(Math.abs(x - cx), Math.abs(y - cy));
+                if (dist === r) coords.push([x, y]);
               }
             }
-
-            pixelBatch = {
-              regionX: regionX + adderX,
-              regionY: regionY + adderY,
-              pixels: [],
-            };
           }
+        }
+      } else if (mode === 'circle-in') {
+        const cx = Math.floor(width / 2);
+        const cy = Math.floor(height / 2);
+        const maxRadius = Math.ceil(Math.sqrt(cx * cx + cy * cy));
 
-          try {
-            const tileRegionX = pixelBatch ? pixelBatch.regionX : regionX + adderX;
-            const tileRegionY = pixelBatch ? pixelBatch.regionY : regionY + adderY;
-            const tileKeyParts = [regionX + adderX, regionY + adderY];
-            const existingColorRGBA = await overlayManager
-              .getTilePixelColor(tileKeyParts[0], tileKeyParts[1], pixelX, pixelY)
-              .catch(() => null);
-            if (existingColorRGBA && Array.isArray(existingColorRGBA)) {
-              const [er, eg, eb] = existingColorRGBA;
-              const existingColorId = findClosestColor([er, eg, eb], state.availableColors);
-              // console.log(`pixel at (${pixelX}, ${pixelY}) has color ${existingColorId} it should be ${colorId}`);
-              if (existingColorId === colorId) {
-                skippedPixels.alreadyPainted++;
-                console.log(`Skipped already painted pixel at (${pixelX}, ${pixelY})`);
-                continue; // Skip
+        for (let r = maxRadius; r >= 0; r--) {
+          for (let y = cy - r; y <= cy + r; y++) {
+            for (let x = cx - r; x <= cx + r; x++) {
+              if (x >= 0 && x < width && y >= 0 && y < height) {
+                const dist = Math.max(Math.abs(x - cx), Math.abs(y - cy));
+                if (dist === r) coords.push([x, y]);
               }
             }
-          } catch (e) {
-            /* ignore */
           }
+        }
+      } else if (mode === 'blocks' || mode === 'shuffle-blocks') {
+        const blocks = [];
+        for (let by = 0; by < height; by += blockHeight) {
+          for (let bx = 0; bx < width; bx += blockWidth) {
+            const block = [];
+            for (let y = by; y < Math.min(by + blockHeight, height); y++) {
+              for (let x = bx; x < Math.min(bx + blockWidth, width); x++) {
+                block.push([x, y]);
+              }
+            }
+            blocks.push(block);
+          }
+        }
 
-          pixelBatch.pixels.push({
-            x: pixelX,
-            y: pixelY,
-            color: colorId,
-            localX: x,
-            localY: y,
-          });
+        if (mode === 'shuffle-blocks') {
+          // простая тасовка Фишера-Йетса
+          for (let i = blocks.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [blocks[i], blocks[j]] = [blocks[j], blocks[i]];
+          }
+        }
 
-          // Calculate batch size based on mode (normal/random)
-          const maxBatchSize = calculateBatchSize();
-          if (pixelBatch.pixels.length >= maxBatchSize) {
-            const modeText =
-              state.batchMode === 'random'
-                ? `random (${state.randomBatchMin}-${state.randomBatchMax})`
-                : 'normal';
+        // склеиваем все блоки
+        for (const block of blocks) {
+          coords.push(...block);
+        }
+      } else {
+        throw new Error(`Unknown mode: ${mode}`);
+      }
+
+      return coords;
+    }
+
+    try {
+      // Используем настройки из состояния
+      const coords = generateCoordinates(
+        width,
+        height,
+        state.coordinateMode || 'rows',
+        state.coordinateDirection || 'bottom-left',
+        state.coordinateSnake !== false, // по умолчанию true
+        state.blockWidth || 6, // blockWidth
+        state.blockHeight || 2 // blockHeight
+      );
+
+      outerLoop: for (const [x, y] of coords) {
+        if (state.stopFlag) {
+          if (pixelBatch && pixelBatch.pixels.length > 0) {
             console.log(
-              `📦 Sending batch with ${pixelBatch.pixels.length} pixels (mode: ${modeText}, target: ${maxBatchSize})`
+              `🎯 Sending final batch before stop with ${pixelBatch.pixels.length} pixels`
+            );
+            const success = await sendBatchWithRetry(
+              pixelBatch.pixels,
+              pixelBatch.regionX,
+              pixelBatch.regionY
+            );
+            if (success) {
+              pixelBatch.pixels.forEach(() => {
+                state.paintedPixels++;
+              });
+              state.currentCharges -= pixelBatch.pixels.length;
+              updateStats();
+            }
+          }
+          state.lastPosition = { x, y };
+          if (state.chargesThresholdInterval) {
+            clearInterval(state.chargesThresholdInterval);
+          }
+          updateUI('paintingPaused', 'warning', { x, y });
+          break outerLoop;
+        }
+
+        const idx = (y * width + x) * 4;
+        const r = pixels[idx];
+        const g = pixels[idx + 1];
+        const b = pixels[idx + 2];
+        const alpha = pixels[idx + 3];
+
+        const tThresh2 = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
+        if (
+          (!state.paintTransparentPixels && alpha < tThresh2) ||
+          (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b))
+        ) {
+          if (!state.paintTransparentPixels && alpha < tThresh2) {
+            skippedPixels.transparent++;
+          } else {
+            skippedPixels.white++;
+          }
+          continue;
+        }
+
+        let targetRgb;
+        if (Utils.isWhitePixel(r, g, b)) {
+          targetRgb = [255, 255, 255];
+        } else {
+          targetRgb = Utils.findClosestPaletteColor(r, g, b, state.activeColorPalette);
+        }
+
+        const colorId = findClosestColor([r, g, b], state.availableColors);
+
+        let absX = startX + x;
+        let absY = startY + y;
+
+        let adderX = Math.floor(absX / 1000);
+        let adderY = Math.floor(absY / 1000);
+        let pixelX = absX % 1000;
+        let pixelY = absY % 1000;
+
+        if (
+          !pixelBatch ||
+          pixelBatch.regionX !== regionX + adderX ||
+          pixelBatch.regionY !== regionY + adderY
+        ) {
+          if (pixelBatch && pixelBatch.pixels.length > 0) {
+            console.log(
+              `🌍 Sending region-change batch with ${
+                pixelBatch.pixels.length
+              } pixels (switching to region ${regionX + adderX},${regionY + adderY})`
             );
             const success = await sendBatchWithRetry(
               pixelBatch.pixels,
@@ -5962,20 +6534,16 @@
             );
 
             if (success) {
-              pixelBatch.pixels.forEach((pixel) => {
+              pixelBatch.pixels.forEach((p) => {
                 state.paintedPixels++;
-                // Mark pixel as painted in map
-                Utils.markPixelPainted(pixel.x, pixel.y, pixelBatch.regionX, pixelBatch.regionY);
+                Utils.markPixelPainted(p.x, p.y, pixelBatch.regionX, pixelBatch.regionY);
               });
-
               state.currentCharges -= pixelBatch.pixels.length;
-              updateStats();
               updateUI('paintingProgress', 'default', {
                 painted: state.paintedPixels,
                 total: state.totalPixels,
               });
 
-              // Use smart save instead of fixed interval
               Utils.performSmartSave();
 
               if (
@@ -5983,53 +6551,126 @@
                 state.paintingSpeed > 0 &&
                 pixelBatch.pixels.length > 0
               ) {
-                const delayPerPixel = 1000 / state.paintingSpeed; // ms per pixel
-                const totalDelay = Math.max(100, delayPerPixel * pixelBatch.pixels.length); // minimum 100ms
+                const batchDelayFactor = Math.max(1, 100 / state.paintingSpeed);
+                const totalDelay = Math.max(100, batchDelayFactor * pixelBatch.pixels.length);
                 await Utils.sleep(totalDelay);
               }
+              updateStats();
             } else {
-              // If batch failed after all retries, stop painting to prevent infinite loops
               console.error(`❌ Batch failed permanently after retries. Stopping painting.`);
               state.stopFlag = true;
               break outerLoop;
             }
-
-            pixelBatch.pixels = [];
           }
 
-          while (state.currentCharges < state.cooldownChargeThreshold && !state.stopFlag) {
-            const { charges, cooldown } = await WPlaceService.getCharges();
-            state.currentCharges = Math.floor(charges);
-            state.cooldown = cooldown;
+          pixelBatch = {
+            regionX: regionX + adderX,
+            regionY: regionY + adderY,
+            pixels: [],
+          };
+        }
 
-            if (state.currentCharges >= state.cooldownChargeThreshold) {
-              // Edge-trigger a notification the instant threshold is crossed
-              NotificationManager.maybeNotifyChargesReached(true);
-              updateStats();
-              break;
+        try {
+          const tileRegionX = pixelBatch ? pixelBatch.regionX : regionX + adderX;
+          const tileRegionY = pixelBatch ? pixelBatch.regionY : regionY + adderY;
+          const tileKeyParts = [regionX + adderX, regionY + adderY];
+          const existingColorRGBA = await overlayManager
+            .getTilePixelColor(tileKeyParts[0], tileKeyParts[1], pixelX, pixelY)
+            .catch(() => null);
+          if (existingColorRGBA && Array.isArray(existingColorRGBA)) {
+            const [er, eg, eb] = existingColorRGBA;
+            const existingColorId = findClosestColor([er, eg, eb], state.availableColors);
+            // console.log(`pixel at (${pixelX}, ${pixelY}) has color ${existingColorId} it should be ${colorId}`);
+            if (existingColorId === colorId) {
+              skippedPixels.alreadyPainted++;
+              console.log(`Skipped already painted pixel at (${pixelX}, ${pixelY})`);
+              continue; // Skip
             }
+          }
+        } catch (e) {
+          /* ignore */
+        }
 
-            // Enable save button during cooldown wait
-            saveBtn.disabled = false;
+        pixelBatch.pixels.push({
+          x: pixelX,
+          y: pixelY,
+          color: colorId,
+          localX: x,
+          localY: y,
+        });
 
-            updateUI('noChargesThreshold', 'warning', {
-              time: Utils.formatTime(state.cooldown),
-              threshold: state.cooldownChargeThreshold,
-              current: state.currentCharges,
+        const maxBatchSize = calculateBatchSize();
+        if (pixelBatch.pixels.length >= maxBatchSize) {
+          const modeText =
+            state.batchMode === 'random'
+              ? `random (${state.randomBatchMin}-${state.randomBatchMax})`
+              : 'normal';
+          console.log(
+            `📦 Sending batch with ${pixelBatch.pixels.length} pixels (mode: ${modeText}, target: ${maxBatchSize})`
+          );
+          const success = await sendBatchWithRetry(
+            pixelBatch.pixels,
+            pixelBatch.regionX,
+            pixelBatch.regionY
+          );
+
+          if (success) {
+            pixelBatch.pixels.forEach((pixel) => {
+              state.paintedPixels++;
+              // Mark pixel as painted in map
+              Utils.markPixelPainted(pixel.x, pixel.y, pixelBatch.regionX, pixelBatch.regionY);
             });
-            await updateStats();
 
-            // Allow auto save during cooldown
+            state.currentCharges -= pixelBatch.pixels.length;
+            updateStats();
+            updateUI('paintingProgress', 'default', {
+              painted: state.paintedPixels,
+              total: state.totalPixels,
+            });
+
+            // Use smart save instead of fixed interval
             Utils.performSmartSave();
 
-            await Utils.sleep(state.cooldown);
+            if (
+              CONFIG.PAINTING_SPEED_ENABLED &&
+              state.paintingSpeed > 0 &&
+              pixelBatch.pixels.length > 0
+            ) {
+              const delayPerPixel = 1000 / state.paintingSpeed;
+              const totalDelay = Math.max(100, delayPerPixel * pixelBatch.pixels.length);
+              await Utils.sleep(totalDelay);
+            }
+          } else {
+            // If batch failed after all retries, stop painting to prevent infinite loops
+            console.error(`❌ Batch failed permanently after retries. Stopping painting.`);
+            state.stopFlag = true;
+            break outerLoop;
           }
 
-          // Disable save button again after exiting wait loop (back to normal painting)
-          if (!state.stopFlag) {
-            saveBtn.disabled = true;
+          pixelBatch.pixels = [];
+        }
+
+        while (state.currentCharges < state.cooldownChargeThreshold && !state.stopFlag) {
+          await updateStats();
+          if (state.currentCharges >= state.cooldownChargeThreshold) {
+            NotificationManager.maybeNotifyChargesReached(true);
+            break;
           }
-          if (state.stopFlag) break outerLoop;
+
+          saveBtn.disabled = false;
+          startChargesThresholdTicker();
+
+          Utils.performSmartSave();
+
+          await Utils.dynamicSleep(() => getRemainingMsToThreshold(state.cooldownChargeThreshold));
+        }
+
+        if (!state.stopFlag) saveBtn.disabled = true;
+        if (state.stopFlag) {
+          if (state.chargesThresholdInterval) {
+            clearInterval(state.chargesThresholdInterval);
+          }
+          break outerLoop;
         }
       }
 
@@ -6055,12 +6696,11 @@
             state.paintingSpeed > 0 &&
             pixelBatch.pixels.length > 0
           ) {
-            const delayPerPixel = 1000 / state.paintingSpeed; // ms per pixel
-            const totalDelay = Math.max(100, delayPerPixel * pixelBatch.pixels.length); // minimum 100ms
+            const delayPerPixel = 1000 / state.paintingSpeed;
+            const totalDelay = Math.max(100, delayPerPixel * pixelBatch.pixels.length);
             await Utils.sleep(totalDelay);
           }
         } else {
-          // If final batch failed after retries, log it
           console.warn(
             `⚠️ Final batch failed with ${pixelBatch.pixels.length} pixels after all retries.`
           );
@@ -6072,6 +6712,9 @@
     }
 
     if (state.stopFlag) {
+      if (state.chargesThresholdInterval) {
+        clearInterval(state.chargesThresholdInterval);
+      }
       updateUI('paintingStopped', 'warning');
       // Save progress when stopped to preserve painted map
       Utils.saveProgress();
@@ -6096,7 +6739,12 @@
     console.log(`   Skipped - White (disabled): ${skippedPixels.white}`);
     console.log(`   Skipped - Already painted: ${skippedPixels.alreadyPainted}`);
     console.log(
-      `   Total processed: ${state.paintedPixels + skippedPixels.transparent + skippedPixels.white + skippedPixels.alreadyPainted}`
+      `   Total processed: ${
+        state.paintedPixels +
+        skippedPixels.transparent +
+        skippedPixels.white +
+        skippedPixels.alreadyPainted
+      }`
     );
 
     updateStats();
@@ -6285,6 +6933,11 @@
         paintTransparentPixels: state.paintTransparentPixels,
         resizeSettings: state.resizeSettings,
         originalImage: state.originalImage,
+        coordinateMode: state.coordinateMode,
+        coordinateDirection: state.coordinateDirection,
+        coordinateSnake: state.coordinateSnake,
+        blockWidth: state.blockWidth,
+        blockHeight: state.blockHeight,
         // Save ignore mask (as base64) with its dimensions
         resizeIgnoreMask:
           state.resizeIgnoreMask &&
@@ -6340,6 +6993,11 @@
       state.paintTransparentPixels = settings.paintTransparentPixels ?? false;
       state.resizeSettings = settings.resizeSettings ?? null;
       state.originalImage = settings.originalImage ?? null;
+      state.coordinateMode = settings.coordinateMode ?? 'rows';
+      state.coordinateDirection = settings.coordinateDirection ?? 'bottom-left';
+      state.coordinateSnake = settings.coordinateSnake ?? true;
+      state.blockWidth = settings.blockWidth ?? 6;
+      state.blockHeight = settings.blockHeight ?? 2;
       // Notifications
       state.notificationsEnabled = settings.notificationsEnabled ?? CONFIG.NOTIFICATIONS.ENABLED;
       state.notifyOnChargesReached =
@@ -6367,7 +7025,17 @@
       } else {
         state.resizeIgnoreMask = null;
       }
+      // Initialize coordinate generation UI
+      const coordinateModeSelect = document.getElementById('coordinateModeSelect');
+      if (coordinateModeSelect) coordinateModeSelect.value = state.coordinateMode;
 
+      const coordinateDirectionSelect = document.getElementById('coordinateDirectionSelect');
+      if (coordinateDirectionSelect) coordinateDirectionSelect.value = state.coordinateDirection;
+
+      const coordinateSnakeToggle = document.getElementById('coordinateSnakeToggle');
+      if (coordinateSnakeToggle) coordinateSnakeToggle.checked = state.coordinateSnake;
+
+      // ... existing code ...
       const speedSlider = document.getElementById('speedSlider');
       if (speedSlider) speedSlider.value = state.paintingSpeed;
       const speedValue = document.getElementById('speedValue');
