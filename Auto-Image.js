@@ -1775,6 +1775,111 @@
       return r >= wt && g >= wt && b >= wt;
     },
 
+    resolveColor(targetRgb, palette, exactMatch = false) {
+      if (!palette || palette.length === 0) return { id: null, rgb: targetRgb };
+
+      const cacheKey = `${targetRgb[0]},${targetRgb[1]},${targetRgb[2]}|${
+        state.colorMatchingAlgorithm
+      }|${state.enableChromaPenalty ? 'c' : 'nc'}|${state.chromaPenaltyWeight}|${exactMatch ? 'exact' : 'closest'}`;
+
+      if (colorCache.has(cacheKey)) return colorCache.get(cacheKey);
+
+      // точное совпадение
+      if (exactMatch) {
+        const match = palette.find(
+          (c) => c.rgb[0] === targetRgb[0] && c.rgb[1] === targetRgb[1] && c.rgb[2] === targetRgb[2]
+        );
+        const result = match ? { id: match.id, rgb: [...match.rgb] } : { id: null, rgb: targetRgb };
+        colorCache.set(cacheKey, result);
+        return result;
+      }
+
+      // проверка на белый через порог
+      const whiteThreshold = state.customWhiteThreshold || CONFIG.WHITE_THRESHOLD;
+      if (
+        targetRgb[0] >= whiteThreshold &&
+        targetRgb[1] >= whiteThreshold &&
+        targetRgb[2] >= whiteThreshold
+      ) {
+        const whiteEntry = palette.find(
+          (c) =>
+            c.rgb[0] >= whiteThreshold && c.rgb[1] >= whiteThreshold && c.rgb[2] >= whiteThreshold
+        );
+        if (whiteEntry) {
+          const result = { id: whiteEntry.id, rgb: [...whiteEntry.rgb] };
+          colorCache.set(cacheKey, result);
+          return result;
+        }
+      }
+
+      // поиск ближайшего цвета
+      let bestId = palette[0].id;
+      let bestRgb = [...palette[0].rgb];
+      let bestScore = Infinity;
+
+      if (state.colorMatchingAlgorithm === 'legacy') {
+        for (let i = 0; i < palette.length; i++) {
+          const c = palette[i];
+          const [r, g, b] = c.rgb;
+          const rmean = (r + targetRgb[0]) / 2;
+          const rdiff = r - targetRgb[0];
+          const gdiff = g - targetRgb[1];
+          const bdiff = b - targetRgb[2];
+          const dist = Math.sqrt(
+            (((512 + rmean) * rdiff * rdiff) >> 8) +
+              4 * gdiff * gdiff +
+              (((767 - rmean) * bdiff * bdiff) >> 8)
+          );
+          if (dist < bestScore) {
+            bestScore = dist;
+            bestId = c.id;
+            bestRgb = [...c.rgb];
+            if (dist === 0) break;
+          }
+        }
+      } else {
+        const [Lt, at, bt] = Utils._lab(targetRgb[0], targetRgb[1], targetRgb[2]);
+        const targetChroma = Math.sqrt(at * at + bt * bt);
+        const penaltyWeight = state.enableChromaPenalty ? state.chromaPenaltyWeight || 0.15 : 0;
+
+        for (let i = 0; i < palette.length; i++) {
+          const c = palette[i];
+          const [r, g, b] = c.rgb;
+          const [L2, a2, b2] = Utils._lab(r, g, b);
+          const dL = Lt - L2,
+            da = at - a2,
+            db = bt - b2;
+          let dist = dL * dL + da * da + db * db;
+
+          if (penaltyWeight > 0 && targetChroma > 20) {
+            const candChroma = Math.sqrt(a2 * a2 + b2 * b2);
+            if (candChroma < targetChroma) {
+              const cd = targetChroma - candChroma;
+              dist += cd * cd * penaltyWeight;
+            }
+          }
+
+          if (dist < bestScore) {
+            bestScore = dist;
+            bestId = c.id;
+            bestRgb = [...c.rgb];
+            if (dist === 0) break;
+          }
+        }
+      }
+
+      const result = { id: bestId, rgb: bestRgb };
+      colorCache.set(cacheKey, result);
+
+      // ограничение кеша
+      if (colorCache.size > 15000) {
+        const firstKey = colorCache.keys().next().value;
+        colorCache.delete(firstKey);
+      }
+
+      return result;
+    },
+
     createImageUploader: () =>
       new Promise((resolve) => {
         const input = document.createElement('input');
@@ -1827,7 +1932,7 @@
       }),
 
     extractAvailableColors: () => {
-      const colorElements = document.querySelectorAll('[id^="color-"]');
+      const colorElements = document.querySelectorAll('.tooltip button[id^="color-"]');
 
       // Separate available and unavailable colors
       const availableColors = [];
@@ -1838,7 +1943,11 @@
         if (id === 0) return; // Skip transparent color
 
         const rgbStr = el.style.backgroundColor.match(/\d+/g);
-        const rgb = rgbStr ? rgbStr.map(Number) : [0, 0, 0];
+        if (!rgbStr || rgbStr.length < 3) {
+          console.warn(`Skipping color element ${el.id} — cannot parse RGB`);
+          return;
+        }
+        const rgb = rgbStr.map(Number);
 
         // Find color name from COLOR_MAP
         const colorInfo = Object.values(CONFIG.COLOR_MAP).find((color) => color.id === id);
@@ -2114,54 +2223,83 @@
       }
     },
 
-    saveProgress: () => {
-      try {
-        // Pack painted map if available
-        let paintedMapPacked = null;
-        if (state.paintedMap && state.imageData) {
-          const data = Utils.packPaintedMapToBase64(
-            state.paintedMap,
-            state.imageData.width,
-            state.imageData.height
-          );
-          if (data) {
-            paintedMapPacked = {
+    buildPaintedMapPacked() {
+      if (state.paintedMap && state.imageData) {
+        const data = Utils.packPaintedMapToBase64(
+          state.paintedMap,
+          state.imageData.width,
+          state.imageData.height
+        );
+        if (data) {
+          return {
+            width: state.imageData.width,
+            height: state.imageData.height,
+            data: data,
+          };
+        }
+      }
+      return null;
+    },
+
+    buildProgressData() {
+      return {
+        timestamp: Date.now(),
+        version: '2.2',
+        state: {
+          totalPixels: state.totalPixels,
+          paintedPixels: state.paintedPixels,
+          lastPosition: state.lastPosition,
+          startPosition: state.startPosition,
+          region: state.region,
+          imageLoaded: state.imageLoaded,
+          colorsChecked: state.colorsChecked,
+          coordinateMode: state.coordinateMode,
+          coordinateDirection: state.coordinateDirection,
+          coordinateSnake: state.coordinateSnake,
+          blockWidth: state.blockWidth,
+          blockHeight: state.blockHeight,
+          availableColors: state.availableColors,
+        },
+        imageData: state.imageData
+          ? {
               width: state.imageData.width,
               height: state.imageData.height,
-              data: data,
-            };
-          }
-        }
+              pixels: Array.from(state.imageData.pixels),
+              totalPixels: state.imageData.totalPixels,
+            }
+          : null,
+        paintedMapPacked: Utils.buildPaintedMapPacked(),
+      };
+    },
 
-        const progressData = {
-          timestamp: Date.now(),
-          version: '2.2',
-          state: {
-            totalPixels: state.totalPixels,
-            paintedPixels: state.paintedPixels,
-            lastPosition: state.lastPosition,
-            startPosition: state.startPosition,
-            region: state.region,
-            imageLoaded: state.imageLoaded,
-            colorsChecked: state.colorsChecked,
-            availableColors: state.availableColors,
-            // Добавляем настройки генерации координат
-            coordinateMode: state.coordinateMode,
-            coordinateDirection: state.coordinateDirection,
-            coordinateSnake: state.coordinateSnake,
-            blockWidth: state.blockWidth,
-            blockHeight: state.blockHeight,
-          },
-          imageData: state.imageData
-            ? {
-                width: state.imageData.width,
-                height: state.imageData.height,
-                pixels: Array.from(state.imageData.pixels),
-                totalPixels: state.imageData.totalPixels,
-              }
-            : null,
-          paintedMapPacked: paintedMapPacked,
-        };
+    migrateProgress(saved) {
+      if (!saved) return null;
+
+      let data = saved;
+      const ver = data.version;
+
+      // если версия не указана или <= 1.x → сначала в v2
+      if (!ver || ver === '1' || ver === '1.0' || ver === '1.1') {
+        data = Utils.migrateProgressToV2(data);
+      }
+
+      // если всё ещё старее v2.1 → мигрируем в 2.1
+      if (data.version === '2' || data.version === '2.0') {
+        data = Utils.migrateProgressToV21(data);
+      }
+
+      // если всё ещё старее v2.2 → мигрируем в 2.2
+      if (data.version === '2.1') {
+        data = Utils.migrateProgressToV22(data);
+      }
+
+      // теперь точно последняя версия
+      return data;
+    },
+
+    saveProgress: () => {
+      try {
+        const progressData = Utils.buildProgressData(state);
 
         localStorage.setItem('wplace-bot-progress', JSON.stringify(progressData));
         return true;
@@ -2176,27 +2314,14 @@
         const saved = localStorage.getItem('wplace-bot-progress');
         if (!saved) return null;
         let data = JSON.parse(saved);
-        const ver = data.version;
-        let migrated = data;
-
-        // Миграция для новых версий
-        if (ver === '2.2') {
-          // already latest
-        } else if (ver === '2.1') {
-          migrated = Utils.migrateProgressToV22(data);
-        } else if (ver === '2' || ver === '2.0') {
-          migrated = Utils.migrateProgressToV22(Utils.migrateProgressToV21(data));
-        } else {
-          migrated = Utils.migrateProgressToV22(Utils.migrateProgressToV21(data));
-        }
+        const migrated = Utils.migrateProgress(data);
 
         if (migrated && migrated !== data) {
           try {
             localStorage.setItem('wplace-bot-progress', JSON.stringify(migrated));
           } catch {}
-          data = migrated;
         }
-        return data;
+        return migrated;
       } catch (error) {
         console.error('Error loading progress:', error);
         return null;
@@ -2289,47 +2414,7 @@
 
     saveProgressToFile: () => {
       try {
-        // Pack painted map if available
-        let paintedMapPacked = null;
-        if (state.paintedMap && state.imageData) {
-          const data = Utils.packPaintedMapToBase64(
-            state.paintedMap,
-            state.imageData.width,
-            state.imageData.height
-          );
-          if (data) {
-            paintedMapPacked = {
-              width: state.imageData.width,
-              height: state.imageData.height,
-              data: data,
-            };
-          }
-        }
-
-        const progressData = {
-          timestamp: Date.now(),
-          version: '2.1',
-          state: {
-            totalPixels: state.totalPixels,
-            paintedPixels: state.paintedPixels,
-            lastPosition: state.lastPosition,
-            startPosition: state.startPosition,
-            region: state.region,
-            imageLoaded: state.imageLoaded,
-            colorsChecked: state.colorsChecked,
-            availableColors: state.availableColors,
-          },
-          imageData: state.imageData
-            ? {
-                width: state.imageData.width,
-                height: state.imageData.height,
-                pixels: Array.from(state.imageData.pixels),
-                totalPixels: state.imageData.totalPixels,
-              }
-            : null,
-          paintedMapPacked: paintedMapPacked,
-        };
-
+        const progressData = Utils.buildProgressData();
         const filename = `wplace-bot-progress-${new Date()
           .toISOString()
           .slice(0, 19)
@@ -2348,14 +2433,8 @@
         if (!data || !data.state) {
           throw new Error('Invalid file format');
         }
-        const ver = data.version;
-        let migrated = data;
-        if (ver === '2.1') {
-        } else if (ver === '2' || ver === '2.0') {
-          migrated = Utils.migrateProgressToV21(data) || data;
-        } else {
-          migrated = Utils.migrateProgressToV21(data) || data;
-        }
+        const migrated = Utils.migrateProgress(data);
+
         const success = Utils.restoreProgress(migrated);
         return success;
       } catch (error) {
@@ -2642,90 +2721,9 @@
   // COLOR MATCHING FUNCTION - Optimized with caching
   const colorCache = new Map();
 
-  function findClosestColor(targetRgb, availableColors) {
-    if (!availableColors || availableColors.length === 0) return 1;
-    const cacheKey = `${targetRgb[0]},${targetRgb[1]},${targetRgb[2]}|${
-      state.colorMatchingAlgorithm
-    }|${state.enableChromaPenalty ? 'c' : 'nc'}|${state.chromaPenaltyWeight}`;
-    if (colorCache.has(cacheKey)) return colorCache.get(cacheKey);
-
-    const whiteThreshold = state.customWhiteThreshold || CONFIG.WHITE_THRESHOLD;
-    if (
-      targetRgb[0] >= whiteThreshold &&
-      targetRgb[1] >= whiteThreshold &&
-      targetRgb[2] >= whiteThreshold
-    ) {
-      const whiteEntry = availableColors.find(
-        (c) =>
-          c.rgb[0] >= whiteThreshold && c.rgb[1] >= whiteThreshold && c.rgb[2] >= whiteThreshold
-      );
-      if (whiteEntry) {
-        colorCache.set(cacheKey, whiteEntry.id);
-        return whiteEntry.id;
-      }
-    }
-
-    let bestId = availableColors[0].id;
-    let bestScore = Infinity;
-
-    if (state.colorMatchingAlgorithm === 'legacy') {
-      for (let i = 0; i < availableColors.length; i++) {
-        const c = availableColors[i];
-        const [r, g, b] = c.rgb;
-        const rmean = (r + targetRgb[0]) / 2;
-        const rdiff = r - targetRgb[0];
-        const gdiff = g - targetRgb[1];
-        const bdiff = b - targetRgb[2];
-        const dist = Math.sqrt(
-          (((512 + rmean) * rdiff * rdiff) >> 8) +
-            4 * gdiff * gdiff +
-            (((767 - rmean) * bdiff * bdiff) >> 8)
-        );
-        if (dist < bestScore) {
-          bestScore = dist;
-          bestId = c.id;
-          if (dist === 0) break;
-        }
-      }
-    } else {
-      // lab
-      const [Lt, at, bt] = Utils._lab(targetRgb[0], targetRgb[1], targetRgb[2]);
-      const targetChroma = Math.sqrt(at * at + bt * bt);
-      const penaltyWeight = state.enableChromaPenalty ? state.chromaPenaltyWeight || 0.15 : 0;
-      for (let i = 0; i < availableColors.length; i++) {
-        const c = availableColors[i];
-        const [r, g, b] = c.rgb;
-        const [L2, a2, b2] = Utils._lab(r, g, b);
-        const dL = Lt - L2,
-          da = at - a2,
-          db = bt - b2;
-        let dist = dL * dL + da * da + db * db;
-        if (penaltyWeight > 0 && targetChroma > 20) {
-          const candChroma = Math.sqrt(a2 * a2 + b2 * b2);
-          if (candChroma < targetChroma) {
-            const cd = targetChroma - candChroma;
-            dist += cd * cd * penaltyWeight;
-          }
-        }
-        if (dist < bestScore) {
-          bestScore = dist;
-          bestId = c.id;
-          if (dist === 0) break;
-        }
-      }
-    }
-
-    colorCache.set(cacheKey, bestId);
-    if (colorCache.size > 15000) {
-      const firstKey = colorCache.keys().next().value;
-      colorCache.delete(firstKey);
-    }
-    return bestId;
-  }
-
   // UI UPDATE FUNCTIONS (declared early to avoid reference errors)
   let updateUI = () => {};
-  let updateStats = () => {};
+  let updateStats = (isManualRefresh) => {};
   let updateDataButtons = () => {};
 
   function updateActiveColorPalette() {
@@ -3271,6 +3269,7 @@
       }
     `;
 
+    // noinspection CssInvalidFunction
     settingsContainer.innerHTML = `
       <div class="wplace-settings-header">
         <div class="wplace-settings-title-wrapper">
@@ -3556,7 +3555,7 @@
             </p>
           </div>
         </div>
-
+        <!-- Todo separate styles of coord to css -->
         <!-- Notifications Section -->
         <div class="wplace-settings-section">
           <label class="wplace-settings-section-label">
@@ -4694,7 +4693,7 @@
       }
     }
 
-    updateStats = async () => {
+    updateStats = async (isManualRefresh = false) => {
       const { charges, max, cooldown } = await WPlaceService.getCharges();
       state.currentCharges = Math.floor(charges);
       state.cooldown = cooldown;
@@ -4713,7 +4712,7 @@
       state.fullChargeInterval = setInterval(updateFullChargeDisplay, 1000);
       updateFullChargeDisplay();
 
-      if (cooldownSlider.max != state.maxCharges) {
+      if (cooldownSlider.max !== state.maxCharges) {
         cooldownSlider.max = state.maxCharges;
       }
 
@@ -4750,6 +4749,28 @@
       }
 
       let colorSwatchesHTML = '';
+      const availableColors = Utils.extractAvailableColors();
+      if (availableColors.length < 10 && isManualRefresh) {
+        Utils.showAlert(Utils.t('noColorsFound'), 'warning');
+      }
+      state.availableColors = state.availableColors.filter(
+        (c) => c.name !== 'Unknown CoIor NaN' && c.id !== null
+      );
+
+      if (state.availableColors.length < availableColors.length) {
+        const oldCount = state.availableColors.length;
+        const newCount = availableColors.length;
+
+        Utils.showAlert(
+          Utils.t('colorsUpdated', {
+            oldCount: oldCount,
+            newCount: newCount,
+            diffCount: oldCount - newCount,
+          }),
+          'success'
+        );
+        state.availableColors = availableColors;
+      }
       if (state.colorsChecked) {
         colorSwatchesHTML = state.availableColors
           .map((color) => {
@@ -5824,7 +5845,7 @@
 
         // Keep state.imageData.processor as the original-based source; painting uses paletted pixels already stored
 
-        updateStats();
+        updateStats(true);
         updateUI('resizeSuccess', 'success', {
           width: newWidth,
           height: newHeight,
@@ -6194,283 +6215,310 @@
     NotificationManager.syncFromState();
   }
 
+  function getRemainingMsToThreshold(threshold) {
+    if (!state.fullChargeData) return state.cooldown; // fallback
+
+    const { current, cooldownMs, startTime } = state.fullChargeData;
+
+    const elapsed = Date.now() - startTime;
+    const remainingCharges = Math.max(0, threshold - current);
+    const remainingMs = remainingCharges * cooldownMs - elapsed;
+    return remainingMs;
+  }
+
+  function startChargesThresholdTicker() {
+    if (!state.fullChargeData) return;
+
+    // Если уже есть интервал, очищаем
+    if (state.chargesThresholdInterval) {
+      clearInterval(state.chargesThresholdInterval);
+    }
+    if (state.stopFlag) return;
+
+    // Вызываем сразу для мгновенного обновления
+    updateChargesThresholdUI();
+
+    state.chargesThresholdInterval = setInterval(() => {
+      updateChargesThresholdUI();
+    }, 1000);
+  }
+
+  function updateChargesThresholdUI() {
+    if (!state.fullChargeData) return;
+    const threshold = state.cooldownChargeThreshold;
+
+    const remainingMs = getRemainingMsToThreshold(state.cooldownChargeThreshold);
+
+    if (remainingMs <= 999) {
+      if (state.chargesThresholdInterval) {
+        clearInterval(state.chargesThresholdInterval);
+      }
+      updateUI('startPaintingMsg', 'success');
+      return; // Уже достигли порога
+    }
+
+    let timeText = Utils.msToTimeText(remainingMs);
+
+    updateUI(
+      'noChargesThreshold',
+      'warning',
+      {
+        threshold,
+        time: timeText,
+      },
+      true
+    );
+  }
+
+  function generateCoordinates(
+    width,
+    height,
+    mode = 'rows',
+    direction = 'top-left',
+    snake = false,
+    blockWidth = 6,
+    blockHeight = 2
+  ) {
+    const coords = [];
+    console.log(
+      'Generating coordinates with \n  mode:',
+      mode,
+      '\n  direction:',
+      direction,
+      '\n  snake:',
+      snake,
+      '\n  blockWidth:',
+      blockWidth,
+      '\n  blockHeight:',
+      blockHeight
+    );
+    // --------- стандартные 4 угла ----------
+    let xStart, xEnd, xStep;
+    let yStart, yEnd, yStep;
+    switch (direction) {
+      case 'top-left':
+        xStart = 0;
+        xEnd = width;
+        xStep = 1;
+        yStart = 0;
+        yEnd = height;
+        yStep = 1;
+        break;
+      case 'top-right':
+        xStart = width - 1;
+        xEnd = -1;
+        xStep = -1;
+        yStart = 0;
+        yEnd = height;
+        yStep = 1;
+        break;
+      case 'bottom-left':
+        xStart = 0;
+        xEnd = width;
+        xStep = 1;
+        yStart = height - 1;
+        yEnd = -1;
+        yStep = -1;
+        break;
+      case 'bottom-right':
+        xStart = width - 1;
+        xEnd = -1;
+        xStep = -1;
+        yStart = height - 1;
+        yEnd = -1;
+        yStep = -1;
+        break;
+      default:
+        throw new Error(`Unknown direction: ${direction}`);
+    }
+
+    // --------- режимы обхода ----------
+    if (mode === 'rows') {
+      for (let y = yStart; y !== yEnd; y += yStep) {
+        if (snake && (y - yStart) % 2 !== 0) {
+          for (let x = xEnd - xStep; x !== xStart - xStep; x -= xStep) {
+            coords.push([x, y]);
+          }
+        } else {
+          for (let x = xStart; x !== xEnd; x += xStep) {
+            coords.push([x, y]);
+          }
+        }
+      }
+    } else if (mode === 'columns') {
+      for (let x = xStart; x !== xEnd; x += xStep) {
+        if (snake && (x - xStart) % 2 !== 0) {
+          for (let y = yEnd - yStep; y !== yStart - yStep; y -= yStep) {
+            coords.push([x, y]);
+          }
+        } else {
+          for (let y = yStart; y !== yEnd; y += yStep) {
+            coords.push([x, y]);
+          }
+        }
+      }
+    } else if (mode === 'circle-out') {
+      const cx = Math.floor(width / 2);
+      const cy = Math.floor(height / 2);
+      const maxRadius = Math.ceil(Math.sqrt(cx * cx + cy * cy));
+
+      for (let r = 0; r <= maxRadius; r++) {
+        for (let y = cy - r; y <= cy + r; y++) {
+          for (let x = cx - r; x <= cx + r; x++) {
+            if (x >= 0 && x < width && y >= 0 && y < height) {
+              const dist = Math.max(Math.abs(x - cx), Math.abs(y - cy));
+              if (dist === r) coords.push([x, y]);
+            }
+          }
+        }
+      }
+    } else if (mode === 'circle-in') {
+      const cx = Math.floor(width / 2);
+      const cy = Math.floor(height / 2);
+      const maxRadius = Math.ceil(Math.sqrt(cx * cx + cy * cy));
+
+      for (let r = maxRadius; r >= 0; r--) {
+        for (let y = cy - r; y <= cy + r; y++) {
+          for (let x = cx - r; x <= cx + r; x++) {
+            if (x >= 0 && x < width && y >= 0 && y < height) {
+              const dist = Math.max(Math.abs(x - cx), Math.abs(y - cy));
+              if (dist === r) coords.push([x, y]);
+            }
+          }
+        }
+      }
+    } else if (mode === 'blocks' || mode === 'shuffle-blocks') {
+      const blocks = [];
+      for (let by = 0; by < height; by += blockHeight) {
+        for (let bx = 0; bx < width; bx += blockWidth) {
+          const block = [];
+          for (let y = by; y < Math.min(by + blockHeight, height); y++) {
+            for (let x = bx; x < Math.min(bx + blockWidth, width); x++) {
+              block.push([x, y]);
+            }
+          }
+          blocks.push(block);
+        }
+      }
+
+      if (mode === 'shuffle-blocks') {
+        // простая тасовка Фишера-Йетса
+        for (let i = blocks.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [blocks[i], blocks[j]] = [blocks[j], blocks[i]];
+        }
+      }
+
+      // склеиваем все блоки
+      for (const block of blocks) {
+        coords.push(...block);
+      }
+    } else {
+      throw new Error(`Unknown mode: ${mode}`);
+    }
+
+    return coords;
+  }
+
+  async function flushPixelBatch(pixelBatch) {
+    if (!pixelBatch || pixelBatch.pixels.length === 0) return true;
+
+    const batchSize = pixelBatch.pixels.length;
+    console.log(
+      `📦 Sending batch with ${batchSize} pixels (region: ${pixelBatch.regionX},${pixelBatch.regionY})`
+    );
+    const success = await sendBatchWithRetry(
+      pixelBatch.pixels,
+      pixelBatch.regionX,
+      pixelBatch.regionY
+    );
+    if (success) {
+      pixelBatch.pixels.forEach((p) => {
+        state.paintedPixels++;
+        Utils.markPixelPainted(p.x, p.y, pixelBatch.regionX, pixelBatch.regionY);
+      });
+      state.currentCharges -= batchSize;
+      updateStats();
+      Utils.performSmartSave();
+
+      if (CONFIG.PAINTING_SPEED_ENABLED && state.paintingSpeed > 0 && batchSize > 0) {
+        const delayPerPixel = 1000 / state.paintingSpeed;
+        const totalDelay = Math.max(100, delayPerPixel * batchSize);
+        await Utils.sleep(totalDelay);
+      }
+    } else {
+      console.error(`❌ Batch failed permanently after retries. Stopping painting.`);
+      state.stopFlag = true;
+    }
+
+    pixelBatch.pixels = [];
+    return success;
+  }
+
   async function processImage() {
     const { width, height, pixels } = state.imageData;
     const { x: startX, y: startY } = state.startPosition;
     const { x: regionX, y: regionY } = state.region;
 
-    const tThresh2 = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
-    const isEligibleAt = (x, y) => {
+    let pixelBatch = null;
+    let skippedPixels = { transparent: 0, white: 0, alreadyPainted: 0, colorUnavailable: 0 };
+
+    const transparencyThreshold =
+      state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
+    const strictSkipUnavailable = true;
+
+    function checkPixelEligibility(x, y) {
       const idx = (y * width + x) * 4;
       const r = pixels[idx],
         g = pixels[idx + 1],
         b = pixels[idx + 2],
         a = pixels[idx + 3];
-      if (!state.paintTransparentPixels && a < tThresh2) return false;
-      if (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b)) return false;
-      return true;
-    };
 
-    let startRow = 0;
-    let startCol = 0;
-    let foundStart = false;
-    let seen = 0;
-    const target = Math.max(0, Math.min(state.paintedPixels || 0, width * height));
-    for (let y = 0; y < height && !foundStart; y++) {
-      for (let x = 0; x < width; x++) {
-        if (!isEligibleAt(x, y)) continue;
-        if (seen === target) {
-          startRow = y;
-          startCol = x;
-          foundStart = true;
-          break;
-        }
-        seen++;
-      }
-    }
-    if (!foundStart) {
-      startRow = height;
-      startCol = 0;
-    }
+      if (!state.paintTransparentPixels && a < transparencyThreshold)
+        return { eligible: false, reason: 'transparent' };
+      if (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b))
+        return { eligible: false, reason: 'white' };
 
-    let pixelBatch = null;
-    let skippedPixels = { transparent: 0, white: 0, alreadyPainted: 0 };
-
-    function getRemainingMsToThreshold(threshold) {
-      if (!state.fullChargeData) return state.cooldown; // fallback
-
-      const { current, cooldownMs, startTime } = state.fullChargeData;
-
-      const elapsed = Date.now() - startTime;
-      const remainingCharges = Math.max(0, threshold - current);
-      const remainingMs = remainingCharges * cooldownMs - elapsed;
-      return remainingMs;
-    }
-
-    function startChargesThresholdTicker() {
-      if (!state.fullChargeData) return;
-
-      // Если уже есть интервал, очищаем
-      if (state.chargesThresholdInterval) {
-        clearInterval(state.chargesThresholdInterval);
-      }
-      if (state.stopFlag) return;
-
-      // Вызываем сразу для мгновенного обновления
-      updateChargesThresholdUI();
-
-      state.chargesThresholdInterval = setInterval(() => {
-        updateChargesThresholdUI();
-      }, 1000);
-    }
-
-    function updateChargesThresholdUI() {
-      if (!state.fullChargeData) return;
-      const threshold = state.cooldownChargeThreshold;
-
-      const remainingMs = getRemainingMsToThreshold(state.cooldownChargeThreshold);
-
-      if (remainingMs <= 999) {
-        if (state.chargesThresholdInterval) {
-          clearInterval(state.chargesThresholdInterval);
-        }
-        updateUI('startPaintingMsg', 'success');
-        return; // Уже достигли порога
-      }
-
-      let timeText = Utils.msToTimeText(remainingMs);
-
-      updateUI(
-        'noChargesThreshold',
-        'warning',
-        {
-          threshold,
-          time: timeText,
-        },
-        true
+      let targetRgb = Utils.isWhitePixel(r, g, b)
+        ? [255, 255, 255]
+        : Utils.findClosestPaletteColor(r, g, b, state.activeColorPalette);
+      const colorCheck = Utils.resolveColor(
+        targetRgb,
+        state.availableColors,
+        strictSkipUnavailable
       );
+
+      if (strictSkipUnavailable && !colorCheck.id)
+        return { eligible: false, reason: 'colorUnavailable' };
+
+      return { eligible: true, r, g, b, a, colorId: colorCheck.id };
     }
 
-    function generateCoordinates(
-      width,
-      height,
-      mode = 'rows',
-      direction = 'top-left',
-      snake = false,
-      blockWidth = 6,
-      blockHeight = 2
-    ) {
-      const coords = [];
-      console.log(
-        'Generating coordinates with \n  mode:',
-        mode,
-        '\n  direction:',
-        direction,
-        '\n  snake:',
-        snake,
-        '\n  blockWidth:',
-        blockWidth,
-        '\n  blockHeight:',
-        blockHeight
-      );
-      // --------- стандартные 4 угла ----------
-      let xStart, xEnd, xStep;
-      let yStart, yEnd, yStep;
-      switch (direction) {
-        case 'top-left':
-          xStart = 0;
-          xEnd = width;
-          xStep = 1;
-          yStart = 0;
-          yEnd = height;
-          yStep = 1;
-          break;
-        case 'top-right':
-          xStart = width - 1;
-          xEnd = -1;
-          xStep = -1;
-          yStart = 0;
-          yEnd = height;
-          yStep = 1;
-          break;
-        case 'bottom-left':
-          xStart = 0;
-          xEnd = width;
-          xStep = 1;
-          yStart = height - 1;
-          yEnd = -1;
-          yStep = -1;
-          break;
-        case 'bottom-right':
-          xStart = width - 1;
-          xEnd = -1;
-          xStep = -1;
-          yStart = height - 1;
-          yEnd = -1;
-          yStep = -1;
-          break;
-        default:
-          throw new Error(`Unknown direction: ${direction}`);
+    function skipPixel(reason, id, rgb, x, y) {
+      if (reason !== 'transparent') {
+        console.log(`Skipped ${reason} pixel (id: ${id}, (${rgb.join(', ')})) at (${x}, ${y})`);
       }
-
-      // --------- режимы обхода ----------
-      if (mode === 'rows') {
-        for (let y = yStart; y !== yEnd; y += yStep) {
-          if (snake && (y - yStart) % 2 !== 0) {
-            for (let x = xEnd - xStep; x !== xStart - xStep; x -= xStep) {
-              coords.push([x, y]);
-            }
-          } else {
-            for (let x = xStart; x !== xEnd; x += xStep) {
-              coords.push([x, y]);
-            }
-          }
-        }
-      } else if (mode === 'columns') {
-        for (let x = xStart; x !== xEnd; x += xStep) {
-          if (snake && (x - xStart) % 2 !== 0) {
-            for (let y = yEnd - yStep; y !== yStart - yStep; y -= yStep) {
-              coords.push([x, y]);
-            }
-          } else {
-            for (let y = yStart; y !== yEnd; y += yStep) {
-              coords.push([x, y]);
-            }
-          }
-        }
-      } else if (mode === 'circle-out') {
-        const cx = Math.floor(width / 2);
-        const cy = Math.floor(height / 2);
-        const maxRadius = Math.ceil(Math.sqrt(cx * cx + cy * cy));
-
-        for (let r = 0; r <= maxRadius; r++) {
-          for (let y = cy - r; y <= cy + r; y++) {
-            for (let x = cx - r; x <= cx + r; x++) {
-              if (x >= 0 && x < width && y >= 0 && y < height) {
-                const dist = Math.max(Math.abs(x - cx), Math.abs(y - cy));
-                if (dist === r) coords.push([x, y]);
-              }
-            }
-          }
-        }
-      } else if (mode === 'circle-in') {
-        const cx = Math.floor(width / 2);
-        const cy = Math.floor(height / 2);
-        const maxRadius = Math.ceil(Math.sqrt(cx * cx + cy * cy));
-
-        for (let r = maxRadius; r >= 0; r--) {
-          for (let y = cy - r; y <= cy + r; y++) {
-            for (let x = cx - r; x <= cx + r; x++) {
-              if (x >= 0 && x < width && y >= 0 && y < height) {
-                const dist = Math.max(Math.abs(x - cx), Math.abs(y - cy));
-                if (dist === r) coords.push([x, y]);
-              }
-            }
-          }
-        }
-      } else if (mode === 'blocks' || mode === 'shuffle-blocks') {
-        const blocks = [];
-        for (let by = 0; by < height; by += blockHeight) {
-          for (let bx = 0; bx < width; bx += blockWidth) {
-            const block = [];
-            for (let y = by; y < Math.min(by + blockHeight, height); y++) {
-              for (let x = bx; x < Math.min(bx + blockWidth, width); x++) {
-                block.push([x, y]);
-              }
-            }
-            blocks.push(block);
-          }
-        }
-
-        if (mode === 'shuffle-blocks') {
-          // простая тасовка Фишера-Йетса
-          for (let i = blocks.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [blocks[i], blocks[j]] = [blocks[j], blocks[i]];
-          }
-        }
-
-        // склеиваем все блоки
-        for (const block of blocks) {
-          coords.push(...block);
-        }
-      } else {
-        throw new Error(`Unknown mode: ${mode}`);
-      }
-
-      return coords;
+      skippedPixels[reason]++;
     }
 
     try {
-      // Используем настройки из состояния
       const coords = generateCoordinates(
         width,
         height,
-        state.coordinateMode || 'rows',
-        state.coordinateDirection || 'bottom-left',
-        state.coordinateSnake !== false, // по умолчанию true
-        state.blockWidth || 6, // blockWidth
-        state.blockHeight || 2 // blockHeight
+        state.coordinateMode,
+        state.coordinateDirection,
+        state.coordinateSnake,
+        state.blockWidth,
+        state.blockHeight
       );
 
       outerLoop: for (const [x, y] of coords) {
         if (state.stopFlag) {
           if (pixelBatch && pixelBatch.pixels.length > 0) {
             console.log(
-              `🎯 Sending final batch before stop with ${pixelBatch.pixels.length} pixels`
+              `🎯 Sending last batch before stop with ${pixelBatch.pixels.length} pixels`
             );
-            const success = await sendBatchWithRetry(
-              pixelBatch.pixels,
-              pixelBatch.regionX,
-              pixelBatch.regionY
-            );
-            if (success) {
-              pixelBatch.pixels.forEach(() => {
-                state.paintedPixels++;
-              });
-              state.currentCharges -= pixelBatch.pixels.length;
-              updateStats();
-            }
+            await flushPixelBatch(pixelBatch);
           }
           state.lastPosition = { x, y };
           if (state.chargesThresholdInterval) {
@@ -6480,34 +6528,7 @@
           break outerLoop;
         }
 
-        const idx = (y * width + x) * 4;
-        const r = pixels[idx];
-        const g = pixels[idx + 1];
-        const b = pixels[idx + 2];
-        const alpha = pixels[idx + 3];
-
-        const tThresh2 = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
-        if (
-          (!state.paintTransparentPixels && alpha < tThresh2) ||
-          (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b))
-        ) {
-          if (!state.paintTransparentPixels && alpha < tThresh2) {
-            skippedPixels.transparent++;
-          } else {
-            skippedPixels.white++;
-          }
-          continue;
-        }
-
-        let targetRgb;
-        if (Utils.isWhitePixel(r, g, b)) {
-          targetRgb = [255, 255, 255];
-        } else {
-          targetRgb = Utils.findClosestPaletteColor(r, g, b, state.activeColorPalette);
-        }
-
-        const colorId = findClosestColor([r, g, b], state.availableColors);
-
+        const targetPixelInfo = checkPixelEligibility(x, y);
         let absX = startX + x;
         let absY = startY + y;
 
@@ -6515,6 +6536,21 @@
         let adderY = Math.floor(absY / 1000);
         let pixelX = absX % 1000;
         let pixelY = absY % 1000;
+        const targetColorId = targetPixelInfo.colorId;
+
+        if (!targetPixelInfo.eligible) {
+          skipPixel(
+            targetPixelInfo.reason,
+            targetColorId,
+            [targetPixelInfo.r, targetPixelInfo.g, targetPixelInfo.b],
+            pixelX,
+            pixelY
+          );
+          continue;
+        }
+
+        console.log(`[DEBUG] Pixel at (${pixelX}, ${pixelY}) eligible: RGB=${targetPixelInfo.r}, ${targetPixelInfo.g}, ${targetPixelInfo.b},
+         alpha=${targetPixelInfo.a}, colorId=${targetColorId}`);
 
         if (
           !pixelBatch ||
@@ -6527,25 +6563,9 @@
                 pixelBatch.pixels.length
               } pixels (switching to region ${regionX + adderX},${regionY + adderY})`
             );
-            const success = await sendBatchWithRetry(
-              pixelBatch.pixels,
-              pixelBatch.regionX,
-              pixelBatch.regionY
-            );
+            const success = await flushBatch(pixelBatch);
 
             if (success) {
-              pixelBatch.pixels.forEach((p) => {
-                state.paintedPixels++;
-                Utils.markPixelPainted(p.x, p.y, pixelBatch.regionX, pixelBatch.regionY);
-              });
-              state.currentCharges -= pixelBatch.pixels.length;
-              updateUI('paintingProgress', 'default', {
-                painted: state.paintedPixels,
-                total: state.totalPixels,
-              });
-
-              Utils.performSmartSave();
-
               if (
                 CONFIG.PAINTING_SPEED_ENABLED &&
                 state.paintingSpeed > 0 &&
@@ -6571,34 +6591,50 @@
         }
 
         try {
-          const tileRegionX = pixelBatch ? pixelBatch.regionX : regionX + adderX;
-          const tileRegionY = pixelBatch ? pixelBatch.regionY : regionY + adderY;
-          const tileKeyParts = [regionX + adderX, regionY + adderY];
-          const existingColorRGBA = await overlayManager
-            .getTilePixelColor(tileKeyParts[0], tileKeyParts[1], pixelX, pixelY)
-            .catch(() => null);
+          const tileKeyParts = [pixelBatch.regionX, pixelBatch.regionY];
+
+          const existingColorRGBA = await overlayManager.getTilePixelColor(
+            tileKeyParts[0],
+            tileKeyParts[1],
+            pixelX,
+            pixelY
+          );
+
           if (existingColorRGBA && Array.isArray(existingColorRGBA)) {
             const [er, eg, eb] = existingColorRGBA;
-            const existingColorId = findClosestColor([er, eg, eb], state.availableColors);
-            // console.log(`pixel at (${pixelX}, ${pixelY}) has color ${existingColorId} it should be ${colorId}`);
-            if (existingColorId === colorId) {
-              skippedPixels.alreadyPainted++;
-              console.log(`Skipped already painted pixel at (${pixelX}, ${pixelY})`);
-              continue; // Skip
+
+            const existingColor = Utils.resolveColor([er, eg, eb], state.availableColors);
+            if (existingColor.id === targetColorId) {
+              skipPixel(
+                'alreadyPainted',
+                targetColorId,
+                [targetPixelInfo.r, targetPixelInfo.g, targetPixelInfo.b],
+                pixelX,
+                pixelY
+              );
+              continue;
             }
+          } else {
+            console.log(
+              `[DEBUG] Pixel (${pixelX}, ${pixelY}) has no existing color or invalid data:`,
+              existingColorRGBA
+            );
           }
         } catch (e) {
-          /* ignore */
+          console.error(`[DEBUG] Error checking existing pixel at (${pixelX}, ${pixelY}):`, e);
         }
 
         pixelBatch.pixels.push({
           x: pixelX,
           y: pixelY,
-          color: colorId,
+          color: targetColorId,
           localX: x,
           localY: y,
         });
-
+        console.log(
+          `[DEBUG] pixelBatch.pixels.push Pixel (${pixelX}, ${pixelY}) Target color id: ${targetColorId}, target RGB: [${targetPixelInfo.r}, ${targetPixelInfo.g}, ${targetPixelInfo.b}]`
+        );
+        debugger;
         const maxBatchSize = calculateBatchSize();
         if (pixelBatch.pixels.length >= maxBatchSize) {
           const modeText =
@@ -6608,40 +6644,8 @@
           console.log(
             `📦 Sending batch with ${pixelBatch.pixels.length} pixels (mode: ${modeText}, target: ${maxBatchSize})`
           );
-          const success = await sendBatchWithRetry(
-            pixelBatch.pixels,
-            pixelBatch.regionX,
-            pixelBatch.regionY
-          );
-
-          if (success) {
-            pixelBatch.pixels.forEach((pixel) => {
-              state.paintedPixels++;
-              // Mark pixel as painted in map
-              Utils.markPixelPainted(pixel.x, pixel.y, pixelBatch.regionX, pixelBatch.regionY);
-            });
-
-            state.currentCharges -= pixelBatch.pixels.length;
-            updateStats();
-            updateUI('paintingProgress', 'default', {
-              painted: state.paintedPixels,
-              total: state.totalPixels,
-            });
-
-            // Use smart save instead of fixed interval
-            Utils.performSmartSave();
-
-            if (
-              CONFIG.PAINTING_SPEED_ENABLED &&
-              state.paintingSpeed > 0 &&
-              pixelBatch.pixels.length > 0
-            ) {
-              const delayPerPixel = 1000 / state.paintingSpeed;
-              const totalDelay = Math.max(100, delayPerPixel * pixelBatch.pixels.length);
-              await Utils.sleep(totalDelay);
-            }
-          } else {
-            // If batch failed after all retries, stop painting to prevent infinite loops
+          const success = await flushPixelBatch(pixelBatch);
+          if (!success) {
             console.error(`❌ Batch failed permanently after retries. Stopping painting.`);
             state.stopFlag = true;
             break outerLoop;
@@ -6667,40 +6671,14 @@
 
         if (!state.stopFlag) saveBtn.disabled = true;
         if (state.stopFlag) {
-          if (state.chargesThresholdInterval) {
-            clearInterval(state.chargesThresholdInterval);
-          }
           break outerLoop;
         }
       }
 
       if (pixelBatch && pixelBatch.pixels.length > 0 && !state.stopFlag) {
         console.log(`🏁 Sending final batch with ${pixelBatch.pixels.length} pixels`);
-        const success = await sendBatchWithRetry(
-          pixelBatch.pixels,
-          pixelBatch.regionX,
-          pixelBatch.regionY
-        );
-        if (success) {
-          pixelBatch.pixels.forEach((pixel) => {
-            state.paintedPixels++;
-            // Mark pixel as painted in map
-            Utils.markPixelPainted(pixel.x, pixel.y, pixelBatch.regionX, pixelBatch.regionY);
-          });
-          state.currentCharges -= pixelBatch.pixels.length;
-          // Final save with painted map
-          Utils.saveProgress();
-
-          if (
-            CONFIG.PAINTING_SPEED_ENABLED &&
-            state.paintingSpeed > 0 &&
-            pixelBatch.pixels.length > 0
-          ) {
-            const delayPerPixel = 1000 / state.paintingSpeed;
-            const totalDelay = Math.max(100, delayPerPixel * pixelBatch.pixels.length);
-            await Utils.sleep(totalDelay);
-          }
-        } else {
+        const success = await flushPixelBatch(pixelBatch);
+        if (!success) {
           console.warn(
             `⚠️ Final batch failed with ${pixelBatch.pixels.length} pixels after all retries.`
           );
@@ -6708,6 +6686,7 @@
       }
     } finally {
       if (window._chargesInterval) clearInterval(window._chargesInterval);
+      if (state.chargesThresholdInterval) clearInterval(state.chargesThresholdInterval);
       window._chargesInterval = null;
     }
 
@@ -7196,12 +7175,17 @@
           '⚠️ Startup token generation failed (no token received), will retry when needed'
         );
         updateUI('tokenRetryLater', 'warning');
+        // Still enable file operations even if initial token generation fails
+        // Users can load progress and use manual/hybrid modes
         enableFileOperations();
       }
     } catch (error) {
       console.error('❌ Critical error during Turnstile initialization:', error); // More specific error
       updateUI('tokenRetryLater', 'warning');
+      // Still enable file operations even if initial setup fails
+      // Users can load progress and use manual/hybrid modes
       enableFileOperations();
+      // Don't show error alert for initialization failures, just log them
     }
   }
 
