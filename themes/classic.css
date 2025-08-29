@@ -12,6 +12,7 @@
   --wplace-warning: #ffaa00;
 
   --wplace-radius: 12px;
+  --wplace-btn-radius: 16px;
   --wplace-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.1);
   --wplace-backdrop: blur(10px);
   --wplace-font: 'Segoe UI', Roboto, sans-serif;
@@ -156,7 +157,7 @@
   background: linear-gradient(135deg, #222222 0%, #4a4a4a 100%);
   border: 1px solid rgba(255,255,255,0.1);
   color: var(--wplace-text);
-  border-radius: var(--wplace-radius);
+  border-radius: var(--wplace-btn-radius);
   font-family: var(--wplace-font);
 }
 
@@ -352,7 +353,6 @@
 :root .wplace-section,
 .wplace-theme--classic .wplace-section {
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 :root .wplace-stats,

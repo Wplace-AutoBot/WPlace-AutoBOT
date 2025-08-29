@@ -8,9 +8,9 @@
 /* ========================= */
 
 /* Import theme files - classic is default */
-@import url('https://staninna.github.io/WPlace-AutoBOT/decoupled-css/themes/classic.css');
-@import url('https://staninna.github.io/WPlace-AutoBOT/decoupled-css/themes/classic-light.css');
-@import url('https://staninna.github.io/WPlace-AutoBOT/decoupled-css/themes/neon.css');
+@import url('https://skalsech.github.io/WPlace-AutoBOT/my_main/themes/classic.css');
+@import url('https://skalsech.github.io/WPlace-AutoBOT/my_main/themes/classic-light.css');
+@import url('https://skalsech.github.io/WPlace-AutoBOT/my_main/themes/neon.css');
 
 /* Default :root CSS variables for 100% classic theme compliance */
 /* These ensure the bot works perfectly even if theme files fail to load */
@@ -28,6 +28,7 @@
 
   /* UI properties */
   --wplace-radius: 12px;
+  --wplace-btn-radius: 16px;
   --wplace-border-style: solid;
   --wplace-border-width: 1px;
   --wplace-border-color: #222222;
@@ -48,42 +49,42 @@
   --wplace-icon-primary: #4facfe;
   --wplace-icon-secondary: #00f2fe;
   --wplace-icon-palette: #f093fb;
-  
+
   /* Additional UI colors */
   --wplace-danger: #ff6a6a;
   --wplace-danger-dark: #ff4757;
   --wplace-muted-text: #ffffffBB;
-  
+
   /* Text variants */
   --wplace-text-secondary: rgba(255,255,255,0.9);
   --wplace-text-muted: rgba(255,255,255,0.7);
   --wplace-text-dim: rgba(255,255,255,0.6);
   --wplace-text-faded: rgba(255,255,255,0.8);
-  
+
   /* Background variants */
   --wplace-bg-input: rgba(255,255,255,0.15);
   --wplace-bg-subtle: rgba(255,255,255,0.1);
   --wplace-bg-faint: rgba(255,255,255,0.08);
   --wplace-bg-ghost: rgba(255,255,255,0.06);
   --wplace-bg-whisper: rgba(255,255,255,0.05);
-  
+
   /* Border variants */
   --wplace-border-subtle: rgba(255,255,255,0.2);
   --wplace-border-faint: rgba(255,255,255,0.15);
   --wplace-border-ghost: rgba(255,255,255,0.1);
   --wplace-border-ultra-faint: rgba(255,255,255,0.05);
-  
+
   /* Shadow variants */
   --wplace-shadow-drag: 0 12px 40px rgba(0, 0, 0, 0.8), 0 0 0 2px rgba(255, 255, 255, 0.2);
   --wplace-shadow-notification: 0 4px 12px rgba(0, 0, 0, 0.3);
   --wplace-shadow-slider-thumb: 0 3px 6px rgba(0,0,0,0.3), 0 0 0 2px var(--wplace-icon-primary);
   --wplace-shadow-slider-hover: 0 4px 8px rgba(0,0,0,0.4), 0 0 0 3px var(--wplace-icon-primary);
-  
+
   /* Animation colors */
   --wplace-pulse-start: rgba(0, 255, 0, 0.7);
   --wplace-pulse-mid: rgba(0, 255, 0, 0);
   --wplace-pulse-end: rgba(0, 255, 0, 0);
-  
+
   /* Slider colors - defaults for classic compatibility */
   --wplace-slider-thumb-bg: white;
   --wplace-slider-track-bg: linear-gradient(to right, var(--wplace-icon-primary) 0%, var(--wplace-icon-secondary) 100%);
@@ -217,8 +218,8 @@
 #wplace-stats-container {
   position: fixed;
   top: 20px;
-  left: 330px;
-  width: 280px;
+  left: 310px;
+  width: 230px;
   max-height: calc(100vh - 40px);
   padding: 0;
   z-index: 9997;
@@ -320,14 +321,14 @@
 
 /* Sections */
 .wplace-status-section {
-  margin-bottom: 12px;
+  margin-bottom: 6px;
   padding: 8px;
   /* Theme-specific styling applied via theme files */
 }
 
 .wplace-section {
-  margin-bottom: 12px;
-  padding: 12px;
+  margin-bottom: 6px;
+  padding: 8px;
   /* Theme-specific styling applied via theme files */
 }
 
@@ -336,11 +337,28 @@
   font-weight: 600;
   margin-bottom: 8px;
   display: flex;
+  justify-content: space-between;
   align-items: center;
+  cursor: pointer;
   gap: 6px;
   text-transform: uppercase;
   letter-spacing: 1px;
   /* Theme-specific styling applied via theme files */
+}
+
+.wplace-section-title i.arrow {
+  transition: transform 0.3s ease;
+}
+
+.wplace-section.collapsed .wplace-controls,
+.wplace-section.collapsed .wplace-cooldown-control {
+  max-height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.wplace-section.collapsed .wplace-section-title i.arrow {
+  transform: rotate(-90deg);
 }
 
 /* ========================= */
@@ -1384,8 +1402,11 @@
 /* Settings Footer */
 .wplace-settings-footer {
   border-top: 1px solid var(--wplace-border-ghost);
-  padding-top: 20px;
+  padding: 20px;
   margin-top: 10px;
+  position: sticky;
+  bottom: 0;
+  background: var(--wplace-secondary);
 }
 
 .wplace-settings-apply-btn {
