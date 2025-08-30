@@ -268,908 +268,214 @@ function applyTheme() {
     }
   }
 
-  const loadLanguagePreference = () => {
-    try {
-      const saved = localStorage.getItem("wplace_language")
-      if (saved && TEXT[saved]) {
-        state.language = saved
-      }
-    } catch (e) {
-      console.warn("Could not load language preference:", e)
-    }
-  }
+  // Simple translation cache
+  const translationCache = new Map();
 
-  // BILINGUAL TEXT STRINGS:)
-  const TEXT = {
+  // Dynamically loaded translations
+  let loadedTranslations = {};
+
+  // Available languages
+  const AVAILABLE_LANGUAGES = ['en', 'ru', 'pt', 'vi', 'fr', 'id', 'tr', 'zh-CN', 'zh-TW', 'ja', 'ko', 'uk'];
+
+  // Function to load translations from JSON file with retry mechanism
+  const loadTranslations = async (language, retryCount = 0) => {
+    if (loadedTranslations[language]) {
+      return loadedTranslations[language];
+    }
+
+    // Load translations from CDN
+    const url = `https://staninna.github.io/WPlace-AutoBOT/decoupled-translations/lang/${language}.json`;
+    const maxRetries = 3;
+    const baseDelay = 1000; // 1 second
+    
+    try {
+      if (retryCount === 0) {
+        console.log(`🔄 Loading ${language} translations from CDN...`);
+      } else {
+        console.log(`🔄 Retrying ${language} translations (attempt ${retryCount + 1}/${maxRetries + 1})...`);
+      }
+      
+      const response = await fetch(url);
+      if (response.ok) {
+        const translations = await response.json();
+        
+        // Validate that translations is an object with keys
+        if (typeof translations === 'object' && translations !== null && Object.keys(translations).length > 0) {
+          loadedTranslations[language] = translations;
+          console.log(`📚 Loaded ${language} translations successfully from CDN (${Object.keys(translations).length} keys)`);
+          return translations;
+        } else {
+          console.warn(`❌ Invalid translation format for ${language}`);
+          throw new Error('Invalid translation format');
+        }
+      } else {
+        console.warn(`❌ CDN returned HTTP ${response.status}: ${response.statusText} for ${language} translations`);
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+    } catch (error) {
+      console.error(`❌ Failed to load ${language} translations from CDN (attempt ${retryCount + 1}):`, error);
+      
+      // Retry with exponential backoff
+      if (retryCount < maxRetries) {
+        const delay = baseDelay * Math.pow(2, retryCount);
+        console.log(`⏳ Retrying in ${delay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        return loadTranslations(language, retryCount + 1);
+      }
+    }
+    
+    return null;
+  };
+
+  const loadLanguagePreference = async () => {
+    const savedLanguage = localStorage.getItem("wplace_language");
+    const browserLocale = navigator.language;
+    const browserLanguage = browserLocale.split("-")[0];
+
+    let selectedLanguage = "en"; // Default fallback
+
+    try {
+      // Check if we have the saved language available
+      if (savedLanguage && AVAILABLE_LANGUAGES.includes(savedLanguage)) {
+        selectedLanguage = savedLanguage;
+        console.log(`🔄 Using saved language preference: ${selectedLanguage}`);
+      }
+      // Try full locale match (e.g. "zh-CN", "zh-TW" etc)
+      else if (AVAILABLE_LANGUAGES.includes(browserLocale)) {
+        selectedLanguage = browserLocale;
+        localStorage.setItem("wplace_language", browserLocale);
+        console.log(`🔄 Using browser locale: ${selectedLanguage}`);
+      }
+      // Try base language match (e.g. "en" for "en-US" or "en-GB" etc)
+      else if (AVAILABLE_LANGUAGES.includes(browserLanguage)) {
+        selectedLanguage = browserLanguage;
+        localStorage.setItem("wplace_language", browserLanguage);
+        console.log(`🔄 Using browser language: ${selectedLanguage}`);
+      }
+      // Use English as fallback
+      else {
+        console.log(`🔄 No matching language found, using English fallback`);
+      }
+
+      // Set the language in state first
+      state.language = selectedLanguage;
+
+      // Only load translations if not already loaded and not English (which should already be loaded)
+      if (selectedLanguage !== "en" && !loadedTranslations[selectedLanguage]) {
+        const loaded = await loadTranslations(selectedLanguage);
+        if (!loaded) {
+          console.warn(`⚠️ Failed to load ${selectedLanguage} translations, falling back to English`);
+          state.language = "en";
+          localStorage.setItem("wplace_language", "en");
+        }
+      }
+    } catch (error) {
+      console.error(`❌ Error in loadLanguagePreference:`, error);
+      state.language = "en"; // Always ensure we have a valid language
+    }
+  };
+  
+  // Simple user notification function for critical issues
+  const showTranslationWarning = (message) => {
+    try {
+      // Create a simple temporary notification banner
+      const warning = document.createElement('div');
+      warning.style.cssText = `
+        position: fixed; top: 10px; right: 10px; z-index: 10001;
+        background: rgba(255, 193, 7, 0.95); color: #212529; padding: 12px 16px;
+        border-radius: 8px; font-size: 14px; font-weight: 500;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3); border: 1px solid rgba(255, 193, 7, 0.8);
+        max-width: 300px; word-wrap: break-word;
+      `;
+      warning.textContent = message;
+      document.body.appendChild(warning);
+      
+      // Auto-remove after 8 seconds
+      setTimeout(() => {
+        if (warning.parentNode) {
+          warning.remove();
+        }
+      }, 8000);
+    } catch (e) {
+      // If DOM manipulation fails, just log
+      console.warn("Failed to show translation warning UI:", e);
+    }
+  };
+
+  // Initialize translations function
+  const initializeTranslations = async () => {
+    try {
+      console.log("🌐 Initializing translation system...");
+      
+      // Always ensure English is loaded as fallback first
+      if (!loadedTranslations["en"]) {
+        const englishLoaded = await loadTranslations("en");
+        if (!englishLoaded) {
+          console.warn("⚠️ Failed to load English translations from CDN, using fallback");
+          showTranslationWarning("⚠️ Translation loading failed, using basic fallbacks");
+        }
+      }
+      
+      // Then load user's language preference
+      await loadLanguagePreference();
+      
+      console.log(`✅ Translation system initialized. Active language: ${state.language}`);
+    } catch (error) {
+      console.error("❌ Translation initialization failed:", error);
+      // Ensure state has a valid language even if loading fails
+      if (!state.language) {
+        state.language = "en";
+      }
+      console.warn("⚠️ Using fallback translations due to initialization failure");
+      showTranslationWarning("⚠️ Translation system error, using basic English");
+    }
+  };
+
+  // Emergency fallback TEXT (minimal)
+  const FALLBACK_TEXT = {
     en: {
       title: "WPlace Auto-Image",
-      toggleOverlay: "Toggle Overlay",
+      settings: "Settings", 
+      close: "Close",
+      language: "Language",
+      loadingError: "Loading translations failed, using fallback",
       scanColors: "Scan Colors",
       uploadImage: "Upload Image",
-      resizeImage: "Resize Image",
-      selectPosition: "Select Position",
       startPainting: "Start Painting",
       stopPainting: "Stop Painting",
-      checkingColors: "🔍 Checking available colors...",
-      noColorsFound: "❌ Open the color palette on the site and try again!",
-      colorsFound: "✅ {count} available colors found. Ready to upload.",
-      loadingImage: "🖼️ Loading image...",
-      imageLoaded: "✅ Image loaded with {count} valid pixels",
-      imageError: "❌ Error loading image",
-      selectPositionAlert: "Paint the first pixel at the location where you want the art to start!",
-      waitingPosition: "👆 Waiting for you to paint the reference pixel...",
-      positionSet: "✅ Position set successfully!",
-      positionTimeout: "❌ Timeout for position selection",
-      startPaintingMsg: "🎨 Starting painting...",
-      paintingProgress: "🧱 Progress: {painted}/{total} pixels...",
-      noCharges: "⌛ No charges. Waiting {time}...",
-      paintingStopped: "⏹️ Painting stopped by user",
-      paintingComplete: "✅ Painting complete! {count} pixels painted.",
-      paintingError: "❌ Error during painting",
-      missingRequirements: "❌ Load an image and select a position first",
       progress: "Progress",
       pixels: "Pixels",
       charges: "Charges",
-      estimatedTime: "Estimated time",
-      initMessage: "Click 'Upload Image' to begin",
-      waitingInit: "Waiting for initialization...",
-      initializingToken: "🔧 Initializing Turnstile token generator...",
-      tokenReady: "✅ Token generator ready - you can now start painting!",
-      tokenRetryLater: "⚠️ Token generator will retry when needed",
-      resizeSuccess: "✅ Image resized to {width}x{height}",
-      paintingPaused: "⏸️ Painting paused at position X: {x}, Y: {y}",
-      captchaNeeded: "❗ Token generation failed. Please try again in a moment.",
-      saveData: "Save Progress",
-      loadData: "Load Progress",
-      saveToFile: "Save to File",
-      loadFromFile: "Load from File",
-      dataManager: "Data Manager",
-      autoSaved: "✅ Progress saved automatically",
-      dataLoaded: "✅ Progress loaded successfully",
-      fileSaved: "✅ Progress saved to file successfully",
-      fileLoaded: "✅ Progress loaded from file successfully",
-      noSavedData: "❌ No saved progress found",
-      savedDataFound: "✅ Saved progress found! Load to continue?",
-      savedDate: "Saved on: {date}",
-      clickLoadToContinue: "Click 'Load Progress' to continue.",
-      fileError: "❌ Error processing file",
-      invalidFileFormat: "❌ Invalid file format",
-      paintingSpeed: "Painting Speed",
-      pixelsPerSecond: "pixels/second",
-      speedSetting: "Speed: {speed} pixels/sec",
-      settings: "Settings",
-      botSettings: "Bot Settings",
-      close: "Close",
-      language: "Language",
-      themeSettings: "Theme Settings",
-      themeSettingsDesc: "Choose your preferred color theme for the interface.",
-      languageSelectDesc: "Select your preferred language. Changes will take effect immediately.",
-      autoCaptcha: "Auto-CAPTCHA Solver (Turnstile)",
-      autoCaptchaDesc: "Automatically generates Turnstile tokens using integrated generator. Falls back to browser automation if needed.",
-      applySettings: "Apply Settings",
-      settingsSaved: "✅ Settings saved successfully!",
-      cooldownSettings: "Cooldown Settings",
-      waitCharges: "Wait until charges reach",
-      captchaSolving: "🔑 Generating Turnstile token...",
-      captchaFailed: "❌ Turnstile token generation failed. Trying fallback method...",
-      automation: "Automation",
-      noChargesThreshold: "⌛ Waiting for charges to reach {threshold}. Currently {current}. Next in {time}...",
-    },
-    ru: {
-      title: "WPlace Авто-Изображение",
-      scanColors: "Сканировать цвета",
-      uploadImage: "Загрузить изображение",
-      resizeImage: "Изменить размер изображения",
-      selectPosition: "Выбрать позицию",
-      startPainting: "Начать рисование",
-      stopPainting: "Остановить рисование",
-      checkingColors: "🔍 Проверка доступных цветов...",
-      noColorsFound: "❌ Откройте палитру цветов на сайте и попробуйте снова!",
-      colorsFound: "✅ Найдено доступных цветов: {count}. Готово к загрузке.",
-      loadingImage: "🖼️ Загрузка изображения...",
-      imageLoaded: "✅ Изображение загружено, валидных пикселей: {count}",
-      imageError: "❌ Ошибка при загрузке изображения",
-      selectPositionAlert: "Нарисуйте первый пиксель в месте, откуда начнётся рисунок!",
-      waitingPosition: "👆 Ожидание, пока вы нарисуете опорный пиксель...",
-      positionSet: "✅ Позиция успешно установлена!",
-      positionTimeout: "❌ Время ожидания выбора позиции истекло",
-      startPaintingMsg: "🎨 Начинаем рисование...",
-      paintingProgress: "🧱 Прогресс: {painted}/{total} пикселей...",
-      noCharges: "⌛ Нет зарядов. Ожидание {time}...",
-      paintingStopped: "⏹️ Рисование остановлено пользователем",
-      paintingComplete: "✅ Рисование завершено! Нарисовано пикселей: {count}.",
-      paintingError: "❌ Ошибка во время рисования",
-      missingRequirements: "❌ Сначала загрузите изображение и выберите позицию",
-      progress: "Прогресс",
-      pixels: "Пиксели",
-      charges: "Заряды",
-      estimatedTime: "Примерное время",
-      initMessage: "Нажмите 'Загрузить изображение', чтобы начать",
-      waitingInit: "Ожидание инициализации...",
-      initializingToken: "🔧 Инициализация генератора Turnstile токенов...",
-      tokenReady: "✅ Генератор токенов готов - можете начинать рисование!",
-      tokenRetryLater: "⚠️ Генератор токенов повторит попытку при необходимости",
-      resizeSuccess: "✅ Изображение изменено до {width}x{height}",
-      paintingPaused: "⏸️ Рисование приостановлено на позиции X: {x}, Y: {y}",
-      captchaNeeded: "❗ Генерация токена не удалась. Пожалуйста, попробуйте через некоторое время.",
-      saveData: "Сохранить прогресс",
-      loadData: "Загрузить прогресс",
-      saveToFile: "Сохранить в файл",
-      loadFromFile: "Загрузить из файла",
-      dataManager: "Менеджер данных",
-      autoSaved: "✅ Прогресс сохранён автоматически",
-      dataLoaded: "✅ Прогресс успешно загружен",
-      fileSaved: "✅ Прогресс успешно сохранён в файл",
-      fileLoaded: "✅ Прогресс успешно загружен из файла",
-      noSavedData: "❌ Сохранённый прогресс не найден",
-      savedDataFound: "✅ Найден сохранённый прогресс! Загрузить, чтобы продолжить?",
-      savedDate: "Сохранено: {date}",
-      clickLoadToContinue: "Нажмите 'Загрузить прогресс', чтобы продолжить.",
-      fileError: "❌ Ошибка при обработке файла",
-      invalidFileFormat: "❌ Неверный формат файла",
-      paintingSpeed: "Скорость рисования",
-      pixelsPerSecond: "пикселей/сек",
-      speedSetting: "Скорость: {speed} пикс./сек",
-      settings: "Настройки",
-      botSettings: "Настройки бота",
-      close: "Закрыть",
-      language: "Язык",
-      themeSettings: "Настройки темы",
-      themeSettingsDesc: "Выберите предпочтительную цветовую тему интерфейса.",
-      languageSelectDesc: "Выберите предпочтительный язык. Изменения вступят в силу немедленно.",
-      autoCaptcha: "Авто-решение CAPTCHA (Turnstile)",
-      autoCaptchaDesc: "Автоматически генерирует Turnstile токены используя встроенный генератор. Возвращается к автоматизации браузера при необходимости.",
-      applySettings: "Применить настройки",
-      settingsSaved: "✅ Настройки успешно сохранены!",
-      cooldownSettings: "Настройки перезарядки",
-      waitCharges: "Ждать до накопления зарядов",
-      captchaSolving: "🔑 Генерирую Turnstile токен...",
-      captchaFailed: "❌ Не удалось сгенерировать Turnstile токен. Пробую резервный метод...",
-      automation: "Автоматизация",
-      noChargesThreshold: "⌛ Ожидание зарядов до {threshold}. Сейчас {current}. Следующий через {time}...",
-    },
-    pt: {
-      title: "WPlace Auto-Image",
-      scanColors: "Escanear Cores",
-      uploadImage: "Upload da Imagem",
-      resizeImage: "Redimensionar Imagem",
-      selectPosition: "Selecionar Posição",
-      startPainting: "Iniciar Pintura",
-      stopPainting: "Parar Pintura",
-      checkingColors: "🔍 Verificando cores disponíveis...",
-      noColorsFound: "❌ Abra a paleta de cores no site e tente novamente!",
-      colorsFound: "✅ {count} cores encontradas. Pronto para upload.",
-      loadingImage: "🖼️ Carregando imagem...",
-      imageLoaded: "✅ Imagem carregada com {count} pixels válidos",
-      imageError: "❌ Erro ao carregar imagem",
-      selectPositionAlert: "Pinte o primeiro pixel на localização onde deseja que a arte comece!",
-      waitingPosition: "👆 Aguardando você pintar o pixel de referência...",
-      positionSet: "✅ Posição definida com sucesso!",
-      positionTimeout: "❌ Tempo esgotado para selecionar posição",
-      startPaintingMsg: "🎨 Iniciando pintura...",
-      paintingProgress: "🧱 Progresso: {painted}/{total} pixels...",
-      noCharges: "⌛ Sem cargas. Aguardando {time}...",
-      paintingStopped: "⏹️ Pintura interromпида pelo usuário",
-      paintingComplete: "✅ Pintura concluída! {count} pixels pintados.",
-      paintingError: "❌ Erro durante a pintura",
-      missingRequirements: "❌ Carregue uma imagem e selecione uma posição primeiro",
-      progress: "Progresso",
-      pixels: "Pixels",
-      charges: "Cargas",
-      estimatedTime: "Tempo estimado",
-      initMessage: "Clique em 'Upload da Imagem' para começar",
-      waitingInit: "Aguardando inicialização...",
-      initializingToken: "🔧 Inicializando gerador de tokens Turnstile...",
-      tokenReady: "✅ Gerador de tokens pronto - você pode começar a pintar!",
-      tokenRetryLater: "⚠️ Gerador de tokens tentará novamente quando necessário",
-      resizeSuccess: "✅ Imagem redimensionada для {width}x{height}",
-      paintingPaused: "⏸️ Pintura pausada na posição X: {x}, Y: {y}",
-      captchaNeeded: "❗ Falha na geração de token. Tente novamente em alguns instantes.",
-      saveData: "Salvar Progresso",
-      loadData: "Carregar Progresso",
-      saveToFile: "Salvar em Arquivo",
-      loadFromFile: "Carregar de Arquivo",
-      dataManager: "Dados",
-      autoSaved: "✅ Progresso salvo automaticamente",
-      dataLoaded: "✅ Progresso carregado com sucesso",
-      fileSaved: "✅ Salvo em arquivo com sucesso",
-      fileLoaded: "✅ Carregado de arquivo com sucesso",
-      noSavedData: "❌ Nenhum progresso salvo encontrado",
-      savedDataFound: "✅ Progresso salvo encontrado! Carregar para continuar?",
-      savedDate: "Salvo em: {date}",
-      clickLoadToContinue: "Clique em 'Carregar Progresso' para continuar.",
-      fileError: "❌ Erro ao processar arquivo",
-      invalidFileFormat: "❌ Formato de arquivo inválido",
-      paintingSpeed: "Velocidade de Pintura",
-      pixelsPerSecond: "pixels/segundo",
-      speedSetting: "Velocidade: {speed} pixels/seg",
-      settings: "Configurações",
-      botSettings: "Configurações do Bot",
-      close: "Fechar",
-      language: "Idioma",
-      themeSettings: "Configurações de Tema",
-      themeSettingsDesc: "Escolha seu tema de cores preferido para a interface.",
-      languageSelectDesc: "Selecione seu idioma preferido. As alterações terão efeito imediatamente.",
-      autoCaptcha: "Resolvedor de CAPTCHA Automático",
-      autoCaptchaDesc: "Tenta resolver o CAPTCHA automaticamente simulando a colocação manual de um pixel quando o token expira.",
-      applySettings: "Aplicar Configurações",
-      settingsSaved: "✅ Configurações salvas com sucesso!",
-      cooldownSettings: "Configurações de Cooldown",
-      waitCharges: "Aguardar até as cargas atingirem",
-      captchaSolving: "🤖 Tentando resolver o CAPTCHA...",
-      captchaFailed: "❌ Falha ao resolver CAPTCHA. Pinte um pixel manualmente.",
-      automation: "Automação",
-      noChargesThreshold: "⌛ Aguardando cargas atingirem {threshold}. Atual: {current}. Próxima em {time}...",
-    },
-    vi: {
-      title: "WPlace Auto-Image",
-      scanColors: "Quét màu",
-      uploadImage: "Tải lên hình ảnh",
-      resizeImage: "Thay đổi kích thước",
-      selectPosition: "Chọn vị trí",
-      startPainting: "Bắt đầu vẽ",
-      stopPainting: "Dừng vẽ",
-      checkingColors: "🔍 Đang kiểm tra màu sắc có sẵn...",
-      noColorsFound: "❌ Hãy mở bảng màu trên trang web và thử lại!",
-      colorsFound: "✅ Tìm thấy {count} màu. Sẵn sàng để tải lên.",
-      loadingImage: "🖼️ Đang tải hình ảnh...",
-      imageLoaded: "✅ Đã tải hình ảnh với {count} pixel hợp lệ",
-      imageError: "❌ Lỗi khi tải hình ảnh",
-      selectPositionAlert: "Vẽ pixel đầu tiên tại vị trí bạn muốn tác phẩm nghệ thuật bắt đầu!",
-      waitingPosition: "👆 Đang chờ bạn vẽ pixel tham chiếu...",
-      positionSet: "✅ Đã đặt vị trí thành công!",
-      positionTimeout: "❌ Hết thời gian chọn vị trí",
-      startPaintingMsg: "🎨 Bắt đầu vẽ...",
-      paintingProgress: "🧱 Tiến trình: {painted}/{total} pixel...",
-      noCharges: "⌛ Không có điện tích. Đang chờ {time}...",
-      paintingStopped: "⏹️ Người dùng đã dừng vẽ",
-      paintingComplete: "✅ Hoàn thành vẽ! Đã vẽ {count} pixel.",
-      paintingError: "❌ Lỗi trong quá trình vẽ",
-      missingRequirements: "❌ Hãy tải lên hình ảnh và chọn vị trí trước",
-      progress: "Tiến trình",
-      pixels: "Pixel",
-      charges: "Điện tích",
-      estimatedTime: "Thời gian ước tính",
-      initMessage: "Nhấp 'Tải lên hình ảnh' để bắt đầu",
-      waitingInit: "Đang chờ khởi tạo...",
-      initializingToken: "🔧 Đang khởi tạo bộ tạo token Turnstile...",
-      tokenReady: "✅ Bộ tạo token đã sẵn sàng - bạn có thể bắt đầu vẽ!",
-      tokenRetryLater: "⚠️ Bộ tạo token sẽ thử lại khi cần thiết",
-      resizeSuccess: "✅ Đã thay đổi kích thước hình ảnh thành {width}x{height}",
-      paintingPaused: "⏸️ Tạm dừng vẽ tại vị trí X: {x}, Y: {y}",
-      captchaNeeded: "❗ Tạo token thất bại. Vui lòng thử lại sau.",
-      saveData: "Lưu tiến trình",
-      loadData: "Tải tiến trình",
-      saveToFile: "Lưu vào tệp",
-      loadFromFile: "Tải từ tệp",
-      dataManager: "Dữ liệu",
-      autoSaved: "✅ Đã tự động lưu tiến trình",
-      dataLoaded: "✅ Đã tải tiến trình thành công",
-      fileSaved: "✅ Đã lưu vào tệp thành công",
-      fileLoaded: "✅ Đã tải từ tệp thành công",
-      noSavedData: "❌ Không tìm thấy tiến trình đã lưu",
-      savedDataFound: "✅ Tìm thấy tiến trình đã lưu! Tải để tiếp tục?",
-      savedDate: "Đã lưu vào: {date}",
-      clickLoadToContinue: "Nhấp 'Tải tiến trình' để tiếp tục.",
-      fileError: "❌ Lỗi khi xử lý tệp",
-      invalidFileFormat: "❌ Định dạng tệp không hợp lệ",
-      paintingSpeed: "Tốc độ vẽ",
-      pixelsPerSecond: "pixel/giây",
-      speedSetting: "Tốc độ: {speed} pixel/giây",
-      settings: "Cài đặt",
-      botSettings: "Cài đặt Bot",
-      close: "Đóng",
-      language: "Ngôn ngữ",
-      themeSettings: "Cài đặt Giao diện",
-      themeSettingsDesc: "Chọn chủ đề màu sắc yêu thích cho giao diện.",
-      languageSelectDesc: "Chọn ngôn ngữ ưa thích. Thay đổi sẽ có hiệu lực ngay lập tức.",
-      autoCaptcha: "Tự động giải CAPTCHA",
-      autoCaptchaDesc: "Tự động cố gắng giải CAPTCHA bằng cách mô phỏng việc đặt pixel thủ công khi token hết hạn.",
-      applySettings: "Áp dụng cài đặt",
-      settingsSaved: "✅ Đã lưu cài đặt thành công!",
-      cooldownSettings: "Cài đặt thời gian chờ",
-      waitCharges: "Chờ cho đến khi số lần sạc đạt",
-      captchaSolving: "🤖 Đang cố gắng giải CAPTCHA...",
-      captchaFailed: "❌ Giải CAPTCHA tự động thất bại. Vui lòng vẽ một pixel thủ công.",
-      automation: "Tự động hóa",
-      noChargesThreshold: "⌛ Đang chờ số lần sạc đạt {threshold}. Hiện tại {current}. Lần tiếp theo trong {time}...",
-    },
-    fr: {
-      title: "WPlace Auto-Image",
-      scanColors: "Scanner les couleurs",
-      uploadImage: "Télécharger l'image",
-      resizeImage: "Redimensionner l'image",
-      selectPosition: "Sélectionner la position",
-      startPainting: "Commencer à peindre",
-      stopPainting: "Arrêter de peindre",
-      checkingColors: "🔍 Vérification des couleurs disponibles...",
-      noColorsFound: "❌ Ouvrez la palette de couleurs sur le site et réessayez!",
-      colorsFound: "✅ {count} couleurs trouvées. Prêt à télécharger.",
-      loadingImage: "🖼️ Chargement de l'image...",
-      imageLoaded: "✅ Image chargée avec {count} pixels valides",
-      imageError: "❌ Erreur lors du chargement de l'image",
-      selectPositionAlert: "Peignez le premier pixel à l'endroit où vous voulez que l'art commence!",
-      waitingPosition: "👆 En attente que vous peigniez le pixel de référence...",
-      positionSet: "✅ Position définie avec succès!",
-      positionTimeout: "❌ Délai d'attente pour la sélection de position",
-      startPaintingMsg: "🎨 Début de la peinture...",
-      paintingProgress: "🧱 Progrès: {painted}/{total} pixels...",
-      noCharges: "⌛ Aucune charge. En attente {time}...",
-      paintingStopped: "⏹️ Peinture arrêtée par l'utilisateur",
-      paintingComplete: "✅ Peinture terminée! {count} pixels peints.",
-      paintingError: "❌ Erreur pendant la peinture",
-      missingRequirements: "❌ Veuillez charger une image et sélectionner une position d'abord",
-      progress: "Progrès",
-      pixels: "Pixels",
-      charges: "Charges",
-      estimatedTime: "Temps estimé",
-      initMessage: "Cliquez sur 'Télécharger l'image' pour commencer",
-      waitingInit: "En attente d'initialisation...",
-      initializingToken: "🔧 Initialisation du générateur de tokens Turnstile...",
-      tokenReady: "✅ Générateur de tokens prêt - vous pouvez commencer à peindre!",
-      tokenRetryLater: "⚠️ Le générateur de tokens réessaiera si nécessaire",
-      resizeSuccess: "✅ Image redimensionnée en {width}x{height}",
-      paintingPaused: "⏸️ Peinture en pause à la position X: {x}, Y: {y}",
-      captchaNeeded: "❗ Échec de la génération de token. Veuillez réessayer dans un moment.",
-      saveData: "Sauvegarder le progrès",
-      loadData: "Charger le progrès",
-      saveToFile: "Sauvegarder dans un fichier",
-      loadFromFile: "Charger depuis un fichier",
-      dataManager: "Données",
-      autoSaved: "✅ Progrès sauvegardé automatiquement",
-      dataLoaded: "✅ Progrès chargé avec succès",
-      fileSaved: "✅ Sauvegardé dans un fichier avec succès",
-      fileLoaded: "✅ Chargé depuis un fichier avec succès",
-      noSavedData: "❌ Aucun progrès sauvegardé trouvé",
-      savedDataFound: "✅ Progrès sauvegardé trouvé! Charger pour continuer?",
-      savedDate: "Sauvegardé le: {date}",
-      clickLoadToContinue: "Cliquez sur 'Charger le progrès' pour continuer.",
-      fileError: "❌ Erreur lors du traitement du fichier",
-      invalidFileFormat: "❌ Format de fichier invalide",
-      paintingSpeed: "Vitesse de peinture",
-      pixelsPerSecond: "pixels/seconde",
-      speedSetting: "Vitesse: {speed} pixels/sec",
-      settings: "Paramètres",
-      botSettings: "Paramètres du Bot",
-      close: "Fermer",
-      language: "Langue",
-      themeSettings: "Paramètres de Thème",
-      themeSettingsDesc: "Choisissez votre thème de couleurs préféré pour l'interface.",
-      languageSelectDesc: "Sélectionnez votre langue préférée. Les changements prendront effet immédiatement.",
-      autoCaptcha: "Résolveur de CAPTCHA automatique",
-      autoCaptchaDesc: "Tente automatiquement de résoudre le CAPTCHA en simulant un placement manuel de pixel lorsque le jeton expire.",
-      applySettings: "Appliquer les paramètres",
-      settingsSaved: "✅ Paramètres enregistrés avec succès !",
-      cooldownSettings: "Paramètres de recharge",
-      waitCharges: "Attendre que les charges atteignent",
-      captchaSolving: "🤖 Tentative de résolution du CAPTCHA...",
-      captchaFailed: "❌ Échec de l'Auto-CAPTCHA. Peignez un pixel manuellement.",
-      automation: "Automatisation",
-      noChargesThreshold: "⌛ En attente que les charges atteignent {threshold}. Actuel: {current}. Prochaine dans {time}...",
-    },
-    id: {
-      title: "WPlace Auto-Image",
-      scanColors: "Pindai Warna",
-      uploadImage: "Unggah Gambar",
-      resizeImage: "Ubah Ukuran Gambar",
-      selectPosition: "Pilih Posisi",
-      startPainting: "Mulai Melukis",
-      stopPainting: "Berhenti Melukis",
-      checkingColors: "🔍 Memeriksa warna yang tersedia...",
-      noColorsFound: "❌ Buka palet warna di situs dan coba lagi!",
-      colorsFound: "✅ {count} warna ditemukan. Siap untuk diunggah.",
-      loadingImage: "🖼️ Memuat gambar...",
-      imageLoaded: "✅ Gambar dimuat dengan {count} piksel valid",
-      imageError: "❌ Kesalahan saat memuat gambar",
-      selectPositionAlert: "Lukis piksel pertama di lokasi tempat karya seni akan dimulai!",
-      waitingPosition: "👆 Menunggu Anda melukis piksel referensi...",
-      positionSet: "✅ Posisi berhasil diatur!",
-      positionTimeout: "❌ Waktu habis untuk memilih posisi",
-      startPaintingMsg: "🎨 Mulai melukis...",
-      paintingProgress: "🧱 Progres: {painted}/{total} piksel...",
-      noCharges: "⌛ Tidak ada muatan. Menunggu {time}...",
-      paintingStopped: "⏹️ Melukis dihentikan oleh pengguna",
-      paintingComplete: "✅ Melukis selesai! {count} piksel telah dilukis.",
-      paintingError: "❌ Kesalahan selama melukis",
-      missingRequirements: "❌ Unggah gambar dan pilih posisi terlebih dahulu",
-      progress: "Progres",
-      pixels: "Piksel",
-      charges: "Muatan",
-      estimatedTime: "Perkiraan waktu",
-      initMessage: "Klik 'Unggah Gambar' untuk memulai",
-      waitingInit: "Menunggu inisialisasi...",
-      initializingToken: "🔧 Menginisialisasi generator token Turnstile...",
-      tokenReady: "✅ Generator token siap - Anda bisa mulai melukis!",
-      tokenRetryLater: "⚠️ Generator token akan mencoba lagi saat diperlukan",
-      resizeSuccess: "✅ Gambar berhasil diubah ukurannya menjadi {width}x{height}",
-      paintingPaused: "⏸️ Melukis dijeda di posisi X: {x}, Y: {y}",
-      captchaNeeded: "❗ Pembuatan token gagal. Silakan coba lagi sebentar lagi.",
-      saveData: "Simpan Progres",
-      loadData: "Muat Progres",
-      saveToFile: "Simpan ke File",
-      loadFromFile: "Muat dari File",
-      dataManager: "Data",
-      autoSaved: "✅ Progres disimpan secara otomatis",
-      dataLoaded: "✅ Progres berhasil dimuat",
-      fileSaved: "✅ Berhasil disimpan ke file",
-      fileLoaded: "✅ Berhasil dimuat dari file",
-      noSavedData: "❌ Tidak ditemukan progres yang disimpan",
-      savedDataFound: "✅ Progres yang disimpan ditemukan! Muat untuk melanjutkan?",
-      savedDate: "Disimpan pada: {date}",
-      clickLoadToContinue: "Klik 'Muat Progres' untuk melanjutkan.",
-      fileError: "❌ Kesalahan saat memproses file",
-      invalidFileFormat: "❌ Format file tidak valid",
-      paintingSpeed: "Kecepatan Melukis",
-      pixelsPerSecond: "piksel/detik",
-      speedSetting: "Kecepatan: {speed} piksel/detik",
-      settings: "Pengaturan",
-      botSettings: "Pengaturan Bot",
-      close: "Tutup",
-      language: "Bahasa",
-      themeSettings: "Pengaturan Tema",
-      themeSettingsDesc: "Pilih tema warna favorit Anda untuk antarmuka.",
-      languageSelectDesc: "Pilih bahasa yang Anda inginkan. Perubahan akan berlaku segera.",
-      autoCaptcha: "Penyelesai CAPTCHA Otomatis",
-      autoCaptchaDesc: "Mencoba menyelesaikan CAPTCHA secara otomatis dengan mensimulasikan penempatan piksel manual saat token kedaluwarsa.",
-      applySettings: "Terapkan Pengaturan",
-      settingsSaved: "✅ Pengaturan berhasil disimpan!",
-      cooldownSettings: "Pengaturan Cooldown",
-      waitCharges: "Tunggu hingga muatan mencapai",
-      captchaSolving: "🤖 Mencoba menyelesaikan CAPTCHA...",
-      captchaFailed: "❌ Gagal menyelesaikan CAPTCHA. Lukis satu piksel secara manual.",
-      automation: "Automasi",
-      noChargesThreshold: "⌛ Menunggu muatan mencapai {threshold}. Saat ini: {current}. Berikutnya dalam {time}...",
-    },
-    tr: {
-      title: "WPlace Otomatik-Resim",
-      toggleOverlay: "Katmanı Aç/Kapat",
-      scanColors: "Renkleri Tara",
-      uploadImage: "Resim Yükle",
-      resizeImage: "Resmi Yeniden Boyutlandır",
-      selectPosition: "Konum Seç",
-      startPainting: "Boyamayı Başlat",
-      stopPainting: "Boyamayı Durdur",
-      checkingColors: "🔍 Uygun renkler kontrol ediliyor...",
-      noColorsFound: "❌ Sitede renk paletini açın ve tekrar deneyin!",
-      colorsFound: "✅ {count} uygun renk bulundu. Yüklemeye hazır.",
-      loadingImage: "🖼️ Resim yükleniyor...",
-      imageLoaded: "✅ Resim {count} geçerli piksel ile yüklendi",
-      imageError: "❌ Resim yüklenirken hata oluştu",
-      selectPositionAlert: "Sanatı başlatmak istediğiniz ilk pikseli boyayın!",
-      waitingPosition: "👆 Referans pikseli boyamanız bekleniyor...",
-      positionSet: "✅ Konum başarıyla ayarlandı!",
-      positionTimeout: "❌ Konum seçme süresi doldu",
-      startPaintingMsg: "🎨 Boyama başlatılıyor...",
-      paintingProgress: "🧱 İlerleme: {painted}/{total} piksel...",
-      noCharges: "⌛ Yeterli hak yok. Bekleniyor {time}...",
-      paintingStopped: "⏹️ Boyama kullanıcı tarafından durduruldu",
-      paintingComplete: "✅ Boyama tamamlandı! {count} piksel boyandı.",
-      paintingError: "❌ Boyama sırasında hata oluştu",
-      missingRequirements: "❌ Önce resim yükleyip konum seçmelisiniz",
-      progress: "İlerleme",
-      pixels: "Pikseller",
-      charges: "Haklar",
-      estimatedTime: "Tahmini süre",
-      initMessage: "Başlamak için 'Resim Yükle'ye tıklayın",
-      waitingInit: "Başlatma bekleniyor...",
-      resizeSuccess: "✅ Resim {width}x{height} boyutuna yeniden boyutlandırıldı",
-      paintingPaused: "⏸️ Boyama duraklatıldı, Konum X: {x}, Y: {y}",
-      captchaNeeded: "❗ CAPTCHA gerekli. Devam etmek için bir pikseli manuel olarak boyayın.",
-      saveData: "İlerlemeyi Kaydet",
-      loadData: "İlerlemeyi Yükle",
-      saveToFile: "Dosyaya Kaydet",
-      loadFromFile: "Dosyadan Yükle",
-      dataManager: "Veri Yöneticisi",
-      autoSaved: "✅ İlerleme otomatik olarak kaydedildi",
-      dataLoaded: "✅ İlerleme başarıyla yüklendi",
-      fileSaved: "✅ İlerleme dosyaya başarıyla kaydedildi",
-      fileLoaded: "✅ İlerleme dosyadan başarıyla yüklendi",
-      noSavedData: "❌ Kayıtlı ilerleme bulunamadı",
-      savedDataFound: "✅ Kayıtlı ilerleme bulundu! Devam etmek için yükleyin.",
-      savedDate: "Kaydedilme tarihi: {date}",
-      clickLoadToContinue: "Devam etmek için 'İlerlemeyi Yükle'ye tıklayın.",
-      fileError: "❌ Dosya işlenirken hata oluştu",
-      invalidFileFormat: "❌ Geçersiz dosya formatı",
-      paintingSpeed: "Boyama Hızı",
-      pixelsPerSecond: "piksel/saniye",
-      speedSetting: "Hız: {speed} piksel/sn",
-      settings: "Ayarlar",
-      botSettings: "Bot Ayarları",
-      close: "Kapat",
-      language: "Dil",
-      themeSettings: "Tema Ayarları",
-      themeSettingsDesc: "Arayüz için tercih ettiğiniz renk temasını seçin.",
-      languageSelectDesc: "Tercih ettiğiniz dili seçin. Değişiklikler hemen uygulanacaktır.",
-      autoCaptcha: "Oto-CAPTCHA Çözücü",
-      autoCaptchaDesc: "CAPTCHA süresi dolduğunda manuel piksel yerleştirmeyi taklit ederek otomatik çözmeyi dener.",
-      applySettings: "Ayarları Uygula",
-      settingsSaved: "✅ Ayarlar başarıyla kaydedildi!",
-      cooldownSettings: "Bekleme Süresi Ayarları",
-      waitCharges: "Haklar şu seviyeye ulaşana kadar bekle",
-      captchaSolving: "🤖 CAPTCHA çözülmeye çalışılıyor...",
-      captchaFailed: "❌ Oto-CAPTCHA başarısız oldu. Bir pikseli manuel boyayın.",
-      automation: "Otomasyon",
-      noChargesThreshold: "⌛ Hakların {threshold} seviyesine ulaşması bekleniyor. Şu anda {current}. Sonraki {time} içinde...",
-    },
-    zh: {
-      title: "WPlace 自动图像",
-      toggleOverlay: "切换覆盖层",
-      scanColors: "扫描颜色",
-      uploadImage: "上传图像",
-      resizeImage: "调整大小",
-      selectPosition: "选择位置",
-      startPainting: "开始绘制",
-      stopPainting: "停止绘制",
-      checkingColors: "🔍 正在检查可用颜色...",
-      noColorsFound: "❌ 请在网站上打开调色板后再试！",
-      colorsFound: "✅ 找到 {count} 个可用颜色，准备上传。",
-      loadingImage: "🖼️ 正在加载图像...",
-      imageLoaded: "✅ 图像已加载，包含 {count} 个有效像素",
-      imageError: "❌ 加载图像时出错",
-      selectPositionAlert: "请在你想让作品开始的位置绘制第一个像素！",
-      waitingPosition: "👆 正在等待你绘制参考像素...",
-      positionSet: "✅ 位置设置成功！",
-      positionTimeout: "❌ 选择位置超时",
-      startPaintingMsg: "🎨 开始绘制...",
-      paintingProgress: "🧱 进度: {painted}/{total} 像素...",
-      noCharges: "⌛ 无可用次数，等待 {time}...",
-      paintingStopped: "⏹️ 已被用户停止",
-      paintingComplete: "✅ 绘制完成！共绘制 {count} 个像素。",
-      paintingError: "❌ 绘制过程中出错",
-      missingRequirements: "❌ 请先加载图像并选择位置",
-      progress: "进度",
-      pixels: "像素",
-      charges: "次数",
-      estimatedTime: "预计时间",
-      initMessage: "点击“上传图像”开始",
-      waitingInit: "正在等待初始化...",
-      initializingToken: "🔧 正在初始化 Turnstile 令牌生成器...",
-      tokenReady: "✅ 令牌生成器已就绪 - 可以开始绘制！",
-      tokenRetryLater: "⚠️ 令牌生成器稍后将重试",
-      resizeSuccess: "✅ 图像已调整为 {width}x{height}",
-      paintingPaused: "⏸️ 在位置 X: {x}, Y: {y} 暂停",
-      captchaNeeded: "❗ 令牌生成失败，请稍后再试。",
-      saveData: "保存进度",
-      loadData: "加载进度",
-      saveToFile: "保存到文件",
-      loadFromFile: "从文件加载",
-      dataManager: "数据管理",
-      autoSaved: "✅ 进度已自动保存",
-      dataLoaded: "✅ 进度加载成功",
-      fileSaved: "✅ 已成功保存到文件",
-      fileLoaded: "✅ 已成功从文件加载",
-      noSavedData: "❌ 未找到已保存进度",
-      savedDataFound: "✅ 找到已保存进度！是否加载继续？",
-      savedDate: "保存时间: {date}",
-      clickLoadToContinue: "点击“加载进度”继续。",
-      fileError: "❌ 处理文件时出错",
-      invalidFileFormat: "❌ 文件格式无效",
-      paintingSpeed: "绘制速度",
-      pixelsPerSecond: "像素/秒",
-      speedSetting: "速度: {speed} 像素/秒",
-      settings: "设置",
-      botSettings: "机器人设置",
-      close: "关闭",
-      language: "语言",
-      themeSettings: "主题设置",
-      themeSettingsDesc: "为界面选择你喜欢的配色主题。",
-      languageSelectDesc: "选择你偏好的语言，变更立即生效。",
-      autoCaptcha: "自动 CAPTCHA 解决",
-      autoCaptchaDesc: "使用集成的生成器自动生成 Turnstile 令牌，必要时回退到浏览器自动化。",
-      applySettings: "应用设置",
-      settingsSaved: "✅ 设置保存成功！",
-      speedOn: "开启",
-      speedOff: "关闭",
-      cooldownSettings: "冷却设置",
-      waitCharges: "等待次数达到",
-      captchaSolving: "🔑 正在生成 Turnstile 令牌...",
-      captchaFailed: "❌ 令牌生成失败。尝试回退方法...",
-      automation: "自动化",
-      noChargesThreshold: "⌛ 等待次数达到 {threshold}。当前 {current}。下次在 {time}...",
-    },
-    "zh-tw": {
-      title: "WPlace 自動圖像",
-      toggleOverlay: "切換覆蓋層",
-      scanColors: "掃描顏色",
-      uploadImage: "上傳圖像",
-      resizeImage: "調整大小",
-      selectPosition: "選擇位置",
-      startPainting: "開始繪製",
-      stopPainting: "停止繪製",
-      checkingColors: "🔍 正在檢查可用顏色...",
-      noColorsFound: "❌ 請在網站上打開調色板後再試！",
-      colorsFound: "✅ 找到 {count} 個可用顏色，準備上傳。",
-      loadingImage: "🖼️ 正在載入圖像...",
-      imageLoaded: "✅ 圖像已載入，包含 {count} 個有效像素",
-      imageError: "❌ 載入圖像時出錯",
-      selectPositionAlert: "請在你想讓作品開始的位置繪製第一個像素！",
-      waitingPosition: "👆 正在等待你繪製參考像素...",
-      positionSet: "✅ 位置設定成功！",
-      positionTimeout: "❌ 選擇位置逾時",
-      startPaintingMsg: "🎨 開始繪製...",
-      paintingProgress: "🧱 進度: {painted}/{total} 像素...",
-      noCharges: "⌛ 無可用次數，等待 {time}...",
-      paintingStopped: "⏹️ 已被使用者停止",
-      paintingComplete: "✅ 繪製完成！共繪製 {count} 個像素。",
-      paintingError: "❌ 繪製過程中出錯",
-      missingRequirements: "❌ 請先載入圖像並選擇位置",
-      progress: "進度",
-      pixels: "像素",
-      charges: "次數",
-      estimatedTime: "預計時間",
-      initMessage: "點擊「上傳圖像」開始",
-      waitingInit: "正在等待初始化...",
-      initializingToken: "🔧 正在初始化 Turnstile 令牌產生器...",
-      tokenReady: "✅ 令牌產生器已就緒 - 可以開始繪製！",
-      tokenRetryLater: "⚠️ 令牌產生器稍後將重試",
-      resizeSuccess: "✅ 圖像已調整為 {width}x{height}",
-      paintingPaused: "⏸️ 在位置 X: {x}, Y: {y} 暫停",
-      captchaNeeded: "❗ 令牌產生失敗，請稍後再試。",
-      saveData: "儲存進度",
-      loadData: "載入進度",
-      saveToFile: "儲存至檔案",
-      loadFromFile: "從檔案載入",
-      dataManager: "資料管理",
-      autoSaved: "✅ 進度已自動儲存",
-      dataLoaded: "✅ 進度載入成功",
-      fileSaved: "✅ 已成功儲存至檔案",
-      fileLoaded: "✅ 已成功從檔案載入",
-      noSavedData: "❌ 未找到已儲存進度",
-      savedDataFound: "✅ 找到已儲存進度！是否載入以繼續？",
-      savedDate: "儲存時間: {date}",
-      clickLoadToContinue: "點擊「載入進度」繼續。",
-      fileError: "❌ 處理檔案時出錯",
-      invalidFileFormat: "❌ 檔案格式無效",
-      paintingSpeed: "繪製速度",
-      pixelsPerSecond: "像素/秒",
-      speedSetting: "速度: {speed} 像素/秒",
-      settings: "設定",
-      botSettings: "機器人設定",
-      close: "關閉",
-      language: "語言",
-      themeSettings: "主題設定",
-      themeSettingsDesc: "為介面選擇你喜歡的配色主題。",
-      languageSelectDesc: "選擇你偏好的語言，變更立即生效。",
-      autoCaptcha: "自動 CAPTCHA 解決",
-      autoCaptchaDesc: "使用整合的產生器自動產生 Turnstile 令牌，必要時回退到瀏覽器自動化。",
-      applySettings: "套用設定",
-      settingsSaved: "✅ 設定儲存成功！",
-      speedOn: "開啟",
-      speedOff: "關閉",
-      cooldownSettings: "冷卻設定",
-      waitCharges: "等待次數達到",
-      captchaSolving: "🔑 正在產生 Turnstile 令牌...",
-      captchaFailed: "❌ 令牌產生失敗。嘗試回退方法...",
-      automation: "自動化",
-      noChargesThreshold: "⌛ 等待次數達到 {threshold}。目前 {current}。下次在 {time}...",
-    },
-    ja: {
-      title: "WPlace 自動画像",
-      toggleOverlay: "オーバーレイ切替",
-      scanColors: "色をスキャン",
-      uploadImage: "画像をアップロード",
-      resizeImage: "画像サイズ変更",
-      selectPosition: "位置を選択",
-      startPainting: "描画開始",
-      stopPainting: "描画停止",
-      checkingColors: "🔍 利用可能な色を確認中...",
-      noColorsFound: "❌ サイトでカラーパレットを開いて再試行してください！",
-      colorsFound: "✅ 利用可能な色 {count} 件を検出。アップロード可能。",
-      loadingImage: "🖼️ 画像を読み込み中...",
-      imageLoaded: "✅ 画像を読み込みました。有効なピクセル {count}",
-      imageError: "❌ 画像の読み込みエラー",
-      selectPositionAlert: "作品を開始したい位置に最初のピクセルを置いてください！",
-      waitingPosition: "👆 参照ピクセルの描画を待っています...",
-      positionSet: "✅ 位置を設定しました！",
-      positionTimeout: "❌ 位置選択のタイムアウト",
-      startPaintingMsg: "🎨 描画を開始...",
-      paintingProgress: "🧱 進捗: {painted}/{total} ピクセル...",
-      noCharges: "⌛ チャージなし。{time} 待機...",
-      paintingStopped: "⏹️ ユーザーにより停止されました",
-      paintingComplete: "✅ 描画完了！ {count} ピクセル描画。",
-      paintingError: "❌ 描画中にエラー",
-      missingRequirements: "❌ 先に画像を読み込み位置を選択してください",
-      progress: "進捗",
-      pixels: "ピクセル",
-      charges: "チャージ",
-      estimatedTime: "推定時間",
-      initMessage: "「画像をアップロード」をクリックして開始",
-      waitingInit: "初期化待機中...",
-      initializingToken: "🔧 Turnstile トークン生成器を初期化中...",
-      tokenReady: "✅ トークン生成器準備完了 - 描画できます！",
-      tokenRetryLater: "⚠️ 必要に応じて再試行します",
-      resizeSuccess: "✅ 画像を {width}x{height} にリサイズ",
-      paintingPaused: "⏸️ X: {x}, Y: {y} で一時停止",
-      captchaNeeded: "❗ トークン生成に失敗。少ししてから再試行してください。",
-      saveData: "進捗を保存",
-      loadData: "進捗を読み込み",
-      saveToFile: "ファイルへ保存",
-      loadFromFile: "ファイルから読み込み",
-      dataManager: "データ管理",
-      autoSaved: "✅ 自動保存しました",
-      dataLoaded: "✅ 進捗を読み込みました",
-      fileSaved: "✅ ファイルに保存しました",
-      fileLoaded: "✅ ファイルから読み込みました",
-      noSavedData: "❌ 保存された進捗がありません",
-      savedDataFound: "✅ 保存された進捗が見つかりました。続行しますか？",
-      savedDate: "保存日時: {date}",
-      clickLoadToContinue: "「進捗を読み込み」をクリックして続行。",
-      fileError: "❌ ファイル処理エラー",
-      invalidFileFormat: "❌ 無効なファイル形式",
-      paintingSpeed: "描画速度",
-      pixelsPerSecond: "ピクセル/秒",
-      speedSetting: "速度: {speed} ピクセル/秒",
-      settings: "設定",
-      botSettings: "ボット設定",
-      close: "閉じる",
-      language: "言語",
-      themeSettings: "テーマ設定",
-      themeSettingsDesc: "インターフェースの好きなカラーテーマを選択。",
-      languageSelectDesc: "希望言語を選択。変更は即時反映されます。",
-      autoCaptcha: "自動 CAPTCHA ソルバー",
-      autoCaptchaDesc: "統合ジェネレーターで Turnstile トークンを自動生成し必要に応じてブラウザ自動化にフォールバック。",
-      applySettings: "設定を適用",
-      settingsSaved: "✅ 設定を保存しました！",
-      speedOn: "オン",
-      speedOff: "オフ",
-      cooldownSettings: "クールダウン設定",
-      waitCharges: "チャージ数が次に達するまで待機",
-      captchaSolving: "🔑 Turnstile トークン生成中...",
-      captchaFailed: "❌ トークン生成失敗。フォールバックを試行...",
-      automation: "自動化",
-      noChargesThreshold: "⌛ チャージ {threshold} を待機中。現在 {current}。次は {time} 後...",
-    },
-    ko: {
-      title: "WPlace 자동 이미지",
-      toggleOverlay: "오버레이 전환",
-      scanColors: "색상 스캔",
-      uploadImage: "이미지 업로드",
-      resizeImage: "크기 조정",
-      selectPosition: "위치 선택",
-      startPainting: "그리기 시작",
-      stopPainting: "그리기 중지",
-      checkingColors: "🔍 사용 가능한 색상 확인 중...",
-      noColorsFound: "❌ 사이트에서 색상 팔레트를 연 후 다시 시도하세요!",
-      colorsFound: "✅ 사용 가능한 색상 {count}개 발견. 업로드 준비 완료.",
-      loadingImage: "🖼️ 이미지 불러오는 중...",
-      imageLoaded: "✅ 이미지 로드 완료. 유효 픽셀 {count}개",
-      imageError: "❌ 이미지 로드 오류",
-      selectPositionAlert: "작품을 시작할 위치에 첫 픽셀을 칠하세요!",
-      waitingPosition: "👆 기준 픽셀을 칠할 때까지 대기 중...",
-      positionSet: "✅ 위치 설정 완료!",
-      positionTimeout: "❌ 위치 선택 시간 초과",
-      startPaintingMsg: "🎨 그리기 시작...",
-      paintingProgress: "🧱 진행: {painted}/{total} 픽셀...",
-      noCharges: "⌛ 사용 가능 횟수 없음. {time} 대기...",
-      paintingStopped: "⏹️ 사용자에 의해 중지됨",
-      paintingComplete: "✅ 그리기 완료! {count} 픽셀 그렸습니다.",
-      paintingError: "❌ 그리는 중 오류",
-      missingRequirements: "❌ 먼저 이미지를 불러오고 위치를 선택하세요",
-      progress: "진행",
-      pixels: "픽셀",
-      charges: "횟수",
-      estimatedTime: "예상 시간",
-      initMessage: "'이미지 업로드'를 클릭하여 시작",
-      waitingInit: "초기화 대기 중...",
-      initializingToken: "🔧 Turnstile 토큰 생성기 초기화 중...",
-      tokenReady: "✅ 토큰 생성 준비 완료 - 그리기를 시작할 수 있습니다!",
-      tokenRetryLater: "⚠️ 필요 시 다시 시도합니다",
-      resizeSuccess: "✅ 이미지가 {width}x{height} 크기로 조정됨",
-      paintingPaused: "⏸️ 위치 X: {x}, Y: {y} 에서 일시 중지",
-      captchaNeeded: "❗ 토큰 생성 실패. 잠시 후 다시 시도하세요.",
-      saveData: "진행 저장",
-      loadData: "진행 불러오기",
-      saveToFile: "파일로 저장",
-      loadFromFile: "파일에서 불러오기",
-      dataManager: "데이터",
-      autoSaved: "✅ 진행 자동 저장됨",
-      dataLoaded: "✅ 진행 불러오기 성공",
-      fileSaved: "✅ 파일 저장 성공",
-      fileLoaded: "✅ 파일 불러오기 성공",
-      noSavedData: "❌ 저장된 진행 없음",
-      savedDataFound: "✅ 저장된 진행 발견! 계속하려면 불러오시겠습니까?",
-      savedDate: "저장 시각: {date}",
-      clickLoadToContinue: "'진행 불러오기'를 클릭하여 계속.",
-      fileError: "❌ 파일 처리 오류",
-      invalidFileFormat: "❌ 잘못된 파일 형식",
-      paintingSpeed: "그리기 속도",
-      pixelsPerSecond: "픽셀/초",
-      speedSetting: "속도: {speed} 픽셀/초",
-      settings: "설정",
-      botSettings: "봇 설정",
-      close: "닫기",
-      language: "언어",
-      themeSettings: "테마 설정",
-      themeSettingsDesc: "인터페이스용 선호 색상 테마를 선택하세요.",
-      languageSelectDesc: "선호 언어를 선택하세요. 변경 사항은 즉시 적용됩니다.",
-      autoCaptcha: "자동 CAPTCHA 해결",
-      autoCaptchaDesc: "통합 생성기를 사용해 Turnstile 토큰을 자동 생성하고 필요 시 브라우저 자동화로 폴백.",
-      applySettings: "설정 적용",
-      settingsSaved: "✅ 설정 저장 완료!",
-      speedOn: "켜짐",
-      speedOff: "꺼짐",
-      cooldownSettings: "쿨다운 설정",
-      waitCharges: "횟수가 다음 값에 도달할 때까지 대기",
-      captchaSolving: "🔑 Turnstile 토큰 생성 중...",
-      captchaFailed: "❌ 토큰 생성 실패. 폴백 시도...",
-      automation: "자동화",
-      noChargesThreshold: "⌛ 횟수가 {threshold} 에 도달할 때까지 대기 중. 현재 {current}. 다음 {time} 후...",
-    },
-    uk: {
-      title: "WPlace Авто-Зображення",
-      toggleOverlay: "Перемкнути оверлей",
-      scanColors: "Сканувати кольори",
-      uploadImage: "Завантажити зображення",
-      resizeImage: "Змінити розмір зображення",
-      selectPosition: "Вибрати позицію",
-      startPainting: "Почати малювання",
-      stopPainting: "Зупинити малювання",
-      checkingColors: "🔍 Перевірка доступних кольорів...",
-      noColorsFound: "❌ Відкрий палітру кольорів на сайті та спробуй ще раз!",
-      colorsFound: "✅ Знайдено {count} доступних кольорів. Готово до завантаження.",
-      loadingImage: "🖼️ Завантаження зображення...",
-      imageLoaded: "✅ Зображення завантажено. Валідних пікселів: {count}",
-      imageError: "❌ Помилка завантаження зображення",
-      selectPositionAlert: "Намалюй перший піксель у місці, де має починатися арт!",
-      waitingPosition: "👆 Очікування на малювання референсного пікселя...",
-      positionSet: "✅ Позицію успішно встановлено!",
-      positionTimeout: "❌ Час вибору позиції вичерпано",
-      startPaintingMsg: "🎨 Початок малювання...",
-      paintingProgress: "🧱 Прогрес: {painted}/{total} пікселів...",
-      noCharges: "⌛ Немає зарядів. Очікування {time}...",
-      paintingStopped: "⏹️ Малювання зупинено користувачем",
-      paintingComplete: "✅ Малювання завершено! Намальовано {count} пікселів.",
-      paintingError: "❌ Помилка під час малювання",
-      missingRequirements: "❌ Спершу завантаж зображення та вибери позицію",
-      progress: "Прогрес",
-      pixels: "Пікселі",
-      charges: "Заряди",
-      estimatedTime: "Орієнтовний час",
-      initMessage: "Натисни 'Завантажити зображення', щоб почати",
-      waitingInit: "Очікування ініціалізації...",
-      initializingToken: "🔧 Ініціалізація генератора токенів Turnstile...",
-      tokenReady: "✅ Генератор токенів готовий – можна починати малювання!",
-      tokenRetryLater: "⚠️ Генератор токенів повторить спробу за потреби",
-      resizeSuccess: "✅ Зображення змінено до {width}x{height}",
-      paintingPaused: "⏸️ Малювання призупинено на позиції X: {x}, Y: {y}",
-      captchaNeeded: "❗ Не вдалося згенерувати токен. Спробуй трохи пізніше.",
-      saveData: "Зберегти прогрес",
-      loadData: "Завантажити прогрес",
-      saveToFile: "Зберегти у файл",
-      loadFromFile: "Завантажити з файлу",
-      dataManager: "Менеджер даних",
-      autoSaved: "✅ Прогрес збережено автоматично",
-      dataLoaded: "✅ Прогрес успішно завантажено",
-      fileSaved: "✅ Прогрес успішно збережено у файл",
-      fileLoaded: "✅ Прогрес успішно завантажено з файлу",
-      noSavedData: "❌ Не знайдено збереженого прогресу",
-      savedDataFound: "✅ Знайдено збережений прогрес! Завантажити, щоб продовжити?",
-      savedDate: "Збережено: {date}",
-      clickLoadToContinue: "Натисни 'Завантажити прогрес', щоб продовжити.",
-      fileError: "❌ Помилка обробки файлу",
-      invalidFileFormat: "❌ Невірний формат файлу",
-      paintingSpeed: "Швидкість малювання",
-      pixelsPerSecond: "пікселів/секунда",
-      speedSetting: "Швидкість: {speed} пікселів/сек",
-      settings: "Налаштування",
-      botSettings: "Налаштування бота",
-      close: "Закрити",
-      language: "Мова",
-      themeSettings: "Налаштування теми",
-      themeSettingsDesc: "Вибери бажану колірну тему для інтерфейсу.",
-      languageSelectDesc: "Вибери бажану мову. Зміни набудуть чинності одразу.",
-      autoCaptcha: "Авто-CAPTCHA (Turnstile)",
-      autoCaptchaDesc: "Автоматично генерує токени Turnstile за допомогою вбудованого генератора. Використовує автоматизацію браузера у разі потреби.",
-      applySettings: "Застосувати налаштування",
-      settingsSaved: "✅ Налаштування успішно збережено!",
-      cooldownSettings: "Налаштування відновлення",
-      waitCharges: "Очікувати, доки кількість зарядів досягне",
-      captchaSolving: "🔑 Генерація токена Turnstile...",
-      captchaFailed: "❌ Не вдалося згенерувати токен Turnstile. Використовую запасний метод...",
-      automation: "Автоматизація",
-      noChargesThreshold: "⌛ Очікування, доки заряди досягнуть {threshold}. Зараз {current}. Наступне через {time}...",
-    },
-  }
+      initMessage: "Click 'Upload Image' to begin"
+    }
+  };
+
+  // Safe translation function with multiple fallback levels
+  const getText = (key, replacements = {}) => {
+    // Try current language first
+    let text = loadedTranslations[state.language]?.[key];
+    
+    // Fallback to English translations
+    if (!text && state.language !== 'en') {
+      text = loadedTranslations['en']?.[key];
+    }
+    
+    // Fallback to hardcoded English
+    if (!text) {
+      text = FALLBACK_TEXT['en']?.[key];
+    }
+    
+    // Last resort - return the key itself
+    if (!text) {
+      console.warn(`⚠️ Missing translation for key: ${key}`);
+      return key;
+    }
+    
+    // Handle string replacements like {count}, {time}, etc.
+    return Object.entries(replacements).reduce((result, [placeholder, value]) => {
+      return result.replace(new RegExp(`\\{${placeholder}\\}`, 'g'), value);
+    }, text);
+  };
 
   // GLOBAL STATE
   const state = {
@@ -1745,7 +1051,7 @@ function applyTheme() {
     if (source === 'turnstile-capture' && token) {
       setTurnstileToken(token);
       if (document.querySelector("#statusText")?.textContent.includes("CAPTCHA")) {
-        Utils.showAlert("Token captured successfully! You can start the bot now.", "success");
+        Utils.showAlert(Utils.t("tokenCapturedSuccess"), "success");
         updateUI("colorsFound", "success", { count: state.availableColors.length });
       }
     }
@@ -1850,15 +1156,15 @@ function applyTheme() {
       overlay.className = 'wplace-turnstile-overlay wplace-overlay-hidden';
 
       const title = document.createElement('div');
-      title.textContent = 'Cloudflare Turnstile — please complete the check if shown';
-      title.className = 'wplace-turnstile-title';
+      title.textContent = Utils.t('turnstileInstructions');
+      title.style.cssText = 'font: 600 12px/1.3 "Segoe UI",sans-serif; margin-bottom: 8px; opacity: 0.9;';
 
       const host = document.createElement('div');
       host.id = 'turnstile-overlay-host';
       host.className = 'wplace-turnstile-host';
 
       const hideBtn = document.createElement('button');
-      hideBtn.textContent = 'Hide';
+      hideBtn.textContent = Utils.t('hideTurnstileBtn');
       hideBtn.className = 'wplace-turnstile-hide-btn';
       hideBtn.addEventListener('click', () => overlay.remove());
 
@@ -2183,12 +1489,50 @@ function applyTheme() {
       return button
     },
 
+    // Synchronous translation function for UI rendering
     t: (key, params = {}) => {
-      let text = TEXT[state.language]?.[key] || TEXT.en[key] || key
+      // Try to get from cache first
+      const cacheKey = `${state.language}_${key}`;
+      if (translationCache.has(cacheKey)) {
+        let text = translationCache.get(cacheKey);
+        Object.keys(params).forEach((param) => {
+          text = text.replace(`{${param}}`, params[param]);
+        });
+        return text;
+      }
+
+      // Try dynamically loaded translations (already loaded)
+      if (loadedTranslations[state.language]?.[key]) {
+        let text = loadedTranslations[state.language][key];
+        // Cache for future use
+        translationCache.set(cacheKey, text);
+        Object.keys(params).forEach((param) => {
+          text = text.replace(`{${param}}`, params[param]);
+        });
+        return text;
+      }
+
+      // Fallback to English if current language failed
+      if (state.language !== 'en' && loadedTranslations['en']?.[key]) {
+        let text = loadedTranslations['en'][key];
+        Object.keys(params).forEach((param) => {
+          text = text.replace(`{${param}}`, params[param]);
+        });
+        return text;
+      }
+
+      // Final fallback to emergency fallback or key
+      let text = FALLBACK_TEXT[state.language]?.[key] || FALLBACK_TEXT.en?.[key] || key;
       Object.keys(params).forEach((param) => {
-        text = text.replace(`{${param}}`, params[param])
-      })
-      return text
+        text = text.replace(new RegExp(`\\{${param}\\}`, 'g'), params[param]);
+      });
+      
+      // Log missing translations for debugging
+      if (text === key && key !== 'undefined') {
+        console.warn(`⚠️ Missing translation for key: ${key} (language: ${state.language})`);
+      }
+      
+      return text;
     },
 
     showAlert: (message, type = "info") => {
@@ -2940,96 +2284,96 @@ function applyTheme() {
 
   // Desktop Notification Manager
   const NotificationManager = {
-      pollTimer: null,
-      pollIntervalMs: 60_000,
-      icon() {
-          const link = document.querySelector("link[rel~='icon']");
-          return link?.href || (location.origin + "/favicon.ico");
-      },
-      async requestPermission() {
-          if (!("Notification" in window)) {
-              Utils.showAlert("Notifications are not supported in this browser.", "warning");
-              return "denied";
-          }
-          if (Notification.permission === "granted") return "granted";
-          try {
-              const perm = await Notification.requestPermission();
-              return perm;
-          } catch {
-              return Notification.permission;
-          }
-      },
-      canNotify() {
-          return state.notificationsEnabled &&
-              typeof Notification !== "undefined" &&
-              Notification.permission === "granted";
-      },
-      notify(title, body, tag = "wplace-charges", force = false) {
-          if (!this.canNotify()) return false;
-          if (!force && state.notifyOnlyWhenUnfocused && document.hasFocus()) return false;
-          try {
-              new Notification(title, {
-                  body,
-                  tag,
-                  renotify: true,
-                  icon: this.icon(),
-                  badge: this.icon(),
-                  silent: false,
-              });
-              return true;
-          } catch {
-              // Graceful fallback
-              Utils.showAlert(body, "info");
-              return false;
-          }
-      },
-      resetEdgeTracking() {
-          state._lastChargesBelow = state.currentCharges < state.cooldownChargeThreshold;
-          state._lastChargesNotifyAt = 0;
-      },
-      maybeNotifyChargesReached(force = false) {
-          if (!state.notificationsEnabled || !state.notifyOnChargesReached) return;
-          const reached = state.currentCharges >= state.cooldownChargeThreshold;
-          const now = Date.now();
-          const repeatMs = Math.max(1, Number(state.notificationIntervalMinutes || 5)) * 60_000;
-          if (reached) {
-              const shouldEdge = state._lastChargesBelow || force;
-              const shouldRepeat = now - (state._lastChargesNotifyAt || 0) >= repeatMs;
-              if (shouldEdge || shouldRepeat) {
-                  const msg = `Charges ready: ${Math.floor(state.currentCharges)} / ${state.maxCharges}. Threshold: ${state.cooldownChargeThreshold}.`;
-                  this.notify("WPlace — Charges Ready", msg, "wplace-notify-charges");
-                  state._lastChargesNotifyAt = now;
-              }
-              state._lastChargesBelow = false;
-          } else {
-              state._lastChargesBelow = true;
-          }
-      },
-      startPolling() {
-          this.stopPolling();
-          if (!state.notificationsEnabled || !state.notifyOnChargesReached) return;
-          // lightweight background polling
-          this.pollTimer = setInterval(async () => {
-              try {
-                  const { charges, cooldown, max } = await WPlaceService.getCharges();
-                  state.currentCharges = Math.floor(charges);
-                  state.cooldown = cooldown;
-                  state.maxCharges = Math.max(1, Math.floor(max));
-                  this.maybeNotifyChargesReached();
-              } catch { /* ignore */ }
-          }, this.pollIntervalMs);
-      },
-      stopPolling() {
-          if (this.pollTimer) {
-              clearInterval(this.pollTimer);
-              this.pollTimer = null;
-          }
-      },
-      syncFromState() {
-          this.resetEdgeTracking();
-          if (state.notificationsEnabled && state.notifyOnChargesReached) this.startPolling();
-          else this.stopPolling();
-      },
+    pollTimer: null,
+    pollIntervalMs: 60_000,
+    icon() {
+      const link = document.querySelector("link[rel~='icon']");
+      return link?.href || (location.origin + "/favicon.ico");
+    },
+    async requestPermission() {
+      if (!("Notification" in window)) {
+        Utils.showAlert(Utils.t("notificationsNotSupported"), "warning");
+        return "denied";
+      }
+      if (Notification.permission === "granted") return "granted";
+      try {
+        const perm = await Notification.requestPermission();
+        return perm;
+      } catch {
+        return Notification.permission;
+      }
+    },
+    canNotify() {
+      return state.notificationsEnabled &&
+          typeof Notification !== "undefined" &&
+          Notification.permission === "granted";
+    },
+    notify(title, body, tag = "wplace-charges", force = false) {
+      if (!this.canNotify()) return false;
+      if (!force && state.notifyOnlyWhenUnfocused && document.hasFocus()) return false;
+      try {
+        new Notification(title, {
+          body,
+          tag,
+          renotify: true,
+          icon: this.icon(),
+          badge: this.icon(),
+          silent: false,
+        });
+        return true;
+      } catch {
+        // Graceful fallback
+        Utils.showAlert(body, "info");
+        return false;
+      }
+    },
+    resetEdgeTracking() {
+      state._lastChargesBelow = state.currentCharges < state.cooldownChargeThreshold;
+      state._lastChargesNotifyAt = 0;
+    },
+    maybeNotifyChargesReached(force = false) {
+      if (!state.notificationsEnabled || !state.notifyOnChargesReached) return;
+      const reached = state.currentCharges >= state.cooldownChargeThreshold;
+      const now = Date.now();
+      const repeatMs = Math.max(1, Number(state.notificationIntervalMinutes || 5)) * 60_000;
+      if (reached) {
+        const shouldEdge = state._lastChargesBelow || force;
+        const shouldRepeat = now - (state._lastChargesNotifyAt || 0) >= repeatMs;
+        if (shouldEdge || shouldRepeat) {
+          const msg = Utils.t("chargesReadyMessage", { current: Math.floor(state.currentCharges), max: state.maxCharges, threshold: state.cooldownChargeThreshold });
+          this.notify(Utils.t("chargesReadyNotification"), msg, "wplace-notify-charges");
+          state._lastChargesNotifyAt = now;
+        }
+        state._lastChargesBelow = false;
+      } else {
+        state._lastChargesBelow = true;
+      }
+    },
+    startPolling() {
+      this.stopPolling();
+      if (!state.notificationsEnabled || !state.notifyOnChargesReached) return;
+      // lightweight background polling
+      this.pollTimer = setInterval(async () => {
+        try {
+          const { charges, cooldown, max } = await WPlaceService.getCharges();
+          state.currentCharges = Math.floor(charges);
+          state.cooldown = cooldown;
+          state.maxCharges = Math.max(1, Math.floor(max));
+          this.maybeNotifyChargesReached();
+        } catch { /* ignore */ }
+      }, this.pollIntervalMs);
+    },
+    stopPolling() {
+      if (this.pollTimer) {
+        clearInterval(this.pollTimer);
+        this.pollTimer = null;
+      }
+    },
+    syncFromState() {
+      this.resetEdgeTracking();
+      if (state.notificationsEnabled && state.notifyOnChargesReached) this.startPolling();
+      else this.stopPolling();
+    },
   };
 
   // COLOR MATCHING FUNCTION - Optimized with caching
@@ -3147,7 +2491,7 @@ function applyTheme() {
     // Don't re-fetch colors here, use what was captured when user clicked upload
     if (!state.availableColors || state.availableColors.length === 0) {
       // If no colors have been captured yet, show message
-      colorsContainer.innerHTML = '<div class="wplace-colors-placeholder">Upload an image first to capture available colors</div>';
+      colorsContainer.innerHTML = `<div class="wplace-colors-placeholder">${Utils.t('uploadImageFirst')}</div>`;
       return;
     }
 
@@ -3365,7 +2709,7 @@ function applyTheme() {
     if (existingResizeOverlay) existingResizeOverlay.remove()
 
     loadThemePreference()
-    loadLanguagePreference()
+    await initializeTranslations()
 
     const theme = getCurrentTheme()
     applyTheme() // <- new: set CSS vars and theme class before building UI
@@ -3401,10 +2745,10 @@ function applyTheme() {
           <button id="settingsBtn" class="wplace-header-btn" title="${Utils.t("settings")}">
             <i class="fas fa-cog"></i>
           </button>
-          <button id="statsBtn" class="wplace-header-btn" title="Show Stats">
+          <button id="statsBtn" class="wplace-header-btn" title="${Utils.t('showStats')}">
             <i class="fas fa-chart-bar"></i>
           </button>
-          <button id="compactBtn" class="wplace-header-btn" title="Compact Mode">
+          <button id="compactBtn" class="wplace-header-btn" title="${Utils.t('compactMode')}">
             <i class="fas fa-compress"></i>
           </button>
           <button id="minimizeBtn" class="wplace-header-btn" title="${Utils.t("minimize")}">
@@ -3428,7 +2772,7 @@ function applyTheme() {
           <div class="wplace-section-title">🖼️ Image Management</div>
           <div class="wplace-controls">
             <div class="wplace-row">
-              <button id="uploadBtn" class="wplace-btn wplace-btn-upload" disabled title="🔄 Waiting for initial setup to complete...">
+              <button id="uploadBtn" class="wplace-btn wplace-btn-upload" disabled title="${Utils.t('waitingSetupComplete')}">
                 <i class="fas fa-upload"></i>
                 <span>${Utils.t("uploadImage")}</span>
               </button>
@@ -3490,7 +2834,7 @@ function applyTheme() {
                 <i class="fas fa-save"></i>
                 <span>${Utils.t("saveData")}</span>
               </button>
-              <button id="loadBtn" class="wplace-btn wplace-btn-primary" disabled title="🔄 Waiting for token generator to initialize...">
+              <button id="loadBtn" class="wplace-btn wplace-btn-primary" disabled title="${Utils.t('waitingTokenGenerator')}">
                 <i class="fas fa-folder-open"></i>
                 <span>${Utils.t("loadData")}</span>
               </button>
@@ -3500,7 +2844,7 @@ function applyTheme() {
                 <i class="fas fa-download"></i>
                 <span>${Utils.t("saveToFile")}</span>
               </button>
-              <button id="loadFromFileBtn" class="wplace-btn wplace-btn-file" disabled title="🔄 Waiting for token generator to initialize...">
+              <button id="loadFromFileBtn" class="wplace-btn wplace-btn-file" disabled title="${Utils.t('waitingTokenGenerator')}">
                 <i class="fas fa-upload"></i>
                 <span>${Utils.t("loadFromFile")}</span>
               </button>
@@ -3518,13 +2862,13 @@ function applyTheme() {
       <div class="wplace-header">
         <div class="wplace-header-title">
           <i class="fas fa-chart-bar"></i>
-          <span>Painting Stats</span>
+          <span>${Utils.t('paintingStats')}</span>
         </div>
         <div class="wplace-header-controls">
-          <button id="refreshChargesBtn" class="wplace-header-btn" title="Refresh Charges">
+          <button id="refreshChargesBtn" class="wplace-header-btn" title="${Utils.t('refreshCharges')}">
             <i class="fas fa-sync"></i>
           </button>
-          <button id="closeStatsBtn" class="wplace-header-btn" title="Close Stats">
+          <button id="closeStatsBtn" class="wplace-header-btn" title="${Utils.t('closeStats')}">
             <i class="fas fa-times"></i>
           </button>
         </div>
@@ -3709,7 +3053,7 @@ function applyTheme() {
           <!-- Speed Control Toggle -->
           <label class="wplace-speed-control-toggle">
             <input type="checkbox" id="enableSpeedToggle" ${CONFIG.PAINTING_SPEED_ENABLED ? 'checked' : ''} class="wplace-speed-checkbox"/>
-            <span>Enable painting speed limit (batch size control)</span>
+            <span>${Utils.t('enablePaintingSpeedLimit')}</span>
           </label>
         </div>
 
@@ -3721,25 +3065,25 @@ function applyTheme() {
           </label>
           <div class="wplace-settings-section-wrapper wplace-notifications-wrapper">
             <label class="wplace-notification-toggle">
-              <span>Enable notifications</span>
+              <span>${Utils.t('enableNotifications')}</span>
               <input type="checkbox" id="notifEnabledToggle" ${state.notificationsEnabled ? 'checked' : ''} class="wplace-notification-checkbox" />
             </label>
             <label class="wplace-notification-toggle">
-              <span>Notify when charges reach threshold</span>
+              <span>${Utils.t('notifyOnChargesThreshold')}</span>
               <input type="checkbox" id="notifOnChargesToggle" ${state.notifyOnChargesReached ? 'checked' : ''} class="wplace-notification-checkbox" />
             </label>
             <label class="wplace-notification-toggle">
-              <span>Only when tab is not focused</span>
+              <span>${Utils.t('onlyWhenNotFocused')}</span>
               <input type="checkbox" id="notifOnlyUnfocusedToggle" ${state.notifyOnlyWhenUnfocused ? 'checked' : ''} class="wplace-notification-checkbox" />
             </label>
             <div class="wplace-notification-interval">
-              <span>Repeat every</span>
+              <span>${Utils.t('repeatEvery')}</span>
               <input type="number" id="notifIntervalInput" min="1" max="60" value="${state.notificationIntervalMinutes}" class="wplace-notification-interval-input" />
-              <span>minute(s)</span>
+              <span>${Utils.t('minutesPl')}</span>
             </div>
             <div class="wplace-notification-buttons">
-              <button id="notifRequestPermBtn" class="wplace-btn wplace-btn-secondary wplace-notification-perm-btn"><i class="fas fa-unlock"></i><span>Grant Permission</span></button>
-              <button id="notifTestBtn" class="wplace-btn wplace-notification-test-btn"><i class="fas fa-bell"></i><span>Test</span></button>
+              <button id="notifRequestPermBtn" class="wplace-btn wplace-btn-secondary wplace-notification-perm-btn"><i class="fas fa-unlock"></i><span>${Utils.t('grantPermission')}</span></button>
+              <button id="notifTestBtn" class="wplace-btn wplace-notification-test-btn"><i class="fas fa-bell"></i><span>${Utils.t('test')}</span></button>
             </div>
           </div>
         </div>
@@ -3910,12 +3254,12 @@ function applyTheme() {
             Paint White Pixels
         </label>
         <div class="resize-zoom-controls">
-          <button id="zoomOutBtn" class="wplace-btn resize-zoom-btn" title="Zoom Out"><i class="fas fa-search-minus"></i></button>
+          <button id="zoomOutBtn" class="wplace-btn resize-zoom-btn" title="${Utils.t('zoomOut')}"><i class="fas fa-search-minus"></i></button>
           <input type="range" id="zoomSlider" class="resize-slider resize-zoom-slider" min="0.1" max="20" value="1" step="0.05">
-          <button id="zoomInBtn" class="wplace-btn resize-zoom-btn" title="Zoom In"><i class="fas fa-search-plus"></i></button>
-          <button id="zoomFitBtn" class="wplace-btn resize-zoom-btn" title="Fit to view">Fit</button>
-          <button id="zoomActualBtn" class="wplace-btn resize-zoom-btn" title="Actual size (100%)">100%</button>
-          <button id="panModeBtn" class="wplace-btn resize-zoom-btn" title="Pan (drag to move view)">
+          <button id="zoomInBtn" class="wplace-btn resize-zoom-btn" title="${Utils.t('zoomIn')}"><i class="fas fa-search-plus"></i></button>
+          <button id="zoomFitBtn" class="wplace-btn resize-zoom-btn" title="${Utils.t('fitToView')}">${Utils.t('fit')}</button>
+          <button id="zoomActualBtn" class="wplace-btn resize-zoom-btn" title="${Utils.t('actualSize')}">${Utils.t('hundred')}</button>
+          <button id="panModeBtn" class="wplace-btn resize-zoom-btn" title="${Utils.t('panMode')}">
             <i class="fas fa-hand-paper"></i>
           </button>
           <span id="zoomValue" class="resize-zoom-value">100%</span>
@@ -3959,9 +3303,6 @@ function applyTheme() {
               <button id="maskModeToggle" class="wplace-btn wplace-btn-primary resize-mode-btn">Toggle</button>
             </div>
           </div>
-          <button id="clearIgnoredBtn" class="wplace-btn resize-clear-btn" title="Clear all ignored pixels">Clear</button>
-          <button id="invertMaskBtn" class="wplace-btn resize-invert-btn" title="Invert mask">Invert</button>
-          <span class="resize-shortcut-help">Shift = Row • Alt = Column</span>
         </div>
       </div>
 
@@ -3973,7 +3314,7 @@ function applyTheme() {
               <div class="wplace-row single">
                   <label class="resize-color-toggle-label">
                       <input type="checkbox" id="showAllColorsToggle" class="resize-color-checkbox">
-                      <span>Show All Colors (including unavailable)</span>
+                      <span>${Utils.t('showAllColorsIncluding')}</span>
                   </label>
               </div>
               <div class="wplace-row" style="display: flex;">
@@ -4006,7 +3347,7 @@ function applyTheme() {
           </label>
           <div class="resize-chroma-weight-control">
             <div class="resize-chroma-weight-header">
-              <span>Chroma Weight</span>
+              <span>${Utils.t('chromaWeight')}</span>
               <span id="chromaWeightValue" class="resize-chroma-weight-value">${state.chromaPenaltyWeight}</span>
             </div>
             <input type="range" id="chromaPenaltyWeightSlider" min="0" max="0.5" step="0.01" value="${state.chromaPenaltyWeight}" class="resize-chroma-weight-slider" />
@@ -4035,15 +3376,15 @@ function applyTheme() {
       <div class="resize-buttons">
         <button id="downloadPreviewBtn" class="wplace-btn wplace-btn-primary">
           <i class="fas fa-download"></i>
-          <span>Download Preview</span>
+          <span>${Utils.t('downloadPreview')}</span>
         </button>
         <button id="confirmResize" class="wplace-btn wplace-btn-start">
           <i class="fas fa-check"></i>
-          <span>Apply</span>
+          <span>${Utils.t('apply')}</span>
         </button>
         <button id="cancelResize" class="wplace-btn wplace-btn-stop">
           <i class="fas fa-times"></i>
-          <span>Cancel</span>
+          <span>${Utils.t('cancel')}</span>
         </button>
       </div>
     `
@@ -4191,18 +3532,18 @@ function applyTheme() {
         if (isVisible) {
           statsContainer.style.display = "none"
           statsBtn.innerHTML = '<i class="fas fa-chart-bar"></i>'
-          statsBtn.title = "Show Stats"
+          statsBtn.title = Utils.t('showStats')
         } else {
           statsContainer.style.display = "block"
           statsBtn.innerHTML = '<i class="fas fa-chart-line"></i>'
-          statsBtn.title = "Hide Stats"
+          statsBtn.title = Utils.t('hideStats')
         }
       })
 
       closeStatsBtn.addEventListener("click", () => {
         statsContainer.style.display = "none"
         statsBtn.innerHTML = '<i class="fas fa-chart-bar"></i>'
-        statsBtn.title = "Show Stats"
+        statsBtn.title = Utils.t('showStats')
       })
 
       if (refreshChargesBtn) {
@@ -4224,7 +3565,7 @@ function applyTheme() {
     if (statsContainer && statsBtn) {
       // Stats container starts hidden - user clicks button to show
       statsBtn.innerHTML = '<i class="fas fa-chart-bar"></i>';
-      statsBtn.title = "Show Stats";
+      statsBtn.title = Utils.t('showStats');
     }
 
     const settingsBtn = container.querySelector("#settingsBtn")
@@ -4311,7 +3652,7 @@ function applyTheme() {
             'hybrid': 'Generator + Auto Fallback',
             'manual': 'Manual Pixel Placement'
           }
-          Utils.showAlert(`Token source set to: ${sourceNames[state.tokenSource]}`, "success")
+          Utils.showAlert(Utils.t('tokenSourceSet', {source: sourceNames[state.tokenSource]}), "success")
         })
       }
 
@@ -4339,7 +3680,7 @@ function applyTheme() {
           
           saveBotSettings()
           console.log(`📦 Batch mode changed to: ${state.batchMode}`)
-          Utils.showAlert(`Batch mode set to: ${state.batchMode === 'random' ? 'Random Range' : 'Normal Fixed Size'}`, "success")
+          Utils.showAlert(Utils.t('batchModeSet', {mode: state.batchMode === 'random' ? Utils.t('randomRange') : Utils.t('normalFixedSize')}), "success")
         })
       }
       
@@ -4375,10 +3716,13 @@ function applyTheme() {
 
       const languageSelect = settingsContainer.querySelector("#languageSelect")
       if (languageSelect) {
-        languageSelect.addEventListener("change", (e) => {
+        languageSelect.addEventListener("change", async (e) => {
           const newLanguage = e.target.value
           state.language = newLanguage
           localStorage.setItem('wplace_language', newLanguage)
+
+          // Load the new language translations
+          await loadTranslations(newLanguage)
 
           setTimeout(() => {
             settingsContainer.style.display = "none"
@@ -4423,9 +3767,9 @@ function applyTheme() {
         enableBlueMarbleToggle.addEventListener('click', async () => {
           state.blueMarbleEnabled = enableBlueMarbleToggle.checked;
           if (state.imageLoaded && overlayManager.imageBitmap) {
-            Utils.showAlert("Re-processing overlay...", "info");
+            Utils.showAlert(Utils.t('reprocessingOverlay'), "info");
             await overlayManager.processImageIntoChunks();
-            Utils.showAlert("Overlay updated!", "success");
+            Utils.showAlert(Utils.t('overlayUpdated'), "success");
           }
         });
       }
@@ -4438,13 +3782,13 @@ function applyTheme() {
       if (notifPermBtn) {
         notifPermBtn.addEventListener("click", async () => {
           const perm = await NotificationManager.requestPermission();
-          if (perm === "granted") Utils.showAlert("Notifications enabled.", "success");
-          else Utils.showAlert("Notifications permission denied.", "warning");
+          if (perm === "granted") Utils.showAlert(Utils.t('notificationsEnabled'), "success");
+          else Utils.showAlert(Utils.t('notificationsPermissionDenied'), "warning");
         });
       }
       if (notifTestBtn) {
         notifTestBtn.addEventListener("click", () => {
-          NotificationManager.notify("WPlace — Test", "This is a test notification.", "wplace-notify-test", true);
+          NotificationManager.notify(Utils.t('testNotificationTitle'), Utils.t('testNotificationMessage'), "wplace-notify-test", true);
         });
       }
 
@@ -4481,10 +3825,10 @@ function applyTheme() {
 
         if (isCompact) {
           compactBtn.innerHTML = '<i class="fas fa-expand"></i>'
-          compactBtn.title = "Expand Mode"
+          compactBtn.title = Utils.t('expandMode')
         } else {
           compactBtn.innerHTML = '<i class="fas fa-compress"></i>'
-          compactBtn.title = "Compact Mode"
+          compactBtn.title = Utils.t('compactMode')
         }
       })
     }
@@ -4496,12 +3840,12 @@ function applyTheme() {
           container.classList.add("wplace-minimized")
           content.classList.add("wplace-hidden")
           minimizeBtn.innerHTML = '<i class="fas fa-expand"></i>'
-          minimizeBtn.title = "Restore"
+          minimizeBtn.title = Utils.t('restore')
         } else {
           container.classList.remove("wplace-minimized")
           content.classList.remove("wplace-hidden")
           minimizeBtn.innerHTML = '<i class="fas fa-minus"></i>'
-          minimizeBtn.title = "Minimize"
+          minimizeBtn.title = Utils.t('minimize')
         }
         saveBotSettings()
       })
@@ -4509,10 +3853,10 @@ function applyTheme() {
 
     if (toggleOverlayBtn) {
       toggleOverlayBtn.addEventListener('click', () => {
-  const isEnabled = overlayManager.toggle();
-  toggleOverlayBtn.classList.toggle('active', isEnabled);
-  toggleOverlayBtn.setAttribute('aria-pressed', isEnabled ? 'true' : 'false');
-        Utils.showAlert(`Overlay ${isEnabled ? 'enabled' : 'disabled'}.`, 'info');
+        const isEnabled = overlayManager.toggle();
+        toggleOverlayBtn.classList.toggle('active', isEnabled);
+        toggleOverlayBtn.setAttribute('aria-pressed', isEnabled ? 'true' : 'false');
+        Utils.showAlert(isEnabled ? Utils.t('overlayEnabled') : Utils.t('overlayDisabled'), 'info');
       });
     }
 
@@ -4521,14 +3865,14 @@ function applyTheme() {
       content.classList.add("wplace-hidden")
       if (minimizeBtn) {
         minimizeBtn.innerHTML = '<i class="fas fa-expand"></i>'
-        minimizeBtn.title = "Restore"
+        minimizeBtn.title = Utils.t('restore')
       }
     } else {
       container.classList.remove("wplace-minimized")
       content.classList.remove("wplace-hidden")
       if (minimizeBtn) {
         minimizeBtn.innerHTML = '<i class="fas fa-minus"></i>'
-        minimizeBtn.title = "Minimize"
+        minimizeBtn.title = Utils.t('minimize')
       }
     }
 
@@ -4544,7 +3888,7 @@ function applyTheme() {
           updateUI("autoSaved", "success")
           Utils.showAlert(Utils.t("autoSaved"), "success")
         } else {
-          Utils.showAlert("❌ Erro ao salvar progresso", "error")
+          Utils.showAlert(Utils.t('errorSavingProgress'), "error")
         }
       })
     }
@@ -4553,7 +3897,7 @@ function applyTheme() {
       loadBtn.addEventListener("click", () => {
         // Check if initial setup is complete
         if (!state.initialSetupComplete) {
-          Utils.showAlert("🔄 Please wait for the initial setup to complete before loading progress.", "warning");
+          Utils.showAlert(Utils.t('pleaseWaitInitialSetup'), "warning");
           return;
         }
         
@@ -4595,7 +3939,7 @@ function applyTheme() {
               startBtn.disabled = false
             }
           } else {
-            Utils.showAlert("❌ Erro ao carregar progresso", "error")
+            Utils.showAlert(Utils.t('errorLoadingProgress'), "error")
           }
         }
       })
@@ -4617,7 +3961,7 @@ function applyTheme() {
       loadFromFileBtn.addEventListener("click", async () => {
         // Check if initial setup is complete
         if (!state.initialSetupComplete) {
-          Utils.showAlert("🔄 Please wait for the initial setup to complete before loading from file.", "warning");
+          Utils.showAlert(Utils.t('pleaseWaitFileSetup'), "warning");
           return;
         }
         
@@ -4705,7 +4049,7 @@ function applyTheme() {
       if (state.colorsChecked) {
         colorSwatchesHTML = state.availableColors.map(color => {
           const rgbString = `rgb(${color.rgb.join(',')})`;
-          return `<div class="wplace-stat-color-swatch" style="background-color: ${rgbString};" title="ID: ${color.id}\nRGB: ${color.rgb.join(', ')}"></div>`;
+          return `<div class="wplace-stat-color-swatch" style="background-color: ${rgbString};" title="${Utils.t('colorTooltip', {id: color.id, rgb: color.rgb.join(', ')})}"></div>`;
         }).join('');
       }
 
@@ -4717,7 +4061,7 @@ function applyTheme() {
             </div>
             ${state.colorsChecked ? `
             <div class="wplace-colors-section">
-                <div class="wplace-stat-label"><i class="fas fa-palette"></i> Available Colors (${state.availableColors.length})</div>
+                <div class="wplace-stat-label"><i class="fas fa-palette"></i> ${Utils.t('availableColors', {count: state.availableColors.length})}</div>
                 <div class="wplace-stat-colors-grid">
                     ${colorSwatchesHTML}
                 </div>
@@ -5660,7 +5004,7 @@ function applyTheme() {
         if (state.imageLoaded && state.imageData.processor && state.colorsChecked) {
           showResizeDialog(state.imageData.processor)
         } else if (!state.colorsChecked) {
-          Utils.showAlert("Please upload an image first to capture available colors", "warning")
+          Utils.showAlert(Utils.t('uploadImageFirstColors'), "warning")
         }
       })
     }
@@ -6477,7 +5821,7 @@ function applyTheme() {
     }
     
     // Show a notification that file operations are now available
-    Utils.showAlert("📂 File operations (Load/Upload) are now available!", "success");
+    Utils.showAlert(Utils.t('fileOperationsAvailable'), "success");
   }
 
   // Optimized token initialization with better timing and error handling
@@ -6503,8 +5847,8 @@ function applyTheme() {
         setTurnstileToken(token);
         console.log("✅ Startup token generated successfully");
         updateUI("tokenReady", "success");
-        Utils.showAlert("🔑 Token generator ready!", "success");
-        enableFileOperations();
+        Utils.showAlert(Utils.t('tokenGeneratorReady'), "success");
+        enableFileOperations(); // Enable file operations since initial setup is complete
       } else {
         console.warn("⚠️ Startup token generation failed (no token received), will retry when needed");
         updateUI("tokenRetryLater", "warning");
@@ -6542,7 +5886,7 @@ function applyTheme() {
       if (whiteInput) whiteInput.addEventListener('change', e => { const v=parseInt(e.target.value,10); if(!isNaN(v)&&v>=200&&v<=255){ state.customWhiteThreshold=v; CONFIG.WHITE_THRESHOLD=v; saveBotSettings(); _updateResizePreview(); }});
   if (ditherToggle) ditherToggle.addEventListener('change', e => { state.ditheringEnabled = e.target.checked; saveBotSettings(); _updateResizePreview(); });
       if (resetBtn) resetBtn.addEventListener('click', () => {
-        state.colorMatchingAlgorithm='lab'; state.enableChromaPenalty=true; state.chromaPenaltyWeight=0.15; state.customTransparencyThreshold=CONFIG.TRANSPARENCY_THRESHOLD=100; state.customWhiteThreshold=CONFIG.WHITE_THRESHOLD=250; saveBotSettings(); const a=document.getElementById('colorAlgorithmSelect'); if(a) a.value='lab'; const ct=document.getElementById('enableChromaPenaltyToggle'); if(ct) ct.checked=true; if(chromaSlider) chromaSlider.value=0.15; if(chromaValue) chromaValue.textContent='0.15'; if(transInput) transInput.value=100; if(whiteInput) whiteInput.value=250; _updateResizePreview(); Utils.showAlert('Advanced color settings reset.', 'success'); });
+        state.colorMatchingAlgorithm='lab'; state.enableChromaPenalty=true; state.chromaPenaltyWeight=0.15; state.customTransparencyThreshold=CONFIG.TRANSPARENCY_THRESHOLD=100; state.customWhiteThreshold=CONFIG.WHITE_THRESHOLD=250; saveBotSettings(); const a=document.getElementById('colorAlgorithmSelect'); if(a) a.value='lab'; const ct=document.getElementById('enableChromaPenaltyToggle'); if(ct) ct.checked=true; if(chromaSlider) chromaSlider.value=0.15; if(chromaValue) chromaValue.textContent='0.15'; if(transInput) transInput.value=100; if(whiteInput) whiteInput.value=250; _updateResizePreview(); Utils.showAlert(Utils.t('advancedColorSettingsReset'), 'success'); });
     };
     // Delay to ensure resize UI built
     setTimeout(advancedInit, 500);
