@@ -401,7 +401,3 @@
   box-shadow: 0 0 30px rgba(0, 255, 65, 0.5) !important;
   font-family: 'Press Start 2P', monospace !important;
 }
-
-.wplace-row .wplace-btn {
-  flex: 1;
-}
