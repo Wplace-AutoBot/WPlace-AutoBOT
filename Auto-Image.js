@@ -5976,7 +5976,13 @@ function applyTheme() {
             const tileRegionX = pixelBatch ? (pixelBatch.regionX) : (regionX + adderX);
             const tileRegionY = pixelBatch ? (pixelBatch.regionY) : (regionY + adderY);
             const tileKeyParts = [(regionX + adderX), (regionY + adderY)];
-            const existingColorRGBA = await overlayManager.getTilePixelColor(tileKeyParts[0], tileKeyParts[1], pixelX, pixelY).catch(() => null);
+            let existingColorRGBA = null;
+            if (overlayManager.isEnabled) {
+              const tileKeyStr = `${tileKeyParts[0]},${tileKeyParts[1]}`;
+              if (overlayManager.originalTilesData?.has(tileKeyStr) || overlayManager.originalTiles?.has(tileKeyStr)) {
+                existingColorRGBA = await overlayManager.getTilePixelColor(tileKeyParts[0], tileKeyParts[1], pixelX, pixelY).catch(() => null);
+              }
+            }
             if (existingColorRGBA && Array.isArray(existingColorRGBA)) {
               const [er, eg, eb] = existingColorRGBA;
               const existingColorId = findClosestColor([er, eg, eb], state.availableColors);
@@ -6213,7 +6219,13 @@ function applyTheme() {
 
         // Skip if already painted the correct color according to overlay
         try {
-          const existingColorRGBA = await overlayManager.getTilePixelColor(pixelBatch.regionX, pixelBatch.regionY, pixelX, pixelY).catch(() => null);
+          let existingColorRGBA = null;
+          if (overlayManager.isEnabled) {
+            const tileKeyStr = `${pixelBatch.regionX},${pixelBatch.regionY}`;
+            if (overlayManager.originalTilesData?.has(tileKeyStr) || overlayManager.originalTiles?.has(tileKeyStr)) {
+              existingColorRGBA = await overlayManager.getTilePixelColor(pixelBatch.regionX, pixelBatch.regionY, pixelX, pixelY).catch(() => null);
+            }
+          }
           if (existingColorRGBA && Array.isArray(existingColorRGBA)) {
             const [er, eg, eb] = existingColorRGBA;
             const existingColorId = findClosestColor([er, eg, eb], state.availableColors);
