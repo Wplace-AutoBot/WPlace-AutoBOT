@@ -3707,32 +3707,17 @@ function applyTheme() {
             <i class="fas fa-paint-brush wplace-icon-paint"></i>
             ${Utils.t("paintOptions")}
           </label>
-          <div class="wplace-settings-section-wrapper wplace-overlay-wrapper" style="
-            background: ${theme.accent ? `${theme.accent}20` : 'rgba(255,255,255,0.1)'};
-            border-radius: ${theme.borderRadius || '12px'};
-            border: 1px solid ${theme.accent || 'rgba(255,255,255,0.1)'};
-            ${theme.animations?.glow ? `
-              box-shadow: 0 0 15px ${theme.accent || 'rgba(255,255,255,0.1)'}33;
-            ` : ''}
-          ">
-              <!-- Paint White Pixels Toggle -->
-              <label for="settingsPaintWhiteToggle" class="wplace-blue-marble-toggle">
-                  <div>
-                      <span class="wplace-blue-marble-title" style="color: ${theme.text || 'white'};">${Utils.t("paintWhitePixels")}</span>
-                  </div>
-                  <input type="checkbox" id="settingsPaintWhiteToggle" ${state.paintWhitePixels ? 'checked' : ''} class="wplace-blue-marble-checkbox" style="
-                    accent-color: ${theme.highlight || '#48dbfb'};
-                  "/>
-              </label>
-              <!-- Paint Transparent Pixels Toggle -->
-              <label for="settingsPaintTransparentToggle" class="wplace-blue-marble-toggle">
-                  <div>
-                      <span class="wplace-blue-marble-title" style="color: ${theme.text || 'white'};">${Utils.t("paintTransparentPixels")}</span>
-                  </div>
-                  <input type="checkbox" id="settingsPaintTransparentToggle" ${state.paintTransparentPixels ? 'checked' : ''} class="wplace-blue-marble-checkbox" style="
-                    accent-color: ${theme.highlight || '#48dbfb'};
-                  "/>
-              </label>
+          <div class="wplace-settings-section-wrapper wplace-notifications-wrapper">
+            <!-- Paint White Pixels Toggle -->
+            <label class="wplace-notification-toggle">
+              <span>${Utils.t("paintWhitePixels")}</span>
+              <input type="checkbox" id="settingsPaintWhiteToggle" ${state.paintWhitePixels ? 'checked' : ''} class="wplace-notification-checkbox" />
+            </label>
+            <!-- Paint Transparent Pixels Toggle -->
+            <label class="wplace-notification-toggle">
+              <span>${Utils.t("paintTransparentPixels")}</span>
+              <input type="checkbox" id="settingsPaintTransparentToggle" ${state.paintTransparentPixels ? 'checked' : ''} class="wplace-notification-checkbox" />
+            </label>
           </div>
         </div>
 
