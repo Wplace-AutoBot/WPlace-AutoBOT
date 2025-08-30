@@ -7,10 +7,8 @@
 /* Theme tokens (CSS vars)   */
 /* ========================= */
 
-/* Import theme files - classic is default */
-@import url('https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/main/themes/classic.css');
-@import url('https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/main/themes/classic-light.css');
-@import url('https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/main/themes/neon.css');
+/* Theme files are now loaded dynamically via JavaScript using the base URL from localStorage */
+/* See Auto-Image.js lines 2749-2757 for dynamic theme loading implementation */
 
 /* Default :root CSS variables for 100% classic theme compliance */
 /* These ensure the bot works perfectly even if theme files fail to load */
