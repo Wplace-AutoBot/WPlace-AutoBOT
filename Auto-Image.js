@@ -354,6 +354,9 @@ function applyTheme() {
       captchaFailed: "❌ Turnstile token generation failed. Trying fallback method...",
       automation: "Automation",
       noChargesThreshold: "⌛ Waiting for charges to reach {threshold}. Currently {current}. Next in {time}...",
+      keepAspectRatio: "Keep Aspect Ratio",
+      paintWhitePixels: "Paint White Pixels",
+      paintTransparentPixels: "Paint Transparent Pixels",
     },
     ru: {
       title: "WPlace Авто-Изображение",
@@ -427,6 +430,9 @@ function applyTheme() {
       captchaFailed: "❌ Не удалось сгенерировать Turnstile токен. Пробую резервный метод...",
       automation: "Автоматизация",
       noChargesThreshold: "⌛ Ожидание зарядов до {threshold}. Сейчас {current}. Следующий через {time}...",
+      keepAspectRatio: "Сохранять пропорции",
+      paintWhitePixels: "Рисовать белые пиксели",
+      paintTransparentPixels: "Рисовать прозрачные пиксели",
     },
     pt: {
       title: "WPlace Auto-Image",
@@ -500,6 +506,9 @@ function applyTheme() {
       captchaFailed: "❌ Falha ao resolver CAPTCHA. Pinte um pixel manualmente.",
       automation: "Automação",
       noChargesThreshold: "⌛ Aguardando cargas atingirem {threshold}. Atual: {current}. Próxima em {time}...",
+      keepAspectRatio: "Manter proporção",
+      paintWhitePixels: "Pintar pixels brancos",
+      paintTransparentPixels: "Pintar pixels transparentes",
     },
     vi: {
       title: "WPlace Auto-Image",
@@ -573,6 +582,9 @@ function applyTheme() {
       captchaFailed: "❌ Giải CAPTCHA tự động thất bại. Vui lòng vẽ một pixel thủ công.",
       automation: "Tự động hóa",
       noChargesThreshold: "⌛ Đang chờ số lần sạc đạt {threshold}. Hiện tại {current}. Lần tiếp theo trong {time}...",
+      keepAspectRatio: "Giữ tỉ lệ",
+      paintWhitePixels: "Tô pixel trắng",
+      paintTransparentPixels: "Tô pixel trong suốt",
     },
     fr: {
       title: "WPlace Auto-Image",
@@ -646,6 +658,9 @@ function applyTheme() {
       captchaFailed: "❌ Échec de l'Auto-CAPTCHA. Peignez un pixel manuellement.",
       automation: "Automatisation",
       noChargesThreshold: "⌛ En attente que les charges atteignent {threshold}. Actuel: {current}. Prochaine dans {time}...",
+      keepAspectRatio: "Conserver les proportions",
+      paintWhitePixels: "Peindre les pixels blancs",
+      paintTransparentPixels: "Peindre les pixels transparents",
     },
     id: {
       title: "WPlace Auto-Image",
@@ -719,6 +734,9 @@ function applyTheme() {
       captchaFailed: "❌ Gagal menyelesaikan CAPTCHA. Lukis satu piksel secara manual.",
       automation: "Automasi",
       noChargesThreshold: "⌛ Menunggu muatan mencapai {threshold}. Saat ini: {current}. Berikutnya dalam {time}...",
+      keepAspectRatio: "Pertahankan rasio aspek",
+      paintWhitePixels: "Warnai piksel putih",
+      paintTransparentPixels: "Warnai piksel transparan",
     },
     tr: {
       title: "WPlace Otomatik-Resim",
@@ -790,6 +808,9 @@ function applyTheme() {
       captchaFailed: "❌ Oto-CAPTCHA başarısız oldu. Bir pikseli manuel boyayın.",
       automation: "Otomasyon",
       noChargesThreshold: "⌛ Hakların {threshold} seviyesine ulaşması bekleniyor. Şu anda {current}. Sonraki {time} içinde...",
+      keepAspectRatio: "En-Boy Oranını Koru",
+      paintWhitePixels: "Beyaz Pikselleri Boya",
+      paintTransparentPixels: "Şeffaf Pikselleri Boya",
     },
     zh: {
       title: "WPlace 自动图像",
@@ -866,6 +887,9 @@ function applyTheme() {
       captchaFailed: "❌ 令牌生成失败。尝试回退方法...",
       automation: "自动化",
       noChargesThreshold: "⌛ 等待次数达到 {threshold}。当前 {current}。下次在 {time}...",
+      keepAspectRatio: "保持纵横比",
+      paintWhitePixels: "绘制白色像素",
+      paintTransparentPixels: "绘制透明像素",
     },
     "zh-tw": {
       title: "WPlace 自動圖像",
@@ -942,6 +966,9 @@ function applyTheme() {
       captchaFailed: "❌ 令牌產生失敗。嘗試回退方法...",
       automation: "自動化",
       noChargesThreshold: "⌛ 等待次數達到 {threshold}。目前 {current}。下次在 {time}...",
+      keepAspectRatio: "保持寬高比",
+      paintWhitePixels: "繪製白色像素",
+      paintTransparentPixels: "繪製透明像素",
     },
     ja: {
       title: "WPlace 自動画像",
@@ -1018,6 +1045,9 @@ function applyTheme() {
       captchaFailed: "❌ トークン生成失敗。フォールバックを試行...",
       automation: "自動化",
       noChargesThreshold: "⌛ チャージ {threshold} を待機中。現在 {current}。次は {time} 後...",
+      keepAspectRatio: "アスペクト比を維持",
+      paintWhitePixels: "白いピクセルを描画",
+      paintTransparentPixels: "透明なピクセルを描画",
     },
     ko: {
       title: "WPlace 자동 이미지",
@@ -1094,6 +1124,9 @@ function applyTheme() {
       captchaFailed: "❌ 토큰 생성 실패. 폴백 시도...",
       automation: "자동화",
       noChargesThreshold: "⌛ 횟수가 {threshold} 에 도달할 때까지 대기 중. 현재 {current}. 다음 {time} 후...",
+      keepAspectRatio: "종횡비 유지",
+      paintWhitePixels: "흰색 픽셀 그리기",
+      paintTransparentPixels: "투명 픽셀 그리기",
     },
     uk: {
       title: "WPlace Авто-Зображення",
@@ -1168,6 +1201,9 @@ function applyTheme() {
       captchaFailed: "❌ Не вдалося згенерувати токен Turnstile. Використовую запасний метод...",
       automation: "Автоматизація",
       noChargesThreshold: "⌛ Очікування, доки заряди досягнуть {threshold}. Зараз {current}. Наступне через {time}...",
+      keepAspectRatio: "Зберігати співвідношення сторін",
+      paintWhitePixels: "Малювати білі пікселі",
+      paintTransparentPixels: "Малювати прозорі пікселі",
     },
   }
 
@@ -3904,15 +3940,15 @@ function applyTheme() {
         </label>
         <label class="resize-checkbox-label">
           <input type="checkbox" id="keepAspect" checked>
-          Keep Aspect Ratio
+          ${Utils.t("keepAspectRatio")}
         </label>
         <label class="resize-checkbox-label">
             <input type="checkbox" id="paintWhiteToggle" checked>
-            Paint White Pixels
+            ${Utils.t("paintWhitePixels")}
         </label>
         <label class="resize-checkbox-label">
             <input type="checkbox" id="paintTransparentToggle" checked>
-            Paint Transparent Pixels
+            ${Utils.t("paintTransparentPixels")}
         </label>
         <div class="resize-zoom-controls">
           <button id="zoomOutBtn" class="wplace-btn resize-zoom-btn" title="Zoom Out"><i class="fas fa-search-minus"></i></button>
