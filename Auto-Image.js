@@ -284,7 +284,7 @@ function applyTheme() {
     }
 
     // Load translations from CDN
-    const url = `https://staninna.github.io/WPlace-AutoBOT/decoupled-translations/lang/${language}.json`;
+    const url = `https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/main/decoupled-translations/lang/${language}.json`;
     const maxRetries = 3;
     const baseDelay = 1000; // 1 second
     
@@ -2729,7 +2729,7 @@ function applyTheme() {
     // Link external CSS files
     const cssLink = document.createElement('link');
     cssLink.rel = 'stylesheet';
-    cssLink.href = 'https://staninna.github.io/WPlace-AutoBOT/decoupled-css/auto-image-styles.css'; // TODO: Before merge change to https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/auto-image-styles.css
+    cssLink.href = 'https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/main/auto-image-styles.css';
     cssLink.setAttribute('data-wplace-theme', 'true');
     document.head.appendChild(cssLink);
 
