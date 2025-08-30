@@ -304,7 +304,7 @@
     }
 
     // Load translations from CDN
-    const url = `https://staninna.github.io/WPlace-AutoBOT/decoupled-translations/lang/${language}.json`;
+    const url = `https://skalsech.github.io/WPlace-AutoBOT/feat-external-lang/lang/${language}.json`;
     const maxRetries = 3;
     const baseDelay = 1000; // 1 second
 
@@ -3302,7 +3302,7 @@
     // Link external CSS files
     const cssLink = document.createElement('link');
     cssLink.rel = 'stylesheet';
-    cssLink.href = 'https://skalsech.github.io/WPlace-AutoBOT/my_main/auto-image-styles.css';
+    cssLink.href = 'https://skalsech.github.io/WPlace-AutoBOT/feat-external-lang/auto-image-styles.css';
     cssLink.setAttribute('data-wplace-theme', 'true');
     document.head.appendChild(cssLink);
 
@@ -6482,13 +6482,15 @@
       return; // Уже достигли порога
     }
 
-    let timeText = Utils.msToTimeText(remainingMs);
+    const current = state.fullChargeData ? state.fullChargeData.current : state.currentCharges;
+    const timeText = Utils.msToTimeText(remainingMs);
 
     updateUI(
       'noChargesThreshold',
       'warning',
       {
         threshold,
+        current,
         time: timeText,
       },
       true
