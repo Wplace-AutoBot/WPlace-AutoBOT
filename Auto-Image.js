@@ -531,6 +531,7 @@ function applyTheme() {
   _lastSaveTime: 0,
   _saveInProgress: false,
   paintedMap: null,
+  outlineIndex: 0,
   }
 
   let _updateResizePreview = () => { };
@@ -2021,6 +2022,7 @@ function applyTheme() {
             imageLoaded: state.imageLoaded,
             colorsChecked: state.colorsChecked,
             availableColors: state.availableColors,
+            outlineIndex: state.outlineIndex,
           },
           imageData: state.imageData
             ? {
@@ -2073,6 +2075,7 @@ function applyTheme() {
         state.paintedMap = null;
         state._lastSavePixelCount = 0;
         state._lastSaveTime = 0;
+  state.outlineIndex = 0;
         console.log("📋 Progress and painted map cleared");
         return true
       } catch (error) {
@@ -2084,6 +2087,8 @@ function applyTheme() {
     restoreProgress: (savedData) => {
       try {
         Object.assign(state, savedData.state)
+  // Ensure outlineIndex is numeric
+  state.outlineIndex = Number.isFinite(state.outlineIndex) ? state.outlineIndex : 0;
 
         if (savedData.imageData) {
           state.imageData = {
@@ -2150,6 +2155,7 @@ function applyTheme() {
             imageLoaded: state.imageLoaded,
             colorsChecked: state.colorsChecked,
             availableColors: state.availableColors,
+            outlineIndex: state.outlineIndex,
           },
           imageData: state.imageData
             ? {
@@ -4908,6 +4914,8 @@ function applyTheme() {
         state.imageData.totalPixels = totalValidPixels;
         state.totalPixels = totalValidPixels;
         state.paintedPixels = 0;
+  // Reset outline traversal when a new image is applied
+  state.outlineIndex = 0;
 
   state.resizeSettings = { baseWidth: width, baseHeight: height, width: newWidth, height: newHeight };
         saveBotSettings();
@@ -5577,9 +5585,11 @@ function applyTheme() {
       top++; left++; bottom--; right--;
     }
 
+    // Resume from saved outline index if present
+    let kStart = Math.max(0, Math.min(state.outlineIndex || 0, order.length));
     let pixelBatch = null;
     try {
-      for (let k = 0; k < order.length; k++) {
+      for (let k = kStart; k < order.length; k++) {
         if (state.stopFlag) break;
         const [x, y] = order[k];
         if (!isEligibleAt(x, y)) continue;
@@ -5622,7 +5632,11 @@ function applyTheme() {
           }
         } catch {}
 
-        pixelBatch.pixels.push({ x: pixelX, y: pixelY, color: colorId, localX: x, localY: y });
+  pixelBatch.pixels.push({ x: pixelX, y: pixelY, color: colorId, localX: x, localY: y });
+  // Update outline resume index as we successfully queue this pixel
+  state.outlineIndex = k + 1;
+  // Smart-save occasionally to persist outlineIndex
+  Utils.performSmartSave();
         const maxBatchSize = calculateBatchSize();
         if (pixelBatch.pixels.length >= maxBatchSize) {
           const success = await sendBatchWithRetry(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
@@ -5679,6 +5693,8 @@ function applyTheme() {
     else {
       updateUI("paintingComplete", "success", { count: state.paintedPixels });
       state.lastPosition = { x: 0, y: 0 };
+      // Reset outline index on completion
+      state.outlineIndex = 0;
       Utils.saveProgress();
       overlayManager.clear();
       const toggleOverlayBtn = document.getElementById('toggleOverlayBtn');
