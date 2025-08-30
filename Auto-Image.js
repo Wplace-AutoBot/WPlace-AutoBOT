@@ -292,8 +292,8 @@
             return loadedTranslations[language];
         }
 
-        // Load translations from CDN
-        const url = `https://staninna.github.io/WPlace-AutoBOT/decoupled-translations/lang/${language}.json`;
+        // Load translations from CDN (GitHub Pages) matching the main branch's lang folder
+        const url = `https://staninna.github.io/WPlace-AutoBOT/lang/${language}.json`;
         const maxRetries = 3;
         const baseDelay = 1000; // 1 second
 
@@ -1074,7 +1074,7 @@
         if (source === 'turnstile-capture' && token) {
             setTurnstileToken(token);
             if (document.querySelector("#statusText")?.textContent.includes("CAPTCHA")) {
-                Utils.showAlert("Token captured successfully! You can start the bot now.", "success");
+                Utils.showAlert(Utils.t("tokenCapturedSuccess"), "success");
                 updateUI("colorsFound", "success", {count: state.availableColors.length});
             }
         }
@@ -1561,7 +1561,7 @@
             return fallback;
         },
 
-        createElement: (tag, props = {}, children = []) => {
+    createElement: (tag, props = {}, children = []) => {
             const element = document.createElement(tag)
 
             Object.entries(props).forEach(([key, value]) => {
@@ -1602,11 +1602,7 @@
         },
 
         t: (key, params = {}) => {
-            let text = TEXT[state.language]?.[key] || TEXT.en[key] || key
-            Object.keys(params).forEach((param) => {
-                text = text.replace(`{${param}}`, params[param])
-            })
-            return text
+            return getText(key, params)
         },
 
         showAlert: (message, type = "info") => {
@@ -2371,7 +2367,7 @@
         },
         async requestPermission() {
             if (!("Notification" in window)) {
-                Utils.showAlert("Notifications are not supported in this browser.", "warning");
+                Utils.showAlert(Utils.t("notificationsNotSupported"), "warning");
                 return "denied";
             }
             if (Notification.permission === "granted") return "granted";
@@ -2798,7 +2794,6 @@
 
 
     async function createUI() {
-        await detectLanguage()
 
         const existingContainer = document.getElementById("wplace-image-bot-container")
         const existingStats = document.getElementById("wplace-stats-container")
@@ -3225,8 +3220,8 @@
               <option value="pt" ${state.language === 'pt' ? 'selected' : ''} class="wplace-settings-option">🇧🇷 Português</option>
               <option value="fr" ${state.language === 'fr' ? 'selected' : ''} class="wplace-settings-option">🇫🇷 Français</option>
               <option value="tr" ${state.language === 'tr' ? 'selected' : ''} class="wplace-settings-option">🇹🇷 Türkçe</option>
-              <option value="zh" ${state.language === 'zh' ? 'selected' : ''} class="wplace-settings-option">🇨🇳 简体中文</option>
-              <option value="zh-tw" ${state.language === 'zh-tw' ? 'selected' : ''} class="wplace-settings-option">🇹🇼 繁體中文</option>
+              <option value="zh-CN" ${state.language === 'zh-CN' ? 'selected' : ''} class="wplace-settings-option">🇨🇳 简体中文</option>
+              <option value="zh-TW" ${state.language === 'zh-TW' ? 'selected' : ''} class="wplace-settings-option">🇹🇼 繁體中文</option>
               <option value="ja" ${state.language === 'ja' ? 'selected' : ''} class="wplace-settings-option">🇯🇵 日本語</option>
               <option value="ko" ${state.language === 'ko' ? 'selected' : ''} class="wplace-settings-option">🇰🇷 한국어</option>
               </select>
@@ -3831,14 +3826,23 @@
 
             const languageSelect = settingsContainer.querySelector("#languageSelect")
             if (languageSelect) {
-                languageSelect.addEventListener("change", (e) => {
-                    const newLanguage = e.target.value
-                    state.language = newLanguage
-                    localStorage.setItem('wplace_language', newLanguage)
+                languageSelect.addEventListener("change", async (e) => {
+                    const newLanguage = e.target.value;
+                    // Try to load selected language first (if not English)
+                    if (newLanguage !== 'en' && !loadedTranslations[newLanguage]) {
+                        const ok = await loadTranslations(newLanguage);
+                        if (!ok) {
+                            Utils.showAlert('Failed to load selected language. Falling back to English.', 'warning');
+                            state.language = 'en';
+                            localStorage.setItem('wplace_language', 'en');
+                            setTimeout(() => createUI(), 50);
+                            return;
+                        }
+                    }
+                    state.language = newLanguage;
+                    localStorage.setItem('wplace_language', newLanguage);
                     // Recreate UI to apply translated labels
-                    setTimeout(() => {
-                        createUI()
-                    }, 100)
+                    setTimeout(() => createUI(), 50);
                 })
             }
 
@@ -3878,9 +3882,9 @@
                 enableBlueMarbleToggle.addEventListener('click', async () => {
                     state.blueMarbleEnabled = enableBlueMarbleToggle.checked;
                     if (state.imageLoaded && overlayManager.imageBitmap) {
-                        Utils.showAlert("Re-processing overlay...", "info");
+                        Utils.showAlert(Utils.t("reprocessingOverlay"), "info");
                         await overlayManager.processImageIntoChunks();
-                        Utils.showAlert("Overlay updated!", "success");
+                        Utils.showAlert(Utils.t("overlayUpdated"), "success");
                     }
                 });
             }
@@ -3893,8 +3897,8 @@
             if (notifPermBtn) {
                 notifPermBtn.addEventListener("click", async () => {
                     const perm = await NotificationManager.requestPermission();
-                    if (perm === "granted") Utils.showAlert("Notifications enabled.", "success");
-                    else Utils.showAlert("Notifications permission denied.", "warning");
+                    if (perm === "granted") Utils.showAlert(Utils.t("notificationsEnabled"), "success");
+                    else Utils.showAlert(Utils.t("notificationsPermissionDenied"), "warning");
                 });
             }
             if (notifTestBtn) {
@@ -3967,7 +3971,7 @@
                 const isEnabled = overlayManager.toggle();
                 toggleOverlayBtn.classList.toggle('active', isEnabled);
                 toggleOverlayBtn.setAttribute('aria-pressed', isEnabled ? 'true' : 'false');
-                Utils.showAlert(`Overlay ${isEnabled ? 'enabled' : 'disabled'}.`, 'info');
+                Utils.showAlert(isEnabled ? Utils.t('overlayEnabled') : Utils.t('overlayDisabled'), 'info');
             });
         }
 
@@ -3999,7 +4003,7 @@
                     updateUI("autoSaved", "success")
                     Utils.showAlert(Utils.t("autoSaved"), "success")
                 } else {
-                    Utils.showAlert("❌ Erro ao salvar progresso", "error")
+                    Utils.showAlert(Utils.t("errorSavingProgress"), "error")
                 }
             })
         }
@@ -4008,7 +4012,7 @@
             loadBtn.addEventListener("click", () => {
                 // Check if initial setup is complete
                 if (!state.initialSetupComplete) {
-                    Utils.showAlert("🔄 Please wait for the initial setup to complete before loading progress.", "warning");
+                    Utils.showAlert(Utils.t("pleaseWaitInitialSetup"), "warning");
                     return;
                 }
 
@@ -4050,7 +4054,7 @@
                             startBtn.disabled = false
                         }
                     } else {
-                        Utils.showAlert("❌ Erro ao carregar progresso", "error")
+                        Utils.showAlert(Utils.t("errorLoadingProgress"), "error")
                     }
                 }
             })
@@ -4072,7 +4076,7 @@
             loadFromFileBtn.addEventListener("click", async () => {
                 // Check if initial setup is complete
                 if (!state.initialSetupComplete) {
-                    Utils.showAlert("🔄 Please wait for the initial setup to complete before loading from file.", "warning");
+                    Utils.showAlert(Utils.t("pleaseWaitFileSetup"), "warning");
                     return;
                 }
 
@@ -5270,7 +5274,7 @@
                 if (state.imageLoaded && state.imageData.processor && state.colorsChecked) {
                     showResizeDialog(state.imageData.processor)
                 } else if (!state.colorsChecked) {
-                    Utils.showAlert("Please upload an image first to capture available colors", "warning")
+                    Utils.showAlert(Utils.t("uploadImageFirstColors"), "warning")
                 }
             })
         }
@@ -6504,9 +6508,12 @@
         }
     }
 
-    // Load theme preference immediately on startup before creating UI
+    // Load theme and translations on startup before creating UI
     loadThemePreference()
     applyTheme()
+
+    // Ensure translations are initialized before building UI
+    await initializeTranslations();
 
     createUI().then(() => {
         setTimeout(initializeTokenGenerator, 1000);
@@ -6580,7 +6587,7 @@
                 if (transInput) transInput.value = 100;
                 if (whiteInput) whiteInput.value = 250;
                 _updateResizePreview();
-                Utils.showAlert('Advanced color settings reset.', 'success');
+                Utils.showAlert(Utils.t('advancedColorSettingsReset'), 'success');
             });
         };
         // Delay to ensure resize UI built
