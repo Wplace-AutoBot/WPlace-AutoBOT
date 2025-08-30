@@ -72,7 +72,7 @@
   "captchaSolving": "🔑 Generating Turnstile token...",
   "captchaFailed": "❌ Turnstile token generation failed. Trying fallback method...",
   "automation": "Automation", 
-  "noChargesThreshold": "⌛ Waiting for charges to reach {threshold}. Currently {current}. ETA: ~{eta} Next in {time}...",
+  "noChargesThreshold": "⌛ Waiting for charges to reach {threshold}. Currently {current}. ETA: {eta} Next in {time}...",
   "tokenCapturedSuccess": "Token captured successfully! You can start the bot now.",
   "notificationsNotSupported": "Notifications are not supported in this browser.",
   "chargesReadyNotification": "WPlace — Charges Ready",
