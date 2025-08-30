@@ -353,7 +353,7 @@ function applyTheme() {
       captchaSolving: "🔑 Generating Turnstile token...",
       captchaFailed: "❌ Turnstile token generation failed. Trying fallback method...",
       automation: "Automation",
-      noChargesThreshold: "⌛ Waiting for charges to reach {threshold}. Currently {current}. Next in {time}...",
+  noChargesThreshold: "⌛ Waiting for charges to reach {threshold}. Currently {current}. Total wait ~{eta} (30s/charge). Next in {time}...",
     },
     ru: {
       title: "WPlace Авто-Изображение",
@@ -6059,10 +6059,13 @@ function applyTheme() {
             // Enable save button during cooldown wait
             saveBtn.disabled = false;
 
+            const deficit = Math.max(0, state.cooldownChargeThreshold - state.currentCharges);
+            const etaMs = deficit * 30000; // 30s per charge
             updateUI("noChargesThreshold", "warning", {
               time: Utils.formatTime(state.cooldown),
               threshold: state.cooldownChargeThreshold,
-              current: state.currentCharges
+              current: state.currentCharges,
+              eta: Utils.formatTime(etaMs)
             });
             await updateStats();
             
@@ -6267,7 +6270,16 @@ function applyTheme() {
             break;
           }
           saveBtn.disabled = false;
-          updateUI('noChargesThreshold', 'warning', { time: Utils.formatTime(state.cooldown), threshold: state.cooldownChargeThreshold, current: state.currentCharges });
+          {
+            const deficit = Math.max(0, state.cooldownChargeThreshold - state.currentCharges);
+            const etaMs = deficit * 30000; // 30s per charge
+            updateUI('noChargesThreshold', 'warning', {
+              time: Utils.formatTime(state.cooldown),
+              threshold: state.cooldownChargeThreshold,
+              current: state.currentCharges,
+              eta: Utils.formatTime(etaMs)
+            });
+          }
           await updateStats();
           Utils.performSmartSave();
           await Utils.sleep(state.cooldown);
