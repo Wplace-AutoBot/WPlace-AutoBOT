@@ -902,7 +902,7 @@
           if (attempt === maxRetries) {
             console.warn('OverlayManager: no bitmap for', tileKey, 'after', maxRetries, 'attempts');
           } else {
-            await Utils.sleep(50 * attempt); // экспоненциальная задержка
+            await Utils.sleep(50 * attempt); // exponential delay
           }
           continue;
         }
@@ -948,8 +948,8 @@
         }
       }
 
-      // 3. Если всё провалилось — можно вернуть null или [0,0,0,0]
-      // Лучше null — чтобы не вводить в заблуждение
+      // 3. If everything fails — you can return null or [0,0,0,0]
+      // Prefer null — to avoid misleading
       return null;
     }
 
@@ -1969,7 +1969,10 @@
 
       if (colorCache.has(cacheKey)) return colorCache.get(cacheKey);
 
-      // точное совпадение
+      // Check for an exact color match in availableColors.
+      // If found, return the matched color with its ID.
+      // If not found, return the target color with null ID.
+      // Cache the result for future lookups.
       if (exactMatch) {
         const match = availableColors.find(
           (c) => c.rgb[0] === targetRgb[0] && c.rgb[1] === targetRgb[1] && c.rgb[2] === targetRgb[2]
@@ -1979,7 +1982,7 @@
         return result;
       }
 
-      // проверка на белый через порог
+      // check for white using threshold
       const whiteThreshold = state.customWhiteThreshold || CONFIG.WHITE_THRESHOLD;
       if (
         targetRgb[0] >= whiteThreshold &&
@@ -1997,7 +2000,7 @@
         }
       }
 
-      // поиск ближайшего цвета
+      // find nearest color
       let bestId = availableColors[0].id;
       let bestRgb = [...availableColors[0].rgb];
       let bestScore = Infinity;
@@ -2056,7 +2059,7 @@
       const result = { id: bestId, rgb: bestRgb };
       colorCache.set(cacheKey, result);
 
-      // ограничение кеша
+      // limit the size of the cache
       if (colorCache.size > 15000) {
         const firstKey = colorCache.keys().next().value;
         colorCache.delete(firstKey);
@@ -2391,7 +2394,7 @@
         const migrated = { ...data };
         migrated.version = '2.2';
 
-        // Добавляем новые поля с значениями по умолчанию
+        // Add new fields with default values
         if (!migrated.state.coordinateMode) {
           migrated.state.coordinateMode = 'rows';
         }
@@ -2470,22 +2473,22 @@
       let data = saved;
       const ver = data.version;
 
-      // если версия не указана или <= 1.x → сначала в v2
+      // If version is missing or ≤ 1.x → first migrate to v2
       if (!ver || ver === '1' || ver === '1.0' || ver === '1.1') {
         data = Utils.migrateProgressToV2(data);
       }
 
-      // если всё ещё старее v2.1 → мигрируем в 2.1
+      // If still older than v2.1 → migrate to 2.1
       if (data.version === '2' || data.version === '2.0') {
         data = Utils.migrateProgressToV21(data);
       }
 
-      // если всё ещё старее v2.2 → мигрируем в 2.2
+      // If still older than v2.2 → migrate to 2.2
       if (data.version === '2.1') {
         data = Utils.migrateProgressToV22(data);
       }
 
-      // теперь точно последняя версия
+      // Now data is guaranteed to be the latest version
       return data;
     },
 
@@ -2527,7 +2530,7 @@
         state.paintedMap = null;
         state._lastSavePixelCount = 0;
         state._lastSaveTime = 0;
-        // Сбрасываем настройки генерации координат к значениям по умолчанию
+        // Reset coordinate generation settings to their default values
         state.coordinateMode = 'rows';
         state.coordinateDirection = 'bottom-left';
         state.coordinateSnake = true;
@@ -2545,7 +2548,7 @@
       try {
         Object.assign(state, savedData.state);
 
-        // Восстанавливаем настройки генерации координат
+        // Restore coordinate generation settings
         if (savedData.state.coordinateMode) {
           state.coordinateMode = savedData.state.coordinateMode;
         }
@@ -3302,7 +3305,8 @@
     // Link external CSS files
     const cssLink = document.createElement('link');
     cssLink.rel = 'stylesheet';
-    cssLink.href = 'https://skalsech.github.io/WPlace-AutoBOT/feat-external-lang/auto-image-styles.css';
+    cssLink.href =
+      'https://skalsech.github.io/WPlace-AutoBOT/feat-external-lang/auto-image-styles.css';
     cssLink.setAttribute('data-wplace-theme', 'true');
     document.head.appendChild(cssLink);
 
@@ -4139,14 +4143,14 @@
     const loadFromFileBtn = container.querySelector('#loadFromFileBtn');
 
     container.querySelectorAll('.wplace-section-title').forEach((title) => {
-      // добавляем стрелку справа, если её нет
+      // Add a right-side arrow if it doesn't exist
       if (!title.querySelector('i.arrow')) {
         const arrow = document.createElement('i');
-        arrow.className = 'fas fa-chevron-down arrow'; // FontAwesome стрелка вниз
+        arrow.className = 'fas fa-chevron-down arrow'; // FontAwesome down arrow
         title.appendChild(arrow);
       }
 
-      // клик для сворачивания/разворачивания
+      // Click event to toggle collapse/expand of the section
       title.addEventListener('click', () => {
         const section = title.parentElement;
         section.classList.toggle('collapsed');
@@ -4874,9 +4878,9 @@
       statusText.className = `wplace-status status-${type}`;
 
       if (!silent) {
-        // Запускаем анимацию только если silent = false
+        // Trigger animation only when silent = false
         statusText.style.animation = 'none';
-        void statusText.offsetWidth; // трюк для перезапуска анимации
+        void statusText.offsetWidth; // trick to restart the animation
         statusText.style.animation = 'slideIn 0.3s ease-out';
       }
     };
@@ -6454,13 +6458,13 @@
   function startChargesThresholdTicker() {
     if (!state.fullChargeData) return;
 
-    // Если уже есть интервал, очищаем
+    // Clear existing interval if any
     if (state.chargesThresholdInterval) {
       clearInterval(state.chargesThresholdInterval);
     }
     if (state.stopFlag) return;
 
-    // Вызываем сразу для мгновенного обновления
+    // Call immediately for instant update
     updateChargesThresholdUI();
 
     state.chargesThresholdInterval = setInterval(() => {
@@ -6475,11 +6479,12 @@
     const remainingMs = getRemainingMsToThreshold(state.cooldownChargeThreshold);
 
     if (remainingMs <= 999) {
+      // Clear interval if threshold is reached
       if (state.chargesThresholdInterval) {
         clearInterval(state.chargesThresholdInterval);
       }
       updateUI('startPaintingMsg', 'success');
-      return; // Уже достигли порога
+      return; // Threshold already reached
     }
 
     const current = state.fullChargeData ? state.fullChargeData.current : state.currentCharges;
@@ -6519,7 +6524,7 @@
       '\n  blockHeight:',
       blockHeight
     );
-    // --------- стандартные 4 угла ----------
+    // --------- Standard 4 corners traversal ----------
     let xStart, xEnd, xStep;
     let yStart, yEnd, yStep;
     switch (direction) {
@@ -6559,7 +6564,7 @@
         throw new Error(`Unknown direction: ${direction}`);
     }
 
-    // --------- режимы обхода ----------
+    // --------- Traversal modes ----------
     if (mode === 'rows') {
       for (let y = yStart; y !== yEnd; y += yStep) {
         if (snake && (y - yStart) % 2 !== 0) {
@@ -6629,14 +6634,14 @@
       }
 
       if (mode === 'shuffle-blocks') {
-        // простая тасовка Фишера-Йетса
+        // Simple Fisher-Yates shuffle
         for (let i = blocks.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
           [blocks[i], blocks[j]] = [blocks[j], blocks[i]];
         }
       }
 
-      // склеиваем все блоки
+      // Concatenate all blocks
       for (const block of blocks) {
         coords.push(...block);
       }
