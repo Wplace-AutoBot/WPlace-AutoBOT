@@ -3081,8 +3081,8 @@ function applyTheme() {
             <select id="batchModeSelect" class="wplace-batch-mode-select">
               <option value="normal" class="wplace-settings-option">📦 Normal (Fixed Size)</option>
               <option value="random" class="wplace-settings-option">🎲 Random (Range)</option>
+              <option value="random-spots" class="wplace-settings-option">✨ Random Placement</option>
               <option value="outline" class="wplace-settings-option">🖊️ Outline First</option>
-              <option value="random-spots" class="wplace-settings-option">✨ Random Spots</option>
             </select>
           </div>
           
