@@ -15,6 +15,11 @@
             MIN: 3,          // Random range minimum
             MAX: 20,         // Random range maximum
         },
+            RANDOMNESS: {
+                EXTERNAL_ENABLED: true, // Try external randomness API
+                BYTE_POOL_SIZE: 4096,    // Prefetch size in bytes
+                API_URL: 'https://www.random.org/integers/?num={num}&min=0&max=255&col=1&base=10&format=plain&rnd=new' // newline-separated bytes
+            },
         PAINTING_SPEED_ENABLED: false, // Off by default
         AUTO_CAPTCHA_ENABLED: true, // Turnstile generator enabled by default
         TOKEN_SOURCE: "generator", // "generator", "manual", or "hybrid" - default to generator
@@ -1782,6 +1787,92 @@
     }
 
     // UTILITY FUNCTIONS
+        // Randomness provider: random.org with graceful fallbacks (crypto PRNG, xorshift)
+        const Random = {
+            _pool: null,
+            _idx: 0,
+            _seed: (Date.now() ^ (Math.random() * 0x7fffffff)) >>> 0,
+            async init() {
+                try {
+                    if (!CONFIG.RANDOMNESS.EXTERNAL_ENABLED) return;
+                    await this._refillPool(CONFIG.RANDOMNESS.BYTE_POOL_SIZE);
+                    console.log(`🎲 Random: initialized pool with ${this._pool?.length || 0} bytes`);
+                } catch (e) {
+                    console.warn('Random: init failed, will fallback on-demand:', e);
+                }
+            },
+            async _refillPool(n) {
+                try {
+                    const url = CONFIG.RANDOMNESS.API_URL.replace('{num}', String(n));
+                    const res = await fetch(url, { method: 'GET', cache: 'no-store' });
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    const text = await res.text();
+                    const lines = text.trim().split(/\s+/);
+                    const bytes = new Uint8Array(lines.length);
+                    for (let i = 0; i < lines.length; i++) {
+                        let v = parseInt(lines[i], 10);
+                        if (Number.isNaN(v)) v = 0;
+                        if (v < 0) v = 0; if (v > 255) v = 255;
+                        bytes[i] = v;
+                    }
+                    this._pool = bytes;
+                    this._idx = 0;
+                } catch (e) {
+                    // If CORS or network fails, keep pool null; we will fallback per-byte
+                    this._pool = null;
+                    this._idx = 0;
+                    throw e;
+                }
+            },
+            _xorshift32() {
+                // Simple xorshift32
+                let x = this._seed || 2463534242;
+                x ^= x << 13; x ^= x >>> 17; x ^= x << 5;
+                this._seed = x >>> 0;
+                return this._seed;
+            },
+            _fallbackByte() {
+                // crypto if available, else xorshift
+                try {
+                    if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+                        const arr = new Uint8Array(1);
+                        crypto.getRandomValues(arr);
+                        return arr[0];
+                    }
+                } catch { /* ignore */ }
+                return (this._xorshift32() & 0xff);
+            },
+            nextByteSync() {
+                if (this._pool && this._idx < this._pool.length) {
+                    return this._pool[this._idx++];
+                }
+                return this._fallbackByte();
+            },
+            randInt(min, max) {
+                // inclusive min,max; works without awaiting network
+                if (max < min) { const t = min; min = max; max = t; }
+                const span = (max - min + 1) >>> 0;
+                if (span <= 1) return min;
+                // Use 32-bit to reduce modulo bias
+                const b0 = this.nextByteSync();
+                const b1 = this.nextByteSync();
+                const b2 = this.nextByteSync();
+                const b3 = this.nextByteSync();
+                const r = ((b0) | (b1 << 8) | (b2 << 16) | (b3 << 24)) >>> 0;
+                return min + (r % span);
+            },
+            shuffleInPlace(arr) {
+                for (let i = arr.length - 1; i > 0; i--) {
+                    const j = this.randInt(0, i);
+                    const tmp = arr[i];
+                    arr[i] = arr[j];
+                    arr[j] = tmp;
+                }
+                return arr;
+            }
+        };
+
+        // UTILITY FUNCTIONS
     const Utils = {
         sleep: (ms) => new Promise((r) => setTimeout(r, ms)),
 
@@ -3713,11 +3804,12 @@
               <i class="fas fa-dice wplace-icon-dice"></i>
               Batch Mode
             </label>
-            <select id="batchModeSelect" class="wplace-batch-mode-select">
-              <option value="normal" class="wplace-settings-option">📦 Normal (Fixed Size)</option>
-              <option value="random" class="wplace-settings-option">🎲 Random (Range)</option>
-              <option value="outline" class="wplace-settings-option">✏️ Outline First</option>
-            </select>
+                        <select id="batchModeSelect" class="wplace-batch-mode-select">
+                            <option value="normal" class="wplace-settings-option">📦 Normal (Fixed Size)</option>
+                            <option value="random" class="wplace-settings-option">🎲 Random (Range)</option>
+                            <option value="outline" class="wplace-settings-option">✏️ Outline First</option>
+                            <option value="random-spots" class="wplace-settings-option">🔀 Random Spots (Placement)</option>
+                        </select>
           </div>
           
           <!-- Normal Mode: Fixed Size Slider -->
@@ -4434,11 +4526,8 @@
                     const newLanguage = e.target.value
                     state.language = newLanguage
                     localStorage.setItem('wplace_language', newLanguage)
-
-                    setTimeout(() => {
-                        settingsContainer.style.display = "none"
-                        createUI()
-                    }, 100)
+                    // Recreate UI to apply translated labels
+                    setTimeout(() => { createUI() }, 100)
                 })
             }
 
@@ -6062,6 +6151,11 @@
             return await processImageOutlineFirst({width, height, pixels, startX, startY, regionX, regionY});
         }
 
+        // Random-spots mode: paint eligible pixels in random order across the whole image
+        if (state.batchMode === 'random-spots') {
+            return await processImageRandomSpots({width, height, pixels, startX, startY, regionX, regionY});
+        }
+
         let startRow = 0;
         let startCol = 0;
         let foundStart = false;
@@ -6223,7 +6317,7 @@
                     // Calculate batch size based on mode (normal/random)
                     const maxBatchSize = calculateBatchSize();
                     if (pixelBatch.pixels.length >= maxBatchSize) {
-                        const modeText = state.batchMode === 'random' ? `random (${state.randomBatchMin}-${state.randomBatchMax})` : (state.batchMode === 'outline' ? 'outline' : 'normal');
+                        const modeText = state.batchMode === 'random' ? `random (${state.randomBatchMin}-${state.randomBatchMax})` : (state.batchMode === 'outline' ? 'outline' : (state.batchMode === 'random-spots' ? 'random-spots' : 'normal'));
                         console.log(`📦 Sending batch with ${pixelBatch.pixels.length} pixels (mode: ${modeText}, target: ${maxBatchSize})`);
                         const success = await sendBatchWithRetry(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
 
@@ -6538,15 +6632,166 @@
         return true;
     }
 
+    // Random-spots painting pipeline: place pixels in random positions
+    async function processImageRandomSpots(ctx) {
+        const {width, height, pixels, startX, startY, regionX, regionY} = ctx;
+
+        const tThresh2 = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
+        const isEligibleAt = (x, y) => {
+            const idx = (y * width + x) * 4;
+            const r = pixels[idx], g = pixels[idx + 1], b = pixels[idx + 2], a = pixels[idx + 3];
+            if (a < tThresh2) return false;
+            if (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b)) return false;
+            return true;
+        };
+
+        // Build list of all eligible coordinates
+        const coords = [];
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                if (isEligibleAt(x, y)) coords.push({x, y});
+            }
+        }
+
+    // Shuffle using Random provider to mix positions robustly
+    Random.shuffleInPlace(coords);
+
+        let pixelBatch = null;
+        for (let i = 0; i < coords.length; i++) {
+            if (state.stopFlag) break;
+            const {x, y} = coords[i];
+
+            const idx = (y * width + x) * 4;
+            const r = pixels[idx], g = pixels[idx + 1], b = pixels[idx + 2];
+            const colorId = findClosestColor([r, g, b], state.availableColors);
+
+            const absX = startX + x;
+            const absY = startY + y;
+            const adderX = Math.floor(absX / 1000);
+            const adderY = Math.floor(absY / 1000);
+            const pixelX = absX % 1000;
+            const pixelY = absY % 1000;
+
+            if (!pixelBatch || pixelBatch.regionX !== regionX + adderX || pixelBatch.regionY !== regionY + adderY) {
+                if (pixelBatch && pixelBatch.pixels.length > 0) {
+                    const success = await sendBatchWithRetry(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
+                    if (success) {
+                        pixelBatch.pixels.forEach((p) => {
+                            state.paintedPixels++;
+                            Utils.markPixelPainted(p.x, p.y, pixelBatch.regionX, pixelBatch.regionY);
+                        });
+                        state.currentCharges -= pixelBatch.pixels.length;
+                        updateStats();
+                        Utils.performSmartSave();
+                    } else {
+                        console.error('❌ Batch failed permanently. Stopping painting.');
+                        state.stopFlag = true;
+                        break;
+                    }
+                }
+                pixelBatch = { regionX: regionX + adderX, regionY: regionY + adderY, pixels: [] };
+            }
+
+            // Skip already painted pixel if overlay indicates correct color
+            try {
+                let existingColorRGBA = null;
+                if (overlayManager.isEnabled) {
+                    const tileKeyStr = `${pixelBatch.regionX},${pixelBatch.regionY}`;
+                    if (overlayManager.originalTilesData?.has(tileKeyStr) || overlayManager.originalTiles?.has(tileKeyStr)) {
+                        existingColorRGBA = await overlayManager.getTilePixelColor(pixelBatch.regionX, pixelBatch.regionY, pixelX, pixelY).catch(() => null);
+                    }
+                }
+                if (existingColorRGBA && Array.isArray(existingColorRGBA)) {
+                    const [er, eg, eb] = existingColorRGBA;
+                    const existingColorId = findClosestColor([er, eg, eb], state.availableColors);
+                    if (existingColorId === colorId) {
+                        continue;
+                    }
+                }
+            } catch { /* ignore */ }
+
+            pixelBatch.pixels.push({ x: pixelX, y: pixelY, color: colorId, localX: x, localY: y });
+
+            const maxBatchSize = calculateBatchSize();
+            if (pixelBatch.pixels.length >= maxBatchSize) {
+                const success = await sendBatchWithRetry(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
+                if (success) {
+                    pixelBatch.pixels.forEach((p) => {
+                        state.paintedPixels++;
+                        Utils.markPixelPainted(p.x, p.y, pixelBatch.regionX, pixelBatch.regionY);
+                    });
+                    state.currentCharges -= pixelBatch.pixels.length;
+                    updateStats();
+                    Utils.performSmartSave();
+                } else {
+                    console.error('❌ Batch failed permanently. Stopping painting.');
+                    state.stopFlag = true;
+                    break;
+                }
+                pixelBatch.pixels = [];
+            }
+
+            while (state.currentCharges < state.cooldownChargeThreshold && !state.stopFlag) {
+                const {charges, cooldown} = await WPlaceService.getCharges();
+                state.currentCharges = Math.floor(charges);
+                state.cooldown = cooldown;
+                if (state.currentCharges >= state.cooldownChargeThreshold) {
+                    NotificationManager.maybeNotifyChargesReached(true);
+                    updateStats();
+                    break;
+                }
+                saveBtn.disabled = false;
+                const deficit = Math.max(0, state.cooldownChargeThreshold - state.currentCharges);
+                const etaMs = deficit * 30000;
+                updateUI('noChargesThreshold', 'warning', {
+                    time: Utils.formatTime(state.cooldown),
+                    threshold: state.cooldownChargeThreshold,
+                    current: state.currentCharges,
+                    eta: Utils.formatTime(etaMs)
+                });
+                await updateStats();
+                Utils.performSmartSave();
+                await Utils.sleep(state.cooldown);
+            }
+            if (!state.stopFlag) saveBtn.disabled = true;
+        }
+
+        if (pixelBatch && pixelBatch.pixels.length > 0 && !state.stopFlag) {
+            const success = await sendBatchWithRetry(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
+            if (success) {
+                pixelBatch.pixels.forEach((p) => {
+                    state.paintedPixels++;
+                    Utils.markPixelPainted(p.x, p.y, pixelBatch.regionX, pixelBatch.regionY);
+                });
+                state.currentCharges -= pixelBatch.pixels.length;
+                Utils.saveProgress();
+            } else {
+                console.warn(`⚠️ Final batch failed with ${pixelBatch.pixels.length} pixels after all retries.`);
+            }
+        }
+
+        overlayManager.clear();
+        const toggleOverlayBtn = document.getElementById('toggleOverlayBtn');
+        if (toggleOverlayBtn) {
+            toggleOverlayBtn.classList.remove('active');
+            toggleOverlayBtn.disabled = true;
+        }
+        updateUI('paintingComplete', 'success', {count: state.paintedPixels});
+        state.lastPosition = {x: 0, y: 0};
+        Utils.saveProgress();
+        updateStats();
+        return true;
+    }
+
     // Helper function to calculate batch size based on mode
     function calculateBatchSize() {
         let targetBatchSize;
 
         if (state.batchMode === 'random') {
-            // Generate random batch size within the specified range
+            // Generate random batch size within the specified range using Random provider
             const min = Math.max(1, state.randomBatchMin);
             const max = Math.max(min, state.randomBatchMax);
-            targetBatchSize = Math.floor(Math.random() * (max - min + 1)) + min;
+            targetBatchSize = Random.randInt(min, max);
             console.log(`🎲 Random batch size generated: ${targetBatchSize} (range: ${min}-${max})`);
         } else {
             // Normal mode - use the fixed paintingSpeed value
@@ -6803,7 +7048,7 @@
                 if (state.batchMode === 'random') {
                     normalBatchControls.style.display = 'none';
                     randomBatchControls.style.display = 'block';
-                } else if (state.batchMode === 'outline') {
+                } else if (state.batchMode === 'outline' || state.batchMode === 'random-spots') {
                     normalBatchControls.style.display = 'none';
                     randomBatchControls.style.display = 'none';
                 } else {
@@ -6958,6 +7203,8 @@
     createUI().then(() => {
         // Generate token automatically after UI is ready
         setTimeout(initializeTokenGenerator, 1000);
+    // Initialize randomness provider in background (non-blocking)
+    setTimeout(() => { Random.init().catch(() => {}); }, 0);
 
         // Attach advanced color matching listeners (resize dialog)
         const advancedInit = () => {
