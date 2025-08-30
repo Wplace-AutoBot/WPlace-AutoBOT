@@ -5574,15 +5574,42 @@ function applyTheme() {
       return true;
     };
 
-    // Build ordered list: perimeter rings from outer to inner
+    // Build ordered list by peeling actual edges of the eligible shape layer-by-layer
+    // Edge definition: an eligible pixel with at least one 4-neighbor (N/S/E/W) not eligible or out of bounds
     const order = [];
-    let top = 0, left = 0, bottom = height - 1, right = width - 1;
-    while (top <= bottom && left <= right) {
-      for (let x = left; x <= right; x++) order.push([x, top]);
-      for (let y = top + 1; y <= bottom; y++) order.push([right, y]);
-      if (top < bottom) for (let x = right - 1; x >= left; x--) order.push([x, bottom]);
-      if (left < right) for (let y = bottom - 1; y > top; y--) order.push([left, y]);
-      top++; left++; bottom--; right--;
+    // Build an eligibility mask to mutate as we peel layers
+    const elig = new Uint8Array(width * height);
+    let remaining = 0;
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        if (isEligibleAt(x, y)) { elig[y * width + x] = 1; remaining++; }
+      }
+    }
+    const isElig = (x, y) => (x >= 0 && y >= 0 && x < width && y < height) && elig[y * width + x] === 1;
+    while (remaining > 0) {
+      const layer = [];
+      // Scan in read order to produce stable edges
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          if (!isElig(x, y)) continue;
+          const edge = !isElig(x, y - 1) || !isElig(x + 1, y) || !isElig(x, y + 1) || !isElig(x - 1, y);
+          if (edge) layer.push([x, y]);
+        }
+      }
+      if (layer.length === 0) {
+        // No detected edge (shouldn't happen), flush remaining in read order to avoid infinite loop
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            if (isElig(x, y)) layer.push([x, y]);
+          }
+        }
+      }
+      // Append this edge layer to global order and remove it from elig mask
+      for (const [x, y] of layer) {
+        order.push([x, y]);
+        const idxMask = y * width + x;
+        if (elig[idxMask] === 1) { elig[idxMask] = 0; remaining--; }
+      }
     }
 
     // Resume from saved outline index if present
