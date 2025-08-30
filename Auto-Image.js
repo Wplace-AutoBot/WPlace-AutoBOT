@@ -354,6 +354,10 @@ function applyTheme() {
       captchaFailed: "❌ Turnstile token generation failed. Trying fallback method...",
       automation: "Automation",
       noChargesThreshold: "⌛ Waiting for charges to reach {threshold}. Currently {current}. Next in {time}...",
+      keepAspectRatio: "Keep Aspect Ratio",
+      paintOptions: "Paint Options",
+      paintWhitePixels: "Paint White Pixels",
+      paintTransparentPixels: "Paint Transparent Pixels",
     },
     ru: {
       title: "WPlace Авто-Изображение",
@@ -427,6 +431,10 @@ function applyTheme() {
       captchaFailed: "❌ Не удалось сгенерировать Turnstile токен. Пробую резервный метод...",
       automation: "Автоматизация",
       noChargesThreshold: "⌛ Ожидание зарядов до {threshold}. Сейчас {current}. Следующий через {time}...",
+      keepAspectRatio: "Сохранять пропорции",
+      paintOptions: "Параметры рисования",
+      paintWhitePixels: "Рисовать белые пиксели",
+      paintTransparentPixels: "Рисовать прозрачные пиксели",
     },
     pt: {
       title: "WPlace Auto-Image",
@@ -500,6 +508,10 @@ function applyTheme() {
       captchaFailed: "❌ Falha ao resolver CAPTCHA. Pinte um pixel manualmente.",
       automation: "Automação",
       noChargesThreshold: "⌛ Aguardando cargas atingirem {threshold}. Atual: {current}. Próxima em {time}...",
+      keepAspectRatio: "Manter proporção",
+      paintOptions: "Opções de Pintura",
+      paintWhitePixels: "Pintar pixels brancos",
+      paintTransparentPixels: "Pintar pixels transparentes",
     },
     vi: {
       title: "WPlace Auto-Image",
@@ -573,6 +585,10 @@ function applyTheme() {
       captchaFailed: "❌ Giải CAPTCHA tự động thất bại. Vui lòng vẽ một pixel thủ công.",
       automation: "Tự động hóa",
       noChargesThreshold: "⌛ Đang chờ số lần sạc đạt {threshold}. Hiện tại {current}. Lần tiếp theo trong {time}...",
+      keepAspectRatio: "Giữ tỉ lệ",
+      paintOptions: "Tùy chọn vẽ",
+      paintWhitePixels: "Tô pixel trắng",
+      paintTransparentPixels: "Tô pixel trong suốt",
     },
     fr: {
       title: "WPlace Auto-Image",
@@ -646,6 +662,10 @@ function applyTheme() {
       captchaFailed: "❌ Échec de l'Auto-CAPTCHA. Peignez un pixel manuellement.",
       automation: "Automatisation",
       noChargesThreshold: "⌛ En attente que les charges atteignent {threshold}. Actuel: {current}. Prochaine dans {time}...",
+      keepAspectRatio: "Conserver les proportions",
+      paintOptions: "Options de peinture",
+      paintWhitePixels: "Peindre les pixels blancs",
+      paintTransparentPixels: "Peindre les pixels transparents",
     },
     id: {
       title: "WPlace Auto-Image",
@@ -719,6 +739,10 @@ function applyTheme() {
       captchaFailed: "❌ Gagal menyelesaikan CAPTCHA. Lukis satu piksel secara manual.",
       automation: "Automasi",
       noChargesThreshold: "⌛ Menunggu muatan mencapai {threshold}. Saat ini: {current}. Berikutnya dalam {time}...",
+      keepAspectRatio: "Pertahankan rasio aspek",
+      paintOptions: "Opsi Mewarnai",
+      paintWhitePixels: "Warnai piksel putih",
+      paintTransparentPixels: "Warnai piksel transparan",
     },
     tr: {
       title: "WPlace Otomatik-Resim",
@@ -790,6 +814,10 @@ function applyTheme() {
       captchaFailed: "❌ Oto-CAPTCHA başarısız oldu. Bir pikseli manuel boyayın.",
       automation: "Otomasyon",
       noChargesThreshold: "⌛ Hakların {threshold} seviyesine ulaşması bekleniyor. Şu anda {current}. Sonraki {time} içinde...",
+      keepAspectRatio: "En-Boy Oranını Koru",
+      paintOptions: "Boyama Seçenekleri",
+      paintWhitePixels: "Beyaz Pikselleri Boya",
+      paintTransparentPixels: "Şeffaf Pikselleri Boya",
     },
     zh: {
       title: "WPlace 自动图像",
@@ -866,6 +894,10 @@ function applyTheme() {
       captchaFailed: "❌ 令牌生成失败。尝试回退方法...",
       automation: "自动化",
       noChargesThreshold: "⌛ 等待次数达到 {threshold}。当前 {current}。下次在 {time}...",
+      keepAspectRatio: "保持纵横比",
+      paintOptions: "绘制选项",
+      paintWhitePixels: "绘制白色像素",
+      paintTransparentPixels: "绘制透明像素",
     },
     "zh-tw": {
       title: "WPlace 自動圖像",
@@ -942,6 +974,10 @@ function applyTheme() {
       captchaFailed: "❌ 令牌產生失敗。嘗試回退方法...",
       automation: "自動化",
       noChargesThreshold: "⌛ 等待次數達到 {threshold}。目前 {current}。下次在 {time}...",
+      keepAspectRatio: "保持寬高比",
+      paintOptions: "繪製選項",
+      paintWhitePixels: "繪製白色像素",
+      paintTransparentPixels: "繪製透明像素",
     },
     ja: {
       title: "WPlace 自動画像",
@@ -1018,6 +1054,10 @@ function applyTheme() {
       captchaFailed: "❌ トークン生成失敗。フォールバックを試行...",
       automation: "自動化",
       noChargesThreshold: "⌛ チャージ {threshold} を待機中。現在 {current}。次は {time} 後...",
+      keepAspectRatio: "アスペクト比を維持",
+      paintOptions: "描画オプション",
+      paintWhitePixels: "白いピクセルを描画",
+      paintTransparentPixels: "透明なピクセルを描画",
     },
     ko: {
       title: "WPlace 자동 이미지",
@@ -1094,6 +1134,10 @@ function applyTheme() {
       captchaFailed: "❌ 토큰 생성 실패. 폴백 시도...",
       automation: "자동화",
       noChargesThreshold: "⌛ 횟수가 {threshold} 에 도달할 때까지 대기 중. 현재 {current}. 다음 {time} 후...",
+      keepAspectRatio: "종횡비 유지",
+      paintOptions: "그리기 옵션",
+      paintWhitePixels: "흰색 픽셀 그리기",
+      paintTransparentPixels: "투명 픽셀 그리기",
     },
     uk: {
       title: "WPlace Авто-Зображення",
@@ -1168,6 +1212,10 @@ function applyTheme() {
       captchaFailed: "❌ Не вдалося згенерувати токен Turnstile. Використовую запасний метод...",
       automation: "Автоматизація",
       noChargesThreshold: "⌛ Очікування, доки заряди досягнуть {threshold}. Зараз {current}. Наступне через {time}...",
+      keepAspectRatio: "Зберігати співвідношення сторін",
+      paintOptions: "Параметри малювання",
+      paintWhitePixels: "Малювати білі пікселі",
+      paintTransparentPixels: "Малювати прозорі пікселі",
     },
   }
 
@@ -1181,6 +1229,7 @@ function applyTheme() {
     availableColors: [],
     activeColorPalette: [], // User-selected colors for conversion
     paintWhitePixels: true, // Default to ON
+    paintTransparentPixels: true, // Default to ON
     currentCharges: 0,
     maxCharges: 1, // Default max charges
     cooldown: CONFIG.COOLDOWN_DEFAULT,
@@ -1495,7 +1544,7 @@ function applyTheme() {
         const d = cached.data;
         const a = d[idx + 3];
         const alphaThresh = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
-        if (a < alphaThresh) {
+        if (!state.paintTransparentPixels && a < alphaThresh) {
           // Treat as transparent / unavailable
           // Lightweight debug: show when transparency causes skip (only if verbose enabled)
           if (window._overlayDebug) console.debug('getTilePixelColor: transparent pixel, skipping', tileKey, x, y, a);
@@ -1527,7 +1576,7 @@ function applyTheme() {
         const data = ctx.getImageData(x, y, 1, 1).data;
         const a = data[3];
         const alphaThresh = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
-        if (a < alphaThresh) {
+        if (!state.paintTransparentPixels && a < alphaThresh) {
           if (window._overlayDebug) console.debug('getTilePixelColor: transparent pixel (fallback), skipping', tileKey, x, y, a);
           return null;
         }
@@ -3652,6 +3701,41 @@ function applyTheme() {
           </div>
         </div>
 
+        <!-- Paint Options Section -->
+        <div class="wplace-settings-section">
+          <label class="wplace-settings-section-label">
+            <i class="fas fa-paint-brush wplace-icon-paint"></i>
+            ${Utils.t("paintOptions")}
+          </label>
+          <div class="wplace-settings-section-wrapper wplace-overlay-wrapper" style="
+            background: ${theme.accent ? `${theme.accent}20` : 'rgba(255,255,255,0.1)'};
+            border-radius: ${theme.borderRadius || '12px'};
+            border: 1px solid ${theme.accent || 'rgba(255,255,255,0.1)'};
+            ${theme.animations?.glow ? `
+              box-shadow: 0 0 15px ${theme.accent || 'rgba(255,255,255,0.1)'}33;
+            ` : ''}
+          ">
+              <!-- Paint White Pixels Toggle -->
+              <label for="settingsPaintWhiteToggle" class="wplace-blue-marble-toggle">
+                  <div>
+                      <span class="wplace-blue-marble-title" style="color: ${theme.text || 'white'};">${Utils.t("paintWhitePixels")}</span>
+                  </div>
+                  <input type="checkbox" id="settingsPaintWhiteToggle" ${state.paintWhitePixels ? 'checked' : ''} class="wplace-blue-marble-checkbox" style="
+                    accent-color: ${theme.highlight || '#48dbfb'};
+                  "/>
+              </label>
+              <!-- Paint Transparent Pixels Toggle -->
+              <label for="settingsPaintTransparentToggle" class="wplace-blue-marble-toggle">
+                  <div>
+                      <span class="wplace-blue-marble-title" style="color: ${theme.text || 'white'};">${Utils.t("paintTransparentPixels")}</span>
+                  </div>
+                  <input type="checkbox" id="settingsPaintTransparentToggle" ${state.paintTransparentPixels ? 'checked' : ''} class="wplace-blue-marble-checkbox" style="
+                    accent-color: ${theme.highlight || '#48dbfb'};
+                  "/>
+              </label>
+          </div>
+        </div>
+
         <!-- Speed Control Section -->
         <div class="wplace-settings-section">
           <label class="wplace-settings-section-label">
@@ -3903,11 +3987,15 @@ function applyTheme() {
         </label>
         <label class="resize-checkbox-label">
           <input type="checkbox" id="keepAspect" checked>
-          Keep Aspect Ratio
+          ${Utils.t("keepAspectRatio")}
         </label>
         <label class="resize-checkbox-label">
             <input type="checkbox" id="paintWhiteToggle" checked>
-            Paint White Pixels
+            ${Utils.t("paintWhitePixels")}
+        </label>
+        <label class="resize-checkbox-label">
+            <input type="checkbox" id="paintTransparentToggle" checked>
+            ${Utils.t("paintTransparentPixels")}
         </label>
         <div class="resize-zoom-controls">
           <button id="zoomOutBtn" class="wplace-btn resize-zoom-btn" title="Zoom Out"><i class="fas fa-search-minus"></i></button>
@@ -4395,17 +4483,33 @@ function applyTheme() {
         })
       }
 
-      const overlayOpacitySlider = settingsContainer.querySelector("#overlayOpacitySlider");
-      const overlayOpacityValue = settingsContainer.querySelector("#overlayOpacityValue");
-      const enableBlueMarbleToggle = settingsContainer.querySelector("#enableBlueMarbleToggle");
+        const overlayOpacitySlider = settingsContainer.querySelector("#overlayOpacitySlider");
+        const overlayOpacityValue = settingsContainer.querySelector("#overlayOpacityValue");
+        const enableBlueMarbleToggle = settingsContainer.querySelector("#enableBlueMarbleToggle");
+        const settingsPaintWhiteToggle = settingsContainer.querySelector("#settingsPaintWhiteToggle");
+        const settingsPaintTransparentToggle = settingsContainer.querySelector("#settingsPaintTransparentToggle");
 
-      if (overlayOpacitySlider && overlayOpacityValue) {
-        overlayOpacitySlider.addEventListener('input', (e) => {
-          const opacity = parseFloat(e.target.value);
-          state.overlayOpacity = opacity;
-          overlayOpacityValue.textContent = `${Math.round(opacity * 100)}%`;
-        });
-      }
+        if (overlayOpacitySlider && overlayOpacityValue) {
+          overlayOpacitySlider.addEventListener('input', (e) => {
+            const opacity = parseFloat(e.target.value);
+            state.overlayOpacity = opacity;
+            overlayOpacityValue.textContent = `${Math.round(opacity * 100)}%`;
+          });
+        }
+
+        if (settingsPaintWhiteToggle) {
+          settingsPaintWhiteToggle.addEventListener('change', (e) => {
+            state.paintWhitePixels = e.target.checked;
+            saveBotSettings();
+          });
+        }
+
+        if (settingsPaintTransparentToggle) {
+          settingsPaintTransparentToggle.addEventListener('change', (e) => {
+            state.paintTransparentPixels = e.target.checked;
+            saveBotSettings();
+          });
+        }
 
       // Speed slider event listener
       const speedSlider = settingsContainer.querySelector("#speedSlider");
@@ -4456,6 +4560,7 @@ function applyTheme() {
     const heightValue = resizeContainer.querySelector("#heightValue")
     const keepAspect = resizeContainer.querySelector("#keepAspect")
     const paintWhiteToggle = resizeContainer.querySelector("#paintWhiteToggle");
+    const paintTransparentToggle = resizeContainer.querySelector("#paintTransparentToggle");
   const zoomSlider = resizeContainer.querySelector("#zoomSlider");
   const zoomValue = resizeContainer.querySelector('#zoomValue');
   const zoomInBtn = resizeContainer.querySelector('#zoomInBtn');
@@ -4767,6 +4872,7 @@ function applyTheme() {
   zoomSlider.value = 1;
   if (zoomValue) zoomValue.textContent = '100%';
       paintWhiteToggle.checked = state.paintWhitePixels;
+      paintTransparentToggle.checked = state.paintTransparentPixels;
 
       let _previewTimer = null;
       let _previewJobId = 0;
@@ -4870,7 +4976,7 @@ function applyTheme() {
               const idx = y * w + x;
               const i4 = idx * 4;
               const r = data[i4], g = data[i4 + 1], b = data[i4 + 2], a = data[i4 + 3];
-              const isEligible = a >= tThresh && (state.paintWhitePixels || !Utils.isWhitePixel(r, g, b));
+              const isEligible = (state.paintTransparentPixels || a >= tThresh) && (state.paintWhitePixels || !Utils.isWhitePixel(r, g, b));
               eligible[idx] = isEligible ? 1 : 0;
               work[idx * 3] = r;
               work[idx * 3 + 1] = g;
@@ -4922,7 +5028,7 @@ function applyTheme() {
         } else {
           for (let i = 0; i < data.length; i += 4) {
             const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
-            if (a < tThresh || (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b))) {
+            if ((!state.paintTransparentPixels && a < tThresh) || (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b))) {
               data[i + 3] = 0;
               continue;
             }
@@ -4969,10 +5075,17 @@ function applyTheme() {
   if (!isNaN(fit) && isFinite(fit)) applyZoom(fit);
       };
 
-      paintWhiteToggle.onchange = (e) => {
-        state.paintWhitePixels = e.target.checked;
-        _updateResizePreview();
-      };
+        paintWhiteToggle.onchange = (e) => {
+          state.paintWhitePixels = e.target.checked;
+          _updateResizePreview();
+          saveBotSettings();
+        };
+
+        paintTransparentToggle.onchange = (e) => {
+          state.paintTransparentPixels = e.target.checked;
+          _updateResizePreview();
+          saveBotSettings();
+        };
 
       let panX = 0, panY = 0;
       const clampPan = () => {
@@ -5406,7 +5519,7 @@ function applyTheme() {
               const i4 = idx * 4;
               const r = data[i4], g = data[i4 + 1], b = data[i4 + 2], a = data[i4 + 3];
               const masked = mask && mask[idx];
-              const isEligible = !masked && a >= tThresh2 && (state.paintWhitePixels || !Utils.isWhitePixel(r, g, b));
+              const isEligible = !masked && (state.paintTransparentPixels || a >= tThresh2) && (state.paintWhitePixels || !Utils.isWhitePixel(r, g, b));
               eligible[idx] = isEligible ? 1 : 0;
               work[idx * 3] = r;
               work[idx * 3 + 1] = g;
@@ -5463,7 +5576,7 @@ function applyTheme() {
           for (let i = 0; i < data.length; i += 4) {
             const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
             const masked = mask && mask[(i>>2)];
-            const isTransparent = a < tThresh2 || masked;
+            const isTransparent = (!state.paintTransparentPixels && a < tThresh2) || masked;
             const isWhiteAndSkipped = !state.paintWhitePixels && Utils.isWhitePixel(r, g, b);
             if (isTransparent || isWhiteAndSkipped) {
               data[i + 3] = 0; // overlay transparency
@@ -5597,7 +5710,7 @@ function applyTheme() {
 
           let totalValidPixels = 0;
           for (let i = 0; i < pixels.length; i += 4) {
-            const isTransparent = pixels[i + 3] < (state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD);
+            const isTransparent = !state.paintTransparentPixels && pixels[i + 3] < (state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD);
             const isWhiteAndSkipped = !state.paintWhitePixels && Utils.isWhitePixel(pixels[i], pixels[i + 1], pixels[i + 2]);
             if (!isTransparent && !isWhiteAndSkipped) {
               totalValidPixels++;
@@ -5842,7 +5955,7 @@ function applyTheme() {
     const isEligibleAt = (x, y) => {
       const idx = (y * width + x) * 4;
       const r = pixels[idx], g = pixels[idx + 1], b = pixels[idx + 2], a = pixels[idx + 3];
-      if (a < tThresh2) return false;
+      if (!state.paintTransparentPixels && a < tThresh2) return false;
       if (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b)) return false;
       return true;
     };
@@ -5890,8 +6003,8 @@ function applyTheme() {
           const alpha = pixels[idx + 3]
 
           const tThresh2 = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
-          if (alpha < tThresh2 || (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b))) {
-            if (alpha < tThresh2) {
+          if ((!state.paintTransparentPixels && alpha < tThresh2) || (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b))) {
+            if (!state.paintTransparentPixels && alpha < tThresh2) {
               skippedPixels.transparent++;
             } else {
               skippedPixels.white++;
@@ -6288,6 +6401,7 @@ function applyTheme() {
   customTransparencyThreshold: state.customTransparencyThreshold,
   customWhiteThreshold: state.customWhiteThreshold,
   paintWhitePixels: state.paintWhitePixels,
+  paintTransparentPixels: state.paintTransparentPixels,
   resizeSettings: state.resizeSettings,
   originalImage: state.originalImage,
   // Save ignore mask (as base64) with its dimensions
@@ -6333,6 +6447,7 @@ function applyTheme() {
   state.customTransparencyThreshold = settings.customTransparencyThreshold ?? CONFIG.TRANSPARENCY_THRESHOLD;
   state.customWhiteThreshold = settings.customWhiteThreshold ?? CONFIG.WHITE_THRESHOLD;
   state.paintWhitePixels = settings.paintWhitePixels ?? true;
+  state.paintTransparentPixels = settings.paintTransparentPixels ?? true;
   state.resizeSettings = settings.resizeSettings ?? null;
   state.originalImage = settings.originalImage ?? null;
       // Notifications

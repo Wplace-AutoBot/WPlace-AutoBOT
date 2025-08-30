@@ -480,13 +480,18 @@
 }
 
 :root .wplace-icon-globe,
-.wplace-theme--classic .wplace-icon-globe { 
-  color: #ffeaa7; 
+.wplace-theme--classic .wplace-icon-globe {
+  color: #ffeaa7;
+}
+
+:root .wplace-icon-paint,
+.wplace-theme--classic .wplace-icon-paint {
+  color: #4facfe;
 }
 
 :root .wplace-icon-eye,
-.wplace-theme--classic .wplace-icon-eye { 
-  color: var(--wplace-highlight); 
+.wplace-theme--classic .wplace-icon-eye {
+  color: var(--wplace-highlight);
 }
 
 /* Form controls and sliders for classic theme */
