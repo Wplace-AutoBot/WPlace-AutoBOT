@@ -353,7 +353,7 @@ function applyTheme() {
       captchaSolving: "🔑 Generating Turnstile token...",
       captchaFailed: "❌ Turnstile token generation failed. Trying fallback method...",
       automation: "Automation",
-  noChargesThreshold: "⌛ Waiting for charges to reach {threshold}. Currently {current}. Total wait ~{eta} (30s/charge). Next in {time}...",
+  noChargesThreshold: "⌛ Waiting for charges to reach {threshold}. Currently {current}. Total wait ~{eta} Next in {time}...",
     },
     ru: {
       title: "WPlace Авто-Изображение",
