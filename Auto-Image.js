@@ -1181,6 +1181,7 @@ function applyTheme() {
     availableColors: [],
     activeColorPalette: [], // User-selected colors for conversion
     paintWhitePixels: true, // Default to ON
+    paintTransparentPixels: true, // Default to ON
     currentCharges: 0,
     maxCharges: 1, // Default max charges
     cooldown: CONFIG.COOLDOWN_DEFAULT,
@@ -1495,7 +1496,7 @@ function applyTheme() {
         const d = cached.data;
         const a = d[idx + 3];
         const alphaThresh = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
-        if (a < alphaThresh) {
+        if (!state.paintTransparentPixels && a < alphaThresh) {
           // Treat as transparent / unavailable
           // Lightweight debug: show when transparency causes skip (only if verbose enabled)
           if (window._overlayDebug) console.debug('getTilePixelColor: transparent pixel, skipping', tileKey, x, y, a);
@@ -1527,7 +1528,7 @@ function applyTheme() {
         const data = ctx.getImageData(x, y, 1, 1).data;
         const a = data[3];
         const alphaThresh = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
-        if (a < alphaThresh) {
+        if (!state.paintTransparentPixels && a < alphaThresh) {
           if (window._overlayDebug) console.debug('getTilePixelColor: transparent pixel (fallback), skipping', tileKey, x, y, a);
           return null;
         }
@@ -3909,6 +3910,10 @@ function applyTheme() {
             <input type="checkbox" id="paintWhiteToggle" checked>
             Paint White Pixels
         </label>
+        <label class="resize-checkbox-label">
+            <input type="checkbox" id="paintTransparentToggle" checked>
+            Paint Transparent Pixels
+        </label>
         <div class="resize-zoom-controls">
           <button id="zoomOutBtn" class="wplace-btn resize-zoom-btn" title="Zoom Out"><i class="fas fa-search-minus"></i></button>
           <input type="range" id="zoomSlider" class="resize-slider resize-zoom-slider" min="0.1" max="20" value="1" step="0.05">
@@ -4456,6 +4461,7 @@ function applyTheme() {
     const heightValue = resizeContainer.querySelector("#heightValue")
     const keepAspect = resizeContainer.querySelector("#keepAspect")
     const paintWhiteToggle = resizeContainer.querySelector("#paintWhiteToggle");
+    const paintTransparentToggle = resizeContainer.querySelector("#paintTransparentToggle");
   const zoomSlider = resizeContainer.querySelector("#zoomSlider");
   const zoomValue = resizeContainer.querySelector('#zoomValue');
   const zoomInBtn = resizeContainer.querySelector('#zoomInBtn');
@@ -4767,6 +4773,7 @@ function applyTheme() {
   zoomSlider.value = 1;
   if (zoomValue) zoomValue.textContent = '100%';
       paintWhiteToggle.checked = state.paintWhitePixels;
+      paintTransparentToggle.checked = state.paintTransparentPixels;
 
       let _previewTimer = null;
       let _previewJobId = 0;
@@ -4870,7 +4877,7 @@ function applyTheme() {
               const idx = y * w + x;
               const i4 = idx * 4;
               const r = data[i4], g = data[i4 + 1], b = data[i4 + 2], a = data[i4 + 3];
-              const isEligible = a >= tThresh && (state.paintWhitePixels || !Utils.isWhitePixel(r, g, b));
+              const isEligible = (state.paintTransparentPixels || a >= tThresh) && (state.paintWhitePixels || !Utils.isWhitePixel(r, g, b));
               eligible[idx] = isEligible ? 1 : 0;
               work[idx * 3] = r;
               work[idx * 3 + 1] = g;
@@ -4922,7 +4929,7 @@ function applyTheme() {
         } else {
           for (let i = 0; i < data.length; i += 4) {
             const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
-            if (a < tThresh || (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b))) {
+            if ((!state.paintTransparentPixels && a < tThresh) || (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b))) {
               data[i + 3] = 0;
               continue;
             }
@@ -4971,6 +4978,11 @@ function applyTheme() {
 
       paintWhiteToggle.onchange = (e) => {
         state.paintWhitePixels = e.target.checked;
+        _updateResizePreview();
+      };
+
+      paintTransparentToggle.onchange = (e) => {
+        state.paintTransparentPixels = e.target.checked;
         _updateResizePreview();
       };
 
@@ -5406,7 +5418,7 @@ function applyTheme() {
               const i4 = idx * 4;
               const r = data[i4], g = data[i4 + 1], b = data[i4 + 2], a = data[i4 + 3];
               const masked = mask && mask[idx];
-              const isEligible = !masked && a >= tThresh2 && (state.paintWhitePixels || !Utils.isWhitePixel(r, g, b));
+              const isEligible = !masked && (state.paintTransparentPixels || a >= tThresh2) && (state.paintWhitePixels || !Utils.isWhitePixel(r, g, b));
               eligible[idx] = isEligible ? 1 : 0;
               work[idx * 3] = r;
               work[idx * 3 + 1] = g;
@@ -5463,7 +5475,7 @@ function applyTheme() {
           for (let i = 0; i < data.length; i += 4) {
             const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
             const masked = mask && mask[(i>>2)];
-            const isTransparent = a < tThresh2 || masked;
+            const isTransparent = (!state.paintTransparentPixels && a < tThresh2) || masked;
             const isWhiteAndSkipped = !state.paintWhitePixels && Utils.isWhitePixel(r, g, b);
             if (isTransparent || isWhiteAndSkipped) {
               data[i + 3] = 0; // overlay transparency
@@ -5597,7 +5609,7 @@ function applyTheme() {
 
           let totalValidPixels = 0;
           for (let i = 0; i < pixels.length; i += 4) {
-            const isTransparent = pixels[i + 3] < (state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD);
+            const isTransparent = !state.paintTransparentPixels && pixels[i + 3] < (state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD);
             const isWhiteAndSkipped = !state.paintWhitePixels && Utils.isWhitePixel(pixels[i], pixels[i + 1], pixels[i + 2]);
             if (!isTransparent && !isWhiteAndSkipped) {
               totalValidPixels++;
@@ -5842,7 +5854,7 @@ function applyTheme() {
     const isEligibleAt = (x, y) => {
       const idx = (y * width + x) * 4;
       const r = pixels[idx], g = pixels[idx + 1], b = pixels[idx + 2], a = pixels[idx + 3];
-      if (a < tThresh2) return false;
+      if (!state.paintTransparentPixels && a < tThresh2) return false;
       if (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b)) return false;
       return true;
     };
@@ -5890,8 +5902,8 @@ function applyTheme() {
           const alpha = pixels[idx + 3]
 
           const tThresh2 = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
-          if (alpha < tThresh2 || (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b))) {
-            if (alpha < tThresh2) {
+          if ((!state.paintTransparentPixels && alpha < tThresh2) || (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b))) {
+            if (!state.paintTransparentPixels && alpha < tThresh2) {
               skippedPixels.transparent++;
             } else {
               skippedPixels.white++;
@@ -6288,6 +6300,7 @@ function applyTheme() {
   customTransparencyThreshold: state.customTransparencyThreshold,
   customWhiteThreshold: state.customWhiteThreshold,
   paintWhitePixels: state.paintWhitePixels,
+  paintTransparentPixels: state.paintTransparentPixels,
   resizeSettings: state.resizeSettings,
   originalImage: state.originalImage,
   // Save ignore mask (as base64) with its dimensions
@@ -6333,6 +6346,7 @@ function applyTheme() {
   state.customTransparencyThreshold = settings.customTransparencyThreshold ?? CONFIG.TRANSPARENCY_THRESHOLD;
   state.customWhiteThreshold = settings.customWhiteThreshold ?? CONFIG.WHITE_THRESHOLD;
   state.paintWhitePixels = settings.paintWhitePixels ?? true;
+  state.paintTransparentPixels = settings.paintTransparentPixels ?? true;
   state.resizeSettings = settings.resizeSettings ?? null;
   state.originalImage = settings.originalImage ?? null;
       // Notifications
