@@ -3586,12 +3586,12 @@
                 ">
               </div>
               <!-- Blue Marble Toggle -->
-              <label for="enableBlueMarbleToggle" class="wplace-blue-marble-toggle">
+              <label for="enableBlueMarbleToggle" class="wplace-settings-toggle">
                   <div>
-                      <span class="wplace-blue-marble-title" style="color: ${
+                      <span class="wplace-settings-toggle-title" style="color: ${
                         theme.text || 'white'
                       };">Blue Marble Effect</span>
-                      <p class="wplace-blue-marble-description" style="color: ${
+                      <p class="wplace-settings-toggle-description" style="color: ${
                         theme.text ? `${theme.text}BB` : 'rgba(255,255,255,0.7)'
                       };">Renders a dithered "shredded" overlay.</p>
                   </div>
@@ -3632,12 +3632,12 @@
           </label>
           
           <!-- Batch Mode Selection -->
-          <div class="wplace-batch-mode-selection">
-            <label class="wplace-batch-mode-label">
+          <div class="wplace-mode-selection">
+            <label class="wplace-mode-label">
               <i class="fas fa-dice wplace-icon-dice"></i>
               Batch Mode
             </label>
-            <select id="batchModeSelect" class="wplace-batch-mode-select">
+            <select id="batchModeSelect" class="wplace-selector">
               <option value="normal" class="wplace-settings-option">📦 Normal (Fixed Size)</option>
               <option value="random" class="wplace-settings-option">🎲 Random (Range)</option>
             </select>
@@ -3685,121 +3685,87 @@
           </label>
         </div>
         
+        <!-- Todo separate styles of coord to css -->
         <!-- Coordinate Generation Section -->
-        <div style="margin-bottom: 25px;">
-          <label style="display: block; margin-bottom: 12px; color: white; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-route" style="color: #4facfe; font-size: 16px;"></i>
+        <div class="wplace-settings-section">
+          <label class="wplace-settings-section-label">
+            <i class="fas fa-route wplace-icon-route"></i>
             Coordinate Generation
           </label>
           
           <!-- Mode Selection -->
-          <div style="margin-bottom: 15px;">
-            <label style="display: block; margin-bottom: 8px; color: rgba(255,255,255,0.9); font-weight: 500; font-size: 14px;">
-              <i class="fas fa-th" style="color: #f093fb; margin-right: 6px;"></i>
+          <div class="wplace-mode-selection">
+            <label class="wplace-mode-label">
+              <i class="fas fa-th wplace-icon-table"></i>
               Generation Mode
             </label>
-            <select id="coordinateModeSelect" style="
-              width: 100%;
-              padding: 10px 12px;
-              background: rgba(255,255,255,0.15);
-              color: white;
-              border: 1px solid rgba(255,255,255,0.2);
-              border-radius: 8px;
-              font-size: 13px;
-              outline: none;
-              cursor: pointer;
-            ">
-              <option value="rows" style="background: #2d3748; color: white;">📏 Rows (Horizontal Lines)</option>
-              <option value="columns" style="background: #2d3748; color: white;">📐 Columns (Vertical Lines)</option>
-              <option value="circle-out" style="background: #2d3748; color: white;">⭕ Circle Out (Center → Edges)</option>
-              <option value="circle-in" style="background: #2d3748; color: white;">⭕ Circle In (Edges → Center)</option>
-              <option value="blocks" style="background: #2d3748; color: white;">🟫 Blocks (Ordered)</option>
-              <option value="shuffle-blocks" style="background: #2d3748; color: white;">🎲 Shuffle Blocks (Random)</option>
+            <select id="coordinateModeSelect" class="wplace-selector">
+              <option value="rows" class="wplace-settings-option">📏 Rows (Horizontal Lines)</option>
+              <option value="columns" class="wplace-settings-option">📐 Columns (Vertical Lines)</option>
+              <option value="circle-out" class="wplace-settings-option">⭕ Circle Out (Center → Edges)</option>
+              <option value="circle-in" class="wplace-settings-option">⭕ Circle In (Edges → Center)</option>
+              <option value="blocks" class="wplace-settings-option">🟫 Blocks (Ordered)</option>
+              <option value="shuffle-blocks" class="wplace-settings-option">🎲 Shuffle Blocks (Random)</option>
             </select>
           </div>
           
           <!-- Direction Selection (only for rows/columns) -->
-          <div id="directionControls" style="margin-bottom: 15px;">
-            <label style="display: block; margin-bottom: 8px; color: rgba(255,255,255,0.9); font-weight: 500; font-size: 14px;">
-              <i class="fas fa-compass" style="color: #00f2fe; margin-right: 6px;"></i>
+          <div id="directionControls" class="wplace-mode-selection">
+            <label class="wplace-mode-label">
+              <i class="fas fa-compass wplace-icon-compass"></i>
               Starting Direction
             </label>
-            <select id="coordinateDirectionSelect" style="
-              width: 100%;
-              padding: 10px 12px;
-              background: rgba(255,255,255,0.15);
-              color: white;
-              border: 1px solid rgba(255,255,255,0.2);
-              border-radius: 8px;
-              font-size: 13px;
-              outline: none;
-              cursor: pointer;
-            ">
-              <option value="top-left" style="background: #2d3748; color: white;">↖️ Top-Left</option>
-              <option value="top-right" style="background: #2d3748; color: white;">↗️ Top-Right</option>
-              <option value="bottom-left" style="background: #2d3748; color: white;">↙️ Bottom-Left</option>
-              <option value="bottom-right" style="background: #2d3748; color: white;">↘️ Bottom-Right</option>
+            <select id="coordinateDirectionSelect" class="wplace-selector">
+              <option value="top-left" class="wplace-settings-option">↖️ Top-Left</option>
+              <option value="top-right" class="wplace-settings-option">↗️ Top-Right</option>
+              <option value="bottom-left" class="wplace-settings-option">↙️ Bottom-Left</option>
+              <option value="bottom-right" class="wplace-settings-option">↘️ Bottom-Right</option>
             </select>
           </div>
           
           <!-- Snake Pattern Toggle (only for rows/columns) -->
-          <div id="snakeControls" style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px;">
-            <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+          <div id="snakeControls" class="wplace-snake-pattern-controls wplace-settings-section-wrapper">
+            <label class="wplace-settings-toggle">
               <div>
-                <span style="font-weight: 500; color: white;">Snake Pattern</span>
-                <p style="font-size: 12px; color: rgba(255,255,255,0.7); margin: 4px 0 0 0;">Alternate direction for each row/column (zigzag pattern)</p>
+                <span class="wplace-settings-toggle-title" style="color: ${
+                  theme.text || 'white'
+                };">Snake Pattern</span>
+                <p class="wplace-settings-toggle-description" style="color: ${
+                  theme.text ? `${theme.text}BB` : 'rgba(255,255,255,0.7)'
+                };">Alternate direction for each row/column (zigzag pattern)</p>
               </div>
-              <input type="checkbox" id="coordinateSnakeToggle" style="
-                cursor: pointer; 
-                width: 20px; 
-                height: 20px;
-                accent-color: #4facfe;
-              "/>
+              <input type="checkbox" id="coordinateSnakeToggle" ${
+                state.coordinateSnake ? 'checked' : ''
+              } class="wplace-blue-marble-checkbox" style="
+                    accent-color: ${theme.highlight || '#48dbfb'};
+                  "/>
             </label>
           </div>
           
           <!-- Block Size Controls (only for blocks/shuffle-blocks) -->
-          <div id="blockControls" style="display: none; background: rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px;">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+          <div id="blockControls" class="wplace-block-size-controls wplace-settings-section-wrapper wplace-shuffle-block-size-controls">
+            <div class="wplace-block-size-grid">
               <div>
-                <label style="display: block; color: rgba(255,255,255,0.8); font-size: 12px; margin-bottom: 8px;">
-                  <i class="fas fa-arrows-alt-h" style="color: #4facfe; margin-right: 4px;"></i>
+                <label class="wplace-block-size-label">
+                  <i class="fas fa-arrows-alt-h wplace-icon-width"></i>
                   Block Width
                 </label>
-                <input type="number" id="blockWidthInput" min="1" max="50" value="6" style="
-                  width: 100%;
-                  padding: 10px 12px;
-                  background: rgba(255,255,255,0.1);
-                  color: white;
-                  border: 1px solid rgba(255,255,255,0.2);
-                  border-radius: 8px;
-                  font-size: 13px;
-                  outline: none;
-                ">
+                <input type="number" id="blockWidthInput" min="1" max="50" value="6" class="wplace-block-size-input">
               </div>
               <div>
                 <label style="display: block; color: rgba(255,255,255,0.8); font-size: 12px; margin-bottom: 8px;">
-                  <i class="fas fa-arrows-alt-v" style="color: #00f2fe; margin-right: 4px;"></i>
+                  <i class="fas fa-arrows-alt-v wplace-icon-height"></i>
                   Block Height
                 </label>
-                <input type="number" id="blockHeightInput" min="1" max="50" value="2" style="
-                  width: 100%;
-                  padding: 10px 12px;
-                  background: rgba(255,255,255,0.1);
-                  color: white;
-                  border: 1px solid rgba(255,255,255,0.2);
-                  border-radius: 8px;
-                  font-size: 13px;
-                  outline: none;
-                ">
+                <input type="number" id="blockHeightInput" min="1" max="50" value="2" class="wplace-block-size-input">
               </div>
             </div>
-            <p style="font-size: 11px; color: rgba(255,255,255,0.6); margin: 8px 0 0 0; text-align: center;">
+            <p class="wplace-block-size-description">
               🧱 Block dimensions for block-based generation modes
             </p>
           </div>
         </div>
-        <!-- Todo separate styles of coord to css -->
+        
         <!-- Notifications Section -->
         <div class="wplace-settings-section">
           <label class="wplace-settings-section-label">

@@ -1056,7 +1056,7 @@
   display: none;
   min-width: 400px;
   max-width: 500px;
-  max-height: 80vh;
+  max-height: 100vh;
   overflow-y: auto;
   animation: slideIn 0.3s ease-out;
   border: 1px solid var(--wplace-border-ghost);
@@ -1091,8 +1091,8 @@
 
 /* Settings content container */
 .wplace-settings-content {
-  padding: 25px;
-  max-height: 70vh;
+  padding: 25px 25px 0 25px;
+  max-height: 67vh;
   overflow-y: auto;
 }
 
@@ -1169,36 +1169,6 @@
   font-size: 12px;
   color: var(--wplace-text-muted);
   margin: 8px 0 0 0;
-}
-
-/* Batch Mode Controls */
-.wplace-batch-mode-selection {
-  margin-bottom: 15px;
-}
-
-.wplace-batch-mode-label {
-  display: block;
-  margin-bottom: 8px;
-  color: var(--wplace-text-secondary);
-  font-weight: 500;
-  font-size: 14px;
-}
-
-.wplace-icon-dice {
-  color: var(--wplace-icon-palette);
-  margin-right: 6px;
-}
-
-.wplace-batch-mode-select {
-  width: 100%;
-  padding: 10px 12px;
-  background: var(--wplace-bg-input);
-  color: var(--wplace-text);
-  border: 1px solid var(--wplace-border-subtle);
-  border-radius: 8px;
-  font-size: 13px;
-  outline: none;
-  cursor: pointer;
 }
 
 /* Batch Controls */
@@ -1333,18 +1303,18 @@
   cursor: pointer;
 }
 
-.wplace-blue-marble-toggle {
+.wplace-settings-toggle {
   display: flex;
   align-items: center;
   justify-content: space-between;
   cursor: pointer;
 }
 
-.wplace-blue-marble-title {
+.wplace-settings-toggle-title {
   font-weight: 500;
 }
 
-.wplace-blue-marble-description {
+.wplace-settings-toggle-description {
   font-size: 12px;
   margin: 4px 0 0 0;
 }
@@ -1403,7 +1373,6 @@
 .wplace-settings-footer {
   border-top: 1px solid var(--wplace-border-ghost);
   padding: 20px;
-  margin-top: 10px;
   position: sticky;
   bottom: 0;
   background: var(--wplace-secondary);
@@ -1814,12 +1783,6 @@
 /* Settings select option styling moved to theme files */
 /* Settings description styling moved to theme files */
 
-.wplace-settings-footer {
-  border-top: 1px solid var(--wplace-border-ghost);
-  padding-top: 20px;
-  margin-top: 10px;
-}
-
 .wplace-settings-apply-btn {
   width: 100%;
   border: none;
@@ -1897,18 +1860,18 @@
   box-shadow: var(--wplace-shadow-slider-hover);
 }
 
-.wplace-blue-marble-toggle {
+.wplace-settings-toggle {
   display: flex;
   align-items: center;
   justify-content: space-between;
   cursor: pointer;
 }
 
-.wplace-blue-marble-title {
+.wplace-settings-toggle-title {
   font-weight: 500;
 }
 
-.wplace-blue-marble-description {
+.wplace-settings-toggle-description {
   font-size: 12px;
   color: var(--wplace-muted-text);
   margin: 4px 0 0 0;
@@ -1921,12 +1884,88 @@
   accent-color: var(--wplace-highlight);
 }
 
+/* Coordinate Generation Controls */
+.wplace-icon-route {
+  color: var(--wplace-icon-primary);
+  font-size: 16px;
+}
+
+.wplace-icon-table {
+  color: var(--wplace-icon-palette);
+  margin-right: 6px;
+}
+
+.wplace-icon-compass {
+  color: var(--wplace-icon-secondary);
+  margin-right: 6px;
+}
+
+/* Snake Pattern Controls */
+.wplace-snake-pattern-controls {
+  padding: 18px;
+  margin-bottom: 15px;
+  /* Theme-specific styling applied via theme files */
+}
+
+/* Block Size Controls */
+.wplace-block-size-controls {
+  padding: 18px;
+  margin-bottom: 15px;
+  /* Theme-specific styling applied via theme files */
+}
+
+.wplace-block-size-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.wplace-block-size-label {
+  display: block;
+  color: var(--wplace-text-faded);
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.wplace-icon-width {
+  color: var(--wplace-icon-primary);
+  margin-right: 4px;
+}
+
+.wplace-icon-height {
+  color: var(--wplace-icon-secondary);
+  margin-right: 4px;
+}
+
+.wplace-block-size-input {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--wplace-bg-subtle);
+  color: var(--wplace-text);
+  border: 1px solid var(--wplace-border-subtle);
+  border-radius: 8px;
+  font-size: 13px;
+  outline: none;
+}
+
+.wplace-block-size-description {
+  font-size: 11px;
+  color: var(--wplace-text-dim);
+  margin: 8px 0 0 0;
+  text-align: center;
+}
+
+/* Random Block Controls */
+.wplace-shuffle-block-size-controls {
+  display: none;
+}
+
 /* Batch Mode Controls */
-.wplace-batch-mode-selection {
+.wplace-mode-selection {
   margin-bottom: 15px;
 }
 
-.wplace-batch-mode-label {
+.wplace-mode-label {
   display: block;
   margin-bottom: 8px;
   color: var(--wplace-text-secondary);
@@ -1939,7 +1978,7 @@
   margin-right: 6px;
 }
 
-.wplace-batch-mode-select {
+.wplace-selector {
   width: 100%;
   padding: 10px 12px;
   background: var(--wplace-bg-input);
