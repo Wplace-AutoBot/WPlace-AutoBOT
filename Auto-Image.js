@@ -3686,6 +3686,24 @@ function applyTheme() {
                     accent-color: ${theme.highlight || '#48dbfb'};
                   "/>
               </label>
+              <!-- Paint White Pixels Toggle -->
+              <label for="settingsPaintWhiteToggle" class="wplace-blue-marble-toggle">
+                  <div>
+                      <span class="wplace-blue-marble-title" style="color: ${theme.text || 'white'};">${Utils.t("paintWhitePixels")}</span>
+                  </div>
+                  <input type="checkbox" id="settingsPaintWhiteToggle" ${state.paintWhitePixels ? 'checked' : ''} class="wplace-blue-marble-checkbox" style="
+                    accent-color: ${theme.highlight || '#48dbfb'};
+                  "/>
+              </label>
+              <!-- Paint Transparent Pixels Toggle -->
+              <label for="settingsPaintTransparentToggle" class="wplace-blue-marble-toggle">
+                  <div>
+                      <span class="wplace-blue-marble-title" style="color: ${theme.text || 'white'};">${Utils.t("paintTransparentPixels")}</span>
+                  </div>
+                  <input type="checkbox" id="settingsPaintTransparentToggle" ${state.paintTransparentPixels ? 'checked' : ''} class="wplace-blue-marble-checkbox" style="
+                    accent-color: ${theme.highlight || '#48dbfb'};
+                  "/>
+              </label>
           </div>
         </div>
 
@@ -4436,17 +4454,33 @@ function applyTheme() {
         })
       }
 
-      const overlayOpacitySlider = settingsContainer.querySelector("#overlayOpacitySlider");
-      const overlayOpacityValue = settingsContainer.querySelector("#overlayOpacityValue");
-      const enableBlueMarbleToggle = settingsContainer.querySelector("#enableBlueMarbleToggle");
+        const overlayOpacitySlider = settingsContainer.querySelector("#overlayOpacitySlider");
+        const overlayOpacityValue = settingsContainer.querySelector("#overlayOpacityValue");
+        const enableBlueMarbleToggle = settingsContainer.querySelector("#enableBlueMarbleToggle");
+        const settingsPaintWhiteToggle = settingsContainer.querySelector("#settingsPaintWhiteToggle");
+        const settingsPaintTransparentToggle = settingsContainer.querySelector("#settingsPaintTransparentToggle");
 
-      if (overlayOpacitySlider && overlayOpacityValue) {
-        overlayOpacitySlider.addEventListener('input', (e) => {
-          const opacity = parseFloat(e.target.value);
-          state.overlayOpacity = opacity;
-          overlayOpacityValue.textContent = `${Math.round(opacity * 100)}%`;
-        });
-      }
+        if (overlayOpacitySlider && overlayOpacityValue) {
+          overlayOpacitySlider.addEventListener('input', (e) => {
+            const opacity = parseFloat(e.target.value);
+            state.overlayOpacity = opacity;
+            overlayOpacityValue.textContent = `${Math.round(opacity * 100)}%`;
+          });
+        }
+
+        if (settingsPaintWhiteToggle) {
+          settingsPaintWhiteToggle.addEventListener('change', (e) => {
+            state.paintWhitePixels = e.target.checked;
+            saveBotSettings();
+          });
+        }
+
+        if (settingsPaintTransparentToggle) {
+          settingsPaintTransparentToggle.addEventListener('change', (e) => {
+            state.paintTransparentPixels = e.target.checked;
+            saveBotSettings();
+          });
+        }
 
       // Speed slider event listener
       const speedSlider = settingsContainer.querySelector("#speedSlider");
@@ -5012,15 +5046,17 @@ function applyTheme() {
   if (!isNaN(fit) && isFinite(fit)) applyZoom(fit);
       };
 
-      paintWhiteToggle.onchange = (e) => {
-        state.paintWhitePixels = e.target.checked;
-        _updateResizePreview();
-      };
+        paintWhiteToggle.onchange = (e) => {
+          state.paintWhitePixels = e.target.checked;
+          _updateResizePreview();
+          saveBotSettings();
+        };
 
-      paintTransparentToggle.onchange = (e) => {
-        state.paintTransparentPixels = e.target.checked;
-        _updateResizePreview();
-      };
+        paintTransparentToggle.onchange = (e) => {
+          state.paintTransparentPixels = e.target.checked;
+          _updateResizePreview();
+          saveBotSettings();
+        };
 
       let panX = 0, panY = 0;
       const clampPan = () => {
