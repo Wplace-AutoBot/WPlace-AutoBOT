@@ -355,6 +355,7 @@ function applyTheme() {
       automation: "Automation",
       noChargesThreshold: "⌛ Waiting for charges to reach {threshold}. Currently {current}. Next in {time}...",
       keepAspectRatio: "Keep Aspect Ratio",
+      paintOptions: "Paint Options",
       paintWhitePixels: "Paint White Pixels",
       paintTransparentPixels: "Paint Transparent Pixels",
     },
@@ -431,6 +432,7 @@ function applyTheme() {
       automation: "Автоматизация",
       noChargesThreshold: "⌛ Ожидание зарядов до {threshold}. Сейчас {current}. Следующий через {time}...",
       keepAspectRatio: "Сохранять пропорции",
+      paintOptions: "Параметры рисования",
       paintWhitePixels: "Рисовать белые пиксели",
       paintTransparentPixels: "Рисовать прозрачные пиксели",
     },
@@ -507,6 +509,7 @@ function applyTheme() {
       automation: "Automação",
       noChargesThreshold: "⌛ Aguardando cargas atingirem {threshold}. Atual: {current}. Próxima em {time}...",
       keepAspectRatio: "Manter proporção",
+      paintOptions: "Opções de Pintura",
       paintWhitePixels: "Pintar pixels brancos",
       paintTransparentPixels: "Pintar pixels transparentes",
     },
@@ -583,6 +586,7 @@ function applyTheme() {
       automation: "Tự động hóa",
       noChargesThreshold: "⌛ Đang chờ số lần sạc đạt {threshold}. Hiện tại {current}. Lần tiếp theo trong {time}...",
       keepAspectRatio: "Giữ tỉ lệ",
+      paintOptions: "Tùy chọn vẽ",
       paintWhitePixels: "Tô pixel trắng",
       paintTransparentPixels: "Tô pixel trong suốt",
     },
@@ -659,6 +663,7 @@ function applyTheme() {
       automation: "Automatisation",
       noChargesThreshold: "⌛ En attente que les charges atteignent {threshold}. Actuel: {current}. Prochaine dans {time}...",
       keepAspectRatio: "Conserver les proportions",
+      paintOptions: "Options de peinture",
       paintWhitePixels: "Peindre les pixels blancs",
       paintTransparentPixels: "Peindre les pixels transparents",
     },
@@ -735,6 +740,7 @@ function applyTheme() {
       automation: "Automasi",
       noChargesThreshold: "⌛ Menunggu muatan mencapai {threshold}. Saat ini: {current}. Berikutnya dalam {time}...",
       keepAspectRatio: "Pertahankan rasio aspek",
+      paintOptions: "Opsi Mewarnai",
       paintWhitePixels: "Warnai piksel putih",
       paintTransparentPixels: "Warnai piksel transparan",
     },
@@ -809,6 +815,7 @@ function applyTheme() {
       automation: "Otomasyon",
       noChargesThreshold: "⌛ Hakların {threshold} seviyesine ulaşması bekleniyor. Şu anda {current}. Sonraki {time} içinde...",
       keepAspectRatio: "En-Boy Oranını Koru",
+      paintOptions: "Boyama Seçenekleri",
       paintWhitePixels: "Beyaz Pikselleri Boya",
       paintTransparentPixels: "Şeffaf Pikselleri Boya",
     },
@@ -888,6 +895,7 @@ function applyTheme() {
       automation: "自动化",
       noChargesThreshold: "⌛ 等待次数达到 {threshold}。当前 {current}。下次在 {time}...",
       keepAspectRatio: "保持纵横比",
+      paintOptions: "绘制选项",
       paintWhitePixels: "绘制白色像素",
       paintTransparentPixels: "绘制透明像素",
     },
@@ -967,6 +975,7 @@ function applyTheme() {
       automation: "自動化",
       noChargesThreshold: "⌛ 等待次數達到 {threshold}。目前 {current}。下次在 {time}...",
       keepAspectRatio: "保持寬高比",
+      paintOptions: "繪製選項",
       paintWhitePixels: "繪製白色像素",
       paintTransparentPixels: "繪製透明像素",
     },
@@ -1046,6 +1055,7 @@ function applyTheme() {
       automation: "自動化",
       noChargesThreshold: "⌛ チャージ {threshold} を待機中。現在 {current}。次は {time} 後...",
       keepAspectRatio: "アスペクト比を維持",
+      paintOptions: "描画オプション",
       paintWhitePixels: "白いピクセルを描画",
       paintTransparentPixels: "透明なピクセルを描画",
     },
@@ -1125,6 +1135,7 @@ function applyTheme() {
       automation: "자동화",
       noChargesThreshold: "⌛ 횟수가 {threshold} 에 도달할 때까지 대기 중. 현재 {current}. 다음 {time} 후...",
       keepAspectRatio: "종횡비 유지",
+      paintOptions: "그리기 옵션",
       paintWhitePixels: "흰색 픽셀 그리기",
       paintTransparentPixels: "투명 픽셀 그리기",
     },
@@ -1202,6 +1213,7 @@ function applyTheme() {
       automation: "Автоматизація",
       noChargesThreshold: "⌛ Очікування, доки заряди досягнуть {threshold}. Зараз {current}. Наступне через {time}...",
       keepAspectRatio: "Зберігати співвідношення сторін",
+      paintOptions: "Параметри малювання",
       paintWhitePixels: "Малювати білі пікселі",
       paintTransparentPixels: "Малювати прозорі пікселі",
     },
@@ -3686,6 +3698,23 @@ function applyTheme() {
                     accent-color: ${theme.highlight || '#48dbfb'};
                   "/>
               </label>
+          </div>
+        </div>
+
+        <!-- Paint Options Section -->
+        <div class="wplace-settings-section">
+          <label class="wplace-settings-section-label">
+            <i class="fas fa-paint-brush wplace-icon-paint"></i>
+            ${Utils.t("paintOptions")}
+          </label>
+          <div class="wplace-settings-section-wrapper wplace-overlay-wrapper" style="
+            background: ${theme.accent ? `${theme.accent}20` : 'rgba(255,255,255,0.1)'};
+            border-radius: ${theme.borderRadius || '12px'};
+            border: 1px solid ${theme.accent || 'rgba(255,255,255,0.1)'};
+            ${theme.animations?.glow ? `
+              box-shadow: 0 0 15px ${theme.accent || 'rgba(255,255,255,0.1)'}33;
+            ` : ''}
+          ">
               <!-- Paint White Pixels Toggle -->
               <label for="settingsPaintWhiteToggle" class="wplace-blue-marble-toggle">
                   <div>
