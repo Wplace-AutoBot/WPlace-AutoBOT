@@ -3668,6 +3668,7 @@ function applyTheme() {
             <select id="batchModeSelect" class="wplace-batch-mode-select">
               <option value="normal" class="wplace-settings-option">📦 Normal (Fixed Size)</option>
               <option value="random" class="wplace-settings-option">🎲 Random (Range)</option>
+              <option value="outline" class="wplace-settings-option">✏️ Outline First</option>
             </select>
           </div>
           
@@ -4331,6 +4332,9 @@ function applyTheme() {
             if (e.target.value === 'random') {
               normalBatchControls.style.display = 'none'
               randomBatchControls.style.display = 'block'
+            } else if (e.target.value === 'outline') {
+              normalBatchControls.style.display = 'none'
+              randomBatchControls.style.display = 'none'
             } else {
               normalBatchControls.style.display = 'block'
               randomBatchControls.style.display = 'none'
@@ -4339,7 +4343,8 @@ function applyTheme() {
           
           saveBotSettings()
           console.log(`📦 Batch mode changed to: ${state.batchMode}`)
-          Utils.showAlert(`Batch mode set to: ${state.batchMode === 'random' ? 'Random Range' : 'Normal Fixed Size'}`, "success")
+          const label = state.batchMode === 'random' ? 'Random Range' : (state.batchMode === 'outline' ? 'Outline First' : 'Normal Fixed Size')
+          Utils.showAlert(`Batch mode set to: ${label}`, "success")
         })
       }
       
@@ -5847,6 +5852,11 @@ function applyTheme() {
       return true;
     };
 
+    // Outline-first mode: branch to specialized pipeline
+    if (state.batchMode === 'outline') {
+      return await processImageOutlineFirst({ width, height, pixels, startX, startY, regionX, regionY });
+    }
+
     let startRow = 0;
     let startCol = 0;
     let foundStart = false;
@@ -5992,7 +6002,7 @@ function applyTheme() {
           // Calculate batch size based on mode (normal/random)
           const maxBatchSize = calculateBatchSize();
           if (pixelBatch.pixels.length >= maxBatchSize) {
-            const modeText = state.batchMode === 'random' ? `random (${state.randomBatchMin}-${state.randomBatchMax})` : 'normal';
+            const modeText = state.batchMode === 'random' ? `random (${state.randomBatchMin}-${state.randomBatchMax})` : (state.batchMode === 'outline' ? 'outline' : 'normal');
             console.log(`📦 Sending batch with ${pixelBatch.pixels.length} pixels (mode: ${modeText}, target: ${maxBatchSize})`);
             const success = await sendBatchWithRetry(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
 
@@ -6122,11 +6132,177 @@ function applyTheme() {
     updateStats()
   }
 
+  // Outline-first painting pipeline: paint detected edges (outline) before interior
+  async function processImageOutlineFirst(ctx) {
+    const { width, height, pixels, startX, startY, regionX, regionY } = ctx;
+
+    const tThresh2 = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
+    const isEligibleAt = (x, y) => {
+      const idx = (y * width + x) * 4;
+      const r = pixels[idx], g = pixels[idx + 1], b = pixels[idx + 2], a = pixels[idx + 3];
+      if (a < tThresh2) return false;
+      if (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b)) return false;
+      return true;
+    };
+
+    // Build a boolean mask of target pixels
+    const mask = new Uint8Array(width * height);
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        mask[y * width + x] = isEligibleAt(x, y) ? 1 : 0;
+      }
+    }
+
+    // Simple 4-neighbor edge detection: a pixel is edge if any neighbor is 0
+    const isEdge = (x, y) => {
+      if (!mask[y * width + x]) return false;
+      // If touching transparency/non-eligible or border of image, consider edge
+      const up = y === 0 || mask[(y - 1) * width + x] === 0;
+      const down = y === height - 1 || mask[(y + 1) * width + x] === 0;
+      const left = x === 0 || mask[y * width + (x - 1)] === 0;
+      const right = x === width - 1 || mask[y * width + (x + 1)] === 0;
+      return up || down || left || right;
+    };
+
+    const outlinePixels = [];
+    const interiorPixels = [];
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        if (!mask[y * width + x]) continue;
+        (isEdge(x, y) ? outlinePixels : interiorPixels).push({ x, y });
+      }
+    }
+
+    // Helper to convert local ordered list into batched sending using existing mechanics
+    const paintOrdered = async (ordered) => {
+      let pixelBatch = null;
+      for (let i = 0; i < ordered.length; i++) {
+        if (state.stopFlag) break;
+        const { x, y } = ordered[i];
+
+        const idx = (y * width + x) * 4;
+        const r = pixels[idx], g = pixels[idx + 1], b = pixels[idx + 2];
+        const colorId = findClosestColor([r, g, b], state.availableColors);
+
+        const absX = startX + x;
+        const absY = startY + y;
+        const adderX = Math.floor(absX / 1000);
+        const adderY = Math.floor(absY / 1000);
+        const pixelX = absX % 1000;
+        const pixelY = absY % 1000;
+
+        if (!pixelBatch || pixelBatch.regionX !== regionX + adderX || pixelBatch.regionY !== regionY + adderY) {
+          if (pixelBatch && pixelBatch.pixels.length > 0) {
+            const success = await sendBatchWithRetry(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
+            if (success) {
+              pixelBatch.pixels.forEach((p) => {
+                state.paintedPixels++;
+                Utils.markPixelPainted(p.x, p.y, pixelBatch.regionX, pixelBatch.regionY);
+              });
+              state.currentCharges -= pixelBatch.pixels.length;
+              updateStats();
+              Utils.performSmartSave();
+            } else {
+              console.error('❌ Batch failed permanently. Stopping painting.');
+              state.stopFlag = true;
+              break;
+            }
+          }
+          pixelBatch = { regionX: regionX + adderX, regionY: regionY + adderY, pixels: [] };
+        }
+
+        // Skip if already painted the correct color according to overlay
+        try {
+          const existingColorRGBA = await overlayManager.getTilePixelColor(pixelBatch.regionX, pixelBatch.regionY, pixelX, pixelY).catch(() => null);
+          if (existingColorRGBA && Array.isArray(existingColorRGBA)) {
+            const [er, eg, eb] = existingColorRGBA;
+            const existingColorId = findClosestColor([er, eg, eb], state.availableColors);
+            if (existingColorId === colorId) {
+              continue;
+            }
+          }
+        } catch { /* ignore */ }
+
+        pixelBatch.pixels.push({ x: pixelX, y: pixelY, color: colorId, localX: x, localY: y });
+
+        const maxBatchSize = calculateBatchSize();
+        if (pixelBatch.pixels.length >= maxBatchSize) {
+          const success = await sendBatchWithRetry(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
+          if (success) {
+            pixelBatch.pixels.forEach((p) => {
+              state.paintedPixels++;
+              Utils.markPixelPainted(p.x, p.y, pixelBatch.regionX, pixelBatch.regionY);
+            });
+            state.currentCharges -= pixelBatch.pixels.length;
+            updateStats();
+            Utils.performSmartSave();
+          } else {
+            console.error('❌ Batch failed permanently. Stopping painting.');
+            state.stopFlag = true;
+            break;
+          }
+          pixelBatch.pixels = [];
+        }
+
+        // Handle charges wait if needed
+        while (state.currentCharges < state.cooldownChargeThreshold && !state.stopFlag) {
+          const { charges, cooldown } = await WPlaceService.getCharges();
+          state.currentCharges = Math.floor(charges);
+          state.cooldown = cooldown;
+          if (state.currentCharges >= state.cooldownChargeThreshold) {
+            NotificationManager.maybeNotifyChargesReached(true);
+            updateStats();
+            break;
+          }
+          saveBtn.disabled = false;
+          updateUI('noChargesThreshold', 'warning', { time: Utils.formatTime(state.cooldown), threshold: state.cooldownChargeThreshold, current: state.currentCharges });
+          await updateStats();
+          Utils.performSmartSave();
+          await Utils.sleep(state.cooldown);
+        }
+        if (!state.stopFlag) saveBtn.disabled = true;
+      }
+
+      if (pixelBatch && pixelBatch.pixels.length > 0 && !state.stopFlag) {
+        const success = await sendBatchWithRetry(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
+        if (success) {
+          pixelBatch.pixels.forEach((p) => {
+            state.paintedPixels++;
+            Utils.markPixelPainted(p.x, p.y, pixelBatch.regionX, pixelBatch.regionY);
+          });
+          state.currentCharges -= pixelBatch.pixels.length;
+          Utils.saveProgress();
+        } else {
+          console.warn(`⚠️ Final batch failed with ${pixelBatch.pixels.length} pixels after all retries.`);
+        }
+      }
+    };
+
+    console.log('✏️ Outline-first mode: painting outlines');
+    await paintOrdered(outlinePixels);
+    if (state.stopFlag) return;
+    console.log('🧱 Outline-first mode: painting interior');
+    await paintOrdered(interiorPixels);
+
+    // Wrap up like normal completion
+    overlayManager.clear();
+    const toggleOverlayBtn = document.getElementById('toggleOverlayBtn');
+    if (toggleOverlayBtn) {
+      toggleOverlayBtn.classList.remove('active');
+      toggleOverlayBtn.disabled = true;
+    }
+    updateUI('paintingComplete', 'success', { count: state.paintedPixels });
+    state.lastPosition = { x: 0, y: 0 };
+    Utils.saveProgress();
+    updateStats();
+    return true;
+  }
+
   // Helper function to calculate batch size based on mode
   function calculateBatchSize() {
     let targetBatchSize;
     
-    if (state.batchMode === 'random') {
+  if (state.batchMode === 'random') {
       // Generate random batch size within the specified range
       const min = Math.max(1, state.randomBatchMin);
       const max = Math.max(min, state.randomBatchMax);
@@ -6372,6 +6548,9 @@ function applyTheme() {
         if (state.batchMode === 'random') {
           normalBatchControls.style.display = 'none';
           randomBatchControls.style.display = 'block';
+        } else if (state.batchMode === 'outline') {
+          normalBatchControls.style.display = 'none';
+          randomBatchControls.style.display = 'none';
         } else {
           normalBatchControls.style.display = 'block';
           randomBatchControls.style.display = 'none';
