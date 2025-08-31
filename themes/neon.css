@@ -1,7 +1,7 @@
 /* WPlace Auto-Image Bot - Neon Theme */
 /* Retro cyberpunk aesthetic with green neon glow effects */
 
-.wplace-theme--neon {
+.wplace-theme-neon {
   /* Neon theme colors - matching upstream main neon theme */
   --wplace-primary: #1a1a2e;
   --wplace-secondary: #16213e;
@@ -10,14 +10,14 @@
   --wplace-highlight: #ff6b35;
   --wplace-success: #39ff14;
   --wplace-error: #ff073a;
-  --wplace-warning: #ffff00;
+  --wplace-warning: #ff0;
 
   /* Neon UI properties */
   --wplace-radius: 0;
   --wplace-border-style: solid;
   --wplace-border-width: 2px;
   --wplace-border-color: #00ff41;
-  --wplace-shadow: 0 0 20px rgba(0, 255, 65, 0.3), inset 0 0 20px rgba(0, 255, 65, 0.1);
+  --wplace-shadow: 0 0 20px rgb(0 255 65 / 30%), inset 0 0 20px rgb(0 255 65 / 10%);
   --wplace-backdrop: none;
   --wplace-font: 'Press Start 2P', monospace, 'Courier New';
 
@@ -39,7 +39,7 @@
   --wplace-danger: #ff073a;
   --wplace-danger-dark: #cc0531;
   --wplace-muted-text: #00ff4180;
-  --wplace-highlight-secondary: #ffaa00;
+  --wplace-highlight-secondary: #fa0;
   
   /* Text variants - neon style */
   --wplace-text-secondary: #00ff41dd;
@@ -48,51 +48,54 @@
   --wplace-text-faded: #00ff41cc;
   
   /* Background variants - neon style */
-  --wplace-bg-input: rgba(0, 255, 65, 0.15);
-  --wplace-bg-subtle: rgba(0, 255, 65, 0.08);
-  --wplace-bg-faint: rgba(0, 255, 65, 0.05);
-  --wplace-bg-ghost: rgba(0, 255, 65, 0.03);
-  --wplace-bg-whisper: rgba(0, 255, 65, 0.02);
+  --wplace-bg-input: rgb(0 255 65 / 15%);
+  --wplace-bg-subtle: rgb(0 255 65 / 8%);
+  --wplace-bg-faint: rgb(0 255 65 / 5%);
+  --wplace-bg-ghost: rgb(0 255 65 / 3%);
+  --wplace-bg-whisper: rgb(0 255 65 / 2%);
   
   /* Border variants - neon style */
-  --wplace-border-subtle: rgba(0, 255, 65, 0.4);
-  --wplace-border-faint: rgba(0, 255, 65, 0.25);
-  --wplace-border-ghost: rgba(0, 255, 65, 0.15);
-  --wplace-border-ultra-faint: rgba(0, 255, 65, 0.08);
+  --wplace-border-subtle: rgb(0 255 65 / 40%);
+  --wplace-border-faint: rgb(0 255 65 / 25%);
+  --wplace-border-ghost: rgb(0 255 65 / 15%);
+  --wplace-border-ultra-faint: rgb(0 255 65 / 8%);
   
   /* Shadow variants - neon style */
-  --wplace-shadow-drag: 0 12px 40px rgba(0, 255, 65, 0.6), 0 0 0 2px rgba(0, 255, 65, 0.8), 0 0 20px rgba(0, 255, 65, 0.3);
-  --wplace-shadow-notification: 0 4px 12px rgba(0, 255, 65, 0.4), 0 0 15px rgba(0, 255, 65, 0.2);
-  --wplace-shadow-slider-thumb: 0 3px 6px rgba(0, 255, 65, 0.5), 0 0 0 2px var(--wplace-icon-primary), 0 0 10px rgba(0, 255, 65, 0.3);
-  --wplace-shadow-slider-hover: 0 4px 8px rgba(0, 255, 65, 0.6), 0 0 0 3px var(--wplace-icon-primary), 0 0 15px rgba(0, 255, 65, 0.4);
+  --wplace-shadow-drag: 0 12px 40px rgb(0 255 65 / 60%), 0 0 0 2px rgb(0 255 65 / 80%), 0 0 20px rgb(0 255 65 / 30%);
+  --wplace-shadow-notification: 0 4px 12px rgb(0 255 65 / 40%), 0 0 15px rgb(0 255 65 / 20%);
+  --wplace-shadow-slider-thumb: 0 3px 6px rgb(0 255 65 / 50%), 0 0 0 2px var(--wplace-icon-primary), 0 0 10px rgb(0 255 65 / 30%);
+  --wplace-shadow-slider-hover: 0 4px 8px rgb(0 255 65 / 60%), 0 0 0 3px var(--wplace-icon-primary), 0 0 15px rgb(0 255 65 / 40%);
   
   /* Animation colors - neon style */
-  --wplace-pulse-start: rgba(0, 255, 65, 0.8);
-  --wplace-pulse-mid: rgba(0, 255, 65, 0);
-  --wplace-pulse-end: rgba(0, 255, 65, 0);
+  --wplace-pulse-start: rgb(0 255 65 / 80%);
+  --wplace-pulse-mid: rgb(0 255 65 / 0%);
+  --wplace-pulse-end: rgb(0 255 65 / 0%);
   
   /* Slider colors - neon style */
   --wplace-slider-thumb-bg: #00ff41;
 }
 
 /* Neon-specific styling overrides */
-.wplace-theme--neon #wplace-image-bot-container {
+.wplace-theme-neon #wplace-image-bot-container {
   background: var(--wplace-primary) !important;
   border: 2px solid var(--wplace-text) !important;
   border-radius: 0 !important;
-  box-shadow: 0 0 20px var(--wplace-text), inset 0 0 20px rgba(0, 255, 65, 0.1) !important;
+  box-shadow: 0 0 20px var(--wplace-text), inset 0 0 20px rgb(0 255 65 / 10%) !important;
   font-family: var(--wplace-font) !important;
 }
 
-.wplace-theme--neon #wplace-stats-container {
+.wplace-theme-neon #wplace-stats-container {
   background: var(--wplace-primary) !important;
   border: 2px solid var(--wplace-text) !important;
   border-radius: 0 !important;
-  box-shadow: 0 0 20px var(--wplace-text), inset 0 0 20px rgba(0, 255, 65, 0.1) !important;
+  box-shadow: 0 0 20px var(--wplace-text), inset 0 0 20px rgb(0 255 65 / 10%) !important;
   font-family: var(--wplace-font) !important;
+  position: fixed !important;
+  overflow: hidden !important;
+  z-index: 9998 !important;
 }
 
-.wplace-theme--neon .wplace-header {
+.wplace-theme-neon .wplace-header {
   background: var(--wplace-secondary) !important;
   border-bottom: 1px solid var(--wplace-text) !important;
   color: var(--wplace-text) !important;
@@ -100,19 +103,19 @@
   font-family: var(--wplace-font) !important;
 }
 
-.wplace-theme--neon .wplace-section {
-  background: rgba(22, 33, 62, 0.5) !important;
+.wplace-theme-neon .wplace-section {
+  background: rgb(22 33 62 / 50%) !important;
   border: 1px solid var(--wplace-text) !important;
   border-radius: 0 !important;
 }
 
-.wplace-theme--neon .wplace-status-section {
-  background: rgba(22, 33, 62, 0.5) !important;
+.wplace-theme-neon .wplace-status-section {
+  background: rgb(22 33 62 / 50%) !important;
   border: 1px solid var(--wplace-text) !important;
   border-radius: 0 !important;
 }
 
-.wplace-theme--neon .wplace-section-title {
+.wplace-theme-neon .wplace-section-title {
   color: var(--wplace-text) !important;
   text-shadow: 0 0 8px var(--wplace-text) !important;
   text-transform: uppercase !important;
@@ -120,7 +123,7 @@
   font-size: 10px !important;
 }
 
-.wplace-theme--neon .wplace-btn {
+.wplace-theme-neon .wplace-btn {
   background: var(--wplace-secondary) !important;
   border: 1px solid var(--wplace-text) !important;
   border-radius: 0 !important;
@@ -131,100 +134,101 @@
   text-transform: uppercase !important;
 }
 
-.wplace-theme--neon .wplace-btn:hover:not(:disabled) {
-  box-shadow: 0 0 15px var(--wplace-text), inset 0 0 15px rgba(0, 255, 65, 0.1) !important;
-  animation: neonGlow 1s ease-in-out infinite alternate !important;
+/* Pixel blinking and neon glow animation for buttons */
+.wplace-theme-neon .wplace-btn:hover:not(:disabled) {
+  box-shadow: 0 0 15px var(--wplace-text), inset 0 0 15px rgb(0 255 65 / 10%) !important;
+  animation: pixel-blink 0.5s infinite, neon-glow 1s ease-in-out infinite alternate !important;
 }
 
-.wplace-theme--neon .wplace-btn-start {
+.wplace-theme-neon .wplace-btn-start {
   background: var(--wplace-secondary) !important;
   border-color: var(--wplace-success) !important;
   color: var(--wplace-success) !important;
   text-shadow: 0 0 8px var(--wplace-success) !important;
 }
 
-.wplace-theme--neon .wplace-btn-stop {
+.wplace-theme-neon .wplace-btn-stop {
   background: var(--wplace-secondary) !important;
   border-color: var(--wplace-error) !important;
   color: var(--wplace-error) !important;
   text-shadow: 0 0 8px var(--wplace-error) !important;
 }
 
-.wplace-theme--neon .wplace-btn-upload {
+.wplace-theme-neon .wplace-btn-upload {
   background: var(--wplace-secondary) !important;
   border: 1px dashed var(--wplace-highlight) !important;
   color: var(--wplace-highlight) !important;
   text-shadow: 0 0 8px var(--wplace-highlight) !important;
 }
 
-.wplace-theme--neon .wplace-btn-select {
+.wplace-theme-neon .wplace-btn-select {
   background: var(--wplace-secondary) !important;
   border-color: var(--wplace-highlight) !important;
   color: var(--wplace-highlight) !important;
   text-shadow: 0 0 8px var(--wplace-highlight) !important;
 }
 
-.wplace-theme--neon .wplace-btn-file {
+.wplace-theme-neon .wplace-btn-file {
   background: var(--wplace-secondary) !important;
   border-color: var(--wplace-warning) !important;
   color: var(--wplace-warning) !important;
   text-shadow: 0 0 8px var(--wplace-warning) !important;
 }
 
-.wplace-theme--neon .wplace-progress {
-  background: rgba(0, 0, 0, 0.8) !important;
+.wplace-theme-neon .wplace-progress {
+  background: rgb(0 0 0 / 80%) !important;
   border: 1px solid var(--wplace-text) !important;
   border-radius: 0 !important;
 }
 
-.wplace-theme--neon .wplace-progress-bar {
+.wplace-theme-neon .wplace-progress-bar {
   background: linear-gradient(90deg, var(--wplace-success) 0%, var(--wplace-text) 100%) !important;
   box-shadow: 0 0 10px var(--wplace-success) !important;
 }
 
-.wplace-theme--neon .wplace-stat-value {
+.wplace-theme-neon .wplace-stat-value {
   color: var(--wplace-text) !important;
   text-shadow: 0 0 5px var(--wplace-text) !important;
 }
 
-.wplace-theme--neon .status-success {
-  background: rgba(57, 255, 20, 0.1) !important;
+.wplace-theme-neon .status-success {
+  background: rgb(57 255 20 / 10%) !important;
   border-color: var(--wplace-success) !important;
   color: var(--wplace-success) !important;
   box-shadow: 0 0 15px var(--wplace-success) !important;
   text-shadow: 0 0 8px var(--wplace-success) !important;
 }
 
-.wplace-theme--neon .status-error {
-  background: rgba(255, 7, 58, 0.1) !important;
+.wplace-theme-neon .status-error {
+  background: rgb(255 7 58 / 10%) !important;
   border-color: var(--wplace-error) !important;
   color: var(--wplace-error) !important;
   box-shadow: 0 0 15px var(--wplace-error) !important;
   text-shadow: 0 0 8px var(--wplace-error) !important;
 }
 
-.wplace-theme--neon .status-default {
-  background: rgba(0, 255, 65, 0.1) !important;
+.wplace-theme-neon .status-default {
+  background: rgb(0 255 65 / 10%) !important;
   border-color: var(--wplace-text) !important;
   color: var(--wplace-text) !important;
   text-shadow: 0 0 5px var(--wplace-text) !important;
 }
 
 /* Settings dialog neon styling */
-.wplace-theme--neon #wplace-settings-container {
+.wplace-theme-neon #wplace-settings-container {
   background: var(--wplace-primary) !important;
   border: 2px solid var(--wplace-text) !important;
   border-radius: 0 !important;
-  box-shadow: 0 0 30px var(--wplace-text), inset 0 0 30px rgba(0, 255, 65, 0.1) !important;
+  box-shadow: 0 0 30px var(--wplace-text), inset 0 0 30px rgb(0 255 65 / 10%) !important;
   font-family: var(--wplace-font) !important;
 }
 
-.wplace-theme--neon .wplace-settings-header {
+.wplace-theme-neon .wplace-settings-header {
   background: var(--wplace-secondary) !important;
   border-bottom: 1px solid var(--wplace-text) !important;
 }
 
-.wplace-theme--neon .wplace-settings-header h3 {
+.wplace-theme-neon .wplace-settings-header h3 {
   color: var(--wplace-text) !important;
   text-shadow: 0 0 10px var(--wplace-text) !important;
   font-family: var(--wplace-font) !important;
@@ -232,25 +236,25 @@
   text-transform: uppercase !important;
 }
 
-.wplace-theme--neon .wplace-settings-close-btn {
+.wplace-theme-neon .wplace-settings-close-btn {
   background: var(--wplace-secondary) !important;
   border: 1px solid var(--wplace-text) !important;
   border-radius: 0 !important;
   color: var(--wplace-text) !important;
 }
 
-.wplace-theme--neon .wplace-settings-close-btn:hover {
+.wplace-theme-neon .wplace-settings-close-btn:hover {
   background: var(--wplace-error) !important;
   box-shadow: 0 0 15px var(--wplace-error) !important;
 }
 
-.wplace-theme--neon .wplace-settings-section-wrapper {
-  background: rgba(22, 33, 62, 0.3) !important;
+.wplace-theme-neon .wplace-settings-section-wrapper {
+  background: rgb(22 33 62 / 30%) !important;
   border: 1px solid var(--wplace-text) !important;
   border-radius: 0 !important;
 }
 
-.wplace-theme--neon .wplace-settings-select {
+.wplace-theme-neon .wplace-settings-select {
   background: var(--wplace-secondary) !important;
   border: 1px solid var(--wplace-text) !important;
   border-radius: 0 !important;
@@ -259,7 +263,7 @@
   font-size: 11px !important;
 }
 
-.wplace-theme--neon .wplace-settings-section-label {
+.wplace-theme-neon .wplace-settings-section-label {
   color: var(--wplace-text) !important;
   text-shadow: 0 0 8px var(--wplace-text) !important;
   font-family: var(--wplace-font) !important;
@@ -267,17 +271,17 @@
   text-transform: uppercase !important;
 }
 
-.wplace-theme--neon .wplace-speed-value {
+.wplace-theme-neon .wplace-speed-value {
   background: var(--wplace-secondary) !important;
   border: 1px solid var(--wplace-text) !important;
   border-radius: 0 !important;
   color: var(--wplace-text) !important;
   text-shadow: 0 0 8px var(--wplace-text) !important;
   font-family: var(--wplace-font) !important;
-  box-shadow: 0 0 10px rgba(0, 255, 65, 0.3) !important;
+  box-shadow: 0 0 10px rgb(0 255 65 / 30%) !important;
 }
 
-.wplace-theme--neon .wplace-overlay-opacity-value {
+.wplace-theme-neon .wplace-overlay-opacity-value {
   background: var(--wplace-secondary) !important;
   border: 1px solid var(--wplace-text) !important;
   border-radius: 0 !important;
@@ -286,18 +290,18 @@
 }
 
 /* Neon slider styling */
-.wplace-theme--neon .wplace-slider,
-.wplace-theme--neon .wplace-speed-slider,
-.wplace-theme--neon .wplace-overlay-opacity-slider {
+.wplace-theme-neon .wplace-slider,
+.wplace-theme-neon .wplace-speed-slider,
+.wplace-theme-neon .wplace-overlay-opacity-slider {
   background: var(--wplace-secondary) !important;
   border: 1px solid var(--wplace-text) !important;
   border-radius: 0 !important;
-  box-shadow: 0 0 10px rgba(0, 255, 65, 0.3) !important;
+  box-shadow: 0 0 10px rgb(0 255 65 / 30%) !important;
 }
 
-.wplace-theme--neon .wplace-slider::-webkit-slider-thumb,
-.wplace-theme--neon .wplace-speed-slider::-webkit-slider-thumb,
-.wplace-theme--neon .wplace-overlay-opacity-slider::-webkit-slider-thumb {
+.wplace-theme-neon .wplace-slider::-webkit-slider-thumb,
+.wplace-theme-neon .wplace-speed-slider::-webkit-slider-thumb,
+.wplace-theme-neon .wplace-overlay-opacity-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: 16px;
   height: 16px;
@@ -306,18 +310,18 @@
   border: 2px solid var(--wplace-text) !important;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 0 8px rgba(0, 255, 65, 0.5) !important;
+  box-shadow: 0 0 8px rgb(0 255 65 / 50%) !important;
 }
 
-.wplace-theme--neon .wplace-slider::-webkit-slider-thumb:hover,
-.wplace-theme--neon .wplace-speed-slider::-webkit-slider-thumb:hover,
-.wplace-theme--neon .wplace-overlay-opacity-slider::-webkit-slider-thumb:hover {
+.wplace-theme-neon .wplace-slider::-webkit-slider-thumb:hover,
+.wplace-theme-neon .wplace-speed-slider::-webkit-slider-thumb:hover,
+.wplace-theme-neon .wplace-overlay-opacity-slider::-webkit-slider-thumb:hover {
   transform: scale(1.1);
   box-shadow: 0 0 15px var(--wplace-text) !important;
 }
 
 /* Scanline animation for neon theme */
-.wplace-theme--neon #wplace-image-bot-container::before {
+.wplace-theme-neon #wplace-image-bot-container::before {
   content: '';
   position: absolute;
   top: 0;
@@ -331,13 +335,8 @@
   opacity: 0.7;
 }
 
-.wplace-theme--neon #wplace-stats-container {
-  position: fixed !important;
-  overflow: hidden !important;
-  z-index: 9998 !important;
-}
 
-.wplace-theme--neon #wplace-stats-container::before {
+.wplace-theme-neon #wplace-stats-container::before {
   content: '';
   position: absolute;
   top: 0;
@@ -347,29 +346,27 @@
   background: linear-gradient(90deg, transparent, var(--wplace-text), transparent);
   z-index: 1;
   pointer-events: none;
-  animation: scanlineStats 4s linear infinite;
+  animation: scanline-stats 4s linear infinite;
   opacity: 0.7;
 }
 
-/* Pixel blinking animation for buttons */
-.wplace-theme--neon .wplace-btn:hover:not(:disabled) {
-  animation: pixelBlink 0.5s infinite, neonGlow 1s ease-in-out infinite alternate;
-}
 
 /* Text glow animations */
-@keyframes neonGlow {
+@keyframes neon-glow {
   0%, 100% {
-    text-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor;
+    text-shadow: 0 0 5px currentcolor, 0 0 10px currentcolor, 0 0 15px currentcolor;
   }
+
   50% {
-    text-shadow: 0 0 2px currentColor, 0 0 5px currentColor, 0 0 8px currentColor;
+    text-shadow: 0 0 2px currentcolor, 0 0 5px currentcolor, 0 0 8px currentcolor;
   }
 }
 
-@keyframes pixelBlink {
+@keyframes pixel-blink {
   0%, 50% {
     opacity: 1;
   }
+
   51%, 100% {
     opacity: 0.7;
   }
@@ -379,25 +376,27 @@
   0% {
     transform: translateY(-100%);
   }
+
   100% {
     transform: translateY(400px);
   }
 }
 
-@keyframes scanlineStats {
+@keyframes scanline-stats {
   0% {
     transform: translateY(-100%);
   }
+
   100% {
     transform: translateY(300px);
   }
 }
 
 /* Resize dialog styling for neon theme */
-.wplace-theme--neon .resize-container {
+.wplace-theme-neon .resize-container {
   background: #1a1a2e !important;
   border: 3px solid #00ff41 !important;
   border-radius: 0 !important;
-  box-shadow: 0 0 30px rgba(0, 255, 65, 0.5) !important;
+  box-shadow: 0 0 30px rgb(0 255 65 / 50%) !important;
   font-family: 'Press Start 2P', monospace !important;
 }

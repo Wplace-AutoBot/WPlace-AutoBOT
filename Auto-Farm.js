@@ -298,7 +298,7 @@
         70% { box-shadow: 0 0 0 10px rgba(0, 255, 0, 0); }
         100% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0); }
       }
-      @keyframes slideIn {
+      @keyframes slide-in {
         from { transform: translateY(20px); opacity: 0; }
         to { transform: translateY(0); opacity: 1; }
       }
@@ -315,7 +315,7 @@
         z-index: 9999;
         font-family: 'Segoe UI', Roboto, sans-serif;
         color: ${CONFIG.THEME.text};
-        animation: slideIn 0.4s ease-out;
+        animation: slide-in 0.4s ease-out;
         overflow: hidden;
       }
       .wplace-header {
@@ -594,7 +594,7 @@
       statusText.className = `wplace-status status-${type}`;
       statusText.style.animation = 'none';
       void statusText.offsetWidth;
-      statusText.style.animation = 'slideIn 0.3s ease-out';
+      statusText.style.animation = 'slide-in 0.3s ease-out';
     }
   };
 

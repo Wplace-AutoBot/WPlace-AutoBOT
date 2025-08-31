@@ -142,7 +142,7 @@
         animations: {
           glow: false,
           scanline: false,
-          pixelBlink: false,
+          'pixel-blink': false,
         },
       },
       'Classic Light': {
@@ -163,7 +163,7 @@
         animations: {
           glow: false,
           scanline: false,
-          pixelBlink: false,
+          'pixel-blink': false,
         },
       },
       'Neon Retro': {
@@ -187,7 +187,7 @@
         animations: {
           glow: true,
           scanline: true,
-          pixelBlink: true,
+          'pixel-blink': true,
         },
       },
     },
@@ -220,16 +220,16 @@
     const theme = getCurrentTheme();
     // Toggle theme class on documentElement so CSS vars cascade to our UI
     document.documentElement.classList.remove(
-      'wplace-theme--classic',
-      'wplace-theme--classic-light',
-      'wplace-theme--neon'
+      'wplace-theme-classic',
+      'wplace-theme-classic-light',
+      'wplace-theme-neon'
     );
 
-    let themeClass = 'wplace-theme--classic'; // default
+    let themeClass = 'wplace-theme-classic'; // default
     if (CONFIG.currentTheme === 'Neon Retro') {
-      themeClass = 'wplace-theme--neon';
+      themeClass = 'wplace-theme-neon';
     } else if (CONFIG.currentTheme === 'Classic Light') {
-      themeClass = 'wplace-theme--classic-light';
+      themeClass = 'wplace-theme-classic-light';
     }
 
     document.documentElement.classList.add(themeClass);
@@ -1859,7 +1859,7 @@
       document.body.appendChild(alertDiv);
 
       setTimeout(() => {
-        alertDiv.style.animation = 'slideDown 0.3s ease-out reverse';
+        alertDiv.style.animation = 'slide-down 0.3s ease-out reverse';
         setTimeout(() => {
           document.body.removeChild(alertDiv);
         }, 300);
@@ -3514,7 +3514,7 @@
       };
       backdrop-filter: ${theme.backdropFilter || 'blur(10px)'};
       overflow: hidden;
-      animation: settingsSlideIn 0.4s ease-out;
+      animation: settings-slide-in 0.4s ease-out;
       ${
         theme.animations?.glow
           ? `
@@ -3937,7 +3937,7 @@
           to { transform: rotate(360deg); }
         }
 
-        @keyframes settingsSlideIn {
+        @keyframes settings-slide-in {
           from {
             opacity: 0;
             transform: translate(-50%, -50%) scale(0.9);
@@ -3948,7 +3948,7 @@
           }
         }
 
-        @keyframes settingsFadeOut {
+        @keyframes settings-fade-out {
           from {
             opacity: 1;
             transform: translate(-50%, -50%) scale(1);
@@ -4414,7 +4414,7 @@
       settingsBtn.addEventListener('click', () => {
         const isVisible = settingsContainer.classList.contains('show');
         if (isVisible) {
-          settingsContainer.style.animation = 'settingsFadeOut 0.3s ease-out forwards';
+          settingsContainer.style.animation = 'settings-fade-out 0.3s ease-out forwards';
           settingsContainer.classList.remove('show');
           setTimeout(() => {
             settingsContainer.style.animation = '';
@@ -4424,12 +4424,12 @@
           settingsContainer.style.left = '50%';
           settingsContainer.style.transform = 'translate(-50%, -50%)';
           settingsContainer.classList.add('show');
-          settingsContainer.style.animation = 'settingsSlideIn 0.4s ease-out';
+          settingsContainer.style.animation = 'settings-slide-in 0.4s ease-out';
         }
       });
 
       closeSettingsBtn.addEventListener('click', () => {
-        settingsContainer.style.animation = 'settingsFadeOut 0.3s ease-out forwards';
+        settingsContainer.style.animation = 'settings-fade-out 0.3s ease-out forwards';
         settingsContainer.classList.remove('show');
         setTimeout(() => {
           settingsContainer.style.animation = '';
@@ -4984,7 +4984,7 @@
         // Trigger animation only when silent = false
         statusText.style.animation = 'none';
         void statusText.offsetWidth; // trick to restart the animation
-        statusText.style.animation = 'slideIn 0.3s ease-out';
+        statusText.style.animation = 'slide-in 0.3s ease-out';
       }
     };
 
