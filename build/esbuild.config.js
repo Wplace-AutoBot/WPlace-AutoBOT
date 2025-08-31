@@ -179,14 +179,30 @@ const targets = {
     },
 };
 
+// Helper to build or watch a single target
+async function buildOrWatchOne(name, config) {
+    if (!watch) {
+        console.log(`📦 Building ${name}...`);
+        await esbuild.build(config);
+        return;
+    }
+    const ctx = await esbuild.context({ ...config, metafile: true });
+    await ctx.watch();
+    console.log(`👀 Watching target "${name}"...`);
+}
+
 // Main build function
 async function build(targetName = 'all') {
     console.log('🔨 Building WPlace AutoBot...');
 
+    if (watch && targetName === 'all') {
+        console.error('❌ Watch mode requires a specific target. Use --target=userscript or --target=standalone');
+        process.exit(1);
+    }
+
     if (targetName === 'all') {
         for (const [name, config] of Object.entries(targets)) {
-            console.log(`📦 Building ${name}...`);
-            await esbuild.build(config);
+            await buildOrWatchOne(name, config);
         }
 
         // Create bookmarklet file with javascript: prefix
@@ -200,10 +216,9 @@ async function build(targetName = 'all') {
             bookmarkletWrapped
         );
     } else if (targets[targetName]) {
-        console.log(`📦 Building ${targetName}...`);
-        await esbuild.build(targets[targetName]);
+        await buildOrWatchOne(targetName, targets[targetName]);
 
-        if (targetName === 'bookmarklet') {
+        if (!watch && targetName === 'bookmarklet') {
             const bookmarkletContent = fs.readFileSync(
                 './dist/auto-image.bookmarklet.js',
                 'utf8'
@@ -219,13 +234,16 @@ async function build(targetName = 'all') {
         process.exit(1);
     }
 
-    console.log('✅ Build complete!');
+    if (!watch) {
+        console.log('✅ Build complete!');
+    }
 }
 
 // Parse command line arguments
 const args = process.argv.slice(2);
 const targetArg = args.find(arg => arg.startsWith('--target='));
 const target = targetArg ? targetArg.split('=')[1] : 'all';
+const watch = args.includes('--watch');
 
 build(target).catch(err => {
     console.error('❌ Build failed:', err);
