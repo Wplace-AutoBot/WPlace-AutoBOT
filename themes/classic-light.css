@@ -41,19 +41,19 @@
   --wplace-text-muted: rgb(33 37 41 / 70%);
   --wplace-text-dim: rgb(33 37 41 / 60%);
   --wplace-text-faded: rgb(33 37 41 / 80%);
-  
+
   /* Background variants */
-  --wplace-bg-input: rgb(0 0 0 / 8%);
-  --wplace-bg-subtle: rgb(0 0 0 / 5%);
-  --wplace-bg-faint: rgb(0 0 0 / 3%);
-  --wplace-bg-ghost: rgb(0 0 0 / 2%);
-  --wplace-bg-whisper: rgb(0 0 0 / 1%);
-  
+  --wplace-bg-input:     #f3f3f3; /* neutral-100 */
+  --wplace-bg-subtle:    #f3f3f3; /* neutral-100 — hover */
+  --wplace-bg-faint:     #e0e0e0; /* neutral-200 */
+  --wplace-bg-ghost:     #d1d1d1; /* neutral-300 */
+  --wplace-bg-whisper:   #e0e0e0; /* can be used as whisper on hover */
+
   /* Border variants */
-  --wplace-border-subtle: rgb(0 0 0 / 20%);
-  --wplace-border-faint: rgb(0 0 0 / 15%);
-  --wplace-border-ghost: rgb(0 0 0 / 10%);
-  --wplace-border-ultra-faint: rgb(0 0 0 / 5%);
+  --wplace-border-subtle:      #d1d1d1; /* neutral-300 */
+  --wplace-border-faint:       #e0e0e0; /* neutral-200 */
+  --wplace-border-ghost:       #e0e0e0; /* neutral-200 */
+  --wplace-border-ultra-faint: #e0e0e0; /* neutral-200 — very faint */
   
   /* Shadow variants */
   --wplace-shadow-drag: 0 12px 40px rgb(0 0 0 / 20%), 0 0 0 2px rgb(111 66 193 / 30%);

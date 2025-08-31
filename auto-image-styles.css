@@ -1289,10 +1289,10 @@
   margin-right: 4px;
 }
 
-.wplace-random-batch-input {
+.wplace-settings-number-input {
   width: 100%;
   padding: 10px 12px;
-  background: var(--wplace-bg-subtle);
+  background: var(--wplace-bg-input);
   color: var(--wplace-text);
   border: 1px solid var(--wplace-border-subtle);
   border-radius: 8px;
@@ -1881,17 +1881,6 @@
 .wplace-icon-height {
   color: var(--wplace-icon-secondary);
   margin-right: 4px;
-}
-
-.wplace-block-size-input {
-  width: 100%;
-  padding: 10px 12px;
-  background: var(--wplace-bg-subtle);
-  color: var(--wplace-text);
-  border: 1px solid var(--wplace-border-subtle);
-  border-radius: 8px;
-  font-size: 13px;
-  outline: none;
 }
 
 .wplace-block-size-description {

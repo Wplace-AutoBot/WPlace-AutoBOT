@@ -3744,14 +3744,14 @@
                   <i class="fas fa-arrow-down wplace-icon-min"></i>
                   Minimum Batch Size
                 </label>
-                <input type="number" id="randomBatchMin" min="1" max="1000" value="${CONFIG.RANDOM_BATCH_RANGE.MIN}" class="wplace-random-batch-input">
+                <input type="number" id="randomBatchMin" min="1" max="1000" value="${CONFIG.RANDOM_BATCH_RANGE.MIN}" class="wplace-settings-number-input">
               </div>
               <div>
                 <label class="wplace-random-batch-label">
                   <i class="fas fa-arrow-up wplace-icon-max"></i>
                   Maximum Batch Size
                 </label>
-                <input type="number" id="randomBatchMax" min="1" max="1000" value="${CONFIG.RANDOM_BATCH_RANGE.MAX}" class="wplace-random-batch-input">
+                <input type="number" id="randomBatchMax" min="1" max="1000" value="${CONFIG.RANDOM_BATCH_RANGE.MAX}" class="wplace-settings-number-input">
               </div>
             </div>
             <p class="wplace-random-batch-description">
@@ -3832,14 +3832,14 @@
                   <i class="fas fa-arrows-alt-h wplace-icon-width"></i>
                   Block Width
                 </label>
-                <input type="number" id="blockWidthInput" min="1" max="50" value="6" class="wplace-block-size-input">
+                <input type="number" id="blockWidthInput" min="1" max="50" value="6" class="wplace-settings-number-input">
               </div>
               <div>
                 <label style="display: block; color: rgba(255,255,255,0.8); font-size: 12px; margin-bottom: 8px;">
                   <i class="fas fa-arrows-alt-v wplace-icon-height"></i>
                   Block Height
                 </label>
-                <input type="number" id="blockHeightInput" min="1" max="50" value="2" class="wplace-block-size-input">
+                <input type="number" id="blockHeightInput" min="1" max="50" value="2" class="wplace-settings-number-input">
               </div>
             </div>
             <p class="wplace-block-size-description">
