@@ -308,21 +308,25 @@ function applyTheme() {
       }
       
       const response = await fetch(url);
-      if (response.ok) {
-        const translations = await response.json();
-        
-        // Validate that translations is an object with keys
-        if (typeof translations === 'object' && translations !== null && Object.keys(translations).length > 0) {
-          loadedTranslations[language] = translations;
-          console.log(`📚 Loaded ${language} translations successfully from CDN (${Object.keys(translations).length} keys)`);
-          return translations;
-        } else {
-          console.warn(`❌ Invalid translation format for ${language}`);
-          throw new Error('Invalid translation format');
-        }
-      } else {
-        console.warn(`❌ CDN returned HTTP ${response.status}: ${response.statusText} for ${language} translations`);
+      if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      const translations = await response.json();
+      if (
+        typeof translations === "object" &&
+        translations !== null &&
+        Object.keys(translations).length > 0
+      ) {
+        loadedTranslations[language] = translations;
+        console.log(
+          `📚 Loaded ${language} translations successfully from CDN (${Object.keys(
+            translations
+          ).length} keys)`
+        );
+        return translations;
+      } else {
+        console.warn(`❌ Invalid translation format for ${language}`);
+        throw new Error("Invalid translation format");
       }
     } catch (error) {
       console.error(`❌ Failed to load ${language} translations from CDN (attempt ${retryCount + 1}):`, error);
@@ -1094,6 +1098,60 @@ function applyTheme() {
         await Utils.sleep(interval);
       }
       return null;
+    },
+
+    // Simple CSS loader with fallback for ORB issues
+    // Based on research: GitHub's raw.githubusercontent.com has 5+ min caching, 
+    // cache-busting params don't work anymore, and /refs/heads/ paths can cause issues
+    async loadCSS(url, attrs = {}) {
+      return new Promise((resolve) => {
+        const link = document.createElement("link");
+        link.rel = "stylesheet";
+        link.href = url;
+        Object.entries(attrs).forEach(([k, v]) => link.setAttribute(k, v));
+        
+        const timeout = setTimeout(() => {
+          // If link doesn't load in 3 seconds, try fetching as text
+          fetch(url)
+            .then(res => res.text())
+            .then(css => {
+              const style = document.createElement("style");
+              Object.entries(attrs).forEach(([k, v]) => style.setAttribute(k, v));
+              style.textContent = css;
+              document.head.appendChild(style);
+              resolve(style);
+            })
+            .catch(() => {
+              console.warn("CSS loading failed for", url);
+              resolve(null);
+            });
+        }, 3000);
+
+        link.onload = () => {
+          clearTimeout(timeout);
+          resolve(link);
+        };
+        
+        link.onerror = () => {
+          clearTimeout(timeout);
+          // Try fallback method immediately on error
+          fetch(url)
+            .then(res => res.text())
+            .then(css => {
+              const style = document.createElement("style");
+              Object.entries(attrs).forEach(([k, v]) => style.setAttribute(k, v));
+              style.textContent = css;
+              document.head.appendChild(style);
+              resolve(style);
+            })
+            .catch(() => {
+              console.warn("CSS fallback failed for", url);
+              resolve(null);
+            });
+        };
+
+        document.head.appendChild(link);
+      });
     },
 
     // Turnstile Generator Integration - Optimized with widget reuse and proper cleanup
@@ -2727,34 +2785,31 @@ function applyTheme() {
     const theme = getCurrentTheme()
     applyTheme() // <- new: set CSS vars and theme class before building UI
 
-    const fontAwesome = document.createElement("link")
-    fontAwesome.rel = "stylesheet"
-    fontAwesome.href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    document.head.appendChild(fontAwesome)
+    // Load external CSS with fallback for ORB/CORS issues
+    await Utils.loadCSS(
+      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    );
 
     if (theme.fontFamily.includes("Press Start 2P")) {
-      const googleFonts = document.createElement("link")
-      googleFonts.rel = "stylesheet"
-      googleFonts.href = "https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
-      document.head.appendChild(googleFonts)
+      await Utils.loadCSS(
+        "https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      );
     }
 
-    // Link external CSS files
-    const cssLink = document.createElement('link');
-    cssLink.rel = 'stylesheet';
-    cssLink.href = `${getBaseUrl()}/auto-image-styles.css`;
-    cssLink.setAttribute('data-wplace-theme', 'true');
-    document.head.appendChild(cssLink);
-
-    // Dynamically load theme CSS files using base URL
-    const themeFiles = ['classic.css', 'classic-light.css', 'neon.css'];
-    themeFiles.forEach(themeFile => {
-      const themeLink = document.createElement('link');
-      themeLink.rel = 'stylesheet';
-      themeLink.href = `${getBaseUrl()}/themes/${themeFile}`;
-      themeLink.setAttribute('data-wplace-theme-file', themeFile);
-      document.head.appendChild(themeLink);
+    // Main stylesheet from GitHub Raw
+    await Utils.loadCSS(`${getBaseUrl()}/auto-image-styles.css`, {
+      "data-wplace-theme": "true"
     });
+
+    // Theme CSS files from GitHub Raw
+    const themeFiles = ['classic.css', 'classic-light.css', 'neon.css'];
+    await Promise.all(
+      themeFiles.map((themeFile) =>
+        Utils.loadCSS(`${getBaseUrl()}/themes/${themeFile}`, {
+          "data-wplace-theme-file": themeFile
+        })
+      )
+    );
 
     const container = document.createElement("div")
     container.id = "wplace-image-bot-container"
