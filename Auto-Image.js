@@ -316,9 +316,7 @@ function applyTheme() {
       return loadedTranslations[language];
     }
 
-    // Add cache-busting to bypass service worker and browser cache
-    const baseUrl = `${getBaseUrl()}/lang/${language}.json`;
-    const url = `${baseUrl}${baseUrl.includes('?') ? '&' : '?'}v=${Date.now()}`;
+    const url = `${getBaseUrl()}/lang/${language}.json`;
     const maxRetries = 3;
     const baseDelay = 1000; // 1 second
     
@@ -329,9 +327,7 @@ function applyTheme() {
         console.log(`🔄 Retrying ${language} translations (attempt ${retryCount + 1}/${maxRetries + 1})...`);
       }
       
-      const response = await fetch(url, {
-        cache: 'no-cache'
-      });
+      const response = await fetch(url);
       if (response.ok) {
         const translations = await response.json();
         
@@ -1121,7 +1117,7 @@ function applyTheme() {
     },
 
     /**
-     * Loads CSS with fallback for cross-origin restrictions and service worker bypass
+     * Loads CSS with fallback for cross-origin restrictions
      * @param {string} url - CSS file URL
      * @param {Object} attrs - HTML attributes to set
      * @param {boolean} critical - Whether to throw on failure (default: false)
@@ -1129,25 +1125,9 @@ function applyTheme() {
      */
     async loadCSS(url, attrs = {}, critical = false) {
       const loadAsInline = async () => {
-        // Add cache-busting to bypass service worker and browser cache
-        const cacheBustedUrl = `${url}${url.includes('?') ? '&' : '?'}v=${Date.now()}`;
-        const res = await fetch(cacheBustedUrl, {
-          cache: 'no-cache'
-        });
+        const res = await fetch(url);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const css = await res.text();
-        
-        // Check for empty or invalid CSS content
-        if (!css || css.trim().length === 0) {
-          throw new Error(`Empty CSS content returned for ${url}`);
-        }
-        
-        // Basic CSS validation - should contain some CSS-like content
-        if (!css.includes('{') && !css.includes('@')) {
-          console.warn(`Suspicious CSS content for ${url}:`, css.substring(0, 200));
-          throw new Error(`Invalid CSS content returned for ${url}`);
-        }
-        
         const style = document.createElement("style");
         Object.entries(attrs).forEach(([k, v]) => style.setAttribute(k, v));
         style.textContent = css;
@@ -1158,8 +1138,7 @@ function applyTheme() {
       return new Promise((resolve, reject) => {
         const link = document.createElement("link");
         link.rel = "stylesheet";
-        // Add cache-busting to bypass service worker and browser cache
-        link.href = `${url}${url.includes('?') ? '&' : '?'}v=${Date.now()}`;
+        link.href = url;
         Object.entries(attrs).forEach(([k, v]) => link.setAttribute(k, v));
         
         const handleError = async (errorMsg) => {
@@ -1171,8 +1150,7 @@ function applyTheme() {
             if (critical) {
               reject(new Error(`Critical CSS failed to load: ${url}`));
             } else {
-              // For theme files, reject so Promise.allSettled detects the failure
-              reject(new Error(`CSS failed to load: ${url} (${errorMsg})`));
+              resolve(null);
             }
           }
         };
@@ -1181,31 +1159,7 @@ function applyTheme() {
 
         link.onload = () => {
           clearTimeout(timeout);
-          console.log(`CSS link onload triggered for: ${url}`);
-          
-          // Additional check: verify the stylesheet actually has rules
-          setTimeout(() => {
-            console.log(`Checking CSS rules after delay for: ${url}`);
-            try {
-              if (link.sheet) {
-                const ruleCount = link.sheet.cssRules.length;
-                console.log(`cc17733e-ab98-4eef-829d-8dad0fe50155 CSS file: ${url} has ${ruleCount} rules`);
-                if (ruleCount === 0) {
-                  console.warn(`CSS loaded but has no rules: ${url}`);
-                  handleError("empty stylesheet");
-                  return;
-                }
-              } else {
-                console.warn(`link.sheet is null for: ${url}`);
-                handleError("no stylesheet object");
-                return;
-              }
-            } catch (e) {
-              // CORS error when accessing cssRules is normal, means CSS loaded from external source
-              console.log(`CSS loaded (CORS protected) for: ${url} - Error: ${e.message}`);
-            }
-            resolve(link);
-          }, 100); // Small delay to let CSS parse
+          resolve(link);
         };
         
         link.onerror = () => {
@@ -2859,87 +2813,20 @@ function applyTheme() {
       );
     }
 
-    // Main stylesheet from GitHub Raw (critical - but usually works)
+    // Main stylesheet from GitHub Raw (critical - will throw on failure)
     await Utils.loadCSS(`${getBaseUrl()}/auto-image-styles.css`, {
       "data-wplace-theme": "true"
     }, true);
 
     // Theme CSS files from GitHub Raw
     const themeFiles = ['classic.css', 'classic-light.css', 'neon.css'];
-    let themeFailures = 0;
-    
-    const themeResults = await Promise.allSettled(
+    await Promise.all(
       themeFiles.map((themeFile) =>
         Utils.loadCSS(`${getBaseUrl()}/themes/${themeFile}`, {
           "data-wplace-theme-file": themeFile
         })
       )
     );
-    
-    // Count failed theme loads
-    themeResults.forEach((result, index) => {
-      if (result.status === 'rejected') {
-        themeFailures++;
-        console.error(`❌ Theme file ${themeFiles[index]} failed to load:`, result.reason);
-      }
-    });
-    
-    // Show popup if any themes failed to load
-    if (themeFailures > 0) {
-      console.error(`❌ ${themeFailures} theme files failed to load due to service worker interference`);
-      
-      // Show popup with reload instructions
-      const popup = document.createElement('div');
-      popup.style.cssText = `
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: #ff4444;
-        color: white;
-        padding: 20px;
-        border-radius: 10px;
-        font-family: Arial, sans-serif;
-        font-size: 14px;
-        z-index: 999999;
-        text-align: center;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-        max-width: 400px;
-      `;
-      popup.innerHTML = `
-        <h3 style="margin: 0 0 15px 0;">⚠️ WPlace Bot - Theme CSS Loading Failed</h3>
-        <p style="margin: 0 0 15px 0;">${themeFailures} theme file(s) couldn't load due to service worker interference.</p>
-        <p style="margin: 0 0 20px 0;"><strong>Please force reload the page:</strong></p>
-        <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; margin: 10px 0;">
-          <strong>Windows/Linux:</strong> Ctrl + Shift + R<br>
-          <strong>Mac:</strong> Cmd + Shift + R<br>
-          <strong>Alternative:</strong> Ctrl + F5
-        </div>
-        <button id="wplace-close-theme-popup" style="
-          background: white; 
-          color: #ff4444; 
-          border: none; 
-          padding: 8px 16px; 
-          border-radius: 5px; 
-          cursor: pointer;
-          font-weight: bold;
-        ">Close</button>
-      `;
-      
-      document.body.appendChild(popup);
-      
-      // Close button functionality
-      popup.querySelector('#wplace-close-theme-popup').onclick = () => {
-        popup.remove();
-      };
-      
-      // Auto-close after 15 seconds
-      setTimeout(() => {
-        if (popup.parentNode) {
-          popup.remove();
-        }
-      }, 15000);
-    }
 
 
     const container = document.createElement("div")
