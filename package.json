@@ -1,0 +1,24 @@
+{
+  "name": "wplace-autobot",
+  "version": "0.0.1",
+  "description": "WPlace Auto-Image",
+  "main": "dist/auto-image.standalone.js",
+  "type": "module",
+  "scripts": {
+    "build": "node build/esbuild.config.js",
+    "build:bookmarklet": "node build/esbuild.config.js --target=bookmarklet",
+    "build:userscript": "node build/esbuild.config.js --target=userscript",
+    "build:standalone": "node build/esbuild.config.js --target=standalone",
+    "build:all": "node build/esbuild.config.js --target=all",
+    "format": "prettier --ignore-path .gitignore --ignore-unknown --write .",
+    "format:check": "prettier --ignore-path .gitignore --ignore-unknown --check .",
+    "clean": "rm -rf dist/*"
+  },
+  "devDependencies": {
+    "esbuild": "^0.19.0",
+    "prettier": "^3.1.0"
+  },
+  "keywords": ["userscript", "bookmarklet", "wplace", "autobot"],
+  "author": "WPlace AutoBot Team",
+  "license": "MIT"
+}

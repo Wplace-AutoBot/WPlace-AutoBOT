@@ -7,10 +7,7 @@
 /* Theme tokens (CSS vars)   */
 /* ========================= */
 
-/* Import theme files - classic is default */
-@import url('https://staninna.github.io/WPlace-AutoBOT/decoupled-css/themes/classic.css');
-@import url('https://staninna.github.io/WPlace-AutoBOT/decoupled-css/themes/classic-light.css');
-@import url('https://staninna.github.io/WPlace-AutoBOT/decoupled-css/themes/neon.css');
+/* Theme files are now embedded at build time - no external imports needed */
 
 /* Default :root CSS variables for 100% classic theme compliance */
 /* These ensure the bot works perfectly even if theme files fail to load */
