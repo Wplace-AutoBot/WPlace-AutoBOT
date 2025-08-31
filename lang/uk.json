@@ -137,5 +137,8 @@
   "expandMode": "Режим розширення",
   "minimize": "Мінімізувати",
   "restore": "Відновити",
-  "hideStats": "Приховати статистику"
+  "hideStats": "Приховати статистику",
+  "paintOptions": "Параметри малювання",
+  "paintWhitePixels": "Малювати білі пікселі",
+  "paintTransparentPixels": "Малювати прозорі пікселі"
 }

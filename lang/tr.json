@@ -137,5 +137,8 @@
   "expandMode": "Genişletme Modu",
   "minimize": "Küçült",
   "restore": "Geri Yükle",
-  "hideStats": "İstatistikleri Gizle"
+  "hideStats": "İstatistikleri Gizle",
+  "paintOptions": "Boya Seçenekleri",
+  "paintWhitePixels": "Beyaz pikselleri boya",
+  "paintTransparentPixels": "Şeffaf pikselleri boya"
 }

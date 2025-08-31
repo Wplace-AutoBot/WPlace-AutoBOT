@@ -137,5 +137,8 @@
   "expandMode": "Mode Perluas",
   "minimize": "Minimalkan",
   "restore": "Pulihkan",
-  "hideStats": "Sembunyikan Statistik"
+  "hideStats": "Sembunyikan Statistik",
+  "paintOptions": "Opsi Pewarnaan",
+  "paintWhitePixels": "Warnai piksel putih",
+  "paintTransparentPixels": "Warnai piksel transparan"
 }
