@@ -326,18 +326,87 @@ function applyTheme() {
         console.log(`🔄 Retrying ${language} translations (attempt ${retryCount + 1}/${maxRetries + 1})...`);
       }
       
-      // Multiple service worker bypass techniques
+      // Aggressive service worker bypass using multiple methods
       const bypassUrl = `${url}${url.includes('?') ? '&' : '?'}_sw_bypass=${Date.now()}&_cb=${Math.random()}`;
-      const response = await fetch(bypassUrl, {
-        cache: 'no-store',  // Stronger than no-cache - completely bypasses cache
-        mode: 'cors',
-        headers: {
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache',
-          'Expires': '0',
-          'X-SW-Bypass': 'true'  // Custom header to signal service workers
+      
+      // Method 1: Try iframe-based bypass (service workers don't intercept iframe requests the same way)
+      const tryIframeBypass = () => {
+        return new Promise((resolve, reject) => {
+          const iframe = document.createElement('iframe');
+          iframe.style.display = 'none';
+          iframe.onload = () => {
+            try {
+              const xhr = iframe.contentWindow.XMLHttpRequest ? new iframe.contentWindow.XMLHttpRequest() : new XMLHttpRequest();
+              xhr.open('GET', bypassUrl, true);
+              xhr.onreadystatechange = () => {
+                if (xhr.readyState === 4) {
+                  document.body.removeChild(iframe);
+                  if (xhr.status >= 200 && xhr.status < 300) {
+                    resolve({ ok: true, json: () => Promise.resolve(JSON.parse(xhr.responseText)) });
+                  } else {
+                    reject(new Error(`HTTP ${xhr.status}`));
+                  }
+                }
+              };
+              xhr.send();
+            } catch (e) {
+              document.body.removeChild(iframe);
+              reject(e);
+            }
+          };
+          iframe.onerror = () => {
+            document.body.removeChild(iframe);
+            reject(new Error('Iframe loading failed'));
+          };
+          document.body.appendChild(iframe);
+          iframe.src = 'about:blank';
+        });
+      };
+
+      // Method 2: XMLHttpRequest bypass (service workers may not intercept XHR the same way)
+      const tryXHRBypass = () => {
+        return new Promise((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.open('GET', bypassUrl, true);
+          xhr.setRequestHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+          xhr.setRequestHeader('Pragma', 'no-cache');
+          xhr.setRequestHeader('Expires', '0');
+          xhr.onreadystatechange = () => {
+            if (xhr.readyState === 4) {
+              if (xhr.status >= 200 && xhr.status < 300) {
+                resolve({ ok: true, json: () => Promise.resolve(JSON.parse(xhr.responseText)) });
+              } else {
+                reject(new Error(`HTTP ${xhr.status}`));
+              }
+            }
+          };
+          xhr.send();
+        });
+      };
+
+      // Try methods in order: fetch, xhr, iframe
+      let response;
+      try {
+        response = await fetch(bypassUrl, {
+          cache: 'no-store',
+          mode: 'cors',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0',
+            'X-SW-Bypass': 'true'
+          }
+        });
+        if (!response.ok) throw new Error('Fetch failed');
+      } catch (fetchError) {
+        console.warn('Fetch failed, trying XHR bypass:', fetchError);
+        try {
+          response = await tryXHRBypass();
+        } catch (xhrError) {
+          console.warn('XHR failed, trying iframe bypass:', xhrError);
+          response = await tryIframeBypass();
         }
-      });
+      }
       if (response.ok) {
         const translations = await response.json();
         
@@ -1135,20 +1204,49 @@ function applyTheme() {
      */
     async loadCSS(url, attrs = {}, critical = false) {
       const loadAsInline = async () => {
-        // Multiple service worker bypass techniques for CSS loading
         const bypassUrl = `${url}${url.includes('?') ? '&' : '?'}_sw_bypass=${Date.now()}&_cb=${Math.random()}`;
-        const res = await fetch(bypassUrl, {
-          cache: 'no-store',  // Stronger than no-cache - completely bypasses cache
-          mode: 'cors',
-          headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-            'Expires': '0',
-            'X-SW-Bypass': 'true'  // Custom header to signal service workers
-          }
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const css = await res.text();
+        
+        // XHR bypass for CSS (service workers may not intercept XHR the same way)
+        const tryXHRBypass = () => {
+          return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', bypassUrl, true);
+            xhr.setRequestHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+            xhr.setRequestHeader('Pragma', 'no-cache');
+            xhr.setRequestHeader('Expires', '0');
+            xhr.onreadystatechange = () => {
+              if (xhr.readyState === 4) {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                  resolve(xhr.responseText);
+                } else {
+                  reject(new Error(`HTTP ${xhr.status}`));
+                }
+              }
+            };
+            xhr.send();
+          });
+        };
+
+        // Try fetch first, then XHR as fallback
+        let css;
+        try {
+          const res = await fetch(bypassUrl, {
+            cache: 'no-store',
+            mode: 'cors',
+            headers: {
+              'Cache-Control': 'no-cache, no-store, must-revalidate',
+              'Pragma': 'no-cache',
+              'Expires': '0',
+              'X-SW-Bypass': 'true'
+            }
+          });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          css = await res.text();
+        } catch (fetchError) {
+          console.warn('CSS fetch failed, trying XHR bypass:', fetchError);
+          css = await tryXHRBypass();
+        }
+
         const style = document.createElement("style");
         Object.entries(attrs).forEach(([k, v]) => style.setAttribute(k, v));
         style.textContent = css;
