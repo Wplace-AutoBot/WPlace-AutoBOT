@@ -296,8 +296,7 @@ function applyTheme() {
       return loadedTranslations[language];
     }
 
-    // Load translations using base URL (checks localStorage, falls back to GitHub)
-    const url = `${getBaseUrl()}/decoupled-translations/lang/${language}.json`;
+    const url = `${getBaseUrl()}/lang/${language}.json`;
     const maxRetries = 3;
     const baseDelay = 1000; // 1 second
     
