@@ -1185,6 +1185,7 @@ function applyTheme() {
           // Additional check: verify the stylesheet actually has rules
           setTimeout(() => {
             try {
+              console.log("cc17733e-ab98-4eef-829d-8dad0fe50155", link.sheet.cssRules.length)
               if (link.sheet && link.sheet.cssRules.length === 0) {
                 console.warn(`CSS loaded but has no rules: ${url}`);
                 handleError("empty stylesheet");
