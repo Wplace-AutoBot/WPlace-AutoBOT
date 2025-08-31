@@ -2,7 +2,7 @@
   // Base URL configuration - checks localStorage first, falls back to GitHub
   const getBaseUrl = () => {
     try {
-      const customBaseUrl = localStorage.getItem('wplace-autobot-base-url');
+      const customBaseUrl = localStorage.getItem('wplace-bot-base-url');
       if (customBaseUrl) {
         return customBaseUrl.endsWith('/') ? customBaseUrl.slice(0, -1) : customBaseUrl;
       }
