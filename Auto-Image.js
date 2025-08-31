@@ -31,115 +31,6 @@
     return cachedBaseUrl;
   };
 
-  /**
-   * Custom service worker to handle baseUrl fetch requests
-   * Intercepts requests and routes them to the correct baseUrl
-   */
-  const installCustomServiceWorker = async () => {
-    if (!('serviceWorker' in navigator)) {
-      console.warn('Service Worker not supported');
-      return;
-    }
-
-    const swCode = `
-      self.addEventListener('fetch', (event) => {
-        const url = new URL(event.request.url);
-        
-        // Check if this is a request for our resources
-        const isWPlaceResource = url.pathname.includes('/lang/') || 
-                                url.pathname.includes('/auto-image-styles.css') ||
-                                url.pathname.includes('/themes/');
-        
-        if (isWPlaceResource) {
-          event.respondWith(
-            (async () => {
-              try {
-                // Get base URL from localStorage - service workers can't access localStorage directly
-                // So we'll pass it via postMessage or use IndexedDB, but for now use URL search params
-                let baseUrl = 'https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/main';
-                
-                // Try to get baseUrl from the request URL if it was passed as a parameter
-                const requestUrl = new URL(event.request.url);
-                const customBase = requestUrl.searchParams.get('_baseUrl');
-                if (customBase) {
-                  try {
-                    const decodedBase = decodeURIComponent(customBase);
-                    baseUrl = decodedBase;
-                  } catch (e) {
-                    console.warn('SW: Invalid baseUrl parameter');
-                  }
-                }
-                
-                // Build the correct URL with our baseUrl
-                const resourcePath = url.pathname.split('/').pop(); // Get filename
-                let newUrl;
-                
-                if (url.pathname.includes('/lang/')) {
-                  newUrl = \`\${baseUrl}/lang/\${resourcePath}\`;
-                } else if (url.pathname.includes('/themes/')) {
-                  newUrl = \`\${baseUrl}/themes/\${resourcePath}\`;
-                } else if (url.pathname.includes('/auto-image-styles.css')) {
-                  newUrl = \`\${baseUrl}/auto-image-styles.css\`;
-                } else {
-                  newUrl = \`\${baseUrl}/\${resourcePath}\`;
-                }
-                
-                console.log('SW: Redirecting', event.request.url, 'to', newUrl);
-                return fetch(newUrl, {
-                  mode: 'cors',
-                  cache: 'no-cache'
-                });
-              } catch (error) {
-                console.error('SW: Error handling request:', error);
-                return fetch(event.request);
-              }
-            })()
-          );
-        }
-      });
-      
-      self.addEventListener('install', (event) => {
-        console.log('WPlace Service Worker installed');
-        self.skipWaiting();
-      });
-      
-      self.addEventListener('activate', (event) => {
-        console.log('WPlace Service Worker activated');
-        event.waitUntil(clients.claim());
-      });
-    `;
-
-    try {
-      // Create a blob URL for the service worker
-      const blob = new Blob([swCode], { type: 'application/javascript' });
-      const swUrl = URL.createObjectURL(blob);
-      
-      const registration = await navigator.serviceWorker.register(swUrl, {
-        scope: '/'
-      });
-      
-      console.log('✅ Custom service worker registered:', registration);
-      
-      // Wait for it to become active
-      await new Promise((resolve) => {
-        if (registration.active) {
-          resolve();
-        } else {
-          registration.addEventListener('updatefound', () => {
-            const newWorker = registration.installing;
-            newWorker.addEventListener('statechange', () => {
-              if (newWorker.state === 'activated') {
-                resolve();
-              }
-            });
-          });
-        }
-      });
-      
-    } catch (error) {
-      console.error('❌ Failed to register custom service worker:', error);
-    }
-  };
 
   // CONFIGURATION CONSTANTS
   const CONFIG = {
@@ -436,10 +327,7 @@ function applyTheme() {
         console.log(`🔄 Retrying ${language} translations (attempt ${retryCount + 1}/${maxRetries + 1})...`);
       }
       
-      // Add baseUrl to the request so service worker can use it
-      const baseUrl = getBaseUrl();
-      const urlWithBase = `${url}${url.includes('?') ? '&' : '?'}_baseUrl=${encodeURIComponent(baseUrl)}`;
-      const response = await fetch(urlWithBase);
+      const response = await fetch(url);
       if (response.ok) {
         const translations = await response.json();
         
@@ -1237,10 +1125,7 @@ function applyTheme() {
      */
     async loadCSS(url, attrs = {}, critical = false) {
       const loadAsInline = async () => {
-        // Add baseUrl to the request so service worker can use it
-        const baseUrl = getBaseUrl();
-        const urlWithBase = `${url}${url.includes('?') ? '&' : '?'}_baseUrl=${encodeURIComponent(baseUrl)}`;
-        const res = await fetch(urlWithBase);
+        const res = await fetch(url);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const css = await res.text();
         const style = document.createElement("style");
@@ -1253,9 +1138,7 @@ function applyTheme() {
       return new Promise((resolve, reject) => {
         const link = document.createElement("link");
         link.rel = "stylesheet";
-        // Add baseUrl to the request so service worker can use it
-        const baseUrl = getBaseUrl();
-        link.href = `${url}${url.includes('?') ? '&' : '?'}_baseUrl=${encodeURIComponent(baseUrl)}`;
+        link.href = url;
         Object.entries(attrs).forEach(([k, v]) => link.setAttribute(k, v));
         
         const handleError = async (errorMsg) => {
@@ -2918,9 +2801,6 @@ function applyTheme() {
 
     const theme = getCurrentTheme()
     applyTheme() // <- new: set CSS vars and theme class before building UI
-
-    // Install custom service worker to handle baseUrl requests
-    await installCustomServiceWorker();
 
     // Load external CSS with fallback for ORB/CORS issues
     await Utils.loadCSS(
