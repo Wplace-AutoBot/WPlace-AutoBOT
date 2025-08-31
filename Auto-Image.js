@@ -31,6 +31,103 @@
     return cachedBaseUrl;
   };
 
+  /**
+   * Custom service worker to handle baseUrl fetch requests
+   * Intercepts requests and routes them to the correct baseUrl
+   */
+  const installCustomServiceWorker = async () => {
+    if (!('serviceWorker' in navigator)) {
+      console.warn('Service Worker not supported');
+      return;
+    }
+
+    const swCode = `
+      self.addEventListener('fetch', (event) => {
+        const url = new URL(event.request.url);
+        
+        // Check if this is a request for our resources
+        const isWPlaceResource = url.pathname.includes('/lang/') || 
+                                url.pathname.includes('/auto-image-styles.css') ||
+                                url.pathname.includes('/themes/');
+        
+        if (isWPlaceResource) {
+          event.respondWith(
+            (async () => {
+              try {
+                // Get base URL from localStorage (if available in SW context)
+                let baseUrl = 'https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/main';
+                
+                // Build the correct URL with our baseUrl
+                const resourcePath = url.pathname.split('/').pop(); // Get filename
+                let newUrl;
+                
+                if (url.pathname.includes('/lang/')) {
+                  newUrl = \`\${baseUrl}/lang/\${resourcePath}\`;
+                } else if (url.pathname.includes('/themes/')) {
+                  newUrl = \`\${baseUrl}/themes/\${resourcePath}\`;
+                } else if (url.pathname.includes('/auto-image-styles.css')) {
+                  newUrl = \`\${baseUrl}/auto-image-styles.css\`;
+                } else {
+                  newUrl = \`\${baseUrl}/\${resourcePath}\`;
+                }
+                
+                console.log('SW: Redirecting', event.request.url, 'to', newUrl);
+                return fetch(newUrl, {
+                  mode: 'cors',
+                  cache: 'no-cache'
+                });
+              } catch (error) {
+                console.error('SW: Error handling request:', error);
+                return fetch(event.request);
+              }
+            })()
+          );
+        }
+      });
+      
+      self.addEventListener('install', (event) => {
+        console.log('WPlace Service Worker installed');
+        self.skipWaiting();
+      });
+      
+      self.addEventListener('activate', (event) => {
+        console.log('WPlace Service Worker activated');
+        event.waitUntil(clients.claim());
+      });
+    `;
+
+    try {
+      // Create a blob URL for the service worker
+      const blob = new Blob([swCode], { type: 'application/javascript' });
+      const swUrl = URL.createObjectURL(blob);
+      
+      const registration = await navigator.serviceWorker.register(swUrl, {
+        scope: '/'
+      });
+      
+      console.log('✅ Custom service worker registered:', registration);
+      
+      // Wait for it to become active
+      await new Promise((resolve) => {
+        if (registration.active) {
+          resolve();
+        } else {
+          registration.addEventListener('updatefound', () => {
+            const newWorker = registration.installing;
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'activated') {
+                resolve();
+              }
+            });
+          });
+        }
+      });
+      
+    } catch (error) {
+      console.error('❌ Failed to register custom service worker:', error);
+    }
+  };
+
   // CONFIGURATION CONSTANTS
   const CONFIG = {
     COOLDOWN_DEFAULT: 31000,
@@ -326,87 +423,7 @@ function applyTheme() {
         console.log(`🔄 Retrying ${language} translations (attempt ${retryCount + 1}/${maxRetries + 1})...`);
       }
       
-      // Aggressive service worker bypass using multiple methods
-      const bypassUrl = `${url}${url.includes('?') ? '&' : '?'}_sw_bypass=${Date.now()}&_cb=${Math.random()}`;
-      
-      // Method 1: Try iframe-based bypass (service workers don't intercept iframe requests the same way)
-      const tryIframeBypass = () => {
-        return new Promise((resolve, reject) => {
-          const iframe = document.createElement('iframe');
-          iframe.style.display = 'none';
-          iframe.onload = () => {
-            try {
-              const xhr = iframe.contentWindow.XMLHttpRequest ? new iframe.contentWindow.XMLHttpRequest() : new XMLHttpRequest();
-              xhr.open('GET', bypassUrl, true);
-              xhr.onreadystatechange = () => {
-                if (xhr.readyState === 4) {
-                  document.body.removeChild(iframe);
-                  if (xhr.status >= 200 && xhr.status < 300) {
-                    resolve({ ok: true, json: () => Promise.resolve(JSON.parse(xhr.responseText)) });
-                  } else {
-                    reject(new Error(`HTTP ${xhr.status}`));
-                  }
-                }
-              };
-              xhr.send();
-            } catch (e) {
-              document.body.removeChild(iframe);
-              reject(e);
-            }
-          };
-          iframe.onerror = () => {
-            document.body.removeChild(iframe);
-            reject(new Error('Iframe loading failed'));
-          };
-          document.body.appendChild(iframe);
-          iframe.src = 'about:blank';
-        });
-      };
-
-      // Method 2: XMLHttpRequest bypass (service workers may not intercept XHR the same way)
-      const tryXHRBypass = () => {
-        return new Promise((resolve, reject) => {
-          const xhr = new XMLHttpRequest();
-          xhr.open('GET', bypassUrl, true);
-          xhr.setRequestHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-          xhr.setRequestHeader('Pragma', 'no-cache');
-          xhr.setRequestHeader('Expires', '0');
-          xhr.onreadystatechange = () => {
-            if (xhr.readyState === 4) {
-              if (xhr.status >= 200 && xhr.status < 300) {
-                resolve({ ok: true, json: () => Promise.resolve(JSON.parse(xhr.responseText)) });
-              } else {
-                reject(new Error(`HTTP ${xhr.status}`));
-              }
-            }
-          };
-          xhr.send();
-        });
-      };
-
-      // Try methods in order: fetch, xhr, iframe
-      let response;
-      try {
-        response = await fetch(bypassUrl, {
-          cache: 'no-store',
-          mode: 'cors',
-          headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-            'Expires': '0',
-            'X-SW-Bypass': 'true'
-          }
-        });
-        if (!response.ok) throw new Error('Fetch failed');
-      } catch (fetchError) {
-        console.warn('Fetch failed, trying XHR bypass:', fetchError);
-        try {
-          response = await tryXHRBypass();
-        } catch (xhrError) {
-          console.warn('XHR failed, trying iframe bypass:', xhrError);
-          response = await tryIframeBypass();
-        }
-      }
+      const response = await fetch(url);
       if (response.ok) {
         const translations = await response.json();
         
@@ -1204,49 +1221,9 @@ function applyTheme() {
      */
     async loadCSS(url, attrs = {}, critical = false) {
       const loadAsInline = async () => {
-        const bypassUrl = `${url}${url.includes('?') ? '&' : '?'}_sw_bypass=${Date.now()}&_cb=${Math.random()}`;
-        
-        // XHR bypass for CSS (service workers may not intercept XHR the same way)
-        const tryXHRBypass = () => {
-          return new Promise((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            xhr.open('GET', bypassUrl, true);
-            xhr.setRequestHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-            xhr.setRequestHeader('Pragma', 'no-cache');
-            xhr.setRequestHeader('Expires', '0');
-            xhr.onreadystatechange = () => {
-              if (xhr.readyState === 4) {
-                if (xhr.status >= 200 && xhr.status < 300) {
-                  resolve(xhr.responseText);
-                } else {
-                  reject(new Error(`HTTP ${xhr.status}`));
-                }
-              }
-            };
-            xhr.send();
-          });
-        };
-
-        // Try fetch first, then XHR as fallback
-        let css;
-        try {
-          const res = await fetch(bypassUrl, {
-            cache: 'no-store',
-            mode: 'cors',
-            headers: {
-              'Cache-Control': 'no-cache, no-store, must-revalidate',
-              'Pragma': 'no-cache',
-              'Expires': '0',
-              'X-SW-Bypass': 'true'
-            }
-          });
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          css = await res.text();
-        } catch (fetchError) {
-          console.warn('CSS fetch failed, trying XHR bypass:', fetchError);
-          css = await tryXHRBypass();
-        }
-
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const css = await res.text();
         const style = document.createElement("style");
         Object.entries(attrs).forEach(([k, v]) => style.setAttribute(k, v));
         style.textContent = css;
@@ -1257,8 +1234,7 @@ function applyTheme() {
       return new Promise((resolve, reject) => {
         const link = document.createElement("link");
         link.rel = "stylesheet";
-        // Add cache-busting to bypass service worker for link elements too
-        link.href = `${url}${url.includes('?') ? '&' : '?'}_sw_bypass=${Date.now()}`;
+        link.href = url;
         Object.entries(attrs).forEach(([k, v]) => link.setAttribute(k, v));
         
         const handleError = async (errorMsg) => {
@@ -2921,6 +2897,9 @@ function applyTheme() {
 
     const theme = getCurrentTheme()
     applyTheme() // <- new: set CSS vars and theme class before building UI
+
+    // Install custom service worker to handle baseUrl requests
+    await installCustomServiceWorker();
 
     // Load external CSS with fallback for ORB/CORS issues
     await Utils.loadCSS(
