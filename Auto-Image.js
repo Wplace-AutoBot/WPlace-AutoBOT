@@ -1299,11 +1299,12 @@
   const Utils = {
     sleep: (ms) => new Promise((r) => setTimeout(r, ms)),
 
-    dynamicSleep: async function (getRemainingMsFn, interval = 500) {
-      let remaining = getRemainingMsFn();
-      while (remaining > 100) {
+    dynamicSleep: async function (tickAndGetRemainingMs) {
+      let remaining = Math.max(0, await tickAndGetRemainingMs());
+      while (remaining > 0) {
+        const interval = remaining > 5000 ? 2000 : remaining > 1000 ? 500 : 100;
         await this.sleep(Math.min(interval, remaining));
-        remaining = getRemainingMsFn();
+        remaining = Math.max(0, await tickAndGetRemainingMs());
       }
     },
 
@@ -6433,10 +6434,10 @@
     async function startPainting() {
       if (!state.imageLoaded || !state.startPosition || !state.region) {
         updateUI('missingRequirements', 'error');
-        return false;
+        return;
       }
       await ensureToken();
-      if (!turnstileToken) return false;
+      if (!turnstileToken) return;
 
       state.running = true;
       state.stopFlag = false;
@@ -6452,23 +6453,21 @@
 
       try {
         await processImage();
-        return true;
       } catch (e) {
         console.error('Unexpected error:', e);
         updateUI('paintingError', 'error');
-        return false;
       } finally {
         state.running = false;
         stopBtn.disabled = true;
         saveBtn.disabled = false;
 
-        if (!state.stopFlag) {
+        if (state.stopFlag) {
+          startBtn.disabled = false;
+        } else {
           startBtn.disabled = true;
           uploadBtn.disabled = false;
           selectPosBtn.disabled = false;
           resizeBtn.disabled = false;
-        } else {
-          startBtn.disabled = false;
         }
         toggleOverlayBtn.disabled = false;
       }
@@ -6561,7 +6560,7 @@
 
     const remainingMs = getRemainingMsToThreshold(state.cooldownChargeThreshold);
 
-    if (remainingMs <= 999) {
+    if (remainingMs <= 999 || state.stopFlag) {
       // Clear interval if threshold is reached
       if (state.chargesThresholdInterval) {
         clearInterval(state.chargesThresholdInterval);
@@ -6781,6 +6780,7 @@
     );
 
     if (!tilesReady) {
+      // todo add to i18n
       updateUI('overlayTilesNotLoaded', 'error');
       state.stopFlag = true;
       return;
@@ -7043,21 +7043,17 @@
           pixelBatch.pixels = [];
         }
 
-        while (state.currentCharges < state.cooldownChargeThreshold && !state.stopFlag) {
-          await updateStats();
-
-          if (state.currentCharges >= state.cooldownChargeThreshold) {
-            NotificationManager.maybeNotifyChargesReached(true);
-            break;
-          }
-
+        if (state.currentCharges < state.cooldownChargeThreshold && !state.stopFlag) {
           startChargesThresholdTicker();
-          Utils.performSmartSave();
 
-          await Utils.dynamicSleep(
-            () => getRemainingMsToThreshold(state.cooldownChargeThreshold),
-            1000
-          );
+          await Utils.dynamicSleep(() => {
+            if (state.currentCharges >= state.cooldownChargeThreshold) {
+              NotificationManager.maybeNotifyChargesReached(true);
+              return 0;
+            }
+            if (state.stopFlag) return 0;
+            return getRemainingMsToThreshold(state.cooldownChargeThreshold);
+          });
         }
 
         if (state.stopFlag) {
