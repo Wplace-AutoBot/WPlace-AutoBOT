@@ -2822,10 +2822,66 @@ function applyTheme() {
       );
     }
 
-    // Main stylesheet from GitHub Raw (critical - will throw on failure)
-    await Utils.loadCSS(`${getBaseUrl()}/auto-image-styles.css`, {
-      "data-wplace-theme": "true"
-    }, true);
+    // Main stylesheet from GitHub Raw (critical - will show popup on failure)
+    try {
+      await Utils.loadCSS(`${getBaseUrl()}/auto-image-styles.css`, {
+        "data-wplace-theme": "true"
+      }, true);
+    } catch (error) {
+      console.error('❌ Critical CSS failed to load:', error);
+      
+      // Show popup with reload instructions
+      const popup = document.createElement('div');
+      popup.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #ff4444;
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        z-index: 999999;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        max-width: 400px;
+      `;
+      popup.innerHTML = `
+        <h3 style="margin: 0 0 15px 0;">⚠️ WPlace Bot - CSS Loading Failed</h3>
+        <p style="margin: 0 0 15px 0;">The bot styles couldn't load due to service worker interference.</p>
+        <p style="margin: 0 0 20px 0;"><strong>Please force reload the page:</strong></p>
+        <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; margin: 10px 0;">
+          <strong>Windows/Linux:</strong> Ctrl + Shift + R<br>
+          <strong>Mac:</strong> Cmd + Shift + R<br>
+          <strong>Alternative:</strong> Ctrl + F5
+        </div>
+        <button id="wplace-close-popup" style="
+          background: white; 
+          color: #ff4444; 
+          border: none; 
+          padding: 8px 16px; 
+          border-radius: 5px; 
+          cursor: pointer;
+          font-weight: bold;
+        ">Close</button>
+      `;
+      
+      document.body.appendChild(popup);
+      
+      // Close button functionality
+      popup.querySelector('#wplace-close-popup').onclick = () => {
+        popup.remove();
+      };
+      
+      // Auto-close after 15 seconds
+      setTimeout(() => {
+        if (popup.parentNode) {
+          popup.remove();
+        }
+      }, 15000);
+    }
 
     // Theme CSS files from GitHub Raw
     const themeFiles = ['classic.css', 'classic-light.css', 'neon.css'];
