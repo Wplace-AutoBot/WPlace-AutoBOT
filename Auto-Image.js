@@ -31,8 +31,7 @@
       OPACITY_DEFAULT: 0.2,
       BLUE_MARBLE_DEFAULT: false,
       ditheringEnabled: false,
-    },
-    // --- START: Color data from colour-converter.js ---
+    }, // --- START: Color data from colour-converter.js ---
     // New color structure with proper ID mapping
     COLOR_MAP: {
       0: { id: 1, name: 'Black', rgb: { r: 0, g: 0, b: 0 } },
@@ -99,8 +98,7 @@
       61: { id: 59, name: 'Slate', rgb: { r: 109, g: 117, b: 141 } },
       62: { id: 60, name: 'Light Slate', rgb: { r: 179, g: 185, b: 209 } },
       63: { id: 0, name: 'Transparent', rgb: null },
-    },
-    // --- END: Color data ---
+    }, // --- END: Color data ---
     // Optimized CSS Classes for reuse
     CSS_CLASSES: {
       BUTTON_PRIMARY: `
@@ -329,7 +327,9 @@
         ) {
           loadedTranslations[language] = translations;
           console.log(
-            `📚 Loaded ${language} translations successfully from CDN (${Object.keys(translations).length} keys)`
+            `📚 Loaded ${language} translations successfully from CDN (${
+              Object.keys(translations).length
+            } keys)`
           );
           return translations;
         } else {
@@ -1295,7 +1295,7 @@
 
     dynamicSleep: async function (getRemainingMsFn, interval = 500) {
       let remaining = getRemainingMsFn();
-      while (remaining > 0) {
+      while (remaining > 100) {
         await this.sleep(Math.min(interval, remaining));
         remaining = getRemainingMsFn();
       }
@@ -1320,12 +1320,7 @@
       if (hours > 0) return `${hours}h ${minutes}m ${seconds}s`;
       if (minutes > 0) return `${minutes}m ${seconds}s`;
       return `${seconds}s`;
-    }, // Turnstile Generator Integration - Optimized with widget reuse and proper cleanup
-    turnstileLoaded: false,
-    _turnstileContainer: null,
-    _turnstileOverlay: null,
-    _turnstileWidgetId: null,
-    _lastSitekey: null,
+    },
 
     /**
      * Calculate the range of tile coordinates (in region space) that cover a given image area.
@@ -1356,7 +1351,12 @@
         endTileX: startRegionX + Math.floor((endPixelX - 1) / tileSize),
         endTileY: startRegionY + Math.floor((endPixelY - 1) / tileSize),
       };
-    },
+    }, // Turnstile Generator Integration - Optimized with widget reuse and proper cleanup
+    turnstileLoaded: false,
+    _turnstileContainer: null,
+    _turnstileOverlay: null,
+    _turnstileWidgetId: null,
+    _lastSitekey: null,
 
     async loadTurnstile() {
       // If Turnstile is already present, just resolve.
@@ -2872,7 +2872,7 @@
         const shouldRepeat = now - (state._lastChargesNotifyAt || 0) >= repeatMs;
         if (shouldEdge || shouldRepeat) {
           const msg = Utils.t('chargesReadyMessage', {
-            current: Math.floor(state.currentCharges),
+            current: state.currentCharges,
             max: state.maxCharges,
             threshold: state.cooldownChargeThreshold,
           });
@@ -2977,7 +2977,9 @@
     // Don't re-fetch colors here, use what was captured when user clicked upload
     if (!state.availableColors || state.availableColors.length === 0) {
       // If no colors have been captured yet, show message
-      colorsContainer.innerHTML = `<div class="wplace-colors-placeholder">${Utils.t('uploadImageFirst')}</div>`;
+      colorsContainer.innerHTML = `<div class="wplace-colors-placeholder">${Utils.t(
+        'uploadImageFirst'
+      )}</div>`;
       return;
     }
 
@@ -3349,7 +3351,9 @@
           <div class="wplace-section-title">🖼️ Image Management</div>
           <div class="wplace-controls">
             <div class="wplace-row">
-              <button id="uploadBtn" class="wplace-btn wplace-btn-upload" disabled title="${Utils.t('waitingSetupComplete')}">
+              <button id="uploadBtn" class="wplace-btn wplace-btn-upload" disabled title="${Utils.t(
+                'waitingSetupComplete'
+              )}">
                 <i class="fas fa-upload"></i>
                 <span>${Utils.t('uploadImage')}</span>
               </button>
@@ -3411,7 +3415,9 @@
                 <i class="fas fa-save"></i>
                 <span>${Utils.t('saveData')}</span>
               </button>
-              <button id="loadBtn" class="wplace-btn wplace-btn-primary" disabled title="${Utils.t('waitingTokenGenerator')}">
+              <button id="loadBtn" class="wplace-btn wplace-btn-primary" disabled title="${Utils.t(
+                'waitingTokenGenerator'
+              )}">
                 <i class="fas fa-folder-open"></i>
                 <span>${Utils.t('loadData')}</span>
               </button>
@@ -3421,7 +3427,9 @@
                 <i class="fas fa-download"></i>
                 <span>${Utils.t('saveToFile')}</span>
               </button>
-              <button id="loadFromFileBtn" class="wplace-btn wplace-btn-file" disabled title="${Utils.t('waitingTokenGenerator')}">
+              <button id="loadFromFileBtn" class="wplace-btn wplace-btn-file" disabled title="${Utils.t(
+                'waitingTokenGenerator'
+              )}">
                 <i class="fas fa-upload"></i>
                 <span>${Utils.t('loadFromFile')}</span>
               </button>
@@ -3442,7 +3450,9 @@
           <span>${Utils.t('paintingStats')}</span>
         </div>
         <div class="wplace-header-controls">
-          <button id="refreshChargesBtn" class="wplace-header-btn" title="${Utils.t('refreshCharges')}">
+          <button id="refreshChargesBtn" class="wplace-header-btn" title="${Utils.t(
+            'refreshCharges'
+          )}">
             <i class="fas fa-sync"></i>
           </button>
           <button id="closeStatsBtn" class="wplace-header-btn" title="${Utils.t('closeStats')}">
@@ -3683,7 +3693,9 @@
           
           <!-- Speed Control Toggle -->
           <label class="wplace-speed-control-toggle">
-            <input type="checkbox" id="enableSpeedToggle" ${CONFIG.PAINTING_SPEED_ENABLED ? 'checked' : ''} class="wplace-speed-checkbox"/>
+            <input type="checkbox" id="enableSpeedToggle" ${
+              CONFIG.PAINTING_SPEED_ENABLED ? 'checked' : ''
+            } class="wplace-speed-checkbox"/>
             <span>${Utils.t('enablePaintingSpeedLimit')}</span>
           </label>
         </div>
@@ -3778,15 +3790,21 @@
           <div class="wplace-settings-section-wrapper wplace-notifications-wrapper">
             <label class="wplace-notification-toggle">
               <span>${Utils.t('enableNotifications')}</span>
-              <input type="checkbox" id="notifEnabledToggle" ${state.notificationsEnabled ? 'checked' : ''} class="wplace-notification-checkbox" />
+              <input type="checkbox" id="notifEnabledToggle" ${
+                state.notificationsEnabled ? 'checked' : ''
+              } class="wplace-notification-checkbox" />
             </label>
             <label class="wplace-notification-toggle">
               <span>${Utils.t('notifyOnChargesThreshold')}</span>
-              <input type="checkbox" id="notifOnChargesToggle" ${state.notifyOnChargesReached ? 'checked' : ''} class="wplace-notification-checkbox" />
+              <input type="checkbox" id="notifOnChargesToggle" ${
+                state.notifyOnChargesReached ? 'checked' : ''
+              } class="wplace-notification-checkbox" />
             </label>
             <label class="wplace-notification-toggle">
               <span>${Utils.t('onlyWhenNotFocused')}</span>
-              <input type="checkbox" id="notifOnlyUnfocusedToggle" ${state.notifyOnlyWhenUnfocused ? 'checked' : ''} class="wplace-notification-checkbox" />
+              <input type="checkbox" id="notifOnlyUnfocusedToggle" ${
+                state.notifyOnlyWhenUnfocused ? 'checked' : ''
+              } class="wplace-notification-checkbox" />
             </label>
             <div class="wplace-notification-interval">
               <span>${Utils.t('repeatEvery')}</span>
@@ -3794,8 +3812,12 @@
               <span>${Utils.t('minutesPl')}</span>
             </div>
             <div class="wplace-notification-buttons">
-              <button id="notifRequestPermBtn" class="wplace-btn wplace-btn-secondary wplace-notification-perm-btn"><i class="fas fa-unlock"></i><span>${Utils.t('grantPermission')}</span></button>
-              <button id="notifTestBtn" class="wplace-btn wplace-notification-test-btn"><i class="fas fa-bell"></i><span>${Utils.t('test')}</span></button>
+              <button id="notifRequestPermBtn" class="wplace-btn wplace-btn-secondary wplace-notification-perm-btn"><i class="fas fa-unlock"></i><span>${Utils.t(
+                'grantPermission'
+              )}</span></button>
+              <button id="notifTestBtn" class="wplace-btn wplace-notification-test-btn"><i class="fas fa-bell"></i><span>${Utils.t(
+                'test'
+              )}</span></button>
             </div>
           </div>
         </div>
@@ -3974,11 +3996,19 @@
             ${Utils.t('paintTransparentPixels')}
         </label>
         <div class="resize-zoom-controls">
-          <button id="zoomOutBtn" class="wplace-btn resize-zoom-btn" title="${Utils.t('zoomOut')}"><i class="fas fa-search-minus"></i></button>
+          <button id="zoomOutBtn" class="wplace-btn resize-zoom-btn" title="${Utils.t(
+            'zoomOut'
+          )}"><i class="fas fa-search-minus"></i></button>
           <input type="range" id="zoomSlider" class="resize-slider resize-zoom-slider" min="0.1" max="20" value="1" step="0.05">
-          <button id="zoomInBtn" class="wplace-btn resize-zoom-btn" title="${Utils.t('zoomIn')}"><i class="fas fa-search-plus"></i></button>
-          <button id="zoomFitBtn" class="wplace-btn resize-zoom-btn" title="${Utils.t('fitToView')}">${Utils.t('fit')}</button>
-          <button id="zoomActualBtn" class="wplace-btn resize-zoom-btn" title="${Utils.t('actualSize')}">${Utils.t('hundred')}</button>
+          <button id="zoomInBtn" class="wplace-btn resize-zoom-btn" title="${Utils.t(
+            'zoomIn'
+          )}"><i class="fas fa-search-plus"></i></button>
+          <button id="zoomFitBtn" class="wplace-btn resize-zoom-btn" title="${Utils.t(
+            'fitToView'
+          )}">${Utils.t('fit')}</button>
+          <button id="zoomActualBtn" class="wplace-btn resize-zoom-btn" title="${Utils.t(
+            'actualSize'
+          )}">${Utils.t('hundred')}</button>
           <button id="panModeBtn" class="wplace-btn resize-zoom-btn" title="${Utils.t('panMode')}">
             <i class="fas fa-hand-paper"></i>
           </button>
@@ -4897,20 +4927,29 @@
       const elapsed = Date.now() - startTime;
       const remainingMs = Math.max(0, (max - current) * cooldownMs - elapsed);
 
-      let timeText = Utils.msToTimeText(remainingMs);
+      const timeText = Utils.msToTimeText(remainingMs);
 
-      const chargesGained = Math.ceil(elapsed / cooldownMs);
-      const currentCharges = Math.min(current + chargesGained, max);
+      // total charges including elapsed time
+      const chargesGained = elapsed / cooldownMs;
+      const rawCharges = current + chargesGained;
+      const cappedCharges = Math.min(rawCharges, max);
 
-      state.currentCharges = Math.floor(currentCharges);
+      // rounding with 0.95 threshold
+      let displayCharges;
+      const fraction = cappedCharges - Math.floor(cappedCharges);
+      if (fraction >= 0.95) {
+        displayCharges = Math.ceil(cappedCharges);
+      } else {
+        displayCharges = Math.floor(cappedCharges);
+      }
+
+      state.currentCharges = displayCharges;
       const chargesEl = document.getElementById('wplace-stat-charges-value');
       const secondsInMinute = Math.ceil(remainingMs / 1000) % 60;
       if (chargesEl && (secondsInMinute === 0 || secondsInMinute === 30)) {
-        chargesEl.innerHTML = `<span">${Math.floor(
-          state.currentCharges
-        )} / ${state.maxCharges}</span>`;
+        chargesEl.innerHTML = `<span">${state.currentCharges} / ${state.maxCharges}</span>`;
       }
-      if (currentCharges >= max) {
+      if (state.currentCharges >= max) {
         fullChargeEl.innerHTML = `<span style="color:#10b981;">FULL</span>`;
         clearInterval(state.fullChargeInterval);
         state.fullChargeInterval = null;
@@ -5003,7 +5042,10 @@
         colorSwatchesHTML = state.availableColors
           .map((color) => {
             const rgbString = `rgb(${color.rgb.join(',')})`;
-            return `<div class="wplace-stat-color-swatch" style="background-color: ${rgbString};" title="${Utils.t('colorTooltip', { id: color.id, rgb: color.rgb.join(', ') })}"></div>`;
+            return `<div class="wplace-stat-color-swatch" style="background-color: ${rgbString};" title="${Utils.t(
+              'colorTooltip',
+              { id: color.id, rgb: color.rgb.join(', ') }
+            )}"></div>`;
           })
           .join('');
       }
@@ -5021,7 +5063,7 @@
                 <i class="fas fa-bolt"></i> ${Utils.t('charges')}
               </div>
               <div class="wplace-stat-value" id="wplace-stat-charges-value">
-                ${Math.floor(state.currentCharges)} / ${state.maxCharges}
+                ${state.currentCharges} / ${state.maxCharges}
               </div>
             </div>
             <div class="wplace-stat-item">
@@ -5036,7 +5078,10 @@
               state.colorsChecked
                 ? `
             <div class="wplace-colors-section">
-                <div class="wplace-stat-label"><i class="fas fa-palette"></i> ${Utils.t('availableColors', { count: state.availableColors.length })}</div>
+                <div class="wplace-stat-label"><i class="fas fa-palette"></i> ${Utils.t(
+                  'availableColors',
+                  { count: state.availableColors.length }
+                )}</div>
                 <div class="wplace-stat-colors-grid">
                     ${colorSwatchesHTML}
                 </div>
@@ -6483,11 +6528,9 @@
       if (state.chargesThresholdInterval) {
         clearInterval(state.chargesThresholdInterval);
       }
-      updateUI('startPaintingMsg', 'success');
       return; // Threshold already reached
     }
 
-    const current = state.fullChargeData ? state.fullChargeData.current : state.currentCharges;
     const timeText = Utils.msToTimeText(remainingMs);
 
     updateUI(
@@ -6495,7 +6538,7 @@
       'warning',
       {
         threshold,
-        current: Math.floor(current),
+        current: state.currentCharges,
         time: timeText,
       },
       true
@@ -6671,6 +6714,10 @@
       });
       state.currentCharges -= batchSize;
       updateStats();
+      updateUI('paintingProgress', 'default', {
+        painted: state.paintedPixels,
+        total: state.totalPixels,
+      });
       Utils.performSmartSave();
 
       if (CONFIG.PAINTING_SPEED_ENABLED && state.paintingSpeed > 0 && batchSize > 0) {
@@ -6793,6 +6840,7 @@
             clearInterval(state.chargesThresholdInterval);
           }
           updateUI('paintingPaused', 'warning', { x, y });
+          // noinspection UnnecessaryLabelOnBreakStatementJS
           break outerLoop;
         }
 
@@ -6848,6 +6896,7 @@
               console.error(`❌ Batch failed permanently after retries. Stopping painting.`);
               state.stopFlag = true;
               updateUI('paintingBatchFailed', 'error');
+              // noinspection UnnecessaryLabelOnBreakStatementJS
               break outerLoop;
             }
           }
@@ -6884,16 +6933,21 @@
               continue;
             }
             console.debug(
-              `[COMPARE] Pixel at 📍 (${pixelX}, ${pixelY}) in region (${regionX + adderX}, ${regionY + adderY})\n` +
+              `[COMPARE] Pixel at 📍 (${pixelX}, ${pixelY}) in region (${
+                regionX + adderX
+              }, ${regionY + adderY})\n` +
                 `  ├── Current color: rgb(${er}, ${eg}, ${eb}) (id: ${existingColor.id})\n` +
                 `  ├── Target color:  rgb(${targetPixelInfo.r}, ${targetPixelInfo.g}, ${targetPixelInfo.b}) (id: ${targetColorId})\n` +
-                `  └── Status: ${isMatch ? '✅ Already painted → SKIP' : '🔴 Needs paint → PAINT'}\n`
+                `  └── Status: ${
+                  isMatch ? '✅ Already painted → SKIP' : '🔴 Needs paint → PAINT'
+                }\n`
             );
           }
         } catch (e) {
           console.error(`[DEBUG] Error checking existing pixel at (${pixelX}, ${pixelY}):`, e);
           updateUI('paintingPixelCheckFailed', 'error', { x: pixelX, y: pixelY });
           state.stopFlag = true;
+          // noinspection UnnecessaryLabelOnBreakStatementJS
           break outerLoop;
         }
 
@@ -6919,6 +6973,7 @@
             console.error(`❌ Batch failed permanently after retries. Stopping painting.`);
             state.stopFlag = true;
             updateUI('paintingBatchFailed', 'error');
+            // noinspection UnnecessaryLabelOnBreakStatementJS
             break outerLoop;
           }
 
@@ -6927,21 +6982,23 @@
 
         while (state.currentCharges < state.cooldownChargeThreshold && !state.stopFlag) {
           await updateStats();
+
           if (state.currentCharges >= state.cooldownChargeThreshold) {
             NotificationManager.maybeNotifyChargesReached(true);
             break;
           }
 
-          saveBtn.disabled = false;
           startChargesThresholdTicker();
-
           Utils.performSmartSave();
 
-          await Utils.dynamicSleep(() => getRemainingMsToThreshold(state.cooldownChargeThreshold));
+          await Utils.dynamicSleep(
+            () => getRemainingMsToThreshold(state.cooldownChargeThreshold),
+            1000
+          );
         }
 
-        if (!state.stopFlag) saveBtn.disabled = true;
         if (state.stopFlag) {
+          // noinspection UnnecessaryLabelOnBreakStatementJS
           break outerLoop;
         }
       }
@@ -7014,7 +7071,7 @@
     }
 
     // Always limit by available charges
-    const maxAllowed = Math.floor(state.currentCharges);
+    const maxAllowed = state.currentCharges;
     const finalBatchSize = Math.min(targetBatchSize, maxAllowed);
 
     return finalBatchSize;
