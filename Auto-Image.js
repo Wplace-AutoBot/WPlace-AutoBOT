@@ -326,7 +326,18 @@ function applyTheme() {
         console.log(`🔄 Retrying ${language} translations (attempt ${retryCount + 1}/${maxRetries + 1})...`);
       }
       
-      const response = await fetch(url);
+      // Multiple service worker bypass techniques
+      const bypassUrl = `${url}${url.includes('?') ? '&' : '?'}_sw_bypass=${Date.now()}&_cb=${Math.random()}`;
+      const response = await fetch(bypassUrl, {
+        cache: 'no-store',  // Stronger than no-cache - completely bypasses cache
+        mode: 'cors',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+          'X-SW-Bypass': 'true'  // Custom header to signal service workers
+        }
+      });
       if (response.ok) {
         const translations = await response.json();
         
@@ -1116,7 +1127,7 @@ function applyTheme() {
     },
 
     /**
-     * Loads CSS with fallback for cross-origin restrictions
+     * Loads CSS with fallback for cross-origin restrictions and service worker bypass
      * @param {string} url - CSS file URL
      * @param {Object} attrs - HTML attributes to set
      * @param {boolean} critical - Whether to throw on failure (default: false)
@@ -1124,7 +1135,18 @@ function applyTheme() {
      */
     async loadCSS(url, attrs = {}, critical = false) {
       const loadAsInline = async () => {
-        const res = await fetch(url);
+        // Multiple service worker bypass techniques for CSS loading
+        const bypassUrl = `${url}${url.includes('?') ? '&' : '?'}_sw_bypass=${Date.now()}&_cb=${Math.random()}`;
+        const res = await fetch(bypassUrl, {
+          cache: 'no-store',  // Stronger than no-cache - completely bypasses cache
+          mode: 'cors',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0',
+            'X-SW-Bypass': 'true'  // Custom header to signal service workers
+          }
+        });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const css = await res.text();
         const style = document.createElement("style");
@@ -1137,7 +1159,8 @@ function applyTheme() {
       return new Promise((resolve, reject) => {
         const link = document.createElement("link");
         link.rel = "stylesheet";
-        link.href = url;
+        // Add cache-busting to bypass service worker for link elements too
+        link.href = `${url}${url.includes('?') ? '&' : '?'}_sw_bypass=${Date.now()}`;
         Object.entries(attrs).forEach(([k, v]) => link.setAttribute(k, v));
         
         const handleError = async (errorMsg) => {
