@@ -1,3 +1,5 @@
+import { EMBEDDED_CSS, EMBEDDED_THEMES, EMBEDDED_LANGUAGES } from 'embedded-assets';
+
 ; (async () => {
   // CONFIGURATION CONSTANTS
   const CONFIG = {
@@ -124,127 +126,41 @@
         background-clip: text; font-weight: bold;
       `
     },
-    THEMES: {
-      "Classic Autobot": {
-        primary: "#000000",
-        secondary: "#111111",
-        accent: "#222222",
-        text: "#ffffff",
-        highlight: "#775ce3",
-        success: "#00ff00",
-        error: "#ff0000",
-        warning: "#ffaa00",
-        fontFamily: "'Segoe UI', Roboto, sans-serif",
-        borderRadius: "12px",
-        borderStyle: "solid",
-        borderWidth: "1px",
-        boxShadow: "0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.1)",
-        backdropFilter: "blur(10px)",
-        animations: {
-          glow: false,
-          scanline: false,
-          pixelBlink: false,
-        },
-      },
-      "Classic Light": {
-        primary: "#ffffff",
-        secondary: "#f8f9fa",
-        accent: "#e9ecef",
-        text: "#212529",
-        highlight: "#6f42c1",
-        success: "#28a745",
-        error: "#dc3545",
-        warning: "#ffc107",
-        fontFamily: "'Segoe UI', Roboto, sans-serif",
-        borderRadius: "12px",
-        borderStyle: "solid",
-        borderWidth: "1px",
-        boxShadow: "0 8px 32px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.08)",
-        backdropFilter: "blur(10px)",
-        animations: {
-          glow: false,
-          scanline: false,
-          pixelBlink: false,
-        },
-      },
-      "Neon Retro": {
-        primary: "#1a1a2e",
-        secondary: "#16213e",
-        accent: "#0f3460",
-        text: "#00ff41",
-        highlight: "#ff6b35",
-        success: "#39ff14",
-        error: "#ff073a",
-        warning: "#ffff00",
-        neon: "#00ffff",
-        purple: "#bf00ff",
-        pink: "#ff1493",
-        fontFamily: "'Press Start 2P', monospace",
-        borderRadius: "0",
-        borderStyle: "solid",
-        borderWidth: "3px",
-        boxShadow: "0 0 20px rgba(0, 255, 65, 0.3), inset 0 0 20px rgba(0, 255, 65, 0.1)",
-        backdropFilter: "none",
-        animations: {
-          glow: true,
-          scanline: true,
-          pixelBlink: true,
-        },
-      },
-    },
-    currentTheme: "Classic Autobot",
+    currentTheme: "classic", // Default to first available theme
   }
 
-  const getCurrentTheme = () => CONFIG.THEMES[CONFIG.currentTheme]
+  const getAvailableThemes = () => Object.keys(EMBEDDED_THEMES)
+  const getCurrentTheme = () => CONFIG.currentTheme
 
   const switchTheme = (themeName) => {
-  if (CONFIG.THEMES[themeName]) {
-    CONFIG.currentTheme = themeName
-    saveThemePreference()
+    if (EMBEDDED_THEMES[themeName]) {
+      CONFIG.currentTheme = themeName
+      saveThemePreference()
 
-    // APPLY THEME VARS/CLASS (new)
-    applyTheme()
+      // Inject theme CSS
+      applyTheme()
 
-    // Recreate UI (kept for now)
-    createUI()
+      // Recreate UI
+      createUI()
+    }
   }
-}
 
-// Add this helper (place it after getCurrentTheme/switchTheme definitions)
-function applyTheme() {
-  const theme = getCurrentTheme();
-  // Toggle theme class on documentElement so CSS vars cascade to our UI
-  document.documentElement.classList.remove('wplace-theme--classic', 'wplace-theme--classic-light', 'wplace-theme--neon');
+  function applyTheme() {
+    // Remove existing theme CSS
+    const existingThemeStyle = document.getElementById('wplace-theme-css')
+    if (existingThemeStyle) {
+      existingThemeStyle.remove()
+    }
+    
+    // Inject new theme CSS
+    const themeName = getCurrentTheme()
+    if (EMBEDDED_THEMES[themeName]) {
+      const style = document.createElement('style')
+      style.id = 'wplace-theme-css'
+      style.textContent = EMBEDDED_THEMES[themeName]
+      document.head.appendChild(style)
+    }
   
-  let themeClass = 'wplace-theme--classic'; // default
-  if (CONFIG.currentTheme === 'Neon Retro') {
-    themeClass = 'wplace-theme--neon';
-  } else if (CONFIG.currentTheme === 'Classic Light') {
-    themeClass = 'wplace-theme--classic-light';
-  }
-  
-  document.documentElement.classList.add(themeClass);
-
-  // Also set CSS variables explicitly in case you want runtime overrides
-  const root = document.documentElement;
-  const setVar = (k, v) => { try { root.style.setProperty(k, v); } catch {} };
-
-  setVar('--wplace-primary', theme.primary);
-  setVar('--wplace-secondary', theme.secondary);
-  setVar('--wplace-accent', theme.accent);
-  setVar('--wplace-text', theme.text);
-  setVar('--wplace-highlight', theme.highlight);
-  setVar('--wplace-success', theme.success);
-  setVar('--wplace-error', theme.error);
-  setVar('--wplace-warning', theme.warning);
-
-  // Typography + look
-  setVar('--wplace-font', theme.fontFamily || "'Segoe UI', Roboto, sans-serif");
-  setVar('--wplace-radius', ('' + (theme.borderRadius || '12px')));
-  setVar('--wplace-border-style', (('' + (theme.borderStyle || 'solid'))));
-  setVar('--wplace-border-width', (('' + (theme.borderWidth || '1px'))));
-  setVar('--wplace-backdrop', (('' + (theme.backdropFilter || 'blur(10px)'))));
-  setVar('--wplace-border-color', 'rgba(255,255,255,0.1)');
 }
 
   
@@ -277,51 +193,26 @@ function applyTheme() {
   // Available languages
   const AVAILABLE_LANGUAGES = ['en', 'ru', 'pt', 'vi', 'fr', 'id', 'tr', 'zh-CN', 'zh-TW', 'ja', 'ko', 'uk'];
 
-  // Function to load translations from JSON file with retry mechanism
-  const loadTranslations = async (language, retryCount = 0) => {
+  // Function to load translations from
+  const loadTranslations = async (language) => {
     if (loadedTranslations[language]) {
       return loadedTranslations[language];
     }
 
-    // Load translations from CDN
-    const url = `https://staninna.github.io/WPlace-AutoBOT/decoupled-translations/lang/${language}.json`;
-    const maxRetries = 3;
-    const baseDelay = 1000; // 1 second
-    
-    try {
-      if (retryCount === 0) {
-        console.log(`🔄 Loading ${language} translations from CDN...`);
-      } else {
-        console.log(`🔄 Retrying ${language} translations (attempt ${retryCount + 1}/${maxRetries + 1})...`);
-      }
+    // Load translations from
+    if (EMBEDDED_LANGUAGES[language]) {
+      const translations = EMBEDDED_LANGUAGES[language];
       
-      const response = await fetch(url);
-      if (response.ok) {
-        const translations = await response.json();
-        
-        // Validate that translations is an object with keys
-        if (typeof translations === 'object' && translations !== null && Object.keys(translations).length > 0) {
-          loadedTranslations[language] = translations;
-          console.log(`📚 Loaded ${language} translations successfully from CDN (${Object.keys(translations).length} keys)`);
-          return translations;
-        } else {
-          console.warn(`❌ Invalid translation format for ${language}`);
-          throw new Error('Invalid translation format');
-        }
+      // Validate that translations is an object with keys
+      if (typeof translations === 'object' && translations !== null && Object.keys(translations).length > 0) {
+        loadedTranslations[language] = translations;
+        console.log(`📚 Loaded ${language} translations successfully from embedded assets (${Object.keys(translations).length} keys)`);
+        return translations;
       } else {
-        console.warn(`❌ CDN returned HTTP ${response.status}: ${response.statusText} for ${language} translations`);
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        console.warn(`❌ Invalid embedded translation format for ${language}`);
       }
-    } catch (error) {
-      console.error(`❌ Failed to load ${language} translations from CDN (attempt ${retryCount + 1}):`, error);
-      
-      // Retry with exponential backoff
-      if (retryCount < maxRetries) {
-        const delay = baseDelay * Math.pow(2, retryCount);
-        console.log(`⏳ Retrying in ${delay}ms...`);
-        await new Promise(resolve => setTimeout(resolve, delay));
-        return loadTranslations(language, retryCount + 1);
-      }
+    } else {
+      console.warn(`❌ No embedded translations found for ${language}`);
     }
     
     return null;
@@ -2712,7 +2603,8 @@ function applyTheme() {
     loadThemePreference()
     await initializeTranslations()
 
-    const theme = getCurrentTheme()
+    const themeName = getCurrentTheme()
+    const theme = EMBEDDED_THEMES[themeName] || {}
     applyTheme() // <- new: set CSS vars and theme class before building UI
 
     const fontAwesome = document.createElement("link")
@@ -2720,19 +2612,18 @@ function applyTheme() {
     fontAwesome.href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     document.head.appendChild(fontAwesome)
 
-    if (theme.fontFamily.includes("Press Start 2P")) {
+    if (theme.fontFamily && theme.fontFamily.includes("Press Start 2P")) {
       const googleFonts = document.createElement("link")
       googleFonts.rel = "stylesheet"
       googleFonts.href = "https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
       document.head.appendChild(googleFonts)
     }
 
-    // Link external CSS files
-    const cssLink = document.createElement('link');
-    cssLink.rel = 'stylesheet';
-    cssLink.href = 'https://staninna.github.io/WPlace-AutoBOT/decoupled-css/auto-image-styles.css'; // TODO: Before merge change to https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/auto-image-styles.css
-    cssLink.setAttribute('data-wplace-theme', 'true');
-    document.head.appendChild(cssLink);
+    // Inject embedded CSS
+    const styleElement = document.createElement('style');
+    styleElement.textContent = EMBEDDED_CSS;
+    styleElement.setAttribute('data-wplace-theme', 'true');
+    document.head.appendChild(styleElement);
 
     const container = document.createElement("div")
     container.id = "wplace-image-bot-container"
@@ -3117,7 +3008,7 @@ function applyTheme() {
           </label>
           <div class="wplace-settings-section-wrapper">
             <select id="themeSelect" class="wplace-settings-select">
-              ${Object.keys(CONFIG.THEMES).map(themeName =>
+              ${getAvailableThemes().map(themeName =>
       `<option value="${themeName}" ${CONFIG.currentTheme === themeName ? 'selected' : ''} class="wplace-settings-option">${themeName}</option>`
     ).join('')}
             </select>
