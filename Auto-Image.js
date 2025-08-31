@@ -1136,6 +1136,18 @@ function applyTheme() {
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const css = await res.text();
+        
+        // Check for empty or invalid CSS content
+        if (!css || css.trim().length === 0) {
+          throw new Error(`Empty CSS content returned for ${url}`);
+        }
+        
+        // Basic CSS validation - should contain some CSS-like content
+        if (!css.includes('{') && !css.includes('@')) {
+          console.warn(`Suspicious CSS content for ${url}:`, css.substring(0, 200));
+          throw new Error(`Invalid CSS content returned for ${url}`);
+        }
+        
         const style = document.createElement("style");
         Object.entries(attrs).forEach(([k, v]) => style.setAttribute(k, v));
         style.textContent = css;
@@ -1156,8 +1168,12 @@ function applyTheme() {
             resolve(style);
           } catch (fallbackError) {
             console.warn(`CSS fallback failed for ${url}:`, fallbackError);
-            // Always reject so Promise.allSettled can detect failures
-            reject(new Error(`CSS failed to load: ${url} (${errorMsg})`));
+            if (critical) {
+              reject(new Error(`Critical CSS failed to load: ${url}`));
+            } else {
+              // For theme files, reject so Promise.allSettled detects the failure
+              reject(new Error(`CSS failed to load: ${url} (${errorMsg})`));
+            }
           }
         };
 
@@ -1165,7 +1181,21 @@ function applyTheme() {
 
         link.onload = () => {
           clearTimeout(timeout);
-          resolve(link);
+          
+          // Additional check: verify the stylesheet actually has rules
+          setTimeout(() => {
+            try {
+              if (link.sheet && link.sheet.cssRules.length === 0) {
+                console.warn(`CSS loaded but has no rules: ${url}`);
+                handleError("empty stylesheet");
+                return;
+              }
+            } catch (e) {
+              // CORS error when accessing cssRules is normal, means CSS loaded from external source
+              console.log(`CSS loaded (CORS protected): ${url}`);
+            }
+            resolve(link);
+          }, 100); // Small delay to let CSS parse
         };
         
         link.onerror = () => {
@@ -2819,66 +2849,10 @@ function applyTheme() {
       );
     }
 
-    // Main stylesheet from GitHub Raw (critical - will show popup on failure)
-    try {
-      await Utils.loadCSS(`${getBaseUrl()}/auto-image-styles.css`, {
-        "data-wplace-theme": "true"
-      }, true);
-    } catch (error) {
-      console.error('❌ Critical CSS failed to load:', error);
-      
-      // Show popup with reload instructions
-      const popup = document.createElement('div');
-      popup.style.cssText = `
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: #ff4444;
-        color: white;
-        padding: 20px;
-        border-radius: 10px;
-        font-family: Arial, sans-serif;
-        font-size: 14px;
-        z-index: 999999;
-        text-align: center;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-        max-width: 400px;
-      `;
-      popup.innerHTML = `
-        <h3 style="margin: 0 0 15px 0;">⚠️ WPlace Bot - CSS Loading Failed</h3>
-        <p style="margin: 0 0 15px 0;">The bot styles couldn't load due to service worker interference.</p>
-        <p style="margin: 0 0 20px 0;"><strong>Please force reload the page:</strong></p>
-        <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; margin: 10px 0;">
-          <strong>Windows/Linux:</strong> Ctrl + Shift + R<br>
-          <strong>Mac:</strong> Cmd + Shift + R<br>
-          <strong>Alternative:</strong> Ctrl + F5
-        </div>
-        <button id="wplace-close-popup" style="
-          background: white; 
-          color: #ff4444; 
-          border: none; 
-          padding: 8px 16px; 
-          border-radius: 5px; 
-          cursor: pointer;
-          font-weight: bold;
-        ">Close</button>
-      `;
-      
-      document.body.appendChild(popup);
-      
-      // Close button functionality
-      popup.querySelector('#wplace-close-popup').onclick = () => {
-        popup.remove();
-      };
-      
-      // Auto-close after 15 seconds
-      setTimeout(() => {
-        if (popup.parentNode) {
-          popup.remove();
-        }
-      }, 15000);
-    }
+    // Main stylesheet from GitHub Raw (critical - but usually works)
+    await Utils.loadCSS(`${getBaseUrl()}/auto-image-styles.css`, {
+      "data-wplace-theme": "true"
+    }, true);
 
     // Theme CSS files from GitHub Raw
     const themeFiles = ['classic.css', 'classic-light.css', 'neon.css'];
@@ -2957,44 +2931,6 @@ function applyTheme() {
       }, 15000);
     }
 
-    // Final fallback: Check if any WPlace styles are actually applied
-    setTimeout(() => {
-      const testElement = document.querySelector('#wplace-image-bot-container');
-      if (testElement) {
-        const computedStyle = window.getComputedStyle(testElement);
-        const hasWPlaceStyles = computedStyle.getPropertyValue('--wplace-primary') || 
-                               computedStyle.position === 'fixed' ||
-                               computedStyle.zIndex > 1000;
-        
-        if (!hasWPlaceStyles) {
-          console.error('❌ WPlace styles not detected - CSS likely blocked');
-          
-          // Show emergency popup
-          const emergencyPopup = document.createElement('div');
-          emergencyPopup.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #ff0000;
-            color: white;
-            padding: 15px;
-            border: 2px solid white;
-            font-family: Arial, sans-serif;
-            font-size: 13px;
-            z-index: 999999;
-            max-width: 300px;
-            border-radius: 5px;
-          `;
-          emergencyPopup.innerHTML = `
-            <strong>🚨 WPlace Bot CSS Blocked!</strong><br>
-            Styles failed to load. Force reload:<br>
-            <strong>Ctrl + Shift + R</strong><br>
-            <button onclick="this.parentNode.remove()" style="margin-top:5px;background:white;color:red;border:none;padding:3px 6px;cursor:pointer;">X</button>
-          `;
-          document.body.appendChild(emergencyPopup);
-        }
-      }
-    }, 2000); // Check after 2 seconds
 
     const container = document.createElement("div")
     container.id = "wplace-image-bot-container"
