@@ -558,6 +558,7 @@
     originalImage: null,
     resizeIgnoreMask: null,
     // Coordinate generation settings
+    strictSkipUnavailable: false,
     coordinateMode: 'rows',
     coordinateDirection: 'bottom-left',
     coordinateSnake: true,
@@ -1957,11 +1958,12 @@
     },
 
     resolveColor(targetRgb, availableColors, exactMatch = false) {
-      if (!availableColors || availableColors.length === 0)
+      if (!availableColors || availableColors.length === 0) {
         return {
           id: null,
           rgb: targetRgb,
         };
+      }
 
       const cacheKey = `${targetRgb[0]},${targetRgb[1]},${targetRgb[2]}|${state.colorMatchingAlgorithm}|${
         state.enableChromaPenalty ? 'c' : 'nc'
@@ -6766,7 +6768,6 @@
 
     const transparencyThreshold =
       state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
-    const strictSkipUnavailable = true;
 
     function checkPixelEligibility(x, y) {
       const idx = (y * width + x) * 4;
@@ -6789,13 +6790,29 @@
       let targetRgb = Utils.isWhitePixel(r, g, b)
         ? [255, 255, 255]
         : Utils.findClosestPaletteColor(r, g, b, state.activeColorPalette);
-      const colorCheck = Utils.resolveColor(
+
+      // Template color ID, normalized/mapped to the nearest available color in our palette.
+      // Example: template requires "Slate", but we only have "Dark Gray" available
+      // → mappedTargetColorId = ID of Dark Gray.
+      //
+      // If `state.strictSkipUnavailable` is enabled, the painting would stop earlier
+      // because "Slate" was not found (null returned).
+      //
+      // Else, the template "Slate" is mapped to the closest available color (e.g., "Dark Gray"),
+      // and we proceed with painting using that mapped color.
+      //
+      // In this case, if the canvas pixel is already Slate (mapped to available Dark Gray),
+      // we skip painting, since template and canvas both resolve to the same available color (Dark Gray).
+      const mappedTargetColorId = Utils.resolveColor(
         targetRgb,
         state.availableColors,
-        strictSkipUnavailable
+        state.strictSkipUnavailable
       );
 
-      if (strictSkipUnavailable && !colorCheck.id)
+      // Technically, checking only `!mappedTargetColorId.id` would be enough,
+      // but combined with `state.strictSkipUnavailable` it makes the logic explicit:
+      // we only skip when the template color cannot be mapped AND strict mode is on.
+      if (state.strictSkipUnavailable && !mappedTargetColorId.id) {
         return {
           eligible: false,
           reason: 'colorUnavailable',
@@ -6803,10 +6820,10 @@
           g,
           b,
           a,
-          colorId: colorCheck.id,
+          mappedColorId: mappedTargetColorId.id,
         };
-
-      return { eligible: true, r, g, b, a, colorId: colorCheck.id };
+      }
+      return { eligible: true, r, g, b, a, mappedColorId: mappedTargetColorId.id };
     }
 
     function skipPixel(reason, id, rgb, x, y) {
@@ -6852,12 +6869,25 @@
         let adderY = Math.floor(absY / 1000);
         let pixelX = absX % 1000;
         let pixelY = absY % 1000;
-        const targetColorId = targetPixelInfo.colorId;
+
+        // Template color ID, normalized/mapped to the nearest available color in our palette.
+        // Example: template requires "Slate", but we only have "Dark Gray" available
+        // → mappedTargetColorId = ID of Dark Gray.
+        //
+        // If `state.strictSkipUnavailable` is enabled, the painting would stop earlier
+        // because "Slate" was not found (null returned).
+        //
+        // Else, the template "Slate" is mapped to the closest available color (e.g., "Dark Gray"),
+        // and we proceed with painting using that mapped color.
+        //
+        // In this case, if the canvas pixel is already Slate (mapped to available Dark Gray),
+        // we skip painting, since template and canvas both resolve to the same available color (Dark Gray).
+        const targetMappedColorId = targetPixelInfo.mappedColorId;
 
         if (!targetPixelInfo.eligible) {
           skipPixel(
             targetPixelInfo.reason,
-            targetColorId,
+            targetMappedColorId,
             [targetPixelInfo.r, targetPixelInfo.g, targetPixelInfo.b],
             pixelX,
             pixelY
@@ -6866,7 +6896,7 @@
         }
 
         // console.log(`[DEBUG] Pixel at (${pixelX}, ${pixelY}) eligible: RGB=${targetPixelInfo.r}, ${targetPixelInfo.g}, ${targetPixelInfo.b},
-        //  alpha=${targetPixelInfo.a}, colorId=${targetColorId}`);
+        //  alpha=${targetPixelInfo.a}, mappedColorId=${targetMappedColorId}`);
 
         if (
           !pixelBatch ||
@@ -6911,21 +6941,26 @@
         try {
           const tileKeyParts = [pixelBatch.regionX, pixelBatch.regionY];
 
-          const existingColorRGBA = await overlayManager.getTilePixelColor(
+          const tilePixelRGBA = await overlayManager.getTilePixelColor(
             tileKeyParts[0],
             tileKeyParts[1],
             pixelX,
             pixelY
           );
 
-          if (existingColorRGBA && Array.isArray(existingColorRGBA)) {
-            const [er, eg, eb] = existingColorRGBA;
-            const existingColor = Utils.resolveColor([er, eg, eb], state.availableColors);
-            const isMatch = existingColor.id === targetColorId;
+          if (tilePixelRGBA && Array.isArray(tilePixelRGBA)) {
+            // Resolve the actual canvas pixel color to the closest available color.
+            // (The raw canvas RGB [er, eg, eb] is mapped into state.availableColors)
+            // so that comparison is consistent with targetMappedColorId.
+            const mappedCanvasColor = Utils.resolveColor(
+              tilePixelRGBA.slice(0, 3),
+              state.availableColors
+            );
+            const isMatch = mappedCanvasColor.id === targetMappedColorId;
             if (isMatch) {
               skipPixel(
                 'alreadyPainted',
-                targetColorId,
+                targetMappedColorId,
                 [targetPixelInfo.r, targetPixelInfo.g, targetPixelInfo.b],
                 pixelX,
                 pixelY
@@ -6936,8 +6971,8 @@
               `[COMPARE] Pixel at 📍 (${pixelX}, ${pixelY}) in region (${
                 regionX + adderX
               }, ${regionY + adderY})\n` +
-                `  ├── Current color: rgb(${er}, ${eg}, ${eb}) (id: ${existingColor.id})\n` +
-                `  ├── Target color:  rgb(${targetPixelInfo.r}, ${targetPixelInfo.g}, ${targetPixelInfo.b}) (id: ${targetColorId})\n` +
+                `  ├── Current color: rgb(${tilePixelRGBA.slice(0, 3).join(', ')}) (id: ${mappedCanvasColor.id})\n` +
+                `  ├── Target color:  rgb(${targetPixelInfo.r}, ${targetPixelInfo.g}, ${targetPixelInfo.b}) (id: ${targetMappedColorId})\n` +
                 `  └── Status: ${
                   isMatch ? '✅ Already painted → SKIP' : '🔴 Needs paint → PAINT'
                 }\n`
@@ -6954,7 +6989,7 @@
         pixelBatch.pixels.push({
           x: pixelX,
           y: pixelY,
-          color: targetColorId,
+          color: targetMappedColorId,
           localX: x,
           localY: y,
         });
