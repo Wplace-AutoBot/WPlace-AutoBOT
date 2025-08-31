@@ -1181,19 +1181,28 @@ function applyTheme() {
 
         link.onload = () => {
           clearTimeout(timeout);
+          console.log(`CSS link onload triggered for: ${url}`);
           
           // Additional check: verify the stylesheet actually has rules
           setTimeout(() => {
+            console.log(`Checking CSS rules after delay for: ${url}`);
             try {
-              console.log("cc17733e-ab98-4eef-829d-8dad0fe50155", link.sheet.cssRules.length)
-              if (link.sheet && link.sheet.cssRules.length === 0) {
-                console.warn(`CSS loaded but has no rules: ${url}`);
-                handleError("empty stylesheet");
+              if (link.sheet) {
+                const ruleCount = link.sheet.cssRules.length;
+                console.log(`cc17733e-ab98-4eef-829d-8dad0fe50155 CSS file: ${url} has ${ruleCount} rules`);
+                if (ruleCount === 0) {
+                  console.warn(`CSS loaded but has no rules: ${url}`);
+                  handleError("empty stylesheet");
+                  return;
+                }
+              } else {
+                console.warn(`link.sheet is null for: ${url}`);
+                handleError("no stylesheet object");
                 return;
               }
             } catch (e) {
               // CORS error when accessing cssRules is normal, means CSS loaded from external source
-              console.log(`CSS loaded (CORS protected): ${url}`);
+              console.log(`CSS loaded (CORS protected) for: ${url} - Error: ${e.message}`);
             }
             resolve(link);
           }, 100); // Small delay to let CSS parse
