@@ -192,6 +192,12 @@
       },
     },
     currentTheme: 'Classic Autobot',
+    PAINT_UNAVAILABLE: true,
+    COORDINATE_MODE: 'rows',
+    COORDINATE_DIRECTION: 'bottom-left',
+    COORDINATE_SNAKE: true,
+    COORDINATE_BLOCK_WIDTH: 6,
+    COORDINATE_BLOCK_HEIGHT: 2,
   };
 
   const getCurrentTheme = () => CONFIG.THEMES[CONFIG.currentTheme];
@@ -557,14 +563,13 @@
     resizeSettings: null,
     originalImage: null,
     resizeIgnoreMask: null,
+    paintUnavailablePixels: CONFIG.PAINT_UNAVAILABLE,
     // Coordinate generation settings
-    strictSkipUnavailable: false,
-    coordinateMode: 'rows',
-    coordinateDirection: 'bottom-left',
-    coordinateSnake: true,
-    blockWidth: 6,
-    blockHeight: 2,
-    // Notification prefs and runtime bookkeeping
+    coordinateMode: CONFIG.COORDINATE_MODE,
+    coordinateDirection: CONFIG.COORDINATE_DIRECTION,
+    coordinateSnake: CONFIG.COORDINATE_SNAKE,
+    blockWidth: CONFIG.COORDINATE_BLOCK_WIDTH,
+    blockHeight: CONFIG.COORDINATE_BLOCK_HEIGHT,
     notificationsEnabled: CONFIG.NOTIFICATIONS.ENABLED,
     notifyOnChargesReached: CONFIG.NOTIFICATIONS.ON_CHARGES_REACHED,
     notifyOnlyWhenUnfocused: CONFIG.NOTIFICATIONS.ONLY_WHEN_UNFOCUSED,
@@ -2398,19 +2403,19 @@
 
         // Add new fields with default values
         if (!migrated.state.coordinateMode) {
-          migrated.state.coordinateMode = 'rows';
+          migrated.state.coordinateMode = CONFIG.COORDINATE_MODE;
         }
         if (!migrated.state.coordinateDirection) {
-          migrated.state.coordinateDirection = 'bottom-left';
+          migrated.state.coordinateDirection = CONFIG.COORDINATE_DIRECTION;
         }
         if (!migrated.state.coordinateSnake) {
-          migrated.state.coordinateSnake = true;
+          migrated.state.coordinateSnake = CONFIG.COORDINATE_SNAKE;
         }
         if (!migrated.state.blockWidth) {
-          migrated.state.blockWidth = 6;
+          migrated.state.blockWidth = CONFIG.COORDINATE_BLOCK_WIDTH;
         }
         if (!migrated.state.blockHeight) {
-          migrated.state.blockHeight = 2;
+          migrated.state.blockHeight = CONFIG.COORDINATE_BLOCK_HEIGHT;
         }
 
         return migrated;
@@ -2533,11 +2538,11 @@
         state._lastSavePixelCount = 0;
         state._lastSaveTime = 0;
         // Reset coordinate generation settings to their default values
-        state.coordinateMode = 'rows';
-        state.coordinateDirection = 'bottom-left';
-        state.coordinateSnake = true;
-        state.blockWidth = 6;
-        state.blockHeight = 2;
+        state.coordinateMode = CONFIG.COORDINATE_MODE;
+        state.coordinateDirection = CONFIG.COORDINATE_DIRECTION;
+        state.coordinateSnake = CONFIG.COORDINATE_SNAKE;
+        state.blockWidth = CONFIG.COORDINATE_BLOCK_WIDTH;
+        state.blockHeight = CONFIG.COORDINATE_BLOCK_HEIGHT;
         console.log('📋 Progress and painted map cleared');
         return true;
       } catch (error) {
@@ -2677,6 +2682,15 @@
         console.error('Failed to restore overlay from data:', error);
         return false;
       }
+    },
+
+    updateCoordinateUI({ mode, directionControls, snakeControls, blockControls }) {
+      const isLinear = mode === 'rows' || mode === 'columns';
+      const isBlock = mode === 'blocks' || mode === 'shuffle-blocks';
+
+      if (directionControls) directionControls.style.display = isLinear ? 'block' : 'none';
+      if (snakeControls) snakeControls.style.display = isLinear ? 'block' : 'none';
+      if (blockControls) blockControls.style.display = isBlock ? 'block' : 'none';
     },
   };
 
@@ -3612,7 +3626,7 @@
                   </div>
                   <input type="checkbox" id="enableBlueMarbleToggle" ${
                     state.blueMarbleEnabled ? 'checked' : ''
-                  } class="wplace-blue-marble-checkbox" style="
+                  } class="wplace-settings-checkbox" style="
                     accent-color: ${theme.highlight || '#48dbfb'};
                   "/>
               </label>
@@ -3702,7 +3716,6 @@
           </label>
         </div>
         
-        <!-- Todo separate styles of coord to css -->
         <!-- Coordinate Generation Section -->
         <div class="wplace-settings-section">
           <label class="wplace-settings-section-label">
@@ -3753,7 +3766,7 @@
               </div>
               <input type="checkbox" id="coordinateSnakeToggle" ${
                 state.coordinateSnake ? 'checked' : ''
-              } class="wplace-blue-marble-checkbox" style="
+              } class="wplace-settings-checkbox" style="
                     accent-color: ${theme.highlight || '#48dbfb'};
                   "/>
             </label>
@@ -3782,6 +3795,25 @@
             </p>
           </div>
         </div>
+        
+          <!-- Pixel Filter Toggles -->
+          <div id="pixelFilterControls" class="wplace-pixel-filter-controls wplace-settings-section-wrapper">
+            <label class="wplace-settings-toggle">
+              <div>
+                <span class="wplace-settings-toggle-title" style="color: ${
+                  theme.text || 'white'
+                };">Paint Unavailable</span>
+                <p class="wplace-settings-toggle-description" style="color: ${
+                  theme.text ? `${theme.text}BB` : 'rgba(255,255,255,0.7)'
+                };">If enabled, template colors that are unavailable will be painted using the closest available color</p>
+              </div>
+              <input type="checkbox" id="paintUnavailablePixelsToggle" ${
+                state.paintUnavailablePixels ? 'checked' : ''
+              } class="wplace-settings-checkbox" style="
+                    accent-color: ${theme.highlight || '#48dbfb'};
+                  "/>
+            </label>
+          </div>
         
         <!-- Notifications Section -->
         <div class="wplace-settings-section">
@@ -4648,36 +4680,40 @@
     const blockControls = settingsContainer.querySelector('#blockControls');
     const blockWidthInput = settingsContainer.querySelector('#blockWidthInput');
     const blockHeightInput = settingsContainer.querySelector('#blockHeightInput');
+    const paintUnavailablePixelsToggle = settingsContainer.querySelector(
+      '#paintUnavailablePixelsToggle'
+    );
 
-    // Function to update UI visibility based on selected mode
-    const updateCoordinateUI = () => {
-      const mode = coordinateModeSelect.value;
-      const isLinear = mode === 'rows' || mode === 'columns';
-      const isBlock = mode === 'blocks' || mode === 'shuffle-blocks';
-
-      // Show/hide direction and snake controls for linear modes
-      if (directionControls) directionControls.style.display = isLinear ? 'block' : 'none';
-      if (snakeControls) snakeControls.style.display = isLinear ? 'block' : 'none';
-
-      // Show/hide block size controls for block modes
-      if (blockControls) blockControls.style.display = isBlock ? 'block' : 'none';
-    };
-
+    if (paintUnavailablePixelsToggle) {
+      paintUnavailablePixelsToggle.checked = state.paintUnavailablePixels;
+      paintUnavailablePixelsToggle.addEventListener('change', (e) => {
+        state.paintUnavailablePixels = e.target.checked;
+        saveBotSettings();
+        console.log(`🎨 Paint unavailable colors: ${state.paintUnavailablePixels ? 'ON' : 'OFF'}`);
+        const statusText = state.paintUnavailablePixels
+          ? 'Unavailable template colors will be painted with the closest available color'
+          : 'Unavailable template colors will be skipped';
+        Utils.showAlert(statusText, 'success');
+      });
+    }
     if (coordinateModeSelect) {
-      coordinateModeSelect.value = state.coordinateMode || 'rows';
+      coordinateModeSelect.value = state.coordinateMode;
       coordinateModeSelect.addEventListener('change', (e) => {
         state.coordinateMode = e.target.value;
-        updateCoordinateUI();
+        Utils.updateCoordinateUI({
+          mode: state.coordinateMode,
+          directionControls,
+          snakeControls,
+          blockControls,
+        });
         saveBotSettings();
         console.log(`🔄 Coordinate mode changed to: ${state.coordinateMode}`);
         Utils.showAlert(`Coordinate mode set to: ${state.coordinateMode}`, 'success');
       });
-      // Initial UI update
-      updateCoordinateUI();
     }
 
     if (coordinateDirectionSelect) {
-      coordinateDirectionSelect.value = state.coordinateDirection || 'bottom-left';
+      coordinateDirectionSelect.value = state.coordinateDirection;
       coordinateDirectionSelect.addEventListener('change', (e) => {
         state.coordinateDirection = e.target.value;
         saveBotSettings();
@@ -4687,7 +4723,7 @@
     }
 
     if (coordinateSnakeToggle) {
-      coordinateSnakeToggle.checked = state.coordinateSnake !== false;
+      coordinateSnakeToggle.checked = state.coordinateSnake;
       coordinateSnakeToggle.addEventListener('change', (e) => {
         state.coordinateSnake = e.target.checked;
         saveBotSettings();
@@ -4700,7 +4736,7 @@
     }
 
     if (blockWidthInput) {
-      blockWidthInput.value = state.blockWidth || 6;
+      blockWidthInput.value = state.blockWidth;
       blockWidthInput.addEventListener('input', (e) => {
         const width = parseInt(e.target.value);
         if (width >= 1 && width <= 50) {
@@ -4711,7 +4747,7 @@
     }
 
     if (blockHeightInput) {
-      blockHeightInput.value = state.blockHeight || 2;
+      blockHeightInput.value = state.blockHeight;
       blockHeightInput.addEventListener('change', (e) => {
         const height = parseInt(e.target.value);
         if (height >= 1 && height <= 50) {
@@ -6547,15 +6583,7 @@
     );
   }
 
-  function generateCoordinates(
-    width,
-    height,
-    mode = 'rows',
-    direction = 'top-left',
-    snake = false,
-    blockWidth = 6,
-    blockHeight = 2
-  ) {
+  function generateCoordinates(width, height, mode, direction, snake, blockWidth, blockHeight) {
     const coords = [];
     console.log(
       'Generating coordinates with \n  mode:',
@@ -6795,7 +6823,7 @@
       // Example: template requires "Slate", but we only have "Dark Gray" available
       // → mappedTargetColorId = ID of Dark Gray.
       //
-      // If `state.strictSkipUnavailable` is enabled, the painting would stop earlier
+      // If `state.paintUnavailablePixels` is enabled, the painting would stop earlier
       // because "Slate" was not found (null returned).
       //
       // Else, the template "Slate" is mapped to the closest available color (e.g., "Dark Gray"),
@@ -6806,13 +6834,13 @@
       const mappedTargetColorId = Utils.resolveColor(
         targetRgb,
         state.availableColors,
-        state.strictSkipUnavailable
+        !state.paintUnavailablePixels
       );
 
       // Technically, checking only `!mappedTargetColorId.id` would be enough,
-      // but combined with `state.strictSkipUnavailable` it makes the logic explicit:
+      // but combined with `state.paintUnavailablePixels` it makes the logic explicit:
       // we only skip when the template color cannot be mapped AND strict mode is on.
-      if (state.strictSkipUnavailable && !mappedTargetColorId.id) {
+      if (!state.paintUnavailablePixels && !mappedTargetColorId.id) {
         return {
           eligible: false,
           reason: 'colorUnavailable',
@@ -6874,7 +6902,7 @@
         // Example: template requires "Slate", but we only have "Dark Gray" available
         // → mappedTargetColorId = ID of Dark Gray.
         //
-        // If `state.strictSkipUnavailable` is enabled, the painting would stop earlier
+        // If `state.paintUnavailablePixels` is enabled, the painting would stop earlier
         // because "Slate" was not found (null returned).
         //
         // Else, the template "Slate" is mapped to the closest available color (e.g., "Dark Gray"),
@@ -7272,7 +7300,7 @@
         paintWhitePixels: state.paintWhitePixels,
         paintTransparentPixels: state.paintTransparentPixels,
         resizeSettings: state.resizeSettings,
-        originalImage: state.originalImage,
+        paintUnavailablePixels: state.paintUnavailablePixels,
         coordinateMode: state.coordinateMode,
         coordinateDirection: state.coordinateDirection,
         coordinateSnake: state.coordinateSnake,
@@ -7292,6 +7320,7 @@
         notifyOnChargesReached: state.notifyOnChargesReached,
         notifyOnlyWhenUnfocused: state.notifyOnlyWhenUnfocused,
         notificationIntervalMinutes: state.notificationIntervalMinutes,
+        originalImage: state.originalImage,
       };
       CONFIG.PAINTING_SPEED_ENABLED = settings.paintingSpeedEnabled;
       // AUTO_CAPTCHA_ENABLED is always true - no need to save/load
@@ -7331,11 +7360,12 @@
       state.paintTransparentPixels = settings.paintTransparentPixels ?? false;
       state.resizeSettings = settings.resizeSettings ?? null;
       state.originalImage = settings.originalImage ?? null;
-      state.coordinateMode = settings.coordinateMode ?? 'rows';
-      state.coordinateDirection = settings.coordinateDirection ?? 'bottom-left';
-      state.coordinateSnake = settings.coordinateSnake ?? true;
-      state.blockWidth = settings.blockWidth ?? 6;
-      state.blockHeight = settings.blockHeight ?? 2;
+      state.paintUnavailablePixels = settings.paintUnavailablePixels ?? CONFIG.PAINT_UNAVAILABLE;
+      state.coordinateMode = settings.coordinateMode ?? CONFIG.COORDINATE_MODE;
+      state.coordinateDirection = settings.coordinateDirection ?? CONFIG.COORDINATE_DIRECTION;
+      state.coordinateSnake = settings.coordinateSnake ?? CONFIG.COORDINATE_SNAKE;
+      state.blockWidth = settings.blockWidth ?? CONFIG.COORDINATE_BLOCK_WIDTH;
+      state.blockHeight = settings.blockHeight ?? CONFIG.COORDINATE_BLOCK_HEIGHT;
       // Notifications
       state.notificationsEnabled = settings.notificationsEnabled ?? CONFIG.NOTIFICATIONS.ENABLED;
       state.notifyOnChargesReached =
@@ -7373,7 +7403,22 @@
       const coordinateSnakeToggle = document.getElementById('coordinateSnakeToggle');
       if (coordinateSnakeToggle) coordinateSnakeToggle.checked = state.coordinateSnake;
 
-      // ... existing code ...
+      const settingsContainer = document.getElementById('wplace-settings-container');
+      const directionControls = settingsContainer.querySelector('#directionControls');
+      const snakeControls = settingsContainer.querySelector('#snakeControls');
+      const blockControls = settingsContainer.querySelector('#blockControls');
+      Utils.updateCoordinateUI({
+        mode: state.coordinateMode,
+        directionControls,
+        snakeControls,
+        blockControls,
+      });
+
+      const paintUnavailablePixelsToggle = document.getElementById('paintUnavailablePixelsToggle');
+      if (paintUnavailablePixelsToggle) {
+        paintUnavailablePixelsToggle.checked = state.paintUnavailablePixels;
+      }
+
       const speedSlider = document.getElementById('speedSlider');
       if (speedSlider) speedSlider.value = state.paintingSpeed;
       const speedValue = document.getElementById('speedValue');

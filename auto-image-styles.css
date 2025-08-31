@@ -1319,10 +1319,11 @@
   margin: 4px 0 0 0;
 }
 
-.wplace-blue-marble-checkbox {
+.wplace-settings-checkbox {
   cursor: pointer;
   width: 20px;
   height: 20px;
+  flex-shrink: 0;
 }
 
 /* Notifications */
@@ -1877,7 +1878,7 @@
   margin: 4px 0 0 0;
 }
 
-.wplace-blue-marble-checkbox {
+.wplace-settings-checkbox {
   cursor: pointer;
   width: 20px;
   height: 20px;
@@ -1898,6 +1899,13 @@
 .wplace-icon-compass {
   color: var(--wplace-icon-secondary);
   margin-right: 6px;
+}
+
+/* Pixel Filter Controls */
+.wplace-pixel-filter-controls {
+  padding: 18px;
+  margin-bottom: 15px;
+  /* Theme-specific styling applied via theme files */
 }
 
 /* Snake Pattern Controls */
