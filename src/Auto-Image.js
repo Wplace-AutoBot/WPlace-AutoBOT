@@ -185,9 +185,21 @@ import {
         currentTheme: 'classic', // Default to first available theme
     };
 
+    /**
+     * Get list of available theme names.
+     * @returns {Array<string>} Array of theme names
+     */
     const getAvailableThemes = () => Object.keys(EMBEDDED_THEMES);
+    /**
+     * Get the current active theme name.
+     * @returns {string} Current theme name
+     */
     const getCurrentTheme = () => CONFIG.currentTheme;
 
+    /**
+     * Switch to a different theme and update UI.
+     * @param {string} themeName - Name of the theme to switch to
+     */
     const switchTheme = themeName => {
         if (EMBEDDED_THEMES[themeName]) {
             CONFIG.currentTheme = themeName;
@@ -201,6 +213,9 @@ import {
         }
     };
 
+    /**
+     * Apply the current theme CSS to the document.
+     */
     function applyTheme() {
         // Remove existing theme CSS
         const existingThemeStyle = document.getElementById('wplace-theme-css');
@@ -218,6 +233,9 @@ import {
         }
     }
 
+    /**
+     * Save current theme preference to localStorage.
+     */
     const saveThemePreference = () => {
         try {
             localStorage.setItem('wplace-theme', CONFIG.currentTheme);
@@ -226,6 +244,9 @@ import {
         }
     };
 
+    /**
+     * Load saved theme preference from localStorage.
+     */
     const loadThemePreference = () => {
         try {
             const saved = localStorage.getItem('wplace-theme');
@@ -259,7 +280,11 @@ import {
         'uk',
     ];
 
-    // Function to load translations from
+    /**
+     * Load translations for a specific language from embedded assets.
+     * @param {string} language - Language code (e.g., 'en', 'ru', 'pt')
+     * @returns {Promise<Object|null>} Translation object or null if not found
+     */
     const loadTranslations = async language => {
         if (loadedTranslations[language]) {
             return loadedTranslations[language];
@@ -292,6 +317,10 @@ import {
         return null;
     };
 
+    /**
+     * Load and set language preference from localStorage or browser locale.
+     * @returns {Promise<void>} Promise that resolves when language is loaded
+     */
     const loadLanguagePreference = async () => {
         const savedLanguage = localStorage.getItem('wplace_language');
         const browserLocale = navigator.language;
@@ -349,7 +378,10 @@ import {
         }
     };
 
-    // Simple user notification function for critical issues
+    /**
+     * Show a temporary warning notification for translation issues.
+     * @param {string} message - Warning message to display
+     */
     const showTranslationWarning = message => {
         try {
             // Create a simple temporary notification banner
@@ -376,7 +408,10 @@ import {
         }
     };
 
-    // Initialize translations function
+    /**
+     * Initialize the translation system by loading English fallback and user's language preference.
+     * @returns {Promise<void>} Promise that resolves when translations are initialized
+     */
     const initializeTranslations = async () => {
         try {
             console.log('🌐 Initializing translation system...');
@@ -434,7 +469,12 @@ import {
         },
     };
 
-    // Safe translation function with multiple fallback levels
+    /**
+     * Safe translation function with multiple fallback levels.
+     * @param {string} key - Translation key to look up
+     * @param {Object} [replacements={}] - Object with placeholder replacements
+     * @returns {string} Translated text with replacements applied
+     */
     const getText = (key, replacements = {}) => {
         // Try current language first
         let text = loadedTranslations[state.language]?.[key];
@@ -542,6 +582,10 @@ import {
             this.workerPool = null; // Web worker pool for heavy processing
         }
 
+        /**
+         * Toggle the overlay on/off state.
+         * @returns {boolean} New enabled state
+         */
         toggle() {
             this.isEnabled = !this.isEnabled;
             console.log(`Overlay ${this.isEnabled ? 'enabled' : 'disabled'}.`);
@@ -554,6 +598,9 @@ import {
         disable() {
             this.isEnabled = false;
         }
+        /**
+         * Clear all overlay data and disable the overlay.
+         */
         clear() {
             this.disable();
             this.imageBitmap = null;
@@ -566,6 +613,11 @@ import {
             }
         }
 
+        /**
+         * Set the overlay image and trigger processing if position is available.
+         * @param {ImageBitmap} imageBitmap - The image to overlay on the canvas
+         * @returns {Promise<void>} Promise that resolves when image is set and processed
+         */
         async setImage(imageBitmap) {
             this.imageBitmap = imageBitmap;
             this.lastProcessedHash = null; // Invalidate cache
@@ -574,6 +626,12 @@ import {
             }
         }
 
+        /**
+         * Set the overlay position and trigger processing if image is available.
+         * @param {Object} startPosition - Starting pixel coordinates {x, y}
+         * @param {Object} region - Region coordinates {x, y}
+         * @returns {Promise<void>} Promise that resolves when position is set and processed
+         */
         async setPosition(startPosition, region) {
             if (!startPosition || !region) {
                 this.startCoords = null;
@@ -597,7 +655,11 @@ import {
             return `${width}x${height}_${px},${py}_${rx},${ry}_${state.blueMarbleEnabled}_${state.overlayOpacity}`;
         }
 
-        // --- OVERLAY UPDATE: Optimized chunking with caching and batch processing ---
+        /**
+         * Process the overlay image into chunked tiles for efficient rendering.
+         * Uses caching to avoid reprocessing unchanged images.
+         * @returns {Promise<void>} Promise that resolves when image processing is complete
+         */
         async processImageIntoChunks() {
             if (!this.imageBitmap || !this.startCoords) return;
 
@@ -863,7 +925,14 @@ import {
             );
         }
 
-        // Returns [r,g,b,a] for a pixel inside a region tile (tileX, tileY are region coords)
+        /**
+         * Get the color of a specific pixel from a cached tile.
+         * @param {number} tileX - Tile X coordinate in region space
+         * @param {number} tileY - Tile Y coordinate in region space  
+         * @param {number} pixelX - Pixel X coordinate within the tile
+         * @param {number} pixelY - Pixel Y coordinate within the tile
+         * @returns {Promise<Array<number>|null>} RGBA color array [r,g,b,a] or null if transparent/unavailable
+         */
         async getTilePixelColor(tileX, tileY, pixelX, pixelY) {
             const tileKey = `${tileX},${tileY}`;
             // Prefer cached ImageData if available
@@ -984,6 +1053,10 @@ import {
     const MAX_BATCH_RETRIES = 10; // Maximum attempts for batch sending
     const TOKEN_LIFETIME = 240000; // 4 minutes (tokens typically last 5 min, use 4 for safety)
 
+    /**
+     * Set the Turnstile token and resolve any pending token promises.
+     * @param {string} token - The Turnstile token to set
+     */
     function setTurnstileToken(token) {
         if (_resolveToken) {
             _resolveToken(token);
@@ -994,16 +1067,28 @@ import {
         console.log('✅ Turnstile token set successfully');
     }
 
+    /**
+     * Check if the current Turnstile token is valid and not expired.
+     * @returns {boolean} True if token is valid and not expired
+     */
     function isTokenValid() {
         return turnstileToken && Date.now() < tokenExpiryTime;
     }
 
+    /**
+     * Invalidate the current Turnstile token, forcing a new one to be generated.
+     */
     function invalidateToken() {
         turnstileToken = null;
         tokenExpiryTime = 0;
         console.log('🗑️ Token invalidated, will force fresh generation');
     }
 
+    /**
+     * Ensure a valid Turnstile token is available, generating one if needed.
+     * @param {boolean} [forceRefresh=false] - Force generation of a new token even if current one is valid
+     * @returns {Promise<string|null>} Promise resolving to the token or null on failure
+     */
     async function ensureToken(forceRefresh = false) {
         // Return cached token if still valid and not forcing refresh
         if (isTokenValid() && !forceRefresh) {
@@ -1048,6 +1133,11 @@ import {
         }
     }
 
+    /**
+     * Generate a Turnstile token with detailed timing and error logging.
+     * @returns {Promise<string>} Promise resolving to the generated token
+     * @throws {Error} If token generation fails
+     */
     async function handleCaptchaWithRetry() {
         const startTime = Date.now();
         try {
@@ -1083,6 +1173,10 @@ import {
         }
     }
 
+    /**
+     * Fallback token generation method when primary Turnstile method fails.
+     * @returns {Promise<string|null>} Promise resolving to fallback token or null
+     */
     async function handleCaptchaFallback() {
         // Implementation for fallback token generation would go here
         // This is a placeholder for browser automation fallback
@@ -1090,6 +1184,10 @@ import {
         return null;
     }
 
+    /**
+     * Inject code into the page context by creating a script element.
+     * @param {Function} callback - Function to inject and execute
+     */
     function inject(callback) {
         const script = document.createElement('script');
         script.textContent = `(${callback})();`;
@@ -1194,6 +1292,10 @@ import {
         }
     });
 
+    /**
+     * Detect user's language preference from WPlace backend or browser locale.
+     * @returns {Promise<void>} Promise that resolves when language is detected and set
+     */
     async function detectLanguage() {
         try {
             const response = await fetch('https://backend.wplace.live/me', {
@@ -1208,8 +1310,20 @@ import {
 
     // UTILITY FUNCTIONS
     const Utils = {
+        /**
+         * Sleep/pause execution for specified milliseconds.
+         * @param {number} ms - Milliseconds to sleep
+         * @returns {Promise<void>} Promise that resolves after the specified delay
+         */
         sleep: ms => new Promise(r => setTimeout(r, ms)),
 
+        /**
+         * Wait for a DOM element to appear with configurable timeout.
+         * @param {string} selector - CSS selector to wait for
+         * @param {number} [interval=200] - Polling interval in milliseconds
+         * @param {number} [timeout=5000] - Maximum wait time in milliseconds
+         * @returns {Promise<Element|null>} The found element or null if timeout
+         */
         waitForSelector: async (selector, interval = 200, timeout = 5000) => {
             const start = Date.now();
             while (Date.now() - start < timeout) {
@@ -1227,6 +1341,10 @@ import {
         _turnstileWidgetId: null,
         _lastSitekey: null,
 
+        /**
+         * Load Cloudflare Turnstile CAPTCHA library if not already loaded.
+         * @returns {Promise<void>} Promise that resolves when Turnstile is ready
+         */
         async loadTurnstile() {
             // If Turnstile is already present, just resolve.
             if (window.turnstile) {
@@ -1546,6 +1664,11 @@ import {
             });
         },
 
+        /**
+         * Generate a Turnstile token for painting operations.
+         * @param {string} sitekey - Cloudflare sitekey for Turnstile verification
+         * @returns {Promise<string|null>} Promise resolving to the generated token or null on failure
+         */
         async generatePaintToken(sitekey) {
             return this.executeTurnstile(sitekey, 'paint');
         },
@@ -1580,6 +1703,11 @@ import {
             this._lastSitekey = null;
         },
 
+        /**
+         * Detect the Cloudflare Turnstile sitekey from the current page.
+         * @param {string} [fallback='0x4AAAAAABpqJe8FO0N84q0F'] - Fallback sitekey if detection fails
+         * @returns {string} The detected or fallback sitekey
+         */
         detectSitekey(fallback = '0x4AAAAAABpqJe8FO0N84q0F') {
             // Cache sitekey to avoid repeated DOM queries
             if (this._cachedSitekey) {
@@ -1741,7 +1869,12 @@ import {
             return button;
         },
 
-        // Synchronous translation function for UI rendering
+        /**
+         * Synchronous translation function for UI rendering with parameter substitution.
+         * @param {string} key - Translation key to look up
+         * @param {Object} [params={}] - Parameters to substitute in the translation string
+         * @returns {string} Translated and parameterized text, or the key if not found
+         */
         t: (key, params = {}) => {
             // Try to get from cache first
             const cacheKey = `${state.language}_${key}`;
@@ -1795,6 +1928,11 @@ import {
             return text;
         },
 
+        /**
+         * Display a temporary alert notification to the user.
+         * @param {string} message - The message to display
+         * @param {string} [type='info'] - Alert type: 'info', 'success', 'warning', or 'error'
+         */
         showAlert: (message, type = 'info') => {
             const alertDiv = document.createElement('div');
             alertDiv.className = `wplace-alert-base wplace-alert-${type}`;
@@ -1810,6 +1948,12 @@ import {
             }, 4000);
         },
 
+        /**
+         * Calculate Euclidean distance between two RGB colors.
+         * @param {Array<number>} a - First RGB color as [r, g, b]
+         * @param {Array<number>} b - Second RGB color as [r, g, b]
+         * @returns {number} Distance between the colors
+         */
         colorDistance: (a, b) =>
             Math.sqrt(
                 Math.pow(a[0] - b[0], 2) +
@@ -1817,6 +1961,13 @@ import {
                     Math.pow(a[2] - b[2], 2)
             ),
         _labCache: new Map(), // key: (r<<16)|(g<<8)|b  value: [L,a,b]
+        /**
+         * Convert RGB color to CIE LAB color space for perceptual color matching.
+         * @param {number} r - Red channel (0-255)
+         * @param {number} g - Green channel (0-255)
+         * @param {number} b - Blue channel (0-255)
+         * @returns {Array<number>} LAB color as [L, a, b] where L is lightness, a and b are color-opponent dimensions
+         */
         _rgbToLab: (r, g, b) => {
             // sRGB -> linear
             const srgbToLinear = v => {
@@ -1843,6 +1994,13 @@ import {
             const b2 = 200 * (fY - fZ);
             return [L, a, b2];
         },
+        /**
+         * Get LAB color values with caching for performance optimization.
+         * @param {number} r - Red channel (0-255)
+         * @param {number} g - Green channel (0-255)
+         * @param {number} b - Blue channel (0-255)
+         * @returns {Array<number>} Cached LAB color as [L, a, b]
+         */
         _lab: (r, g, b) => {
             const key = (r << 16) | (g << 8) | b;
             let v = Utils._labCache.get(key);
@@ -1852,6 +2010,15 @@ import {
             }
             return v;
         },
+        /**
+         * Find the perceptually closest color from the available palette.
+         * Uses LAB color space for accurate perceptual distance calculation.
+         * @param {number} r - Red channel (0-255) of target color
+         * @param {number} g - Green channel (0-255) of target color
+         * @param {number} b - Blue channel (0-255) of target color
+         * @param {Array<Array<number>>} [palette] - Array of RGB triplets [[r,g,b], ...]. Uses CONFIG.COLOR_MAP if not provided
+         * @returns {Array<number>} The closest palette color as [r, g, b] RGB triplet
+         */
         findClosestPaletteColor: (r, g, b, palette) => {
             // Use provided palette or derive from COLOR_MAP
             if (!palette || palette.length === 0) {
@@ -2029,6 +2196,11 @@ import {
             return availableColors;
         },
 
+        /**
+         * Format milliseconds into human-readable time string.
+         * @param {number} ms - Time in milliseconds
+         * @returns {string} Formatted time string (e.g., "2h 30m 15s" or "45s")
+         */
         formatTime: ms => {
             const seconds = Math.floor((ms / 1000) % 60);
             const minutes = Math.floor((ms / (1000 * 60)) % 60);
@@ -2044,6 +2216,13 @@ import {
             return result;
         },
 
+        /**
+         * Calculate estimated completion time based on remaining pixels and charges.
+         * @param {number} remainingPixels - Number of pixels left to paint
+         * @param {number} charges - Available charges
+         * @param {number} cooldown - Cooldown time per charge in milliseconds
+         * @returns {number} Estimated time in milliseconds
+         */
         calculateEstimatedTime: (remainingPixels, charges, cooldown) => {
             if (remainingPixels <= 0) return 0;
 
@@ -2795,6 +2974,12 @@ import {
     // COLOR MATCHING FUNCTION - Optimized with caching
     const colorCache = new Map();
 
+    /**
+     * Find the closest available color ID for a target RGB color using caching.
+     * @param {Array<number>} targetRgb - Target RGB color as [r, g, b]
+     * @param {Array<Object>} availableColors - Array of available color objects with id and rgb properties
+     * @returns {number} The ID of the closest available color
+     */
     function findClosestColor(targetRgb, availableColors) {
         if (!availableColors || availableColors.length === 0) return 1;
         const cacheKey = `${targetRgb[0]},${targetRgb[1]},${targetRgb[2]}|${state.colorMatchingAlgorithm}|${state.enableChromaPenalty ? 'c' : 'nc'}|${state.chromaPenaltyWeight}`;
@@ -2888,6 +3073,9 @@ import {
     let updateStats = () => {};
     let updateDataButtons = () => {};
 
+    /**
+     * Update the active color palette based on currently selected color swatches.
+     */
     function updateActiveColorPalette() {
         state.activeColorPalette = [];
         const activeSwatches = document.querySelectorAll(
@@ -2910,6 +3098,11 @@ import {
         }
     }
 
+    /**
+     * Toggle all color swatches on or off, respecting availability.
+     * @param {boolean} select - Whether to select (true) or deselect (false) colors
+     * @param {boolean} [showingUnavailable=false] - Whether unavailable colors are currently shown
+     */
     function toggleAllColors(select, showingUnavailable = false) {
         const swatches = document.querySelectorAll('.wplace-color-swatch');
         if (swatches) {
@@ -2927,6 +3120,9 @@ import {
         updateActiveColorPalette();
     }
 
+    /**
+     * Deselect all paid/premium colors (color IDs >= 32).
+     */
     function unselectAllPaidColors() {
         const swatches = document.querySelectorAll('.wplace-color-swatch');
         if (swatches) {
@@ -2943,6 +3139,10 @@ import {
         updateActiveColorPalette();
     }
 
+    /**
+     * Initialize the color palette UI with available colors.
+     * @param {Element} container - DOM container element for the color palette
+     */
     function initializeColorPalette(container) {
         const colorsContainer = container.querySelector('#colors-container');
         const showAllToggle = container.querySelector('#showAllColorsToggle');
@@ -2956,6 +3156,10 @@ import {
             return;
         }
 
+        /**
+         * Populate the color palette with color swatches.
+         * @param {boolean} [showUnavailable=false] - Whether to show unavailable colors
+         */
         function populateColors(showUnavailable = false) {
             colorsContainer.innerHTML = '';
             let availableCount = 0;
@@ -3058,6 +3262,10 @@ import {
             .querySelector('#unselectPaidBtn')
             ?.addEventListener('click', () => unselectAllPaidColors());
     }
+    /**
+     * Handle CAPTCHA challenges based on user's token source preference.
+     * @returns {Promise<string|null>} Promise resolving to the generated token or null
+     */
     async function handleCaptcha() {
         const startTime = performance.now();
 
@@ -3242,6 +3450,10 @@ import {
         });
     }
 
+    /**
+     * Create and initialize the main user interface components.
+     * @returns {Promise<void>} Promise that resolves when UI is created
+     */
     async function createUI() {
         await detectLanguage();
 
@@ -4053,6 +4265,10 @@ import {
 
         makeDraggable(container);
 
+        /**
+         * Make a UI element draggable by its header.
+         * @param {Element} element - The element to make draggable
+         */
         function makeDraggable(element) {
             let pos1 = 0,
                 pos2 = 0,
@@ -4070,6 +4286,10 @@ import {
 
             header.onmousedown = dragMouseDown;
 
+            /**
+             * Handle mouse down event to start dragging.
+             * @param {MouseEvent} e - The mouse event
+             */
             function dragMouseDown(e) {
                 if (
                     e.target.closest('.wplace-header-btn') ||

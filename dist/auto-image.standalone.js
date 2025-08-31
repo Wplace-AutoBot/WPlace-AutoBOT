@@ -4234,6 +4234,10 @@
         this.lastProcessedHash = null;
         this.workerPool = null;
       }
+      /**
+       * Toggle the overlay on/off state.
+       * @returns {boolean} New enabled state
+       */
       toggle() {
         this.isEnabled = !this.isEnabled;
         console.log(`Overlay ${this.isEnabled ? "enabled" : "disabled"}.`);
@@ -4245,6 +4249,9 @@
       disable() {
         this.isEnabled = false;
       }
+      /**
+       * Clear all overlay data and disable the overlay.
+       */
       clear() {
         this.disable();
         this.imageBitmap = null;
@@ -4256,6 +4263,11 @@
           this.processPromise = null;
         }
       }
+      /**
+       * Set the overlay image and trigger processing if position is available.
+       * @param {ImageBitmap} imageBitmap - The image to overlay on the canvas
+       * @returns {Promise<void>} Promise that resolves when image is set and processed
+       */
       async setImage(imageBitmap) {
         this.imageBitmap = imageBitmap;
         this.lastProcessedHash = null;
@@ -4263,6 +4275,12 @@
           await this.processImageIntoChunks();
         }
       }
+      /**
+       * Set the overlay position and trigger processing if image is available.
+       * @param {Object} startPosition - Starting pixel coordinates {x, y}
+       * @param {Object} region - Region coordinates {x, y}
+       * @returns {Promise<void>} Promise that resolves when position is set and processed
+       */
       async setPosition(startPosition, region) {
         if (!startPosition || !region) {
           this.startCoords = null;
@@ -4285,7 +4303,11 @@
         const { x: rx, y: ry } = this.startCoords.region;
         return `${width}x${height}_${px},${py}_${rx},${ry}_${state.blueMarbleEnabled}_${state.overlayOpacity}`;
       }
-      // --- OVERLAY UPDATE: Optimized chunking with caching and batch processing ---
+      /**
+       * Process the overlay image into chunked tiles for efficient rendering.
+       * Uses caching to avoid reprocessing unchanged images.
+       * @returns {Promise<void>} Promise that resolves when image processing is complete
+       */
       async processImageIntoChunks() {
         if (!this.imageBitmap || !this.startCoords)
           return;
@@ -4484,7 +4506,14 @@
           "*"
         );
       }
-      // Returns [r,g,b,a] for a pixel inside a region tile (tileX, tileY are region coords)
+      /**
+       * Get the color of a specific pixel from a cached tile.
+       * @param {number} tileX - Tile X coordinate in region space
+       * @param {number} tileY - Tile Y coordinate in region space  
+       * @param {number} pixelX - Pixel X coordinate within the tile
+       * @param {number} pixelY - Pixel Y coordinate within the tile
+       * @returns {Promise<Array<number>|null>} RGBA color array [r,g,b,a] or null if transparent/unavailable
+       */
       async getTilePixelColor(tileX, tileY, pixelX, pixelY) {
         const tileKey = `${tileX},${tileY}`;
         const cached = this.originalTilesData.get(tileKey);
@@ -4772,7 +4801,19 @@
       }
     }
     const Utils = {
+      /**
+       * Sleep/pause execution for specified milliseconds.
+       * @param {number} ms - Milliseconds to sleep
+       * @returns {Promise<void>} Promise that resolves after the specified delay
+       */
       sleep: (ms) => new Promise((r) => setTimeout(r, ms)),
+      /**
+       * Wait for a DOM element to appear with configurable timeout.
+       * @param {string} selector - CSS selector to wait for
+       * @param {number} [interval=200] - Polling interval in milliseconds
+       * @param {number} [timeout=5000] - Maximum wait time in milliseconds
+       * @returns {Promise<Element|null>} The found element or null if timeout
+       */
       waitForSelector: async (selector, interval = 200, timeout = 5e3) => {
         const start = Date.now();
         while (Date.now() - start < timeout) {
@@ -4789,6 +4830,10 @@
       _turnstileOverlay: null,
       _turnstileWidgetId: null,
       _lastSitekey: null,
+      /**
+       * Load Cloudflare Turnstile CAPTCHA library if not already loaded.
+       * @returns {Promise<void>} Promise that resolves when Turnstile is ready
+       */
       async loadTurnstile() {
         if (window.turnstile) {
           this.turnstileLoaded = true;
@@ -5047,6 +5092,11 @@
           }
         });
       },
+      /**
+       * Generate a Turnstile token for painting operations.
+       * @param {string} sitekey - Cloudflare sitekey for Turnstile verification
+       * @returns {Promise<string|null>} Promise resolving to the generated token or null on failure
+       */
       async generatePaintToken(sitekey) {
         return this.executeTurnstile(sitekey, "paint");
       },
@@ -5071,6 +5121,11 @@
         this._turnstileOverlay = null;
         this._lastSitekey = null;
       },
+      /**
+       * Detect the Cloudflare Turnstile sitekey from the current page.
+       * @param {string} [fallback='0x4AAAAAABpqJe8FO0N84q0F'] - Fallback sitekey if detection fails
+       * @returns {string} The detected or fallback sitekey
+       */
       detectSitekey(fallback = "0x4AAAAAABpqJe8FO0N84q0F") {
         var _a;
         if (this._cachedSitekey) {
@@ -5198,7 +5253,12 @@
           button.addEventListener("click", onClick);
         return button;
       },
-      // Synchronous translation function for UI rendering
+      /**
+       * Synchronous translation function for UI rendering with parameter substitution.
+       * @param {string} key - Translation key to look up
+       * @param {Object} [params={}] - Parameters to substitute in the translation string
+       * @returns {string} Translated and parameterized text, or the key if not found
+       */
       t: (key, params = {}) => {
         var _a, _b, _c, _d;
         const cacheKey = `${state.language}_${key}`;
@@ -5238,6 +5298,11 @@
         }
         return text;
       },
+      /**
+       * Display a temporary alert notification to the user.
+       * @param {string} message - The message to display
+       * @param {string} [type='info'] - Alert type: 'info', 'success', 'warning', or 'error'
+       */
       showAlert: (message, type = "info") => {
         const alertDiv = document.createElement("div");
         alertDiv.className = `wplace-alert-base wplace-alert-${type}`;
@@ -5250,11 +5315,24 @@
           }, 300);
         }, 4e3);
       },
+      /**
+       * Calculate Euclidean distance between two RGB colors.
+       * @param {Array<number>} a - First RGB color as [r, g, b]
+       * @param {Array<number>} b - Second RGB color as [r, g, b]
+       * @returns {number} Distance between the colors
+       */
       colorDistance: (a, b) => Math.sqrt(
         Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2) + Math.pow(a[2] - b[2], 2)
       ),
       _labCache: /* @__PURE__ */ new Map(),
       // key: (r<<16)|(g<<8)|b  value: [L,a,b]
+      /**
+       * Convert RGB color to CIE LAB color space for perceptual color matching.
+       * @param {number} r - Red channel (0-255)
+       * @param {number} g - Green channel (0-255)
+       * @param {number} b - Blue channel (0-255)
+       * @returns {Array<number>} LAB color as [L, a, b] where L is lightness, a and b are color-opponent dimensions
+       */
       _rgbToLab: (r, g, b) => {
         const srgbToLinear = (v) => {
           v /= 255;
@@ -5276,6 +5354,13 @@
         const b2 = 200 * (fY - fZ);
         return [L, a, b2];
       },
+      /**
+       * Get LAB color values with caching for performance optimization.
+       * @param {number} r - Red channel (0-255)
+       * @param {number} g - Green channel (0-255)
+       * @param {number} b - Blue channel (0-255)
+       * @returns {Array<number>} Cached LAB color as [L, a, b]
+       */
       _lab: (r, g, b) => {
         const key = r << 16 | g << 8 | b;
         let v = Utils._labCache.get(key);
@@ -5285,6 +5370,15 @@
         }
         return v;
       },
+      /**
+       * Find the perceptually closest color from the available palette.
+       * Uses LAB color space for accurate perceptual distance calculation.
+       * @param {number} r - Red channel (0-255) of target color
+       * @param {number} g - Green channel (0-255) of target color
+       * @param {number} b - Blue channel (0-255) of target color
+       * @param {Array<Array<number>>} [palette] - Array of RGB triplets [[r,g,b], ...]. Uses CONFIG.COLOR_MAP if not provided
+       * @returns {Array<number>} The closest palette color as [r, g, b] RGB triplet
+       */
       findClosestPaletteColor: (r, g, b, palette) => {
         if (!palette || palette.length === 0) {
           palette = Object.values(CONFIG.COLOR_MAP).filter((c) => c.rgb).map((c) => [c.rgb.r, c.rgb.g, c.rgb.b]);
@@ -5433,6 +5527,11 @@
         console.log("=== END COLOR STATUS ===");
         return availableColors;
       },
+      /**
+       * Format milliseconds into human-readable time string.
+       * @param {number} ms - Time in milliseconds
+       * @returns {string} Formatted time string (e.g., "2h 30m 15s" or "45s")
+       */
       formatTime: (ms) => {
         const seconds = Math.floor(ms / 1e3 % 60);
         const minutes = Math.floor(ms / (1e3 * 60) % 60);
@@ -5448,6 +5547,13 @@
         result += `${seconds}s`;
         return result;
       },
+      /**
+       * Calculate estimated completion time based on remaining pixels and charges.
+       * @param {number} remainingPixels - Number of pixels left to paint
+       * @param {number} charges - Available charges
+       * @param {number} cooldown - Cooldown time per charge in milliseconds
+       * @returns {number} Estimated time in milliseconds
+       */
       calculateEstimatedTime: (remainingPixels, charges, cooldown) => {
         if (remainingPixels <= 0)
           return 0;
