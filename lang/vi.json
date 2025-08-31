@@ -137,5 +137,8 @@
   "expandMode": "Chế độ mở rộng",
   "minimize": "Thu nhỏ",
   "restore": "Khôi phục",
-  "hideStats": "Ẩn thống kê"
+  "hideStats": "Ẩn thống kê",
+  "paintOptions": "Tùy chọn vẽ",
+  "paintWhitePixels": "Vẽ điểm ảnh trắng",
+  "paintTransparentPixels": "Vẽ điểm ảnh trong suốt"
 }
