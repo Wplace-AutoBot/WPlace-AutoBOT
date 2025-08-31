@@ -1,15 +1,34 @@
 ; (async () => {
-  // Base URL configuration - checks localStorage first, falls back to GitHub
+  /**
+   * Gets the base URL for loading external resources (CSS, translations, etc.)
+   * Checks localStorage first for custom URL, validates it for security, then falls back to GitHub
+   * @returns {string} Base URL without trailing slash
+   */
+  let cachedBaseUrl = null;
   const getBaseUrl = () => {
+    if (cachedBaseUrl) {
+      return cachedBaseUrl;
+    }
+
     try {
       const customBaseUrl = localStorage.getItem('wplace-bot-base-url');
-      if (customBaseUrl) {
-        return customBaseUrl.endsWith('/') ? customBaseUrl.slice(0, -1) : customBaseUrl;
+      if (customBaseUrl && customBaseUrl.trim()) {
+        // Validate URL for security
+        const url = new URL(customBaseUrl.trim());
+        if (!['http:', 'https:'].includes(url.protocol)) {
+          console.warn('Invalid protocol in custom base URL, using default');
+          cachedBaseUrl = 'https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/main';
+          return cachedBaseUrl;
+        }
+        cachedBaseUrl = customBaseUrl.endsWith('/') ? customBaseUrl.slice(0, -1) : customBaseUrl;
+        return cachedBaseUrl;
       }
     } catch (e) {
-      console.warn('Could not access localStorage for base URL:', e);
+      console.warn('Could not access or validate localStorage base URL:', e);
     }
-    return 'https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/main';
+    
+    cachedBaseUrl = 'https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/main';
+    return cachedBaseUrl;
   };
 
   // CONFIGURATION CONSTANTS
@@ -308,25 +327,21 @@ function applyTheme() {
       }
       
       const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      const translations = await response.json();
-      if (
-        typeof translations === "object" &&
-        translations !== null &&
-        Object.keys(translations).length > 0
-      ) {
-        loadedTranslations[language] = translations;
-        console.log(
-          `📚 Loaded ${language} translations successfully from CDN (${Object.keys(
-            translations
-          ).length} keys)`
-        );
-        return translations;
+      if (response.ok) {
+        const translations = await response.json();
+        
+        // Validate that translations is an object with keys
+        if (typeof translations === 'object' && translations !== null && Object.keys(translations).length > 0) {
+          loadedTranslations[language] = translations;
+          console.log(`📚 Loaded ${language} translations successfully from CDN (${Object.keys(translations).length} keys)`);
+          return translations;
+        } else {
+          console.warn(`❌ Invalid translation format for ${language}`);
+          throw new Error('Invalid translation format');
+        }
       } else {
-        console.warn(`❌ Invalid translation format for ${language}`);
-        throw new Error("Invalid translation format");
+        console.warn(`❌ CDN returned HTTP ${response.status}: ${response.statusText} for ${language} translations`);
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
     } catch (error) {
       console.error(`❌ Failed to load ${language} translations from CDN (attempt ${retryCount + 1}):`, error);
