@@ -1156,11 +1156,8 @@ function applyTheme() {
             resolve(style);
           } catch (fallbackError) {
             console.warn(`CSS fallback failed for ${url}:`, fallbackError);
-            if (critical) {
-              reject(new Error(`Critical CSS failed to load: ${url}`));
-            } else {
-              resolve(null);
-            }
+            // Always reject so Promise.allSettled can detect failures
+            reject(new Error(`CSS failed to load: ${url} (${errorMsg})`));
           }
         };
 
@@ -2959,6 +2956,45 @@ function applyTheme() {
         }
       }, 15000);
     }
+
+    // Final fallback: Check if any WPlace styles are actually applied
+    setTimeout(() => {
+      const testElement = document.querySelector('#wplace-image-bot-container');
+      if (testElement) {
+        const computedStyle = window.getComputedStyle(testElement);
+        const hasWPlaceStyles = computedStyle.getPropertyValue('--wplace-primary') || 
+                               computedStyle.position === 'fixed' ||
+                               computedStyle.zIndex > 1000;
+        
+        if (!hasWPlaceStyles) {
+          console.error('❌ WPlace styles not detected - CSS likely blocked');
+          
+          // Show emergency popup
+          const emergencyPopup = document.createElement('div');
+          emergencyPopup.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #ff0000;
+            color: white;
+            padding: 15px;
+            border: 2px solid white;
+            font-family: Arial, sans-serif;
+            font-size: 13px;
+            z-index: 999999;
+            max-width: 300px;
+            border-radius: 5px;
+          `;
+          emergencyPopup.innerHTML = `
+            <strong>🚨 WPlace Bot CSS Blocked!</strong><br>
+            Styles failed to load. Force reload:<br>
+            <strong>Ctrl + Shift + R</strong><br>
+            <button onclick="this.parentNode.remove()" style="margin-top:5px;background:white;color:red;border:none;padding:3px 6px;cursor:pointer;">X</button>
+          `;
+          document.body.appendChild(emergencyPopup);
+        }
+      }
+    }, 2000); // Check after 2 seconds
 
     const container = document.createElement("div")
     container.id = "wplace-image-bot-container"
