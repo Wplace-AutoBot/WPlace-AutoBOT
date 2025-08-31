@@ -117,8 +117,36 @@ npm run dev:tunnel
 - `npm run format` - Format code with Prettier
 - `npm run format:check` - Check code formatting
 
+### Documentation
+- `npm run docs:api` - Generate API documentation from JSDoc comments
+
 ### Utilities
 - `npm run clean` - Clean dist directory
+
+## Prerequisites
+
+### System Requirements
+- **Node.js 18+** - Required for build tools and development server
+- **Modern browser** - Chrome, Firefox, or Safari
+- **Cloudflared** (optional) - For tunnel testing on wplace.live
+
+### Browser Setup for Testing
+- Use a **trusted browser profile** that doesn't trigger excessive CAPTCHA challenges
+- Ensure browser allows local HTTP requests (for development server)
+- Consider disabling ad blockers temporarily if they interfere with Turnstile
+
+## Testing on wplace.live
+
+### Important Notes
+- Testing **must** occur on https://wplace.live with a trusted browser profile
+- Turnstile CAPTCHA challenges must not be blocked by your setup
+- Use the development server to inject local builds into the live page
+
+### Debug Mode
+Enable verbose logging by setting in browser console:
+```javascript
+window._overlayDebug = true;
+```
 
 ## Bookmarklet for Testing
 
