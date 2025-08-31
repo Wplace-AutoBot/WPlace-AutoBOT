@@ -316,7 +316,9 @@ function applyTheme() {
       return loadedTranslations[language];
     }
 
-    const url = `${getBaseUrl()}/lang/${language}.json`;
+    // Add cache-busting to bypass service worker and browser cache
+    const baseUrl = `${getBaseUrl()}/lang/${language}.json`;
+    const url = `${baseUrl}${baseUrl.includes('?') ? '&' : '?'}v=${Date.now()}`;
     const maxRetries = 3;
     const baseDelay = 1000; // 1 second
     
@@ -327,7 +329,9 @@ function applyTheme() {
         console.log(`🔄 Retrying ${language} translations (attempt ${retryCount + 1}/${maxRetries + 1})...`);
       }
       
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        cache: 'no-cache'
+      });
       if (response.ok) {
         const translations = await response.json();
         
@@ -1125,7 +1129,11 @@ function applyTheme() {
      */
     async loadCSS(url, attrs = {}, critical = false) {
       const loadAsInline = async () => {
-        const res = await fetch(url);
+        // Add cache-busting to bypass service worker and browser cache
+        const cacheBustedUrl = `${url}${url.includes('?') ? '&' : '?'}v=${Date.now()}`;
+        const res = await fetch(cacheBustedUrl, {
+          cache: 'no-cache'
+        });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const css = await res.text();
         const style = document.createElement("style");
@@ -1138,7 +1146,8 @@ function applyTheme() {
       return new Promise((resolve, reject) => {
         const link = document.createElement("link");
         link.rel = "stylesheet";
-        link.href = url;
+        // Add cache-busting to bypass service worker and browser cache
+        link.href = `${url}${url.includes('?') ? '&' : '?'}v=${Date.now()}`;
         Object.entries(attrs).forEach(([k, v]) => link.setAttribute(k, v));
         
         const handleError = async (errorMsg) => {
