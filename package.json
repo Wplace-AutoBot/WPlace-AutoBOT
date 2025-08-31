@@ -10,6 +10,8 @@
         "build:userscript": "node build/esbuild.config.js --target=userscript",
         "build:standalone": "node build/esbuild.config.js --target=standalone",
         "build:all": "node build/esbuild.config.js --target=all",
+        "dev:userscript": "node build/esbuild.config.js --target=userscript --watch",
+        "dev:standalone": "node build/esbuild.config.js --target=standalone --watch",
         "format": "prettier --ignore-path .gitignore --ignore-path .prettierignore --ignore-unknown --write .",
         "format:check": "prettier --ignore-path .gitignore --ignore-path .prettierignore --ignore-unknown --check .",
         "clean": "rm -rf dist/*"
