@@ -54,8 +54,21 @@
           event.respondWith(
             (async () => {
               try {
-                // Get base URL from localStorage (if available in SW context)
+                // Get base URL from localStorage - service workers can't access localStorage directly
+                // So we'll pass it via postMessage or use IndexedDB, but for now use URL search params
                 let baseUrl = 'https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/main';
+                
+                // Try to get baseUrl from the request URL if it was passed as a parameter
+                const requestUrl = new URL(event.request.url);
+                const customBase = requestUrl.searchParams.get('_baseUrl');
+                if (customBase) {
+                  try {
+                    const decodedBase = decodeURIComponent(customBase);
+                    baseUrl = decodedBase;
+                  } catch (e) {
+                    console.warn('SW: Invalid baseUrl parameter');
+                  }
+                }
                 
                 // Build the correct URL with our baseUrl
                 const resourcePath = url.pathname.split('/').pop(); // Get filename
@@ -423,7 +436,10 @@ function applyTheme() {
         console.log(`🔄 Retrying ${language} translations (attempt ${retryCount + 1}/${maxRetries + 1})...`);
       }
       
-      const response = await fetch(url);
+      // Add baseUrl to the request so service worker can use it
+      const baseUrl = getBaseUrl();
+      const urlWithBase = `${url}${url.includes('?') ? '&' : '?'}_baseUrl=${encodeURIComponent(baseUrl)}`;
+      const response = await fetch(urlWithBase);
       if (response.ok) {
         const translations = await response.json();
         
@@ -1221,7 +1237,10 @@ function applyTheme() {
      */
     async loadCSS(url, attrs = {}, critical = false) {
       const loadAsInline = async () => {
-        const res = await fetch(url);
+        // Add baseUrl to the request so service worker can use it
+        const baseUrl = getBaseUrl();
+        const urlWithBase = `${url}${url.includes('?') ? '&' : '?'}_baseUrl=${encodeURIComponent(baseUrl)}`;
+        const res = await fetch(urlWithBase);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const css = await res.text();
         const style = document.createElement("style");
@@ -1234,7 +1253,9 @@ function applyTheme() {
       return new Promise((resolve, reject) => {
         const link = document.createElement("link");
         link.rel = "stylesheet";
-        link.href = url;
+        // Add baseUrl to the request so service worker can use it
+        const baseUrl = getBaseUrl();
+        link.href = `${url}${url.includes('?') ? '&' : '?'}_baseUrl=${encodeURIComponent(baseUrl)}`;
         Object.entries(attrs).forEach(([k, v]) => link.setAttribute(k, v));
         
         const handleError = async (errorMsg) => {
