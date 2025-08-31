@@ -3640,16 +3640,55 @@
             <i class="fas fa-paint-brush wplace-icon-paint"></i>
             ${Utils.t('paintOptions')}
           </label>
-          <div class="wplace-settings-section-wrapper wplace-notifications-wrapper">
-            <!-- Paint White Pixels Toggle -->
-            <label class="wplace-notification-toggle">
-              <span>${Utils.t('paintWhitePixels')}</span>
-              <input type="checkbox" id="settingsPaintWhiteToggle" ${state.paintWhitePixels ? 'checked' : ''} class="wplace-notification-checkbox" />
+          <!-- Pixel Filter Toggles -->
+          <div id="pixelFilterControls" class="wplace-settings-section-wrapper wplace-pixel-filter-controls">
+            <!-- Paint White Pixels -->
+            <label class="wplace-settings-toggle">
+              <div>
+                <span class="wplace-settings-toggle-title" style="color: ${theme.text || 'white'};">
+                  ${Utils.t('paintWhitePixels')}
+                </span>
+                <p class="wplace-settings-toggle-description" style="color: ${
+                  theme.text ? `${theme.text}BB` : 'rgba(255,255,255,0.7)'
+                };">
+                  ${Utils.t('paintWhitePixelsDescription')}
+                </p>
+              </div>
+              <input type="checkbox" id="settingsPaintWhiteToggle" ${state.paintWhitePixels ? 'checked' : ''} 
+                class="wplace-settings-checkbox"
+                style="accent-color: ${theme.highlight || '#48dbfb'};"/>
             </label>
-            <!-- Paint Transparent Pixels Toggle -->
-            <label class="wplace-notification-toggle">
-              <span>${Utils.t('paintTransparentPixels')}</span>
-              <input type="checkbox" id="settingsPaintTransparentToggle" ${state.paintTransparentPixels ? 'checked' : ''} class="wplace-notification-checkbox" />
+            
+            <!-- Paint Transparent Pixels -->
+            <label class="wplace-settings-toggle">
+              <div>
+                <span class="wplace-settings-toggle-title" style="color: ${theme.text || 'white'};">
+                  ${Utils.t('paintTransparentPixels')}
+                </span>
+                <p class="wplace-settings-toggle-description" style="color: ${
+                  theme.text ? `${theme.text}BB` : 'rgba(255,255,255,0.7)'
+                };">
+                  ${Utils.t('paintTransparentPixelsDescription')}
+                </p>
+              </div>
+              <input type="checkbox" id="settingsPaintTransparentToggle" ${state.paintTransparentPixels ? 'checked' : ''} 
+                class="wplace-settings-checkbox"
+                style="accent-color: ${theme.highlight || '#48dbfb'};"/>
+            </label>
+            <label class="wplace-settings-toggle">
+              <div>
+                <span class="wplace-settings-toggle-title" style="color: ${
+                  theme.text || 'white'
+                };">${Utils.t('paintUnavailablePixels')}</span>
+                <p class="wplace-settings-toggle-description" style="color: ${
+                  theme.text ? `${theme.text}BB` : 'rgba(255,255,255,0.7)'
+                };">${Utils.t('paintUnavailablePixelsDescription')}</p>
+              </div>
+              <input type="checkbox" id="paintUnavailablePixelsToggle" ${
+                state.paintUnavailablePixels ? 'checked' : ''
+              } class="wplace-settings-checkbox" style="
+                    accent-color: ${theme.highlight || '#48dbfb'};
+                  "/>
             </label>
           </div>
         </div>
@@ -3796,25 +3835,6 @@
             </p>
           </div>
         </div>
-        
-          <!-- Pixel Filter Toggles -->
-          <div id="pixelFilterControls" class="wplace-pixel-filter-controls wplace-settings-section-wrapper">
-            <label class="wplace-settings-toggle">
-              <div>
-                <span class="wplace-settings-toggle-title" style="color: ${
-                  theme.text || 'white'
-                };">Paint Unavailable</span>
-                <p class="wplace-settings-toggle-description" style="color: ${
-                  theme.text ? `${theme.text}BB` : 'rgba(255,255,255,0.7)'
-                };">If enabled, template colors that are unavailable will be painted using the closest available color</p>
-              </div>
-              <input type="checkbox" id="paintUnavailablePixelsToggle" ${
-                state.paintUnavailablePixels ? 'checked' : ''
-              } class="wplace-settings-checkbox" style="
-                    accent-color: ${theme.highlight || '#48dbfb'};
-                  "/>
-            </label>
-          </div>
         
         <!-- Notifications Section -->
         <div class="wplace-settings-section">
@@ -4587,16 +4607,30 @@
       }
 
       if (settingsPaintWhiteToggle) {
+        settingsPaintWhiteToggle.checked = state.paintWhitePixels;
         settingsPaintWhiteToggle.addEventListener('change', (e) => {
           state.paintWhitePixels = e.target.checked;
           saveBotSettings();
+          console.log(`🎨 Paint white pixels: ${state.paintWhitePixels ? 'ON' : 'OFF'}`);
+          const statusText = state.paintWhitePixels
+            ? 'White pixels in the template will be painted'
+            : 'White pixels will be skipped';
+          Utils.showAlert(statusText, 'success');
         });
       }
 
       if (settingsPaintTransparentToggle) {
+        settingsPaintTransparentToggle.checked = state.paintTransparentPixels;
         settingsPaintTransparentToggle.addEventListener('change', (e) => {
           state.paintTransparentPixels = e.target.checked;
           saveBotSettings();
+          console.log(
+            `🎨 Paint transparent pixels: ${state.paintTransparentPixels ? 'ON' : 'OFF'}`
+          );
+          const statusText = state.paintTransparentPixels
+            ? 'Transparent pixels in the template will be painted with the closest available color'
+            : 'Transparent pixels will be skipped';
+          Utils.showAlert(statusText, 'success');
         });
       }
 
@@ -6769,6 +6803,7 @@
     const { x: startX, y: startY } = state.startPosition;
     const { x: regionX, y: regionY } = state.region;
 
+    // todo force load tiles
     const tilesReady = await overlayManager.waitForTiles(
       regionX,
       regionY,
@@ -6780,7 +6815,6 @@
     );
 
     if (!tilesReady) {
-      // todo add to i18n
       updateUI('overlayTilesNotLoaded', 'error');
       state.stopFlag = true;
       return;
@@ -7413,6 +7447,18 @@
       const paintUnavailablePixelsToggle = document.getElementById('paintUnavailablePixelsToggle');
       if (paintUnavailablePixelsToggle) {
         paintUnavailablePixelsToggle.checked = state.paintUnavailablePixels;
+      }
+
+      const settingsPaintWhiteToggle = settingsContainer.querySelector('#settingsPaintWhiteToggle');
+      if (settingsPaintWhiteToggle) {
+        settingsPaintWhiteToggle.checked = state.paintWhitePixels;
+      }
+
+      const settingsPaintTransparentToggle = settingsContainer.querySelector(
+        '#settingsPaintTransparentToggle'
+      );
+      if (settingsPaintTransparentToggle) {
+        settingsPaintTransparentToggle.checked = state.paintTransparentPixels;
       }
 
       const speedSlider = document.getElementById('speedSlider');

@@ -1905,6 +1905,9 @@
 .wplace-pixel-filter-controls {
   padding: 18px;
   margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   /* Theme-specific styling applied via theme files */
 }
 

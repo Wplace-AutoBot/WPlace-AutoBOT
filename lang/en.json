@@ -145,6 +145,10 @@
   "restore": "Restore",
   "hideStats": "Hide Stats",
   "paintOptions": "Paint Options",
-  "paintWhitePixels": "Paint White Pixels",
-  "paintTransparentPixels": "Paint Transparent Pixels"
+  "paintWhitePixels": "Paint White",
+  "paintWhitePixelsDescription": "If enabled, template white pixels will be painted.",
+  "paintTransparentPixels": "Paint Transparent",
+  "paintTransparentPixelsDescription": "If enabled, template transparent pixels will be painted",
+  "paintUnavailablePixels": "Paint Unavailable",
+  "paintUnavailablePixelsDescription": "If enabled, template colors that are unavailable will be painted using the closest available color"
 }
