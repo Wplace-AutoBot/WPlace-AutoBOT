@@ -3309,25 +3309,37 @@
     const theme = getCurrentTheme();
     applyTheme(); // <- new: set CSS vars and theme class before building UI
 
-    const fontAwesome = document.createElement('link');
-    fontAwesome.rel = 'stylesheet';
-    fontAwesome.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
-    document.head.appendChild(fontAwesome);
+    function appendLinkOnce(href, attributes = {}) {
+      // Check if a link with the same href already exists in the document head
+      const exists = Array.from(document.head.querySelectorAll('link')).some(
+        (link) => link.href === href
+      );
+      if (exists) return;
 
-    if (theme.fontFamily.includes('Press Start 2P')) {
-      const googleFonts = document.createElement('link');
-      googleFonts.rel = 'stylesheet';
-      googleFonts.href = 'https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap';
-      document.head.appendChild(googleFonts);
+      // Create a new link element
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = href;
+
+      // Add any additional attributes (e.g., data-* attributes)
+      for (const [key, value] of Object.entries(attributes)) {
+        link.setAttribute(key, value);
+      }
+
+      // Append the link element to the document head
+      document.head.appendChild(link);
     }
 
-    // Link external CSS files
-    const cssLink = document.createElement('link');
-    cssLink.rel = 'stylesheet';
-    cssLink.href =
-      'https://skalsech.github.io/WPlace-AutoBOT/feat-external-lang/auto-image-styles.css';
-    cssLink.setAttribute('data-wplace-theme', 'true');
-    document.head.appendChild(cssLink);
+    appendLinkOnce('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+
+    if (theme.fontFamily.includes('Press Start 2P')) {
+      appendLinkOnce('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+    }
+
+    appendLinkOnce(
+      'https://skalsech.github.io/WPlace-AutoBOT/feat-external-lang/auto-image-styles.css',
+      { 'data-wplace-theme': 'true' }
+    );
 
     const container = document.createElement('div');
     container.id = 'wplace-image-bot-container';
