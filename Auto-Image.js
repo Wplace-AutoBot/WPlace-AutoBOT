@@ -1100,32 +1100,46 @@ function applyTheme() {
       return null;
     },
 
-    // Simple CSS loader with fallback for ORB issues
-    // Based on research: GitHub's raw.githubusercontent.com has 5+ min caching, 
-    // cache-busting params don't work anymore, and /refs/heads/ paths can cause issues
-    async loadCSS(url, attrs = {}) {
-      return new Promise((resolve) => {
+    /**
+     * Loads CSS with fallback for cross-origin restrictions
+     * @param {string} url - CSS file URL
+     * @param {Object} attrs - HTML attributes to set
+     * @param {boolean} critical - Whether to throw on failure (default: false)
+     * @returns {Promise<HTMLElement|null>} Link or style element
+     */
+    async loadCSS(url, attrs = {}, critical = false) {
+      const loadAsInline = async () => {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const css = await res.text();
+        const style = document.createElement("style");
+        Object.entries(attrs).forEach(([k, v]) => style.setAttribute(k, v));
+        style.textContent = css;
+        document.head.appendChild(style);
+        return style;
+      };
+
+      return new Promise((resolve, reject) => {
         const link = document.createElement("link");
         link.rel = "stylesheet";
         link.href = url;
         Object.entries(attrs).forEach(([k, v]) => link.setAttribute(k, v));
         
-        const timeout = setTimeout(() => {
-          // If link doesn't load in 3 seconds, try fetching as text
-          fetch(url)
-            .then(res => res.text())
-            .then(css => {
-              const style = document.createElement("style");
-              Object.entries(attrs).forEach(([k, v]) => style.setAttribute(k, v));
-              style.textContent = css;
-              document.head.appendChild(style);
-              resolve(style);
-            })
-            .catch(() => {
-              console.warn("CSS loading failed for", url);
+        const handleError = async (errorMsg) => {
+          try {
+            const style = await loadAsInline();
+            resolve(style);
+          } catch (fallbackError) {
+            console.warn(`CSS fallback failed for ${url}:`, fallbackError);
+            if (critical) {
+              reject(new Error(`Critical CSS failed to load: ${url}`));
+            } else {
               resolve(null);
-            });
-        }, 3000);
+            }
+          }
+        };
+
+        const timeout = setTimeout(() => handleError("timeout"), 3000);
 
         link.onload = () => {
           clearTimeout(timeout);
@@ -1134,20 +1148,7 @@ function applyTheme() {
         
         link.onerror = () => {
           clearTimeout(timeout);
-          // Try fallback method immediately on error
-          fetch(url)
-            .then(res => res.text())
-            .then(css => {
-              const style = document.createElement("style");
-              Object.entries(attrs).forEach(([k, v]) => style.setAttribute(k, v));
-              style.textContent = css;
-              document.head.appendChild(style);
-              resolve(style);
-            })
-            .catch(() => {
-              console.warn("CSS fallback failed for", url);
-              resolve(null);
-            });
+          handleError("link error");
         };
 
         document.head.appendChild(link);
@@ -2796,10 +2797,10 @@ function applyTheme() {
       );
     }
 
-    // Main stylesheet from GitHub Raw
+    // Main stylesheet from GitHub Raw (critical - will throw on failure)
     await Utils.loadCSS(`${getBaseUrl()}/auto-image-styles.css`, {
       "data-wplace-theme": "true"
-    });
+    }, true);
 
     // Theme CSS files from GitHub Raw
     const themeFiles = ['classic.css', 'classic-light.css', 'neon.css'];
