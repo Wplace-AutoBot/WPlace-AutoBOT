@@ -137,5 +137,8 @@
   "expandMode": "Mode Étendu",
   "minimize": "Réduire",
   "restore": "Restaurer",
-  "hideStats": "Masquer les Stats"
+  "hideStats": "Masquer les Stats",
+  "paintOptions": "Options de peinture",
+  "paintWhitePixels": "Peindre les pixels blancs",
+  "paintTransparentPixels": "Peindre les pixels transparents"
 }

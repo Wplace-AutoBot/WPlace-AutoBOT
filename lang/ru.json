@@ -136,5 +136,8 @@
   "expandMode": "Режим расширения",
   "minimize": "Свернуть",
   "restore": "Восстановить",
-  "hideStats": "Скрыть статистику"
+  "hideStats": "Скрыть статистику",
+  "paintOptions": "Параметры рисования",
+  "paintWhitePixels": "Рисовать белые пиксели",
+  "paintTransparentPixels": "Рисовать прозрачные пиксели"
 }

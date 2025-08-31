@@ -1117,6 +1117,10 @@
   font-size: 16px;
 }
 
+.wplace-icon-paint {
+  font-size: 16px;
+}
+
 /* Section wrapper styling */
 .wplace-settings-section-wrapper {
   padding: 18px;
@@ -1814,6 +1818,7 @@
 .wplace-icon-bell { font-size: 16px; }
 .wplace-icon-palette { font-size: 16px; }
 .wplace-icon-globe { font-size: 16px; }
+.wplace-icon-paint { font-size: 16px; }
 .wplace-icon-eye { font-size: 16px; }
 
 /* Overlay Settings Controls */
