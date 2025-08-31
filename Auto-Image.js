@@ -1,17 +1,4 @@
 ; (async () => {
-  // Base URL configuration - checks localStorage first, falls back to GitHub
-  const getBaseUrl = () => {
-    try {
-      const customBaseUrl = localStorage.getItem('wplace-bot-base-url');
-      if (customBaseUrl) {
-        return customBaseUrl.endsWith('/') ? customBaseUrl.slice(0, -1) : customBaseUrl;
-      }
-    } catch (e) {
-      console.warn('Could not access localStorage for base URL:', e);
-    }
-    return 'https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/main';
-  };
-
   // CONFIGURATION CONSTANTS
   const CONFIG = {
     COOLDOWN_DEFAULT: 31000,
@@ -296,7 +283,8 @@ function applyTheme() {
       return loadedTranslations[language];
     }
 
-    const url = `${getBaseUrl()}/lang/${language}.json`;
+    // Load translations from CDN
+    const url = `https://staninna.github.io/WPlace-AutoBOT/decoupled-translations/lang/${language}.json`;
     const maxRetries = 3;
     const baseDelay = 1000; // 1 second
     
@@ -2742,19 +2730,9 @@ function applyTheme() {
     // Link external CSS files
     const cssLink = document.createElement('link');
     cssLink.rel = 'stylesheet';
-    cssLink.href = `${getBaseUrl()}/auto-image-styles.css`;
+    cssLink.href = 'https://staninna.github.io/WPlace-AutoBOT/decoupled-css/auto-image-styles.css'; // TODO: Before merge change to https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/auto-image-styles.css
     cssLink.setAttribute('data-wplace-theme', 'true');
     document.head.appendChild(cssLink);
-
-    // Dynamically load theme CSS files using base URL
-    const themeFiles = ['classic.css', 'classic-light.css', 'neon.css'];
-    themeFiles.forEach(themeFile => {
-      const themeLink = document.createElement('link');
-      themeLink.rel = 'stylesheet';
-      themeLink.href = `${getBaseUrl()}/themes/${themeFile}`;
-      themeLink.setAttribute('data-wplace-theme-file', themeFile);
-      document.head.appendChild(themeLink);
-    });
 
     const container = document.createElement("div")
     container.id = "wplace-image-bot-container"
