@@ -1923,15 +1923,3 @@
   color: var(--wplace-icon-palette);
   margin-right: 6px;
 }
-
-.wplace-selector {
-  width: 100%;
-  padding: 10px 12px;
-  background: var(--wplace-bg-input);
-  color: var(--wplace-text);
-  border: 1px solid var(--wplace-border-subtle);
-  border-radius: 8px;
-  font-size: 13px;
-  outline: none;
-  cursor: pointer;
-}

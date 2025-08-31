@@ -242,22 +242,22 @@
       } catch {}
     };
 
-    // setVar('--wplace-primary', theme.primary);
-    // setVar('--wplace-secondary', theme.secondary);
-    // setVar('--wplace-accent', theme.accent);
-    // setVar('--wplace-text', theme.text);
-    // setVar('--wplace-highlight', theme.highlight);
-    // setVar('--wplace-success', theme.success);
-    // setVar('--wplace-error', theme.error);
-    // setVar('--wplace-warning', theme.warning);
-    //
-    // // Typography + look
-    // setVar('--wplace-font', theme.fontFamily || "'Segoe UI', Roboto, sans-serif");
-    // setVar('--wplace-radius', '' + (theme.borderRadius || '12px'));
-    // setVar('--wplace-border-style', '' + (theme.borderStyle || 'solid'));
-    // setVar('--wplace-border-width', '' + (theme.borderWidth || '1px'));
-    // setVar('--wplace-backdrop', '' + (theme.backdropFilter || 'blur(10px)'));
-    // setVar('--wplace-border-color', 'rgba(255,255,255,0.1)');
+    setVar('--wplace-primary', theme.primary);
+    setVar('--wplace-secondary', theme.secondary);
+    setVar('--wplace-accent', theme.accent);
+    setVar('--wplace-text', theme.text);
+    setVar('--wplace-highlight', theme.highlight);
+    setVar('--wplace-success', theme.success);
+    setVar('--wplace-error', theme.error);
+    setVar('--wplace-warning', theme.warning);
+
+    // Typography + look
+    setVar('--wplace-font', theme.fontFamily || "'Segoe UI', Roboto, sans-serif");
+    setVar('--wplace-radius', '' + (theme.borderRadius || '12px'));
+    setVar('--wplace-border-style', '' + (theme.borderStyle || 'solid'));
+    setVar('--wplace-border-width', '' + (theme.borderWidth || '1px'));
+    setVar('--wplace-backdrop', '' + (theme.backdropFilter || 'blur(10px)'));
+    setVar('--wplace-border-color', 'rgba(255,255,255,0.1)');
   }
 
   const saveThemePreference = () => {
@@ -3706,7 +3706,7 @@
               <i class="fas fa-dice wplace-icon-dice"></i>
               Batch Mode
             </label>
-            <select id="batchModeSelect" class="wplace-selector">
+            <select id="batchModeSelect" class="wplace-settings-select">
               <option value="normal" class="wplace-settings-option">📦 Normal (Fixed Size)</option>
               <option value="random" class="wplace-settings-option">🎲 Random (Range)</option>
             </select>
@@ -3769,7 +3769,7 @@
               <i class="fas fa-th wplace-icon-table"></i>
               Generation Mode
             </label>
-            <select id="coordinateModeSelect" class="wplace-selector">
+            <select id="coordinateModeSelect" class="wplace-settings-select">
               <option value="rows" class="wplace-settings-option">📏 Rows (Horizontal Lines)</option>
               <option value="columns" class="wplace-settings-option">📐 Columns (Vertical Lines)</option>
               <option value="circle-out" class="wplace-settings-option">⭕ Circle Out (Center → Edges)</option>
@@ -3785,7 +3785,7 @@
               <i class="fas fa-compass wplace-icon-compass"></i>
               Starting Direction
             </label>
-            <select id="coordinateDirectionSelect" class="wplace-selector">
+            <select id="coordinateDirectionSelect" class="wplace-settings-select">
               <option value="top-left" class="wplace-settings-option">↖️ Top-Left</option>
               <option value="top-right" class="wplace-settings-option">↗️ Top-Right</option>
               <option value="bottom-left" class="wplace-settings-option">↙️ Bottom-Left</option>
@@ -3923,10 +3923,7 @@
       </div>
 
         <div class="wplace-settings-footer">
-             <button id="applySettingsBtn" class="wplace-settings-apply-btn" style="
-              width: 100%;
-                ${CONFIG.CSS_CLASSES.BUTTON_PRIMARY}
-          ">
+             <button id="applySettingsBtn" class="wplace-settings-apply-btn">
                  <i class="fas fa-check"></i> ${Utils.t('applySettings')}
           </button>
         </div>
