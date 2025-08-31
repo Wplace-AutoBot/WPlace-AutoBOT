@@ -137,5 +137,8 @@
   "expandMode": "展开模式",
   "minimize": "最小化",
   "restore": "恢复",
-  "hideStats": "隐藏统计"
+  "hideStats": "隐藏统计",
+  "paintOptions": "绘图选项",
+  "paintWhitePixels": "绘制白色像素",
+  "paintTransparentPixels": "绘制透明像素"
 }

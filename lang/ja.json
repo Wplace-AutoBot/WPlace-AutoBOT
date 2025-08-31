@@ -137,5 +137,8 @@
   "expandMode": "展開モード",
   "minimize": "最小化",
   "restore": "復元",
-  "hideStats": "統計を非表示"
+  "hideStats": "統計を非表示",
+  "paintOptions": "描画オプション",
+  "paintWhitePixels": "白いピクセルを描画",
+  "paintTransparentPixels": "透明ピクセルを描画"
 }
