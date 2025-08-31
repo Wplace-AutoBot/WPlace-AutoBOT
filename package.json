@@ -13,7 +13,7 @@
     "dev:userscript": "node build/esbuild.config.js --target=userscript --watch",
     "dev:standalone": "node build/esbuild.config.js --target=standalone --watch",
     "serve:dist": "http-server dist -p 5173 -c-1 --cors",
-    "tunnel:start": "cloudflared tunnel run wplace-bot-dev",
+    "tunnel:start": "cloudflared tunnel run --token $CLOUDFLARED_TOKEN",
     "tunnel:quick": "cloudflared tunnel --url http://localhost:5173",
     "dev:tunnel": "run-p dev:standalone serve:dist tunnel:start",
     "lint": "eslint .",
