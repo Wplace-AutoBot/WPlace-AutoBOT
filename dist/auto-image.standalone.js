@@ -14,78 +14,86 @@
 /* Default :root CSS variables for 100% classic theme compliance */
 /* These ensure the bot works perfectly even if theme files fail to load */
 :root {
-  /* Classic theme colors - exact upstream main values */
-  --wplace-primary: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
-  --wplace-secondary: linear-gradient(135deg, #111111 0%, #2a2a2a 100%);
-  --wplace-accent: #222222;
-  --wplace-text: #ffffff;
-  --wplace-highlight: #775ce3;
-  --wplace-highlight-secondary: #d3a4ff;
-  --wplace-success: #00ff00;
-  --wplace-error: #ff0000;
-  --wplace-warning: #ffaa00;
+    /* Classic theme colors - exact upstream main values */
+    --wplace-primary: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+    --wplace-secondary: linear-gradient(135deg, #111111 0%, #2a2a2a 100%);
+    --wplace-accent: #222222;
+    --wplace-text: #ffffff;
+    --wplace-highlight: #775ce3;
+    --wplace-highlight-secondary: #d3a4ff;
+    --wplace-success: #00ff00;
+    --wplace-error: #ff0000;
+    --wplace-warning: #ffaa00;
 
-  /* UI properties */
-  --wplace-radius: 12px;
-  --wplace-border-style: solid;
-  --wplace-border-width: 1px;
-  --wplace-border-color: #222222;
-  --wplace-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.1);
-  --wplace-backdrop: blur(10px);
-  --wplace-font: 'Segoe UI', Roboto, sans-serif;
+    /* UI properties */
+    --wplace-radius: 12px;
+    --wplace-border-style: solid;
+    --wplace-border-width: 1px;
+    --wplace-border-color: #222222;
+    --wplace-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.1);
+    --wplace-backdrop: blur(10px);
+    --wplace-font: 'Segoe UI', Roboto, sans-serif;
 
-  /* Z-index layers */
-  --wplace-z-overlay: 10000;
-  --wplace-z-alert: 10002;
-  --wplace-z-settings: 10002;
+    /* Z-index layers */
+    --wplace-z-overlay: 10000;
+    --wplace-z-alert: 10002;
+    --wplace-z-settings: 10002;
 
-  /* Feature toggles */
-  --wplace-scanline: 0;
-  --wplace-pixel-blink: 0;
+    /* Feature toggles */
+    --wplace-scanline: 0;
+    --wplace-pixel-blink: 0;
 
-  /* Icon colors */
-  --wplace-icon-primary: #4facfe;
-  --wplace-icon-secondary: #00f2fe;
-  --wplace-icon-palette: #f093fb;
-  
-  /* Additional UI colors */
-  --wplace-danger: #ff6a6a;
-  --wplace-danger-dark: #ff4757;
-  --wplace-muted-text: #ffffffBB;
-  
-  /* Text variants */
-  --wplace-text-secondary: rgba(255,255,255,0.9);
-  --wplace-text-muted: rgba(255,255,255,0.7);
-  --wplace-text-dim: rgba(255,255,255,0.6);
-  --wplace-text-faded: rgba(255,255,255,0.8);
-  
-  /* Background variants */
-  --wplace-bg-input: rgba(255,255,255,0.15);
-  --wplace-bg-subtle: rgba(255,255,255,0.1);
-  --wplace-bg-faint: rgba(255,255,255,0.08);
-  --wplace-bg-ghost: rgba(255,255,255,0.06);
-  --wplace-bg-whisper: rgba(255,255,255,0.05);
-  
-  /* Border variants */
-  --wplace-border-subtle: rgba(255,255,255,0.2);
-  --wplace-border-faint: rgba(255,255,255,0.15);
-  --wplace-border-ghost: rgba(255,255,255,0.1);
-  --wplace-border-ultra-faint: rgba(255,255,255,0.05);
-  
-  /* Shadow variants */
-  --wplace-shadow-drag: 0 12px 40px rgba(0, 0, 0, 0.8), 0 0 0 2px rgba(255, 255, 255, 0.2);
-  --wplace-shadow-notification: 0 4px 12px rgba(0, 0, 0, 0.3);
-  --wplace-shadow-slider-thumb: 0 3px 6px rgba(0,0,0,0.3), 0 0 0 2px var(--wplace-icon-primary);
-  --wplace-shadow-slider-hover: 0 4px 8px rgba(0,0,0,0.4), 0 0 0 3px var(--wplace-icon-primary);
-  
-  /* Animation colors */
-  --wplace-pulse-start: rgba(0, 255, 0, 0.7);
-  --wplace-pulse-mid: rgba(0, 255, 0, 0);
-  --wplace-pulse-end: rgba(0, 255, 0, 0);
-  
-  /* Slider colors - defaults for classic compatibility */
-  --wplace-slider-thumb-bg: white;
-  --wplace-slider-track-bg: linear-gradient(to right, var(--wplace-icon-primary) 0%, var(--wplace-icon-secondary) 100%);
+    /* Icon colors */
+    --wplace-icon-primary: #4facfe;
+    --wplace-icon-secondary: #00f2fe;
+    --wplace-icon-palette: #f093fb;
+
+    /* Additional UI colors */
+    --wplace-danger: #ff6a6a;
+    --wplace-danger-dark: #ff4757;
+    --wplace-muted-text: #ffffffbb;
+
+    /* Text variants */
+    --wplace-text-secondary: rgba(255, 255, 255, 0.9);
+    --wplace-text-muted: rgba(255, 255, 255, 0.7);
+    --wplace-text-dim: rgba(255, 255, 255, 0.6);
+    --wplace-text-faded: rgba(255, 255, 255, 0.8);
+
+    /* Background variants */
+    --wplace-bg-input: rgba(255, 255, 255, 0.15);
+    --wplace-bg-subtle: rgba(255, 255, 255, 0.1);
+    --wplace-bg-faint: rgba(255, 255, 255, 0.08);
+    --wplace-bg-ghost: rgba(255, 255, 255, 0.06);
+    --wplace-bg-whisper: rgba(255, 255, 255, 0.05);
+
+    /* Border variants */
+    --wplace-border-subtle: rgba(255, 255, 255, 0.2);
+    --wplace-border-faint: rgba(255, 255, 255, 0.15);
+    --wplace-border-ghost: rgba(255, 255, 255, 0.1);
+    --wplace-border-ultra-faint: rgba(255, 255, 255, 0.05);
+
+    /* Shadow variants */
+    --wplace-shadow-drag:
+        0 12px 40px rgba(0, 0, 0, 0.8), 0 0 0 2px rgba(255, 255, 255, 0.2);
+    --wplace-shadow-notification: 0 4px 12px rgba(0, 0, 0, 0.3);
+    --wplace-shadow-slider-thumb:
+        0 3px 6px rgba(0, 0, 0, 0.3), 0 0 0 2px var(--wplace-icon-primary);
+    --wplace-shadow-slider-hover:
+        0 4px 8px rgba(0, 0, 0, 0.4), 0 0 0 3px var(--wplace-icon-primary);
+
+    /* Animation colors */
+    --wplace-pulse-start: rgba(0, 255, 0, 0.7);
+    --wplace-pulse-mid: rgba(0, 255, 0, 0);
+    --wplace-pulse-end: rgba(0, 255, 0, 0);
+
+    /* Slider colors - defaults for classic compatibility */
+    --wplace-slider-thumb-bg: white;
+    --wplace-slider-track-bg: linear-gradient(
+        to right,
+        var(--wplace-icon-primary) 0%,
+        var(--wplace-icon-secondary) 100%
+    );
 }
 
 /* Theme classes are now defined in separate files */
@@ -95,77 +103,83 @@
 /* ========================= */
 /* Core animations (shared)  */
 /* ========================= */
- @keyframes neonGlow {
-  0%,
-  100% {
-    text-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor;
-  }
-  50% {
-    text-shadow: 0 0 2px currentColor, 0 0 5px currentColor, 0 0 8px currentColor;
-  }
+@keyframes neonGlow {
+    0%,
+    100% {
+        text-shadow:
+            0 0 5px currentColor,
+            0 0 10px currentColor,
+            0 0 15px currentColor;
+    }
+    50% {
+        text-shadow:
+            0 0 2px currentColor,
+            0 0 5px currentColor,
+            0 0 8px currentColor;
+    }
 }
 
- @keyframes pixelBlink {
-  0%,
-  50% {
-    opacity: 1;
-  }
-  51%,
-  100% {
-    opacity: 0.7;
-  }
+@keyframes pixelBlink {
+    0%,
+    50% {
+        opacity: 1;
+    }
+    51%,
+    100% {
+        opacity: 0.7;
+    }
 }
 
- @keyframes scanline {
-  0% {
-    transform: translateY(-100%);
-  }
-  100% {
-    transform: translateY(400px);
-  }
+@keyframes scanline {
+    0% {
+        transform: translateY(-100%);
+    }
+    100% {
+        transform: translateY(400px);
+    }
 }
 
- @keyframes pulse {
-  0% {
-    box-shadow: 0 0 0 0 var(--wplace-pulse-start);
-  }
-  70% {
-    box-shadow: 0 0 0 10px var(--wplace-pulse-mid);
-  }
-  100% {
-    box-shadow: 0 0 0 0 var(--wplace-pulse-end);
-  }
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 var(--wplace-pulse-start);
+    }
+    70% {
+        box-shadow: 0 0 0 10px var(--wplace-pulse-mid);
+    }
+    100% {
+        box-shadow: 0 0 0 0 var(--wplace-pulse-end);
+    }
 }
 
- @keyframes slideIn {
-  from {
-    transform: translateY(-10px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+@keyframes slideIn {
+    from {
+        transform: translateY(-10px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
- @keyframes slideDown {
-  from {
-    transform: translateX(-50%) translateY(-20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(-50%) translateY(0);
-    opacity: 1;
-  }
+@keyframes slideDown {
+    from {
+        transform: translateX(-50%) translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
 }
 
- @keyframes shimmer {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
 }
 
 /* ========================= */
@@ -173,244 +187,246 @@
 /* Align with JS structure   */
 /* ========================= */
 #wplace-image-bot-container {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  width: 280px;
-  max-height: calc(100vh - 40px);
-  padding: 0;
-  z-index: 9998;
-  animation: slideIn 0.4s ease-out;
-  overflow-y: auto;
-  overflow-x: hidden;
-  transition: all 0.3s ease;
-  user-select: none;
-  /* Default classic theme styling for 100% compliance */
-  background: var(--wplace-primary);
-  color: var(--wplace-text);
-  border-radius: var(--wplace-radius);
-  box-shadow: var(--wplace-shadow);
-  font-family: var(--wplace-font);
-  backdrop-filter: var(--wplace-backdrop);
-  border: var(--wplace-border-width) var(--wplace-border-style) var(--wplace-border-color);
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: 280px;
+    max-height: calc(100vh - 40px);
+    padding: 0;
+    z-index: 9998;
+    animation: slideIn 0.4s ease-out;
+    overflow-y: auto;
+    overflow-x: hidden;
+    transition: all 0.3s ease;
+    user-select: none;
+    /* Default classic theme styling for 100% compliance */
+    background: var(--wplace-primary);
+    color: var(--wplace-text);
+    border-radius: var(--wplace-radius);
+    box-shadow: var(--wplace-shadow);
+    font-family: var(--wplace-font);
+    backdrop-filter: var(--wplace-backdrop);
+    border: var(--wplace-border-width) var(--wplace-border-style)
+        var(--wplace-border-color);
 }
 
 #wplace-image-bot-container.wplace-dragging {
-  transition: none;
-  box-shadow: var(--wplace-shadow-drag);
-  transform: scale(1.02);
-  z-index: 9999;
+    transition: none;
+    box-shadow: var(--wplace-shadow-drag);
+    transform: scale(1.02);
+    z-index: 9999;
 }
 
 #wplace-image-bot-container.wplace-compact {
-  width: 240px;
+    width: 240px;
 }
 
 #wplace-image-bot-container.wplace-minimized {
-  width: 200px;
-  height: auto;
-  overflow: hidden;
+    width: 200px;
+    height: auto;
+    overflow: hidden;
 }
 
 /* Stats container sits to the right of main (280 + 30 = 330) */
 #wplace-stats-container {
-  position: fixed;
-  top: 20px;
-  left: 330px;
-  width: 280px;
-  max-height: calc(100vh - 40px);
-  padding: 0;
-  z-index: 9997;
-  animation: slideIn 0.4s ease-out;
-  overflow-y: auto;
-  transition: all 0.3s ease;
-  user-select: none;
-  display: none;
-  /* Default classic theme styling for 100% compliance */
-  background: var(--wplace-primary);
-  color: var(--wplace-text);
-  border-radius: var(--wplace-radius);
-  box-shadow: var(--wplace-shadow);
-  font-family: var(--wplace-font);
-  backdrop-filter: var(--wplace-backdrop);
-  border: var(--wplace-border-width) var(--wplace-border-style) var(--wplace-border-color);
+    position: fixed;
+    top: 20px;
+    left: 330px;
+    width: 280px;
+    max-height: calc(100vh - 40px);
+    padding: 0;
+    z-index: 9997;
+    animation: slideIn 0.4s ease-out;
+    overflow-y: auto;
+    transition: all 0.3s ease;
+    user-select: none;
+    display: none;
+    /* Default classic theme styling for 100% compliance */
+    background: var(--wplace-primary);
+    color: var(--wplace-text);
+    border-radius: var(--wplace-radius);
+    box-shadow: var(--wplace-shadow);
+    font-family: var(--wplace-font);
+    backdrop-filter: var(--wplace-backdrop);
+    border: var(--wplace-border-width) var(--wplace-border-style)
+        var(--wplace-border-color);
 }
 
 #wplace-stats-container.wplace-dragging {
-  transition: none;
+    transition: none;
 }
 
 /* Back-compat for legacy class (some earlier CSS used this) */
 .wplace-drag-active {
-  transition: none !important;
-  box-shadow: var(--wplace-shadow-drag) !important;
-  transform: scale(1.02) !important;
-  z-index: 9999 !important;
+    transition: none !important;
+    box-shadow: var(--wplace-shadow-drag) !important;
+    transform: scale(1.02) !important;
+    z-index: 9999 !important;
 }
 
 /* ========================= */
 /* Header and content blocks */
 /* ========================= */
 .wplace-header {
-  padding: 8px 12px;
-  font-size: 13px;
-  font-weight: 700;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: move;
-  user-select: none;
-  border-bottom: 1px solid var(--wplace-border-ghost);
-  transition: background 0.2s ease;
-  position: relative;
-  z-index: 2;
-  /* Default styling for 100% classic compliance */
-  background: var(--wplace-secondary);
-  color: var(--wplace-highlight);
-  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: move;
+    user-select: none;
+    border-bottom: 1px solid var(--wplace-border-ghost);
+    transition: background 0.2s ease;
+    position: relative;
+    z-index: 2;
+    /* Default styling for 100% classic compliance */
+    background: var(--wplace-secondary);
+    color: var(--wplace-highlight);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .wplace-header-title {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .wplace-header-controls {
-  display: flex;
-  gap: 6px;
+    display: flex;
+    gap: 6px;
 }
 
 .wplace-header-btn {
-  border: none;
-  cursor: pointer;
-  width: 18px;
-  height: 18px;
-  padding: 0;
-  font-size: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-  /* Default styling for 100% classic compliance */
-  background: rgba(255,255,255,0.1);
-  color: var(--wplace-text);
-  border-radius: 4px;
-  font-family: var(--wplace-font);
+    border: none;
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    /* Default styling for 100% classic compliance */
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--wplace-text);
+    border-radius: 4px;
+    font-family: var(--wplace-font);
 }
 
 .wplace-header-btn:hover {
-  transform: scale(1.1);
-  /* Default styling for 100% classic compliance */
-  background: var(--wplace-accent);
-  color: var(--wplace-text);
+    transform: scale(1.1);
+    /* Default styling for 100% classic compliance */
+    background: var(--wplace-accent);
+    color: var(--wplace-text);
 }
 
 .wplace-content {
-  display: block;
-  position: relative;
-  z-index: 2;
-  padding: 12px;
+    display: block;
+    position: relative;
+    z-index: 2;
+    padding: 12px;
 }
 
 .wplace-content.wplace-hidden {
-  display: none;
+    display: none;
 }
 
 /* Sections */
 .wplace-status-section {
-  margin-bottom: 12px;
-  padding: 8px;
-  /* Theme-specific styling applied via theme files */
+    margin-bottom: 12px;
+    padding: 8px;
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-section {
-  margin-bottom: 12px;
-  padding: 12px;
-  /* Theme-specific styling applied via theme files */
+    margin-bottom: 12px;
+    padding: 12px;
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-section-title {
-  font-size: 11px;
-  font-weight: 600;
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  /* Theme-specific styling applied via theme files */
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    /* Theme-specific styling applied via theme files */
 }
 
 /* ========================= */
 /* Controls and buttons      */
 /* ========================= */
 .wplace-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .wplace-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
 }
 
 .wplace-row.single {
-  grid-template-columns: 1fr;
+    grid-template-columns: 1fr;
 }
 
 .wplace-btn {
-  padding: 8px 12px;
-  border: none;
-  font-weight: 500;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  font-size: 11px;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  font-weight: 500;
-  /* Theme-specific styling applied via theme files */
+    padding: 8px 12px;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 11px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    font-weight: 500;
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  transition: left 0.5s ease;
-  /* Theme-specific styling applied via theme files */
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    transition: left 0.5s ease;
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-btn:hover:not(:disabled)::before {
-  left: 100%;
+    left: 100%;
 }
 
 .wplace-btn:hover:not(:disabled) {
-  transform: translateY(-1px);
-  /* Theme-specific styling applied via theme files */
+    transform: translateY(-1px);
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-btn:active:not(:disabled) {
-  transform: translateY(0);
+    transform: translateY(0);
 }
 
 .wplace-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none !important;
-  /* Theme-specific styling applied via theme files */
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-btn:disabled::before {
-  display: none;
+    display: none;
 }
 
 /* Button variants moved to theme files */
@@ -419,112 +435,112 @@
 /* Stats and progress        */
 /* ========================= */
 .wplace-stats {
-  margin-bottom: 8px;
-  padding: 8px;
-  /* Theme-specific styling applied via theme files */
+    margin-bottom: 8px;
+    padding: 8px;
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-stat-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 4px 0;
-  font-size: 11px;
-  border-bottom: 1px solid var(--wplace-border-ultra-faint);
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    font-size: 11px;
+    border-bottom: 1px solid var(--wplace-border-ultra-faint);
 }
 
 .wplace-stat-item:last-child {
-  border-bottom: none;
+    border-bottom: none;
 }
 
 .wplace-stat-label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  opacity: 0.9;
-  font-size: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    opacity: 0.9;
+    font-size: 10px;
 }
 
 .wplace-stat-value {
-  font-weight: 600;
-  /* Theme-specific styling applied via theme files */
+    font-weight: 600;
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-colors-section {
-  margin-top: 10px;
-  padding-top: 8px;
-  border-top: 1px solid var(--wplace-border-ultra-faint);
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid var(--wplace-border-ultra-faint);
 }
 
 .wplace-stat-colors-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(16px, 1fr));
-  gap: 4px;
-  margin-top: 8px;
-  padding: 4px;
-  max-height: 80px;
-  overflow-y: auto;
-  /* Theme-specific styling applied via theme files */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(16px, 1fr));
+    gap: 4px;
+    margin-top: 8px;
+    padding: 4px;
+    max-height: 80px;
+    overflow-y: auto;
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-colors-placeholder {
-  text-align: center;
-  color: #888;
-  padding: 20px;
-  font-style: italic;
+    text-align: center;
+    color: #888;
+    padding: 20px;
+    font-style: italic;
 }
 
 .wplace-cooldown-value {
-  font-weight: bold;
-  min-width: 20px;
-  text-align: center;
-  display: inline-block;
+    font-weight: bold;
+    min-width: 20px;
+    text-align: center;
+    display: inline-block;
 }
 
 .wplace-stat-color-swatch {
-  width: 16px;
-  height: 16px;
-  /* Theme-specific styling applied via theme files */
+    width: 16px;
+    height: 16px;
+    /* Theme-specific styling applied via theme files */
 }
 
 /* Progress */
 .wplace-progress {
-  width: 100%;
-  margin: 8px 0;
-  overflow: hidden;
-  height: 6px;
-  position: relative;
-  /* Theme-specific styling applied via theme files */
+    width: 100%;
+    margin: 8px 0;
+    overflow: hidden;
+    height: 6px;
+    position: relative;
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-progress-bar {
-  height: 6px;
-  transition: width 0.5s ease;
-  position: relative;
-  /* Theme-specific styling applied via theme files */
+    height: 6px;
+    transition: width 0.5s ease;
+    position: relative;
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-progress-bar::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  animation: shimmer 2s infinite;
-  /* Theme-specific styling applied via theme files */
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    animation: shimmer 2s infinite;
+    /* Theme-specific styling applied via theme files */
 }
 
 /* ========================= */
 /* Status blocks             */
 /* ========================= */
 .wplace-status {
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-  padding: 6px;
-  border: 1px solid;
-  font-size: 11px;
-  /* Theme-specific styling applied via theme files */
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    padding: 6px;
+    border: 1px solid;
+    font-size: 11px;
+    /* Theme-specific styling applied via theme files */
 }
 
 /* Status styling moved to theme files */
@@ -533,362 +549,365 @@
 /* Resize dialog             */
 /* ========================= */
 .resize-container {
-  display: none;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  padding: 20px;
-  z-index: 10000;
-  width: 90%;
-  max-width: 700px;
-  max-height: 90%;
-  overflow: auto;
-  /* Theme-specific styling applied via theme files */
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    z-index: 10000;
+    width: 90%;
+    max-width: 700px;
+    max-height: 90%;
+    overflow: auto;
+    /* Theme-specific styling applied via theme files */
 }
 
 .resize-preview-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 15px 0;
-  height: 300px;
-  overflow: hidden;
-  /* Theme-specific styling applied via theme files */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 15px 0;
+    height: 300px;
+    overflow: hidden;
+    /* Theme-specific styling applied via theme files */
 }
 
 .resize-canvas-stack {
-  position: relative;
-  transform-origin: center center;
-  display: inline-block;
+    position: relative;
+    transform-origin: center center;
+    display: inline-block;
 }
 
 .resize-base-canvas,
 .resize-mask-canvas {
-  position: absolute;
-  left: 0;
-  top: 0;
-  image-rendering: pixelated;
-  image-rendering: -moz-crisp-edges;
-  image-rendering: crisp-edges;
+    position: absolute;
+    left: 0;
+    top: 0;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
 }
 
 .resize-mask-canvas {
-  pointer-events: auto;
+    pointer-events: auto;
 }
 
 .resize-tools {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  margin-top: 8px;
-  font-size: 12px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 8px;
+    font-size: 12px;
 }
 
 .resize-tools button {
-  padding: 6px 10px;
-  cursor: pointer;
-  /* Theme-specific styling applied via theme files */
+    padding: 6px 10px;
+    cursor: pointer;
+    /* Theme-specific styling applied via theme files */
 }
 
 /* Button active states moved to theme files */
 
 .resize-controls {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
-  align-items: center;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    align-items: center;
 }
 
 .resize-slider {
-  width: 100%;
-  height: 4px;
-  border: none;
-  outline: none;
-  -webkit-appearance: none;
-  /* Theme-specific styling applied via theme files */
+    width: 100%;
+    height: 4px;
+    border: none;
+    outline: none;
+    -webkit-appearance: none;
+    /* Theme-specific styling applied via theme files */
 }
 
 .resize-zoom-controls {
-  grid-column: 1 / -1;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 15px;
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 15px;
 }
 
 .resize-buttons {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
 }
 
 .resize-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 9999;
-  display: none;
-  /* Theme-specific styling applied via theme files */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    display: none;
+    /* Theme-specific styling applied via theme files */
 }
 
 /* ========================= */
 /* Color grid                */
 /* ========================= */
 .wplace-color-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-  gap: 10px;
-  padding-top: 8px;
-  max-height: 300px;
-  overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    gap: 10px;
+    padding-top: 8px;
+    max-height: 300px;
+    overflow-y: auto;
 }
 
 .wplace-color-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
 }
 
 .wplace-color-item-name {
-  font-size: 9px;
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 100%;
-  /* Theme-specific styling applied via theme files */
+    font-size: 9px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-color-swatch {
-  width: 22px;
-  height: 22px;
-  cursor: pointer;
-  transition: transform 0.1s ease, box-shadow 0.2s ease;
-  position: relative;
-  margin: 0 auto;
-  /* Theme-specific styling applied via theme files */
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    transition:
+        transform 0.1s ease,
+        box-shadow 0.2s ease;
+    position: relative;
+    margin: 0 auto;
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-color-swatch.unavailable {
-  border-style: dashed;
-  cursor: not-allowed;
-  /* Theme-specific styling applied via theme files */
+    border-style: dashed;
+    cursor: not-allowed;
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-color-swatch:hover {
-  transform: scale(1.1);
-  z-index: 1;
+    transform: scale(1.1);
+    z-index: 1;
 }
 
 .wplace-color-swatch:not(.active) {
-  opacity: 0.3;
-  /* Theme-specific styling applied via theme files */
+    opacity: 0.3;
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-color-swatch.unavailable:not(.active) {
-  opacity: 0.2;
-  /* Theme-specific styling applied via theme files */
+    opacity: 0.2;
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-color-swatch.active::after {
-  content: '\u2714';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: var(--wplace-text);
-  font-size: 12px;
-  font-weight: bold;
-  /* Theme-specific styling applied via theme files */
+    content: '\u2714';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--wplace-text);
+    font-size: 12px;
+    font-weight: bold;
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-color-divider {
-  border: none;
-  height: 1px;
-  margin: 8px 0;
-  /* Theme-specific styling applied via theme files */
+    border: none;
+    height: 1px;
+    margin: 8px 0;
+    /* Theme-specific styling applied via theme files */
 }
 
 /* ========================= */
 /* Cooldown controls         */
 /* ========================= */
 .wplace-cooldown-control {
-  margin-top: 8px;
+    margin-top: 8px;
 }
 
 .wplace-cooldown-control label {
-  font-size: 11px;
-  margin-bottom: 4px;
-  display: block;
+    font-size: 11px;
+    margin-bottom: 4px;
+    display: block;
 }
 
 .wplace-slider-container {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .wplace-slider {
-  flex: 1;
-  -webkit-appearance: none;
-  appearance: none;
-  height: 4px;
-  outline: none;
-  /* Theme-specific styling applied via theme files */
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    outline: none;
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 14px;
-  height: 14px;
-  cursor: pointer;
-  /* Theme-specific styling applied via theme files */
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+    /* Theme-specific styling applied via theme files */
 }
 
 /* ========================= */
 /* Settings container (base) */
 /* ========================= */
 #wplace-settings-container {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  padding: 0px;
-  z-index: 10002;
-  display: none;
-  min-width: 420px;
-  max-width: 480px;
-  overflow: hidden;
-  /* Default classic theme styling for 100% compliance */
-  background: var(--wplace-primary);
-  color: var(--wplace-text);
-  border-radius: var(--wplace-radius);
-  box-shadow: var(--wplace-shadow);
-  font-family: var(--wplace-font);
-  backdrop-filter: var(--wplace-backdrop);
-  border: var(--wplace-border-width) var(--wplace-border-style) var(--wplace-border-color);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 0px;
+    z-index: 10002;
+    display: none;
+    min-width: 420px;
+    max-width: 480px;
+    overflow: hidden;
+    /* Default classic theme styling for 100% compliance */
+    background: var(--wplace-primary);
+    color: var(--wplace-text);
+    border-radius: var(--wplace-radius);
+    box-shadow: var(--wplace-shadow);
+    font-family: var(--wplace-font);
+    backdrop-filter: var(--wplace-backdrop);
+    border: var(--wplace-border-width) var(--wplace-border-style)
+        var(--wplace-border-color);
 }
 
 #wplace-settings-container.show {
-  display: block;
-  animation: settingsSlideIn 0.4s ease-out;
+    display: block;
+    animation: settingsSlideIn 0.4s ease-out;
 }
 
 @keyframes settingsSlideIn {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
 }
 
 @keyframes settingsFadeOut {
-  from {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.9);
-  }
+    from {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9);
+    }
 }
 
 .wplace-settings {
-  padding: 16px;
-  max-height: 400px;
-  overflow-y: auto;
+    padding: 16px;
+    max-height: 400px;
+    overflow-y: auto;
 }
 
 .wplace-setting-section {
-  margin-bottom: 20px;
-  padding: 12px;
+    margin-bottom: 20px;
+    padding: 12px;
 }
 
 /* ========================= */
 /* Form controls             */
 /* ========================= */
 .wplace-select {
-  width: 100%;
-  padding: 8px 12px;
-  font-size: 14px;
-  margin-bottom: 10px;
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 14px;
+    margin-bottom: 10px;
 }
 
 .wplace-select:focus {
-  outline: none;
+    outline: none;
 }
 
 .wplace-description {
-  font-size: 12px;
-  opacity: 0.8;
-  line-height: 1.4;
+    font-size: 12px;
+    opacity: 0.8;
+    line-height: 1.4;
 }
 
 /* Speed controls */
 .wplace-speed-control {
-  margin-top: 12px;
-  padding: 12px;
+    margin-top: 12px;
+    padding: 12px;
 }
 
 .wplace-speed-label {
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
-  font-size: 13px;
-  font-weight: 600;
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 600;
 }
 
 .wplace-speed-label i {
-  margin-right: 6px;
+    margin-right: 6px;
 }
 
 .wplace-speed-slider-container {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 .wplace-speed-slider {
-  flex: 1;
-  height: 6px;
-  outline: none;
-  cursor: pointer;
-  -webkit-appearance: none;
-  appearance: none;
-  background: var(--wplace-slider-track-bg);
-  border-radius: 4px;
+    flex: 1;
+    height: 6px;
+    outline: none;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    background: var(--wplace-slider-track-bg);
+    border-radius: 4px;
 }
 
 .wplace-speed-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-  /* Theme-specific styling applied via theme files */
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-speed-slider::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-  /* Theme-specific styling applied via theme files */
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-speed-display {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  min-width: 90px;
-  justify-content: flex-end;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 90px;
+    justify-content: flex-end;
 }
 
 /* ========================= */
@@ -896,75 +915,77 @@
 /* ========================= */
 /* Hidden invisible widget host (token generator) */
 .wplace-turnstile-hidden {
-  position: fixed !important;
-  left: -99999px !important;
-  top: -99999px !important;
-  width: 1px !important;
-  height: 1px !important;
-  pointer-events: none !important;
-  opacity: 0 !important;
-  visibility: hidden !important;
-  z-index: -99999 !important;
-  overflow: hidden !important;
+    position: fixed !important;
+    left: -99999px !important;
+    top: -99999px !important;
+    width: 1px !important;
+    height: 1px !important;
+    pointer-events: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    z-index: -99999 !important;
+    overflow: hidden !important;
 }
 
 /* Visible overlay (interactive fallback) */
 .wplace-turnstile-overlay {
-  position: fixed !important;
-  bottom: 20px !important;
-  right: 20px !important;
-  z-index: 99999 !important;
-  padding: 20px !important;
-  min-width: 300px !important;
-  max-width: 400px !important;
-  /* Theme-specific styling applied via theme files */
+    position: fixed !important;
+    bottom: 20px !important;
+    right: 20px !important;
+    z-index: 99999 !important;
+    padding: 20px !important;
+    min-width: 300px !important;
+    max-width: 400px !important;
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-turnstile-title {
-  font: 600 12px/1.3 'Segoe UI', sans-serif !important;
-  margin-bottom: 8px !important;
-  opacity: 0.9 !important;
-  /* Theme-specific styling applied via theme files */
+    font:
+        600 12px/1.3 'Segoe UI',
+        sans-serif !important;
+    margin-bottom: 8px !important;
+    opacity: 0.9 !important;
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-turnstile-host {
-  width: 100% !important;
-  min-height: 70px !important;
+    width: 100% !important;
+    min-height: 70px !important;
 }
 
 .wplace-turnstile-hide-btn {
-  position: absolute !important;
-  top: 6px !important;
-  right: 6px !important;
-  font-size: 11px !important;
-  background: transparent !important;
-  padding: 2px 6px !important;
-  cursor: pointer !important;
-  transition: background 0.2s ease !important;
-  /* Theme-specific styling applied via theme files */
+    position: absolute !important;
+    top: 6px !important;
+    right: 6px !important;
+    font-size: 11px !important;
+    background: transparent !important;
+    padding: 2px 6px !important;
+    cursor: pointer !important;
+    transition: background 0.2s ease !important;
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-turnstile-hide-btn:hover {
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 /* ========================= */
 /* Alert system (used by JS) */
 /* ========================= */
 .wplace-alert-base {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 12px 20px;
-  color: var(--wplace-text);
-  font-weight: 600;
-  z-index: 10002;
-  max-width: 400px;
-  text-align: center;
-  animation: slideDown 0.3s ease-out;
-  box-shadow: var(--wplace-shadow-notification);
-  /* Theme-specific styling applied via theme files */
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 20px;
+    color: var(--wplace-text);
+    font-weight: 600;
+    z-index: 10002;
+    max-width: 400px;
+    text-align: center;
+    animation: slideDown 0.3s ease-out;
+    box-shadow: var(--wplace-shadow-notification);
+    /* Theme-specific styling applied via theme files */
 }
 
 /* Alert styling moved to theme files */
@@ -973,54 +994,54 @@
 /* Modal overlay helpers     */
 /* ========================= */
 .wplace-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 100002;
-  display: none;
-  /* Theme-specific styling applied via theme files */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 100002;
+    display: none;
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-overlay.show {
-  display: block;
+    display: block;
 }
 
 /* Overlay visibility helpers */
 .wplace-overlay-hidden {
-  display: none !important;
+    display: none !important;
 }
 
 .wplace-overlay-visible {
-  display: block !important;
+    display: block !important;
 }
 
 /* ========================= */
 /* Responsive tweaks         */
 /* ========================= */
- @media (max-width: 768px) {
-  #wplace-image-bot-container {
-    left: 10px;
-    width: calc(100vw - 20px);
-    max-height: calc(100vh - 20px);
-  }
+@media (max-width: 768px) {
+    #wplace-image-bot-container {
+        left: 10px;
+        width: calc(100vw - 20px);
+        max-height: calc(100vh - 20px);
+    }
 
-  #wplace-stats-container {
-    display: none !important; /* hide secondary panel on small screens */
-  }
+    #wplace-stats-container {
+        display: none !important; /* hide secondary panel on small screens */
+    }
 
-  .wplace-alert-base {
-    max-width: 90vw;
-    margin: 0 5vw;
-  }
+    .wplace-alert-base {
+        max-width: 90vw;
+        margin: 0 5vw;
+    }
 
-  .wplace-turnstile-overlay {
-    bottom: 10px !important;
-    right: 10px !important;
-    left: 10px !important;
-    min-width: auto !important;
-  }
+    .wplace-turnstile-overlay {
+        bottom: 10px !important;
+        right: 10px !important;
+        left: 10px !important;
+        min-width: auto !important;
+    }
 }
 
 /* Auto light/dark support moved to theme files */
@@ -1029,39 +1050,39 @@
 /* Settings container variants (optional)*/
 /* ===================================== */
 .wplace-settings-container-base {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 100001;
-  display: none;
-  min-width: 400px;
-  max-width: 500px;
-  max-height: 80vh;
-  overflow-y: auto;
-  animation: slideIn 0.3s ease-out;
-  border: 1px solid var(--wplace-border-ghost);
-  padding: 0;
-  /* Theme-specific styling applied via theme files */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 100001;
+    display: none;
+    min-width: 400px;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+    animation: slideIn 0.3s ease-out;
+    border: 1px solid var(--wplace-border-ghost);
+    padding: 0;
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-settings-container-base.show {
-  display: block;
+    display: block;
 }
 
 /* ===================================== */
 /* Utility styles                         */
 /* ===================================== */
 .wplace-paint-effect {
-  animation: pulse 0.5s ease-out;
+    animation: pulse 0.5s ease-out;
 }
 
 .wplace-settings-error {
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-stats-container.hidden {
-  display: none;
+    display: none;
 }
 
 /* Theme-specific effects are now in separate theme files */
@@ -1072,323 +1093,323 @@
 
 /* Settings content container */
 .wplace-settings-content {
-  padding: 25px;
-  max-height: 70vh;
-  overflow-y: auto;
+    padding: 25px;
+    max-height: 70vh;
+    overflow-y: auto;
 }
 
 /* Settings section containers */
 .wplace-settings-section {
-  margin-bottom: 25px;
+    margin-bottom: 25px;
 }
 
 /* Section labels */
 .wplace-settings-section-label {
-  margin-bottom: 12px;
-  color: var(--wplace-text);
-  font-weight: 500;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+    margin-bottom: 12px;
+    color: var(--wplace-text);
+    font-weight: 500;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 /* Icon colors */
 .wplace-icon-key {
-  font-size: 16px;
+    font-size: 16px;
 }
 
 .wplace-icon-robot {
-  font-size: 16px;
+    font-size: 16px;
 }
 
 .wplace-icon-speed {
-  font-size: 16px;
+    font-size: 16px;
 }
 
 .wplace-icon-bell {
-  font-size: 16px;
+    font-size: 16px;
 }
 
 .wplace-icon-palette {
-  font-size: 16px;
+    font-size: 16px;
 }
 
 .wplace-icon-globe {
-  font-size: 16px;
+    font-size: 16px;
 }
 
 .wplace-icon-paint {
-  font-size: 16px;
+    font-size: 16px;
 }
 
 /* Section wrapper styling */
 .wplace-settings-section-wrapper {
-  padding: 18px;
-  /* Theme-specific styling applied via theme files */
+    padding: 18px;
+    /* Theme-specific styling applied via theme files */
 }
 
 /* Select dropdowns */
 .wplace-settings-select {
-  width: 100%;
-  padding: 12px 16px;
-  font-size: 14px;
-  outline: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-family: inherit;
-  /* Theme-specific styling applied via theme files */
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 14px;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-settings-option {
-  padding: 10px;
-  /* Theme-specific styling applied via theme files */
+    padding: 10px;
+    /* Theme-specific styling applied via theme files */
 }
 
 /* Settings description text */
 .wplace-settings-description {
-  font-size: 12px;
-  color: var(--wplace-text-muted);
-  margin: 8px 0 0 0;
+    font-size: 12px;
+    color: var(--wplace-text-muted);
+    margin: 8px 0 0 0;
 }
 
 /* Batch Mode Controls */
 .wplace-batch-mode-selection {
-  margin-bottom: 15px;
+    margin-bottom: 15px;
 }
 
 .wplace-batch-mode-label {
-  display: block;
-  margin-bottom: 8px;
-  color: var(--wplace-text-secondary);
-  font-weight: 500;
-  font-size: 14px;
+    display: block;
+    margin-bottom: 8px;
+    color: var(--wplace-text-secondary);
+    font-weight: 500;
+    font-size: 14px;
 }
 
 .wplace-icon-dice {
-  color: var(--wplace-icon-palette);
-  margin-right: 6px;
+    color: var(--wplace-icon-palette);
+    margin-right: 6px;
 }
 
 .wplace-batch-mode-select {
-  width: 100%;
-  padding: 10px 12px;
-  background: var(--wplace-bg-input);
-  color: var(--wplace-text);
-  border: 1px solid var(--wplace-border-subtle);
-  border-radius: 8px;
-  font-size: 13px;
-  outline: none;
-  cursor: pointer;
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--wplace-bg-input);
+    color: var(--wplace-text);
+    border: 1px solid var(--wplace-border-subtle);
+    border-radius: 8px;
+    font-size: 13px;
+    outline: none;
+    cursor: pointer;
 }
 
 /* Batch Controls */
 .wplace-batch-controls {
-  padding: 18px;
-  margin-bottom: 15px;
-  /* Theme-specific styling applied via theme files */
+    padding: 18px;
+    margin-bottom: 15px;
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-random-batch-controls {
-  display: none;
+    display: none;
 }
 
 /* Speed Slider Container */
 .wplace-speed-slider-container {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
 }
 
 .wplace-speed-slider {
-  flex: 1;
-  height: 8px;
-  outline: none;
-  -webkit-appearance: none;
-  cursor: pointer;
-  background: var(--wplace-slider-track-bg);
-  border-radius: 4px;
+    flex: 1;
+    height: 8px;
+    outline: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    background: var(--wplace-slider-track-bg);
+    border-radius: 4px;
 }
 
 .wplace-speed-value {
-  min-width: 100px;
-  text-align: center;
-  padding: 8px 12px;
-  font-weight: bold;
-  font-size: 13px;
-  /* Theme-specific styling applied via theme files */
+    min-width: 100px;
+    text-align: center;
+    padding: 8px 12px;
+    font-weight: bold;
+    font-size: 13px;
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-speed-labels {
-  display: flex;
-  justify-content: space-between;
-  color: var(--wplace-text-muted);
-  font-size: 11px;
-  margin-top: 8px;
+    display: flex;
+    justify-content: space-between;
+    color: var(--wplace-text-muted);
+    font-size: 11px;
+    margin-top: 8px;
 }
 
 /* Random Batch Controls */
 .wplace-random-batch-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
 }
 
 .wplace-random-batch-label {
-  display: block;
-  color: var(--wplace-text-faded);
-  font-size: 12px;
-  margin-bottom: 8px;
+    display: block;
+    color: var(--wplace-text-faded);
+    font-size: 12px;
+    margin-bottom: 8px;
 }
 
 .wplace-icon-min {
-  color: var(--wplace-icon-primary);
-  margin-right: 4px;
+    color: var(--wplace-icon-primary);
+    margin-right: 4px;
 }
 
 .wplace-icon-max {
-  color: var(--wplace-icon-secondary);
-  margin-right: 4px;
+    color: var(--wplace-icon-secondary);
+    margin-right: 4px;
 }
 
 .wplace-random-batch-input {
-  width: 100%;
-  padding: 10px 12px;
-  background: var(--wplace-bg-subtle);
-  color: var(--wplace-text);
-  border: 1px solid var(--wplace-border-subtle);
-  border-radius: 8px;
-  font-size: 13px;
-  outline: none;
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--wplace-bg-subtle);
+    color: var(--wplace-text);
+    border: 1px solid var(--wplace-border-subtle);
+    border-radius: 8px;
+    font-size: 13px;
+    outline: none;
 }
 
 .wplace-random-batch-description {
-  font-size: 11px;
-  color: var(--wplace-text-dim);
-  margin: 8px 0 0 0;
-  text-align: center;
+    font-size: 11px;
+    color: var(--wplace-text-dim);
+    margin: 8px 0 0 0;
+    text-align: center;
 }
 
 /* Speed Control Toggle */
 .wplace-speed-control-toggle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--wplace-text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--wplace-text);
 }
 
 .wplace-speed-checkbox {
-  cursor: pointer;
+    cursor: pointer;
 }
 
 /* Overlay Settings */
 .wplace-overlay-opacity-control {
-  margin-bottom: 15px;
+    margin-bottom: 15px;
 }
 
 .wplace-overlay-opacity-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
 }
 
 .wplace-overlay-opacity-label {
-  font-weight: 500;
-  font-size: 13px;
+    font-weight: 500;
+    font-size: 13px;
 }
 
 .wplace-overlay-opacity-value {
-  min-width: 40px;
-  text-align: center;
-  padding: 4px 8px;
-  font-size: 12px;
+    min-width: 40px;
+    text-align: center;
+    padding: 4px 8px;
+    font-size: 12px;
 }
 
 .wplace-overlay-opacity-slider {
-  width: 100%;
-  -webkit-appearance: none;
-  height: 8px;
-  outline: none;
-  cursor: pointer;
+    width: 100%;
+    -webkit-appearance: none;
+    height: 8px;
+    outline: none;
+    cursor: pointer;
 }
 
 .wplace-blue-marble-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
 }
 
 .wplace-blue-marble-title {
-  font-weight: 500;
+    font-weight: 500;
 }
 
 .wplace-blue-marble-description {
-  font-size: 12px;
-  margin: 4px 0 0 0;
+    font-size: 12px;
+    margin: 4px 0 0 0;
 }
 
 .wplace-blue-marble-checkbox {
-  cursor: pointer;
-  width: 20px;
-  height: 20px;
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
 }
 
 /* Notifications */
 .wplace-notifications-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .wplace-notification-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .wplace-notification-checkbox {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
 }
 
 .wplace-notification-interval {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .wplace-notification-interval-input {
-  width: 70px;
-  padding: 6px 8px;
-  border-radius: 6px;
-  border: 1px solid var(--wplace-border-subtle);
-  background: var(--wplace-bg-faint);
-  color: var(--wplace-text);
+    width: 70px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--wplace-border-subtle);
+    background: var(--wplace-bg-faint);
+    color: var(--wplace-text);
 }
 
 .wplace-notification-buttons {
-  display: flex;
-  gap: 10px;
+    display: flex;
+    gap: 10px;
 }
 
 .wplace-notification-perm-btn,
 .wplace-notification-test-btn {
-  flex: 1;
+    flex: 1;
 }
 
 /* Settings Footer */
 .wplace-settings-footer {
-  border-top: 1px solid var(--wplace-border-ghost);
-  padding-top: 20px;
-  margin-top: 10px;
+    border-top: 1px solid var(--wplace-border-ghost);
+    padding-top: 20px;
+    margin-top: 10px;
 }
 
 .wplace-settings-apply-btn {
-  width: 100%;
+    width: 100%;
 }
 
 /* ===================================== */
@@ -1397,251 +1418,255 @@
 
 /* Resize dialog title */
 .resize-dialog-title {
-  margin-top: 0;
+    margin-top: 0;
 }
 
 /* Resize control labels */
 .resize-control-label {
-  display: block;
-  margin-bottom: 8px;
-  font-size: 14px;
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
 }
 
 .resize-checkbox-label {
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
-  font-size: 14px;
-  gap: 8px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 14px;
+    gap: 8px;
 }
 
 /* Zoom controls */
 .resize-zoom-controls {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 15px;
-  flex-wrap: wrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 15px;
+    flex-wrap: wrap;
 }
 
 .resize-zoom-btn {
-  padding: 4px 8px;
+    padding: 4px 8px;
 }
 
 .resize-zoom-slider {
-  max-width: 220px;
+    max-width: 220px;
 }
 
 .resize-zoom-value {
-  margin-left: 6px;
-  min-width: 48px;
-  text-align: right;
-  opacity: 0.85;
-  font-size: 12px;
+    margin-left: 6px;
+    min-width: 48px;
+    text-align: right;
+    opacity: 0.85;
+    font-size: 12px;
 }
 
 .resize-camera-help {
-  font-size: 11px;
-  opacity: 0.75;
-  margin-left: auto;
+    font-size: 11px;
+    opacity: 0.75;
+    margin-left: auto;
 }
 
 /* Canvas positioning */
 .resize-pan-stage {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
 }
 
 .resize-canvas-positioned {
-  position: absolute;
-  left: 0;
-  top: 0;
-  transform-origin: top left;
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform-origin: top left;
 }
 
 /* Resize tools */
 .resize-tools-container {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  align-items: center;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
 }
 
 .resize-brush-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .resize-brush-control {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  justify-content: space-between;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: space-between;
 }
 
 .resize-tool-label {
-  font-size: 12px;
-  opacity: 0.85;
+    font-size: 12px;
+    opacity: 0.85;
 }
 
 .resize-tool-input-group {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .resize-tool-slider {
-  width: 120px;
+    width: 120px;
 }
 
 .resize-tool-value {
-  font-size: 12px;
-  opacity: 0.85;
-  min-width: 18px;
-  text-align: center;
+    font-size: 12px;
+    opacity: 0.85;
+    min-width: 18px;
+    text-align: center;
 }
 
 .resize-mode-controls {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .resize-mode-group {
-  display: flex;
-  gap: 6px;
+    display: flex;
+    gap: 6px;
 }
 
 .resize-mode-btn,
 .resize-clear-btn,
 .resize-invert-btn {
-  padding: 4px 8px;
-  font-size: 12px;
+    padding: 4px 8px;
+    font-size: 12px;
 }
 
 .resize-shortcut-help {
-  opacity: 0.8;
-  font-size: 12px;
+    opacity: 0.8;
+    font-size: 12px;
 }
 
 /* Color palette section */
 .resize-color-palette-section {
-  margin-top: 15px;
+    margin-top: 15px;
 }
 
 .resize-color-toggle-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
 }
 
 .resize-color-checkbox {
-  cursor: pointer;
+    cursor: pointer;
 }
 
 /* Advanced color section */
 .resize-advanced-color-section {
-  margin-top: 15px;
+    margin-top: 15px;
 }
 
 .resize-advanced-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .resize-advanced-label {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-size: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 12px;
 }
 
 .resize-advanced-label-text {
-  font-weight: 600;
+    font-weight: 600;
 }
 
 .resize-advanced-select {
-  padding: 6px 8px;
-  border-radius: 6px;
-  border: 1px solid var(--wplace-border-faint);
-  background: var(--wplace-bg-whisper);
-  color: var(--wplace-text);
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--wplace-border-faint);
+    background: var(--wplace-bg-whisper);
+    color: var(--wplace-text);
 }
 
 .resize-advanced-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
 }
 
 .resize-advanced-toggle-content {
-  flex: 1;
+    flex: 1;
 }
 
 .resize-advanced-description {
-  margin-top: 2px;
-  opacity: 0.65;
+    margin-top: 2px;
+    opacity: 0.65;
 }
 
 .resize-advanced-checkbox {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
 }
 
 .resize-chroma-weight-control {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .resize-chroma-weight-header {
-  display: flex;
-  justify-content: space-between;
-  font-size: 11px;
-  margin-bottom: 4px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    margin-bottom: 4px;
 }
 
 .resize-chroma-weight-value {
-  background: var(--wplace-bg-faint);
-  padding: 2px 6px;
-  border-radius: 4px;
+    background: var(--wplace-bg-faint);
+    padding: 2px 6px;
+    border-radius: 4px;
 }
 
 .resize-chroma-weight-slider {
-  width: 100%;
+    width: 100%;
 }
 
 .resize-threshold-controls {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
 }
 
 .resize-threshold-label {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-size: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 12px;
 }
 
 .resize-threshold-input {
-  padding: 6px 8px;
-  border-radius: 6px;
-  border: 1px solid var(--wplace-border-faint);
-  background: var(--wplace-bg-whisper);
-  color: var(--wplace-text);
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--wplace-border-faint);
+    background: var(--wplace-bg-whisper);
+    color: var(--wplace-text);
 }
 
 .resize-reset-advanced-btn {
-  background: linear-gradient(135deg, var(--wplace-danger), var(--wplace-danger-dark));
-  font-size: 11px;
+    background: linear-gradient(
+        135deg,
+        var(--wplace-danger),
+        var(--wplace-danger-dark)
+    );
+    font-size: 11px;
 }
 
 /* ===================================== */
@@ -1650,119 +1675,123 @@
 
 /* Overlay styles exact match */
 .resize-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 9999;
-  display: none;
-  /* Theme-specific styling applied via theme files */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    display: none;
+    /* Theme-specific styling applied via theme files */
 }
 
 /* Settings animations - removed duplicate, handled above */
 
 /* Settings Header Styling */
 .wplace-settings-header {
-  background: var(--wplace-accent);
-  padding: 20px;
-  border-bottom: 1px solid var(--wplace-border-color);
-  cursor: move;
+    background: var(--wplace-accent);
+    padding: 20px;
+    border-bottom: 1px solid var(--wplace-border-color);
+    cursor: move;
 }
 
 .wplace-settings-title-wrapper {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .wplace-settings-title {
-  margin: 0;
-  color: var(--wplace-text);
-  font-size: 20px;
-  font-weight: 300;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+    margin: 0;
+    color: var(--wplace-text);
+    font-size: 20px;
+    font-weight: 300;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .wplace-settings-icon {
-  font-size: 18px;
-  color: var(--wplace-highlight);
-  animation: spin 2s linear infinite;
+    font-size: 18px;
+    color: var(--wplace-highlight);
+    animation: spin 2s linear infinite;
 }
 
 .wplace-settings-close-btn {
-  background: rgba(34, 34, 34, 0.4);
-  color: var(--wplace-text);
-  border: 1px solid var(--wplace-border-color);
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  font-size: 14px;
-  font-weight: 300;
+    background: rgba(34, 34, 34, 0.4);
+    color: var(--wplace-text);
+    border: 1px solid var(--wplace-border-color);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    font-weight: 300;
 }
 
 .wplace-settings-close-btn:hover {
-  background: rgba(255, 0, 0, 0.4);
-  transform: scale(1.1);
+    background: rgba(255, 0, 0, 0.4);
+    transform: scale(1.1);
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* Font styling corrections */
 .resize-controls label {
-  font-size: 12px;
-  color: var(--wplace-text);
+    font-size: 12px;
+    color: var(--wplace-text);
 }
 
 .resize-dialog-title {
-  margin-top: 0;
-  color: var(--wplace-text);
+    margin-top: 0;
+    color: var(--wplace-text);
 }
 
 /* Ensure proper z-indexing */
 .resize-container {
-  z-index: 10000;
+    z-index: 10000;
 }
 
 /* Missing button hover styles */
 .resize-tools button {
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: 1px solid var(--wplace-border-subtle);
-  background: var(--wplace-bg-ghost);
-  color: var(--wplace-text);
-  cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--wplace-border-subtle);
+    background: var(--wplace-bg-ghost);
+    color: var(--wplace-text);
+    cursor: pointer;
 }
 
 /* Canvas styling */
 .resize-canvas-stack {
-  position: relative;
-  transform-origin: center center;
-  display: inline-block;
+    position: relative;
+    transform-origin: center center;
+    display: inline-block;
 }
 
 .resize-base-canvas,
 .resize-mask-canvas {
-  position: absolute;
-  left: 0;
-  top: 0;
-  image-rendering: pixelated;
-  image-rendering: -moz-crisp-edges;
-  image-rendering: crisp-edges;
+    position: absolute;
+    left: 0;
+    top: 0;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
 }
 
 .resize-mask-canvas {
-  pointer-events: auto;
+    pointer-events: auto;
 }
 
 /* Additional precision fixes for exact upstream main matching */
@@ -1774,863 +1803,222 @@
 /* All remaining settings styling moved to theme files */
 
 .wplace-settings-section-wrapper {
-  padding: 18px;
-  /* Theme-specific styling applied via theme files */
+    padding: 18px;
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-settings-select {
-  width: 100%;
-  padding: 12px 16px;
-  font-size: 14px;
-  outline: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-family: inherit;
-  /* Theme-specific styling applied via theme files */
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 14px;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    /* Theme-specific styling applied via theme files */
 }
 
 /* Settings select option styling moved to theme files */
 /* Settings description styling moved to theme files */
 
 .wplace-settings-footer {
-  border-top: 1px solid var(--wplace-border-ghost);
-  padding-top: 20px;
-  margin-top: 10px;
+    border-top: 1px solid var(--wplace-border-ghost);
+    padding-top: 20px;
+    margin-top: 10px;
 }
 
 .wplace-settings-apply-btn {
-  width: 100%;
-  border: none;
-  padding: 10px 16px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  justify-content: center;
-  /* Theme-specific styling applied via theme files */
+    width: 100%;
+    border: none;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+    /* Theme-specific styling applied via theme files */
 }
 
 /* Icon styling moved to theme files */
-.wplace-icon-key { font-size: 16px; }
-.wplace-icon-robot { font-size: 16px; }
-.wplace-icon-speed { font-size: 16px; }
-.wplace-icon-bell { font-size: 16px; }
-.wplace-icon-palette { font-size: 16px; }
-.wplace-icon-globe { font-size: 16px; }
-.wplace-icon-paint { font-size: 16px; }
-.wplace-icon-eye { font-size: 16px; }
+.wplace-icon-key {
+    font-size: 16px;
+}
+.wplace-icon-robot {
+    font-size: 16px;
+}
+.wplace-icon-speed {
+    font-size: 16px;
+}
+.wplace-icon-bell {
+    font-size: 16px;
+}
+.wplace-icon-palette {
+    font-size: 16px;
+}
+.wplace-icon-globe {
+    font-size: 16px;
+}
+.wplace-icon-paint {
+    font-size: 16px;
+}
+.wplace-icon-eye {
+    font-size: 16px;
+}
 
 /* Overlay Settings Controls */
 .wplace-overlay-opacity-control {
-  margin-bottom: 15px;
+    margin-bottom: 15px;
 }
 
 .wplace-overlay-opacity-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
 }
 
 .wplace-overlay-opacity-label {
-  font-weight: 500;
-  font-size: 13px;
+    font-weight: 500;
+    font-size: 13px;
 }
 
 .wplace-overlay-opacity-value {
-  min-width: 40px;
-  text-align: center;
-  background: var(--wplace-accent);
-  color: var(--wplace-text);
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 12px;
-  border: var(--wplace-border-width) var(--wplace-border-style) var(--wplace-border-color);
+    min-width: 40px;
+    text-align: center;
+    background: var(--wplace-accent);
+    color: var(--wplace-text);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    border: var(--wplace-border-width) var(--wplace-border-style)
+        var(--wplace-border-color);
 }
 
 .wplace-overlay-opacity-slider {
-  width: 100%;
-  -webkit-appearance: none;
-  height: 8px;
-  /* Theme-specific styling applied via theme files */
-  outline: none;
-  cursor: pointer;
+    width: 100%;
+    -webkit-appearance: none;
+    height: 8px;
+    /* Theme-specific styling applied via theme files */
+    outline: none;
+    cursor: pointer;
 }
 
 .wplace-overlay-opacity-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: var(--wplace-slider-thumb-bg);
-  box-shadow: var(--wplace-shadow-slider-thumb);
-  cursor: pointer;
-  transition: all 0.2s ease;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--wplace-slider-thumb-bg);
+    box-shadow: var(--wplace-shadow-slider-thumb);
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .wplace-overlay-opacity-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
-  box-shadow: var(--wplace-shadow-slider-hover);
+    transform: scale(1.2);
+    box-shadow: var(--wplace-shadow-slider-hover);
 }
 
 .wplace-blue-marble-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
 }
 
 .wplace-blue-marble-title {
-  font-weight: 500;
+    font-weight: 500;
 }
 
 .wplace-blue-marble-description {
-  font-size: 12px;
-  color: var(--wplace-muted-text);
-  margin: 4px 0 0 0;
+    font-size: 12px;
+    color: var(--wplace-muted-text);
+    margin: 4px 0 0 0;
 }
 
 .wplace-blue-marble-checkbox {
-  cursor: pointer;
-  width: 20px;
-  height: 20px;
-  accent-color: var(--wplace-highlight);
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    accent-color: var(--wplace-highlight);
 }
 
 /* Batch Mode Controls */
 .wplace-batch-mode-selection {
-  margin-bottom: 15px;
+    margin-bottom: 15px;
 }
 
 .wplace-batch-mode-label {
-  display: block;
-  margin-bottom: 8px;
-  color: var(--wplace-text-secondary);
-  font-weight: 500;
-  font-size: 14px;
+    display: block;
+    margin-bottom: 8px;
+    color: var(--wplace-text-secondary);
+    font-weight: 500;
+    font-size: 14px;
 }
 
 .wplace-icon-dice {
-  color: var(--wplace-icon-palette);
-  margin-right: 6px;
+    color: var(--wplace-icon-palette);
+    margin-right: 6px;
 }
 
 .wplace-batch-mode-select {
-  width: 100%;
-  padding: 10px 12px;
-  background: var(--wplace-bg-input);
-  color: var(--wplace-text);
-  border: 1px solid var(--wplace-border-subtle);
-  border-radius: 8px;
-  font-size: 13px;
-  outline: none;
-  cursor: pointer;
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--wplace-bg-input);
+    color: var(--wplace-text);
+    border: 1px solid var(--wplace-border-subtle);
+    border-radius: 8px;
+    font-size: 13px;
+    outline: none;
+    cursor: pointer;
 }
 
 .wplace-batch-controls {
-  padding: 18px;
-  margin-bottom: 15px;
-  /* Theme-specific styling applied via theme files */
+    padding: 18px;
+    margin-bottom: 15px;
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-speed-slider-container {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
 }
 
 .wplace-speed-slider {
-  flex: 1;
-  height: 8px;
-  outline: none;
-  -webkit-appearance: none;
-  cursor: pointer;
-  background: var(--wplace-slider-track-bg);
-  border-radius: 4px;
+    flex: 1;
+    height: 8px;
+    outline: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    background: var(--wplace-slider-track-bg);
+    border-radius: 4px;
 }
 
 .wplace-speed-value {
-  min-width: 100px;
-  text-align: center;
-  padding: 8px 12px;
-  font-weight: bold;
-  font-size: 13px;
-  /* Theme-specific styling applied via theme files */
+    min-width: 100px;
+    text-align: center;
+    padding: 8px 12px;
+    font-weight: bold;
+    font-size: 13px;
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-speed-labels {
-  display: flex;
-  justify-content: space-between;
-  color: var(--wplace-text-muted);
-  font-size: 11px;
-  margin-top: 8px;
+    display: flex;
+    justify-content: space-between;
+    color: var(--wplace-text-muted);
+    font-size: 11px;
+    margin-top: 8px;
 }
 `;
   var EMBEDDED_THEMES = {
-    "classic-light": "/* WPlace Auto-Image Bot - Classic Light Theme */\n/* Clean, bright theme based on classic design with light backgrounds */\n\n.wplace-theme--classic-light {\n  /* === CORE COLORS === */\n  --wplace-primary: #ffffff;           /* Clean white */\n  --wplace-secondary: #f8f9fa;         /* Light gray */\n  --wplace-accent: #e9ecef;            /* Lighter gray */\n  --wplace-text: #212529;              /* Dark text */\n  --wplace-highlight: #6f42c1;         /* Purple highlight */\n  --wplace-success: #28a745;           /* Bootstrap green */\n  --wplace-error: #dc3545;             /* Bootstrap red */\n  --wplace-warning: #ffc107;           /* Bootstrap yellow */\n\n  /* === UI PROPERTIES === */\n  --wplace-radius: 8px;\n  --wplace-border-style: solid;\n  --wplace-border-width: 1px;\n  --wplace-border-color: #415a77;\n  --wplace-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.08);\n  --wplace-backdrop: blur(10px);\n  --wplace-font: 'Segoe UI', Roboto, sans-serif;\n\n  /* === EXTENDED COLOR PALETTE === */\n  /* Icon colors */\n  --wplace-icon-primary: #4facfe;      /* Light blue */\n  --wplace-icon-secondary: #00f2fe;    /* Cyan */\n  --wplace-icon-palette: #f093fb;      /* Pink */\n  \n  /* Additional UI colors */\n  --wplace-danger: #dc3545;            /* Bootstrap red */\n  --wplace-danger-dark: #c82333;       /* Darker red */\n  --wplace-muted-text: rgba(33, 37, 41, 0.7);\n  --wplace-highlight-secondary: #d3a4ff;\n  \n  /* Text variants */\n  --wplace-text-secondary: rgba(33, 37, 41, 0.9);\n  --wplace-text-muted: rgba(33, 37, 41, 0.7);\n  --wplace-text-dim: rgba(33, 37, 41, 0.6);\n  --wplace-text-faded: rgba(33, 37, 41, 0.8);\n  \n  /* Background variants */\n  --wplace-bg-input: rgba(0, 0, 0, 0.08);\n  --wplace-bg-subtle: rgba(0, 0, 0, 0.05);\n  --wplace-bg-faint: rgba(0, 0, 0, 0.03);\n  --wplace-bg-ghost: rgba(0, 0, 0, 0.02);\n  --wplace-bg-whisper: rgba(0, 0, 0, 0.01);\n  \n  /* Border variants */\n  --wplace-border-subtle: rgba(0, 0, 0, 0.2);\n  --wplace-border-faint: rgba(0, 0, 0, 0.15);\n  --wplace-border-ghost: rgba(0, 0, 0, 0.1);\n  --wplace-border-ultra-faint: rgba(0, 0, 0, 0.05);\n  \n  /* Shadow variants */\n  --wplace-shadow-drag: 0 12px 40px rgba(0, 0, 0, 0.2), 0 0 0 2px rgba(111, 66, 193, 0.3);\n  --wplace-shadow-notification: 0 4px 12px rgba(0, 0, 0, 0.15);\n  --wplace-shadow-slider-thumb: 0 3px 6px rgba(0, 0, 0, 0.2), 0 0 0 2px var(--wplace-icon-primary);\n  --wplace-shadow-slider-hover: 0 4px 8px rgba(0, 0, 0, 0.25), 0 0 0 3px var(--wplace-icon-primary);\n  \n  /* Animation colors */\n  --wplace-pulse-start: rgba(40, 167, 69, 0.7);\n  --wplace-pulse-mid: rgba(40, 167, 69, 0);\n  --wplace-pulse-end: rgba(40, 167, 69, 0);\n  \n  /* Slider colors */\n  --wplace-slider-thumb-bg: #6f42c1;\n  --wplace-slider-track-bg: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);\n}\n\n/* === COMPONENT STYLING === */\n\n/* Main container with clean light styling */\n.wplace-theme--classic-light #wplace-image-bot-container {\n  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;\n  color: var(--wplace-text) !important;\n  border: 1px solid rgba(0, 0, 0, 0.15) !important;\n  border-radius: 12px !important;\n  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.08) !important;\n  font-family: 'Segoe UI', Roboto, sans-serif !important;\n  backdrop-filter: blur(10px) !important;\n}\n\n\n/* Stats container with proper contrast */\n.wplace-theme--classic-light #wplace-stats-container {\n  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;\n  border: 1px solid rgba(0, 0, 0, 0.2) !important;\n  border-radius: 12px !important;\n  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;\n  font-family: 'Segoe UI', Roboto, sans-serif !important;\n  color: var(--wplace-text) !important;\n  position: fixed !important;\n  overflow: hidden !important;\n  z-index: 9998 !important;\n}\n\n/* Stats header styling */\n.wplace-theme--classic-light #wplace-stats-container .wplace-header {\n  background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%) !important;\n  color: var(--wplace-text) !important;\n  border-bottom: 1px solid rgba(0, 0, 0, 0.2) !important;\n  text-shadow: none !important;\n  font-weight: 600 !important;\n}\n\n/* Stats title specific styling */\n.wplace-theme--classic-light #wplace-stats-container .wplace-header .wplace-stats-title {\n  color: var(--wplace-text) !important;\n  text-shadow: none !important;\n}\n\n/* Comprehensive text and element styling for light theme - scoped to bot containers only */\n\n.wplace-theme--classic-light .wplace-status,\n.wplace-theme--classic-light .wplace-stats,\n.wplace-theme--classic-light .wplace-section,\n.wplace-theme--classic-light .wplace-controls,\n.wplace-theme--classic-light .wplace-data-management,\n.wplace-theme--classic-light .wplace-cooldown-settings {\n  color: var(--wplace-text) !important;\n}\n\n/* Data management section buttons */\n.wplace-theme--classic-light .wplace-data-management .wplace-btn {\n  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;\n  border: 1px solid rgba(0, 0, 0, 0.2) !important;\n  color: #212529 !important;\n  font-weight: 500 !important;\n}\n\n.wplace-theme--classic-light .wplace-data-management .wplace-btn:hover:not(:disabled) {\n  background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%) !important;\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;\n}\n\n/* Settings dialog */\n.wplace-theme--classic-light #wplace-settings-container {\n  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;\n  border: 1px solid rgba(0, 0, 0, 0.15) !important;\n  border-radius: 12px !important;\n  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.08) !important;\n  font-family: 'Segoe UI', Roboto, sans-serif !important;\n  backdrop-filter: blur(10px) !important;\n  color: var(--wplace-text) !important;\n}\n\n/* Settings dialog text elements */\n.wplace-theme--classic-light #wplace-settings-container * {\n  color: var(--wplace-text) !important;\n}\n\n.wplace-theme--classic-light #wplace-settings-container .wplace-settings-section-wrapper * {\n  color: var(--wplace-text) !important;\n}\n\n/* Color palette text labels */\n.wplace-theme--classic-light .wplace-stat-colors-grid * {\n  color: var(--wplace-text) !important;\n  font-weight: 500 !important;\n}\n\n.wplace-theme--classic-light .wplace-color-label {\n  color: var(--wplace-text) !important;\n  font-weight: 500 !important;\n  text-shadow: none !important;\n}\n\n.wplace-theme--classic-light .wplace-color-name {\n  color: var(--wplace-text) !important;\n  font-weight: 500 !important;\n}\n\n.wplace-theme--classic-light .wplace-color-item-name {\n  color: #000000 !important;\n  font-weight: 600 !important;\n  text-shadow: none !important;\n}\n\n/* Resize dialog */\n.wplace-theme--classic-light .resize-container {\n  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;\n  border: 1px solid rgba(0, 0, 0, 0.15) !important;\n  border-radius: 12px !important;\n  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.08) !important;\n  font-family: 'Segoe UI', Roboto, sans-serif !important;\n  backdrop-filter: blur(10px) !important;\n}\n\n/* Headers with light gradient */\n.wplace-theme--classic-light .wplace-header {\n  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;\n  color: var(--wplace-highlight) !important;\n  border-bottom: 1px solid rgba(0, 0, 0, 0.15) !important;\n  text-shadow: none !important;\n}\n\n/* Settings header */\n.wplace-theme--classic-light .wplace-settings-header {\n  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;\n  border-bottom: 1px solid rgba(0, 0, 0, 0.15) !important;\n}\n\n.wplace-theme--classic-light .wplace-settings-title {\n  color: var(--wplace-text) !important;\n  text-shadow: none !important;\n}\n\n.wplace-theme--classic-light .wplace-settings-close-btn {\n  background: rgba(0, 0, 0, 0.05) !important;\n  border: 1px solid rgba(0, 0, 0, 0.2) !important;\n  border-radius: 50% !important;\n  color: var(--wplace-text) !important;\n  transition: all 0.3s ease !important;\n}\n\n.wplace-theme--classic-light .wplace-settings-close-btn:hover {\n  background: rgba(220, 53, 69, 0.1) !important;\n  border-color: var(--wplace-error) !important;\n  box-shadow: 0 0 12px rgba(220, 53, 69, 0.3) !important;\n}\n\n/* Section titles */\n.wplace-theme--classic-light .wplace-section-title {\n  color: var(--wplace-highlight) !important;\n  text-shadow: none !important;\n  font-weight: 600 !important;\n}\n\n/* Buttons with light styling */\n.wplace-theme--classic-light .wplace-btn {\n  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;\n  border: 1px solid rgba(0, 0, 0, 0.2) !important;\n  border-radius: 12px !important;\n  color: var(--wplace-text) !important;\n  font-family: 'Segoe UI', Roboto, sans-serif !important;\n  font-weight: 500 !important;\n  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;\n}\n\n.wplace-theme--classic-light .wplace-btn:hover:not(:disabled) {\n  background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%) !important;\n  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;\n  transform: translateY(-1px) !important;\n}\n\n/* Button variants with classic light colors */\n.wplace-theme--classic-light .wplace-btn-start {\n  background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;\n  color: white !important;\n  font-weight: 600 !important;\n}\n\n.wplace-theme--classic-light .wplace-btn-start:hover:not(:disabled) {\n  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4) !important;\n}\n\n.wplace-theme--classic-light .wplace-btn-stop {\n  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;\n  color: white !important;\n  font-weight: 600 !important;\n}\n\n.wplace-theme--classic-light .wplace-btn-stop:hover:not(:disabled) {\n  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4) !important;\n}\n\n.wplace-theme--classic-light .wplace-btn-upload {\n  background: rgba(111, 66, 193, 0.1) !important;\n  border: 2px dashed var(--wplace-highlight) !important;\n  color: var(--wplace-highlight) !important;\n}\n\n.wplace-theme--classic-light .wplace-btn-upload:hover:not(:disabled) {\n  background: rgba(111, 66, 193, 0.15) !important;\n  box-shadow: 0 4px 12px rgba(111, 66, 193, 0.2) !important;\n}\n\n/* Progress bars with clean light styling */\n.wplace-theme--classic-light .wplace-progress {\n  background: rgba(0, 0, 0, 0.1) !important;\n  border: 1px solid rgba(0, 0, 0, 0.15) !important;\n  border-radius: 12px !important;\n}\n\n.wplace-theme--classic-light .wplace-progress-bar {\n  background: linear-gradient(135deg, #6f42c1 0%, #9370db 100%) !important;\n  box-shadow: none !important;\n}\n\n.wplace-theme--classic-light .wplace-progress-bar::after {\n  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent) !important;\n}\n\n/* Status indicators with light colors */\n.wplace-theme--classic-light .status-success {\n  background: rgba(40, 167, 69, 0.1) !important;\n  border-color: var(--wplace-success) !important;\n  color: var(--wplace-success) !important;\n  box-shadow: 0 0 15px rgba(40, 167, 69, 0.2) !important;\n  text-shadow: none !important;\n}\n\n.wplace-theme--classic-light .status-error {\n  background: rgba(220, 53, 69, 0.1) !important;\n  border-color: var(--wplace-error) !important;\n  color: var(--wplace-error) !important;\n  box-shadow: 0 0 15px rgba(220, 53, 69, 0.2) !important;\n  text-shadow: none !important;\n}\n\n.wplace-theme--classic-light .status-default {\n  background: rgba(111, 66, 193, 0.1) !important;\n  border-color: var(--wplace-highlight) !important;\n  color: var(--wplace-highlight) !important;\n  text-shadow: none !important;\n}\n\n.wplace-theme--classic-light .wplace-stat-label {\n  color: var(--wplace-text) !important;\n  text-shadow: none !important;\n  font-weight: 500 !important;\n}\n\n.wplace-theme--classic-light .wplace-stat-value {\n  color: var(--wplace-highlight) !important;\n  text-shadow: none !important;\n  font-weight: 600 !important;\n}\n\n/* Sections with light styling */\n.wplace-theme--classic-light .wplace-section {\n  background: rgba(0, 0, 0, 0.03) !important;\n  border: 1px solid rgba(0, 0, 0, 0.1) !important;\n  border-radius: 12px !important;\n}\n\n.wplace-theme--classic-light .wplace-status-section {\n  background: rgba(0, 0, 0, 0.03) !important;\n  border: 1px solid rgba(0, 0, 0, 0.1) !important;\n  border-radius: 12px !important;\n}\n\n.wplace-theme--classic-light .wplace-settings-section-wrapper {\n  background: rgba(0, 0, 0, 0.03) !important;\n  border: 1px solid rgba(0, 0, 0, 0.1) !important;\n  border-radius: 12px !important;\n}\n\n/* Form controls with light styling */\n.wplace-theme--classic-light .wplace-settings-select {\n  background: #ffffff !important;\n  border: 1px solid rgba(0, 0, 0, 0.2) !important;\n  border-radius: 8px !important;\n  color: var(--wplace-text) !important;\n  font-family: 'Segoe UI', Roboto, sans-serif !important;\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;\n}\n\n.wplace-theme--classic-light .wplace-settings-select:focus {\n  border-color: var(--wplace-highlight) !important;\n  box-shadow: 0 0 0 2px rgba(111, 66, 193, 0.3) !important;\n}\n\n/* Dropdown menu options */\n.wplace-theme--classic-light .wplace-settings-select option {\n  background: #ffffff !important;\n  color: var(--wplace-text) !important;\n}\n\n.wplace-theme--classic-light .wplace-settings-option {\n  background: #ffffff !important;\n  color: var(--wplace-text) !important;\n}\n\n/* Sliders with classic gradient */\n.wplace-theme--classic-light .wplace-speed-slider {\n  background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%) !important;\n  border-radius: 4px !important;\n}\n\n.wplace-theme--classic-light .wplace-overlay-opacity-slider {\n  background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%) !important;\n  border-radius: 4px !important;\n}\n\n.wplace-theme--classic-light .wplace-slider {\n  background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%) !important;\n  border-radius: 4px !important;\n}\n\n.wplace-theme--classic-light .wplace-slider::-webkit-slider-thumb {\n  -webkit-appearance: none;\n  width: 16px;\n  height: 16px;\n  border-radius: 50%;\n  background: var(--wplace-slider-thumb-bg);\n  border: 1px solid rgba(0, 0, 0, 0.2);\n  cursor: pointer;\n  transition: all 0.2s ease;\n  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);\n}\n\n.wplace-theme--classic-light .wplace-speed-value {\n  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;\n  border-radius: 8px !important;\n  color: white !important;\n  font-weight: 600 !important;\n  box-shadow: 0 3px 10px rgba(79, 172, 254, 0.3) !important;\n  border: 1px solid rgba(0, 0, 0, 0.1) !important;\n}\n\n/* Settings labels */\n.wplace-theme--classic-light .wplace-settings-section-label {\n  color: var(--wplace-highlight) !important;\n  text-shadow: none !important;\n  font-family: 'Segoe UI', Roboto, sans-serif !important;\n  font-weight: 600 !important;\n}\n\n/* Icon colors for classic light theme */\n.wplace-theme--classic-light .wplace-icon-key { color: #4facfe; }\n.wplace-theme--classic-light .wplace-icon-robot { color: #4facfe; }\n.wplace-theme--classic-light .wplace-icon-speed { color: #4facfe; }\n.wplace-theme--classic-light .wplace-icon-bell { color: #ffc107; }\n.wplace-theme--classic-light .wplace-icon-palette { color: #f093fb; }\n.wplace-theme--classic-light .wplace-icon-globe { color: #ffeaa7; }\n.wplace-theme--classic-light .wplace-icon-paint { color: #4facfe; }\n.wplace-theme--classic-light .wplace-icon-eye { color: #6f42c1; }\n\n/* Clean light theme animations */\n@keyframes lightShimmer {\n  0% {\n    transform: translateX(-100%);\n  }\n  100% {\n    transform: translateX(200%);\n  }\n}\n\n/* Turnstile/CF checkbox overlay - CRITICAL FIX */\n.wplace-theme--classic-light .wplace-turnstile-overlay {\n  background: rgba(255, 255, 255, 0.98) !important;\n  border-radius: 12px !important;\n  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;\n  backdrop-filter: blur(10px) !important;\n  border: 1px solid rgba(0, 0, 0, 0.2) !important;\n  color: var(--wplace-text) !important;\n  font-family: 'Segoe UI', Roboto, sans-serif !important;\n}\n\n.wplace-theme--classic-light .wplace-turnstile-title {\n  color: var(--wplace-text) !important;\n}\n\n.wplace-theme--classic-light .wplace-turnstile-hide-btn {\n  color: var(--wplace-text) !important;\n  border: 1px solid rgba(0, 0, 0, 0.2) !important;\n  border-radius: 6px !important;\n  background: rgba(0, 0, 0, 0.05) !important;\n}\n\n.wplace-theme--classic-light .wplace-turnstile-hide-btn:hover {\n  background: rgba(0, 0, 0, 0.1) !important;\n}\n\n/* Color swatches with light styling */\n.wplace-theme--classic-light .wplace-color-swatch {\n  border: 1px solid rgba(0, 0, 0, 0.2) !important;\n  border-radius: 4px !important;\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;\n}\n\n.wplace-theme--classic-light .wplace-color-swatch:hover {\n  box-shadow: 0 4px 16px rgba(111, 66, 193, 0.3) !important;\n  transform: translateY(-1px);\n}\n\n.wplace-theme--classic-light .wplace-stat-colors-grid {\n  background: rgba(0, 0, 0, 0.05) !important;\n  border-radius: 8px !important;\n  border: 1px solid rgba(0, 0, 0, 0.1) !important;\n}\n",
-    "classic": `/* WPlace Auto-Image Bot - Classic Theme */
-/* Clean, modern UI with gradients and subtle effects */
-
-.wplace-theme--classic {
-  --wplace-primary: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
-  --wplace-secondary: linear-gradient(135deg, #111111 0%, #2a2a2a 100%);
-  --wplace-accent: #222222;
-  --wplace-text: #ffffff;
-  --wplace-highlight: #775ce3;
-  --wplace-success: #00ff00;
-  --wplace-error: #ff0000;
-  --wplace-warning: #ffaa00;
-
-  --wplace-radius: 12px;
-  --wplace-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.1);
-  --wplace-backdrop: blur(10px);
-  --wplace-font: 'Segoe UI', Roboto, sans-serif;
-
-  --wplace-scanline: 0;
-  --wplace-pixel-blink: 0;
-
-  /* Icon colors */
-  --wplace-icon-primary: #4facfe;
-  --wplace-icon-secondary: #00f2fe;
-  --wplace-icon-palette: #f093fb;
-  
-  /* Additional UI colors */
-  --wplace-danger: #ff6a6a;
-  --wplace-danger-dark: #ff4757;
-  --wplace-muted-text: #ffffffBB;
-  --wplace-highlight-secondary: #d3a4ff;
-  
-  /* Text variants */
-  --wplace-text-secondary: rgba(255,255,255,0.9);
-  --wplace-text-muted: rgba(255,255,255,0.7);
-  --wplace-text-dim: rgba(255,255,255,0.6);
-  --wplace-text-faded: rgba(255,255,255,0.8);
-  
-  /* Background variants */
-  --wplace-bg-input: rgba(255,255,255,0.15);
-  --wplace-bg-subtle: rgba(255,255,255,0.1);
-  --wplace-bg-faint: rgba(255,255,255,0.08);
-  --wplace-bg-ghost: rgba(255,255,255,0.06);
-  --wplace-bg-whisper: rgba(255,255,255,0.05);
-  
-  /* Border variants */
-  --wplace-border-subtle: rgba(255,255,255,0.2);
-  --wplace-border-faint: rgba(255,255,255,0.15);
-  --wplace-border-ghost: rgba(255,255,255,0.1);
-  --wplace-border-ultra-faint: rgba(255,255,255,0.05);
-  
-  /* Shadow variants */
-  --wplace-shadow-drag: 0 12px 40px rgba(0, 0, 0, 0.8), 0 0 0 2px rgba(255, 255, 255, 0.2);
-  --wplace-shadow-notification: 0 4px 12px rgba(0, 0, 0, 0.3);
-  --wplace-shadow-slider-thumb: 0 3px 6px rgba(0,0,0,0.3), 0 0 0 2px var(--wplace-icon-primary);
-  --wplace-shadow-slider-hover: 0 4px 8px rgba(0,0,0,0.4), 0 0 0 3px var(--wplace-icon-primary);
-  
-  /* Animation colors */
-  --wplace-pulse-start: rgba(0, 255, 0, 0.7);
-  --wplace-pulse-mid: rgba(0, 255, 0, 0);
-  --wplace-pulse-end: rgba(0, 255, 0, 0);
-  
-  /* Slider colors */
-  --wplace-slider-thumb-bg: white;
-  --wplace-slider-track-bg: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
-}
-
-/* Classic theme container styling */
-:root #wplace-image-bot-container,
-.wplace-theme--classic #wplace-image-bot-container {
-  background: var(--wplace-primary);
-  color: var(--wplace-text);
-  border-radius: var(--wplace-radius);
-  box-shadow: var(--wplace-shadow);
-  font-family: var(--wplace-font);
-  backdrop-filter: var(--wplace-backdrop);
-  border: var(--wplace-border-width) var(--wplace-border-style) var(--wplace-border-color);
-}
-
-:root #wplace-stats-container,
-.wplace-theme--classic #wplace-stats-container {
-  background: var(--wplace-primary);
-  color: var(--wplace-text);
-  border-radius: var(--wplace-radius);
-  box-shadow: var(--wplace-shadow);
-  font-family: var(--wplace-font);
-  backdrop-filter: var(--wplace-backdrop);
-  border: var(--wplace-border-width) var(--wplace-border-style) var(--wplace-border-color);
-}
-
-:root #wplace-settings-container,
-.wplace-theme--classic #wplace-settings-container {
-  background: var(--wplace-primary);
-  color: var(--wplace-text);
-  border-radius: var(--wplace-radius);
-  box-shadow: var(--wplace-shadow);
-  font-family: var(--wplace-font);
-  backdrop-filter: var(--wplace-backdrop);
-  border: var(--wplace-border-width) var(--wplace-border-style) var(--wplace-border-color);
-}
-
-:root .wplace-header,
-.wplace-theme--classic .wplace-header {
-  background: var(--wplace-secondary);
-  color: var(--wplace-highlight);
-}
-
-:root .wplace-section-title,
-.wplace-theme--classic .wplace-section-title {
-  color: var(--wplace-highlight);
-}
-
-:root .wplace-stat-value,
-.wplace-theme--classic .wplace-stat-value {
-  color: var(--wplace-highlight);
-}
-
-:root .wplace-status-section,
-.wplace-theme--classic .wplace-status-section {
-  border-radius: var(--wplace-radius);
-}
-
-:root .wplace-section,
-.wplace-theme--classic .wplace-section {
-  border-radius: var(--wplace-radius);
-}
-
-:root .wplace-stats,
-.wplace-theme--classic .wplace-stats {
-  border-radius: var(--wplace-radius);
-}
-
-:root .wplace-status,
-.wplace-theme--classic .wplace-status {
-  border-radius: var(--wplace-radius);
-}
-
-:root .wplace-alert-base,
-.wplace-theme--classic .wplace-alert-base {
-  border-radius: var(--wplace-radius);
-}
-
-:root .wplace-settings-container-base,
-.wplace-theme--classic .wplace-settings-container-base {
-  font-family: var(--wplace-font);
-  border-radius: var(--wplace-radius);
-  background: var(--wplace-primary);
-  color: var(--wplace-text);
-  box-shadow: var(--wplace-shadow);
-  backdrop-filter: var(--wplace-backdrop);
-}
-
-/* Button styling for classic theme */
-:root .wplace-btn,
-.wplace-theme--classic .wplace-btn {
-  background: linear-gradient(135deg, #222222 0%, #4a4a4a 100%);
-  border: 1px solid rgba(255,255,255,0.1);
-  color: var(--wplace-text);
-  border-radius: var(--wplace-radius);
-  font-family: var(--wplace-font);
-}
-
-:root .wplace-btn::before,
-.wplace-theme--classic .wplace-btn::before {
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-}
-
-:root .wplace-btn:hover:not(:disabled),
-.wplace-theme--classic .wplace-btn:hover:not(:disabled) {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-}
-
-:root .wplace-btn:disabled,
-.wplace-theme--classic .wplace-btn:disabled {
-  box-shadow: none !important;
-}
-
-:root .wplace-btn-overlay.active,
-.wplace-theme--classic .wplace-btn-overlay.active {
-  background: linear-gradient(135deg, #29b6f6 0%, #8e2de2 100%);
-  box-shadow: 0 0 15px #8e2de2;
-}
-
-/* Button variants - exact upstream main colors */
-:root .wplace-btn-primary,
-.wplace-theme--classic .wplace-btn-primary {
-  background: linear-gradient(135deg, #222222 0%, #6a5acd 100%);
-  color: var(--wplace-text);
-}
-
-:root .wplace-btn-upload,
-.wplace-theme--classic .wplace-btn-upload {
-  background: linear-gradient(135deg, #111111 0%, #4a4a4a 100%);
-  color: var(--wplace-text);
-  border: 1px dashed var(--wplace-highlight) !important;
-}
-
-:root .wplace-btn-start,
-.wplace-theme--classic .wplace-btn-start {
-  background: linear-gradient(135deg, var(--wplace-success) 0%, #228b22 100%);
-  color: white;
-}
-
-:root .wplace-btn-stop,
-.wplace-theme--classic .wplace-btn-stop {
-  background: linear-gradient(135deg, var(--wplace-error) 0%, #dc143c 100%);
-  color: white;
-}
-
-:root .wplace-btn-select,
-.wplace-theme--classic .wplace-btn-select {
-  background: linear-gradient(135deg, var(--wplace-highlight) 0%, #9370db 100%);
-  color: white;
-}
-
-:root .wplace-btn-file,
-.wplace-theme--classic .wplace-btn-file {
-  background: linear-gradient(135deg, #ff8c00 0%, #ff7f50 100%);
-  color: white;
-}
-
-:root .wplace-btn.active,
-:root .wplace-btn[aria-pressed="true"],
-.wplace-theme--classic .wplace-btn.active,
-.wplace-theme--classic .wplace-btn[aria-pressed="true"] {
-  background: var(--wplace-highlight) !important;
-  color: #000000 !important;
-  border-color: var(--wplace-text) !important;
-  box-shadow: 0 0 8px rgba(0,0,0,0.25) inset, 0 0 6px rgba(0,0,0,0.2) !important;
-}
-
-:root .wplace-btn.active i,
-:root .wplace-btn[aria-pressed="true"] i,
-.wplace-theme--classic .wplace-btn.active i,
-.wplace-theme--classic .wplace-btn[aria-pressed="true"] i { 
-  filter: drop-shadow(0 0 3px #000000); 
-}
-
-:root .mask-mode-group .wplace-btn.active,
-:root .mask-mode-group .wplace-btn[aria-pressed="true"],
-.wplace-theme--classic .mask-mode-group .wplace-btn.active,
-.wplace-theme--classic .mask-mode-group .wplace-btn[aria-pressed="true"] {
-  background: var(--wplace-highlight);
-  color: #000000;
-  border-color: var(--wplace-text);
-  box-shadow: 0 0 8px rgba(0,0,0,0.25) inset, 0 0 6px rgba(0,0,0,0.2);
-}
-
-/* Status styling for classic theme */
-:root .status-default,
-.wplace-theme--classic .status-default {
-  background: rgba(255,255,255,0.1);
-  border-color: var(--wplace-text);
-  color: var(--wplace-text);
-}
-
-:root .status-success,
-.wplace-theme--classic .status-success {
-  background: rgba(0, 255, 0, 0.1);
-  border-color: var(--wplace-success);
-  color: var(--wplace-success);
-  box-shadow: 0 0 15px var(--wplace-success);
-}
-
-:root .status-error,
-.wplace-theme--classic .status-error {
-  background: rgba(255, 0, 0, 0.1);
-  border-color: var(--wplace-error);
-  color: var(--wplace-error);
-  box-shadow: 0 0 15px var(--wplace-error);
-}
-
-:root .status-warning,
-.wplace-theme--classic .status-warning {
-  background: rgba(255, 165, 0, 0.1);
-  border-color: var(--wplace-warning);
-  color: var(--wplace-warning);
-  box-shadow: 0 0 15px var(--wplace-warning);
-}
-
-:root .wplace-status.status-default,
-.wplace-theme--classic .wplace-status.status-default {
-  color: var(--wplace-text);
-  background: rgba(255,255,255,0.1);
-  border-color: var(--wplace-text);
-}
-
-/* Alert styling for classic theme */
-:root .wplace-alert-info,
-.wplace-theme--classic .wplace-alert-info {
-  background: linear-gradient(135deg, #3498db, #2980b9);
-  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
-}
-
-:root .wplace-alert-success,
-.wplace-theme--classic .wplace-alert-success {
-  background: linear-gradient(135deg, #27ae60, #229954);
-  box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
-}
-
-:root .wplace-alert-warning,
-.wplace-theme--classic .wplace-alert-warning {
-  background: linear-gradient(135deg, #f39c12, #e67e22);
-  box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
-}
-
-:root .wplace-alert-error,
-.wplace-theme--classic .wplace-alert-error {
-  background: linear-gradient(135deg, #e74c3c, #c0392b);
-  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
-}
-
-/* Progress bar styling for classic theme */
-:root .wplace-progress,
-.wplace-theme--classic .wplace-progress {
-  background: rgba(0,0,0,0.3);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: var(--wplace-radius);
-}
-
-:root .wplace-progress-bar,
-.wplace-theme--classic .wplace-progress-bar {
-  background: linear-gradient(135deg, var(--wplace-highlight) 0%, #9370db 100%);
-}
-
-:root .wplace-progress-bar::after,
-.wplace-theme--classic .wplace-progress-bar::after {
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-}
-
-/* Header and sections styling for classic theme */
-:root .wplace-header-btn,
-.wplace-theme--classic .wplace-header-btn {
-  background: rgba(255,255,255,0.1);
-  color: var(--wplace-highlight);
-  border-radius: 4px;
-  font-family: var(--wplace-font);
-}
-
-:root .wplace-header-btn:hover,
-.wplace-theme--classic .wplace-header-btn:hover {
-  background: #222222;
-  color: var(--wplace-text);
-}
-
-:root .wplace-status-section,
-.wplace-theme--classic .wplace-status-section {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-:root .wplace-section,
-.wplace-theme--classic .wplace-section {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-:root .wplace-stats,
-.wplace-theme--classic .wplace-stats {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* Font and typography for classic theme */
-:root .wplace-turnstile-overlay,
-.wplace-theme--classic .wplace-turnstile-overlay {
-  background: rgba(0, 0, 0, 0.9) !important;
-  border-radius: var(--wplace-radius) !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
-  backdrop-filter: var(--wplace-backdrop) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  color: var(--wplace-text) !important;
-  font-family: var(--wplace-font) !important;
-}
-
-:root .wplace-alert-base,
-.wplace-theme--classic .wplace-alert-base {
-  font-family: var(--wplace-font);
-}
-
-/* Auto light/dark support for classic theme */
-@media (prefers-color-scheme: light) {
-  :root .theme-auto,
-  .wplace-theme--classic .theme-auto {
-    --wplace-primary: #ffffff;
-    --wplace-secondary: #f5f5f5;
-    --wplace-accent: #007acc;
-    --wplace-text: #333333;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  :root .theme-auto,
-  .wplace-theme--classic .theme-auto {
-    --wplace-primary: #1e1e1e;
-    --wplace-secondary: #2d2d30;
-    --wplace-accent: var(--wplace-highlight);
-    --wplace-text: #ffffff;
-  }
-}
-
-/* Border and color styling for classic theme */
-:root .wplace-color-item-name,
-.wplace-theme--classic .wplace-color-item-name {
-  color: #ccc;
-}
-
-:root .wplace-color-swatch,
-.wplace-theme--classic .wplace-color-swatch {
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
-}
-
-:root .wplace-stat-color-swatch,
-.wplace-theme--classic .wplace-stat-color-swatch {
-  border-radius: 3px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.5);
-}
-
-:root .resize-tools button,
-.wplace-theme--classic .resize-tools button {
-  border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.06);
-  color: #fff;
-}
-
-:root .resize-slider,
-.wplace-theme--classic .resize-slider {
-  background: #ccc;
-  border-radius: var(--wplace-radius);
-}
-
-/* Text effects and filters for classic theme */
-:root .wplace-header,
-.wplace-theme--classic .wplace-header {
-  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-}
-
-:root .wplace-color-swatch:not(.active),
-.wplace-theme--classic .wplace-color-swatch:not(.active) {
-  filter: grayscale(80%);
-}
-
-:root .wplace-color-swatch.unavailable:not(.active),
-.wplace-theme--classic .wplace-color-swatch.unavailable:not(.active) {
-  filter: grayscale(90%);
-}
-
-:root .wplace-color-swatch.active::after,
-.wplace-theme--classic .wplace-color-swatch.active::after {
-  text-shadow: 0 0 3px black;
-}
-
-/* Icon colors for classic theme */
-:root .wplace-icon-key,
-.wplace-theme--classic .wplace-icon-key { 
-  color: #4facfe; 
-}
-
-:root .wplace-icon-robot,
-.wplace-theme--classic .wplace-icon-robot { 
-  color: #4facfe; 
-}
-
-:root .wplace-icon-speed,
-.wplace-theme--classic .wplace-icon-speed { 
-  color: #4facfe; 
-}
-
-:root .wplace-icon-bell,
-.wplace-theme--classic .wplace-icon-bell { 
-  color: #ffd166; 
-}
-
-:root .wplace-icon-palette,
-.wplace-theme--classic .wplace-icon-palette { 
-  color: #f093fb; 
-}
-
-:root .wplace-icon-globe,
-.wplace-theme--classic .wplace-icon-globe {
-  color: #ffeaa7;
-}
-
-:root .wplace-icon-paint,
-.wplace-theme--classic .wplace-icon-paint {
-  color: #4facfe;
-}
-
-:root .wplace-icon-eye,
-.wplace-theme--classic .wplace-icon-eye {
-  color: var(--wplace-highlight);
-}
-
-/* Form controls and sliders for classic theme */
-:root .wplace-slider,
-.wplace-theme--classic .wplace-slider {
-  background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
-  border-radius: 4px;
-}
-
-:root .wplace-slider::-webkit-slider-thumb,
-.wplace-theme--classic .wplace-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--wplace-slider-thumb-bg);
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-:root .wplace-speed-slider,
-.wplace-theme--classic .wplace-speed-slider {
-  border-radius: 3px;
-}
-
-:root .wplace-speed-slider::-webkit-slider-thumb,
-.wplace-theme--classic .wplace-speed-slider::-webkit-slider-thumb {
-  border-radius: 50%;
-  border: 2px solid;
-}
-
-:root .wplace-speed-slider::-moz-range-thumb,
-.wplace-theme--classic .wplace-speed-slider::-moz-range-thumb {
-  border-radius: 50%;
-  border: 2px solid;
-}
-
-:root .wplace-color-swatch.unavailable,
-.wplace-theme--classic .wplace-color-swatch.unavailable {
-  border-color: #666;
-}
-
-:root .wplace-turnstile-title,
-.wplace-theme--classic .wplace-turnstile-title {
-  color: var(--wplace-text) !important;
-}
-
-:root .wplace-turnstile-hide-btn,
-.wplace-theme--classic .wplace-turnstile-hide-btn {
-  color: var(--wplace-text) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  border-radius: 6px !important;
-}
-
-:root .wplace-turnstile-hide-btn:hover,
-.wplace-theme--classic .wplace-turnstile-hide-btn:hover {
-  background: rgba(255, 255, 255, 0.1) !important;
-}
-
-:root .wplace-settings-select,
-.wplace-theme--classic .wplace-settings-select {
-  background: rgba(255,255,255,0.15);
-  color: white;
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 8px;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-}
-
-:root .wplace-settings-option,
-.wplace-theme--classic .wplace-settings-option {
-  background: #2d3748;
-  color: white;
-}
-
-:root .wplace-stat-colors-grid,
-.wplace-theme--classic .wplace-stat-colors-grid {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
-}
-
-:root .resize-overlay,
-.wplace-theme--classic .resize-overlay {
-  background: rgba(0, 0, 0, 0.8);
-}
-
-:root .wplace-overlay,
-.wplace-theme--classic .wplace-overlay {
-  background: rgba(0, 0, 0, 0.8);
-}
-
-:root .wplace-settings-error,
-.wplace-theme--classic .wplace-settings-error {
-  background: rgba(255, 0, 0, 0.4) !important;
-}
-
-/* Settings sections and batch controls for classic theme */
-:root .wplace-settings-section-wrapper,
-.wplace-theme--classic .wplace-settings-section-wrapper {
-  background: rgba(255,255,255,0.1);
-  border-radius: var(--wplace-radius);
-  border: 1px solid rgba(255,255,255,0.1);
-}
-
-:root .wplace-batch-controls,
-.wplace-theme--classic .wplace-batch-controls {
-  background: rgba(255,255,255,0.1);
-  border-radius: var(--wplace-radius);
-  border: 1px solid rgba(255,255,255,0.1);
-}
-
-:root .wplace-speed-slider,
-.wplace-theme--classic .wplace-speed-slider {
-  background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
-  border-radius: 4px;
-}
-
-:root .wplace-overlay-opacity-slider,
-.wplace-theme--classic .wplace-overlay-opacity-slider {
-  background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
-  border-radius: 4px;
-}
-
-:root .wplace-speed-value,
-.wplace-theme--classic .wplace-speed-value {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-  border-radius: 8px;
-  color: white;
-  box-shadow: 0 3px 10px rgba(79, 172, 254, 0.3);
-  border: 1px solid rgba(255,255,255,0.2);
-}
-
-/* Additional elements for classic theme */
-:root .wplace-color-divider,
-.wplace-theme--classic .wplace-color-divider {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-:root .wplace-settings-select option,
-.wplace-theme--classic .wplace-settings-select option {
-  background: #2d3748;
-  color: white;
-}
-
-:root .wplace-settings-description,
-.wplace-theme--classic .wplace-settings-description {
-  color: rgba(255,255,255,0.7);
-}
-
-:root .wplace-settings-apply-btn,
-.wplace-theme--classic .wplace-settings-apply-btn {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-  color: white;
-  border-radius: 8px;
-}
-
-/* Resize dialog styling for classic theme */
-:root .resize-container,
-.wplace-theme--classic .resize-container {
-  background: #000000;
-  border: 1px solid #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 0 20px rgba(0,0,0,0.5);
-}
-`,
-    "neon": "/* WPlace Auto-Image Bot - Neon Theme */\n/* Retro cyberpunk aesthetic with green neon glow effects */\n\n.wplace-theme--neon {\n  /* Neon theme colors - matching upstream main neon theme */\n  --wplace-primary: #1a1a2e;\n  --wplace-secondary: #16213e;\n  --wplace-accent: #0f3460;\n  --wplace-text: #00ff41;\n  --wplace-highlight: #ff6b35;\n  --wplace-success: #39ff14;\n  --wplace-error: #ff073a;\n  --wplace-warning: #ffff00;\n\n  /* Neon UI properties */\n  --wplace-radius: 0;\n  --wplace-border-style: solid;\n  --wplace-border-width: 2px;\n  --wplace-border-color: #00ff41;\n  --wplace-shadow: 0 0 20px rgba(0, 255, 65, 0.3), inset 0 0 20px rgba(0, 255, 65, 0.1);\n  --wplace-backdrop: none;\n  --wplace-font: 'Press Start 2P', monospace, 'Courier New';\n\n  /* Z-index layers */\n  --wplace-z-overlay: 10000;\n  --wplace-z-alert: 10002;\n  --wplace-z-settings: 10002;\n\n  /* Feature toggles */\n  --wplace-scanline: 1;\n  --wplace-pixel-blink: 1;\n\n  /* Icon colors - neon variants */\n  --wplace-icon-primary: #00ff41;\n  --wplace-icon-secondary: #39ff14;\n  --wplace-icon-palette: #ff6b35;\n  \n  /* Additional UI colors - neon variants */\n  --wplace-danger: #ff073a;\n  --wplace-danger-dark: #cc0531;\n  --wplace-muted-text: #00ff4180;\n  --wplace-highlight-secondary: #ffaa00;\n  \n  /* Text variants - neon style */\n  --wplace-text-secondary: #00ff41dd;\n  --wplace-text-muted: #00ff41bb;\n  --wplace-text-dim: #00ff4199;\n  --wplace-text-faded: #00ff41cc;\n  \n  /* Background variants - neon style */\n  --wplace-bg-input: rgba(0, 255, 65, 0.15);\n  --wplace-bg-subtle: rgba(0, 255, 65, 0.08);\n  --wplace-bg-faint: rgba(0, 255, 65, 0.05);\n  --wplace-bg-ghost: rgba(0, 255, 65, 0.03);\n  --wplace-bg-whisper: rgba(0, 255, 65, 0.02);\n  \n  /* Border variants - neon style */\n  --wplace-border-subtle: rgba(0, 255, 65, 0.4);\n  --wplace-border-faint: rgba(0, 255, 65, 0.25);\n  --wplace-border-ghost: rgba(0, 255, 65, 0.15);\n  --wplace-border-ultra-faint: rgba(0, 255, 65, 0.08);\n  \n  /* Shadow variants - neon style */\n  --wplace-shadow-drag: 0 12px 40px rgba(0, 255, 65, 0.6), 0 0 0 2px rgba(0, 255, 65, 0.8), 0 0 20px rgba(0, 255, 65, 0.3);\n  --wplace-shadow-notification: 0 4px 12px rgba(0, 255, 65, 0.4), 0 0 15px rgba(0, 255, 65, 0.2);\n  --wplace-shadow-slider-thumb: 0 3px 6px rgba(0, 255, 65, 0.5), 0 0 0 2px var(--wplace-icon-primary), 0 0 10px rgba(0, 255, 65, 0.3);\n  --wplace-shadow-slider-hover: 0 4px 8px rgba(0, 255, 65, 0.6), 0 0 0 3px var(--wplace-icon-primary), 0 0 15px rgba(0, 255, 65, 0.4);\n  \n  /* Animation colors - neon style */\n  --wplace-pulse-start: rgba(0, 255, 65, 0.8);\n  --wplace-pulse-mid: rgba(0, 255, 65, 0);\n  --wplace-pulse-end: rgba(0, 255, 65, 0);\n  \n  /* Slider colors - neon style */\n  --wplace-slider-thumb-bg: #00ff41;\n}\n\n/* Neon-specific styling overrides */\n.wplace-theme--neon #wplace-image-bot-container {\n  background: var(--wplace-primary) !important;\n  border: 2px solid var(--wplace-text) !important;\n  border-radius: 0 !important;\n  box-shadow: 0 0 20px var(--wplace-text), inset 0 0 20px rgba(0, 255, 65, 0.1) !important;\n  font-family: var(--wplace-font) !important;\n}\n\n.wplace-theme--neon #wplace-stats-container {\n  background: var(--wplace-primary) !important;\n  border: 2px solid var(--wplace-text) !important;\n  border-radius: 0 !important;\n  box-shadow: 0 0 20px var(--wplace-text), inset 0 0 20px rgba(0, 255, 65, 0.1) !important;\n  font-family: var(--wplace-font) !important;\n}\n\n.wplace-theme--neon .wplace-header {\n  background: var(--wplace-secondary) !important;\n  border-bottom: 1px solid var(--wplace-text) !important;\n  color: var(--wplace-text) !important;\n  text-shadow: 0 0 10px var(--wplace-text) !important;\n  font-family: var(--wplace-font) !important;\n}\n\n.wplace-theme--neon .wplace-section {\n  background: rgba(22, 33, 62, 0.5) !important;\n  border: 1px solid var(--wplace-text) !important;\n  border-radius: 0 !important;\n}\n\n.wplace-theme--neon .wplace-status-section {\n  background: rgba(22, 33, 62, 0.5) !important;\n  border: 1px solid var(--wplace-text) !important;\n  border-radius: 0 !important;\n}\n\n.wplace-theme--neon .wplace-section-title {\n  color: var(--wplace-text) !important;\n  text-shadow: 0 0 8px var(--wplace-text) !important;\n  text-transform: uppercase !important;\n  font-family: var(--wplace-font) !important;\n  font-size: 10px !important;\n}\n\n.wplace-theme--neon .wplace-btn {\n  background: var(--wplace-secondary) !important;\n  border: 1px solid var(--wplace-text) !important;\n  border-radius: 0 !important;\n  color: var(--wplace-text) !important;\n  text-shadow: 0 0 5px var(--wplace-text) !important;\n  font-family: var(--wplace-font) !important;\n  font-size: 9px !important;\n  text-transform: uppercase !important;\n}\n\n.wplace-theme--neon .wplace-btn:hover:not(:disabled) {\n  box-shadow: 0 0 15px var(--wplace-text), inset 0 0 15px rgba(0, 255, 65, 0.1) !important;\n  animation: neonGlow 1s ease-in-out infinite alternate !important;\n}\n\n.wplace-theme--neon .wplace-btn-start {\n  background: var(--wplace-secondary) !important;\n  border-color: var(--wplace-success) !important;\n  color: var(--wplace-success) !important;\n  text-shadow: 0 0 8px var(--wplace-success) !important;\n}\n\n.wplace-theme--neon .wplace-btn-stop {\n  background: var(--wplace-secondary) !important;\n  border-color: var(--wplace-error) !important;\n  color: var(--wplace-error) !important;\n  text-shadow: 0 0 8px var(--wplace-error) !important;\n}\n\n.wplace-theme--neon .wplace-btn-upload {\n  background: var(--wplace-secondary) !important;\n  border: 1px dashed var(--wplace-highlight) !important;\n  color: var(--wplace-highlight) !important;\n  text-shadow: 0 0 8px var(--wplace-highlight) !important;\n}\n\n.wplace-theme--neon .wplace-btn-select {\n  background: var(--wplace-secondary) !important;\n  border-color: var(--wplace-highlight) !important;\n  color: var(--wplace-highlight) !important;\n  text-shadow: 0 0 8px var(--wplace-highlight) !important;\n}\n\n.wplace-theme--neon .wplace-btn-file {\n  background: var(--wplace-secondary) !important;\n  border-color: var(--wplace-warning) !important;\n  color: var(--wplace-warning) !important;\n  text-shadow: 0 0 8px var(--wplace-warning) !important;\n}\n\n.wplace-theme--neon .wplace-progress {\n  background: rgba(0, 0, 0, 0.8) !important;\n  border: 1px solid var(--wplace-text) !important;\n  border-radius: 0 !important;\n}\n\n.wplace-theme--neon .wplace-progress-bar {\n  background: linear-gradient(90deg, var(--wplace-success) 0%, var(--wplace-text) 100%) !important;\n  box-shadow: 0 0 10px var(--wplace-success) !important;\n}\n\n.wplace-theme--neon .wplace-stat-value {\n  color: var(--wplace-text) !important;\n  text-shadow: 0 0 5px var(--wplace-text) !important;\n}\n\n.wplace-theme--neon .status-success {\n  background: rgba(57, 255, 20, 0.1) !important;\n  border-color: var(--wplace-success) !important;\n  color: var(--wplace-success) !important;\n  box-shadow: 0 0 15px var(--wplace-success) !important;\n  text-shadow: 0 0 8px var(--wplace-success) !important;\n}\n\n.wplace-theme--neon .status-error {\n  background: rgba(255, 7, 58, 0.1) !important;\n  border-color: var(--wplace-error) !important;\n  color: var(--wplace-error) !important;\n  box-shadow: 0 0 15px var(--wplace-error) !important;\n  text-shadow: 0 0 8px var(--wplace-error) !important;\n}\n\n.wplace-theme--neon .status-default {\n  background: rgba(0, 255, 65, 0.1) !important;\n  border-color: var(--wplace-text) !important;\n  color: var(--wplace-text) !important;\n  text-shadow: 0 0 5px var(--wplace-text) !important;\n}\n\n/* Settings dialog neon styling */\n.wplace-theme--neon #wplace-settings-container {\n  background: var(--wplace-primary) !important;\n  border: 2px solid var(--wplace-text) !important;\n  border-radius: 0 !important;\n  box-shadow: 0 0 30px var(--wplace-text), inset 0 0 30px rgba(0, 255, 65, 0.1) !important;\n  font-family: var(--wplace-font) !important;\n}\n\n.wplace-theme--neon .wplace-settings-header {\n  background: var(--wplace-secondary) !important;\n  border-bottom: 1px solid var(--wplace-text) !important;\n}\n\n.wplace-theme--neon .wplace-settings-header h3 {\n  color: var(--wplace-text) !important;\n  text-shadow: 0 0 10px var(--wplace-text) !important;\n  font-family: var(--wplace-font) !important;\n  font-size: 16px !important;\n  text-transform: uppercase !important;\n}\n\n.wplace-theme--neon .wplace-settings-close-btn {\n  background: var(--wplace-secondary) !important;\n  border: 1px solid var(--wplace-text) !important;\n  border-radius: 0 !important;\n  color: var(--wplace-text) !important;\n}\n\n.wplace-theme--neon .wplace-settings-close-btn:hover {\n  background: var(--wplace-error) !important;\n  box-shadow: 0 0 15px var(--wplace-error) !important;\n}\n\n.wplace-theme--neon .wplace-settings-section-wrapper {\n  background: rgba(22, 33, 62, 0.3) !important;\n  border: 1px solid var(--wplace-text) !important;\n  border-radius: 0 !important;\n}\n\n.wplace-theme--neon .wplace-settings-select {\n  background: var(--wplace-secondary) !important;\n  border: 1px solid var(--wplace-text) !important;\n  border-radius: 0 !important;\n  color: var(--wplace-text) !important;\n  font-family: var(--wplace-font) !important;\n  font-size: 11px !important;\n}\n\n.wplace-theme--neon .wplace-settings-section-label {\n  color: var(--wplace-text) !important;\n  text-shadow: 0 0 8px var(--wplace-text) !important;\n  font-family: var(--wplace-font) !important;\n  font-size: 12px !important;\n  text-transform: uppercase !important;\n}\n\n.wplace-theme--neon .wplace-speed-value {\n  background: var(--wplace-secondary) !important;\n  border: 1px solid var(--wplace-text) !important;\n  border-radius: 0 !important;\n  color: var(--wplace-text) !important;\n  text-shadow: 0 0 8px var(--wplace-text) !important;\n  font-family: var(--wplace-font) !important;\n  box-shadow: 0 0 10px rgba(0, 255, 65, 0.3) !important;\n}\n\n.wplace-theme--neon .wplace-overlay-opacity-value {\n  background: var(--wplace-secondary) !important;\n  border: 1px solid var(--wplace-text) !important;\n  border-radius: 0 !important;\n  color: var(--wplace-text) !important;\n  text-shadow: 0 0 5px var(--wplace-text) !important;\n}\n\n/* Neon slider styling */\n.wplace-theme--neon .wplace-slider,\n.wplace-theme--neon .wplace-speed-slider,\n.wplace-theme--neon .wplace-overlay-opacity-slider {\n  background: var(--wplace-secondary) !important;\n  border: 1px solid var(--wplace-text) !important;\n  border-radius: 0 !important;\n  box-shadow: 0 0 10px rgba(0, 255, 65, 0.3) !important;\n}\n\n.wplace-theme--neon .wplace-slider::-webkit-slider-thumb,\n.wplace-theme--neon .wplace-speed-slider::-webkit-slider-thumb,\n.wplace-theme--neon .wplace-overlay-opacity-slider::-webkit-slider-thumb {\n  -webkit-appearance: none;\n  width: 16px;\n  height: 16px;\n  border-radius: 0 !important;\n  background: var(--wplace-slider-thumb-bg) !important;\n  border: 2px solid var(--wplace-text) !important;\n  cursor: pointer;\n  transition: all 0.2s ease;\n  box-shadow: 0 0 8px rgba(0, 255, 65, 0.5) !important;\n}\n\n.wplace-theme--neon .wplace-slider::-webkit-slider-thumb:hover,\n.wplace-theme--neon .wplace-speed-slider::-webkit-slider-thumb:hover,\n.wplace-theme--neon .wplace-overlay-opacity-slider::-webkit-slider-thumb:hover {\n  transform: scale(1.1);\n  box-shadow: 0 0 15px var(--wplace-text) !important;\n}\n\n/* Scanline animation for neon theme */\n.wplace-theme--neon #wplace-image-bot-container::before {\n  content: '';\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  height: 2px;\n  background: linear-gradient(90deg, transparent, var(--wplace-text), transparent);\n  z-index: 1;\n  pointer-events: none;\n  animation: scanline 3s linear infinite;\n  opacity: 0.7;\n}\n\n.wplace-theme--neon #wplace-stats-container {\n  position: fixed !important;\n  overflow: hidden !important;\n  z-index: 9998 !important;\n}\n\n.wplace-theme--neon #wplace-stats-container::before {\n  content: '';\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  height: 2px;\n  background: linear-gradient(90deg, transparent, var(--wplace-text), transparent);\n  z-index: 1;\n  pointer-events: none;\n  animation: scanlineStats 4s linear infinite;\n  opacity: 0.7;\n}\n\n/* Pixel blinking animation for buttons */\n.wplace-theme--neon .wplace-btn:hover:not(:disabled) {\n  animation: pixelBlink 0.5s infinite, neonGlow 1s ease-in-out infinite alternate;\n}\n\n/* Text glow animations */\n@keyframes neonGlow {\n  0%, 100% {\n    text-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor;\n  }\n  50% {\n    text-shadow: 0 0 2px currentColor, 0 0 5px currentColor, 0 0 8px currentColor;\n  }\n}\n\n@keyframes pixelBlink {\n  0%, 50% {\n    opacity: 1;\n  }\n  51%, 100% {\n    opacity: 0.7;\n  }\n}\n\n@keyframes scanline {\n  0% {\n    transform: translateY(-100%);\n  }\n  100% {\n    transform: translateY(400px);\n  }\n}\n\n@keyframes scanlineStats {\n  0% {\n    transform: translateY(-100%);\n  }\n  100% {\n    transform: translateY(300px);\n  }\n}\n\n/* Resize dialog styling for neon theme */\n.wplace-theme--neon .resize-container {\n  background: #1a1a2e !important;\n  border: 3px solid #00ff41 !important;\n  border-radius: 0 !important;\n  box-shadow: 0 0 30px rgba(0, 255, 65, 0.5) !important;\n  font-family: 'Press Start 2P', monospace !important;\n}\n"
+    "classic-light": "/* WPlace Auto-Image Bot - Classic Light Theme */\n/* Clean, bright theme based on classic design with light backgrounds */\n\n.wplace-theme--classic-light {\n    /* === CORE COLORS === */\n    --wplace-primary: #ffffff; /* Clean white */\n    --wplace-secondary: #f8f9fa; /* Light gray */\n    --wplace-accent: #e9ecef; /* Lighter gray */\n    --wplace-text: #212529; /* Dark text */\n    --wplace-highlight: #6f42c1; /* Purple highlight */\n    --wplace-success: #28a745; /* Bootstrap green */\n    --wplace-error: #dc3545; /* Bootstrap red */\n    --wplace-warning: #ffc107; /* Bootstrap yellow */\n\n    /* === UI PROPERTIES === */\n    --wplace-radius: 8px;\n    --wplace-border-style: solid;\n    --wplace-border-width: 1px;\n    --wplace-border-color: #415a77;\n    --wplace-shadow:\n        0 8px 32px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.08);\n    --wplace-backdrop: blur(10px);\n    --wplace-font: 'Segoe UI', Roboto, sans-serif;\n\n    /* === EXTENDED COLOR PALETTE === */\n    /* Icon colors */\n    --wplace-icon-primary: #4facfe; /* Light blue */\n    --wplace-icon-secondary: #00f2fe; /* Cyan */\n    --wplace-icon-palette: #f093fb; /* Pink */\n\n    /* Additional UI colors */\n    --wplace-danger: #dc3545; /* Bootstrap red */\n    --wplace-danger-dark: #c82333; /* Darker red */\n    --wplace-muted-text: rgba(33, 37, 41, 0.7);\n    --wplace-highlight-secondary: #d3a4ff;\n\n    /* Text variants */\n    --wplace-text-secondary: rgba(33, 37, 41, 0.9);\n    --wplace-text-muted: rgba(33, 37, 41, 0.7);\n    --wplace-text-dim: rgba(33, 37, 41, 0.6);\n    --wplace-text-faded: rgba(33, 37, 41, 0.8);\n\n    /* Background variants */\n    --wplace-bg-input: rgba(0, 0, 0, 0.08);\n    --wplace-bg-subtle: rgba(0, 0, 0, 0.05);\n    --wplace-bg-faint: rgba(0, 0, 0, 0.03);\n    --wplace-bg-ghost: rgba(0, 0, 0, 0.02);\n    --wplace-bg-whisper: rgba(0, 0, 0, 0.01);\n\n    /* Border variants */\n    --wplace-border-subtle: rgba(0, 0, 0, 0.2);\n    --wplace-border-faint: rgba(0, 0, 0, 0.15);\n    --wplace-border-ghost: rgba(0, 0, 0, 0.1);\n    --wplace-border-ultra-faint: rgba(0, 0, 0, 0.05);\n\n    /* Shadow variants */\n    --wplace-shadow-drag:\n        0 12px 40px rgba(0, 0, 0, 0.2), 0 0 0 2px rgba(111, 66, 193, 0.3);\n    --wplace-shadow-notification: 0 4px 12px rgba(0, 0, 0, 0.15);\n    --wplace-shadow-slider-thumb:\n        0 3px 6px rgba(0, 0, 0, 0.2), 0 0 0 2px var(--wplace-icon-primary);\n    --wplace-shadow-slider-hover:\n        0 4px 8px rgba(0, 0, 0, 0.25), 0 0 0 3px var(--wplace-icon-primary);\n\n    /* Animation colors */\n    --wplace-pulse-start: rgba(40, 167, 69, 0.7);\n    --wplace-pulse-mid: rgba(40, 167, 69, 0);\n    --wplace-pulse-end: rgba(40, 167, 69, 0);\n\n    /* Slider colors */\n    --wplace-slider-thumb-bg: #6f42c1;\n    --wplace-slider-track-bg: linear-gradient(\n        to right,\n        #4facfe 0%,\n        #00f2fe 100%\n    );\n}\n\n/* === COMPONENT STYLING === */\n\n/* Main container with clean light styling */\n.wplace-theme--classic-light #wplace-image-bot-container {\n    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;\n    color: var(--wplace-text) !important;\n    border: 1px solid rgba(0, 0, 0, 0.15) !important;\n    border-radius: 12px !important;\n    box-shadow:\n        0 8px 32px rgba(0, 0, 0, 0.15),\n        0 0 0 1px rgba(0, 0, 0, 0.08) !important;\n    font-family: 'Segoe UI', Roboto, sans-serif !important;\n    backdrop-filter: blur(10px) !important;\n}\n\n/* Stats container with proper contrast */\n.wplace-theme--classic-light #wplace-stats-container {\n    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;\n    border: 1px solid rgba(0, 0, 0, 0.2) !important;\n    border-radius: 12px !important;\n    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;\n    font-family: 'Segoe UI', Roboto, sans-serif !important;\n    color: var(--wplace-text) !important;\n    position: fixed !important;\n    overflow: hidden !important;\n    z-index: 9998 !important;\n}\n\n/* Stats header styling */\n.wplace-theme--classic-light #wplace-stats-container .wplace-header {\n    background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%) !important;\n    color: var(--wplace-text) !important;\n    border-bottom: 1px solid rgba(0, 0, 0, 0.2) !important;\n    text-shadow: none !important;\n    font-weight: 600 !important;\n}\n\n/* Stats title specific styling */\n.wplace-theme--classic-light\n    #wplace-stats-container\n    .wplace-header\n    .wplace-stats-title {\n    color: var(--wplace-text) !important;\n    text-shadow: none !important;\n}\n\n/* Comprehensive text and element styling for light theme - scoped to bot containers only */\n\n.wplace-theme--classic-light .wplace-status,\n.wplace-theme--classic-light .wplace-stats,\n.wplace-theme--classic-light .wplace-section,\n.wplace-theme--classic-light .wplace-controls,\n.wplace-theme--classic-light .wplace-data-management,\n.wplace-theme--classic-light .wplace-cooldown-settings {\n    color: var(--wplace-text) !important;\n}\n\n/* Data management section buttons */\n.wplace-theme--classic-light .wplace-data-management .wplace-btn {\n    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;\n    border: 1px solid rgba(0, 0, 0, 0.2) !important;\n    color: #212529 !important;\n    font-weight: 500 !important;\n}\n\n.wplace-theme--classic-light\n    .wplace-data-management\n    .wplace-btn:hover:not(:disabled) {\n    background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%) !important;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;\n}\n\n/* Settings dialog */\n.wplace-theme--classic-light #wplace-settings-container {\n    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;\n    border: 1px solid rgba(0, 0, 0, 0.15) !important;\n    border-radius: 12px !important;\n    box-shadow:\n        0 16px 48px rgba(0, 0, 0, 0.2),\n        0 0 0 1px rgba(0, 0, 0, 0.08) !important;\n    font-family: 'Segoe UI', Roboto, sans-serif !important;\n    backdrop-filter: blur(10px) !important;\n    color: var(--wplace-text) !important;\n}\n\n/* Settings dialog text elements */\n.wplace-theme--classic-light #wplace-settings-container * {\n    color: var(--wplace-text) !important;\n}\n\n.wplace-theme--classic-light\n    #wplace-settings-container\n    .wplace-settings-section-wrapper\n    * {\n    color: var(--wplace-text) !important;\n}\n\n/* Color palette text labels */\n.wplace-theme--classic-light .wplace-stat-colors-grid * {\n    color: var(--wplace-text) !important;\n    font-weight: 500 !important;\n}\n\n.wplace-theme--classic-light .wplace-color-label {\n    color: var(--wplace-text) !important;\n    font-weight: 500 !important;\n    text-shadow: none !important;\n}\n\n.wplace-theme--classic-light .wplace-color-name {\n    color: var(--wplace-text) !important;\n    font-weight: 500 !important;\n}\n\n.wplace-theme--classic-light .wplace-color-item-name {\n    color: #000000 !important;\n    font-weight: 600 !important;\n    text-shadow: none !important;\n}\n\n/* Resize dialog */\n.wplace-theme--classic-light .resize-container {\n    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;\n    border: 1px solid rgba(0, 0, 0, 0.15) !important;\n    border-radius: 12px !important;\n    box-shadow:\n        0 16px 48px rgba(0, 0, 0, 0.2),\n        0 0 0 1px rgba(0, 0, 0, 0.08) !important;\n    font-family: 'Segoe UI', Roboto, sans-serif !important;\n    backdrop-filter: blur(10px) !important;\n}\n\n/* Headers with light gradient */\n.wplace-theme--classic-light .wplace-header {\n    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;\n    color: var(--wplace-highlight) !important;\n    border-bottom: 1px solid rgba(0, 0, 0, 0.15) !important;\n    text-shadow: none !important;\n}\n\n/* Settings header */\n.wplace-theme--classic-light .wplace-settings-header {\n    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;\n    border-bottom: 1px solid rgba(0, 0, 0, 0.15) !important;\n}\n\n.wplace-theme--classic-light .wplace-settings-title {\n    color: var(--wplace-text) !important;\n    text-shadow: none !important;\n}\n\n.wplace-theme--classic-light .wplace-settings-close-btn {\n    background: rgba(0, 0, 0, 0.05) !important;\n    border: 1px solid rgba(0, 0, 0, 0.2) !important;\n    border-radius: 50% !important;\n    color: var(--wplace-text) !important;\n    transition: all 0.3s ease !important;\n}\n\n.wplace-theme--classic-light .wplace-settings-close-btn:hover {\n    background: rgba(220, 53, 69, 0.1) !important;\n    border-color: var(--wplace-error) !important;\n    box-shadow: 0 0 12px rgba(220, 53, 69, 0.3) !important;\n}\n\n/* Section titles */\n.wplace-theme--classic-light .wplace-section-title {\n    color: var(--wplace-highlight) !important;\n    text-shadow: none !important;\n    font-weight: 600 !important;\n}\n\n/* Buttons with light styling */\n.wplace-theme--classic-light .wplace-btn {\n    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;\n    border: 1px solid rgba(0, 0, 0, 0.2) !important;\n    border-radius: 12px !important;\n    color: var(--wplace-text) !important;\n    font-family: 'Segoe UI', Roboto, sans-serif !important;\n    font-weight: 500 !important;\n    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;\n}\n\n.wplace-theme--classic-light .wplace-btn:hover:not(:disabled) {\n    background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%) !important;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;\n    transform: translateY(-1px) !important;\n}\n\n/* Button variants with classic light colors */\n.wplace-theme--classic-light .wplace-btn-start {\n    background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;\n    color: white !important;\n    font-weight: 600 !important;\n}\n\n.wplace-theme--classic-light .wplace-btn-start:hover:not(:disabled) {\n    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4) !important;\n}\n\n.wplace-theme--classic-light .wplace-btn-stop {\n    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;\n    color: white !important;\n    font-weight: 600 !important;\n}\n\n.wplace-theme--classic-light .wplace-btn-stop:hover:not(:disabled) {\n    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4) !important;\n}\n\n.wplace-theme--classic-light .wplace-btn-upload {\n    background: rgba(111, 66, 193, 0.1) !important;\n    border: 2px dashed var(--wplace-highlight) !important;\n    color: var(--wplace-highlight) !important;\n}\n\n.wplace-theme--classic-light .wplace-btn-upload:hover:not(:disabled) {\n    background: rgba(111, 66, 193, 0.15) !important;\n    box-shadow: 0 4px 12px rgba(111, 66, 193, 0.2) !important;\n}\n\n/* Progress bars with clean light styling */\n.wplace-theme--classic-light .wplace-progress {\n    background: rgba(0, 0, 0, 0.1) !important;\n    border: 1px solid rgba(0, 0, 0, 0.15) !important;\n    border-radius: 12px !important;\n}\n\n.wplace-theme--classic-light .wplace-progress-bar {\n    background: linear-gradient(135deg, #6f42c1 0%, #9370db 100%) !important;\n    box-shadow: none !important;\n}\n\n.wplace-theme--classic-light .wplace-progress-bar::after {\n    background: linear-gradient(\n        90deg,\n        transparent,\n        rgba(255, 255, 255, 0.3),\n        transparent\n    ) !important;\n}\n\n/* Status indicators with light colors */\n.wplace-theme--classic-light .status-success {\n    background: rgba(40, 167, 69, 0.1) !important;\n    border-color: var(--wplace-success) !important;\n    color: var(--wplace-success) !important;\n    box-shadow: 0 0 15px rgba(40, 167, 69, 0.2) !important;\n    text-shadow: none !important;\n}\n\n.wplace-theme--classic-light .status-error {\n    background: rgba(220, 53, 69, 0.1) !important;\n    border-color: var(--wplace-error) !important;\n    color: var(--wplace-error) !important;\n    box-shadow: 0 0 15px rgba(220, 53, 69, 0.2) !important;\n    text-shadow: none !important;\n}\n\n.wplace-theme--classic-light .status-default {\n    background: rgba(111, 66, 193, 0.1) !important;\n    border-color: var(--wplace-highlight) !important;\n    color: var(--wplace-highlight) !important;\n    text-shadow: none !important;\n}\n\n.wplace-theme--classic-light .wplace-stat-label {\n    color: var(--wplace-text) !important;\n    text-shadow: none !important;\n    font-weight: 500 !important;\n}\n\n.wplace-theme--classic-light .wplace-stat-value {\n    color: var(--wplace-highlight) !important;\n    text-shadow: none !important;\n    font-weight: 600 !important;\n}\n\n/* Sections with light styling */\n.wplace-theme--classic-light .wplace-section {\n    background: rgba(0, 0, 0, 0.03) !important;\n    border: 1px solid rgba(0, 0, 0, 0.1) !important;\n    border-radius: 12px !important;\n}\n\n.wplace-theme--classic-light .wplace-status-section {\n    background: rgba(0, 0, 0, 0.03) !important;\n    border: 1px solid rgba(0, 0, 0, 0.1) !important;\n    border-radius: 12px !important;\n}\n\n.wplace-theme--classic-light .wplace-settings-section-wrapper {\n    background: rgba(0, 0, 0, 0.03) !important;\n    border: 1px solid rgba(0, 0, 0, 0.1) !important;\n    border-radius: 12px !important;\n}\n\n/* Form controls with light styling */\n.wplace-theme--classic-light .wplace-settings-select {\n    background: #ffffff !important;\n    border: 1px solid rgba(0, 0, 0, 0.2) !important;\n    border-radius: 8px !important;\n    color: var(--wplace-text) !important;\n    font-family: 'Segoe UI', Roboto, sans-serif !important;\n    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;\n}\n\n.wplace-theme--classic-light .wplace-settings-select:focus {\n    border-color: var(--wplace-highlight) !important;\n    box-shadow: 0 0 0 2px rgba(111, 66, 193, 0.3) !important;\n}\n\n/* Dropdown menu options */\n.wplace-theme--classic-light .wplace-settings-select option {\n    background: #ffffff !important;\n    color: var(--wplace-text) !important;\n}\n\n.wplace-theme--classic-light .wplace-settings-option {\n    background: #ffffff !important;\n    color: var(--wplace-text) !important;\n}\n\n/* Sliders with classic gradient */\n.wplace-theme--classic-light .wplace-speed-slider {\n    background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%) !important;\n    border-radius: 4px !important;\n}\n\n.wplace-theme--classic-light .wplace-overlay-opacity-slider {\n    background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%) !important;\n    border-radius: 4px !important;\n}\n\n.wplace-theme--classic-light .wplace-slider {\n    background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%) !important;\n    border-radius: 4px !important;\n}\n\n.wplace-theme--classic-light .wplace-slider::-webkit-slider-thumb {\n    -webkit-appearance: none;\n    width: 16px;\n    height: 16px;\n    border-radius: 50%;\n    background: var(--wplace-slider-thumb-bg);\n    border: 1px solid rgba(0, 0, 0, 0.2);\n    cursor: pointer;\n    transition: all 0.2s ease;\n    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);\n}\n\n.wplace-theme--classic-light .wplace-speed-value {\n    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;\n    border-radius: 8px !important;\n    color: white !important;\n    font-weight: 600 !important;\n    box-shadow: 0 3px 10px rgba(79, 172, 254, 0.3) !important;\n    border: 1px solid rgba(0, 0, 0, 0.1) !important;\n}\n\n/* Settings labels */\n.wplace-theme--classic-light .wplace-settings-section-label {\n    color: var(--wplace-highlight) !important;\n    text-shadow: none !important;\n    font-family: 'Segoe UI', Roboto, sans-serif !important;\n    font-weight: 600 !important;\n}\n\n/* Icon colors for classic light theme */\n.wplace-theme--classic-light .wplace-icon-key {\n    color: #4facfe;\n}\n.wplace-theme--classic-light .wplace-icon-robot {\n    color: #4facfe;\n}\n.wplace-theme--classic-light .wplace-icon-speed {\n    color: #4facfe;\n}\n.wplace-theme--classic-light .wplace-icon-bell {\n    color: #ffc107;\n}\n.wplace-theme--classic-light .wplace-icon-palette {\n    color: #f093fb;\n}\n.wplace-theme--classic-light .wplace-icon-globe {\n    color: #ffeaa7;\n}\n.wplace-theme--classic-light .wplace-icon-paint {\n    color: #4facfe;\n}\n.wplace-theme--classic-light .wplace-icon-eye {\n    color: #6f42c1;\n}\n\n/* Clean light theme animations */\n@keyframes lightShimmer {\n    0% {\n        transform: translateX(-100%);\n    }\n    100% {\n        transform: translateX(200%);\n    }\n}\n\n/* Turnstile/CF checkbox overlay - CRITICAL FIX */\n.wplace-theme--classic-light .wplace-turnstile-overlay {\n    background: rgba(255, 255, 255, 0.98) !important;\n    border-radius: 12px !important;\n    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;\n    backdrop-filter: blur(10px) !important;\n    border: 1px solid rgba(0, 0, 0, 0.2) !important;\n    color: var(--wplace-text) !important;\n    font-family: 'Segoe UI', Roboto, sans-serif !important;\n}\n\n.wplace-theme--classic-light .wplace-turnstile-title {\n    color: var(--wplace-text) !important;\n}\n\n.wplace-theme--classic-light .wplace-turnstile-hide-btn {\n    color: var(--wplace-text) !important;\n    border: 1px solid rgba(0, 0, 0, 0.2) !important;\n    border-radius: 6px !important;\n    background: rgba(0, 0, 0, 0.05) !important;\n}\n\n.wplace-theme--classic-light .wplace-turnstile-hide-btn:hover {\n    background: rgba(0, 0, 0, 0.1) !important;\n}\n\n/* Color swatches with light styling */\n.wplace-theme--classic-light .wplace-color-swatch {\n    border: 1px solid rgba(0, 0, 0, 0.2) !important;\n    border-radius: 4px !important;\n    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;\n}\n\n.wplace-theme--classic-light .wplace-color-swatch:hover {\n    box-shadow: 0 4px 16px rgba(111, 66, 193, 0.3) !important;\n    transform: translateY(-1px);\n}\n\n.wplace-theme--classic-light .wplace-stat-colors-grid {\n    background: rgba(0, 0, 0, 0.05) !important;\n    border-radius: 8px !important;\n    border: 1px solid rgba(0, 0, 0, 0.1) !important;\n}\n",
+    "classic": "/* WPlace Auto-Image Bot - Classic Theme */\n/* Clean, modern UI with gradients and subtle effects */\n\n.wplace-theme--classic {\n    --wplace-primary: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);\n    --wplace-secondary: linear-gradient(135deg, #111111 0%, #2a2a2a 100%);\n    --wplace-accent: #222222;\n    --wplace-text: #ffffff;\n    --wplace-highlight: #775ce3;\n    --wplace-success: #00ff00;\n    --wplace-error: #ff0000;\n    --wplace-warning: #ffaa00;\n\n    --wplace-radius: 12px;\n    --wplace-shadow:\n        0 8px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.1);\n    --wplace-backdrop: blur(10px);\n    --wplace-font: 'Segoe UI', Roboto, sans-serif;\n\n    --wplace-scanline: 0;\n    --wplace-pixel-blink: 0;\n\n    /* Icon colors */\n    --wplace-icon-primary: #4facfe;\n    --wplace-icon-secondary: #00f2fe;\n    --wplace-icon-palette: #f093fb;\n\n    /* Additional UI colors */\n    --wplace-danger: #ff6a6a;\n    --wplace-danger-dark: #ff4757;\n    --wplace-muted-text: #ffffffbb;\n    --wplace-highlight-secondary: #d3a4ff;\n\n    /* Text variants */\n    --wplace-text-secondary: rgba(255, 255, 255, 0.9);\n    --wplace-text-muted: rgba(255, 255, 255, 0.7);\n    --wplace-text-dim: rgba(255, 255, 255, 0.6);\n    --wplace-text-faded: rgba(255, 255, 255, 0.8);\n\n    /* Background variants */\n    --wplace-bg-input: rgba(255, 255, 255, 0.15);\n    --wplace-bg-subtle: rgba(255, 255, 255, 0.1);\n    --wplace-bg-faint: rgba(255, 255, 255, 0.08);\n    --wplace-bg-ghost: rgba(255, 255, 255, 0.06);\n    --wplace-bg-whisper: rgba(255, 255, 255, 0.05);\n\n    /* Border variants */\n    --wplace-border-subtle: rgba(255, 255, 255, 0.2);\n    --wplace-border-faint: rgba(255, 255, 255, 0.15);\n    --wplace-border-ghost: rgba(255, 255, 255, 0.1);\n    --wplace-border-ultra-faint: rgba(255, 255, 255, 0.05);\n\n    /* Shadow variants */\n    --wplace-shadow-drag:\n        0 12px 40px rgba(0, 0, 0, 0.8), 0 0 0 2px rgba(255, 255, 255, 0.2);\n    --wplace-shadow-notification: 0 4px 12px rgba(0, 0, 0, 0.3);\n    --wplace-shadow-slider-thumb:\n        0 3px 6px rgba(0, 0, 0, 0.3), 0 0 0 2px var(--wplace-icon-primary);\n    --wplace-shadow-slider-hover:\n        0 4px 8px rgba(0, 0, 0, 0.4), 0 0 0 3px var(--wplace-icon-primary);\n\n    /* Animation colors */\n    --wplace-pulse-start: rgba(0, 255, 0, 0.7);\n    --wplace-pulse-mid: rgba(0, 255, 0, 0);\n    --wplace-pulse-end: rgba(0, 255, 0, 0);\n\n    /* Slider colors */\n    --wplace-slider-thumb-bg: white;\n    --wplace-slider-track-bg: linear-gradient(\n        to right,\n        #4facfe 0%,\n        #00f2fe 100%\n    );\n}\n\n/* Classic theme container styling */\n:root #wplace-image-bot-container,\n.wplace-theme--classic #wplace-image-bot-container {\n    background: var(--wplace-primary);\n    color: var(--wplace-text);\n    border-radius: var(--wplace-radius);\n    box-shadow: var(--wplace-shadow);\n    font-family: var(--wplace-font);\n    backdrop-filter: var(--wplace-backdrop);\n    border: var(--wplace-border-width) var(--wplace-border-style)\n        var(--wplace-border-color);\n}\n\n:root #wplace-stats-container,\n.wplace-theme--classic #wplace-stats-container {\n    background: var(--wplace-primary);\n    color: var(--wplace-text);\n    border-radius: var(--wplace-radius);\n    box-shadow: var(--wplace-shadow);\n    font-family: var(--wplace-font);\n    backdrop-filter: var(--wplace-backdrop);\n    border: var(--wplace-border-width) var(--wplace-border-style)\n        var(--wplace-border-color);\n}\n\n:root #wplace-settings-container,\n.wplace-theme--classic #wplace-settings-container {\n    background: var(--wplace-primary);\n    color: var(--wplace-text);\n    border-radius: var(--wplace-radius);\n    box-shadow: var(--wplace-shadow);\n    font-family: var(--wplace-font);\n    backdrop-filter: var(--wplace-backdrop);\n    border: var(--wplace-border-width) var(--wplace-border-style)\n        var(--wplace-border-color);\n}\n\n:root .wplace-header,\n.wplace-theme--classic .wplace-header {\n    background: var(--wplace-secondary);\n    color: var(--wplace-highlight);\n}\n\n:root .wplace-section-title,\n.wplace-theme--classic .wplace-section-title {\n    color: var(--wplace-highlight);\n}\n\n:root .wplace-stat-value,\n.wplace-theme--classic .wplace-stat-value {\n    color: var(--wplace-highlight);\n}\n\n:root .wplace-status-section,\n.wplace-theme--classic .wplace-status-section {\n    border-radius: var(--wplace-radius);\n}\n\n:root .wplace-section,\n.wplace-theme--classic .wplace-section {\n    border-radius: var(--wplace-radius);\n}\n\n:root .wplace-stats,\n.wplace-theme--classic .wplace-stats {\n    border-radius: var(--wplace-radius);\n}\n\n:root .wplace-status,\n.wplace-theme--classic .wplace-status {\n    border-radius: var(--wplace-radius);\n}\n\n:root .wplace-alert-base,\n.wplace-theme--classic .wplace-alert-base {\n    border-radius: var(--wplace-radius);\n}\n\n:root .wplace-settings-container-base,\n.wplace-theme--classic .wplace-settings-container-base {\n    font-family: var(--wplace-font);\n    border-radius: var(--wplace-radius);\n    background: var(--wplace-primary);\n    color: var(--wplace-text);\n    box-shadow: var(--wplace-shadow);\n    backdrop-filter: var(--wplace-backdrop);\n}\n\n/* Button styling for classic theme */\n:root .wplace-btn,\n.wplace-theme--classic .wplace-btn {\n    background: linear-gradient(135deg, #222222 0%, #4a4a4a 100%);\n    border: 1px solid rgba(255, 255, 255, 0.1);\n    color: var(--wplace-text);\n    border-radius: var(--wplace-radius);\n    font-family: var(--wplace-font);\n}\n\n:root .wplace-btn::before,\n.wplace-theme--classic .wplace-btn::before {\n    background: linear-gradient(\n        90deg,\n        transparent,\n        rgba(255, 255, 255, 0.1),\n        transparent\n    );\n}\n\n:root .wplace-btn:hover:not(:disabled),\n.wplace-theme--classic .wplace-btn:hover:not(:disabled) {\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);\n}\n\n:root .wplace-btn:disabled,\n.wplace-theme--classic .wplace-btn:disabled {\n    box-shadow: none !important;\n}\n\n:root .wplace-btn-overlay.active,\n.wplace-theme--classic .wplace-btn-overlay.active {\n    background: linear-gradient(135deg, #29b6f6 0%, #8e2de2 100%);\n    box-shadow: 0 0 15px #8e2de2;\n}\n\n/* Button variants - exact upstream main colors */\n:root .wplace-btn-primary,\n.wplace-theme--classic .wplace-btn-primary {\n    background: linear-gradient(135deg, #222222 0%, #6a5acd 100%);\n    color: var(--wplace-text);\n}\n\n:root .wplace-btn-upload,\n.wplace-theme--classic .wplace-btn-upload {\n    background: linear-gradient(135deg, #111111 0%, #4a4a4a 100%);\n    color: var(--wplace-text);\n    border: 1px dashed var(--wplace-highlight) !important;\n}\n\n:root .wplace-btn-start,\n.wplace-theme--classic .wplace-btn-start {\n    background: linear-gradient(135deg, var(--wplace-success) 0%, #228b22 100%);\n    color: white;\n}\n\n:root .wplace-btn-stop,\n.wplace-theme--classic .wplace-btn-stop {\n    background: linear-gradient(135deg, var(--wplace-error) 0%, #dc143c 100%);\n    color: white;\n}\n\n:root .wplace-btn-select,\n.wplace-theme--classic .wplace-btn-select {\n    background: linear-gradient(\n        135deg,\n        var(--wplace-highlight) 0%,\n        #9370db 100%\n    );\n    color: white;\n}\n\n:root .wplace-btn-file,\n.wplace-theme--classic .wplace-btn-file {\n    background: linear-gradient(135deg, #ff8c00 0%, #ff7f50 100%);\n    color: white;\n}\n\n:root .wplace-btn.active,\n:root .wplace-btn[aria-pressed='true'],\n.wplace-theme--classic .wplace-btn.active,\n.wplace-theme--classic .wplace-btn[aria-pressed='true'] {\n    background: var(--wplace-highlight) !important;\n    color: #000000 !important;\n    border-color: var(--wplace-text) !important;\n    box-shadow:\n        0 0 8px rgba(0, 0, 0, 0.25) inset,\n        0 0 6px rgba(0, 0, 0, 0.2) !important;\n}\n\n:root .wplace-btn.active i,\n:root .wplace-btn[aria-pressed='true'] i,\n.wplace-theme--classic .wplace-btn.active i,\n.wplace-theme--classic .wplace-btn[aria-pressed='true'] i {\n    filter: drop-shadow(0 0 3px #000000);\n}\n\n:root .mask-mode-group .wplace-btn.active,\n:root .mask-mode-group .wplace-btn[aria-pressed='true'],\n.wplace-theme--classic .mask-mode-group .wplace-btn.active,\n.wplace-theme--classic .mask-mode-group .wplace-btn[aria-pressed='true'] {\n    background: var(--wplace-highlight);\n    color: #000000;\n    border-color: var(--wplace-text);\n    box-shadow:\n        0 0 8px rgba(0, 0, 0, 0.25) inset,\n        0 0 6px rgba(0, 0, 0, 0.2);\n}\n\n/* Status styling for classic theme */\n:root .status-default,\n.wplace-theme--classic .status-default {\n    background: rgba(255, 255, 255, 0.1);\n    border-color: var(--wplace-text);\n    color: var(--wplace-text);\n}\n\n:root .status-success,\n.wplace-theme--classic .status-success {\n    background: rgba(0, 255, 0, 0.1);\n    border-color: var(--wplace-success);\n    color: var(--wplace-success);\n    box-shadow: 0 0 15px var(--wplace-success);\n}\n\n:root .status-error,\n.wplace-theme--classic .status-error {\n    background: rgba(255, 0, 0, 0.1);\n    border-color: var(--wplace-error);\n    color: var(--wplace-error);\n    box-shadow: 0 0 15px var(--wplace-error);\n}\n\n:root .status-warning,\n.wplace-theme--classic .status-warning {\n    background: rgba(255, 165, 0, 0.1);\n    border-color: var(--wplace-warning);\n    color: var(--wplace-warning);\n    box-shadow: 0 0 15px var(--wplace-warning);\n}\n\n:root .wplace-status.status-default,\n.wplace-theme--classic .wplace-status.status-default {\n    color: var(--wplace-text);\n    background: rgba(255, 255, 255, 0.1);\n    border-color: var(--wplace-text);\n}\n\n/* Alert styling for classic theme */\n:root .wplace-alert-info,\n.wplace-theme--classic .wplace-alert-info {\n    background: linear-gradient(135deg, #3498db, #2980b9);\n    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);\n}\n\n:root .wplace-alert-success,\n.wplace-theme--classic .wplace-alert-success {\n    background: linear-gradient(135deg, #27ae60, #229954);\n    box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);\n}\n\n:root .wplace-alert-warning,\n.wplace-theme--classic .wplace-alert-warning {\n    background: linear-gradient(135deg, #f39c12, #e67e22);\n    box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);\n}\n\n:root .wplace-alert-error,\n.wplace-theme--classic .wplace-alert-error {\n    background: linear-gradient(135deg, #e74c3c, #c0392b);\n    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);\n}\n\n/* Progress bar styling for classic theme */\n:root .wplace-progress,\n.wplace-theme--classic .wplace-progress {\n    background: rgba(0, 0, 0, 0.3);\n    border: 1px solid rgba(255, 255, 255, 0.1);\n    border-radius: var(--wplace-radius);\n}\n\n:root .wplace-progress-bar,\n.wplace-theme--classic .wplace-progress-bar {\n    background: linear-gradient(\n        135deg,\n        var(--wplace-highlight) 0%,\n        #9370db 100%\n    );\n}\n\n:root .wplace-progress-bar::after,\n.wplace-theme--classic .wplace-progress-bar::after {\n    background: linear-gradient(\n        90deg,\n        transparent,\n        rgba(255, 255, 255, 0.3),\n        transparent\n    );\n}\n\n/* Header and sections styling for classic theme */\n:root .wplace-header-btn,\n.wplace-theme--classic .wplace-header-btn {\n    background: rgba(255, 255, 255, 0.1);\n    color: var(--wplace-highlight);\n    border-radius: 4px;\n    font-family: var(--wplace-font);\n}\n\n:root .wplace-header-btn:hover,\n.wplace-theme--classic .wplace-header-btn:hover {\n    background: #222222;\n    color: var(--wplace-text);\n}\n\n:root .wplace-status-section,\n.wplace-theme--classic .wplace-status-section {\n    background: rgba(255, 255, 255, 0.03);\n    border: 1px solid rgba(255, 255, 255, 0.1);\n}\n\n:root .wplace-section,\n.wplace-theme--classic .wplace-section {\n    background: rgba(255, 255, 255, 0.03);\n    border: 1px solid rgba(255, 255, 255, 0.1);\n}\n\n:root .wplace-stats,\n.wplace-theme--classic .wplace-stats {\n    background: rgba(255, 255, 255, 0.03);\n    border: 1px solid rgba(255, 255, 255, 0.1);\n}\n\n/* Font and typography for classic theme */\n:root .wplace-turnstile-overlay,\n.wplace-theme--classic .wplace-turnstile-overlay {\n    background: rgba(0, 0, 0, 0.9) !important;\n    border-radius: var(--wplace-radius) !important;\n    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;\n    backdrop-filter: var(--wplace-backdrop) !important;\n    border: 1px solid rgba(255, 255, 255, 0.2) !important;\n    color: var(--wplace-text) !important;\n    font-family: var(--wplace-font) !important;\n}\n\n:root .wplace-alert-base,\n.wplace-theme--classic .wplace-alert-base {\n    font-family: var(--wplace-font);\n}\n\n/* Auto light/dark support for classic theme */\n@media (prefers-color-scheme: light) {\n    :root .theme-auto,\n    .wplace-theme--classic .theme-auto {\n        --wplace-primary: #ffffff;\n        --wplace-secondary: #f5f5f5;\n        --wplace-accent: #007acc;\n        --wplace-text: #333333;\n    }\n}\n\n@media (prefers-color-scheme: dark) {\n    :root .theme-auto,\n    .wplace-theme--classic .theme-auto {\n        --wplace-primary: #1e1e1e;\n        --wplace-secondary: #2d2d30;\n        --wplace-accent: var(--wplace-highlight);\n        --wplace-text: #ffffff;\n    }\n}\n\n/* Border and color styling for classic theme */\n:root .wplace-color-item-name,\n.wplace-theme--classic .wplace-color-item-name {\n    color: #ccc;\n}\n\n:root .wplace-color-swatch,\n.wplace-theme--classic .wplace-color-swatch {\n    border: 1px solid rgba(255, 255, 255, 0.2);\n    border-radius: 4px;\n}\n\n:root .wplace-stat-color-swatch,\n.wplace-theme--classic .wplace-stat-color-swatch {\n    border-radius: 3px;\n    border: 1px solid rgba(255, 255, 255, 0.1);\n    box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.5);\n}\n\n:root .resize-tools button,\n.wplace-theme--classic .resize-tools button {\n    border-radius: 6px;\n    border: 1px solid rgba(255, 255, 255, 0.2);\n    background: rgba(255, 255, 255, 0.06);\n    color: #fff;\n}\n\n:root .resize-slider,\n.wplace-theme--classic .resize-slider {\n    background: #ccc;\n    border-radius: var(--wplace-radius);\n}\n\n/* Text effects and filters for classic theme */\n:root .wplace-header,\n.wplace-theme--classic .wplace-header {\n    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);\n}\n\n:root .wplace-color-swatch:not(.active),\n.wplace-theme--classic .wplace-color-swatch:not(.active) {\n    filter: grayscale(80%);\n}\n\n:root .wplace-color-swatch.unavailable:not(.active),\n.wplace-theme--classic .wplace-color-swatch.unavailable:not(.active) {\n    filter: grayscale(90%);\n}\n\n:root .wplace-color-swatch.active::after,\n.wplace-theme--classic .wplace-color-swatch.active::after {\n    text-shadow: 0 0 3px black;\n}\n\n/* Icon colors for classic theme */\n:root .wplace-icon-key,\n.wplace-theme--classic .wplace-icon-key {\n    color: #4facfe;\n}\n\n:root .wplace-icon-robot,\n.wplace-theme--classic .wplace-icon-robot {\n    color: #4facfe;\n}\n\n:root .wplace-icon-speed,\n.wplace-theme--classic .wplace-icon-speed {\n    color: #4facfe;\n}\n\n:root .wplace-icon-bell,\n.wplace-theme--classic .wplace-icon-bell {\n    color: #ffd166;\n}\n\n:root .wplace-icon-palette,\n.wplace-theme--classic .wplace-icon-palette {\n    color: #f093fb;\n}\n\n:root .wplace-icon-globe,\n.wplace-theme--classic .wplace-icon-globe {\n    color: #ffeaa7;\n}\n\n:root .wplace-icon-paint,\n.wplace-theme--classic .wplace-icon-paint {\n    color: #4facfe;\n}\n\n:root .wplace-icon-eye,\n.wplace-theme--classic .wplace-icon-eye {\n    color: var(--wplace-highlight);\n}\n\n/* Form controls and sliders for classic theme */\n:root .wplace-slider,\n.wplace-theme--classic .wplace-slider {\n    background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);\n    border-radius: 4px;\n}\n\n:root .wplace-slider::-webkit-slider-thumb,\n.wplace-theme--classic .wplace-slider::-webkit-slider-thumb {\n    -webkit-appearance: none;\n    width: 16px;\n    height: 16px;\n    border-radius: 50%;\n    background: var(--wplace-slider-thumb-bg);\n    border: none;\n    cursor: pointer;\n    transition: all 0.2s ease;\n}\n\n:root .wplace-speed-slider,\n.wplace-theme--classic .wplace-speed-slider {\n    border-radius: 3px;\n}\n\n:root .wplace-speed-slider::-webkit-slider-thumb,\n.wplace-theme--classic .wplace-speed-slider::-webkit-slider-thumb {\n    border-radius: 50%;\n    border: 2px solid;\n}\n\n:root .wplace-speed-slider::-moz-range-thumb,\n.wplace-theme--classic .wplace-speed-slider::-moz-range-thumb {\n    border-radius: 50%;\n    border: 2px solid;\n}\n\n:root .wplace-color-swatch.unavailable,\n.wplace-theme--classic .wplace-color-swatch.unavailable {\n    border-color: #666;\n}\n\n:root .wplace-turnstile-title,\n.wplace-theme--classic .wplace-turnstile-title {\n    color: var(--wplace-text) !important;\n}\n\n:root .wplace-turnstile-hide-btn,\n.wplace-theme--classic .wplace-turnstile-hide-btn {\n    color: var(--wplace-text) !important;\n    border: 1px solid rgba(255, 255, 255, 0.2) !important;\n    border-radius: 6px !important;\n}\n\n:root .wplace-turnstile-hide-btn:hover,\n.wplace-theme--classic .wplace-turnstile-hide-btn:hover {\n    background: rgba(255, 255, 255, 0.1) !important;\n}\n\n:root .wplace-settings-select,\n.wplace-theme--classic .wplace-settings-select {\n    background: rgba(255, 255, 255, 0.15);\n    color: white;\n    border: 1px solid rgba(255, 255, 255, 0.2);\n    border-radius: 8px;\n    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);\n}\n\n:root .wplace-settings-option,\n.wplace-theme--classic .wplace-settings-option {\n    background: #2d3748;\n    color: white;\n}\n\n:root .wplace-stat-colors-grid,\n.wplace-theme--classic .wplace-stat-colors-grid {\n    background: rgba(0, 0, 0, 0.2);\n    border-radius: 4px;\n}\n\n:root .resize-overlay,\n.wplace-theme--classic .resize-overlay {\n    background: rgba(0, 0, 0, 0.8);\n}\n\n:root .wplace-overlay,\n.wplace-theme--classic .wplace-overlay {\n    background: rgba(0, 0, 0, 0.8);\n}\n\n:root .wplace-settings-error,\n.wplace-theme--classic .wplace-settings-error {\n    background: rgba(255, 0, 0, 0.4) !important;\n}\n\n/* Settings sections and batch controls for classic theme */\n:root .wplace-settings-section-wrapper,\n.wplace-theme--classic .wplace-settings-section-wrapper {\n    background: rgba(255, 255, 255, 0.1);\n    border-radius: var(--wplace-radius);\n    border: 1px solid rgba(255, 255, 255, 0.1);\n}\n\n:root .wplace-batch-controls,\n.wplace-theme--classic .wplace-batch-controls {\n    background: rgba(255, 255, 255, 0.1);\n    border-radius: var(--wplace-radius);\n    border: 1px solid rgba(255, 255, 255, 0.1);\n}\n\n:root .wplace-speed-slider,\n.wplace-theme--classic .wplace-speed-slider {\n    background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);\n    border-radius: 4px;\n}\n\n:root .wplace-overlay-opacity-slider,\n.wplace-theme--classic .wplace-overlay-opacity-slider {\n    background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);\n    border-radius: 4px;\n}\n\n:root .wplace-speed-value,\n.wplace-theme--classic .wplace-speed-value {\n    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);\n    border-radius: 8px;\n    color: white;\n    box-shadow: 0 3px 10px rgba(79, 172, 254, 0.3);\n    border: 1px solid rgba(255, 255, 255, 0.2);\n}\n\n/* Additional elements for classic theme */\n:root .wplace-color-divider,\n.wplace-theme--classic .wplace-color-divider {\n    background: rgba(255, 255, 255, 0.1);\n}\n\n:root .wplace-settings-select option,\n.wplace-theme--classic .wplace-settings-select option {\n    background: #2d3748;\n    color: white;\n}\n\n:root .wplace-settings-description,\n.wplace-theme--classic .wplace-settings-description {\n    color: rgba(255, 255, 255, 0.7);\n}\n\n:root .wplace-settings-apply-btn,\n.wplace-theme--classic .wplace-settings-apply-btn {\n    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);\n    color: white;\n    border-radius: 8px;\n}\n\n/* Resize dialog styling for classic theme */\n:root .resize-container,\n.wplace-theme--classic .resize-container {\n    background: #000000;\n    border: 1px solid #ffffff;\n    border-radius: 12px;\n    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);\n}\n",
+    "neon": "/* WPlace Auto-Image Bot - Neon Theme */\n/* Retro cyberpunk aesthetic with green neon glow effects */\n\n.wplace-theme--neon {\n    /* Neon theme colors - matching upstream main neon theme */\n    --wplace-primary: #1a1a2e;\n    --wplace-secondary: #16213e;\n    --wplace-accent: #0f3460;\n    --wplace-text: #00ff41;\n    --wplace-highlight: #ff6b35;\n    --wplace-success: #39ff14;\n    --wplace-error: #ff073a;\n    --wplace-warning: #ffff00;\n\n    /* Neon UI properties */\n    --wplace-radius: 0;\n    --wplace-border-style: solid;\n    --wplace-border-width: 2px;\n    --wplace-border-color: #00ff41;\n    --wplace-shadow:\n        0 0 20px rgba(0, 255, 65, 0.3), inset 0 0 20px rgba(0, 255, 65, 0.1);\n    --wplace-backdrop: none;\n    --wplace-font: 'Press Start 2P', monospace, 'Courier New';\n\n    /* Z-index layers */\n    --wplace-z-overlay: 10000;\n    --wplace-z-alert: 10002;\n    --wplace-z-settings: 10002;\n\n    /* Feature toggles */\n    --wplace-scanline: 1;\n    --wplace-pixel-blink: 1;\n\n    /* Icon colors - neon variants */\n    --wplace-icon-primary: #00ff41;\n    --wplace-icon-secondary: #39ff14;\n    --wplace-icon-palette: #ff6b35;\n\n    /* Additional UI colors - neon variants */\n    --wplace-danger: #ff073a;\n    --wplace-danger-dark: #cc0531;\n    --wplace-muted-text: #00ff4180;\n    --wplace-highlight-secondary: #ffaa00;\n\n    /* Text variants - neon style */\n    --wplace-text-secondary: #00ff41dd;\n    --wplace-text-muted: #00ff41bb;\n    --wplace-text-dim: #00ff4199;\n    --wplace-text-faded: #00ff41cc;\n\n    /* Background variants - neon style */\n    --wplace-bg-input: rgba(0, 255, 65, 0.15);\n    --wplace-bg-subtle: rgba(0, 255, 65, 0.08);\n    --wplace-bg-faint: rgba(0, 255, 65, 0.05);\n    --wplace-bg-ghost: rgba(0, 255, 65, 0.03);\n    --wplace-bg-whisper: rgba(0, 255, 65, 0.02);\n\n    /* Border variants - neon style */\n    --wplace-border-subtle: rgba(0, 255, 65, 0.4);\n    --wplace-border-faint: rgba(0, 255, 65, 0.25);\n    --wplace-border-ghost: rgba(0, 255, 65, 0.15);\n    --wplace-border-ultra-faint: rgba(0, 255, 65, 0.08);\n\n    /* Shadow variants - neon style */\n    --wplace-shadow-drag:\n        0 12px 40px rgba(0, 255, 65, 0.6), 0 0 0 2px rgba(0, 255, 65, 0.8),\n        0 0 20px rgba(0, 255, 65, 0.3);\n    --wplace-shadow-notification:\n        0 4px 12px rgba(0, 255, 65, 0.4), 0 0 15px rgba(0, 255, 65, 0.2);\n    --wplace-shadow-slider-thumb:\n        0 3px 6px rgba(0, 255, 65, 0.5), 0 0 0 2px var(--wplace-icon-primary),\n        0 0 10px rgba(0, 255, 65, 0.3);\n    --wplace-shadow-slider-hover:\n        0 4px 8px rgba(0, 255, 65, 0.6), 0 0 0 3px var(--wplace-icon-primary),\n        0 0 15px rgba(0, 255, 65, 0.4);\n\n    /* Animation colors - neon style */\n    --wplace-pulse-start: rgba(0, 255, 65, 0.8);\n    --wplace-pulse-mid: rgba(0, 255, 65, 0);\n    --wplace-pulse-end: rgba(0, 255, 65, 0);\n\n    /* Slider colors - neon style */\n    --wplace-slider-thumb-bg: #00ff41;\n}\n\n/* Neon-specific styling overrides */\n.wplace-theme--neon #wplace-image-bot-container {\n    background: var(--wplace-primary) !important;\n    border: 2px solid var(--wplace-text) !important;\n    border-radius: 0 !important;\n    box-shadow:\n        0 0 20px var(--wplace-text),\n        inset 0 0 20px rgba(0, 255, 65, 0.1) !important;\n    font-family: var(--wplace-font) !important;\n}\n\n.wplace-theme--neon #wplace-stats-container {\n    background: var(--wplace-primary) !important;\n    border: 2px solid var(--wplace-text) !important;\n    border-radius: 0 !important;\n    box-shadow:\n        0 0 20px var(--wplace-text),\n        inset 0 0 20px rgba(0, 255, 65, 0.1) !important;\n    font-family: var(--wplace-font) !important;\n}\n\n.wplace-theme--neon .wplace-header {\n    background: var(--wplace-secondary) !important;\n    border-bottom: 1px solid var(--wplace-text) !important;\n    color: var(--wplace-text) !important;\n    text-shadow: 0 0 10px var(--wplace-text) !important;\n    font-family: var(--wplace-font) !important;\n}\n\n.wplace-theme--neon .wplace-section {\n    background: rgba(22, 33, 62, 0.5) !important;\n    border: 1px solid var(--wplace-text) !important;\n    border-radius: 0 !important;\n}\n\n.wplace-theme--neon .wplace-status-section {\n    background: rgba(22, 33, 62, 0.5) !important;\n    border: 1px solid var(--wplace-text) !important;\n    border-radius: 0 !important;\n}\n\n.wplace-theme--neon .wplace-section-title {\n    color: var(--wplace-text) !important;\n    text-shadow: 0 0 8px var(--wplace-text) !important;\n    text-transform: uppercase !important;\n    font-family: var(--wplace-font) !important;\n    font-size: 10px !important;\n}\n\n.wplace-theme--neon .wplace-btn {\n    background: var(--wplace-secondary) !important;\n    border: 1px solid var(--wplace-text) !important;\n    border-radius: 0 !important;\n    color: var(--wplace-text) !important;\n    text-shadow: 0 0 5px var(--wplace-text) !important;\n    font-family: var(--wplace-font) !important;\n    font-size: 9px !important;\n    text-transform: uppercase !important;\n}\n\n.wplace-theme--neon .wplace-btn:hover:not(:disabled) {\n    box-shadow:\n        0 0 15px var(--wplace-text),\n        inset 0 0 15px rgba(0, 255, 65, 0.1) !important;\n    animation: neonGlow 1s ease-in-out infinite alternate !important;\n}\n\n.wplace-theme--neon .wplace-btn-start {\n    background: var(--wplace-secondary) !important;\n    border-color: var(--wplace-success) !important;\n    color: var(--wplace-success) !important;\n    text-shadow: 0 0 8px var(--wplace-success) !important;\n}\n\n.wplace-theme--neon .wplace-btn-stop {\n    background: var(--wplace-secondary) !important;\n    border-color: var(--wplace-error) !important;\n    color: var(--wplace-error) !important;\n    text-shadow: 0 0 8px var(--wplace-error) !important;\n}\n\n.wplace-theme--neon .wplace-btn-upload {\n    background: var(--wplace-secondary) !important;\n    border: 1px dashed var(--wplace-highlight) !important;\n    color: var(--wplace-highlight) !important;\n    text-shadow: 0 0 8px var(--wplace-highlight) !important;\n}\n\n.wplace-theme--neon .wplace-btn-select {\n    background: var(--wplace-secondary) !important;\n    border-color: var(--wplace-highlight) !important;\n    color: var(--wplace-highlight) !important;\n    text-shadow: 0 0 8px var(--wplace-highlight) !important;\n}\n\n.wplace-theme--neon .wplace-btn-file {\n    background: var(--wplace-secondary) !important;\n    border-color: var(--wplace-warning) !important;\n    color: var(--wplace-warning) !important;\n    text-shadow: 0 0 8px var(--wplace-warning) !important;\n}\n\n.wplace-theme--neon .wplace-progress {\n    background: rgba(0, 0, 0, 0.8) !important;\n    border: 1px solid var(--wplace-text) !important;\n    border-radius: 0 !important;\n}\n\n.wplace-theme--neon .wplace-progress-bar {\n    background: linear-gradient(\n        90deg,\n        var(--wplace-success) 0%,\n        var(--wplace-text) 100%\n    ) !important;\n    box-shadow: 0 0 10px var(--wplace-success) !important;\n}\n\n.wplace-theme--neon .wplace-stat-value {\n    color: var(--wplace-text) !important;\n    text-shadow: 0 0 5px var(--wplace-text) !important;\n}\n\n.wplace-theme--neon .status-success {\n    background: rgba(57, 255, 20, 0.1) !important;\n    border-color: var(--wplace-success) !important;\n    color: var(--wplace-success) !important;\n    box-shadow: 0 0 15px var(--wplace-success) !important;\n    text-shadow: 0 0 8px var(--wplace-success) !important;\n}\n\n.wplace-theme--neon .status-error {\n    background: rgba(255, 7, 58, 0.1) !important;\n    border-color: var(--wplace-error) !important;\n    color: var(--wplace-error) !important;\n    box-shadow: 0 0 15px var(--wplace-error) !important;\n    text-shadow: 0 0 8px var(--wplace-error) !important;\n}\n\n.wplace-theme--neon .status-default {\n    background: rgba(0, 255, 65, 0.1) !important;\n    border-color: var(--wplace-text) !important;\n    color: var(--wplace-text) !important;\n    text-shadow: 0 0 5px var(--wplace-text) !important;\n}\n\n/* Settings dialog neon styling */\n.wplace-theme--neon #wplace-settings-container {\n    background: var(--wplace-primary) !important;\n    border: 2px solid var(--wplace-text) !important;\n    border-radius: 0 !important;\n    box-shadow:\n        0 0 30px var(--wplace-text),\n        inset 0 0 30px rgba(0, 255, 65, 0.1) !important;\n    font-family: var(--wplace-font) !important;\n}\n\n.wplace-theme--neon .wplace-settings-header {\n    background: var(--wplace-secondary) !important;\n    border-bottom: 1px solid var(--wplace-text) !important;\n}\n\n.wplace-theme--neon .wplace-settings-header h3 {\n    color: var(--wplace-text) !important;\n    text-shadow: 0 0 10px var(--wplace-text) !important;\n    font-family: var(--wplace-font) !important;\n    font-size: 16px !important;\n    text-transform: uppercase !important;\n}\n\n.wplace-theme--neon .wplace-settings-close-btn {\n    background: var(--wplace-secondary) !important;\n    border: 1px solid var(--wplace-text) !important;\n    border-radius: 0 !important;\n    color: var(--wplace-text) !important;\n}\n\n.wplace-theme--neon .wplace-settings-close-btn:hover {\n    background: var(--wplace-error) !important;\n    box-shadow: 0 0 15px var(--wplace-error) !important;\n}\n\n.wplace-theme--neon .wplace-settings-section-wrapper {\n    background: rgba(22, 33, 62, 0.3) !important;\n    border: 1px solid var(--wplace-text) !important;\n    border-radius: 0 !important;\n}\n\n.wplace-theme--neon .wplace-settings-select {\n    background: var(--wplace-secondary) !important;\n    border: 1px solid var(--wplace-text) !important;\n    border-radius: 0 !important;\n    color: var(--wplace-text) !important;\n    font-family: var(--wplace-font) !important;\n    font-size: 11px !important;\n}\n\n.wplace-theme--neon .wplace-settings-section-label {\n    color: var(--wplace-text) !important;\n    text-shadow: 0 0 8px var(--wplace-text) !important;\n    font-family: var(--wplace-font) !important;\n    font-size: 12px !important;\n    text-transform: uppercase !important;\n}\n\n.wplace-theme--neon .wplace-speed-value {\n    background: var(--wplace-secondary) !important;\n    border: 1px solid var(--wplace-text) !important;\n    border-radius: 0 !important;\n    color: var(--wplace-text) !important;\n    text-shadow: 0 0 8px var(--wplace-text) !important;\n    font-family: var(--wplace-font) !important;\n    box-shadow: 0 0 10px rgba(0, 255, 65, 0.3) !important;\n}\n\n.wplace-theme--neon .wplace-overlay-opacity-value {\n    background: var(--wplace-secondary) !important;\n    border: 1px solid var(--wplace-text) !important;\n    border-radius: 0 !important;\n    color: var(--wplace-text) !important;\n    text-shadow: 0 0 5px var(--wplace-text) !important;\n}\n\n/* Neon slider styling */\n.wplace-theme--neon .wplace-slider,\n.wplace-theme--neon .wplace-speed-slider,\n.wplace-theme--neon .wplace-overlay-opacity-slider {\n    background: var(--wplace-secondary) !important;\n    border: 1px solid var(--wplace-text) !important;\n    border-radius: 0 !important;\n    box-shadow: 0 0 10px rgba(0, 255, 65, 0.3) !important;\n}\n\n.wplace-theme--neon .wplace-slider::-webkit-slider-thumb,\n.wplace-theme--neon .wplace-speed-slider::-webkit-slider-thumb,\n.wplace-theme--neon .wplace-overlay-opacity-slider::-webkit-slider-thumb {\n    -webkit-appearance: none;\n    width: 16px;\n    height: 16px;\n    border-radius: 0 !important;\n    background: var(--wplace-slider-thumb-bg) !important;\n    border: 2px solid var(--wplace-text) !important;\n    cursor: pointer;\n    transition: all 0.2s ease;\n    box-shadow: 0 0 8px rgba(0, 255, 65, 0.5) !important;\n}\n\n.wplace-theme--neon .wplace-slider::-webkit-slider-thumb:hover,\n.wplace-theme--neon .wplace-speed-slider::-webkit-slider-thumb:hover,\n.wplace-theme--neon .wplace-overlay-opacity-slider::-webkit-slider-thumb:hover {\n    transform: scale(1.1);\n    box-shadow: 0 0 15px var(--wplace-text) !important;\n}\n\n/* Scanline animation for neon theme */\n.wplace-theme--neon #wplace-image-bot-container::before {\n    content: '';\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    height: 2px;\n    background: linear-gradient(\n        90deg,\n        transparent,\n        var(--wplace-text),\n        transparent\n    );\n    z-index: 1;\n    pointer-events: none;\n    animation: scanline 3s linear infinite;\n    opacity: 0.7;\n}\n\n.wplace-theme--neon #wplace-stats-container {\n    position: fixed !important;\n    overflow: hidden !important;\n    z-index: 9998 !important;\n}\n\n.wplace-theme--neon #wplace-stats-container::before {\n    content: '';\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    height: 2px;\n    background: linear-gradient(\n        90deg,\n        transparent,\n        var(--wplace-text),\n        transparent\n    );\n    z-index: 1;\n    pointer-events: none;\n    animation: scanlineStats 4s linear infinite;\n    opacity: 0.7;\n}\n\n/* Pixel blinking animation for buttons */\n.wplace-theme--neon .wplace-btn:hover:not(:disabled) {\n    animation:\n        pixelBlink 0.5s infinite,\n        neonGlow 1s ease-in-out infinite alternate;\n}\n\n/* Text glow animations */\n@keyframes neonGlow {\n    0%,\n    100% {\n        text-shadow:\n            0 0 5px currentColor,\n            0 0 10px currentColor,\n            0 0 15px currentColor;\n    }\n    50% {\n        text-shadow:\n            0 0 2px currentColor,\n            0 0 5px currentColor,\n            0 0 8px currentColor;\n    }\n}\n\n@keyframes pixelBlink {\n    0%,\n    50% {\n        opacity: 1;\n    }\n    51%,\n    100% {\n        opacity: 0.7;\n    }\n}\n\n@keyframes scanline {\n    0% {\n        transform: translateY(-100%);\n    }\n    100% {\n        transform: translateY(400px);\n    }\n}\n\n@keyframes scanlineStats {\n    0% {\n        transform: translateY(-100%);\n    }\n    100% {\n        transform: translateY(300px);\n    }\n}\n\n/* Resize dialog styling for neon theme */\n.wplace-theme--neon .resize-container {\n    background: #1a1a2e !important;\n    border: 3px solid #00ff41 !important;\n    border-radius: 0 !important;\n    box-shadow: 0 0 30px rgba(0, 255, 65, 0.5) !important;\n    font-family: 'Press Start 2P', monospace !important;\n}\n"
   };
   var EMBEDDED_LANGUAGES = {
     "en": {
@@ -4420,7 +3808,11 @@
         7: { id: 8, name: "Orange", rgb: { r: 255, g: 127, b: 39 } },
         8: { id: 9, name: "Gold", rgb: { r: 246, g: 170, b: 9 } },
         9: { id: 10, name: "Yellow", rgb: { r: 249, g: 221, b: 59 } },
-        10: { id: 11, name: "Light Yellow", rgb: { r: 255, g: 250, b: 188 } },
+        10: {
+          id: 11,
+          name: "Light Yellow",
+          rgb: { r: 255, g: 250, b: 188 }
+        },
         11: { id: 12, name: "Dark Green", rgb: { r: 14, g: 185, b: 104 } },
         12: { id: 13, name: "Green", rgb: { r: 19, g: 230, b: 123 } },
         13: { id: 14, name: "Light Green", rgb: { r: 135, g: 255, b: 94 } },
@@ -4432,36 +3824,76 @@
         19: { id: 18, name: "Dark Blue", rgb: { r: 40, g: 80, b: 158 } },
         20: { id: 19, name: "Blue", rgb: { r: 64, g: 147, b: 228 } },
         21: { id: 21, name: "Indigo", rgb: { r: 107, g: 80, b: 246 } },
-        22: { id: 22, name: "Light Indigo", rgb: { r: 153, g: 177, b: 251 } },
+        22: {
+          id: 22,
+          name: "Light Indigo",
+          rgb: { r: 153, g: 177, b: 251 }
+        },
         23: { id: 23, name: "Dark Purple", rgb: { r: 120, g: 12, b: 153 } },
         24: { id: 24, name: "Purple", rgb: { r: 170, g: 56, b: 185 } },
-        25: { id: 25, name: "Light Purple", rgb: { r: 224, g: 159, b: 249 } },
+        25: {
+          id: 25,
+          name: "Light Purple",
+          rgb: { r: 224, g: 159, b: 249 }
+        },
         26: { id: 26, name: "Dark Pink", rgb: { r: 203, g: 0, b: 122 } },
         27: { id: 27, name: "Pink", rgb: { r: 236, g: 31, b: 128 } },
         28: { id: 28, name: "Light Pink", rgb: { r: 243, g: 141, b: 169 } },
         29: { id: 29, name: "Dark Brown", rgb: { r: 104, g: 70, b: 52 } },
         30: { id: 30, name: "Brown", rgb: { r: 149, g: 104, b: 42 } },
         31: { id: 31, name: "Beige", rgb: { r: 248, g: 178, b: 119 } },
-        32: { id: 52, name: "Light Beige", rgb: { r: 255, g: 197, b: 165 } },
-        33: { id: 32, name: "Medium Gray", rgb: { r: 170, g: 170, b: 170 } },
+        32: {
+          id: 52,
+          name: "Light Beige",
+          rgb: { r: 255, g: 197, b: 165 }
+        },
+        33: {
+          id: 32,
+          name: "Medium Gray",
+          rgb: { r: 170, g: 170, b: 170 }
+        },
         34: { id: 33, name: "Dark Red", rgb: { r: 165, g: 14, b: 30 } },
         35: { id: 34, name: "Light Red", rgb: { r: 250, g: 128, b: 114 } },
         36: { id: 35, name: "Dark Orange", rgb: { r: 228, g: 92, b: 26 } },
-        37: { id: 37, name: "Dark Goldenrod", rgb: { r: 156, g: 132, b: 49 } },
+        37: {
+          id: 37,
+          name: "Dark Goldenrod",
+          rgb: { r: 156, g: 132, b: 49 }
+        },
         38: { id: 38, name: "Goldenrod", rgb: { r: 197, g: 173, b: 49 } },
-        39: { id: 39, name: "Light Goldenrod", rgb: { r: 232, g: 212, b: 95 } },
+        39: {
+          id: 39,
+          name: "Light Goldenrod",
+          rgb: { r: 232, g: 212, b: 95 }
+        },
         40: { id: 40, name: "Dark Olive", rgb: { r: 74, g: 107, b: 58 } },
         41: { id: 41, name: "Olive", rgb: { r: 90, g: 148, b: 74 } },
-        42: { id: 42, name: "Light Olive", rgb: { r: 132, g: 197, b: 115 } },
+        42: {
+          id: 42,
+          name: "Light Olive",
+          rgb: { r: 132, g: 197, b: 115 }
+        },
         43: { id: 43, name: "Dark Cyan", rgb: { r: 15, g: 121, b: 159 } },
         44: { id: 45, name: "Light Blue", rgb: { r: 125, g: 199, b: 255 } },
         45: { id: 46, name: "Dark Indigo", rgb: { r: 77, g: 49, b: 184 } },
-        46: { id: 47, name: "Dark Slate Blue", rgb: { r: 74, g: 66, b: 132 } },
+        46: {
+          id: 47,
+          name: "Dark Slate Blue",
+          rgb: { r: 74, g: 66, b: 132 }
+        },
         47: { id: 48, name: "Slate Blue", rgb: { r: 122, g: 113, b: 196 } },
-        48: { id: 49, name: "Light Slate Blue", rgb: { r: 181, g: 174, b: 241 } },
+        48: {
+          id: 49,
+          name: "Light Slate Blue",
+          rgb: { r: 181, g: 174, b: 241 }
+        },
         49: { id: 53, name: "Dark Peach", rgb: { r: 155, g: 82, b: 73 } },
         50: { id: 54, name: "Peach", rgb: { r: 209, g: 128, b: 120 } },
-        51: { id: 55, name: "Light Peach", rgb: { r: 250, g: 182, b: 164 } },
+        51: {
+          id: 55,
+          name: "Light Peach",
+          rgb: { r: 250, g: 182, b: 164 }
+        },
         52: { id: 50, name: "Light Brown", rgb: { r: 219, g: 164, b: 99 } },
         53: { id: 56, name: "Dark Tan", rgb: { r: 123, g: 99, b: 82 } },
         54: { id: 57, name: "Tan", rgb: { r: 156, g: 132, b: 107 } },
@@ -4469,10 +3901,18 @@
         56: { id: 51, name: "Dark Beige", rgb: { r: 209, g: 128, b: 81 } },
         57: { id: 61, name: "Dark Stone", rgb: { r: 109, g: 100, b: 63 } },
         58: { id: 62, name: "Stone", rgb: { r: 148, g: 140, b: 107 } },
-        59: { id: 63, name: "Light Stone", rgb: { r: 205, g: 197, b: 158 } },
+        59: {
+          id: 63,
+          name: "Light Stone",
+          rgb: { r: 205, g: 197, b: 158 }
+        },
         60: { id: 58, name: "Dark Slate", rgb: { r: 51, g: 57, b: 65 } },
         61: { id: 59, name: "Slate", rgb: { r: 109, g: 117, b: 141 } },
-        62: { id: 60, name: "Light Slate", rgb: { r: 179, g: 185, b: 209 } },
+        62: {
+          id: 60,
+          name: "Light Slate",
+          rgb: { r: 179, g: 185, b: 209 }
+        },
         63: { id: 0, name: "Transparent", rgb: null }
       },
       // --- END: Color data ---
@@ -4545,7 +3985,20 @@
     };
     const translationCache = /* @__PURE__ */ new Map();
     let loadedTranslations = {};
-    const AVAILABLE_LANGUAGES = ["en", "ru", "pt", "vi", "fr", "id", "tr", "zh-CN", "zh-TW", "ja", "ko", "uk"];
+    const AVAILABLE_LANGUAGES = [
+      "en",
+      "ru",
+      "pt",
+      "vi",
+      "fr",
+      "id",
+      "tr",
+      "zh-CN",
+      "zh-TW",
+      "ja",
+      "ko",
+      "uk"
+    ];
     const loadTranslations = async (language) => {
       if (loadedTranslations[language]) {
         return loadedTranslations[language];
@@ -4554,10 +4007,14 @@
         const translations = EMBEDDED_LANGUAGES[language];
         if (typeof translations === "object" && translations !== null && Object.keys(translations).length > 0) {
           loadedTranslations[language] = translations;
-          console.log(`\u{1F4DA} Loaded ${language} translations successfully from embedded assets (${Object.keys(translations).length} keys)`);
+          console.log(
+            `\u{1F4DA} Loaded ${language} translations successfully from embedded assets (${Object.keys(translations).length} keys)`
+          );
           return translations;
         } else {
-          console.warn(`\u274C Invalid embedded translation format for ${language}`);
+          console.warn(
+            `\u274C Invalid embedded translation format for ${language}`
+          );
         }
       } else {
         console.warn(`\u274C No embedded translations found for ${language}`);
@@ -4572,7 +4029,9 @@
       try {
         if (savedLanguage && AVAILABLE_LANGUAGES.includes(savedLanguage)) {
           selectedLanguage = savedLanguage;
-          console.log(`\u{1F504} Using saved language preference: ${selectedLanguage}`);
+          console.log(
+            `\u{1F504} Using saved language preference: ${selectedLanguage}`
+          );
         } else if (AVAILABLE_LANGUAGES.includes(browserLocale)) {
           selectedLanguage = browserLocale;
           localStorage.setItem("wplace_language", browserLocale);
@@ -4582,13 +4041,17 @@
           localStorage.setItem("wplace_language", browserLanguage);
           console.log(`\u{1F504} Using browser language: ${selectedLanguage}`);
         } else {
-          console.log(`\u{1F504} No matching language found, using English fallback`);
+          console.log(
+            `\u{1F504} No matching language found, using English fallback`
+          );
         }
         state.language = selectedLanguage;
         if (selectedLanguage !== "en" && !loadedTranslations[selectedLanguage]) {
           const loaded = await loadTranslations(selectedLanguage);
           if (!loaded) {
-            console.warn(`\u26A0\uFE0F Failed to load ${selectedLanguage} translations, falling back to English`);
+            console.warn(
+              `\u26A0\uFE0F Failed to load ${selectedLanguage} translations, falling back to English`
+            );
             state.language = "en";
             localStorage.setItem("wplace_language", "en");
           }
@@ -4625,19 +4088,29 @@
         if (!loadedTranslations["en"]) {
           const englishLoaded = await loadTranslations("en");
           if (!englishLoaded) {
-            console.warn("\u26A0\uFE0F Failed to load English translations from CDN, using fallback");
-            showTranslationWarning("\u26A0\uFE0F Translation loading failed, using basic fallbacks");
+            console.warn(
+              "\u26A0\uFE0F Failed to load English translations from CDN, using fallback"
+            );
+            showTranslationWarning(
+              "\u26A0\uFE0F Translation loading failed, using basic fallbacks"
+            );
           }
         }
         await loadLanguagePreference();
-        console.log(`\u2705 Translation system initialized. Active language: ${state.language}`);
+        console.log(
+          `\u2705 Translation system initialized. Active language: ${state.language}`
+        );
       } catch (error) {
         console.error("\u274C Translation initialization failed:", error);
         if (!state.language) {
           state.language = "en";
         }
-        console.warn("\u26A0\uFE0F Using fallback translations due to initialization failure");
-        showTranslationWarning("\u26A0\uFE0F Translation system error, using basic English");
+        console.warn(
+          "\u26A0\uFE0F Using fallback translations due to initialization failure"
+        );
+        showTranslationWarning(
+          "\u26A0\uFE0F Translation system error, using basic English"
+        );
       }
     };
     const FALLBACK_TEXT = {
@@ -4670,9 +4143,15 @@
         console.warn(`\u26A0\uFE0F Missing translation for key: ${key}`);
         return key;
       }
-      return Object.entries(replacements).reduce((result, [placeholder, value]) => {
-        return result.replace(new RegExp(`\\{${placeholder}\\}`, "g"), value);
-      }, text);
+      return Object.entries(replacements).reduce(
+        (result, [placeholder, value]) => {
+          return result.replace(
+            new RegExp(`\\{${placeholder}\\}`, "g"),
+            value
+          );
+        },
+        text
+      );
     };
     const state = {
       running: false,
@@ -4815,7 +4294,9 @@
         }
         const currentHash = this._generateProcessHash();
         if (this.lastProcessedHash === currentHash && this.chunkedTiles.size > 0) {
-          console.log(`\u{1F4E6} Using cached overlay chunks (${this.chunkedTiles.size} tiles)`);
+          console.log(
+            `\u{1F4E6} Using cached overlay chunks (${this.chunkedTiles.size} tiles)`
+          );
           return;
         }
         this.processPromise = this._doProcessImageIntoChunks();
@@ -4849,19 +4330,32 @@
         }
         for (let i = 0; i < tilesToProcess.length; i += batchSize) {
           const batch = tilesToProcess.slice(i, i + batchSize);
-          await Promise.all(batch.map(async ({ tx, ty }) => {
-            const tileKey = `${tx},${ty}`;
-            const chunkBitmap = await this._processTile(tx, ty, imageWidth, imageHeight, startPixelX, startPixelY, startRegionX, startRegionY);
-            if (chunkBitmap) {
-              this.chunkedTiles.set(tileKey, chunkBitmap);
-            }
-          }));
+          await Promise.all(
+            batch.map(async ({ tx, ty }) => {
+              const tileKey = `${tx},${ty}`;
+              const chunkBitmap = await this._processTile(
+                tx,
+                ty,
+                imageWidth,
+                imageHeight,
+                startPixelX,
+                startPixelY,
+                startRegionX,
+                startRegionY
+              );
+              if (chunkBitmap) {
+                this.chunkedTiles.set(tileKey, chunkBitmap);
+              }
+            })
+          );
           if (i + batchSize < tilesToProcess.length) {
             await new Promise((resolve) => setTimeout(resolve, 0));
           }
         }
         const processingTime = performance.now() - startTime;
-        console.log(`\u2705 Overlay processed ${this.chunkedTiles.size} tiles in ${Math.round(processingTime)}ms`);
+        console.log(
+          `\u2705 Overlay processed ${this.chunkedTiles.size} tiles in ${Math.round(processingTime)}ms`
+        );
       }
       async _processTile(tx, ty, imageWidth, imageHeight, startPixelX, startPixelY, startRegionX, startRegionY) {
         const tileKey = `${tx},${ty}`;
@@ -4869,16 +4363,35 @@
         const imgStartY = (ty - startRegionY) * this.tileSize - startPixelY;
         const sX = Math.max(0, imgStartX);
         const sY = Math.max(0, imgStartY);
-        const sW = Math.min(imageWidth - sX, this.tileSize - (sX - imgStartX));
-        const sH = Math.min(imageHeight - sY, this.tileSize - (sY - imgStartY));
+        const sW = Math.min(
+          imageWidth - sX,
+          this.tileSize - (sX - imgStartX)
+        );
+        const sH = Math.min(
+          imageHeight - sY,
+          this.tileSize - (sY - imgStartY)
+        );
         if (sW <= 0 || sH <= 0)
           return null;
         const dX = Math.max(0, -imgStartX);
         const dY = Math.max(0, -imgStartY);
-        const chunkCanvas = new OffscreenCanvas(this.tileSize, this.tileSize);
+        const chunkCanvas = new OffscreenCanvas(
+          this.tileSize,
+          this.tileSize
+        );
         const chunkCtx = chunkCanvas.getContext("2d");
         chunkCtx.imageSmoothingEnabled = false;
-        chunkCtx.drawImage(this.imageBitmap, sX, sY, sW, sH, dX, dY, sW, sH);
+        chunkCtx.drawImage(
+          this.imageBitmap,
+          sX,
+          sY,
+          sW,
+          sH,
+          dX,
+          dY,
+          sW,
+          sH
+        );
         if (state.blueMarbleEnabled) {
           const imageData = chunkCtx.getImageData(dX, dY, sW, sH);
           const data = imageData.data;
@@ -4911,7 +4424,10 @@
               try {
                 let canvas, ctx;
                 if (typeof OffscreenCanvas !== "undefined") {
-                  canvas = new OffscreenCanvas(originalBitmap.width, originalBitmap.height);
+                  canvas = new OffscreenCanvas(
+                    originalBitmap.width,
+                    originalBitmap.height
+                  );
                   ctx = canvas.getContext("2d");
                 } else {
                   canvas = document.createElement("canvas");
@@ -4921,17 +4437,37 @@
                 }
                 ctx.imageSmoothingEnabled = false;
                 ctx.drawImage(originalBitmap, 0, 0);
-                const imgData = ctx.getImageData(0, 0, originalBitmap.width, originalBitmap.height);
-                this.originalTilesData.set(tileKey, { w: originalBitmap.width, h: originalBitmap.height, data: new Uint8ClampedArray(imgData.data) });
+                const imgData = ctx.getImageData(
+                  0,
+                  0,
+                  originalBitmap.width,
+                  originalBitmap.height
+                );
+                this.originalTilesData.set(tileKey, {
+                  w: originalBitmap.width,
+                  h: originalBitmap.height,
+                  data: new Uint8ClampedArray(imgData.data)
+                });
               } catch (e) {
-                console.warn("OverlayManager: could not cache ImageData for", tileKey, e);
+                console.warn(
+                  "OverlayManager: could not cache ImageData for",
+                  tileKey,
+                  e
+                );
               }
             } catch (e) {
-              console.warn("OverlayManager: could not create original bitmap for", tileKey, e);
+              console.warn(
+                "OverlayManager: could not create original bitmap for",
+                tileKey,
+                e
+              );
             }
             if (chunkBitmap) {
               try {
-                finalBlob = await this._compositeTileOptimized(blobData, chunkBitmap);
+                finalBlob = await this._compositeTileOptimized(
+                  blobData,
+                  chunkBitmap
+                );
               } catch (e) {
                 console.error("Error compositing overlay:", e);
                 finalBlob = blobData;
@@ -4939,11 +4475,14 @@
             }
           }
         }
-        window.postMessage({
-          source: "auto-image-overlay",
-          blobID,
-          blobData: finalBlob
-        }, "*");
+        window.postMessage(
+          {
+            source: "auto-image-overlay",
+            blobID,
+            blobData: finalBlob
+          },
+          "*"
+        );
       }
       // Returns [r,g,b,a] for a pixel inside a region tile (tileX, tileY are region coords)
       async getTilePixelColor(tileX, tileY, pixelX, pixelY) {
@@ -4958,7 +4497,13 @@
           const alphaThresh = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
           if (!state.paintTransparentPixels && a < alphaThresh) {
             if (window._overlayDebug)
-              console.debug("getTilePixelColor: transparent pixel, skipping", tileKey, x, y, a);
+              console.debug(
+                "getTilePixelColor: transparent pixel, skipping",
+                tileKey,
+                x,
+                y,
+                a
+              );
             return null;
           }
           return [d[idx], d[idx + 1], d[idx + 2], a];
@@ -4986,18 +4531,33 @@
           const alphaThresh = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
           if (!state.paintTransparentPixels && a < alphaThresh) {
             if (window._overlayDebug)
-              console.debug("getTilePixelColor: transparent pixel (fallback), skipping", tileKey, x, y, a);
+              console.debug(
+                "getTilePixelColor: transparent pixel (fallback), skipping",
+                tileKey,
+                x,
+                y,
+                a
+              );
             return null;
           }
           return [data[0], data[1], data[2], a];
         } catch (e) {
-          console.warn("OverlayManager.getTilePixelColor failed for", tileKey, pixelX, pixelY, e);
+          console.warn(
+            "OverlayManager.getTilePixelColor failed for",
+            tileKey,
+            pixelX,
+            pixelY,
+            e
+          );
           return null;
         }
       }
       async _compositeTileOptimized(originalBlob, overlayBitmap) {
         const originalBitmap = await createImageBitmap(originalBlob);
-        const canvas = new OffscreenCanvas(originalBitmap.width, originalBitmap.height);
+        const canvas = new OffscreenCanvas(
+          originalBitmap.width,
+          originalBitmap.height
+        );
         const ctx = canvas.getContext("2d");
         ctx.imageSmoothingEnabled = false;
         ctx.drawImage(originalBitmap, 0, 0);
@@ -5060,7 +4620,9 @@
           console.log("\u2705 Token captured and cached successfully");
           return token;
         }
-        console.log("\u26A0\uFE0F Invisible Turnstile failed, forcing browser automation...");
+        console.log(
+          "\u26A0\uFE0F Invisible Turnstile failed, forcing browser automation..."
+        );
         const fallbackToken = await handleCaptchaFallback();
         if (fallbackToken && fallbackToken.length > 20) {
           setTurnstileToken(fallbackToken);
@@ -5079,19 +4641,29 @@
         const sitekey = Utils.detectSitekey();
         console.log("\u{1F511} Generating Turnstile token for sitekey:", sitekey);
         if (typeof window !== "undefined" && window.navigator) {
-          console.log("\u{1F9ED} UA:", window.navigator.userAgent, "Platform:", window.navigator.platform);
+          console.log(
+            "\u{1F9ED} UA:",
+            window.navigator.userAgent,
+            "Platform:",
+            window.navigator.platform
+          );
         }
         const token = await Utils.generatePaintToken(sitekey);
         if (token && token.length > 20) {
           const elapsed = Math.round(Date.now() - startTime);
-          console.log(`\u2705 Turnstile token generated successfully in ${elapsed}ms`);
+          console.log(
+            `\u2705 Turnstile token generated successfully in ${elapsed}ms`
+          );
           return token;
         } else {
           throw new Error("Invalid or empty token received");
         }
       } catch (error) {
         const elapsed = Math.round(Date.now() - startTime);
-        console.log(`\u274C Turnstile token generation failed after ${elapsed}ms:`, error);
+        console.log(
+          `\u274C Turnstile token generation failed after ${elapsed}ms:`,
+          error
+        );
         throw error;
       }
     }
@@ -5127,8 +4699,17 @@
             try {
               const payload = JSON.parse(args[1].body);
               if (payload.t) {
-                console.log("\u2705 Turnstile Token Captured:", payload.t);
-                window.postMessage({ source: "turnstile-capture", token: payload.t }, "*");
+                console.log(
+                  "\u2705 Turnstile Token Captured:",
+                  payload.t
+                );
+                window.postMessage(
+                  {
+                    source: "turnstile-capture",
+                    token: payload.t
+                  },
+                  "*"
+                );
               }
             } catch (_) {
             }
@@ -5140,18 +4721,23 @@
               const blobUUID = crypto.randomUUID();
               const originalBlob = await cloned.blob();
               fetchedBlobQueue.set(blobUUID, (processedBlob) => {
-                resolve(new Response(processedBlob, {
-                  headers: cloned.headers,
-                  status: cloned.status,
-                  statusText: cloned.statusText
-                }));
+                resolve(
+                  new Response(processedBlob, {
+                    headers: cloned.headers,
+                    status: cloned.status,
+                    statusText: cloned.statusText
+                  })
+                );
               });
-              window.postMessage({
-                source: "auto-image-tile",
-                endpoint: url,
-                blobID: blobUUID,
-                blobData: originalBlob
-              }, "*");
+              window.postMessage(
+                {
+                  source: "auto-image-tile",
+                  endpoint: url,
+                  blobID: blobUUID,
+                  blobData: originalBlob
+                },
+                "*"
+              );
             });
           }
         }
@@ -5168,7 +4754,9 @@
         setTurnstileToken(token);
         if ((_a = document.querySelector("#statusText")) == null ? void 0 : _a.textContent.includes("CAPTCHA")) {
           Utils.showAlert(Utils.t("tokenCapturedSuccess"), "success");
-          updateUI("colorsFound", "success", { count: state.availableColors.length });
+          updateUI("colorsFound", "success", {
+            count: state.availableColors.length
+          });
         }
       }
     });
@@ -5207,7 +4795,9 @@
           return Promise.resolve();
         }
         return new Promise((resolve, reject) => {
-          if (document.querySelector('script[src^="https://challenges.cloudflare.com/turnstile/v0/api.js"]')) {
+          if (document.querySelector(
+            'script[src^="https://challenges.cloudflare.com/turnstile/v0/api.js"]'
+          )) {
             const checkReady = () => {
               if (window.turnstile) {
                 this.turnstileLoaded = true;
@@ -5234,7 +4824,7 @@
           document.head.appendChild(script);
         });
       },
-      // Create or reuse the turnstile container - completely hidden for token generation  
+      // Create or reuse the turnstile container - completely hidden for token generation
       ensureTurnstileContainer() {
         if (!this._turnstileContainer || !document.body.contains(this._turnstileContainer)) {
           if (this._turnstileContainer) {
@@ -5280,18 +4870,31 @@
           try {
             console.log("\u{1F504} Reusing existing Turnstile widget...");
             const token = await Promise.race([
-              window.turnstile.execute(this._turnstileWidgetId, { action }),
-              new Promise((_, reject) => setTimeout(() => reject(new Error("Execute timeout")), 15e3))
+              window.turnstile.execute(this._turnstileWidgetId, {
+                action
+              }),
+              new Promise(
+                (_, reject) => setTimeout(
+                  () => reject(new Error("Execute timeout")),
+                  15e3
+                )
+              )
             ]);
             if (token && token.length > 20) {
               console.log("\u2705 Token generated via widget reuse");
               return token;
             }
           } catch (error) {
-            console.log("\uFFFD Widget reuse failed, will create a fresh widget:", error.message);
+            console.log(
+              "\uFFFD Widget reuse failed, will create a fresh widget:",
+              error.message
+            );
           }
         }
-        const invisibleToken = await this.createTurnstileWidget(sitekey, action);
+        const invisibleToken = await this.createTurnstileWidget(
+          sitekey,
+          action
+        );
         if (invisibleToken && invisibleToken.length > 20) {
           return invisibleToken;
         }
@@ -5305,15 +4908,22 @@
             if (this._turnstileWidgetId && ((_a = window.turnstile) == null ? void 0 : _a.remove)) {
               try {
                 window.turnstile.remove(this._turnstileWidgetId);
-                console.log("\u{1F9F9} Cleaned up existing Turnstile widget");
+                console.log(
+                  "\u{1F9F9} Cleaned up existing Turnstile widget"
+                );
               } catch (e) {
-                console.warn("\u26A0\uFE0F Widget cleanup warning:", e.message);
+                console.warn(
+                  "\u26A0\uFE0F Widget cleanup warning:",
+                  e.message
+                );
               }
             }
             const container = this.ensureTurnstileContainer();
             container.innerHTML = "";
             if (!((_b = window.turnstile) == null ? void 0 : _b.render)) {
-              console.error("\u274C Turnstile not available for rendering");
+              console.error(
+                "\u274C Turnstile not available for rendering"
+              );
               resolve(null);
               return;
             }
@@ -5338,7 +4948,14 @@
             }
             Promise.race([
               window.turnstile.execute(widgetId, { action }),
-              new Promise((_, reject) => setTimeout(() => reject(new Error("Invisible execute timeout")), 12e3))
+              new Promise(
+                (_, reject) => setTimeout(
+                  () => reject(
+                    new Error("Invisible execute timeout")
+                  ),
+                  12e3
+                )
+              )
             ]).then(resolve).catch(() => resolve(null));
           } catch (e) {
             console.error("\u274C Invisible Turnstile creation failed:", e);
@@ -5355,13 +4972,18 @@
               try {
                 window.turnstile.remove(this._turnstileWidgetId);
               } catch (e) {
-                console.warn("\u26A0\uFE0F Widget cleanup warning:", e.message);
+                console.warn(
+                  "\u26A0\uFE0F Widget cleanup warning:",
+                  e.message
+                );
               }
             }
             const overlay = this.ensureTurnstileOverlayContainer();
             overlay.classList.remove("wplace-overlay-hidden");
             overlay.style.display = "block";
-            const host = overlay.querySelector("#turnstile-overlay-host");
+            const host = overlay.querySelector(
+              "#turnstile-overlay-host"
+            );
             host.innerHTML = "";
             const timeout = setTimeout(() => {
               console.warn("\u23F0 Interactive Turnstile widget timeout");
@@ -5378,11 +5000,15 @@
                 clearTimeout(timeout);
                 overlay.classList.add("wplace-overlay-hidden");
                 overlay.style.display = "none";
-                console.log("\u2705 Interactive Turnstile completed successfully");
+                console.log(
+                  "\u2705 Interactive Turnstile completed successfully"
+                );
                 if (typeof token === "string" && token.length > 20) {
                   resolve(token);
                 } else {
-                  console.warn("\u274C Invalid token from interactive widget");
+                  console.warn(
+                    "\u274C Invalid token from interactive widget"
+                  );
                   resolve(null);
                 }
               },
@@ -5390,7 +5016,10 @@
                 clearTimeout(timeout);
                 overlay.classList.add("wplace-overlay-hidden");
                 overlay.style.display = "none";
-                console.warn("\u274C Interactive Turnstile error:", error);
+                console.warn(
+                  "\u274C Interactive Turnstile error:",
+                  error
+                );
                 resolve(null);
               }
             });
@@ -5400,13 +5029,20 @@
               clearTimeout(timeout);
               overlay.classList.add("wplace-overlay-hidden");
               overlay.style.display = "none";
-              console.warn("\u274C Failed to create interactive Turnstile widget");
+              console.warn(
+                "\u274C Failed to create interactive Turnstile widget"
+              );
               resolve(null);
             } else {
-              console.log("\u2705 Interactive Turnstile widget created, waiting for user interaction...");
+              console.log(
+                "\u2705 Interactive Turnstile widget created, waiting for user interaction..."
+              );
             }
           } catch (e) {
-            console.error("\u274C Interactive Turnstile creation failed:", e);
+            console.error(
+              "\u274C Interactive Turnstile creation failed:",
+              e
+            );
             resolve(null);
           }
         });
@@ -5455,41 +5091,65 @@
             const sitekey = sitekeySel.getAttribute("data-sitekey");
             if (sitekey && sitekey.length > 10) {
               this._cachedSitekey = sitekey;
-              console.log("\u{1F50D} Sitekey detected from data attribute:", sitekey);
+              console.log(
+                "\u{1F50D} Sitekey detected from data attribute:",
+                sitekey
+              );
               return sitekey;
             }
           }
           const turnstileEl = document.querySelector(".cf-turnstile");
           if (((_a = turnstileEl == null ? void 0 : turnstileEl.dataset) == null ? void 0 : _a.sitekey) && turnstileEl.dataset.sitekey.length > 10) {
             this._cachedSitekey = turnstileEl.dataset.sitekey;
-            console.log("\u{1F50D} Sitekey detected from turnstile element:", this._cachedSitekey);
+            console.log(
+              "\u{1F50D} Sitekey detected from turnstile element:",
+              this._cachedSitekey
+            );
             return this._cachedSitekey;
           }
-          const metaTags = document.querySelectorAll('meta[name*="turnstile"], meta[property*="turnstile"]');
+          const metaTags = document.querySelectorAll(
+            'meta[name*="turnstile"], meta[property*="turnstile"]'
+          );
           for (const meta of metaTags) {
             const content = meta.getAttribute("content");
             if (content && content.length > 10) {
               this._cachedSitekey = content;
-              console.log("\u{1F50D} Sitekey detected from meta tag:", this._cachedSitekey);
+              console.log(
+                "\u{1F50D} Sitekey detected from meta tag:",
+                this._cachedSitekey
+              );
               return this._cachedSitekey;
             }
           }
           if (typeof window !== "undefined" && window.__TURNSTILE_SITEKEY && window.__TURNSTILE_SITEKEY.length > 10) {
             this._cachedSitekey = window.__TURNSTILE_SITEKEY;
-            console.log("\u{1F50D} Sitekey detected from global variable:", this._cachedSitekey);
+            console.log(
+              "\u{1F50D} Sitekey detected from global variable:",
+              this._cachedSitekey
+            );
             return this._cachedSitekey;
           }
           const scripts = document.querySelectorAll("script");
           for (const script of scripts) {
             const content = script.textContent || script.innerHTML;
-            const sitekeyMatch = content.match(/sitekey['":\s]+(['"0-9a-zA-X_-]{20,})/i);
+            const sitekeyMatch = content.match(
+              /sitekey['":\s]+(['"0-9a-zA-X_-]{20,})/i
+            );
             if (sitekeyMatch && sitekeyMatch[1] && sitekeyMatch[1].length > 10) {
-              this._cachedSitekey = sitekeyMatch[1].replace(/['"]/g, "");
-              console.log("\u{1F50D} Sitekey detected from script content:", this._cachedSitekey);
+              this._cachedSitekey = sitekeyMatch[1].replace(
+                /['"]/g,
+                ""
+              );
+              console.log(
+                "\u{1F50D} Sitekey detected from script content:",
+                this._cachedSitekey
+              );
               return this._cachedSitekey;
             }
           }
-          console.log("\u{1F50D} No sitekey detected, trying known working sitekeys...");
+          console.log(
+            "\u{1F50D} No sitekey detected, trying known working sitekeys..."
+          );
           for (const testSitekey of potentialSitekeys) {
             console.log("\u{1F50D} Trying sitekey:", testSitekey);
             this._cachedSitekey = testSitekey;
@@ -5566,10 +5226,15 @@
         }
         let text = ((_c = FALLBACK_TEXT[state.language]) == null ? void 0 : _c[key]) || ((_d = FALLBACK_TEXT.en) == null ? void 0 : _d[key]) || key;
         Object.keys(params).forEach((param) => {
-          text = text.replace(new RegExp(`\\{${param}\\}`, "g"), params[param]);
+          text = text.replace(
+            new RegExp(`\\{${param}\\}`, "g"),
+            params[param]
+          );
         });
         if (text === key && key !== "undefined") {
-          console.warn(`\u26A0\uFE0F Missing translation for key: ${key} (language: ${state.language})`);
+          console.warn(
+            `\u26A0\uFE0F Missing translation for key: ${key} (language: ${state.language})`
+          );
         }
         return text;
       },
@@ -5585,7 +5250,9 @@
           }, 300);
         }, 4e3);
       },
-      colorDistance: (a, b) => Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2) + Math.pow(a[2] - b[2], 2)),
+      colorDistance: (a, b) => Math.sqrt(
+        Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2) + Math.pow(a[2] - b[2], 2)
+      ),
       _labCache: /* @__PURE__ */ new Map(),
       // key: (r<<16)|(g<<8)|b  value: [L,a,b]
       _rgbToLab: (r, g, b) => {
@@ -5631,7 +5298,9 @@
             const rdiff = pr - r;
             const gdiff = pg - g;
             const bdiff = pb - b;
-            const dist = Math.sqrt(((512 + rmean) * rdiff * rdiff >> 8) + 4 * gdiff * gdiff + ((767 - rmean) * bdiff * bdiff >> 8));
+            const dist = Math.sqrt(
+              ((512 + rmean) * rdiff * rdiff >> 8) + 4 * gdiff * gdiff + ((767 - rmean) * bdiff * bdiff >> 8)
+            );
             if (dist < menorDist) {
               menorDist = dist;
               cor = [pr, pg, pb];
@@ -5726,7 +5395,9 @@
             return;
           const rgbStr = el.style.backgroundColor.match(/\d+/g);
           const rgb = rgbStr ? rgbStr.map(Number) : [0, 0, 0];
-          const colorInfo = Object.values(CONFIG.COLOR_MAP).find((color) => color.id === id);
+          const colorInfo = Object.values(CONFIG.COLOR_MAP).find(
+            (color) => color.id === id
+          );
           const name = colorInfo ? colorInfo.name : `Unknown Color ${id}`;
           const colorData = { id, name, rgb };
           if (!el.querySelector("svg")) {
@@ -5737,18 +5408,26 @@
         });
         console.log("=== CAPTURED COLORS STATUS ===");
         console.log(`Total available colors: ${availableColors.length}`);
-        console.log(`Total unavailable colors: ${unavailableColors.length}`);
-        console.log(`Total colors scanned: ${availableColors.length + unavailableColors.length}`);
+        console.log(
+          `Total unavailable colors: ${unavailableColors.length}`
+        );
+        console.log(
+          `Total colors scanned: ${availableColors.length + unavailableColors.length}`
+        );
         if (availableColors.length > 0) {
           console.log("\n--- AVAILABLE COLORS ---");
           availableColors.forEach((color, index) => {
-            console.log(`${index + 1}. ID: ${color.id}, Name: "${color.name}", RGB: (${color.rgb[0]}, ${color.rgb[1]}, ${color.rgb[2]})`);
+            console.log(
+              `${index + 1}. ID: ${color.id}, Name: "${color.name}", RGB: (${color.rgb[0]}, ${color.rgb[1]}, ${color.rgb[2]})`
+            );
           });
         }
         if (unavailableColors.length > 0) {
           console.log("\n--- UNAVAILABLE COLORS ---");
           unavailableColors.forEach((color, index) => {
-            console.log(`${index + 1}. ID: ${color.id}, Name: "${color.name}", RGB: (${color.rgb[0]}, ${color.rgb[1]}, ${color.rgb[2]}) [LOCKED]`);
+            console.log(
+              `${index + 1}. ID: ${color.id}, Name: "${color.name}", RGB: (${color.rgb[0]}, ${color.rgb[1]}, ${color.rgb[2]}) [LOCKED]`
+            );
           });
         }
         console.log("=== END COLOR STATUS ===");
@@ -5774,7 +5453,9 @@
           return 0;
         const paintingSpeedDelay = state.paintingSpeed > 0 ? 1e3 / state.paintingSpeed : 1e3;
         const timeFromSpeed = remainingPixels * paintingSpeedDelay;
-        const cyclesNeeded = Math.ceil(remainingPixels / Math.max(charges, 1));
+        const cyclesNeeded = Math.ceil(
+          remainingPixels / Math.max(charges, 1)
+        );
         const timeFromCharges = cyclesNeeded * cooldown;
         return timeFromSpeed + timeFromCharges;
       },
@@ -5843,7 +5524,10 @@
         let binary = "";
         const chunk = 32768;
         for (let i = 0; i < bytes.length; i += chunk) {
-          binary += String.fromCharCode.apply(null, bytes.subarray(i, Math.min(i + chunk, bytes.length)));
+          binary += String.fromCharCode.apply(
+            null,
+            bytes.subarray(i, Math.min(i + chunk, bytes.length))
+          );
         }
         return btoa(binary);
       },
@@ -5879,7 +5563,11 @@
           const width = (_a = migrated.imageData) == null ? void 0 : _a.width;
           const height = (_b = migrated.imageData) == null ? void 0 : _b.height;
           if (migrated.paintedMap && width && height) {
-            const data = Utils.packPaintedMapToBase64(migrated.paintedMap, width, height);
+            const data = Utils.packPaintedMapToBase64(
+              migrated.paintedMap,
+              width,
+              height
+            );
             migrated.paintedMapPacked = { width, height, data };
           }
           delete migrated.paintedMap;
@@ -5906,7 +5594,11 @@
             const width = (_a = migrated.imageData) == null ? void 0 : _a.width;
             const height = (_b = migrated.imageData) == null ? void 0 : _b.height;
             if (migrated.paintedMap && width && height) {
-              const data = Utils.packPaintedMapToBase64(migrated.paintedMap, width, height);
+              const data = Utils.packPaintedMapToBase64(
+                migrated.paintedMap,
+                width,
+                height
+              );
               migrated.paintedMapPacked = { width, height, data };
             }
             delete migrated.paintedMap;
@@ -5914,7 +5606,10 @@
           migrated.version = "2.1";
           return migrated;
         } catch (e) {
-          console.warn("Migration to v2.1 failed, using original data:", e);
+          console.warn(
+            "Migration to v2.1 failed, using original data:",
+            e
+          );
           return saved;
         }
       },
@@ -5922,7 +5617,11 @@
         try {
           let paintedMapPacked = null;
           if (state.paintedMap && state.imageData) {
-            const data = Utils.packPaintedMapToBase64(state.paintedMap, state.imageData.width, state.imageData.height);
+            const data = Utils.packPaintedMapToBase64(
+              state.paintedMap,
+              state.imageData.width,
+              state.imageData.height
+            );
             if (data) {
               paintedMapPacked = {
                 width: state.imageData.width,
@@ -5952,7 +5651,10 @@
             } : null,
             paintedMapPacked
           };
-          localStorage.setItem("wplace-bot-progress", JSON.stringify(progressData));
+          localStorage.setItem(
+            "wplace-bot-progress",
+            JSON.stringify(progressData)
+          );
           return true;
         } catch (error) {
           console.error("Error saving progress:", error);
@@ -5975,7 +5677,10 @@
           }
           if (migrated && migrated !== data) {
             try {
-              localStorage.setItem("wplace-bot-progress", JSON.stringify(migrated));
+              localStorage.setItem(
+                "wplace-bot-progress",
+                JSON.stringify(migrated)
+              );
             } catch {
             }
             data = migrated;
@@ -6005,14 +5710,20 @@
           if (savedData.imageData) {
             state.imageData = {
               ...savedData.imageData,
-              pixels: new Uint8ClampedArray(savedData.imageData.pixels)
+              pixels: new Uint8ClampedArray(
+                savedData.imageData.pixels
+              )
             };
             try {
               const canvas = document.createElement("canvas");
               canvas.width = state.imageData.width;
               canvas.height = state.imageData.height;
               const ctx = canvas.getContext("2d");
-              const imageData = new ImageData(state.imageData.pixels, state.imageData.width, state.imageData.height);
+              const imageData = new ImageData(
+                state.imageData.pixels,
+                state.imageData.width,
+                state.imageData.height
+              );
               ctx.putImageData(imageData, 0, 0);
               const proc = new ImageProcessor("");
               proc.img = canvas;
@@ -6020,14 +5731,23 @@
               proc.ctx = ctx;
               state.imageData.processor = proc;
             } catch (e) {
-              console.warn("Could not rebuild processor from saved image data:", e);
+              console.warn(
+                "Could not rebuild processor from saved image data:",
+                e
+              );
             }
           }
           if (savedData.paintedMapPacked && savedData.paintedMapPacked.data) {
             const { width, height, data } = savedData.paintedMapPacked;
-            state.paintedMap = Utils.unpackPaintedMapFromBase64(data, width, height);
+            state.paintedMap = Utils.unpackPaintedMapFromBase64(
+              data,
+              width,
+              height
+            );
           } else if (savedData.paintedMap) {
-            state.paintedMap = savedData.paintedMap.map((row) => Array.from(row));
+            state.paintedMap = savedData.paintedMap.map(
+              (row) => Array.from(row)
+            );
           }
           return true;
         } catch (error) {
@@ -6039,7 +5759,11 @@
         try {
           let paintedMapPacked = null;
           if (state.paintedMap && state.imageData) {
-            const data = Utils.packPaintedMapToBase64(state.paintedMap, state.imageData.width, state.imageData.height);
+            const data = Utils.packPaintedMapToBase64(
+              state.paintedMap,
+              state.imageData.width,
+              state.imageData.height
+            );
             if (data) {
               paintedMapPacked = {
                 width: state.imageData.width,
@@ -6070,7 +5794,10 @@
             paintedMapPacked
           };
           const filename = `wplace-bot-progress-${(/* @__PURE__ */ new Date()).toISOString().slice(0, 19).replace(/:/g, "-")}.json`;
-          Utils.createFileDownloader(JSON.stringify(progressData, null, 2), filename);
+          Utils.createFileDownloader(
+            JSON.stringify(progressData, null, 2),
+            filename
+          );
           return true;
         } catch (error) {
           console.error("Error saving to file:", error);
@@ -6109,12 +5836,18 @@
             state.imageData.width,
             state.imageData.height
           );
-          const canvas = new OffscreenCanvas(state.imageData.width, state.imageData.height);
+          const canvas = new OffscreenCanvas(
+            state.imageData.width,
+            state.imageData.height
+          );
           const ctx = canvas.getContext("2d");
           ctx.putImageData(imageData, 0, 0);
           const imageBitmap = await canvas.transferToImageBitmap();
           await overlayManager.setImage(imageBitmap);
-          await overlayManager.setPosition(state.startPosition, state.region);
+          await overlayManager.setPosition(
+            state.startPosition,
+            state.region
+          );
           overlayManager.enable();
           const toggleOverlayBtn = document.getElementById("toggleOverlayBtn");
           if (toggleOverlayBtn) {
@@ -6159,7 +5892,12 @@
         };
       }
       getPixelData() {
-        return this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height).data;
+        return this.ctx.getImageData(
+          0,
+          0,
+          this.canvas.width,
+          this.canvas.height
+        ).data;
       }
       resize(newWidth, newHeight) {
         const tempCanvas = document.createElement("canvas");
@@ -6190,15 +5928,24 @@
           await ensureToken();
           if (!turnstileToken)
             return "token_error";
-          const payload = { coords: [pixelX, pixelY], colors: [color], t: turnstileToken };
-          const res = await fetch(`https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`, {
-            method: "POST",
-            headers: { "Content-Type": "text/plain;charset=UTF-8" },
-            credentials: "include",
-            body: JSON.stringify(payload)
-          });
+          const payload = {
+            coords: [pixelX, pixelY],
+            colors: [color],
+            t: turnstileToken
+          };
+          const res = await fetch(
+            `https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "text/plain;charset=UTF-8" },
+              credentials: "include",
+              body: JSON.stringify(payload)
+            }
+          );
           if (res.status === 403) {
-            console.error("\u274C 403 Forbidden. Turnstile token might be invalid or expired.");
+            console.error(
+              "\u274C 403 Forbidden. Turnstile token might be invalid or expired."
+            );
             turnstileToken = null;
             tokenPromise = new Promise((resolve) => {
               _resolveToken = resolve;
@@ -6243,7 +5990,10 @@
       },
       async requestPermission() {
         if (!("Notification" in window)) {
-          Utils.showAlert(Utils.t("notificationsNotSupported"), "warning");
+          Utils.showAlert(
+            Utils.t("notificationsNotSupported"),
+            "warning"
+          );
           return "denied";
         }
         if (Notification.permission === "granted")
@@ -6292,8 +6042,16 @@
           const shouldEdge = state._lastChargesBelow || force;
           const shouldRepeat = now - (state._lastChargesNotifyAt || 0) >= repeatMs;
           if (shouldEdge || shouldRepeat) {
-            const msg = Utils.t("chargesReadyMessage", { current: Math.floor(state.currentCharges), max: state.maxCharges, threshold: state.cooldownChargeThreshold });
-            this.notify(Utils.t("chargesReadyNotification"), msg, "wplace-notify-charges");
+            const msg = Utils.t("chargesReadyMessage", {
+              current: Math.floor(state.currentCharges),
+              max: state.maxCharges,
+              threshold: state.cooldownChargeThreshold
+            });
+            this.notify(
+              Utils.t("chargesReadyNotification"),
+              msg,
+              "wplace-notify-charges"
+            );
             state._lastChargesNotifyAt = now;
           }
           state._lastChargesBelow = false;
@@ -6339,7 +6097,9 @@
         return colorCache.get(cacheKey);
       const whiteThreshold = state.customWhiteThreshold || CONFIG.WHITE_THRESHOLD;
       if (targetRgb[0] >= whiteThreshold && targetRgb[1] >= whiteThreshold && targetRgb[2] >= whiteThreshold) {
-        const whiteEntry = availableColors.find((c) => c.rgb[0] >= whiteThreshold && c.rgb[1] >= whiteThreshold && c.rgb[2] >= whiteThreshold);
+        const whiteEntry = availableColors.find(
+          (c) => c.rgb[0] >= whiteThreshold && c.rgb[1] >= whiteThreshold && c.rgb[2] >= whiteThreshold
+        );
         if (whiteEntry) {
           colorCache.set(cacheKey, whiteEntry.id);
           return whiteEntry.id;
@@ -6355,7 +6115,9 @@
           const rdiff = r - targetRgb[0];
           const gdiff = g - targetRgb[1];
           const bdiff = b - targetRgb[2];
-          const dist = Math.sqrt(((512 + rmean) * rdiff * rdiff >> 8) + 4 * gdiff * gdiff + ((767 - rmean) * bdiff * bdiff >> 8));
+          const dist = Math.sqrt(
+            ((512 + rmean) * rdiff * rdiff >> 8) + 4 * gdiff * gdiff + ((767 - rmean) * bdiff * bdiff >> 8)
+          );
           if (dist < bestScore) {
             bestScore = dist;
             bestId = c.id;
@@ -6364,7 +6126,11 @@
           }
         }
       } else {
-        const [Lt, at, bt] = Utils._lab(targetRgb[0], targetRgb[1], targetRgb[2]);
+        const [Lt, at, bt] = Utils._lab(
+          targetRgb[0],
+          targetRgb[1],
+          targetRgb[2]
+        );
         const targetChroma = Math.sqrt(at * at + bt * bt);
         const penaltyWeight = state.enableChromaPenalty ? state.chromaPenaltyWeight || 0.15 : 0;
         for (let i = 0; i < availableColors.length; i++) {
@@ -6404,7 +6170,9 @@
     function updateActiveColorPalette() {
       var _a;
       state.activeColorPalette = [];
-      const activeSwatches = document.querySelectorAll(".wplace-color-swatch.active");
+      const activeSwatches = document.querySelectorAll(
+        ".wplace-color-swatch.active"
+      );
       if (activeSwatches) {
         activeSwatches.forEach((swatch) => {
           const rgbStr = swatch.getAttribute("data-rgb");
@@ -6436,7 +6204,10 @@
       const swatches = document.querySelectorAll(".wplace-color-swatch");
       if (swatches) {
         swatches.forEach((swatch) => {
-          const colorId = parseInt(swatch.getAttribute("data-color-id"), 10);
+          const colorId = parseInt(
+            swatch.getAttribute("data-color-id"),
+            10
+          );
           if (!isNaN(colorId) && colorId >= 32) {
             swatch.classList.toggle("active", false);
           }
@@ -6458,7 +6229,9 @@
         colorsContainer.innerHTML = "";
         let availableCount = 0;
         let totalCount = 0;
-        const allColors = Object.values(CONFIG.COLOR_MAP).filter((color) => color.rgb !== null);
+        const allColors = Object.values(CONFIG.COLOR_MAP).filter(
+          (color) => color.rgb !== null
+        );
         allColors.forEach((colorData) => {
           const { id, name, rgb } = colorData;
           const rgbKey = `${rgb.r},${rgb.g},${rgb.b}`;
@@ -6471,7 +6244,9 @@
           }
           if (isAvailable)
             availableCount++;
-          const colorItem = Utils.createElement("div", { className: "wplace-color-item" });
+          const colorItem = Utils.createElement("div", {
+            className: "wplace-color-item"
+          });
           const swatch = Utils.createElement("button", {
             className: `wplace-color-swatch ${!isAvailable ? "unavailable" : ""}`,
             title: `${name} (ID: ${id})${!isAvailable ? " (Unavailable)" : ""}`,
@@ -6486,10 +6261,14 @@
           } else {
             swatch.classList.add("active");
           }
-          const nameLabel = Utils.createElement("span", {
-            className: "wplace-color-item-name",
-            style: !isAvailable ? "color: #888; font-style: italic;" : ""
-          }, name + (!isAvailable ? " (N/A)" : ""));
+          const nameLabel = Utils.createElement(
+            "span",
+            {
+              className: "wplace-color-item-name",
+              style: !isAvailable ? "color: #888; font-style: italic;" : ""
+            },
+            name + (!isAvailable ? " (N/A)" : "")
+          );
           if (isAvailable) {
             swatch.addEventListener("click", () => {
               swatch.classList.toggle("active");
@@ -6508,37 +6287,61 @@
           populateColors(e.target.checked);
         });
       }
-      (_a = container.querySelector("#selectAllBtn")) == null ? void 0 : _a.addEventListener("click", () => toggleAllColors(true, showAllToggle == null ? void 0 : showAllToggle.checked));
-      (_b = container.querySelector("#unselectAllBtn")) == null ? void 0 : _b.addEventListener("click", () => toggleAllColors(false, showAllToggle == null ? void 0 : showAllToggle.checked));
+      (_a = container.querySelector("#selectAllBtn")) == null ? void 0 : _a.addEventListener(
+        "click",
+        () => toggleAllColors(true, showAllToggle == null ? void 0 : showAllToggle.checked)
+      );
+      (_b = container.querySelector("#unselectAllBtn")) == null ? void 0 : _b.addEventListener(
+        "click",
+        () => toggleAllColors(false, showAllToggle == null ? void 0 : showAllToggle.checked)
+      );
       (_c = container.querySelector("#unselectPaidBtn")) == null ? void 0 : _c.addEventListener("click", () => unselectAllPaidColors());
     }
     async function handleCaptcha() {
       const startTime = performance.now();
       if (state.tokenSource === "manual") {
-        console.log("\u{1F3AF} Manual token source selected - using pixel placement automation");
+        console.log(
+          "\u{1F3AF} Manual token source selected - using pixel placement automation"
+        );
         return await handleCaptchaFallback();
       }
       try {
         const sitekey = Utils.detectSitekey();
         console.log("\u{1F511} Generating Turnstile token for sitekey:", sitekey);
-        console.log("\u{1F9ED} UA:", navigator.userAgent.substring(0, 50) + "...", "Platform:", navigator.platform);
+        console.log(
+          "\u{1F9ED} UA:",
+          navigator.userAgent.substring(0, 50) + "...",
+          "Platform:",
+          navigator.platform
+        );
         if (!window.turnstile) {
           await Utils.loadTurnstile();
         }
         const token = await Utils.generatePaintToken(sitekey);
-        console.log(`\u{1F50D} Token received - Type: ${typeof token}, Value: ${token ? typeof token === "string" ? token.length > 50 ? token.substring(0, 50) + "..." : token : JSON.stringify(token) : "null/undefined"}, Length: ${(token == null ? void 0 : token.length) || 0}`);
+        console.log(
+          `\u{1F50D} Token received - Type: ${typeof token}, Value: ${token ? typeof token === "string" ? token.length > 50 ? token.substring(0, 50) + "..." : token : JSON.stringify(token) : "null/undefined"}, Length: ${(token == null ? void 0 : token.length) || 0}`
+        );
         if (typeof token === "string" && token.length > 20) {
           const duration = Math.round(performance.now() - startTime);
-          console.log(`\u2705 Turnstile token generated successfully in ${duration}ms`);
+          console.log(
+            `\u2705 Turnstile token generated successfully in ${duration}ms`
+          );
           return token;
         } else {
-          throw new Error(`Invalid or empty token received - Type: ${typeof token}, Value: ${JSON.stringify(token)}, Length: ${(token == null ? void 0 : token.length) || 0}`);
+          throw new Error(
+            `Invalid or empty token received - Type: ${typeof token}, Value: ${JSON.stringify(token)}, Length: ${(token == null ? void 0 : token.length) || 0}`
+          );
         }
       } catch (error) {
         const duration = Math.round(performance.now() - startTime);
-        console.error(`\u274C Turnstile token generation failed after ${duration}ms:`, error);
+        console.error(
+          `\u274C Turnstile token generation failed after ${duration}ms:`,
+          error
+        );
         if (state.tokenSource === "hybrid") {
-          console.log("\u{1F504} Hybrid mode: Generator failed, automatically switching to manual pixel placement...");
+          console.log(
+            "\u{1F504} Hybrid mode: Generator failed, automatically switching to manual pixel placement..."
+          );
           const fbToken = await handleCaptchaFallback();
           return fbToken;
         } else {
@@ -6554,19 +6357,37 @@
               _resolveToken = res;
             });
           }
-          const timeoutPromise = Utils.sleep(2e4).then(() => reject(new Error("Auto-CAPTCHA timed out.")));
+          const timeoutPromise = Utils.sleep(2e4).then(
+            () => reject(new Error("Auto-CAPTCHA timed out."))
+          );
           const solvePromise = (async () => {
-            const mainPaintBtn = await Utils.waitForSelector("button.btn.btn-primary.btn-lg, button.btn-primary.sm\\:btn-xl", 200, 1e4);
+            const mainPaintBtn = await Utils.waitForSelector(
+              "button.btn.btn-primary.btn-lg, button.btn-primary.sm\\:btn-xl",
+              200,
+              1e4
+            );
             if (!mainPaintBtn)
-              throw new Error("Could not find the main paint button.");
+              throw new Error(
+                "Could not find the main paint button."
+              );
             mainPaintBtn.click();
             await Utils.sleep(500);
-            const transBtn = await Utils.waitForSelector("button#color-0", 200, 5e3);
+            const transBtn = await Utils.waitForSelector(
+              "button#color-0",
+              200,
+              5e3
+            );
             if (!transBtn)
-              throw new Error("Could not find the transparent color button.");
+              throw new Error(
+                "Could not find the transparent color button."
+              );
             transBtn.click();
             await Utils.sleep(500);
-            const canvas = await Utils.waitForSelector("canvas", 200, 5e3);
+            const canvas = await Utils.waitForSelector(
+              "canvas",
+              200,
+              5e3
+            );
             if (!canvas)
               throw new Error("Could not find the canvas element.");
             canvas.setAttribute("tabindex", "0");
@@ -6574,17 +6395,41 @@
             const rect = canvas.getBoundingClientRect();
             const centerX = Math.round(rect.left + rect.width / 2);
             const centerY = Math.round(rect.top + rect.height / 2);
-            canvas.dispatchEvent(new MouseEvent("mousemove", { clientX: centerX, clientY: centerY, bubbles: true }));
-            canvas.dispatchEvent(new KeyboardEvent("keydown", { key: " ", code: "Space", bubbles: true }));
+            canvas.dispatchEvent(
+              new MouseEvent("mousemove", {
+                clientX: centerX,
+                clientY: centerY,
+                bubbles: true
+              })
+            );
+            canvas.dispatchEvent(
+              new KeyboardEvent("keydown", {
+                key: " ",
+                code: "Space",
+                bubbles: true
+              })
+            );
             await Utils.sleep(50);
-            canvas.dispatchEvent(new KeyboardEvent("keyup", { key: " ", code: "Space", bubbles: true }));
+            canvas.dispatchEvent(
+              new KeyboardEvent("keyup", {
+                key: " ",
+                code: "Space",
+                bubbles: true
+              })
+            );
             await Utils.sleep(500);
             await Utils.sleep(800);
             const confirmLoop = async () => {
               while (!turnstileToken) {
-                let confirmBtn = await Utils.waitForSelector("button.btn.btn-primary.btn-lg, button.btn.btn-primary.sm\\:btn-xl");
+                let confirmBtn = await Utils.waitForSelector(
+                  "button.btn.btn-primary.btn-lg, button.btn.btn-primary.sm\\:btn-xl"
+                );
                 if (!confirmBtn) {
-                  const allPrimary = Array.from(document.querySelectorAll("button.btn-primary"));
+                  const allPrimary = Array.from(
+                    document.querySelectorAll(
+                      "button.btn-primary"
+                    )
+                  );
                   confirmBtn = allPrimary.length ? allPrimary[allPrimary.length - 1] : null;
                 }
                 if (confirmBtn) {
@@ -6608,9 +6453,13 @@
     async function createUI() {
       var _a, _b;
       await detectLanguage();
-      const existingContainer = document.getElementById("wplace-image-bot-container");
+      const existingContainer = document.getElementById(
+        "wplace-image-bot-container"
+      );
       const existingStats = document.getElementById("wplace-stats-container");
-      const existingSettings = document.getElementById("wplace-settings-container");
+      const existingSettings = document.getElementById(
+        "wplace-settings-container"
+      );
       const existingResizeContainer = document.querySelector(".resize-container");
       const existingResizeOverlay = document.querySelector(".resize-overlay");
       if (existingContainer)
@@ -7482,22 +7331,32 @@
           }, 300);
         });
         applySettingsBtn.addEventListener("click", () => {
-          const colorAlgorithmSelect = document.getElementById("colorAlgorithmSelect");
+          const colorAlgorithmSelect = document.getElementById(
+            "colorAlgorithmSelect"
+          );
           if (colorAlgorithmSelect)
             state.colorMatchingAlgorithm = colorAlgorithmSelect.value;
-          const enableChromaPenaltyToggle = document.getElementById("enableChromaPenaltyToggle");
+          const enableChromaPenaltyToggle = document.getElementById(
+            "enableChromaPenaltyToggle"
+          );
           if (enableChromaPenaltyToggle)
             state.enableChromaPenalty = enableChromaPenaltyToggle.checked;
-          const chromaPenaltyWeightSlider = document.getElementById("chromaPenaltyWeightSlider");
+          const chromaPenaltyWeightSlider = document.getElementById(
+            "chromaPenaltyWeightSlider"
+          );
           if (chromaPenaltyWeightSlider)
             state.chromaPenaltyWeight = parseFloat(chromaPenaltyWeightSlider.value) || 0.15;
-          const transparencyThresholdInput = document.getElementById("transparencyThresholdInput");
+          const transparencyThresholdInput = document.getElementById(
+            "transparencyThresholdInput"
+          );
           if (transparencyThresholdInput) {
             const v = parseInt(transparencyThresholdInput.value, 10);
             if (!isNaN(v) && v >= 0 && v <= 255)
               state.customTransparencyThreshold = v;
           }
-          const whiteThresholdInput = document.getElementById("whiteThresholdInput");
+          const whiteThresholdInput = document.getElementById(
+            "whiteThresholdInput"
+          );
           if (whiteThresholdInput) {
             const v = parseInt(whiteThresholdInput.value, 10);
             if (!isNaN(v) && v >= 200 && v <= 255)
@@ -7506,8 +7365,12 @@
           CONFIG.TRANSPARENCY_THRESHOLD = state.customTransparencyThreshold;
           CONFIG.WHITE_THRESHOLD = state.customWhiteThreshold;
           const notifEnabledToggle = document.getElementById("notifEnabledToggle");
-          const notifOnChargesToggle = document.getElementById("notifOnChargesToggle");
-          const notifOnlyUnfocusedToggle = document.getElementById("notifOnlyUnfocusedToggle");
+          const notifOnChargesToggle = document.getElementById(
+            "notifOnChargesToggle"
+          );
+          const notifOnlyUnfocusedToggle = document.getElementById(
+            "notifOnlyUnfocusedToggle"
+          );
           const notifIntervalInput = document.getElementById("notifIntervalInput");
           if (notifEnabledToggle)
             state.notificationsEnabled = !!notifEnabledToggle.checked;
@@ -7531,18 +7394,29 @@
           tokenSourceSelect.addEventListener("change", (e) => {
             state.tokenSource = e.target.value;
             saveBotSettings();
-            console.log(`\u{1F511} Token source changed to: ${state.tokenSource}`);
+            console.log(
+              `\u{1F511} Token source changed to: ${state.tokenSource}`
+            );
             const sourceNames = {
-              "generator": "Automatic Generator",
-              "hybrid": "Generator + Auto Fallback",
-              "manual": "Manual Pixel Placement"
+              generator: "Automatic Generator",
+              hybrid: "Generator + Auto Fallback",
+              manual: "Manual Pixel Placement"
             };
-            Utils.showAlert(Utils.t("tokenSourceSet", { source: sourceNames[state.tokenSource] }), "success");
+            Utils.showAlert(
+              Utils.t("tokenSourceSet", {
+                source: sourceNames[state.tokenSource]
+              }),
+              "success"
+            );
           });
         }
         const batchModeSelect = settingsContainer.querySelector("#batchModeSelect");
-        const normalBatchControls = settingsContainer.querySelector("#normalBatchControls");
-        const randomBatchControls = settingsContainer.querySelector("#randomBatchControls");
+        const normalBatchControls = settingsContainer.querySelector(
+          "#normalBatchControls"
+        );
+        const randomBatchControls = settingsContainer.querySelector(
+          "#randomBatchControls"
+        );
         const randomBatchMin = settingsContainer.querySelector("#randomBatchMin");
         const randomBatchMax = settingsContainer.querySelector("#randomBatchMax");
         if (batchModeSelect) {
@@ -7559,7 +7433,12 @@
             }
             saveBotSettings();
             console.log(`\u{1F4E6} Batch mode changed to: ${state.batchMode}`);
-            Utils.showAlert(Utils.t("batchModeSet", { mode: state.batchMode === "random" ? Utils.t("randomRange") : Utils.t("normalFixedSize") }), "success");
+            Utils.showAlert(
+              Utils.t("batchModeSet", {
+                mode: state.batchMode === "random" ? Utils.t("randomRange") : Utils.t("normalFixedSize")
+              }),
+              "success"
+            );
           });
         }
         if (randomBatchMin) {
@@ -7608,11 +7487,21 @@
             switchTheme(newTheme);
           });
         }
-        const overlayOpacitySlider = settingsContainer.querySelector("#overlayOpacitySlider");
-        const overlayOpacityValue = settingsContainer.querySelector("#overlayOpacityValue");
-        const enableBlueMarbleToggle = settingsContainer.querySelector("#enableBlueMarbleToggle");
-        const settingsPaintWhiteToggle = settingsContainer.querySelector("#settingsPaintWhiteToggle");
-        const settingsPaintTransparentToggle = settingsContainer.querySelector("#settingsPaintTransparentToggle");
+        const overlayOpacitySlider = settingsContainer.querySelector(
+          "#overlayOpacitySlider"
+        );
+        const overlayOpacityValue = settingsContainer.querySelector(
+          "#overlayOpacityValue"
+        );
+        const enableBlueMarbleToggle = settingsContainer.querySelector(
+          "#enableBlueMarbleToggle"
+        );
+        const settingsPaintWhiteToggle = settingsContainer.querySelector(
+          "#settingsPaintWhiteToggle"
+        );
+        const settingsPaintTransparentToggle = settingsContainer.querySelector(
+          "#settingsPaintTransparentToggle"
+        );
         if (overlayOpacitySlider && overlayOpacityValue) {
           overlayOpacitySlider.addEventListener("input", (e) => {
             const opacity = parseFloat(e.target.value);
@@ -7652,20 +7541,33 @@
             }
           });
         }
-        const notifPermBtn = settingsContainer.querySelector("#notifRequestPermBtn");
+        const notifPermBtn = settingsContainer.querySelector(
+          "#notifRequestPermBtn"
+        );
         const notifTestBtn = settingsContainer.querySelector("#notifTestBtn");
         if (notifPermBtn) {
           notifPermBtn.addEventListener("click", async () => {
             const perm = await NotificationManager.requestPermission();
             if (perm === "granted")
-              Utils.showAlert(Utils.t("notificationsEnabled"), "success");
+              Utils.showAlert(
+                Utils.t("notificationsEnabled"),
+                "success"
+              );
             else
-              Utils.showAlert(Utils.t("notificationsPermissionDenied"), "warning");
+              Utils.showAlert(
+                Utils.t("notificationsPermissionDenied"),
+                "warning"
+              );
           });
         }
         if (notifTestBtn) {
           notifTestBtn.addEventListener("click", () => {
-            NotificationManager.notify(Utils.t("testNotificationTitle"), Utils.t("testNotificationMessage"), "wplace-notify-test", true);
+            NotificationManager.notify(
+              Utils.t("testNotificationTitle"),
+              Utils.t("testNotificationMessage"),
+              "wplace-notify-test",
+              true
+            );
           });
         }
       }
@@ -7675,7 +7577,9 @@
       const heightValue = resizeContainer.querySelector("#heightValue");
       const keepAspect = resizeContainer.querySelector("#keepAspect");
       const paintWhiteToggle = resizeContainer.querySelector("#paintWhiteToggle");
-      const paintTransparentToggle = resizeContainer.querySelector("#paintTransparentToggle");
+      const paintTransparentToggle = resizeContainer.querySelector(
+        "#paintTransparentToggle"
+      );
       const zoomSlider = resizeContainer.querySelector("#zoomSlider");
       const zoomValue = resizeContainer.querySelector("#zoomValue");
       const zoomInBtn = resizeContainer.querySelector("#zoomInBtn");
@@ -7691,7 +7595,9 @@
       const maskCtx = maskCanvas.getContext("2d");
       const confirmResize = resizeContainer.querySelector("#confirmResize");
       const cancelResize = resizeContainer.querySelector("#cancelResize");
-      const downloadPreviewBtn = resizeContainer.querySelector("#downloadPreviewBtn");
+      const downloadPreviewBtn = resizeContainer.querySelector(
+        "#downloadPreviewBtn"
+      );
       const clearIgnoredBtn = resizeContainer.querySelector("#clearIgnoredBtn");
       if (compactBtn) {
         compactBtn.addEventListener("click", () => {
@@ -7727,8 +7633,14 @@
         toggleOverlayBtn.addEventListener("click", () => {
           const isEnabled = overlayManager.toggle();
           toggleOverlayBtn.classList.toggle("active", isEnabled);
-          toggleOverlayBtn.setAttribute("aria-pressed", isEnabled ? "true" : "false");
-          Utils.showAlert(isEnabled ? Utils.t("overlayEnabled") : Utils.t("overlayDisabled"), "info");
+          toggleOverlayBtn.setAttribute(
+            "aria-pressed",
+            isEnabled ? "true" : "false"
+          );
+          Utils.showAlert(
+            isEnabled ? Utils.t("overlayEnabled") : Utils.t("overlayDisabled"),
+            "info"
+          );
         });
       }
       if (state.minimized) {
@@ -7764,7 +7676,10 @@
       if (loadBtn) {
         loadBtn.addEventListener("click", () => {
           if (!state.initialSetupComplete) {
-            Utils.showAlert(Utils.t("pleaseWaitInitialSetup"), "warning");
+            Utils.showAlert(
+              Utils.t("pleaseWaitInitialSetup"),
+              "warning"
+            );
             return;
           }
           const savedData = Utils.loadProgress();
@@ -7787,7 +7702,10 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
               updateDataButtons();
               updateStats();
               Utils.restoreOverlayFromData().catch((error) => {
-                console.error("Failed to restore overlay from localStorage:", error);
+                console.error(
+                  "Failed to restore overlay from localStorage:",
+                  error
+                );
               });
               if (!state.colorsChecked) {
                 uploadBtn.disabled = false;
@@ -7799,7 +7717,10 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
                 startBtn.disabled = false;
               }
             } else {
-              Utils.showAlert(Utils.t("errorLoadingProgress"), "error");
+              Utils.showAlert(
+                Utils.t("errorLoadingProgress"),
+                "error"
+              );
             }
           }
         });
@@ -7829,7 +7750,10 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
               updateDataButtons();
               await updateStats();
               await Utils.restoreOverlayFromData().catch((error) => {
-                console.error("Failed to restore overlay from file:", error);
+                console.error(
+                  "Failed to restore overlay from file:",
+                  error
+                );
               });
               if (state.colorsChecked) {
                 uploadBtn.disabled = false;
@@ -7870,9 +7794,15 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
         }
         let imageStatsHTML = "";
         if (state.imageLoaded) {
-          const progress = state.totalPixels > 0 ? Math.round(state.paintedPixels / state.totalPixels * 100) : 0;
+          const progress = state.totalPixels > 0 ? Math.round(
+            state.paintedPixels / state.totalPixels * 100
+          ) : 0;
           const remainingPixels = state.totalPixels - state.paintedPixels;
-          state.estimatedTime = Utils.calculateEstimatedTime(remainingPixels, state.currentCharges, state.cooldown);
+          state.estimatedTime = Utils.calculateEstimatedTime(
+            remainingPixels,
+            state.currentCharges,
+            state.cooldown
+          );
           progressBar.style.width = `${progress}%`;
           imageStatsHTML = `
                 <div class="wplace-stat-item">
@@ -7941,8 +7871,14 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
           initialW = rs.width;
           initialH = rs.height;
         }
-        initialW = Math.max(parseInt(widthSlider.min, 10) || 10, Math.min(initialW, parseInt(widthSlider.max, 10)));
-        initialH = Math.max(parseInt(heightSlider.min, 10) || 10, Math.min(initialH, parseInt(heightSlider.max, 10)));
+        initialW = Math.max(
+          parseInt(widthSlider.min, 10) || 10,
+          Math.min(initialW, parseInt(widthSlider.max, 10))
+        );
+        initialH = Math.max(
+          parseInt(heightSlider.min, 10) || 10,
+          Math.min(initialH, parseInt(heightSlider.max, 10))
+        );
         widthSlider.value = initialW;
         heightSlider.value = initialH;
         widthValue.textContent = initialW;
@@ -8045,8 +7981,19 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
               await baseProcessor.load();
             }
             baseCtx.clearRect(0, 0, newWidth, newHeight);
-            baseCtx.drawImage(baseProcessor.img, 0, 0, newWidth, newHeight);
-            maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+            baseCtx.drawImage(
+              baseProcessor.img,
+              0,
+              0,
+              newWidth,
+              newHeight
+            );
+            maskCtx.clearRect(
+              0,
+              0,
+              maskCanvas.width,
+              maskCanvas.height
+            );
             if (_maskImageData2)
               maskCtx.putImageData(_maskImageData2, 0, 0);
             updateZoomLayout();
@@ -8086,9 +8033,18 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
               if (!eligible[nidx])
                 return;
               const base = nidx * 3;
-              work[base] = Math.min(255, Math.max(0, work[base] + er * factor));
-              work[base + 1] = Math.min(255, Math.max(0, work[base + 1] + eg * factor));
-              work[base + 2] = Math.min(255, Math.max(0, work[base + 2] + eb * factor));
+              work[base] = Math.min(
+                255,
+                Math.max(0, work[base] + er * factor)
+              );
+              work[base + 1] = Math.min(
+                255,
+                Math.max(0, work[base + 1] + eg * factor)
+              );
+              work[base + 2] = Math.min(
+                255,
+                Math.max(0, work[base + 2] + eb * factor)
+              );
             };
             for (let y = 0; y < h; y++) {
               for (let x = 0; x < w; x++) {
@@ -8097,7 +8053,12 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
                   continue;
                 const base = idx * 3;
                 const r0 = work[base], g0 = work[base + 1], b0 = work[base + 2];
-                const [nr, ng, nb] = Utils.findClosestPaletteColor(r0, g0, b0, state.activeColorPalette);
+                const [nr, ng, nb] = Utils.findClosestPaletteColor(
+                  r0,
+                  g0,
+                  b0,
+                  state.activeColorPalette
+                );
                 const i4 = idx * 4;
                 data[i4] = nr;
                 data[i4 + 1] = ng;
@@ -8122,7 +8083,12 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
                 data[i + 3] = 0;
                 continue;
               }
-              const [nr, ng, nb] = Utils.findClosestPaletteColor(r, g, b, state.activeColorPalette);
+              const [nr, ng, nb] = Utils.findClosestPaletteColor(
+                r,
+                g,
+                b,
+                state.activeColorPalette
+              );
               data[i] = nr;
               data[i + 1] = ng;
               data[i + 2] = nb;
@@ -8139,12 +8105,19 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
         };
         const onWidthInput = () => {
           if (keepAspect.checked) {
-            heightSlider.value = Math.round(parseInt(widthSlider.value, 10) / aspectRatio);
+            heightSlider.value = Math.round(
+              parseInt(widthSlider.value, 10) / aspectRatio
+            );
           }
           _updateResizePreview();
           const curW = parseInt(widthSlider.value, 10);
           const curH = parseInt(heightSlider.value, 10);
-          state.resizeSettings = { baseWidth: width, baseHeight: height, width: curW, height: curH };
+          state.resizeSettings = {
+            baseWidth: width,
+            baseHeight: height,
+            width: curW,
+            height: curH
+          };
           saveBotSettings();
           const fit = typeof computeFitZoom === "function" ? computeFitZoom() : 1;
           if (!isNaN(fit) && isFinite(fit))
@@ -8152,12 +8125,19 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
         };
         const onHeightInput = () => {
           if (keepAspect.checked) {
-            widthSlider.value = Math.round(parseInt(heightSlider.value, 10) * aspectRatio);
+            widthSlider.value = Math.round(
+              parseInt(heightSlider.value, 10) * aspectRatio
+            );
           }
           _updateResizePreview();
           const curW = parseInt(widthSlider.value, 10);
           const curH = parseInt(heightSlider.value, 10);
-          state.resizeSettings = { baseWidth: width, baseHeight: height, width: curW, height: curH };
+          state.resizeSettings = {
+            baseWidth: width,
+            baseHeight: height,
+            width: curW,
+            height: curH
+          };
           saveBotSettings();
           const fit = typeof computeFitZoom === "function" ? computeFitZoom() : 1;
           if (!isNaN(fit) && isFinite(fit))
@@ -8175,7 +8155,10 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
         };
         let panX = 0, panY = 0;
         const clampPan = () => {
-          const wrapRect = (panStage == null ? void 0 : panStage.getBoundingClientRect()) || { width: 0, height: 0 };
+          const wrapRect = (panStage == null ? void 0 : panStage.getBoundingClientRect()) || {
+            width: 0,
+            height: 0
+          };
           const w = (baseCanvas.width || 1) * _zoomLevel;
           const h = (baseCanvas.height || 1) * _zoomLevel;
           if (w <= wrapRect.width) {
@@ -8222,9 +8205,15 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
           applyZoom(parseFloat(zoomSlider.value));
         });
         if (zoomInBtn)
-          zoomInBtn.addEventListener("click", () => applyZoom(parseFloat(zoomSlider.value) + 0.1));
+          zoomInBtn.addEventListener(
+            "click",
+            () => applyZoom(parseFloat(zoomSlider.value) + 0.1)
+          );
         if (zoomOutBtn)
-          zoomOutBtn.addEventListener("click", () => applyZoom(parseFloat(zoomSlider.value) - 0.1));
+          zoomOutBtn.addEventListener(
+            "click",
+            () => applyZoom(parseFloat(zoomSlider.value) - 0.1)
+          );
         const computeFitZoom = () => {
           const wrapRect = panStage == null ? void 0 : panStage.getBoundingClientRect();
           if (!wrapRect)
@@ -8270,7 +8259,10 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
           if (!panModeBtn)
             return;
           panModeBtn.classList.toggle("active", panMode);
-          panModeBtn.setAttribute("aria-pressed", panMode ? "true" : "false");
+          panModeBtn.setAttribute(
+            "aria-pressed",
+            panMode ? "true" : "false"
+          );
         };
         if (panModeBtn) {
           updatePanModeBtn();
@@ -8324,79 +8316,106 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
               setCursor(allowPan ? "grab" : "");
             }
           });
-          panStage.addEventListener("wheel", (e) => {
-            if (!e.ctrlKey && !e.metaKey)
-              return;
-            e.preventDefault();
-            const rect = panStage.getBoundingClientRect();
-            const cx = e.clientX - rect.left - panX;
-            const cy = e.clientY - rect.top - panY;
-            const before = _zoomLevel;
-            const step = Math.max(0.05, Math.min(0.5, Math.abs(e.deltaY) > 20 ? 0.2 : 0.1));
-            const next = Math.max(0.05, Math.min(20, before + (e.deltaY > 0 ? -step : step)));
-            if (next === before)
-              return;
-            const scale = next / before;
-            panX = panX - cx * (scale - 1);
-            panY = panY - cy * (scale - 1);
-            applyZoom(next);
-          }, { passive: false });
+          panStage.addEventListener(
+            "wheel",
+            (e) => {
+              if (!e.ctrlKey && !e.metaKey)
+                return;
+              e.preventDefault();
+              const rect = panStage.getBoundingClientRect();
+              const cx = e.clientX - rect.left - panX;
+              const cy = e.clientY - rect.top - panY;
+              const before = _zoomLevel;
+              const step = Math.max(
+                0.05,
+                Math.min(0.5, Math.abs(e.deltaY) > 20 ? 0.2 : 0.1)
+              );
+              const next = Math.max(
+                0.05,
+                Math.min(20, before + (e.deltaY > 0 ? -step : step))
+              );
+              if (next === before)
+                return;
+              const scale = next / before;
+              panX = panX - cx * (scale - 1);
+              panY = panY - cy * (scale - 1);
+              applyZoom(next);
+            },
+            { passive: false }
+          );
           let lastTouchDist = null;
           let touchStartTime = 0;
           let doubleTapTimer = null;
-          panStage.addEventListener("touchstart", (e) => {
-            if (e.touches.length === 1) {
-              const t = e.touches[0];
-              isPanning = true;
-              startX = t.clientX;
-              startY = t.clientY;
-              startPanX = panX;
-              startPanY = panY;
-              setCursor("grabbing");
-              const now = Date.now();
-              if (now - touchStartTime < 300) {
-                const z = Math.abs(_zoomLevel - 1) < 0.01 ? computeFitZoom() : 1;
-                applyZoom(z);
-                centerInView();
-                if (doubleTapTimer)
-                  clearTimeout(doubleTapTimer);
-              } else {
-                touchStartTime = now;
-                doubleTapTimer = setTimeout(() => {
-                  doubleTapTimer = null;
-                }, 320);
+          panStage.addEventListener(
+            "touchstart",
+            (e) => {
+              if (e.touches.length === 1) {
+                const t = e.touches[0];
+                isPanning = true;
+                startX = t.clientX;
+                startY = t.clientY;
+                startPanX = panX;
+                startPanY = panY;
+                setCursor("grabbing");
+                const now = Date.now();
+                if (now - touchStartTime < 300) {
+                  const z = Math.abs(_zoomLevel - 1) < 0.01 ? computeFitZoom() : 1;
+                  applyZoom(z);
+                  centerInView();
+                  if (doubleTapTimer)
+                    clearTimeout(doubleTapTimer);
+                } else {
+                  touchStartTime = now;
+                  doubleTapTimer = setTimeout(() => {
+                    doubleTapTimer = null;
+                  }, 320);
+                }
+              } else if (e.touches.length === 2) {
+                const [a, b] = e.touches;
+                lastTouchDist = Math.hypot(
+                  b.clientX - a.clientX,
+                  b.clientY - a.clientY
+                );
               }
-            } else if (e.touches.length === 2) {
-              const [a, b] = e.touches;
-              lastTouchDist = Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
-            }
-          }, { passive: true });
-          panStage.addEventListener("touchmove", (e) => {
-            if (e.touches.length === 1 && isPanning) {
-              const t = e.touches[0];
-              const dx = t.clientX - startX;
-              const dy = t.clientY - startY;
-              panX = startPanX + dx;
-              panY = startPanY + dy;
-              applyPan();
-            } else if (e.touches.length === 2 && lastTouchDist != null) {
-              e.preventDefault();
-              const [a, b] = e.touches;
-              const dist = Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
-              const rect = panStage.getBoundingClientRect();
-              const centerX = (a.clientX + b.clientX) / 2 - rect.left - panX;
-              const centerY = (a.clientY + b.clientY) / 2 - rect.top - panY;
-              const before = _zoomLevel;
-              const scale = dist / (lastTouchDist || dist);
-              const next = Math.max(0.05, Math.min(20, before * scale));
-              if (next !== before) {
-                panX = panX - centerX * (next / before - 1);
-                panY = panY - centerY * (next / before - 1);
-                applyZoom(next);
+            },
+            { passive: true }
+          );
+          panStage.addEventListener(
+            "touchmove",
+            (e) => {
+              if (e.touches.length === 1 && isPanning) {
+                const t = e.touches[0];
+                const dx = t.clientX - startX;
+                const dy = t.clientY - startY;
+                panX = startPanX + dx;
+                panY = startPanY + dy;
+                applyPan();
+              } else if (e.touches.length === 2 && lastTouchDist != null) {
+                e.preventDefault();
+                const [a, b] = e.touches;
+                const dist = Math.hypot(
+                  b.clientX - a.clientX,
+                  b.clientY - a.clientY
+                );
+                const rect = panStage.getBoundingClientRect();
+                const centerX = (a.clientX + b.clientX) / 2 - rect.left - panX;
+                const centerY = (a.clientY + b.clientY) / 2 - rect.top - panY;
+                const before = _zoomLevel;
+                const scale = dist / (lastTouchDist || dist);
+                const next = Math.max(
+                  0.05,
+                  Math.min(20, before * scale)
+                );
+                if (next !== before) {
+                  panX = panX - centerX * (next / before - 1);
+                  panY = panY - centerY * (next / before - 1);
+                  applyZoom(next);
+                }
+                lastTouchDist = dist;
               }
-              lastTouchDist = dist;
-            }
-          }, { passive: false });
+            },
+            { passive: false }
+          );
           panStage.addEventListener("touchend", () => {
             isPanning = false;
             lastTouchDist = null;
@@ -8411,9 +8430,15 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
             _updateResizePreview();
           };
           if (window.requestIdleCallback) {
-            _previewTimer2 = setTimeout(() => requestIdleCallback(run, { timeout: 150 }), 50);
+            _previewTimer2 = setTimeout(
+              () => requestIdleCallback(run, { timeout: 150 }),
+              50
+            );
           } else {
-            _previewTimer2 = setTimeout(() => requestAnimationFrame(run), 50);
+            _previewTimer2 = setTimeout(
+              () => requestAnimationFrame(run),
+              50
+            );
           }
         };
         const markDragStart = () => {
@@ -8441,7 +8466,9 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
         let rowColSize = 1;
         let maskMode = "ignore";
         const brushEl = resizeContainer.querySelector("#maskBrushSize");
-        const brushValEl = resizeContainer.querySelector("#maskBrushSizeValue");
+        const brushValEl = resizeContainer.querySelector(
+          "#maskBrushSizeValue"
+        );
         const btnIgnore = resizeContainer.querySelector("#maskModeIgnore");
         const btnUnignore = resizeContainer.querySelector("#maskModeUnignore");
         const btnToggle = resizeContainer.querySelector("#maskModeToggle");
@@ -8486,7 +8513,10 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
         if (btnIgnore)
           btnIgnore.addEventListener("click", () => setMode("ignore"));
         if (btnUnignore)
-          btnUnignore.addEventListener("click", () => setMode("unignore"));
+          btnUnignore.addEventListener(
+            "click",
+            () => setMode("unignore")
+          );
         if (btnToggle)
           btnToggle.addEventListener("click", () => setMode("toggle"));
         updateModeButtons();
@@ -8656,12 +8686,24 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
           draggingMask = true;
           handlePaint(e);
         });
-        maskCanvas.addEventListener("touchstart", (e) => {
-        }, { passive: true });
-        maskCanvas.addEventListener("touchmove", (e) => {
-        }, { passive: true });
-        maskCanvas.addEventListener("touchend", (e) => {
-        }, { passive: true });
+        maskCanvas.addEventListener(
+          "touchstart",
+          (e) => {
+          },
+          { passive: true }
+        );
+        maskCanvas.addEventListener(
+          "touchmove",
+          (e) => {
+          },
+          { passive: true }
+        );
+        maskCanvas.addEventListener(
+          "touchend",
+          (e) => {
+          },
+          { passive: true }
+        );
         window.addEventListener("mousemove", (e) => {
           if (draggingMask)
             handlePaint(e);
@@ -8738,9 +8780,18 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
               if (!eligible[nidx])
                 return;
               const base = nidx * 3;
-              work[base] = Math.min(255, Math.max(0, work[base] + er * factor));
-              work[base + 1] = Math.min(255, Math.max(0, work[base + 1] + eg * factor));
-              work[base + 2] = Math.min(255, Math.max(0, work[base + 2] + eb * factor));
+              work[base] = Math.min(
+                255,
+                Math.max(0, work[base] + er * factor)
+              );
+              work[base + 1] = Math.min(
+                255,
+                Math.max(0, work[base + 1] + eg * factor)
+              );
+              work[base + 2] = Math.min(
+                255,
+                Math.max(0, work[base + 2] + eb * factor)
+              );
             };
             for (let y = 0; y < h; y++) {
               for (let x = 0; x < w; x++) {
@@ -8749,7 +8800,12 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
                   continue;
                 const base = idx * 3;
                 const r0 = work[base], g0 = work[base + 1], b0 = work[base + 2];
-                const [nr, ng, nb] = Utils.findClosestPaletteColor(r0, g0, b0, state.activeColorPalette);
+                const [nr, ng, nb] = Utils.findClosestPaletteColor(
+                  r0,
+                  g0,
+                  b0,
+                  state.activeColorPalette
+                );
                 const i4 = idx * 4;
                 data[i4] = nr;
                 data[i4 + 1] = ng;
@@ -8780,7 +8836,12 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
                 continue;
               }
               totalValidPixels++;
-              const [nr, ng, nb] = Utils.findClosestPaletteColor(r, g, b, state.activeColorPalette);
+              const [nr, ng, nb] = Utils.findClosestPaletteColor(
+                r,
+                g,
+                b,
+                state.activeColorPalette
+              );
               data[i] = nr;
               data[i + 1] = ng;
               data[i + 2] = nb;
@@ -8795,7 +8856,12 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
           state.imageData.totalPixels = totalValidPixels;
           state.totalPixels = totalValidPixels;
           state.paintedPixels = 0;
-          state.resizeSettings = { baseWidth: width, baseHeight: height, width: newWidth, height: newHeight };
+          state.resizeSettings = {
+            baseWidth: width,
+            baseHeight: height,
+            width: newWidth,
+            height: newHeight
+          };
           saveBotSettings();
           const finalImageBitmap = await createImageBitmap(tempCanvas);
           await overlayManager.setImage(finalImageBitmap);
@@ -8803,7 +8869,10 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
           toggleOverlayBtn.classList.add("active");
           toggleOverlayBtn.setAttribute("aria-pressed", "true");
           updateStats();
-          updateUI("resizeSuccess", "success", { width: newWidth, height: newHeight });
+          updateUI("resizeSuccess", "success", {
+            width: newWidth,
+            height: newHeight
+          });
           closeResizeDialog();
         };
         downloadPreviewBtn.onclick = () => {
@@ -8899,7 +8968,9 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
           if (!state.colorsChecked) {
             state.availableColors = availableColors;
             state.colorsChecked = true;
-            updateUI("colorsFound", "success", { count: availableColors.length });
+            updateUI("colorsFound", "success", {
+              count: availableColors.length
+            });
             updateStats();
             selectPosBtn.disabled = false;
             if (state.imageLoaded) {
@@ -8910,7 +8981,9 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
             updateUI("loadingImage", "default");
             const imageSrc = await Utils.createImageUploader();
             if (!imageSrc) {
-              updateUI("colorsFound", "success", { count: state.availableColors.length });
+              updateUI("colorsFound", "success", {
+                count: state.availableColors.length
+              });
               return;
             }
             const processor = new ImageProcessor(imageSrc);
@@ -8920,7 +8993,11 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
             let totalValidPixels = 0;
             for (let i = 0; i < pixels.length; i += 4) {
               const isTransparent = !state.paintTransparentPixels && pixels[i + 3] < (state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD);
-              const isWhiteAndSkipped = !state.paintWhitePixels && Utils.isWhitePixel(pixels[i], pixels[i + 1], pixels[i + 2]);
+              const isWhiteAndSkipped = !state.paintWhitePixels && Utils.isWhitePixel(
+                pixels[i],
+                pixels[i + 1],
+                pixels[i + 2]
+              );
               if (!isTransparent && !isWhiteAndSkipped) {
                 totalValidPixels++;
               }
@@ -8956,7 +9033,9 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
             }
             updateStats();
             updateDataButtons();
-            updateUI("imageLoaded", "success", { count: totalValidPixels });
+            updateUI("imageLoaded", "success", {
+              count: totalValidPixels
+            });
           } catch {
             updateUI("imageError", "error");
           }
@@ -8967,7 +9046,10 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
           if (state.imageLoaded && state.imageData.processor && state.colorsChecked) {
             showResizeDialog(state.imageData.processor);
           } else if (!state.colorsChecked) {
-            Utils.showAlert(Utils.t("uploadImageFirstColors"), "warning");
+            Utils.showAlert(
+              Utils.t("uploadImageFirstColors"),
+              "warning"
+            );
           }
         });
       }
@@ -8989,7 +9071,9 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
                 const clonedResponse = response.clone();
                 const data = await clonedResponse.json();
                 if ((data == null ? void 0 : data.painted) === 1) {
-                  const regionMatch = url.match(/\/pixel\/(\d+)\/(\d+)/);
+                  const regionMatch = url.match(
+                    /\/pixel\/(\d+)\/(\d+)/
+                  );
                   if (regionMatch && regionMatch.length >= 3) {
                     state.region = {
                       x: Number.parseInt(regionMatch[1]),
@@ -9003,7 +9087,10 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
                       y: payload.coords[1]
                     };
                     state.lastPosition = { x: 0, y: 0 };
-                    await overlayManager.setPosition(state.startPosition, state.region);
+                    await overlayManager.setPosition(
+                      state.startPosition,
+                      state.region
+                    );
                     if (state.imageLoaded) {
                       startBtn.disabled = false;
                     }
@@ -9088,8 +9175,12 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
       const checkSavedProgress = () => {
         const savedData = Utils.loadProgress();
         if (savedData && savedData.state.paintedPixels > 0) {
-          const savedDate = new Date(savedData.timestamp).toLocaleString();
-          const progress = Math.round(savedData.state.paintedPixels / savedData.state.totalPixels * 100);
+          const savedDate = new Date(
+            savedData.timestamp
+          ).toLocaleString();
+          const progress = Math.round(
+            savedData.state.paintedPixels / savedData.state.totalPixels * 100
+          );
           Utils.showAlert(
             `${Utils.t("savedDataFound")}
 
@@ -9131,7 +9222,10 @@ ${Utils.t("clickLoadToContinue")}`,
       let startCol = 0;
       let foundStart = false;
       let seen = 0;
-      const target = Math.max(0, Math.min(state.paintedPixels || 0, width * height));
+      const target = Math.max(
+        0,
+        Math.min(state.paintedPixels || 0, width * height)
+      );
       for (let y = 0; y < height && !foundStart; y++) {
         for (let x = 0; x < width; x++) {
           if (!isEligibleAt(x, y))
@@ -9157,8 +9251,14 @@ ${Utils.t("clickLoadToContinue")}`,
             for (let x = y === startRow ? startCol : 0; x < width; x++) {
               if (state.stopFlag) {
                 if (pixelBatch && pixelBatch.pixels.length > 0) {
-                  console.log(`\u{1F3AF} Sending final batch before stop with ${pixelBatch.pixels.length} pixels`);
-                  const success = await sendBatchWithRetry(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
+                  console.log(
+                    `\u{1F3AF} Sending final batch before stop with ${pixelBatch.pixels.length} pixels`
+                  );
+                  const success = await sendBatchWithRetry(
+                    pixelBatch.pixels,
+                    pixelBatch.regionX,
+                    pixelBatch.regionY
+                  );
                   if (success) {
                     pixelBatch.pixels.forEach(() => {
                       state.paintedPixels++;
@@ -9189,9 +9289,17 @@ ${Utils.t("clickLoadToContinue")}`,
               if (Utils.isWhitePixel(r, g, b)) {
                 targetRgb = [255, 255, 255];
               } else {
-                targetRgb = Utils.findClosestPaletteColor(r, g, b, state.activeColorPalette);
+                targetRgb = Utils.findClosestPaletteColor(
+                  r,
+                  g,
+                  b,
+                  state.activeColorPalette
+                );
               }
-              const colorId = findClosestColor([r, g, b], state.availableColors);
+              const colorId = findClosestColor(
+                [r, g, b],
+                state.availableColors
+              );
               let absX = startX + x;
               let absY = startY + y;
               let adderX = Math.floor(absX / 1e3);
@@ -9200,12 +9308,23 @@ ${Utils.t("clickLoadToContinue")}`,
               let pixelY = absY % 1e3;
               if (!pixelBatch || pixelBatch.regionX !== regionX + adderX || pixelBatch.regionY !== regionY + adderY) {
                 if (pixelBatch && pixelBatch.pixels.length > 0) {
-                  console.log(`\u{1F30D} Sending region-change batch with ${pixelBatch.pixels.length} pixels (switching to region ${regionX + adderX},${regionY + adderY})`);
-                  const success = await sendBatchWithRetry(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
+                  console.log(
+                    `\u{1F30D} Sending region-change batch with ${pixelBatch.pixels.length} pixels (switching to region ${regionX + adderX},${regionY + adderY})`
+                  );
+                  const success = await sendBatchWithRetry(
+                    pixelBatch.pixels,
+                    pixelBatch.regionX,
+                    pixelBatch.regionY
+                  );
                   if (success) {
                     pixelBatch.pixels.forEach((p) => {
                       state.paintedPixels++;
-                      Utils.markPixelPainted(p.x, p.y, pixelBatch.regionX, pixelBatch.regionY);
+                      Utils.markPixelPainted(
+                        p.x,
+                        p.y,
+                        pixelBatch.regionX,
+                        pixelBatch.regionY
+                      );
                     });
                     state.currentCharges -= pixelBatch.pixels.length;
                     updateUI("paintingProgress", "default", {
@@ -9214,13 +9333,21 @@ ${Utils.t("clickLoadToContinue")}`,
                     });
                     Utils.performSmartSave();
                     if (CONFIG.PAINTING_SPEED_ENABLED && state.paintingSpeed > 0 && pixelBatch.pixels.length > 0) {
-                      const batchDelayFactor = Math.max(1, 100 / state.paintingSpeed);
-                      const totalDelay = Math.max(100, batchDelayFactor * pixelBatch.pixels.length);
+                      const batchDelayFactor = Math.max(
+                        1,
+                        100 / state.paintingSpeed
+                      );
+                      const totalDelay = Math.max(
+                        100,
+                        batchDelayFactor * pixelBatch.pixels.length
+                      );
                       await Utils.sleep(totalDelay);
                     }
                     updateStats();
                   } else {
-                    console.error(`\u274C Batch failed permanently after retries. Stopping painting.`);
+                    console.error(
+                      `\u274C Batch failed permanently after retries. Stopping painting.`
+                    );
                     state.stopFlag = true;
                     break outerLoop;
                   }
@@ -9234,14 +9361,27 @@ ${Utils.t("clickLoadToContinue")}`,
               try {
                 const tileRegionX = pixelBatch ? pixelBatch.regionX : regionX + adderX;
                 const tileRegionY = pixelBatch ? pixelBatch.regionY : regionY + adderY;
-                const tileKeyParts = [regionX + adderX, regionY + adderY];
-                const existingColorRGBA = await overlayManager.getTilePixelColor(tileKeyParts[0], tileKeyParts[1], pixelX, pixelY).catch(() => null);
+                const tileKeyParts = [
+                  regionX + adderX,
+                  regionY + adderY
+                ];
+                const existingColorRGBA = await overlayManager.getTilePixelColor(
+                  tileKeyParts[0],
+                  tileKeyParts[1],
+                  pixelX,
+                  pixelY
+                ).catch(() => null);
                 if (existingColorRGBA && Array.isArray(existingColorRGBA)) {
                   const [er, eg, eb] = existingColorRGBA;
-                  const existingColorId = findClosestColor([er, eg, eb], state.availableColors);
+                  const existingColorId = findClosestColor(
+                    [er, eg, eb],
+                    state.availableColors
+                  );
                   if (existingColorId === colorId) {
                     skippedPixels.alreadyPainted++;
-                    console.log(`Skipped already painted pixel at (${pixelX}, ${pixelY})`);
+                    console.log(
+                      `Skipped already painted pixel at (${pixelX}, ${pixelY})`
+                    );
                     continue;
                   }
                 }
@@ -9257,12 +9397,23 @@ ${Utils.t("clickLoadToContinue")}`,
               const maxBatchSize = calculateBatchSize();
               if (pixelBatch.pixels.length >= maxBatchSize) {
                 const modeText = state.batchMode === "random" ? `random (${state.randomBatchMin}-${state.randomBatchMax})` : "normal";
-                console.log(`\u{1F4E6} Sending batch with ${pixelBatch.pixels.length} pixels (mode: ${modeText}, target: ${maxBatchSize})`);
-                const success = await sendBatchWithRetry(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
+                console.log(
+                  `\u{1F4E6} Sending batch with ${pixelBatch.pixels.length} pixels (mode: ${modeText}, target: ${maxBatchSize})`
+                );
+                const success = await sendBatchWithRetry(
+                  pixelBatch.pixels,
+                  pixelBatch.regionX,
+                  pixelBatch.regionY
+                );
                 if (success) {
                   pixelBatch.pixels.forEach((pixel) => {
                     state.paintedPixels++;
-                    Utils.markPixelPainted(pixel.x, pixel.y, pixelBatch.regionX, pixelBatch.regionY);
+                    Utils.markPixelPainted(
+                      pixel.x,
+                      pixel.y,
+                      pixelBatch.regionX,
+                      pixelBatch.regionY
+                    );
                   });
                   state.currentCharges -= pixelBatch.pixels.length;
                   updateStats();
@@ -9273,11 +9424,16 @@ ${Utils.t("clickLoadToContinue")}`,
                   Utils.performSmartSave();
                   if (CONFIG.PAINTING_SPEED_ENABLED && state.paintingSpeed > 0 && pixelBatch.pixels.length > 0) {
                     const delayPerPixel = 1e3 / state.paintingSpeed;
-                    const totalDelay = Math.max(100, delayPerPixel * pixelBatch.pixels.length);
+                    const totalDelay = Math.max(
+                      100,
+                      delayPerPixel * pixelBatch.pixels.length
+                    );
                     await Utils.sleep(totalDelay);
                   }
                 } else {
-                  console.error(`\u274C Batch failed permanently after retries. Stopping painting.`);
+                  console.error(
+                    `\u274C Batch failed permanently after retries. Stopping painting.`
+                  );
                   state.stopFlag = true;
                   break outerLoop;
                 }
@@ -9310,22 +9466,38 @@ ${Utils.t("clickLoadToContinue")}`,
             }
           }
         if (pixelBatch && pixelBatch.pixels.length > 0 && !state.stopFlag) {
-          console.log(`\u{1F3C1} Sending final batch with ${pixelBatch.pixels.length} pixels`);
-          const success = await sendBatchWithRetry(pixelBatch.pixels, pixelBatch.regionX, pixelBatch.regionY);
+          console.log(
+            `\u{1F3C1} Sending final batch with ${pixelBatch.pixels.length} pixels`
+          );
+          const success = await sendBatchWithRetry(
+            pixelBatch.pixels,
+            pixelBatch.regionX,
+            pixelBatch.regionY
+          );
           if (success) {
             pixelBatch.pixels.forEach((pixel) => {
               state.paintedPixels++;
-              Utils.markPixelPainted(pixel.x, pixel.y, pixelBatch.regionX, pixelBatch.regionY);
+              Utils.markPixelPainted(
+                pixel.x,
+                pixel.y,
+                pixelBatch.regionX,
+                pixelBatch.regionY
+              );
             });
             state.currentCharges -= pixelBatch.pixels.length;
             Utils.saveProgress();
             if (CONFIG.PAINTING_SPEED_ENABLED && state.paintingSpeed > 0 && pixelBatch.pixels.length > 0) {
               const delayPerPixel = 1e3 / state.paintingSpeed;
-              const totalDelay = Math.max(100, delayPerPixel * pixelBatch.pixels.length);
+              const totalDelay = Math.max(
+                100,
+                delayPerPixel * pixelBatch.pixels.length
+              );
               await Utils.sleep(totalDelay);
             }
           } else {
-            console.warn(`\u26A0\uFE0F Final batch failed with ${pixelBatch.pixels.length} pixels after all retries.`);
+            console.warn(
+              `\u26A0\uFE0F Final batch failed with ${pixelBatch.pixels.length} pixels after all retries.`
+            );
           }
         }
       } finally {
@@ -9337,7 +9509,9 @@ ${Utils.t("clickLoadToContinue")}`,
         updateUI("paintingStopped", "warning");
         Utils.saveProgress();
       } else {
-        updateUI("paintingComplete", "success", { count: state.paintedPixels });
+        updateUI("paintingComplete", "success", {
+          count: state.paintedPixels
+        });
         state.lastPosition = { x: 0, y: 0 };
         Utils.saveProgress();
         overlayManager.clear();
@@ -9351,8 +9525,12 @@ ${Utils.t("clickLoadToContinue")}`,
       console.log(`   Painted: ${state.paintedPixels}`);
       console.log(`   Skipped - Transparent: ${skippedPixels.transparent}`);
       console.log(`   Skipped - White (disabled): ${skippedPixels.white}`);
-      console.log(`   Skipped - Already painted: ${skippedPixels.alreadyPainted}`);
-      console.log(`   Total processed: ${state.paintedPixels + skippedPixels.transparent + skippedPixels.white + skippedPixels.alreadyPainted}`);
+      console.log(
+        `   Skipped - Already painted: ${skippedPixels.alreadyPainted}`
+      );
+      console.log(
+        `   Total processed: ${state.paintedPixels + skippedPixels.transparent + skippedPixels.white + skippedPixels.alreadyPainted}`
+      );
       updateStats();
     }
     function calculateBatchSize() {
@@ -9361,7 +9539,9 @@ ${Utils.t("clickLoadToContinue")}`,
         const min = Math.max(1, state.randomBatchMin);
         const max = Math.max(min, state.randomBatchMax);
         targetBatchSize = Math.floor(Math.random() * (max - min + 1)) + min;
-        console.log(`\u{1F3B2} Random batch size generated: ${targetBatchSize} (range: ${min}-${max})`);
+        console.log(
+          `\u{1F3B2} Random batch size generated: ${targetBatchSize} (range: ${min}-${max})`
+        );
       } else {
         targetBatchSize = state.paintingSpeed;
       }
@@ -9373,32 +9553,46 @@ ${Utils.t("clickLoadToContinue")}`,
       let attempt = 0;
       while (attempt < maxRetries && !state.stopFlag) {
         attempt++;
-        console.log(`\u{1F504} Attempting to send batch (attempt ${attempt}/${maxRetries}) for region ${regionX},${regionY} with ${pixels.length} pixels`);
+        console.log(
+          `\u{1F504} Attempting to send batch (attempt ${attempt}/${maxRetries}) for region ${regionX},${regionY} with ${pixels.length} pixels`
+        );
         const result = await sendPixelBatch(pixels, regionX, regionY);
         if (result === true) {
           console.log(`\u2705 Batch succeeded on attempt ${attempt}`);
           return true;
         } else if (result === "token_error") {
-          console.log(`\u{1F511} Token error on attempt ${attempt}, regenerating...`);
+          console.log(
+            `\u{1F511} Token error on attempt ${attempt}, regenerating...`
+          );
           updateUI("captchaSolving", "warning");
           try {
             await handleCaptcha();
             attempt--;
             continue;
           } catch (e) {
-            console.error(`\u274C Token regeneration failed on attempt ${attempt}:`, e);
+            console.error(
+              `\u274C Token regeneration failed on attempt ${attempt}:`,
+              e
+            );
             updateUI("captchaFailed", "error");
             await Utils.sleep(5e3);
           }
         } else {
-          console.warn(`\u26A0\uFE0F Batch failed on attempt ${attempt}, retrying...`);
-          const baseDelay = Math.min(1e3 * Math.pow(2, attempt - 1), 3e4);
+          console.warn(
+            `\u26A0\uFE0F Batch failed on attempt ${attempt}, retrying...`
+          );
+          const baseDelay = Math.min(
+            1e3 * Math.pow(2, attempt - 1),
+            3e4
+          );
           const jitter = Math.random() * 1e3;
           await Utils.sleep(baseDelay + jitter);
         }
       }
       if (attempt >= maxRetries) {
-        console.error(`\u274C Batch failed after ${maxRetries} attempts (MAX_BATCH_RETRIES=${MAX_BATCH_RETRIES}). This will stop painting to prevent infinite loops.`);
+        console.error(
+          `\u274C Batch failed after ${maxRetries} attempts (MAX_BATCH_RETRIES=${MAX_BATCH_RETRIES}). This will stop painting to prevent infinite loops.`
+        );
         updateUI("paintingError", "error");
         return false;
       }
@@ -9429,30 +9623,40 @@ ${Utils.t("clickLoadToContinue")}`,
       }
       try {
         const payload = { coords, colors, t: token };
-        const res = await fetch(`https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=UTF-8" },
-          credentials: "include",
-          body: JSON.stringify(payload)
-        });
+        const res = await fetch(
+          `https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=UTF-8" },
+            credentials: "include",
+            body: JSON.stringify(payload)
+          }
+        );
         if (res.status === 403) {
           let data2 = null;
           try {
             data2 = await res.json();
           } catch (_) {
           }
-          console.error("\u274C 403 Forbidden. Turnstile token might be invalid or expired.");
+          console.error(
+            "\u274C 403 Forbidden. Turnstile token might be invalid or expired."
+          );
           try {
             console.log("\u{1F504} Regenerating Turnstile token after 403...");
             token = await handleCaptcha();
             turnstileToken = token;
             const retryPayload = { coords, colors, t: token };
-            const retryRes = await fetch(`https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`, {
-              method: "POST",
-              headers: { "Content-Type": "text/plain;charset=UTF-8" },
-              credentials: "include",
-              body: JSON.stringify(retryPayload)
-            });
+            const retryRes = await fetch(
+              `https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "text/plain;charset=UTF-8"
+                },
+                credentials: "include",
+                body: JSON.stringify(retryPayload)
+              }
+            );
             if (retryRes.status === 403) {
               turnstileToken = null;
               tokenPromise = new Promise((resolve) => {
@@ -9493,7 +9697,9 @@ ${Utils.t("clickLoadToContinue")}`,
           // "generator", "hybrid", or "manual"
           minimized: state.minimized,
           overlayOpacity: state.overlayOpacity,
-          blueMarbleEnabled: (_b = document.getElementById("enableBlueMarbleToggle")) == null ? void 0 : _b.checked,
+          blueMarbleEnabled: (_b = document.getElementById(
+            "enableBlueMarbleToggle"
+          )) == null ? void 0 : _b.checked,
           ditheringEnabled: state.ditheringEnabled,
           colorMatchingAlgorithm: state.colorMatchingAlgorithm,
           enableChromaPenalty: state.enableChromaPenalty,
@@ -9505,7 +9711,13 @@ ${Utils.t("clickLoadToContinue")}`,
           resizeSettings: state.resizeSettings,
           originalImage: state.originalImage,
           // Save ignore mask (as base64) with its dimensions
-          resizeIgnoreMask: state.resizeIgnoreMask && state.resizeSettings && state.resizeSettings.width * state.resizeSettings.height === state.resizeIgnoreMask.length ? { w: state.resizeSettings.width, h: state.resizeSettings.height, data: btoa(String.fromCharCode(...state.resizeIgnoreMask)) } : null,
+          resizeIgnoreMask: state.resizeIgnoreMask && state.resizeSettings && state.resizeSettings.width * state.resizeSettings.height === state.resizeIgnoreMask.length ? {
+            w: state.resizeSettings.width,
+            h: state.resizeSettings.height,
+            data: btoa(
+              String.fromCharCode(...state.resizeIgnoreMask)
+            )
+          } : null,
           // Notifications
           notificationsEnabled: state.notificationsEnabled,
           notifyOnChargesReached: state.notifyOnChargesReached,
@@ -9513,7 +9725,10 @@ ${Utils.t("clickLoadToContinue")}`,
           notificationIntervalMinutes: state.notificationIntervalMinutes
         };
         CONFIG.PAINTING_SPEED_ENABLED = settings.paintingSpeedEnabled;
-        localStorage.setItem("wplace-bot-settings", JSON.stringify(settings));
+        localStorage.setItem(
+          "wplace-bot-settings",
+          JSON.stringify(settings)
+        );
       } catch (e) {
         console.warn("Could not save bot settings:", e);
       }
@@ -9574,8 +9789,12 @@ ${Utils.t("clickLoadToContinue")}`,
         const batchModeSelect = document.getElementById("batchModeSelect");
         if (batchModeSelect)
           batchModeSelect.value = state.batchMode;
-        const normalBatchControls = document.getElementById("normalBatchControls");
-        const randomBatchControls = document.getElementById("randomBatchControls");
+        const normalBatchControls = document.getElementById(
+          "normalBatchControls"
+        );
+        const randomBatchControls = document.getElementById(
+          "randomBatchControls"
+        );
         if (normalBatchControls && randomBatchControls) {
           if (state.batchMode === "random") {
             normalBatchControls.style.display = "none";
@@ -9597,43 +9816,63 @@ ${Utils.t("clickLoadToContinue")}`,
         const cooldownValue = document.getElementById("cooldownValue");
         if (cooldownValue)
           cooldownValue.textContent = state.cooldownChargeThreshold;
-        const overlayOpacitySlider = document.getElementById("overlayOpacitySlider");
+        const overlayOpacitySlider = document.getElementById(
+          "overlayOpacitySlider"
+        );
         if (overlayOpacitySlider)
           overlayOpacitySlider.value = state.overlayOpacity;
-        const overlayOpacityValue = document.getElementById("overlayOpacityValue");
+        const overlayOpacityValue = document.getElementById(
+          "overlayOpacityValue"
+        );
         if (overlayOpacityValue)
           overlayOpacityValue.textContent = `${Math.round(state.overlayOpacity * 100)}%`;
-        const enableBlueMarbleToggle = document.getElementById("enableBlueMarbleToggle");
+        const enableBlueMarbleToggle = document.getElementById(
+          "enableBlueMarbleToggle"
+        );
         if (enableBlueMarbleToggle)
           enableBlueMarbleToggle.checked = state.blueMarbleEnabled;
         const tokenSourceSelect = document.getElementById("tokenSourceSelect");
         if (tokenSourceSelect)
           tokenSourceSelect.value = state.tokenSource;
-        const colorAlgorithmSelect = document.getElementById("colorAlgorithmSelect");
+        const colorAlgorithmSelect = document.getElementById(
+          "colorAlgorithmSelect"
+        );
         if (colorAlgorithmSelect)
           colorAlgorithmSelect.value = state.colorMatchingAlgorithm;
-        const enableChromaPenaltyToggle = document.getElementById("enableChromaPenaltyToggle");
+        const enableChromaPenaltyToggle = document.getElementById(
+          "enableChromaPenaltyToggle"
+        );
         if (enableChromaPenaltyToggle)
           enableChromaPenaltyToggle.checked = state.enableChromaPenalty;
-        const chromaPenaltyWeightSlider = document.getElementById("chromaPenaltyWeightSlider");
+        const chromaPenaltyWeightSlider = document.getElementById(
+          "chromaPenaltyWeightSlider"
+        );
         if (chromaPenaltyWeightSlider)
           chromaPenaltyWeightSlider.value = state.chromaPenaltyWeight;
         const chromaWeightValue = document.getElementById("chromaWeightValue");
         if (chromaWeightValue)
           chromaWeightValue.textContent = state.chromaPenaltyWeight;
-        const transparencyThresholdInput = document.getElementById("transparencyThresholdInput");
+        const transparencyThresholdInput = document.getElementById(
+          "transparencyThresholdInput"
+        );
         if (transparencyThresholdInput)
           transparencyThresholdInput.value = state.customTransparencyThreshold;
-        const whiteThresholdInput = document.getElementById("whiteThresholdInput");
+        const whiteThresholdInput = document.getElementById(
+          "whiteThresholdInput"
+        );
         if (whiteThresholdInput)
           whiteThresholdInput.value = state.customWhiteThreshold;
         const notifEnabledToggle = document.getElementById("notifEnabledToggle");
         if (notifEnabledToggle)
           notifEnabledToggle.checked = state.notificationsEnabled;
-        const notifOnChargesToggle = document.getElementById("notifOnChargesToggle");
+        const notifOnChargesToggle = document.getElementById(
+          "notifOnChargesToggle"
+        );
         if (notifOnChargesToggle)
           notifOnChargesToggle.checked = state.notifyOnChargesReached;
-        const notifOnlyUnfocusedToggle = document.getElementById("notifOnlyUnfocusedToggle");
+        const notifOnlyUnfocusedToggle = document.getElementById(
+          "notifOnlyUnfocusedToggle"
+        );
         if (notifOnlyUnfocusedToggle)
           notifOnlyUnfocusedToggle.checked = state.notifyOnlyWhenUnfocused;
         const notifIntervalInput = document.getElementById("notifIntervalInput");
@@ -9645,9 +9884,15 @@ ${Utils.t("clickLoadToContinue")}`,
       }
     }
     console.log("\u{1F680} WPlace Auto-Image with Turnstile Token Generator loaded");
-    console.log("\u{1F511} Turnstile token generator: ALWAYS ENABLED (Background mode)");
-    console.log("\u{1F3AF} Manual pixel captcha solving: Available as fallback/alternative");
-    console.log("\u{1F4F1} Turnstile widgets: DISABLED - pure background token generation only!");
+    console.log(
+      "\u{1F511} Turnstile token generator: ALWAYS ENABLED (Background mode)"
+    );
+    console.log(
+      "\u{1F3AF} Manual pixel captcha solving: Available as fallback/alternative"
+    );
+    console.log(
+      "\u{1F4F1} Turnstile widgets: DISABLED - pure background token generation only!"
+    );
     function enableFileOperations() {
       state.initialSetupComplete = true;
       const loadBtn = document.querySelector("#loadBtn");
@@ -9687,7 +9932,9 @@ ${Utils.t("clickLoadToContinue")}`,
     }
     async function initializeTokenGenerator() {
       if (isTokenValid()) {
-        console.log("\u2705 Valid token already available, skipping initialization");
+        console.log(
+          "\u2705 Valid token already available, skipping initialization"
+        );
         updateUI("tokenReady", "success");
         enableFileOperations();
         return;
@@ -9697,7 +9944,9 @@ ${Utils.t("clickLoadToContinue")}`,
         updateUI("initializingToken", "default");
         console.log("Attempting to load Turnstile script...");
         await Utils.loadTurnstile();
-        console.log("Turnstile script loaded. Attempting to generate token...");
+        console.log(
+          "Turnstile script loaded. Attempting to generate token..."
+        );
         const token = await handleCaptchaWithRetry();
         if (token) {
           setTurnstileToken(token);
@@ -9706,12 +9955,17 @@ ${Utils.t("clickLoadToContinue")}`,
           Utils.showAlert(Utils.t("tokenGeneratorReady"), "success");
           enableFileOperations();
         } else {
-          console.warn("\u26A0\uFE0F Startup token generation failed (no token received), will retry when needed");
+          console.warn(
+            "\u26A0\uFE0F Startup token generation failed (no token received), will retry when needed"
+          );
           updateUI("tokenRetryLater", "warning");
           enableFileOperations();
         }
       } catch (error) {
-        console.error("\u274C Critical error during Turnstile initialization:", error);
+        console.error(
+          "\u274C Critical error during Turnstile initialization:",
+          error
+        );
         updateUI("tokenRetryLater", "warning");
         enableFileOperations();
       }
@@ -9721,14 +9975,22 @@ ${Utils.t("clickLoadToContinue")}`,
     createUI().then(() => {
       setTimeout(initializeTokenGenerator, 1e3);
       const advancedInit = () => {
-        const chromaSlider = document.getElementById("chromaPenaltyWeightSlider");
+        const chromaSlider = document.getElementById(
+          "chromaPenaltyWeightSlider"
+        );
         const chromaValue = document.getElementById("chromaWeightValue");
         const resetBtn = document.getElementById("resetAdvancedColorBtn");
         const algoSelect = document.getElementById("colorAlgorithmSelect");
-        const chromaToggle = document.getElementById("enableChromaPenaltyToggle");
-        const transInput = document.getElementById("transparencyThresholdInput");
+        const chromaToggle = document.getElementById(
+          "enableChromaPenaltyToggle"
+        );
+        const transInput = document.getElementById(
+          "transparencyThresholdInput"
+        );
         const whiteInput = document.getElementById("whiteThresholdInput");
-        const ditherToggle = document.getElementById("enableDitheringToggle");
+        const ditherToggle = document.getElementById(
+          "enableDitheringToggle"
+        );
         if (algoSelect)
           algoSelect.addEventListener("change", (e) => {
             state.colorMatchingAlgorithm = e.target.value;
@@ -9785,7 +10047,9 @@ ${Utils.t("clickLoadToContinue")}`,
             const a = document.getElementById("colorAlgorithmSelect");
             if (a)
               a.value = "lab";
-            const ct = document.getElementById("enableChromaPenaltyToggle");
+            const ct = document.getElementById(
+              "enableChromaPenaltyToggle"
+            );
             if (ct)
               ct.checked = true;
             if (chromaSlider)
@@ -9797,7 +10061,10 @@ ${Utils.t("clickLoadToContinue")}`,
             if (whiteInput)
               whiteInput.value = 250;
             _updateResizePreview();
-            Utils.showAlert(Utils.t("advancedColorSettingsReset"), "success");
+            Utils.showAlert(
+              Utils.t("advancedColorSettingsReset"),
+              "success"
+            );
           });
       };
       setTimeout(advancedInit, 500);
