@@ -6953,44 +6953,82 @@
         state.blockWidth,
         state.blockHeight
       );
-
-      // Outline-first: prioritize edge pixels where neighbor colors differ from target
+      // In outline-first mode, compute a smarter edge set (8-neighborhood, color diff),
+      // paint ALL edges first in row-major order (ignoring generation mode), then paint the rest
+      // using the chosen generation mode.
+      let phases = [coords];
+      let edgeKeySet = null;
       if (state.batchMode === 'outline-first') {
-        const isEdge = (x, y) => {
-          const idx = (y * width + x) * 4;
-          const r = pixels[idx], g = pixels[idx + 1], b = pixels[idx + 2], a = pixels[idx + 3];
-          if (!state.paintTransparentPixels && a < (state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD)) return false;
-          // Target mapped color id at (x,y)
-          const targetRgb = Utils.isWhitePixel(r, g, b)
-            ? [255, 255, 255]
-            : Utils.findClosestPaletteColor(r, g, b, state.activeColorPalette);
-          const targetId = Utils.resolveColor(targetRgb, state.availableColors, !state.paintUnavailablePixels).id;
-          // Check 4-neighbors
-          const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
-          for (const [dx,dy] of dirs) {
-            const nx = x + dx, ny = y + dy;
-            if (nx < 0 || nx >= width || ny < 0 || ny >= height) continue;
-            const nIdx = (ny * width + nx) * 4;
-            const nr = pixels[nIdx], ng = pixels[nIdx + 1], nb = pixels[nIdx + 2], na = pixels[nIdx + 3];
-            if (!state.paintTransparentPixels && na < (state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD)) continue;
-            const nTargetRgb = Utils.isWhitePixel(nr, ng, nb)
-              ? [255, 255, 255]
-              : Utils.findClosestPaletteColor(nr, ng, nb, state.activeColorPalette);
-            const nTargetId = Utils.resolveColor(nTargetRgb, state.availableColors, !state.paintUnavailablePixels).id;
-            if (nTargetId !== targetId) return true;
-          }
-          return false;
+        const idCache = new Int16Array(width * height);
+        idCache.fill(-2); // -2 = unknown, -1 = ineligible, >=0 = mapped color id
+        const idxOf = (x, y) => y * width + x;
+        const colorDiff2Threshold = 1600; // ~40 RGB units
+        const getMappedId = (x, y) => {
+          const i = idxOf(x, y);
+          const cached = idCache[i];
+          if (cached !== -2) return cached;
+          const { eligible, mappedColorId } = checkPixelEligibility(x, y);
+          idCache[i] = eligible ? mappedColorId : -1;
+          return idCache[i];
         };
+        const isEdgeSmart = (x, y) => {
+          const i = idxOf(x, y);
+          const id = getMappedId(x, y);
+          if (id < 0) return false; // not painting this pixel, so not part of outline
+          const pIdx = i * 4;
+          const pr = pixels[pIdx], pg = pixels[pIdx + 1], pb = pixels[pIdx + 2];
+          let differCount = 0;
+          for (let dy = -1; dy <= 1; dy++) {
+            for (let dx = -1; dx <= 1; dx++) {
+              if (dx === 0 && dy === 0) continue;
+              const nx = x + dx, ny = y + dy;
+              if (nx < 0 || nx >= width || ny < 0 || ny >= height) {
+                differCount++;
+                continue;
+              }
+              const nid = getMappedId(nx, ny);
+              if (nid < 0) {
+                differCount++;
+                continue;
+              }
+              if (nid !== id) {
+                differCount++;
+                // Check strong color difference to prioritize crisp edges
+                const npi = idxOf(nx, ny) * 4;
+                const dr = pixels[npi] - pr;
+                const dg = pixels[npi + 1] - pg;
+                const db = pixels[npi + 2] - pb;
+                const dist2 = dr * dr + dg * dg + db * db;
+                if (dist2 >= colorDiff2Threshold) {
+                  // Early return for strong edges
+                  return true;
+                }
+              }
+            }
+          }
+          // Consider as edge if there is at least 1 differing/absent neighbor, stronger when >=2
+          return differCount >= 2;
+        };
+        // Build edges in row-major order (ignoring generation mode)
         const edges = [];
-        const fill = [];
-        for (const [x,y] of coords) {
-          (isEdge(x,y) ? edges : fill).push([x,y]);
+        edgeKeySet = new Set();
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            if (isEdgeSmart(x, y)) {
+              edges.push([x, y]);
+              edgeKeySet.add(idxOf(x, y));
+            }
+          }
         }
-        coords = [...edges, ...fill];
-        console.log(`✏️ Outline-first ordering applied: edges=${edges.length}, fill=${fill.length}`);
+        const fill = coords.filter(([x, y]) => !edgeKeySet.has(idxOf(x, y)));
+        phases = [edges, fill];
+        console.log(`✏️ Outline-first (two-phase) prepared: edges=${edges.length}, fill=${fill.length}`);
       }
 
-      outerLoop: for (const [x, y] of coords) {
+      let aborted = false;
+      for (let phaseIdx = 0; phaseIdx < phases.length && !aborted; phaseIdx++) {
+        const phaseCoords = phases[phaseIdx];
+        for (const [x, y] of phaseCoords) {
         if (state.stopFlag) {
           if (pixelBatch && pixelBatch.pixels.length > 0) {
             console.log(
@@ -7000,8 +7038,8 @@
           }
           state.lastPosition = { x, y };
           updateUI('paintingPaused', 'warning', { x, y });
-          // noinspection UnnecessaryLabelOnBreakStatementJS
-          break outerLoop;
+          aborted = true;
+          break;
         }
 
         const targetPixelInfo = checkPixelEligibility(x, y);
@@ -7069,8 +7107,8 @@
               console.error(`❌ Batch failed permanently after retries. Stopping painting.`);
               state.stopFlag = true;
               updateUI('paintingBatchFailed', 'error');
-              // noinspection UnnecessaryLabelOnBreakStatementJS
-              break outerLoop;
+              aborted = true;
+              break;
             }
           }
 
@@ -7125,8 +7163,8 @@
           console.error(`[DEBUG] Error checking existing pixel at (${pixelX}, ${pixelY}):`, e);
           updateUI('paintingPixelCheckFailed', 'error', { x: pixelX, y: pixelY });
           state.stopFlag = true;
-          // noinspection UnnecessaryLabelOnBreakStatementJS
-          break outerLoop;
+          aborted = true;
+          break;
         }
 
         pixelBatch.pixels.push({
@@ -7151,8 +7189,8 @@
             console.error(`❌ Batch failed permanently after retries. Stopping painting.`);
             state.stopFlag = true;
             updateUI('paintingBatchFailed', 'error');
-            // noinspection UnnecessaryLabelOnBreakStatementJS
-            break outerLoop;
+            aborted = true;
+            break;
           }
 
           pixelBatch.pixels = [];
@@ -7174,19 +7212,23 @@
         }
 
         if (state.stopFlag) {
-          // noinspection UnnecessaryLabelOnBreakStatementJS
-          break outerLoop;
+          aborted = true;
+          break;
         }
       }
-
-      if (pixelBatch && pixelBatch.pixels.length > 0 && !state.stopFlag) {
-        console.log(`🏁 Sending final batch with ${pixelBatch.pixels.length} pixels`);
-        const success = await flushPixelBatch(pixelBatch);
-        if (!success) {
+      // Flush between phases to ensure outline completes before fill
+      if (!aborted && pixelBatch && pixelBatch.pixels.length > 0) {
+        console.log(
+          `🏁 Phase ${phaseIdx + 1}/${phases.length} complete — sending remaining ${pixelBatch.pixels.length} pixels`
+        );
+        const ok = await flushPixelBatch(pixelBatch);
+        if (!ok) {
           console.warn(
-            `⚠️ Final batch failed with ${pixelBatch.pixels.length} pixels after all retries.`
+            `⚠️ Final phase batch failed with ${pixelBatch.pixels.length} pixels after all retries.`
           );
         }
+        pixelBatch.pixels = [];
+      }
       }
     } finally {
       if (window._chargesInterval) clearInterval(window._chargesInterval);
