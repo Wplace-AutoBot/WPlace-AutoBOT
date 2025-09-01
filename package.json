@@ -21,11 +21,7 @@
         "format": "prettier --ignore-path .gitignore --ignore-path .prettierignore --ignore-unknown --write .",
         "format:check": "prettier --ignore-path .gitignore --ignore-path .prettierignore --ignore-unknown --check .",
         "clean": "rm -rf dist/*",
-        "docs:api": "documentation build src/Auto-Image.js -f md -o docs/api/README.md",
-        "test": "vitest run",
-        "test:watch": "vitest",
-        "test:unit": "vitest run --coverage",
-        "analyze": "node -e \"const fs=require('fs'); const meta=JSON.parse(fs.readFileSync('dist/meta.json')); const inputs=Object.entries(meta.inputs).sort((a,b)=>b[1].bytes-a[1].bytes); console.log('Bundle Analysis:'); inputs.slice(0,10).forEach(([path,data])=>console.log((data.bytes/1024).toFixed(1)+'KB', path));\""
+        "docs:api": "documentation build src/Auto-Image.js -f md -o docs/api/README.md"
     },
     "devDependencies": {
         "@eslint/js": "^9.34.0",
