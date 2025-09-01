@@ -7349,7 +7349,7 @@
                     await handleCaptcha();
                     // Don't count token regeneration as a failed attempt
                     attempt--;
-                    continue;
+
                 } catch (e) {
                     console.error(`❌ Token regeneration failed on attempt ${attempt}:`, e);
                     updateUI('captchaFailed', 'error');
