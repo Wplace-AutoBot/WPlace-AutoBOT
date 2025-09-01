@@ -1,0 +1,48 @@
+name: Feature Request
+description: Have an idea you want added? Suggest it here!
+title: "[FEAT] "
+labels: ["enhancement"]
+assignees:
+  - Patricklumowa
+body:
+  - type: textarea
+    id: related-problem
+    attributes:
+      label: Is your feature request related to a problem? Please describe.
+      description: "Describe what the problem is."
+      placeholder: |
+        E.g. It's tedious to manually place pixels to recreate complex designs.
+        E.g. The bot currently can't detect areas that need fixing automatically.
+    validations:
+      required: false
+  - type: textarea
+    id: feature-solution
+    attributes:
+      label: Describe the solution you'd like
+      description: "Describe what you want to happen."
+      placeholder: |
+        E.g. Add an automatic pixel placement feature that matches a template image.
+        E.g. Implement prioritization of important areas first, like outlines or text.
+        E.g. Allow configuration of rate limits to avoid getting banned.
+    validations:
+      required: true
+  - type: textarea
+    id: feature-alternatives
+    attributes:
+      label: Describe alternatives you've considered
+      description: "Describe any alternative solutions or features you've considered."
+      placeholder: |
+        E.g. Manually placing pixels myself.
+        E.g. Using a different bot that doesn't support template images.
+        E.g. Semi-automatic scripts that still require manual correction.
+    validations:
+      required: false
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Add any other context or screenshots about the feature request here. If your feature is based on "something," please add any links relative to that "something" here.
+      placeholder: |
+        E.g. A sample template image the bot should replicate.
+        E.g. A video of the bot in action or a similar tool online.
+        E.g. Notes on color palette, priority zones, or timing restrictions.
