@@ -1,0 +1,100 @@
+name: Bug Report
+description: Found a bug? Report it here!
+title: "[BUG] "
+labels: ["bug"]
+assignees:
+  - Patricklumowa
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to fill out this template!
+        **The more information you provide, the easier it will be to identify and fix the bug.**
+        If you want a guide on filing bug reports effectively, you can [find it here](https://www.chiark.greenend.org.uk/~sgtatham/bugs.html).
+  - type: checkboxes
+    id: checked-bugs
+    attributes:
+      label: Have you checked to see if this issue has already been reported?
+      options:
+        - label: This bug has not been previously reported.
+    validations:
+      required: true
+  - type: textarea
+    id: describe-bug
+    attributes:
+      label: Describe The Bug
+      description: "Explain what goes wrong when using the bot."
+      placeholder: "E.g. The bot places pixels on the wrong coordinates or skips areas."
+    validations:
+      required: true
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+      description: "Describe what you expected to happen or why you think the current behavior is wrong."
+      placeholder: |
+        E.g. The bot should place pixels exactly according to the template image.
+        E.g. The bot should respect rate limits and avoid bans.
+    validations:
+      required: false
+  - type: textarea
+    id: things-tried
+    attributes:
+      label: Things You Tried
+      description: "List all attempts you made to fix or work around the bug."
+      placeholder: "E.g. Restarted the bot, tried a different template, or updated the pixel map."
+    validations:
+      required: false
+  - type: textarea
+    id: reproduce-bug
+    attributes:
+      label: Reproduce The Bug
+      description: "Explain exactly how to trigger the bug."
+      placeholder: |
+        E.g.
+        1. Launch the bot
+        2. Load a template image
+        3. Start pixel placement
+        4. Observe that some pixels are placed incorrectly or skipped
+    validations:
+      required: false
+  - type: textarea
+    id: error-message
+    attributes:
+      label: Error Message
+      description: "If there are error messages, add them here."
+      placeholder: "E.g. Error: Coordinates out of range!"
+    validations:
+      required: false
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: "Include screenshots or links to illustrate the problem."
+      placeholder: "E.g. Imgur link showing the pixel placement error"
+    validations:
+      required: false
+  - type: textarea
+    id: system-information
+    attributes:
+      label: System Information
+      description: "Provide details about your OS, bot version, and browser. Please fill this out!"
+      placeholder: |
+        OS: (E.g. Windows)
+        wplace-autoBOT Version: 2.0
+        Browser: Mozilla 142.0
+        You found an easter egg :3
+      value: |
+        OS: 
+        wplace-autoBOT Version: 
+        Browser:
+    validations:
+      required: true
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Information
+      description: "Add any other context about the problem here."
+      placeholder: "E.g. This issue started after the last update or happens only with large templates."
+    validations:
+      required: false
