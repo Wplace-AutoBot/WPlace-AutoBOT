@@ -544,10 +544,10 @@
     lastPosition: { x: 0, y: 0 },
     estimatedTime: 0,
     language: 'en',
-    paintingSpeed: CONFIG.PAINTING_SPEED.DEFAULT, // pixels  size
-    Mode: CONFIG._MODE, // "normal" or "random"
-    randomMin: CONFIG.RANDOM__RANGE.MIN, // Random range minimum
-    randomMax: CONFIG.RANDOM__RANGE.MAX, // Random range maximum
+    paintingSpeed: CONFIG.PAINTING_SPEED.DEFAULT, // pixels batch size
+    batchMode: CONFIG.BATCH_MODE, // "normal" or "random"
+    randomBatchMin: CONFIG.RANDOM_BATCH_RANGE.MIN, // Random range minimum
+    randomBatchMax: CONFIG.RANDOM_BATCH_RANGE.MAX, // Random range maximum
     cooldownChargeThreshold: CONFIG.COOLDOWN_CHARGE_THRESHOLD,
     chargesThresholdInterval: null,
     tokenSource: CONFIG.TOKEN_SOURCE, // "generator" or "manual"
