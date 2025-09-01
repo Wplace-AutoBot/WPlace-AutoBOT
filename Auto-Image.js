@@ -7030,7 +7030,16 @@
           }
         }
         edgeKeySet = edgesSet;
-        const fill = coords.filter(([x, y]) => !edgeKeySet.has(idxOf(x, y)));
+        // Build fill strictly in row-major order, ignoring coordinate settings
+        const fill = [];
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            const k = idxOf(x, y);
+            if (edgeKeySet.has(k)) continue; // skip outline
+            if (getMappedId(x, y) < 0) continue; // skip ineligible
+            fill.push([x, y]);
+          }
+        }
         phases = [edgesOrdered, fill];
         console.log(
           `✏️ Outline-first (two-phase) prepared: edges=${edgesOrdered.length}, fill=${fill.length}`
