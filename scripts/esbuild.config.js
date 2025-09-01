@@ -1,6 +1,6 @@
 import esbuild from 'esbuild';
-import fs from 'fs.js';
-import path from 'path.js';
+import fs from 'fs';
+import path from 'path';
 
 // Plugin to embed CSS files as template literals
 const cssEmbedPlugin = {
