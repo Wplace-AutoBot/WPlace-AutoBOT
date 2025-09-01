@@ -13,7 +13,7 @@ const envPath = path.join(__dirname, '..', '.env');
 if (fs.existsSync(envPath)) {
     const envContent = fs.readFileSync(envPath, 'utf8');
     const envLines = envContent.split('\n');
-    
+
     for (const line of envLines) {
         const trimmedLine = line.trim();
         if (trimmedLine && !trimmedLine.startsWith('#')) {
@@ -35,22 +35,22 @@ if (!process.env.CLOUDFLARED_TOKEN) {
 console.log('🚀 Starting Cloudflare tunnel with token from .env...');
 
 // Spawn cloudflared process
-const cloudflared = spawn('cloudflared', [
-    'tunnel',
-    'run',
-    '--token', process.env.CLOUDFLARED_TOKEN
-], {
-    stdio: 'inherit',
-    env: { ...process.env, TUNNEL_URL: 'http://localhost:5173' }
-});
+const cloudflared = spawn(
+    'cloudflared',
+    ['tunnel', 'run', '--token', process.env.CLOUDFLARED_TOKEN],
+    {
+        stdio: 'inherit',
+        env: { ...process.env, TUNNEL_URL: 'http://localhost:5173' },
+    }
+);
 
 // Handle process events
-cloudflared.on('error', (error) => {
+cloudflared.on('error', error => {
     console.error('❌ Failed to start cloudflared:', error.message);
     process.exit(1);
 });
 
-cloudflared.on('close', (code) => {
+cloudflared.on('close', code => {
     console.log(`📤 Cloudflared process exited with code ${code}`);
     process.exit(code);
 });
