@@ -1,0 +1,74 @@
+name: CI
+
+on:
+    push:
+        branches: [main, hotfix/**, feature/**]
+    pull_request:
+        branches: [main]
+
+jobs:
+    format-check:
+        runs-on: ubuntu-latest
+        name: Code formatting check
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '18'
+                  cache: 'npm'
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Check code formatting
+              run: npm run format:check
+
+    build:
+        runs-on: ubuntu-latest
+        name: Build and validate
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '18'
+                  cache: 'npm'
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Build all targets
+              run: npm run build:all
+
+            - name: Validate build outputs
+              run: |
+                  # Check that all expected files were created
+                  test -f dist/auto-image.standalone.js || (echo "Missing standalone build" && exit 1)
+                  test -f dist/auto-image.userscript.js || (echo "Missing userscript build" && exit 1)
+                  test -f dist/auto-image.bookmarklet.js || (echo "Missing bookmarklet build" && exit 1)
+                  test -f dist/auto-image.bookmarklet.txt || (echo "Missing bookmarklet txt" && exit 1)
+
+                  # Verify files are not empty
+                  test -s dist/auto-image.standalone.js || (echo "Standalone build is empty" && exit 1)
+                  test -s dist/auto-image.userscript.js || (echo "Userscript build is empty" && exit 1)
+                  test -s dist/auto-image.bookmarklet.js || (echo "Bookmarklet build is empty" && exit 1)
+
+                  # Check that embedded assets are present in builds (no external URLs)
+                  ! grep -q "https://" dist/auto-image.standalone.js || (echo "Found external URLs in standalone build" && exit 1)
+                  ! grep -q "http://" dist/auto-image.standalone.js || (echo "Found external URLs in standalone build" && exit 1)
+
+                  echo "✅ All build outputs validated successfully"
+
+            - name: Upload build artifacts
+              uses: actions/upload-artifact@v4
+              with:
+                  name: build-outputs
+                  path: dist/
+                  retention-days: 30
