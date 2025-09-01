@@ -3140,8 +3140,8 @@ function applyTheme() {
               <option value="pt" ${state.language === 'pt' ? 'selected' : ''} class="wplace-settings-option">🇧🇷 Português</option>
               <option value="fr" ${state.language === 'fr' ? 'selected' : ''} class="wplace-settings-option">🇫🇷 Français</option>
               <option value="tr" ${state.language === 'tr' ? 'selected' : ''} class="wplace-settings-option">🇹🇷 Türkçe</option>
-              <option value="zh" ${state.language === 'zh' ? 'selected' : ''} class="wplace-settings-option">🇨🇳 简体中文</option>
-              <option value="zh-tw" ${state.language === 'zh-tw' ? 'selected' : ''} class="wplace-settings-option">🇹🇼 繁體中文</option>
+              <option value="zh-CN" ${state.language === 'zh-CN' ? 'selected' : ''} class="wplace-settings-option">🇨🇳 简体中文</option>
+              <option value="zh-TW" ${state.language === 'zh-TW' ? 'selected' : ''} class="wplace-settings-option">🇹🇼 繁體中文</option>
               <option value="ja" ${state.language === 'ja' ? 'selected' : ''} class="wplace-settings-option">🇯🇵 日本語</option>
               <option value="ko" ${state.language === 'ko' ? 'selected' : ''} class="wplace-settings-option">🇰🇷 한국어</option>
               </select>
