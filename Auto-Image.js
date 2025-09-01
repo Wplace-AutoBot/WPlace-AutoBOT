@@ -16,7 +16,7 @@
       MIN: 3, // Random range minimum
       MAX: 20, // Random range maximum
     },
-    PAINTING_SPEED_ENABLED: false, // On by default
+    PAINTING_SPEED_ENABLED: true, // On by default
     AUTO_CAPTCHA_ENABLED: true, // Turnstile generator enabled by default
     TOKEN_SOURCE: 'generator', // "generator", "manual", or "hybrid" - default to generator
     COOLDOWN_CHARGE_THRESHOLD: 1, // Default wait threshold
@@ -659,7 +659,7 @@
       return `${width}x${height}_${px},${py}_${rx},${ry}_${state.blueMarbleEnabled}_${state.overlayOpacity}`;
     }
 
-    // --- OVERLAY UPDATE: Optimized chunking with caching and  processing ---
+    // --- OVERLAY UPDATE: Optimized chunking with caching and batch processing ---
     async processImageIntoChunks() {
       if (!this.imageBitmap || !this.startCoords) return;
 
@@ -706,7 +706,7 @@
       const totalTiles = (endTileX - startTileX + 1) * (endTileY - startTileY + 1);
       console.log(`🔄 Processing ${totalTiles} overlay tiles...`);
 
-      // Process tiles in es to avoid blocking the main thread
+      // Process tiles in batches to avoid blocking the main thread
       const batchSize = 4; // Process 4 tiles at a time
       const tilesToProcess = [];
 
