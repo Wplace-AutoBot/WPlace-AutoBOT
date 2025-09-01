@@ -1216,7 +1216,8 @@
       const url = args[0] instanceof Request ? args[0].url : args[0];
 
       if (typeof url === 'string') {
-  if (url.includes(`${CONFIG.URLS.BACKEND_BASE}/s0/pixel/`)) {
+        // Note: Avoid referencing userscript variables here (runs in page context)
+        if (url.includes('/s0/pixel/')) {
           try {
             const payload = JSON.parse(args[1].body);
             if (payload.t) {
