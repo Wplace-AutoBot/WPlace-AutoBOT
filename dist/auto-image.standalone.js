@@ -4509,7 +4509,7 @@
       /**
        * Get the color of a specific pixel from a cached tile.
        * @param {number} tileX - Tile X coordinate in region space
-       * @param {number} tileY - Tile Y coordinate in region space  
+       * @param {number} tileY - Tile Y coordinate in region space
        * @param {number} pixelX - Pixel X coordinate within the tile
        * @param {number} pixelY - Pixel Y coordinate within the tile
        * @returns {Promise<Array<number>|null>} RGBA color array [r,g,b,a] or null if transparent/unavailable
