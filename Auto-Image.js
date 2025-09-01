@@ -308,7 +308,7 @@
     }
 
     // Load translations from CDN
-    const url = `https://skalsech.github.io/WPlace-AutoBOT/feat-external-lang/lang/${language}.json`;
+    const url = `https://wplace-autobot.github.io/WPlace-AutoBOT/main/lang/${language}.json`;
     const maxRetries = 3;
     const baseDelay = 1000; // 1 second
 
@@ -3338,7 +3338,7 @@
     }
 
     appendLinkOnce(
-      'https://skalsech.github.io/WPlace-AutoBOT/feat-external-lang/auto-image-styles.css',
+      ' https://wplace-autobot.github.io/WPlace-AutoBOT/main/auto-image-styles.css',
       { 'data-wplace-theme': 'true' }
     );
 
