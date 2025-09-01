@@ -5005,15 +5005,12 @@
         return;
       }
 
-      const { current, max, cooldownMs, startTime } = state.fullChargeData;
+      const { current, max, cooldownMs, startTime, spentSinceShot } = state.fullChargeData;
       const elapsed = Date.now() - startTime;
-      const remainingMs = Math.max(0, (max - current) * cooldownMs - elapsed);
 
-      const timeText = Utils.msToTimeText(remainingMs);
-
-      // total charges including elapsed time
+      // total charges including elapsed time and spent during painting since snapshot
       const chargesGained = elapsed / cooldownMs;
-      const rawCharges = current + chargesGained;
+      const rawCharges = current + chargesGained - spentSinceShot;
       const cappedCharges = Math.min(rawCharges, max);
 
       // rounding with 0.95 threshold
@@ -5025,7 +5022,10 @@
         displayCharges = Math.floor(cappedCharges);
       }
 
-      state.currentCharges = displayCharges;
+      state.currentCharges = Math.max(0, displayCharges);
+      const remainingMs = Math.max(0, (max - cappedCharges) * cooldownMs);
+      const timeText = Utils.msToTimeText(remainingMs);
+
       const chargesEl = document.getElementById('wplace-stat-charges-value');
       const secondsInMinute = Math.ceil(remainingMs / 1000) % 60;
       if (chargesEl && (secondsInMinute === 0 || secondsInMinute === 30)) {
@@ -5043,20 +5043,34 @@
     }
 
     updateStats = async (isManualRefresh = false) => {
-      const { charges, max, cooldown } = await WPlaceService.getCharges();
-      state.currentCharges = Math.floor(charges);
-      state.cooldown = cooldown;
-      state.maxCharges = Math.floor(max) > 1 ? Math.floor(max) : state.maxCharges;
+      const isForcedRefresh = isManualRefresh;
+      const isFirstCheck = !state.fullChargeData?.startTime;
 
-      state.fullChargeData = {
-        current: charges,
-        max: max,
-        cooldownMs: cooldown,
-        startTime: Date.now(),
-      };
-      // Evaluate notifications every time we refresh server-side charges
-      NotificationManager.maybeNotifyChargesReached();
+      const minUpdateInterval = 60_000;
+      const maxUpdateInterval = 90_000;
+      const randomUpdateThreshold =
+        minUpdateInterval + Math.random() * (maxUpdateInterval - minUpdateInterval);
+      const timeSinceLastUpdate = Date.now() - (state.fullChargeData?.startTime || 0);
+      const isTimeToUpdate = timeSinceLastUpdate >= randomUpdateThreshold;
 
+      const shouldCallApi = isForcedRefresh || isFirstCheck || isTimeToUpdate;
+
+      if (shouldCallApi) {
+        const { charges, max, cooldown } = await WPlaceService.getCharges();
+        state.currentCharges = Math.floor(charges);
+        state.cooldown = cooldown;
+        state.maxCharges = Math.floor(max) > 1 ? Math.floor(max) : state.maxCharges;
+
+        state.fullChargeData = {
+          current: charges,
+          max: max,
+          cooldownMs: cooldown,
+          startTime: Date.now(),
+          spentSinceShot: 0,
+        };
+        // Evaluate notifications every time we refresh server-side charges
+        NotificationManager.maybeNotifyChargesReached();
+      }
       if (state.fullChargeInterval) clearInterval(state.fullChargeInterval);
       state.fullChargeInterval = setInterval(updateFullChargeDisplay, 1000);
       updateFullChargeDisplay();
@@ -6784,7 +6798,10 @@
         state.paintedPixels++;
         Utils.markPixelPainted(p.x, p.y, pixelBatch.regionX, pixelBatch.regionY);
       });
-      state.currentCharges -= batchSize;
+      state.fullChargeData = {
+        ...state.fullChargeData,
+        spentSinceShot: state.fullChargeData.spentSinceShot + batchSize,
+      };
       updateStats();
       updateUI('paintingProgress', 'default', {
         painted: state.paintedPixels,
