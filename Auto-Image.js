@@ -4998,9 +4998,10 @@
       }
     };
 
-    function updateFullChargeDisplay(intervalMs) {
+    function updateChargeStatsDisplay(intervalMs) {
+      const currentChargesEl = document.getElementById('wplace-stat-charges-value');
       const fullChargeEl = document.getElementById('wplace-stat-fullcharge-value');
-      if (!fullChargeEl) return;
+      if (!fullChargeEl && !currentChargesEl) return;
       if (!state.fullChargeData) {
         fullChargeEl.textContent = '--:--:--';
         return;
@@ -5025,14 +5026,12 @@
 
       state.displayCharges = Math.max(0, displayCharges);
       state.preciseCurrentCharges = cappedCharges;
-      const remainingMs = getMsToTargetCharges(cappedCharges, max, state.cooldown, intervalMs);
 
+      const remainingMs = getMsToTargetCharges(cappedCharges, max, state.cooldown, intervalMs);
       const timeText = Utils.msToTimeText(remainingMs);
 
-      const chargesEl = document.getElementById('wplace-stat-charges-value');
-      const secondsInMinute = Math.ceil(remainingMs / 1000) % 60;
-      if (chargesEl && (secondsInMinute === 0 || secondsInMinute === 30)) {
-        chargesEl.innerHTML = `<span">${state.displayCharges} / ${state.maxCharges}</span>`;
+      if (currentChargesEl) {
+        currentChargesEl.innerHTML = `${state.displayCharges} / ${state.maxCharges}`;
       }
 
       if (
@@ -5043,14 +5042,14 @@
         updateChargesThresholdUI(intervalMs);
       }
 
-      if (state.displayCharges >= max) {
-        fullChargeEl.innerHTML = `<span style="color:#10b981;">FULL</span>`;
-        clearInterval(state.fullChargeInterval);
-        state.fullChargeInterval = null;
-      } else {
-        fullChargeEl.innerHTML = `
-          <span style="color:#f59e0b;">${timeText}</span>
-        `;
+      if (fullChargeEl) {
+        if (state.displayCharges >= max) {
+          fullChargeEl.innerHTML = `<span style="color:#10b981;">FULL</span>`;
+        } else {
+          fullChargeEl.innerHTML = `
+            <span style="color:#f59e0b;">${timeText}</span>
+          `;
+        }
       }
     }
 
@@ -5084,10 +5083,16 @@
         // Evaluate notifications every time we refresh server-side charges
         NotificationManager.maybeNotifyChargesReached();
       }
-      if (state.fullChargeInterval) clearInterval(state.fullChargeInterval);
+
+      if (state.fullChargeInterval) {
+        clearInterval(state.fullChargeInterval);
+        state.fullChargeInterval = null;
+      }
       const intervalMs = 1000;
-      state.fullChargeInterval = setInterval(() => updateFullChargeDisplay(intervalMs), intervalMs);
-      updateFullChargeDisplay(intervalMs);
+      state.fullChargeInterval = setInterval(
+        () => updateChargeStatsDisplay(intervalMs),
+        intervalMs
+      );
 
       if (cooldownSlider.max !== state.maxCharges) {
         cooldownSlider.max = state.maxCharges;
@@ -5160,12 +5165,6 @@
           .join('');
       }
 
-      let fullChargeValue = '';
-      const fullChargeEl = document.getElementById('wplace-stat-fullcharge-value');
-      if (fullChargeEl) {
-        fullChargeValue = fullChargeEl.innerHTML;
-      }
-
       statsArea.innerHTML = `
             ${imageStatsHTML}
             <div class="wplace-stat-item">
@@ -5180,9 +5179,7 @@
               <div class="wplace-stat-label">
                 <i class="fas fa-battery-half"></i> ${Utils.t('fullChargeIn')}
               </div>
-              <div class="wplace-stat-value" id="wplace-stat-fullcharge-value">
-                ${fullChargeValue || '--:--:--'}
-              </div>
+              <div class="wplace-stat-value" id="wplace-stat-fullcharge-value">--:--:--</div>
             </div>
             ${
               state.colorsChecked
@@ -5200,6 +5197,9 @@
                 : ''
             }
         `;
+
+      // should be after statsArea.innerHTML = '...'. todo make full stats ui update partial
+      updateChargeStatsDisplay(intervalMs);
     };
 
     updateDataButtons = () => {
@@ -6608,7 +6608,7 @@
     const threshold = state.cooldownChargeThreshold;
     const remainingMs = getMsToTargetCharges(
       state.preciseCurrentCharges,
-      state.cooldownChargeThreshold,
+      threshold,
       state.cooldown,
       intervalMs
     );
