@@ -8,9 +8,9 @@
 /* ========================= */
 
 /* Import theme files - classic is default */
-@import url('https://skalsech.github.io/WPlace-AutoBOT/feat-external-lang/themes/classic.css');
-@import url('https://skalsech.github.io/WPlace-AutoBOT/feat-external-lang/themes/classic-light.css');
-@import url('https://skalsech.github.io/WPlace-AutoBOT/feat-external-lang/themes/neon.css');
+@import url('https://wplace-autobot.github.io/WPlace-AutoBOT/main/themes/classic.css');
+@import url('https://wplace-autobot.github.io/WPlace-AutoBOT/main/themes/classic-light.css');
+@import url('https://wplace-autobot.github.io/WPlace-AutoBOT/main/themes/neon.css');
 
 /* Default :root CSS variables for 100% classic theme compliance */
 /* These ensure the bot works perfectly even if theme files fail to load */
