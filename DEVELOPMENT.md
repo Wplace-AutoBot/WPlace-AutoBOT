@@ -19,6 +19,7 @@ to improve this guide.
 - Code quality and formatting
 - Documentation generation
 - CI/CD overview
+- Testing and Quality Assurance
 - Testing recipes
 - Troubleshooting
 - FAQ
@@ -341,6 +342,120 @@ npm run docs:api
 - Output: docs/api/README.md
 
 Author high-value JSDoc for exported functions/classes to keep docs useful.
+
+## Testing and Quality Assurance
+
+The project includes a comprehensive testing infrastructure with unit tests, bundle analysis, and performance monitoring.
+
+### Unit Tests (Vitest)
+
+Fast, reliable unit tests for extracted utility functions:
+
+```bash
+# Run all tests
+npm run test
+
+# Run tests with coverage report
+npm run test:unit
+
+# Run tests in watch mode for development
+npm run test:watch
+```
+
+**Test Coverage:**
+- **108 total tests** across 5 test suites
+- **97%+ coverage** on utility functions
+- **Color processing**: RGB↔LAB conversion, color distance, palette matching
+- **Image processing**: Pixel manipulation, transparency, effects, resizing
+- **Coordinate system**: Region/absolute mapping, boundary validation
+- **Configuration**: Validation, sanitization, error handling
+- **Integration**: Cross-module workflows and real-world scenarios
+
+**Test Structure:**
+```
+tests/
+├── color.test.js        # Color conversion and matching utilities
+├── image.test.js        # Image processing and pixel manipulation
+├── coordinates.test.js  # Coordinate conversion and validation
+├── config.test.js       # Configuration validation and sanitization
+└── integration.test.js  # Cross-module integration tests
+
+src/lib/                 # Extracted pure functions (testable utilities)
+├── color.js            # Color space conversion and matching
+├── image.js            # Image processing and pixel utilities
+├── coordinates.js      # Coordinate conversion and region mapping
+└── config.js           # Configuration validation and defaults
+```
+
+
+### Bundle Analysis
+
+Monitor bundle size and composition to prevent regressions:
+
+```bash
+# Build project first to generate metafile
+npm run build
+
+# Analyze bundle composition
+npm run analyze
+```
+
+**Analysis Features:**
+- **Bundle size tracking**: Monitors file sizes across builds
+- **Dependency analysis**: Shows largest contributors to bundle size
+- **Performance metrics**: Build time and size history in `dist/build-stats.json`
+- **Regression detection**: Compare sizes between builds
+
+### Performance Monitoring
+
+Automatic build performance tracking:
+
+**Metrics Collected:**
+- **Build times**: Milliseconds per target (userscript, standalone, bookmarklet)
+- **Bundle sizes**: Final file sizes for each target
+- **Historical data**: `dist/build-stats.json` tracks metrics over time
+- **Size analysis**: Top contributors to bundle size
+
+**Example Build Output:**
+```bash
+📦 Building standalone...
+✨ Built standalone in 104ms
+📊 Bundle size: 492.90 KB
+```
+
+**Current Bundle Sizes:**
+- **Standalone**: 492.90 KB (IIFE format for console injection)
+- **Userscript**: 351.86 KB (with Tampermonkey/Violentmonkey headers)
+- **Bookmarklet**: 351.41 KB (wrapped for bookmark usage)
+
+### Testing Best Practices
+
+**During Development:**
+1. Run `npm run test:watch` for immediate feedback
+2. Maintain test coverage when adding new utilities
+3. Use integration tests for complex workflows
+4. Test edge cases and error conditions
+
+**Before Commits:**
+1. Run full test suite: `npm run test:unit`
+2. Check bundle size: `npm run analyze`
+3. Verify formatting: `npm run format:check`
+4. Fix linting issues: `npm run lint:fix`
+
+**For New Features:**
+1. Extract pure functions to `src/lib/` for testability
+2. Write comprehensive unit tests for new utilities
+3. Add integration tests for complex interactions
+4. Document functions with JSDoc for auto-generated docs
+
+### Continuous Integration
+
+The CI pipeline automatically:
+- **Runs all unit tests** with coverage reporting
+- **Validates build outputs** for all targets
+- **Checks bundle integrity** (no external URLs in standalone)
+- **Enforces code quality** with ESLint and Prettier
+- **Tracks performance metrics** across builds
 
 ## Testing recipes
 
