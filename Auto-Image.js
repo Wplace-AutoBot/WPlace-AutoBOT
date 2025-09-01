@@ -11,7 +11,7 @@
       MAX: 1000, // Maximum 1000 pixels batch size
       DEFAULT: 5, // Default 5 pixels batch size
     },
-    BATCH_MODE: 'normal', // "normal" or "random" - default to normal
+  BATCH_MODE: 'normal', // "normal", "random", or "outline-first" - default to normal
     RANDOM_BATCH_RANGE: {
       MIN: 3, // Random range minimum
       MAX: 20, // Random range maximum
@@ -26,6 +26,17 @@
       ON_CHARGES_REACHED: true,
       ONLY_WHEN_UNFOCUSED: true,
       REPEAT_MINUTES: 5, // repeat reminder while threshold condition holds
+    },
+    // Centralized external URLs
+    URLS: {
+      CDN_BASE: 'https://wplace-autobot.github.io/WPlace-AutoBOT/main',
+      LANG_DIR: 'lang',
+      STYLESHEET: 'auto-image-styles.css',
+      FONTAWESOME_CSS: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
+      GOOGLE_FONTS_PRESS_START_2P:
+        'https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap',
+      BACKEND_BASE: 'https://backend.wplace.live',
+      TURNSTILE_API: 'https://challenges.cloudflare.com/turnstile/v0/api.js',
     },
     OVERLAY: {
       OPACITY_DEFAULT: 0.2,
@@ -191,7 +202,7 @@
         },
       },
     },
-    currentTheme: 'Classic Autobot',
+  currentTheme: 'Classic Autobot',
     PAINT_UNAVAILABLE: true,
     COORDINATE_MODE: 'rows',
     COORDINATE_DIRECTION: 'bottom-left',
@@ -307,8 +318,8 @@
       return loadedTranslations[language];
     }
 
-    // Load translations from CDN
-    const url = `https://wplace-autobot.github.io/WPlace-AutoBOT/main/lang/${language}.json`;
+  // Load translations from CDN
+  const url = `${CONFIG.URLS.CDN_BASE}/${CONFIG.URLS.LANG_DIR}/${language}.json`;
     const maxRetries = 3;
     const baseDelay = 1000; // 1 second
 
@@ -475,18 +486,12 @@
   // Emergency fallback TEXT (minimal)
   const FALLBACK_TEXT = {
     en: {
-      title: 'WPlace Auto-Image',
-      toggleOverlay: 'Toggle Overlay',
-      scanColors: 'Scan Colors',
-      uploadImage: 'Upload Image',
-      resizeImage: 'Resize Image',
-      selectPosition: 'Select Position',
-      startPainting: 'Start Painting',
-      stopPainting: 'Stop Painting',
-      progress: 'Progress',
-      pixels: 'Pixels',
       charges: 'Charges',
       initMessage: "Click 'Upload Image' to begin",
+      batchModeSet: 'Batch mode updated: {mode}',
+      randomRange: 'Random range',
+      normalFixedSize: 'Normal fixed size',
+      tokenCapturedSuccess: 'Token captured successfully',
     },
   };
 
@@ -545,7 +550,7 @@
     estimatedTime: 0,
     language: 'en',
     paintingSpeed: CONFIG.PAINTING_SPEED.DEFAULT, // pixels batch size
-    batchMode: CONFIG.BATCH_MODE, // "normal" or "random"
+  batchMode: CONFIG.BATCH_MODE, // "normal", "random", or "outline-first"
     randomBatchMin: CONFIG.RANDOM_BATCH_RANGE.MIN, // Random range minimum
     randomBatchMax: CONFIG.RANDOM_BATCH_RANGE.MAX, // Random range maximum
     cooldownChargeThreshold: CONFIG.COOLDOWN_CHARGE_THRESHOLD,
@@ -1211,7 +1216,7 @@
       const url = args[0] instanceof Request ? args[0].url : args[0];
 
       if (typeof url === 'string') {
-        if (url.includes('https://backend.wplace.live/s0/pixel/')) {
+  if (url.includes(`${CONFIG.URLS.BACKEND_BASE}/s0/pixel/`)) {
           try {
             const payload = JSON.parse(args[1].body);
             if (payload.t) {
@@ -1286,7 +1291,7 @@
 
   async function detectLanguage() {
     try {
-      const response = await fetch('https://backend.wplace.live/me', {
+  const response = await fetch(`${CONFIG.URLS.BACKEND_BASE}/me`, {
         credentials: 'include',
       });
       const data = await response.json();
@@ -1377,7 +1382,7 @@
         // Avoid adding the script twice
         if (
           document.querySelector(
-            'script[src^="https://challenges.cloudflare.com/turnstile/v0/api.js"]'
+            `script[src^="${CONFIG.URLS.TURNSTILE_API}"]`
           )
         ) {
           const checkReady = () => {
@@ -1392,7 +1397,7 @@
         }
 
         const script = document.createElement('script');
-        script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+  script.src = `${CONFIG.URLS.TURNSTILE_API}?render=explicit`;
         script.async = true;
         script.defer = true;
         script.onload = () => {
@@ -2776,7 +2781,7 @@
           colors: [color],
           t: turnstileToken,
         };
-        const res = await fetch(`https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`, {
+  const res = await fetch(`${CONFIG.URLS.BACKEND_BASE}/s0/pixel/${regionX}/${regionY}`, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
           credentials: 'include',
@@ -2806,7 +2811,7 @@
       };
 
       try {
-        const res = await fetch('https://backend.wplace.live/me', {
+  const res = await fetch(`${CONFIG.URLS.BACKEND_BASE}/me`, {
           credentials: 'include',
         });
 
@@ -3331,16 +3336,13 @@
       document.head.appendChild(link);
     }
 
-    appendLinkOnce('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+  appendLinkOnce(CONFIG.URLS.FONTAWESOME_CSS);
 
     if (theme.fontFamily.includes('Press Start 2P')) {
-      appendLinkOnce('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+  appendLinkOnce(CONFIG.URLS.GOOGLE_FONTS_PRESS_START_2P);
     }
 
-    appendLinkOnce(
-      'https://wplace-autobot.github.io/WPlace-AutoBOT/main/auto-image-styles.css',
-      { 'data-wplace-theme': 'true' }
-    );
+  appendLinkOnce(`${CONFIG.URLS.CDN_BASE}/${CONFIG.URLS.STYLESHEET}`, { 'data-wplace-theme': 'true' });
 
     const container = document.createElement('div');
     container.id = 'wplace-image-bot-container';
@@ -3722,6 +3724,7 @@
             <select id="batchModeSelect" class="wplace-settings-select">
               <option value="normal" class="wplace-settings-option">📦 Normal (Fixed Size)</option>
               <option value="random" class="wplace-settings-option">🎲 Random (Range)</option>
+              <option value="outline-first" class="wplace-settings-option">🖊️ Outline First</option>
             </select>
           </div>
           
@@ -4527,6 +4530,9 @@
             if (e.target.value === 'random') {
               normalBatchControls.style.display = 'none';
               randomBatchControls.style.display = 'block';
+            } else if (e.target.value === 'outline-first') {
+              normalBatchControls.style.display = 'block';
+              randomBatchControls.style.display = 'none';
             } else {
               normalBatchControls.style.display = 'block';
               randomBatchControls.style.display = 'none';
@@ -4535,13 +4541,13 @@
 
           saveBotSettings();
           console.log(`📦 Batch mode changed to: ${state.batchMode}`);
-          Utils.showAlert(
-            Utils.t('batchModeSet', {
-              mode:
-                state.batchMode === 'random' ? Utils.t('randomRange') : Utils.t('normalFixedSize'),
-            }),
-            'success'
-          );
+          const modeText =
+            state.batchMode === 'random'
+              ? Utils.t('randomRange')
+              : state.batchMode === 'outline-first'
+              ? 'Outline First'
+              : Utils.t('normalFixedSize');
+          Utils.showAlert(Utils.t('batchModeSet', { mode: modeText }), 'success');
         });
       }
 
@@ -6443,7 +6449,7 @@
         const tempFetch = async (url, options) => {
           if (
             typeof url === 'string' &&
-            url.includes('https://backend.wplace.live/s0/pixel/') &&
+            url.includes(`${CONFIG.URLS.BACKEND_BASE}/s0/pixel/`) &&
             options?.method?.toUpperCase() === 'POST'
           ) {
             try {
@@ -6909,7 +6915,7 @@
     }
 
     try {
-      const coords = generateCoordinates(
+      let coords = generateCoordinates(
         width,
         height,
         state.coordinateMode,
@@ -6918,6 +6924,42 @@
         state.blockWidth,
         state.blockHeight
       );
+
+      // Outline-first: prioritize edge pixels where neighbor colors differ from target
+      if (state.batchMode === 'outline-first') {
+        const isEdge = (x, y) => {
+          const idx = (y * width + x) * 4;
+          const r = pixels[idx], g = pixels[idx + 1], b = pixels[idx + 2], a = pixels[idx + 3];
+          if (!state.paintTransparentPixels && a < (state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD)) return false;
+          // Target mapped color id at (x,y)
+          const targetRgb = Utils.isWhitePixel(r, g, b)
+            ? [255, 255, 255]
+            : Utils.findClosestPaletteColor(r, g, b, state.activeColorPalette);
+          const targetId = Utils.resolveColor(targetRgb, state.availableColors, !state.paintUnavailablePixels).id;
+          // Check 4-neighbors
+          const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
+          for (const [dx,dy] of dirs) {
+            const nx = x + dx, ny = y + dy;
+            if (nx < 0 || nx >= width || ny < 0 || ny >= height) continue;
+            const nIdx = (ny * width + nx) * 4;
+            const nr = pixels[nIdx], ng = pixels[nIdx + 1], nb = pixels[nIdx + 2], na = pixels[nIdx + 3];
+            if (!state.paintTransparentPixels && na < (state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD)) continue;
+            const nTargetRgb = Utils.isWhitePixel(nr, ng, nb)
+              ? [255, 255, 255]
+              : Utils.findClosestPaletteColor(nr, ng, nb, state.activeColorPalette);
+            const nTargetId = Utils.resolveColor(nTargetRgb, state.availableColors, !state.paintUnavailablePixels).id;
+            if (nTargetId !== targetId) return true;
+          }
+          return false;
+        };
+        const edges = [];
+        const fill = [];
+        for (const [x,y] of coords) {
+          (isEdge(x,y) ? edges : fill).push([x,y]);
+        }
+        coords = [...edges, ...fill];
+        console.log(`✏️ Outline-first ordering applied: edges=${edges.length}, fill=${fill.length}`);
+      }
 
       outerLoop: for (const [x, y] of coords) {
         if (state.stopFlag) {
@@ -7259,7 +7301,7 @@
     try {
       const payload = { coords, colors, t: token };
 
-      const res = await fetch(`https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`, {
+  const res = await fetch(`${CONFIG.URLS.BACKEND_BASE}/s0/pixel/${regionX}/${regionY}`, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
         credentials: 'include',
@@ -7282,7 +7324,7 @@
           // Retry the request with new token
           const retryPayload = { coords, colors, t: token };
           const retryRes = await fetch(
-            `https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`,
+            `${CONFIG.URLS.BACKEND_BASE}/s0/pixel/${regionX}/${regionY}`,
             {
               method: 'POST',
               headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
@@ -7324,7 +7366,7 @@
       const settings = {
         paintingSpeed: state.paintingSpeed,
         paintingSpeedEnabled: document.getElementById('enableSpeedToggle')?.checked,
-        batchMode: state.batchMode, // "normal" or "random"
+  batchMode: state.batchMode, // "normal", "random", or "outline-first"
         randomBatchMin: state.randomBatchMin,
         randomBatchMax: state.randomBatchMax,
         cooldownChargeThreshold: state.cooldownChargeThreshold,
@@ -7492,6 +7534,9 @@
         if (state.batchMode === 'random') {
           normalBatchControls.style.display = 'none';
           randomBatchControls.style.display = 'block';
+        } else if (state.batchMode === 'outline-first') {
+          normalBatchControls.style.display = 'block';
+          randomBatchControls.style.display = 'none';
         } else {
           normalBatchControls.style.display = 'block';
           randomBatchControls.style.display = 'none';
