@@ -181,9 +181,56 @@ const targets = {
 
 // Helper to build or watch a single target
 async function buildOrWatchOne(name, config) {
+    const startTime = Date.now();
+
     if (!watch) {
         console.log(`📦 Building ${name}...`);
-        await esbuild.build(config);
+        const result = await esbuild.build({ ...config, metafile: true });
+        const elapsed = Date.now() - startTime;
+
+        // Log build metrics
+        console.log(`✨ Built ${name} in ${elapsed}ms`);
+
+        // Log bundle size
+        if (config.outfile && fs.existsSync(config.outfile)) {
+            const stats = fs.statSync(config.outfile);
+            const sizeKB = (stats.size / 1024).toFixed(2);
+            console.log(`📊 Bundle size: ${sizeKB} KB`);
+        }
+
+        // Save metafile for analysis
+        if (result.metafile) {
+            const metaPath = './dist/meta.json';
+            fs.writeFileSync(
+                metaPath,
+                JSON.stringify(result.metafile, null, 2)
+            );
+        }
+
+        // Save build stats
+        const buildStats = {
+            target: name,
+            timestamp: new Date().toISOString(),
+            buildTime: elapsed,
+            bundleSize:
+                config.outfile && fs.existsSync(config.outfile)
+                    ? fs.statSync(config.outfile).size
+                    : 0,
+        };
+
+        // Append to build stats file
+        const statsPath = './dist/build-stats.json';
+        let allStats = [];
+        if (fs.existsSync(statsPath)) {
+            try {
+                allStats = JSON.parse(fs.readFileSync(statsPath, 'utf8'));
+            } catch (e) {
+                allStats = [];
+            }
+        }
+        allStats.push(buildStats);
+        fs.writeFileSync(statsPath, JSON.stringify(allStats, null, 2));
+
         return;
     }
     const ctx = await esbuild.context({ ...config, metafile: true });
@@ -196,7 +243,9 @@ async function build(targetName = 'all') {
     console.log('🔨 Building WPlace AutoBot...');
 
     if (watch && targetName === 'all') {
-        console.error('❌ Watch mode requires a specific target. Use --target=userscript or --target=standalone');
+        console.error(
+            '❌ Watch mode requires a specific target. Use --target=userscript or --target=standalone'
+        );
         process.exit(1);
     }
 
