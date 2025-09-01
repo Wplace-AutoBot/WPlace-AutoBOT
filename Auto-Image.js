@@ -3338,7 +3338,7 @@
     }
 
     appendLinkOnce(
-      ' https://wplace-autobot.github.io/WPlace-AutoBOT/main/auto-image-styles.css',
+      'https://wplace-autobot.github.io/WPlace-AutoBOT/main/auto-image-styles.css',
       { 'data-wplace-theme': 'true' }
     );
 
