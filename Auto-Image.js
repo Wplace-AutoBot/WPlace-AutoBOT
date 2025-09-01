@@ -6962,7 +6962,6 @@
         const idCache = new Int16Array(width * height);
         idCache.fill(-2); // -2 = unknown, -1 = ineligible, >=0 = mapped color id
         const idxOf = (x, y) => y * width + x;
-        const colorDiff2Threshold = 1600; // ~40 RGB units
         const getMappedId = (x, y) => {
           const i = idxOf(x, y);
           const cached = idCache[i];
@@ -6971,58 +6970,71 @@
           idCache[i] = eligible ? mappedColorId : -1;
           return idCache[i];
         };
-        const isEdgeSmart = (x, y) => {
-          const i = idxOf(x, y);
+        // Silhouette edge: eligible pixel with any ineligible or out-of-bounds neighbor (8-neighborhood)
+        const isSilhouetteEdge = (x, y) => {
           const id = getMappedId(x, y);
-          if (id < 0) return false; // not painting this pixel, so not part of outline
-          const pIdx = i * 4;
-          const pr = pixels[pIdx], pg = pixels[pIdx + 1], pb = pixels[pIdx + 2];
-          let differCount = 0;
+          if (id < 0) return false; // not painting this pixel
           for (let dy = -1; dy <= 1; dy++) {
             for (let dx = -1; dx <= 1; dx++) {
               if (dx === 0 && dy === 0) continue;
-              const nx = x + dx, ny = y + dy;
-              if (nx < 0 || nx >= width || ny < 0 || ny >= height) {
-                differCount++;
-                continue;
-              }
+              const nx = x + dx,
+                ny = y + dy;
+              if (nx < 0 || nx >= width || ny < 0 || ny >= height) return true;
               const nid = getMappedId(nx, ny);
-              if (nid < 0) {
-                differCount++;
-                continue;
-              }
-              if (nid !== id) {
-                differCount++;
-                // Check strong color difference to prioritize crisp edges
-                const npi = idxOf(nx, ny) * 4;
-                const dr = pixels[npi] - pr;
-                const dg = pixels[npi + 1] - pg;
-                const db = pixels[npi + 2] - pb;
-                const dist2 = dr * dr + dg * dg + db * db;
-                if (dist2 >= colorDiff2Threshold) {
-                  // Early return for strong edges
-                  return true;
-                }
-              }
+              if (nid < 0) return true; // neighbor won't be painted → border to background
             }
           }
-          // Consider as edge if there is at least 1 differing/absent neighbor, stronger when >=2
-          return differCount >= 2;
+          return false;
         };
-        // Build edges in row-major order (ignoring generation mode)
-        const edges = [];
-        edgeKeySet = new Set();
+        // Build set of silhouette edges
+        const edgesSet = new Set();
         for (let y = 0; y < height; y++) {
           for (let x = 0; x < width; x++) {
-            if (isEdgeSmart(x, y)) {
-              edges.push([x, y]);
-              edgeKeySet.add(idxOf(x, y));
+            if (isSilhouetteEdge(x, y)) edgesSet.add(idxOf(x, y));
+          }
+        }
+        // Order edges by connected traversal (8-neighborhood) so it traces outlines
+        const dir8 = [
+          [1, 0],
+          [1, 1],
+          [0, 1],
+          [-1, 1],
+          [-1, 0],
+          [-1, -1],
+          [0, -1],
+          [1, -1],
+        ];
+        const visited = new Set();
+        const edgesOrdered = [];
+        const keyToXY = (k) => [k % width, Math.floor(k / width)];
+        // Seeds sorted row-major for deterministic coverage of multiple components
+        const seeds = Array.from(edgesSet.values()).sort((a, b) => a - b);
+        for (const seed of seeds) {
+          if (visited.has(seed)) continue;
+          const queue = [seed];
+          visited.add(seed);
+          while (queue.length) {
+            const cur = queue.shift();
+            const [cx, cy] = keyToXY(cur);
+            edgesOrdered.push([cx, cy]);
+            for (const [dx, dy] of dir8) {
+              const nx = cx + dx,
+                ny = cy + dy;
+              if (nx < 0 || nx >= width || ny < 0 || ny >= height) continue;
+              const nk = idxOf(nx, ny);
+              if (!visited.has(nk) && edgesSet.has(nk)) {
+                visited.add(nk);
+                queue.push(nk);
+              }
             }
           }
         }
+        edgeKeySet = edgesSet;
         const fill = coords.filter(([x, y]) => !edgeKeySet.has(idxOf(x, y)));
-        phases = [edges, fill];
-        console.log(`✏️ Outline-first (two-phase) prepared: edges=${edges.length}, fill=${fill.length}`);
+        phases = [edgesOrdered, fill];
+        console.log(
+          `✏️ Outline-first (two-phase) prepared: edges=${edgesOrdered.length}, fill=${fill.length}`
+        );
       }
 
       let aborted = false;
