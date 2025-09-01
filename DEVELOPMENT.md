@@ -1,156 +1,494 @@
-# Development Setup Guide
+# DEVELOPMENT.md
 
-## Quick Start
+WPlace-AutoBOT Development Guide
+
+This document describes how to set up, build, and iterate on the project.
+It reflects the current repository state as of the latest commits.
+
+If you run into anything unclear or outdated, please open an issue or a PR
+to improve this guide.
+
+## Table of contents
+
+- Quick start
+- Build targets and outputs
+- Development workflows
+- Serving and tunneling
+- Project structure
+- Environment and prerequisites
+- Code quality and formatting
+- Documentation generation
+- CI/CD overview
+- Testing recipes
+- Troubleshooting
+- FAQ
+
+## Quick start
+
+1) Install dependencies
 
 ```bash
-# Start development with watch mode
-npm run dev:userscript
-
-# Start development with tunnel (for testing on wplace.live)
-npm run dev:tunnel
+npm ci
 ```
 
-## Cloudflare Tunnel Setup (One-time)
+2) Generate all builds once
 
-The tunnel allows you to test your local development code on the live wplace.live site via HTTPS.
-
-### Method 1: Zero Trust Dashboard (Recommended)
-
-1. **Access Zero Trust Dashboard**
-   - Visit https://one.dash.cloudflare.com/
-   - Go to **Networks > Tunnels**
-
-2. **Create New Tunnel**
-   - Click **"Create a tunnel"**
-   - Select **"Cloudflared"** as connector type
-   - Name: `wplace-bot-dev`
-   - Click **"Save tunnel"**
-
-3. **Install Cloudflared Connector**
-   - The dashboard will show install commands for your OS
-   - Copy and run the appropriate command:
-   ```bash
-   # macOS
-   brew install cloudflare/cloudflare/cloudflared
-   
-   # Linux 
-   curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
-   sudo dpkg -i cloudflared.deb
-   ```
-
-4. **Authenticate Tunnel**
-   - Copy the token command from dashboard (looks like):
-   ```bash
-   cloudflared service install eyJhbGciOiJFUzI1NiJ9...
-   ```
-   - Run this command to authenticate your tunnel
-
-5. **Configure Public Hostname**
-   - Click **"Public Hostnames"** tab in your tunnel
-   - Click **"Add a public hostname"**
-   - **Subdomain**: `wplace-bot-dev` for example
-   - **Domain**: Select your domain from dropdown  
-   - **Service Type**: `HTTP`
-   - **URL**: `localhost:5173`
-   - Click **"Save hostname"**
-
-6. **Start Development Server**
-   - Ensure your local server is running: `npm run serve:dist`
-   - Your tunnel URL will be: `https://wplace-bot-dev.yourdomain.com`
-
-### Method 2: Quick Tunnel (For Testing)
 ```bash
-# Start quick tunnel (no dashboard setup needed)
-cloudflared tunnel --url http://localhost:5173
-# Generates random URL like: https://seasonal-deck-organisms-sf.trycloudflare.com
+npm run build
 ```
 
-## Development Workflow
+3) Start a development workflow (pick one)
 
-### Option 1: Local Development Only
-```bash
-npm run dev:userscript
-# Files rebuild automatically on changes
-# Install the built userscript in Tampermonkey
-```
+- Userscript (Tampermonkey/Violentmonkey):
 
-### Option 2: Live Testing with Tunnel
+  ```bash
+  npm run dev:userscript
+  ```
+
+- Standalone (console-injected/bookmarklet):
+
+  ```bash
+  npm run dev:standalone
+  ```
+
+4) Serve the dist folder locally on http://localhost:5173
+
 ```bash
-# Terminal 1: Start development server
 npm run serve:dist
-
-# Terminal 2: Start tunnel
-npm run tunnel:start
-
-# Use the bookmarklet on wplace.live:
-javascript:(()=>{fetch('https://YOUR-TUNNEL-URL/auto-image.standalone.js').then(r=>r.text()).then(s=>eval(s))})()
 ```
 
-### Option 3: Combined Development + Tunnel
+5) Optional: expose your local server via Cloudflare Tunnel
+
+- Quick (random URL, no .env required):
+
+  ```bash
+  npm run tunnel:quick
+  ```
+
+- Authenticated (stable tunnel via token in .env; recommended):
+
+ - Put your token in a local .env (see "Environment" below)
+ - Start the tunnel:
+
+   ```bash
+   npm run tunnel:start
+   ```
+
+6) Develop, iterate, and test on wplace.live using one of the "Testing recipes" further below.
+
+Tip: To run all dev pieces at once (watch + serve + tokenized tunnel), use:
+
 ```bash
 npm run dev:tunnel
-# Starts cloudflared, watch mode and serve mode (with CORS enabled)
 ```
 
-## Available Scripts
+This runs:
+- dev:standalone
+- serve:dist
+- tunnel:start
 
-### Development
-- `npm run dev:userscript` - Watch mode for userscript
-- `npm run dev:standalone` - Watch mode for standalone  
-- `npm run dev:tunnel` - Combined development mode with tunnel support
+## Build targets and outputs
 
-### Building
-- `npm run build` - Build all targets
-- `npm run build:userscript` - Build userscript only
-- `npm run build:standalone` - Build standalone only
-- `npm run build:bookmarklet` - Build bookmarklet only
-- `npm run build:all` - Build all targets (same as `npm run build`)
+The build system is based on esbuild with custom plugins that embed assets
+directly into the bundle. No external URLs are used in the final artifacts.
 
-### Serving & Tunneling
-- `npm run serve:dist` - Serve dist files on localhost:5173 with CORS enabled
-- `npm run tunnel:quick` - Start quick tunnel (generates random URL)
-- `npm run tunnel:start` - Start named tunnel (requires dashboard setup)
+Targets are defined in build/esbuild.config.js and produced in dist/:
 
-### Code Quality
-- `npm run lint` - Run ESLint
-- `npm run lint:fix` - Run ESLint with auto-fix
-- `npm run format` - Format code with Prettier
-- `npm run format:check` - Check code formatting
+- Standalone
+ - File: dist/auto-image.standalone.js
+ - Format: IIFE executed in page context
+ - Use cases: console injection, bookmarklet wrapper
 
-### Documentation
-- `npm run docs:api` - Generate API documentation from JSDoc comments
+- Userscript
+ - File: dist/auto-image.userscript.js
+ - Contains Tampermonkey/Violentmonkey header
+ - Match: https://wplace.live/*
+ - Use case: install/update via a local or tunneled URL
 
-### Utilities
-- `npm run clean` - Clean dist directory
+- Bookmarklet
+ - File: dist/auto-image.bookmarklet.js
+ - Wrapper: dist/auto-image.bookmarklet.txt (ready-to-paste javascript:... URL)
+ - Use case: create a browser bookmark for one-click injection
 
-## Prerequisites
+Available build scripts:
 
-### System Requirements
-- **Node.js 18+** - Required for build tools and development server
-- **Modern browser** - Chrome, Firefox, or Safari
-- **Cloudflared** (optional) - For tunnel testing on wplace.live
+```bash
+# Build everything (default)
+npm run build
 
-### Browser Setup for Testing
-- Use a **trusted browser profile** that doesn't trigger excessive CAPTCHA challenges
-- Ensure browser allows local HTTP requests (for development server)
-- Consider disabling ad blockers temporarily if they interfere with Turnstile
+# Build a specific target
+npm run build:userscript
+npm run build:standalone
+npm run build:bookmarklet
 
-## Testing on wplace.live
-
-### Important Notes
-- Testing **must** occur on https://wplace.live with a trusted browser profile
-- Turnstile CAPTCHA challenges must not be blocked by your setup
-- Use the development server to inject local builds into the live page
-
-### Debug Mode
-Enable verbose logging by setting in browser console:
-```javascript
-window._overlayDebug = true;
+# Build all targets (explicit)
+npm run build:all
 ```
 
-## Bookmarklet for Testing
+Notes:
+- The CI validates that outputs exist and the "standalone" bundle contains
+  no http/https references.
+- After building the bookmarklet target, a .txt wrapper is generated to
+  make creating a bookmark easy.
 
-Create a bookmark with this URL to test on wplace.live (replace with your tunnel URL):
-```javascript
-javascript:(()=>{fetch('https://YOUR-TUNNEL-URL/auto-image.standalone.js').then(r=>r.text()).then(s=>eval(s))})()
+## Development workflows
+
+Pick the workflow that matches your testing style.
+
+1) Userscript-based development
+
+- Start a watcher:
+
+  ```bash
+  npm run dev:userscript
+  ```
+
+- Serve dist files:
+
+  ```bash
+  npm run serve:dist
+  ```
+
+- In Tampermonkey/Violentmonkey, install from URL:
+  http://localhost:5173/auto-image.userscript.js or, when tunneling,
+  https://your-tunnel-url/auto-image.userscript.js
+
+- Reload wplace.live to pick up updates.
+
+2) Standalone/bookmarklet development
+
+- Start a watcher:
+
+  ```bash
+  npm run dev:standalone
+  ```
+
+- Serve dist files:
+
+  ```bash
+  npm run serve:dist
+  ```
+
+- Inject into wplace.live via:
+ - DevTools Console (see "Testing recipes")
+ - Bookmarklet:
+  - Build bookmarklet or use watcher, then open dist/auto-image.bookmarklet.txt
+  - Copy its content (starts with javascript:(function(){…})();)
+  - Create a new bookmark with that content as the URL
+  - Click it on https://wplace.live
+
+3) One command tunnel workflow (recommended for remote devices)
+
+- Put your Cloudflare tunnel token in .env (see next section)
+- Run:
+
+  ```bash
+  npm run dev:tunnel
+  ```
+
+This will:
+- watch standalone changes
+- serve dist on http://localhost:5173 with CORS
+- start tunnel (https public URL)
+
+Then use the tunnel URL in your testing recipes.
+
+## Serving and tunneling
+
+Local static server:
+
+```bash
+npm run serve:dist
 ```
+
+- Serves the dist folder on http://localhost:5173
+- CORS is enabled for easy injection across origins
+
+Cloudflare Tunnel options:
+
+- Quick tunnel (ephemeral, random URL; no setup required):
+
+  ```bash
+  npm run tunnel:quick
+  ```
+
+- Tokenized tunnel (stable URL tied to your account; requires .env):
+
+ 1) Install Cloudflared (https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/)
+ 2) In the Cloudflare Zero Trust dashboard:
+  - Networks -> Tunnels -> Create a tunnel -> "Cloudflared"
+  - After creation, copy the connector "Install and run" token
+ 3) Create .env in repo root:
+
+  ```bash
+  CLOUDFLARED_TOKEN=your_tunnel_token_here
+  ```
+
+ 4) Start the tunnel:
+
+  ```bash
+  npm run tunnel:start
+  ```
+
+- All-in-one dev loop:
+
+  ```bash
+  npm run dev:tunnel
+  ```
+
+Security note: Your tunnel token is a secret. Keep it in .env (already
+.gitignore'd). Never commit or share it.
+
+## Project structure
+
+```
+WPlace-AutoBOT/
+├── src/        # Source code (runtime)
+│ ├── Auto-Image.js   # Main script
+│ ├── auto-image-styles.css
+│ ├── lang/     # Embedded translations (JSON)
+│ └── themes/     # Embedded themes (CSS)
+├── build/
+│ └── esbuild.config.js # Builds all targets, embeds assets
+├── scripts/
+│ └── tunnel.js     # Cloudflared tunnel runner (token mode)
+├── dist/       # Build outputs
+├── docs/
+│ └── api/README.md   # Generated from JSDoc
+├── AccountSwapper/   # Account Swapper extention
+├── package.json
+├── eslint.config.js
+├── .prettierrc
+├── .prettierignore
+├── .gitignore
+├── .env.example
+└── LICENSE
+```
+
+Embedded assets:
+
+- CSS: src/auto-image-styles.css and src/themes/*.css are loaded at build
+  time and injected as template strings. The script imports them via the
+  virtual module embedded-assets.
+- Translations: src/lang/*.json are embedded as JS objects. The script
+  loads language data from the embedded bundle; no network fetches.
+
+## Environment and prerequisites
+
+System requirements:
+- Node.js 18+
+- Git
+- Modern browser with devtools (Chrome/Firefox/Safari)
+- Cloudflared (optional, for tunnel testing)
+
+Install cloudflared:
+
+- macOS (Homebrew): `brew install cloudflare/cloudflare/cloudflared`
+- Windows: see Cloudflare docs
+- Linux (Deb-based): `sudo apt-get install cloudflared` (or download from
+  Cloudflare)
+
+Environment variables:
+
+- .env (local only, not committed):
+
+  ```bash
+  CLOUDFLARED_TOKEN=your_tunnel_token_here
+  ```
+
+- Use `.env.example` as a reference.
+
+## Code quality and formatting
+
+Scripts:
+
+```bash
+# Lint
+npm run lint
+npm run lint:fix
+
+# Format
+npm run format
+npm run format:check
+```
+
+ESLint (eslint.config.js):
+- Based on @eslint/js recommended + eslint-config-prettier
+- ES2022, ESM
+- Rules tuned for low-noise iteration (e.g. allow unused args prefixed
+  with _)
+- Ignores: dist/, node_modules/, AccountSwapper/
+
+Prettier (.prettierrc):
+- printWidth 80, singleQuote true, etc.
+- .prettierignore excludes dist/** and other artifacts
+
+Cleaning:
+
+```bash
+npm run clean
+```
+
+## Documentation generation
+
+Generate API docs (JSDoc -> Markdown):
+
+```bash
+npm run docs:api
+```
+
+- Source: src/Auto-Image.js
+- Output: docs/api/README.md
+
+Author high-value JSDoc for exported functions/classes to keep docs useful.
+
+## Testing recipes
+
+Choose any method below to load your local/tunneled build into wplace.live.
+
+1) Console injection (standalone)
+
+- With tunnel:
+
+  ```js
+  fetch('https://YOUR_TUNNEL_HOST/auto-image.standalone.js')
+  .then(r => r.text())
+  .then(code => eval(code));
+  ```
+
+2) Bookmarklet
+
+- Build or watch the bookmarklet target
+- Open dist/auto-image.bookmarklet.txt
+- Copy the entire javascript:(function(){…})(); text
+- Create a new bookmark whose URL is that content
+- Open https://wplace.live and click the bookmark
+
+3) Userscript (Tampermonkey/Violentmonkey)
+
+- Install from URL:
+ - Local: http://localhost:5173/auto-image.userscript.js <!-- TODO: Test -->
+ - Tunnel: https://YOUR_TUNNEL_HOST/auto-image.userscript.js
+- Reload the site to apply updates
+
+4) One-command dev with tunnel
+
+```bash
+npm run dev:tunnel
+```
+
+- Then use recipe (1) or (3) against the tunnel URL
+
+Debug tips:
+
+- Turn on verbose overlay pixel checks:
+
+  ```js
+  window._overlayDebug = true;
+  ```
+
+- Hard-reload the page to clear caches if behavior seems stale
+- Open DevTools "Network" -> Disable cache (while DevTools is open)
+
+## Troubleshooting
+
+Cloudflared not found
+
+- Ensure it's installed and on PATH: `cloudflared --version`
+- If using token mode, verify CLOUDFLARED_TOKEN is set in .env
+
+CLOUDFLARED_TOKEN missing
+
+- npm run tunnel:start will fail fast with a clear message
+- Use npm run tunnel:quick if you just need a temporary URL
+
+403 Forbidden from backend.wplace.live
+
+- Cloudflare Turnstile token invalid or expired
+- The script auto-regenerates tokens; wait a moment and retry
+- If persisted, reload the page and re-inject
+- Make sure you're testing on the actual site origin (https)
+
+Userscript doesn't run
+
+- Confirm match pattern includes https://wplace.live/*
+- Make sure the script is enabled
+
+Build fails with "Unknown target" or watch error
+
+- Watch mode requires a specific target:
+
+  ```bash
+  # OK
+  node build/esbuild.config.js --target=userscript --watch
+
+  # Not allowed
+  node build/esbuild.config.js --watch
+  ```
+
+CORS / mixed content
+
+- Always use the tunnel URL (https) when injecting into https sites
+- The local server enables CORS but won't upgrade http to https
+
+CAPTCHA/Turnstile issues in browser
+
+- Try a fresh profile and ensure normal browsing works
+- If you get frequent challenges, consider waiting or switching profile
+
+## FAQ
+
+Why port 5173?
+
+- It's a convenient default that avoids collisions. Update scripts if you
+  need a different port.
+
+Where do themes and translations come from at runtime?
+
+- They are embedded at build time (see the embedded-assets virtual module).
+  The runtime script never fetches them over the network.
+
+How do I quickly reset the build outputs?
+
+```bash
+npm run clean && npm run build
+```
+
+Can I contribute an additional theme or locale?
+
+- Yes. Add a CSS file under src/themes or a JSON file under src/lang.
+  The build will auto-embed new assets. Keep names consistent and avoid
+  breaking existing keys/classes.
+
+## Available scripts (npm run ...)
+
+Development
+- dev:userscript Watch userscript development
+- dev:standalone Watch standalone development
+- dev:tunnel Watch + serve + tokenized tunnel (recommended for remote testing)
+
+Build
+- build Build all targets (userscript, standalone, bookmarklet)
+- build:userscript Build userscript only
+- build:standalone Build standalone only
+- build:bookmarklet Build bookmarklet only
+- build:all Explicit build of all targets
+
+Serve & tunnel
+- serve:dist Serve dist on localhost:5173 with CORS enabled
+- tunnel:quick Start quick tunnel (random URL, no .env needed)
+- tunnel:start Start tunnel using CLOUDFLARED_TOKEN from .env
+
+Code quality & maintenance
+- lint Run ESLint to check code quality
+- lint:fix ESLint with automatic fixes
+- format Format with Prettier
+- format:check Check formatting without changing files
+- clean Remove dist/*
+
+Docs
+- docs:api  Generate API docs from JSDoc to docs/api/README.md
+
+## License
+
+MIT see LICENSE for details.
