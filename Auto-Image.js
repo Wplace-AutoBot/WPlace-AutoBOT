@@ -1216,57 +1216,85 @@
       const url = args[0] instanceof Request ? args[0].url : args[0];
 
       if (typeof url === 'string') {
-        // Note: Avoid referencing userscript variables here (runs in page context)
-        if (url.includes('/s0/pixel/')) {
-          try {
-            const payload = JSON.parse(args[1].body);
-            if (payload.t) {
-              // 📊 Debug log
-              console.log(
-                `🔍✅ Turnstile Token Captured - Type: ${typeof payload.t}, Value: ${
-                  payload.t
-                    ? typeof payload.t === 'string'
-                      ? payload.t.length > 50
-                        ? payload.t.substring(0, 50) + '...'
-                        : payload.t
-                      : JSON.stringify(payload.t)
-                    : 'null/undefined'
-                }, Length: ${payload.t?.length || 0}`
-              );
-              window.postMessage({ source: 'turnstile-capture', token: payload.t }, '*');
+        try {
+          // Note: Avoid referencing userscript variables here (runs in page context)
+          if (url.includes('/s0/pixel/')) {
+            try {
+              const payload = JSON.parse(args?.[1]?.body || '{}');
+              if (payload.t) {
+                // 📊 Debug log
+                console.log(
+                  `🔍✅ Turnstile Token Captured - Type: ${typeof payload.t}, Value: ${
+                    payload.t
+                      ? typeof payload.t === 'string'
+                        ? payload.t.length > 50
+                          ? payload.t.substring(0, 50) + '...'
+                          : payload.t
+                        : JSON.stringify(payload.t)
+                      : 'null/undefined'
+                  }, Length: ${payload.t?.length || 0}`
+                );
+                window.postMessage({ source: 'turnstile-capture', token: payload.t }, '*');
+              }
+            } catch (_) {
+              /* ignore */
             }
-          } catch (_) {
-            /* ignore */
           }
-        }
 
-        const contentType = response.headers.get('content-type') || '';
-        if (contentType.includes('image/png') && url.includes('.png')) {
-          const cloned = response.clone();
-          return new Promise(async (resolve) => {
-            const blobUUID = crypto.randomUUID();
-            const originalBlob = await cloned.blob();
+          const contentType = response.headers.get('content-type') || '';
+          // Intercept only map tile PNGs to avoid interfering with other images
+          if (
+            contentType.includes('image/png') &&
+            url.includes('/files/s0/tiles/') &&
+            url.endsWith('.png')
+          ) {
+            const cloned = response.clone();
+            return new Promise(async (resolve) => {
+              const blobUUID =
+                crypto && typeof crypto.randomUUID === 'function'
+                  ? crypto.randomUUID()
+                  : `${Date.now()}-${Math.random()}`;
+              const originalBlob = await cloned.blob();
 
-            fetchedBlobQueue.set(blobUUID, (processedBlob) => {
-              resolve(
-                new Response(processedBlob, {
-                  headers: cloned.headers,
-                  status: cloned.status,
-                  statusText: cloned.statusText,
-                })
+              fetchedBlobQueue.set(blobUUID, (processedBlob) => {
+                resolve(
+                  new Response(processedBlob, {
+                    headers: cloned.headers,
+                    status: cloned.status,
+                    statusText: cloned.statusText,
+                  })
+                );
+                fetchedBlobQueue.delete(blobUUID);
+              });
+
+              window.postMessage(
+                {
+                  source: 'auto-image-tile',
+                  endpoint: url,
+                  blobID: blobUUID,
+                  blobData: originalBlob,
+                },
+                '*'
               );
-            });
 
-            window.postMessage(
-              {
-                source: 'auto-image-tile',
-                endpoint: url,
-                blobID: blobUUID,
-                blobData: originalBlob,
-              },
-              '*'
-            );
-          });
+              // Safety: if overlay side doesn't respond in time, return original tile
+              setTimeout(() => {
+                if (fetchedBlobQueue.has(blobUUID)) {
+                  fetchedBlobQueue.delete(blobUUID);
+                  resolve(
+                    new Response(originalBlob, {
+                      headers: cloned.headers,
+                      status: cloned.status,
+                      statusText: cloned.statusText,
+                    })
+                  );
+                }
+              }, 500);
+            });
+          }
+        } catch (e) {
+          // Never break site networking due to our hook
+          // console.warn('fetch hook error (ignored):', e);
         }
       }
 
