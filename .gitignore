@@ -1,1 +1,18 @@
-node_modules
+# Node modules
+node_modules/
+
+# NPM/Yarn lock
+package-lock.json
+package.json
+
+# Prettier
+.prettierrc.json
+
+# ESLint
+eslint.config.cjs
+
+# Staged changes
+staged_changes.diff
+
+# IDE (WebStorm/IntelliJ IDEA)
+.idea/
