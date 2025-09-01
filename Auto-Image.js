@@ -530,7 +530,8 @@
     fullChargeData: null,
     fullChargeInterval: null,
     paintTransparentPixels: false, // Default to OFF
-    currentCharges: 0,
+    displayCharges: 0,
+    preciseCurrentCharges: 0,
     maxCharges: 1, // Default max charges
     cooldown: CONFIG.COOLDOWN_DEFAULT,
     imageData: null,
@@ -2876,12 +2877,12 @@
       }
     },
     resetEdgeTracking() {
-      state._lastChargesBelow = state.currentCharges < state.cooldownChargeThreshold;
+      state._lastChargesBelow = state.displayCharges < state.cooldownChargeThreshold;
       state._lastChargesNotifyAt = 0;
     },
     maybeNotifyChargesReached(force = false) {
       if (!state.notificationsEnabled || !state.notifyOnChargesReached) return;
-      const reached = state.currentCharges >= state.cooldownChargeThreshold;
+      const reached = state.displayCharges >= state.cooldownChargeThreshold;
       const now = Date.now();
       const repeatMs = Math.max(1, Number(state.notificationIntervalMinutes || 5)) * 60_000;
       if (reached) {
@@ -2889,7 +2890,7 @@
         const shouldRepeat = now - (state._lastChargesNotifyAt || 0) >= repeatMs;
         if (shouldEdge || shouldRepeat) {
           const msg = Utils.t('chargesReadyMessage', {
-            current: state.currentCharges,
+            current: state.displayCharges,
             max: state.maxCharges,
             threshold: state.cooldownChargeThreshold,
           });
@@ -2908,7 +2909,7 @@
       this.pollTimer = setInterval(async () => {
         try {
           const { charges, cooldown, max } = await WPlaceService.getCharges();
-          state.currentCharges = Math.floor(charges);
+          state.displayCharges = Math.floor(charges);
           state.cooldown = cooldown;
           state.maxCharges = Math.max(1, Math.floor(max));
           this.maybeNotifyChargesReached();
@@ -4997,7 +4998,7 @@
       }
     };
 
-    function updateFullChargeDisplay() {
+    function updateFullChargeDisplay(intervalMs) {
       const fullChargeEl = document.getElementById('wplace-stat-fullcharge-value');
       if (!fullChargeEl) return;
       if (!state.fullChargeData) {
@@ -5022,16 +5023,27 @@
         displayCharges = Math.floor(cappedCharges);
       }
 
-      state.currentCharges = Math.max(0, displayCharges);
-      const remainingMs = Math.max(0, (max - cappedCharges) * cooldownMs);
+      state.displayCharges = Math.max(0, displayCharges);
+      state.preciseCurrentCharges = cappedCharges;
+      const remainingMs = getMsToTargetCharges(cappedCharges, max, state.cooldown, intervalMs);
+
       const timeText = Utils.msToTimeText(remainingMs);
 
       const chargesEl = document.getElementById('wplace-stat-charges-value');
       const secondsInMinute = Math.ceil(remainingMs / 1000) % 60;
       if (chargesEl && (secondsInMinute === 0 || secondsInMinute === 30)) {
-        chargesEl.innerHTML = `<span">${state.currentCharges} / ${state.maxCharges}</span>`;
+        chargesEl.innerHTML = `<span">${state.displayCharges} / ${state.maxCharges}</span>`;
       }
-      if (state.currentCharges >= max) {
+
+      if (
+        state.displayCharges < state.cooldownChargeThreshold &&
+        !state.stopFlag &&
+        state.running
+      ) {
+        updateChargesThresholdUI(intervalMs);
+      }
+
+      if (state.displayCharges >= max) {
         fullChargeEl.innerHTML = `<span style="color:#10b981;">FULL</span>`;
         clearInterval(state.fullChargeInterval);
         state.fullChargeInterval = null;
@@ -5057,7 +5069,8 @@
 
       if (shouldCallApi) {
         const { charges, max, cooldown } = await WPlaceService.getCharges();
-        state.currentCharges = Math.floor(charges);
+        state.displayCharges = Math.floor(charges);
+        state.preciseCurrentCharges = charges;
         state.cooldown = cooldown;
         state.maxCharges = Math.floor(max) > 1 ? Math.floor(max) : state.maxCharges;
 
@@ -5072,8 +5085,9 @@
         NotificationManager.maybeNotifyChargesReached();
       }
       if (state.fullChargeInterval) clearInterval(state.fullChargeInterval);
-      state.fullChargeInterval = setInterval(updateFullChargeDisplay, 1000);
-      updateFullChargeDisplay();
+      const intervalMs = 1000;
+      state.fullChargeInterval = setInterval(() => updateFullChargeDisplay(intervalMs), intervalMs);
+      updateFullChargeDisplay(intervalMs);
 
       if (cooldownSlider.max !== state.maxCharges) {
         cooldownSlider.max = state.maxCharges;
@@ -5086,7 +5100,7 @@
         const remainingPixels = state.totalPixels - state.paintedPixels;
         state.estimatedTime = Utils.calculateEstimatedTime(
           remainingPixels,
-          state.currentCharges,
+          state.displayCharges,
           state.cooldown
         );
         progressBar.style.width = `${progress}%`;
@@ -5159,7 +5173,7 @@
                 <i class="fas fa-bolt"></i> ${Utils.t('charges')}
               </div>
               <div class="wplace-stat-value" id="wplace-stat-charges-value">
-                ${state.currentCharges} / ${state.maxCharges}
+                ${state.displayCharges} / ${state.maxCharges}
               </div>
             </div>
             <div class="wplace-stat-item">
@@ -6583,48 +6597,21 @@
     NotificationManager.syncFromState();
   }
 
-  function getRemainingMsToThreshold(threshold) {
-    if (!state.fullChargeData) return state.cooldown; // fallback
-
-    const { current, cooldownMs, startTime } = state.fullChargeData;
-
-    const elapsed = Date.now() - startTime;
-    const remainingCharges = Math.max(0, threshold - current);
-    const remainingMs = remainingCharges * cooldownMs - elapsed;
-    return remainingMs;
+  function getMsToTargetCharges(current, target, cooldown, intervalMs = 0) {
+    const remainingCharges = target - current;
+    return Math.max(0, remainingCharges * cooldown - intervalMs);
   }
 
-  function startChargesThresholdTicker() {
-    if (!state.fullChargeData) return;
-
-    // Clear existing interval if any
-    if (state.chargesThresholdInterval) {
-      clearInterval(state.chargesThresholdInterval);
-    }
+  function updateChargesThresholdUI(intervalMs) {
     if (state.stopFlag) return;
 
-    // Call immediately for instant update
-    updateChargesThresholdUI();
-
-    state.chargesThresholdInterval = setInterval(() => {
-      updateChargesThresholdUI();
-    }, 1000);
-  }
-
-  function updateChargesThresholdUI() {
-    if (!state.fullChargeData) return;
     const threshold = state.cooldownChargeThreshold;
-
-    const remainingMs = getRemainingMsToThreshold(state.cooldownChargeThreshold);
-
-    if (remainingMs <= 999 || state.stopFlag) {
-      // Clear interval if threshold is reached
-      if (state.chargesThresholdInterval) {
-        clearInterval(state.chargesThresholdInterval);
-      }
-      return; // Threshold already reached
-    }
-
+    const remainingMs = getMsToTargetCharges(
+      state.preciseCurrentCharges,
+      state.cooldownChargeThreshold,
+      state.cooldown,
+      intervalMs
+    );
     const timeText = Utils.msToTimeText(remainingMs);
 
     updateUI(
@@ -6632,7 +6619,7 @@
       'warning',
       {
         threshold,
-        current: state.currentCharges,
+        current: state.displayCharges,
         time: timeText,
       },
       true
@@ -6941,9 +6928,6 @@
             await flushPixelBatch(pixelBatch);
           }
           state.lastPosition = { x, y };
-          if (state.chargesThresholdInterval) {
-            clearInterval(state.chargesThresholdInterval);
-          }
           updateUI('paintingPaused', 'warning', { x, y });
           // noinspection UnnecessaryLabelOnBreakStatementJS
           break outerLoop;
@@ -7103,16 +7087,18 @@
           pixelBatch.pixels = [];
         }
 
-        if (state.currentCharges < state.cooldownChargeThreshold && !state.stopFlag) {
-          startChargesThresholdTicker();
-
+        if (state.displayCharges < state.cooldownChargeThreshold && !state.stopFlag) {
           await Utils.dynamicSleep(() => {
-            if (state.currentCharges >= state.cooldownChargeThreshold) {
+            if (state.displayCharges >= state.cooldownChargeThreshold) {
               NotificationManager.maybeNotifyChargesReached(true);
               return 0;
             }
             if (state.stopFlag) return 0;
-            return getRemainingMsToThreshold(state.cooldownChargeThreshold);
+            return getMsToTargetCharges(
+              state.preciseCurrentCharges,
+              state.cooldownChargeThreshold,
+              state.cooldown
+            );
           });
         }
 
@@ -7133,7 +7119,6 @@
       }
     } finally {
       if (window._chargesInterval) clearInterval(window._chargesInterval);
-      if (state.chargesThresholdInterval) clearInterval(state.chargesThresholdInterval);
       window._chargesInterval = null;
     }
 
@@ -7190,7 +7175,7 @@
     }
 
     // Always limit by available charges
-    const maxAllowed = state.currentCharges;
+    const maxAllowed = state.displayCharges;
     const finalBatchSize = Math.min(targetBatchSize, maxAllowed);
 
     return finalBatchSize;
