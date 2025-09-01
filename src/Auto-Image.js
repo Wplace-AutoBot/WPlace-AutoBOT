@@ -4,38 +4,31 @@ import {
     EMBEDDED_LANGUAGES,
 } from 'embedded-assets';
 
+// Import ALL tested utility functions
+import { rgbToLab, labDistance, findClosestColor } from './lib/color.js';
+import { 
+    absoluteToRegionCoords, regionToAbsoluteCoords, getTileKey, parseTileKey,
+    isValidPixelCoord, clampPixelCoords, calculateDistance, calculateManhattanDistance,
+    coordinatesEqual, getNeighboringPixels, getAllNeighboringPixels
+} from './lib/coordinates.js';
+import { 
+    getPixelFromImageData, setPixelInImageData, isPixelTransparent, isPixelWhite,
+    getPixelIndex, applyBlueMarbleEffect, resizeImageData
+} from './lib/image.js';
+import { 
+    DEFAULT_CONFIG, sanitizeConfig, isValidCooldown, isValidThreshold,
+    isValidPaintingSpeed, isValidOpacity, isValidTokenSource, isValidRepeatMinutes,
+    validateNotificationConfig, validateOverlayConfig, validatePaintingSpeedConfig
+} from './lib/config.js';
+
 (async () => {
-    // CONFIGURATION CONSTANTS
+    // CONFIGURATION CONSTANTS - Use tested utilities from src/lib/config.js
     const CONFIG = {
-        COOLDOWN_DEFAULT: 31000,
-        TRANSPARENCY_THRESHOLD: 100,
-        WHITE_THRESHOLD: 250,
-        LOG_INTERVAL: 10,
-        PAINTING_SPEED: {
-            MIN: 1, // Minimum 1 pixel batch size
-            MAX: 1000, // Maximum 1000 pixels batch size
-            DEFAULT: 5, // Default 5 pixels batch size
-        },
+        ...DEFAULT_CONFIG,
         BATCH_MODE: 'normal', // "normal" or "random" - default to normal
         RANDOM_BATCH_RANGE: {
             MIN: 3, // Random range minimum
             MAX: 20, // Random range maximum
-        },
-        PAINTING_SPEED_ENABLED: false, // Off by default
-        AUTO_CAPTCHA_ENABLED: true, // Turnstile generator enabled by default
-        TOKEN_SOURCE: 'generator', // "generator", "manual", or "hybrid" - default to generator
-        COOLDOWN_CHARGE_THRESHOLD: 1, // Default wait threshold
-        // Desktop Notifications (defaults)
-        NOTIFICATIONS: {
-            ENABLED: true,
-            ON_CHARGES_REACHED: true,
-            ONLY_WHEN_UNFOCUSED: true,
-            REPEAT_MINUTES: 5, // repeat reminder while threshold condition holds
-        },
-        OVERLAY: {
-            OPACITY_DEFAULT: 0.6,
-            BLUE_MARBLE_DEFAULT: false,
-            ditheringEnabled: false,
         },
         // --- START: Color data from colour-converter.js ---
         // New color structure with proper ID mapping
@@ -846,7 +839,7 @@ import {
                 if (tileMatch) {
                     const tileX = parseInt(tileMatch[1], 10);
                     const tileY = parseInt(tileMatch[2], 10);
-                    const tileKey = `${tileX},${tileY}`;
+                    const tileKey = getTileKey(tileX, tileY);
 
                     const chunkBitmap = this.chunkedTiles.get(tileKey);
                     // Also store the original tile bitmap for later pixel color checks
@@ -934,19 +927,20 @@ import {
          * @returns {Promise<Array<number>|null>} RGBA color array [r,g,b,a] or null if transparent/unavailable
          */
         async getTilePixelColor(tileX, tileY, pixelX, pixelY) {
-            const tileKey = `${tileX},${tileY}`;
+            const tileKey = getTileKey(tileX, tileY);
             // Prefer cached ImageData if available
             const cached = this.originalTilesData.get(tileKey);
             if (cached && cached.data && cached.w > 0 && cached.h > 0) {
                 const x = Math.max(0, Math.min(cached.w - 1, pixelX));
                 const y = Math.max(0, Math.min(cached.h - 1, pixelY));
-                const idx = (y * cached.w + x) * 4;
-                const d = cached.data;
-                const a = d[idx + 3];
+                const imageData = { data: cached.data, width: cached.w, height: cached.h };
+                const pixel = getPixelFromImageData(imageData, x, y);
+                if (!pixel) return null;
+                
                 const alphaThresh =
                     state.customTransparencyThreshold ||
                     CONFIG.TRANSPARENCY_THRESHOLD;
-                if (!state.paintTransparentPixels && a < alphaThresh) {
+                if (!state.paintTransparentPixels && isPixelTransparent(pixel, alphaThresh)) {
                     // Treat as transparent / unavailable
                     // Lightweight debug: show when transparency causes skip (only if verbose enabled)
                     if (window._overlayDebug)
@@ -955,11 +949,11 @@ import {
                             tileKey,
                             x,
                             y,
-                            a
+                            pixel[3]
                         );
                     return null;
                 }
-                return [d[idx], d[idx + 1], d[idx + 2], a];
+                return pixel;
             }
 
             // Fallback: draw stored bitmap to canvas and read single pixel
@@ -1963,36 +1957,14 @@ import {
         _labCache: new Map(), // key: (r<<16)|(g<<8)|b  value: [L,a,b]
         /**
          * Convert RGB color to CIE LAB color space for perceptual color matching.
+         * Uses tested implementation from lib/color.js
          * @param {number} r - Red channel (0-255)
          * @param {number} g - Green channel (0-255)
          * @param {number} b - Blue channel (0-255)
          * @returns {Array<number>} LAB color as [L, a, b] where L is lightness, a and b are color-opponent dimensions
          */
         _rgbToLab: (r, g, b) => {
-            // sRGB -> linear
-            const srgbToLinear = v => {
-                v /= 255;
-                return v <= 0.04045
-                    ? v / 12.92
-                    : Math.pow((v + 0.055) / 1.055, 2.4);
-            };
-            const rl = srgbToLinear(r);
-            const gl = srgbToLinear(g);
-            const bl = srgbToLinear(b);
-            let X = rl * 0.4124 + gl * 0.3576 + bl * 0.1805;
-            let Y = rl * 0.2126 + gl * 0.7152 + bl * 0.0722;
-            let Z = rl * 0.0193 + gl * 0.1192 + bl * 0.9505;
-            X /= 0.95047;
-            Y /= 1.0;
-            Z /= 1.08883;
-            const f = t => (t > 0.008856 ? Math.cbrt(t) : 7.787 * t + 16 / 116);
-            const fX = f(X),
-                fY = f(Y),
-                fZ = f(Z);
-            const L = 116 * fY - 16;
-            const a = 500 * (fX - fY);
-            const b2 = 200 * (fY - fZ);
-            return [L, a, b2];
+            return rgbToLab(r, g, b);
         },
         /**
          * Get LAB color values with caching for performance optimization.
@@ -3041,10 +3013,7 @@ import {
                 const c = availableColors[i];
                 const [r, g, b] = c.rgb;
                 const [L2, a2, b2] = Utils._lab(r, g, b);
-                const dL = Lt - L2,
-                    da = at - a2,
-                    db = bt - b2;
-                let dist = dL * dL + da * da + db * db;
+                let dist = labDistance([Lt, at, bt], [L2, a2, b2]);
                 if (penaltyWeight > 0 && targetChroma > 20) {
                     const candChroma = Math.sqrt(a2 * a2 + b2 * b2);
                     if (candChroma < targetChroma) {
@@ -5261,22 +5230,20 @@ import {
                     for (let y = 0; y < h; y++) {
                         for (let x = 0; x < w; x++) {
                             const idx = y * w + x;
-                            const i4 = idx * 4;
-                            const r = data[i4],
-                                g = data[i4 + 1],
-                                b = data[i4 + 2],
-                                a = data[i4 + 3];
+                            const rgba = getPixelFromImageData({ data, width: w, height: h }, x, y);
+                            if (!rgba) continue;
+                            const [r, g, b, a] = rgba;
                             const isEligible =
                                 (state.paintTransparentPixels ||
                                     a >= tThresh) &&
                                 (state.paintWhitePixels ||
-                                    !Utils.isWhitePixel(r, g, b));
+                                    !isPixelWhite([r, g, b]));
                             eligible[idx] = isEligible ? 1 : 0;
                             work[idx * 3] = r;
                             work[idx * 3 + 1] = g;
                             work[idx * 3 + 2] = b;
                             if (!isEligible) {
-                                data[i4 + 3] = 0; // transparent in preview overlay
+                                setPixelInImageData({ data, width: w, height: h }, x, y, [rgba[0], rgba[1], rgba[2], 0]); // transparent in preview overlay
                             }
                         }
                     }
@@ -5314,11 +5281,7 @@ import {
                                 b0,
                                 state.activeColorPalette
                             );
-                            const i4 = idx * 4;
-                            data[i4] = nr;
-                            data[i4 + 1] = ng;
-                            data[i4 + 2] = nb;
-                            data[i4 + 3] = 255;
+                            setPixelInImageData({ data, width: w, height: h }, x, y, [nr, ng, nb, 255]);
 
                             const er = r0 - nr;
                             const eg = g0 - ng;
@@ -5336,29 +5299,21 @@ import {
                 if (state.ditheringEnabled && !_isDraggingSize) {
                     applyFSDither();
                 } else {
-                    for (let i = 0; i < data.length; i += 4) {
-                        const r = data[i],
-                            g = data[i + 1],
-                            b = data[i + 2],
-                            a = data[i + 3];
-                        if (
-                            (!state.paintTransparentPixels && a < tThresh) ||
-                            (!state.paintWhitePixels &&
-                                Utils.isWhitePixel(r, g, b))
-                        ) {
-                            data[i + 3] = 0;
-                            continue;
+                    for (let y = 0; y < newHeight; y++) {
+                        for (let x = 0; x < newWidth; x++) {
+                            const rgba = getPixelFromImageData({ data, width: newWidth, height: newHeight }, x, y);
+                            if (!rgba) continue;
+                            const [r, g, b, a] = rgba;
+                            if (
+                                (!state.paintTransparentPixels && isPixelTransparent(rgba, tThresh)) ||
+                                (!state.paintWhitePixels && isPixelWhite([r, g, b]))
+                            ) {
+                                setPixelInImageData({ data, width: newWidth, height: newHeight }, x, y, [r, g, b, 0]);
+                                continue;
+                            }
+                            const [nr, ng, nb] = findClosestColor([r, g, b], state.activeColorPalette);
+                            setPixelInImageData({ data, width: newWidth, height: newHeight }, x, y, [nr, ng, nb, 255]);
                         }
-                        const [nr, ng, nb] = Utils.findClosestPaletteColor(
-                            r,
-                            g,
-                            b,
-                            state.activeColorPalette
-                        );
-                        data[i] = nr;
-                        data[i + 1] = ng;
-                        data[i + 2] = nb;
-                        data[i + 3] = 255;
                     }
                 }
 
@@ -5835,9 +5790,8 @@ import {
                     if (yy < 0 || yy >= h) continue;
                     for (let xx = cx - radius; xx <= cx + radius; xx++) {
                         if (xx < 0 || xx >= w) continue;
-                        const dx = xx - cx,
-                            dy = yy - cy;
-                        if (dx * dx + dy * dy <= r2) {
+                        const distance = calculateDistance(xx, yy, cx, cy);
+                        if (distance * distance <= r2) {
                             const idx = yy * w + xx;
                             let val = state.resizeIgnoreMask[idx];
                             if (maskMode === 'toggle') {
@@ -6082,24 +6036,22 @@ import {
                     for (let y = 0; y < h; y++) {
                         for (let x = 0; x < w; x++) {
                             const idx = y * w + x;
-                            const i4 = idx * 4;
-                            const r = data[i4],
-                                g = data[i4 + 1],
-                                b = data[i4 + 2],
-                                a = data[i4 + 3];
+                            const rgba = getPixelFromImageData({ data, width: w, height: h }, x, y);
+                            if (!rgba) continue;
+                            const [r, g, b, a] = rgba;
                             const masked = mask && mask[idx];
                             const isEligible =
                                 !masked &&
                                 (state.paintTransparentPixels ||
                                     a >= tThresh2) &&
                                 (state.paintWhitePixels ||
-                                    !Utils.isWhitePixel(r, g, b));
+                                    !isPixelWhite([r, g, b]));
                             eligible[idx] = isEligible ? 1 : 0;
                             work[idx * 3] = r;
                             work[idx * 3 + 1] = g;
                             work[idx * 3 + 2] = b;
                             if (!isEligible) {
-                                data[i4 + 3] = 0;
+                                setPixelInImageData({ data, width: w, height: h }, x, y, [rgba[0], rgba[1], rgba[2], 0]);
                             }
                         }
                         // Yield to keep UI responsive
@@ -6139,11 +6091,7 @@ import {
                                 b0,
                                 state.activeColorPalette
                             );
-                            const i4 = idx * 4;
-                            data[i4] = nr;
-                            data[i4 + 1] = ng;
-                            data[i4 + 2] = nb;
-                            data[i4 + 3] = 255;
+                            setPixelInImageData({ data, width: w, height: h }, x, y, [nr, ng, nb, 255]);
                             totalValidPixels++;
 
                             const er = r0 - nr;
@@ -6163,33 +6111,27 @@ import {
                 if (state.ditheringEnabled) {
                     await applyFSDitherFinal();
                 } else {
-                    for (let i = 0; i < data.length; i += 4) {
-                        const r = data[i],
-                            g = data[i + 1],
-                            b = data[i + 2],
-                            a = data[i + 3];
-                        const masked = mask && mask[i >> 2];
-                        const isTransparent =
-                            (!state.paintTransparentPixels && a < tThresh2) ||
-                            masked;
-                        const isWhiteAndSkipped =
-                            !state.paintWhitePixels &&
-                            Utils.isWhitePixel(r, g, b);
-                        if (isTransparent || isWhiteAndSkipped) {
-                            data[i + 3] = 0; // overlay transparency
-                            continue;
+                    for (let y = 0; y < newHeight; y++) {
+                        for (let x = 0; x < newWidth; x++) {
+                            const i = (y * newWidth + x) * 4;
+                            const rgba = getPixelFromImageData({ data, width: newWidth, height: newHeight }, x, y);
+                            if (!rgba) continue;
+                            const [r, g, b, a] = rgba;
+                            const masked = mask && mask[i >> 2];
+                            const isTransparent =
+                                (!state.paintTransparentPixels && isPixelTransparent(rgba, tThresh2)) ||
+                                masked;
+                            const isWhiteAndSkipped =
+                                !state.paintWhitePixels &&
+                                isPixelWhite([r, g, b]);
+                            if (isTransparent || isWhiteAndSkipped) {
+                                setPixelInImageData({ data, width: newWidth, height: newHeight }, x, y, [r, g, b, 0]); // overlay transparency
+                                continue;
+                            }
+                            totalValidPixels++;
+                            const [nr, ng, nb] = findClosestColor([r, g, b], state.activeColorPalette);
+                            setPixelInImageData({ data, width: newWidth, height: newHeight }, x, y, [nr, ng, nb, 255]);
                         }
-                        totalValidPixels++;
-                        const [nr, ng, nb] = Utils.findClosestPaletteColor(
-                            r,
-                            g,
-                            b,
-                            state.activeColorPalette
-                        );
-                        data[i] = nr;
-                        data[i + 1] = ng;
-                        data[i + 2] = nb;
-                        data[i + 3] = 255;
                     }
                 }
                 tempCtx.putImageData(imgData, 0, 0);
@@ -6359,10 +6301,11 @@ import {
                                     CONFIG.TRANSPARENCY_THRESHOLD);
                         const isWhiteAndSkipped =
                             !state.paintWhitePixels &&
-                            Utils.isWhitePixel(
+                            isPixelWhite([
                                 pixels[i],
                                 pixels[i + 1],
                                 pixels[i + 2]
+                            ]
                             );
                         if (!isTransparent && !isWhiteAndSkipped) {
                             totalValidPixels++;
@@ -6629,13 +6572,12 @@ import {
         const tThresh2 =
             state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
         const isEligibleAt = (x, y) => {
-            const idx = (y * width + x) * 4;
-            const r = pixels[idx],
-                g = pixels[idx + 1],
-                b = pixels[idx + 2],
-                a = pixels[idx + 3];
-            if (!state.paintTransparentPixels && a < tThresh2) return false;
-            if (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b))
+            const imageData = { data: pixels, width, height };
+            const pixel = getPixelFromImageData(imageData, x, y);
+            if (!pixel) return false;
+            
+            if (!state.paintTransparentPixels && isPixelTransparent(pixel, tThresh2)) return false;
+            if (!state.paintWhitePixels && isPixelWhite([pixel[0], pixel[1], pixel[2]]))
                 return false;
             return true;
         };
@@ -6706,7 +6648,7 @@ import {
                         CONFIG.TRANSPARENCY_THRESHOLD;
                     if (
                         (!state.paintTransparentPixels && alpha < tThresh2) ||
-                        (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b))
+                        (!state.paintWhitePixels && isPixelWhite([r, g, b]))
                     ) {
                         if (!state.paintTransparentPixels && alpha < tThresh2) {
                             skippedPixels.transparent++;
@@ -6717,7 +6659,7 @@ import {
                     }
 
                     let targetRgb;
-                    if (Utils.isWhitePixel(r, g, b)) {
+                    if (isPixelWhite([r, g, b])) {
                         targetRgb = [255, 255, 255];
                     } else {
                         targetRgb = Utils.findClosestPaletteColor(
@@ -6736,10 +6678,7 @@ import {
                     let absX = startX + x;
                     let absY = startY + y;
 
-                    let adderX = Math.floor(absX / 1000);
-                    let adderY = Math.floor(absY / 1000);
-                    let pixelX = absX % 1000;
-                    let pixelY = absY % 1000;
+                    const { regionX: adderX, regionY: adderY, pixelX, pixelY } = absoluteToRegionCoords(absX, absY);
 
                     if (
                         !pixelBatch ||
