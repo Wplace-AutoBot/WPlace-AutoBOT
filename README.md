@@ -45,12 +45,6 @@ This project was fork from https://github.com/DarkModde/WPlace-AutoBOT
 
 <br>
 
-### 🎯┃Auto-Farm
-#### AUTOFARM USES CHARGES TO GET LEVELS, IT DOES NOT DRAW AN IMAGE FOR YOU. PLEASE USE AUTO-IMAGE FOR THAT
-```js
-javascript:fetch("https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/Auto-Farm.js").then(t=>t.text()).then(eval);
-```
-
 ### 🖼️┃Auto-Image
 
 ```js
