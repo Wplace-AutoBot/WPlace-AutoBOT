@@ -3317,9 +3317,27 @@ import {
     styleElement.setAttribute('data-wplace-theme', 'true');
     document.head.appendChild(styleElement);
 
+    // Check for development mode
+    const isDevMode = localStorage.getItem('dev-mode') === 'true';
+    
+    // Generate dev info header if in development mode
+    const devInfoHeader = isDevMode ? `
+      <div class="wplace-dev-info" style="
+        font-size: 11px; 
+        color: #888; 
+        padding: 2px 8px; 
+        background: rgba(0,0,0,0.1); 
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        font-family: 'Courier New', monospace;
+      ">
+        Build: __BUILD_DATE__ <br /> Commit: __COMMIT_HASH__
+      </div>
+    ` : '';
+
     const container = document.createElement('div');
     container.id = 'wplace-image-bot-container';
     container.innerHTML = `
+      ${devInfoHeader}
       <div class="wplace-header">
         <div class="wplace-header-title">
           <i class="fas fa-image"></i>
