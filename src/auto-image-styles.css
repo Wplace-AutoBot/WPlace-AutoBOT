@@ -1305,7 +1305,37 @@
   justify-content: space-between;
   color: var(--wplace-text-muted);
   font-size: 11px;
-  margin-top: 8px;
+  margin: 4px 0;
+  padding: 0;
+  width: 100%;
+  min-height: 16px;
+  position: relative;
+}
+
+.wplace-speed-min {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 500;
+  position: absolute;
+  left: 20px;
+  transform: translateX(-50%);
+}
+
+.wplace-speed-max {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 500;
+  position: absolute;
+  right: 20px;
+  transform: translateX(50%);
+}
+
+.wplace-speed-min i,
+.wplace-speed-max i {
+  font-size: 10px;
+  opacity: 0.8;
 }
 
 /* Random Batch Controls */
@@ -2057,6 +2087,18 @@
   text-align: center;
   transition: all 0.2s ease;
   flex-shrink: 0;
+  
+  /* Hide native HTML number input spin buttons */
+  -moz-appearance: textfield; /* Firefox */
+}
+
+/* Hide WebKit spin buttons */
+.wplace-speed-input::-webkit-outer-spin-button,
+.wplace-speed-input::-webkit-inner-spin-button,
+.wplace-cooldown-input::-webkit-outer-spin-button,
+.wplace-cooldown-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .wplace-speed-input:focus, 

@@ -504,3 +504,76 @@
   font-family: 'Press Start 2P', monospace !important;
 }
 
+/* Input field styling for neon theme */
+.wplace-theme-neon .wplace-speed-input,
+.wplace-theme-neon .wplace-cooldown-input {
+  background: var(--wplace-secondary) !important;
+  border: 2px solid var(--wplace-text) !important;
+  border-radius: 0 !important;
+  color: var(--wplace-text) !important;
+  text-shadow: 0 0 8px var(--wplace-text) !important;
+  font-family: 'Press Start 2P', monospace !important;
+  font-size: 10px !important;
+  box-shadow: 0 0 10px rgb(0 255 65 / 30%) !important;
+  text-align: center !important;
+  width: 50px !important;
+}
+
+.wplace-theme-neon .wplace-speed-input:focus,
+.wplace-theme-neon .wplace-cooldown-input:focus {
+  background: var(--wplace-primary) !important;
+  box-shadow: 0 0 20px var(--wplace-text), inset 0 0 10px rgb(0 255 65 / 20%) !important;
+  text-shadow: 0 0 12px var(--wplace-text) !important;
+}
+
+/* Button styling for neon theme */
+.wplace-theme-neon .wplace-input-btn-small {
+  background: var(--wplace-secondary) !important;
+  border: 2px solid var(--wplace-text) !important;
+  border-radius: 0 !important;
+  color: var(--wplace-text) !important;
+  text-shadow: 0 0 8px var(--wplace-text) !important;
+  font-family: 'Press Start 2P', monospace !important;
+  font-size: 10px !important;
+  width: 24px !important;
+  height: 24px !important;
+  box-shadow: 0 0 10px rgb(0 255 65 / 30%) !important;
+}
+
+.wplace-theme-neon .wplace-input-btn-small:hover {
+  box-shadow: 0 0 20px var(--wplace-text), inset 0 0 15px rgb(0 255 65 / 20%) !important;
+  animation: pixel-blink 0.5s infinite, neon-glow 1s ease-in-out infinite alternate !important;
+}
+
+/* Speed/Cooldown unit labels for neon theme */
+.wplace-theme-neon .wplace-speed-unit,
+.wplace-theme-neon .wplace-cooldown-unit {
+  color: var(--wplace-text) !important;
+  text-shadow: 0 0 8px var(--wplace-text) !important;
+  font-family: 'Press Start 2P', monospace !important;
+  font-size: 9px !important;
+  text-transform: uppercase !important;
+}
+
+/* Min/Max labels for neon theme */
+.wplace-theme-neon .wplace-speed-labels {
+  padding: 0 !important;
+  width: 100% !important;
+  min-height: 16px !important;
+}
+
+.wplace-theme-neon .wplace-speed-min,
+.wplace-theme-neon .wplace-speed-max {
+  color: var(--wplace-text) !important;
+  text-shadow: 0 0 8px var(--wplace-text) !important;
+  font-family: 'Press Start 2P', monospace !important;
+  font-size: 9px !important;
+  text-transform: uppercase !important;
+  gap: 6px !important;
+}
+
+.wplace-theme-neon .wplace-speed-min i,
+.wplace-theme-neon .wplace-speed-max i {
+  text-shadow: 0 0 5px currentColor !important;
+}
+

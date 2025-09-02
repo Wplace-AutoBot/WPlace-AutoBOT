@@ -3718,6 +3718,10 @@ import {
           <div id="normalBatchControls" class="wplace-batch-controls wplace-normal-batch-controls">
             <div class="wplace-speed-slider-container">
               <input type="range" id="speedSlider" min="${CONFIG.PAINTING_SPEED.MIN}" max="${CONFIG.PAINTING_SPEED.MAX}" value="${CONFIG.PAINTING_SPEED.DEFAULT}" class="wplace-speed-slider">
+              <div class="wplace-speed-labels">
+                <span class="wplace-speed-min">🐢 ${CONFIG.PAINTING_SPEED.MIN}</span>
+                <span class="wplace-speed-max">${CONFIG.PAINTING_SPEED.MAX} 🐇</span>
+              </div>
               <div class="wplace-speed-controls">
                 <div class="wplace-speed-input-group">
                   <button id="speedDecrease" class="wplace-input-btn wplace-input-btn-small" type="button">-</button>
@@ -3726,10 +3730,6 @@ import {
                 </div>
                 <span class="wplace-speed-unit">pixels</span>
               </div>
-            </div>
-            <div class="wplace-speed-labels">
-              <span class="wplace-speed-min"><i class="fas fa-turtle"></i> ${CONFIG.PAINTING_SPEED.MIN}</span>
-              <span class="wplace-speed-max"><i class="fas fa-rabbit"></i> ${CONFIG.PAINTING_SPEED.MAX}</span>
             </div>
           </div>
           
