@@ -235,12 +235,14 @@ import {
       'wplace-theme-neon'
     );
 
-    let themeClass = 'wplace-theme-classic'; // default
-    if (CONFIG.currentTheme === 'Neon Retro') {
-      themeClass = 'wplace-theme-neon';
-    } else if (CONFIG.currentTheme === 'Classic Light') {
-      themeClass = 'wplace-theme-classic-light';
-    }
+    // Map CONFIG theme names to CSS class names
+    const themeClassMapping = {
+      'Classic Autobot': 'wplace-theme-classic',
+      'Classic Light': 'wplace-theme-classic-light',
+      'Neon Retro': 'wplace-theme-neon'
+    };
+    
+    const themeClass = themeClassMapping[CONFIG.currentTheme] || 'wplace-theme-classic';
 
     document.documentElement.classList.add(themeClass);
 
@@ -252,10 +254,18 @@ import {
 
     // Inject new theme CSS from embedded themes
     const themeName = getCurrentThemeName();
-    if (EMBEDDED_THEMES[themeName]) {
+    // Map CONFIG theme names to embedded theme file names
+    const themeFileMapping = {
+      'Classic Autobot': 'classic',
+      'Classic Light': 'classic-light', 
+      'Neon Retro': 'neon'
+    };
+    
+    const themeFileName = themeFileMapping[themeName] || 'classic';
+    if (EMBEDDED_THEMES[themeFileName]) {
       const style = document.createElement('style');
       style.id = 'wplace-theme-css';
-      style.textContent = EMBEDDED_THEMES[themeName];
+      style.textContent = EMBEDDED_THEMES[themeFileName];
       document.head.appendChild(style);
     }
 
