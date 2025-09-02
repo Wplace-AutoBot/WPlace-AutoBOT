@@ -87,6 +87,7 @@ javascript:fetch("https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBO
 - [x] Paint over multiple tiles
 - [x] Multi Account Auto Switcher Via Other Branch ; https://github.com/Wplace-AutoBot/WPlace-AutoBOT/tree/Acc-switch (Ram Efficient LOL)
 - [x] AutoCaptcha Solver With Turnstile Token Generator
+- [x] Wider Paint Control Options
 - [x] Advance Color Processing
 - [x] MultiLanguage Support
 - [x] Multi account through save and load feature
