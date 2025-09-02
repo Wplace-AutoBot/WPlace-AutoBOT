@@ -1781,19 +1781,30 @@ import {
     },
 
     // Add hold-to-repeat functionality to buttons (for +/- buttons)
-    addHoldToRepeatListener: (button, callback, initialDelay = 500, repeatInterval = 100) => {
+    addHoldToRepeatListener: (button, callback, initialDelay = 500, initialInterval = 150) => {
       let timeout, interval;
+      let currentInterval = initialInterval;
+      const minInterval = 25; // Fastest repeat rate
+      const acceleration = 0.9; // Speed multiplier each cycle
       
       const startRepeating = () => {
         callback(); // Execute immediately
+        currentInterval = initialInterval; // Reset to initial speed
+        
         timeout = setTimeout(() => {
-          interval = setInterval(callback, repeatInterval);
+          const acceleratingRepeat = () => {
+            callback();
+            currentInterval = Math.max(minInterval, currentInterval * acceleration);
+            interval = setTimeout(acceleratingRepeat, currentInterval);
+          };
+          acceleratingRepeat();
         }, initialDelay);
       };
       
       const stopRepeating = () => {
         clearTimeout(timeout);
-        clearInterval(interval);
+        clearTimeout(interval);
+        currentInterval = initialInterval; // Reset for next time
       };
       
       // Handle both mouse and touch events
