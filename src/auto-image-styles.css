@@ -1955,3 +1955,325 @@
   color: var(--wplace-icon-palette);
   margin-right: 6px;
 }
+
+/* ========================= */
+/* Enhanced Slider Controls */
+/* ========================= */
+
+/* Vertical Layout - Slider on top, controls below */
+.wplace-speed-slider-container, 
+.wplace-slider-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 8px 0;
+}
+
+.wplace-speed-slider, 
+.wplace-slider {
+  width: 100%;
+  height: 6px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 3px;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.wplace-speed-slider::-webkit-slider-thumb, 
+.wplace-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #4facfe;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.wplace-speed-slider::-webkit-slider-thumb:hover, 
+.wplace-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.4), 0 0 0 3px #4facfe;
+}
+
+/* Controls row - input group + unit label */
+.wplace-speed-controls, 
+.wplace-cooldown-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* Input group with +/- buttons */
+.wplace-speed-input-group, 
+.wplace-cooldown-input-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 4px;
+  padding: 2px;
+  flex-shrink: 0;
+}
+
+/* Small +/- buttons */
+.wplace-input-btn-small {
+  background: transparent;
+  color: #4facfe;
+  border: none;
+  border-radius: 2px;
+  width: 16px;
+  height: 18px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.wplace-input-btn-small:hover {
+  background: rgba(79, 172, 254, 0.15);
+  color: white;
+}
+
+.wplace-input-btn-small:active {
+  background: rgba(79, 172, 254, 0.3);
+}
+
+/* Number input fields */
+.wplace-speed-input, 
+.wplace-cooldown-input {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 3px;
+  color: white;
+  padding: 2px 6px;
+  font-size: 12px;
+  width: 42px;
+  text-align: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.wplace-speed-input:focus, 
+.wplace-cooldown-input:focus {
+  outline: none;
+  background: rgba(0,0,0,0.5);
+  border-color: #4facfe;
+  box-shadow: 0 0 0 1px rgba(79, 172, 254, 0.3);
+}
+
+/* Unit labels */
+.wplace-speed-unit, 
+.wplace-cooldown-unit {
+  color: rgba(255,255,255,0.7);
+  font-size: 11px;
+  min-width: 35px;
+}
+
+/* ========================= */
+/* Additional UI Components */
+/* ========================= */
+
+/* Keyframes for animations */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes settings-slide-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes settings-fade-out {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+}
+
+/* Overlay opacity slider */
+#overlayOpacitySlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.3), 0 0 0 2px #4facfe;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#overlayOpacitySlider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.4), 0 0 0 3px #4facfe;
+}
+
+#overlayOpacitySlider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.3), 0 0 0 2px #4facfe;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+/* Theme and language selects */
+#themeSelect:hover, #languageSelect:hover {
+  border-color: rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+}
+
+#themeSelect:focus, #languageSelect:focus {
+  border-color: #4facfe;
+  box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.3);
+}
+
+#themeSelect option, #languageSelect option {
+  background: #2d3748;
+  color: white;
+  padding: 10px;
+  border-radius: 6px;
+}
+
+#themeSelect option:hover, #languageSelect option:hover {
+  background: #4a5568;
+}
+
+/* Dragging state */
+.wplace-dragging {
+  opacity: 0.9;
+  box-shadow: 0 30px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.2);
+  transition: none;
+}
+
+/* Settings header interactions */
+.wplace-settings-header:hover {
+  background: rgba(255,255,255,0.15) !important;
+}
+
+.wplace-settings-header:active {
+  background: rgba(255,255,255,0.2) !important;
+}
+
+/* ========================= */
+/* Dynamic Warning Banner    */
+/* ========================= */
+.wplace-warning-banner {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 10001;
+  background: rgba(255, 193, 7, 0.95);
+  color: #212529;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  border: 1px solid rgba(255, 193, 7, 0.8);
+  max-width: 300px;
+  word-wrap: break-word;
+}
+
+/* ========================= */
+/* Settings Container Theme  */
+/* ========================= */
+.wplace-settings-container-themed {
+  min-width: 420px;
+  max-width: 480px;
+  z-index: 99999;
+  color: var(--theme-text, white);
+  font-family: var(--theme-font-family, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif);
+  box-shadow: var(--theme-box-shadow, 0 20px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1));
+  backdrop-filter: var(--theme-backdrop-filter, blur(10px));
+  overflow: hidden;
+  animation: settings-slide-in 0.4s ease-out;
+}
+
+.wplace-settings-container-themed.glow-effect {
+  box-shadow: var(--theme-box-shadow, 0 20px 40px rgba(0,0,0,0.3)), 
+             0 0 30px var(--theme-glow-color, #00ffff);
+}
+
+/* Theme-aware dynamic text colors */
+.wplace-settings-section-label,
+.wplace-overlay-opacity-label,
+.wplace-settings-toggle-title,
+.wplace-settings-toggle-description,
+.resize-dialog-title {
+  color: var(--theme-text, white) !important;
+}
+
+.wplace-icon-eye {
+  color: var(--theme-highlight, #48dbfb) !important;
+}
+
+/* Dynamic accent color for checkboxes and inputs */
+.wplace-settings-checkbox,
+.wplace-slider,
+input[type="range"] {
+  accent-color: var(--theme-highlight, #48dbfb);
+}
+
+/* ========================= */
+/* Reusable CSS Classes      */
+/* ========================= */
+.wplace-btn-primary {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wplace-btn-secondary {
+  background: rgba(255,255,255,0.1);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.wplace-modern-card {
+  background: rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 18px;
+  border: 1px solid rgba(255,255,255,0.1);
+  backdrop-filter: blur(5px);
+}
+
+.wplace-gradient-text {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: bold;
+}

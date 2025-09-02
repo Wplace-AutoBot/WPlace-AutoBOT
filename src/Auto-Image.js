@@ -4,7 +4,6 @@ import {
     EMBEDDED_LANGUAGES,
 } from 'embedded-assets';
 
-// eslint-disable-next-line prettier/prettier
 ; (async () => {
   // CONFIGURATION CONSTANTS
   const CONFIG = {
@@ -22,7 +21,7 @@ import {
       MIN: 3, // Random range minimum
       MAX: 20, // Random range maximum
     },
-    PAINTING_SPEED_ENABLED: true, // On by default
+    PAINTING_SPEED_ENABLED: false, // On by default
     AUTO_CAPTCHA_ENABLED: true, // Turnstile generator enabled by default
     TOKEN_SOURCE: 'generator', // "generator", "manual", or "hybrid" - default to generator
     COOLDOWN_CHARGE_THRESHOLD: 1, // Default wait threshold
@@ -105,30 +104,7 @@ import {
       62: { id: 60, name: 'Light Slate', rgb: { r: 179, g: 185, b: 209 } },
       63: { id: 0, name: 'Transparent', rgb: null },
     }, // --- END: Color data ---
-    // Optimized CSS Classes for reuse
-    CSS_CLASSES: {
-      BUTTON_PRIMARY: `
-        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        color: white; border: none; border-radius: 8px; padding: 10px 16px;
-        cursor: pointer; font-weight: 500; transition: all 0.3s ease;
-        display: flex; align-items: center; gap: 8px;
-      `,
-      BUTTON_SECONDARY: `
-        background: rgba(255,255,255,0.1); color: white;
-        border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;
-        padding: 8px 12px; cursor: pointer; transition: all 0.3s ease;
-      `,
-      MODERN_CARD: `
-        background: rgba(255,255,255,0.1); border-radius: 12px;
-        padding: 18px; border: 1px solid rgba(255,255,255,0.1);
-        backdrop-filter: blur(5px);
-      `,
-      GRADIENT_TEXT: `
-        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        background-clip: text; font-weight: bold;
-      `,
-    },
+    // CSS Classes moved to src/auto-image-styles.css
     THEMES: {
       'Classic Autobot': {
         primary: '#000000',
@@ -424,13 +400,7 @@ import {
     try {
       // Create a simple temporary notification banner
       const warning = document.createElement('div');
-      warning.style.cssText = `
-        position: fixed; top: 10px; right: 10px; z-index: 10001;
-        background: rgba(255, 193, 7, 0.95); color: #212529; padding: 12px 16px;
-        border-radius: 8px; font-size: 14px; font-weight: 500;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3); border: 1px solid rgba(255, 193, 7, 0.8);
-        max-width: 300px; word-wrap: break-word;
-      `;
+      warning.className = 'wplace-warning-banner';
       warning.textContent = message;
       document.body.appendChild(warning);
 
@@ -489,6 +459,7 @@ import {
       progress: 'Progress',
       pixels: 'Pixels',
       charges: 'Charges',
+      batchSize: 'Batch Size',
       initMessage: "Click 'Upload Image' to begin",
     },
   };
@@ -1799,10 +1770,10 @@ import {
       return element;
     },
 
-    createButton: (id, text, icon, onClick, style = CONFIG.CSS_CLASSES.BUTTON_PRIMARY) => {
+    createButton: (id, text, icon, onClick, className = 'wplace-btn-primary') => {
       const button = Utils.createElement('button', {
         id: id,
-        style: style,
+        className: className,
         innerHTML: `${icon ? `<i class="${icon}"></i>` : ''}<span>${text}</span>`,
       });
       if (onClick) button.addEventListener('click', onClick);
@@ -3435,7 +3406,14 @@ import {
                 <label id="cooldownLabel">${Utils.t('waitCharges')}:</label>
                 <div class="wplace-slider-container">
                     <input type="range" id="cooldownSlider" class="wplace-slider" min="1" max="1" value="${state.cooldownChargeThreshold}">
-                    <span id="cooldownValue" class="wplace-cooldown-value">${state.cooldownChargeThreshold}</span>
+                    <div class="wplace-cooldown-controls">
+                        <div class="wplace-cooldown-input-group">
+                            <button id="cooldownDecrease" class="wplace-input-btn wplace-input-btn-small" type="button">-</button>
+                            <input type="number" id="cooldownInput" class="wplace-cooldown-input" min="1" max="999" value="${state.cooldownChargeThreshold}">
+                            <button id="cooldownIncrease" class="wplace-input-btn wplace-input-btn-small" type="button">+</button>
+                        </div>
+                        <span class="wplace-cooldown-unit">Charges</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -3517,30 +3495,21 @@ import {
       ? `linear-gradient(135deg, ${theme.primary} 0%, ${theme.secondary || theme.primary} 100%)`
       : `linear-gradient(135deg, #667eea 0%, #764ba2 100%)`;
 
-    settingsContainer.className = 'wplace-settings-container-base';
-    // Apply theme-specific background
+    settingsContainer.className = 'wplace-settings-container-base wplace-settings-container-themed';
+    
+    // Apply theme-specific background and CSS custom properties
     settingsContainer.style.background = themeBackground;
-    settingsContainer.style.cssText += `
-      min-width: 420px;
-      max-width: 480px;
-      z-index: 99999;
-      color: ${theme.text || 'white'};
-      font-family: ${theme.fontFamily || "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"};
-      box-shadow: ${
-        theme.boxShadow || '0 20px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1)'
-      };
-      backdrop-filter: ${theme.backdropFilter || 'blur(10px)'};
-      overflow: hidden;
-      animation: settings-slide-in 0.4s ease-out;
-      ${
-        theme.animations?.glow
-          ? `
-        box-shadow: ${theme.boxShadow || '0 20px 40px rgba(0,0,0,0.3)'}, 
-                   0 0 30px ${theme.highlight || theme.neon || '#00ffff'};
-      `
-          : ''
-      }
-    `;
+    settingsContainer.style.setProperty('--theme-text', theme.text || 'white');
+    settingsContainer.style.setProperty('--theme-font-family', theme.fontFamily || "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif");
+    settingsContainer.style.setProperty('--theme-box-shadow', theme.boxShadow || '0 20px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1)');
+    settingsContainer.style.setProperty('--theme-backdrop-filter', theme.backdropFilter || 'blur(10px)');
+    settingsContainer.style.setProperty('--theme-highlight', theme.highlight || '#48dbfb');
+    
+    // Add glow effect class if theme supports it
+    if (theme.animations?.glow) {
+      settingsContainer.classList.add('glow-effect');
+      settingsContainer.style.setProperty('--theme-glow-color', theme.highlight || theme.neon || '#00ffff');
+    }
 
     // noinspection CssInvalidFunction
     settingsContainer.innerHTML = `
@@ -3591,10 +3560,8 @@ import {
 
         <!-- Overlay Settings Section -->
         <div class="wplace-settings-section">
-          <label class="wplace-settings-section-label" style="color: ${theme.text || 'white'};">
-            <i class="fas fa-eye wplace-icon-eye" style="color: ${
-              theme.highlight || '#48dbfb'
-            };"></i>
+          <label class="wplace-settings-section-label">
+            <i class="fas fa-eye wplace-icon-eye"></i>
             Overlay Settings
           </label>
           <div class="wplace-settings-section-wrapper wplace-overlay-wrapper" style="
@@ -3662,7 +3629,7 @@ import {
             <!-- Paint White Pixels -->
             <label class="wplace-settings-toggle">
               <div>
-                <span class="wplace-settings-toggle-title" style="color: ${theme.text || 'white'};">
+                <span class="wplace-settings-toggle-title" >
                   ${Utils.t('paintWhitePixels')}
                 </span>
                 <p class="wplace-settings-toggle-description" style="color: ${
@@ -3673,13 +3640,13 @@ import {
               </div>
               <input type="checkbox" id="settingsPaintWhiteToggle" ${state.paintWhitePixels ? 'checked' : ''} 
                 class="wplace-settings-checkbox"
-                style="accent-color: ${theme.highlight || '#48dbfb'};"/>
+                />
             </label>
             
             <!-- Paint Transparent Pixels -->
             <label class="wplace-settings-toggle">
               <div>
-                <span class="wplace-settings-toggle-title" style="color: ${theme.text || 'white'};">
+                <span class="wplace-settings-toggle-title" >
                   ${Utils.t('paintTransparentPixels')}
                 </span>
                 <p class="wplace-settings-toggle-description" style="color: ${
@@ -3690,7 +3657,7 @@ import {
               </div>
               <input type="checkbox" id="settingsPaintTransparentToggle" ${state.paintTransparentPixels ? 'checked' : ''} 
                 class="wplace-settings-checkbox"
-                style="accent-color: ${theme.highlight || '#48dbfb'};"/>
+                />
             </label>
             <label class="wplace-settings-toggle">
               <div>
@@ -3733,7 +3700,14 @@ import {
           <div id="normalBatchControls" class="wplace-batch-controls wplace-normal-batch-controls">
             <div class="wplace-speed-slider-container">
               <input type="range" id="speedSlider" min="${CONFIG.PAINTING_SPEED.MIN}" max="${CONFIG.PAINTING_SPEED.MAX}" value="${CONFIG.PAINTING_SPEED.DEFAULT}" class="wplace-speed-slider">
-              <div id="speedValue" class="wplace-speed-value">${CONFIG.PAINTING_SPEED.DEFAULT} (batch size)</div>
+              <div class="wplace-speed-controls">
+                <div class="wplace-speed-input-group">
+                  <button id="speedDecrease" class="wplace-input-btn wplace-input-btn-small" type="button">-</button>
+                  <input type="number" id="speedInput" class="wplace-speed-input" min="${CONFIG.PAINTING_SPEED.MIN}" max="${CONFIG.PAINTING_SPEED.MAX}" value="${CONFIG.PAINTING_SPEED.DEFAULT}">
+                  <button id="speedIncrease" class="wplace-input-btn wplace-input-btn-small" type="button">+</button>
+                </div>
+                <span class="wplace-speed-unit">pixels</span>
+              </div>
             </div>
             <div class="wplace-speed-labels">
               <span class="wplace-speed-min"><i class="fas fa-turtle"></i> ${CONFIG.PAINTING_SPEED.MIN}</span>
@@ -3944,105 +3918,12 @@ import {
                  <i class="fas fa-check"></i> ${Utils.t('applySettings')}
           </button>
         </div>
-
-      <style>
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-
-        @keyframes settings-slide-in {
-          from {
-            opacity: 0;
-            transform: translate(-50%, -50%) scale(0.9);
-          }
-          to {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
-          }
-        }
-
-        @keyframes settings-fade-out {
-          from {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
-          }
-          to {
-            opacity: 0;
-            transform: translate(-50%, -50%) scale(0.9);
-          }
-        }
-
-        #speedSlider::-webkit-slider-thumb, #overlayOpacitySlider::-webkit-slider-thumb {
-          -webkit-appearance: none;
-          width: 18px;
-          height: 18px;
-          border-radius: 50%;
-          background: white;
-          box-shadow: 0 3px 6px rgba(0,0,0,0.3), 0 0 0 2px #4facfe;
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-
-        #speedSlider::-webkit-slider-thumb:hover, #overlayOpacitySlider::-webkit-slider-thumb:hover {
-          transform: scale(1.2);
-          box-shadow: 0 4px 8px rgba(0,0,0,0.4), 0 0 0 3px #4facfe;
-        }
-
-        #speedSlider::-moz-range-thumb, #overlayOpacitySlider::-moz-range-thumb {
-          width: 18px;
-          height: 18px;
-          border-radius: 50%;
-          background: white;
-          box-shadow: 0 3px 6px rgba(0,0,0,0.3), 0 0 0 2px #4facfe;
-          cursor: pointer;
-          border: none;
-          transition: all 0.2s ease;
-        }
-
-        #themeSelect:hover, #languageSelect:hover {
-          border-color: rgba(255,255,255,0.4);
-          background: rgba(255,255,255,0.2);
-          transform: translateY(-1px);
-          box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-        }
-
-        #themeSelect:focus, #languageSelect:focus {
-          border-color: #4facfe;
-          box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.3);
-        }
-
-        #themeSelect option, #languageSelect option {
-          background: #2d3748;
-          color: white;
-          padding: 10px;
-          border-radius: 6px;
-        }
-
-        #themeSelect option:hover, #languageSelect option:hover {
-          background: #4a5568;
-        }
-
-        .wplace-dragging {
-          opacity: 0.9;
-          box-shadow: 0 30px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.2);
-          transition: none;
-        }
-
-        .wplace-settings-header:hover {
-          background: rgba(255,255,255,0.15) !important;
-        }
-
-        .wplace-settings-header:active {
-          background: rgba(255,255,255,0.2) !important;
-        }
-      </style>
     `;
 
     const resizeContainer = document.createElement('div');
     resizeContainer.className = 'resize-container';
     resizeContainer.innerHTML = `
-      <h3 class="resize-dialog-title" style="color: ${theme.text}">${Utils.t('resizeImage')}</h3>
+      <h3 class="resize-dialog-title">${Utils.t('resizeImage')}</h3>
       <div class="resize-controls">
         <label class="resize-control-label">
           Width: <span id="widthValue">0</span>px
@@ -4287,6 +4168,9 @@ import {
     const closeStatsBtn = statsContainer.querySelector('#closeStatsBtn');
     const refreshChargesBtn = statsContainer.querySelector('#refreshChargesBtn');
     const cooldownSlider = container.querySelector('#cooldownSlider');
+    const cooldownInput = container.querySelector('#cooldownInput');
+    const cooldownDecrease = container.querySelector('#cooldownDecrease');
+    const cooldownIncrease = container.querySelector('#cooldownIncrease');
     const cooldownValue = container.querySelector('#cooldownValue');
 
     if (!uploadBtn || !selectPosBtn || !startBtn || !stopBtn) {
@@ -4648,16 +4532,41 @@ import {
         });
       }
 
-      // Speed slider event listener
+      // Speed slider + input + buttons event listeners
       const speedSlider = settingsContainer.querySelector('#speedSlider');
-      const speedValue = settingsContainer.querySelector('#speedValue');
-      if (speedSlider && speedValue) {
-        speedSlider.addEventListener('input', (e) => {
-          const speed = parseInt(e.target.value, 10);
+      const speedInput = settingsContainer.querySelector('#speedInput');
+      const speedDecrease = settingsContainer.querySelector('#speedDecrease');
+      const speedIncrease = settingsContainer.querySelector('#speedIncrease');
+      if (speedSlider && speedInput) {
+        const updateSpeed = (newValue, source) => {
+          const speed = Math.max(CONFIG.PAINTING_SPEED.MIN, Math.min(CONFIG.PAINTING_SPEED.MAX, parseInt(newValue)));
           state.paintingSpeed = speed;
-          speedValue.textContent = `${speed} (batch size)`;
+          
+          if (source !== 'slider') speedSlider.value = speed;
+          if (source !== 'input') speedInput.value = speed;
+          
           saveBotSettings();
+        };
+
+        speedSlider.addEventListener('input', (e) => {
+          updateSpeed(e.target.value, 'slider');
         });
+
+        speedInput.addEventListener('input', (e) => {
+          updateSpeed(e.target.value, 'input');
+        });
+
+        if (speedDecrease) {
+          speedDecrease.addEventListener('click', () => {
+            updateSpeed(parseInt(speedInput.value) - 1, 'button');
+          });
+        }
+
+        if (speedIncrease) {
+          speedIncrease.addEventListener('click', () => {
+            updateSpeed(parseInt(speedInput.value) + 1, 'button');
+          });
+        }
       }
 
       if (enableBlueMarbleToggle) {
@@ -5098,8 +5007,11 @@ import {
         intervalMs
       );
 
-      if (cooldownSlider.max !== state.maxCharges) {
+      if (cooldownSlider && cooldownSlider.max !== state.maxCharges) {
         cooldownSlider.max = state.maxCharges;
+      }
+      if (cooldownInput && cooldownInput.max !== state.maxCharges) {
+        cooldownInput.max = state.maxCharges;
       }
 
       let imageStatsHTML = '';
@@ -6586,14 +6498,37 @@ import {
 
     setTimeout(checkSavedProgress, 1000);
 
-    if (cooldownSlider && cooldownValue) {
-      cooldownSlider.addEventListener('input', (e) => {
-        const threshold = parseInt(e.target.value);
+    if (cooldownSlider && cooldownInput) {
+      const updateCooldown = (newValue, source) => {
+        const threshold = Math.max(1, Math.min(state.maxCharges || 999, parseInt(newValue)));
         state.cooldownChargeThreshold = threshold;
-        cooldownValue.textContent = threshold;
+        
+        if (source !== 'slider') cooldownSlider.value = threshold;
+        if (source !== 'input') cooldownInput.value = threshold;
+        
         saveBotSettings();
         NotificationManager.resetEdgeTracking(); // prevent spurious notify after threshold change
+      };
+
+      cooldownSlider.addEventListener('input', (e) => {
+        updateCooldown(e.target.value, 'slider');
       });
+
+      cooldownInput.addEventListener('input', (e) => {
+        updateCooldown(e.target.value, 'input');
+      });
+
+      if (cooldownDecrease) {
+        cooldownDecrease.addEventListener('click', () => {
+          updateCooldown(parseInt(cooldownInput.value) - 1, 'button');
+        });
+      }
+
+      if (cooldownIncrease) {
+        cooldownIncrease.addEventListener('click', () => {
+          updateCooldown(parseInt(cooldownInput.value) + 1, 'button');
+        });
+      }
     }
 
     loadBotSettings();
@@ -7477,9 +7412,9 @@ import {
       }
 
       const speedSlider = document.getElementById('speedSlider');
+      const speedInput = document.getElementById('speedInput');
       if (speedSlider) speedSlider.value = state.paintingSpeed;
-      const speedValue = document.getElementById('speedValue');
-      if (speedValue) speedValue.textContent = `${state.paintingSpeed} (batch size)`;
+      if (speedInput) speedInput.value = state.paintingSpeed;
 
       const enableSpeedToggle = document.getElementById('enableSpeedToggle');
       if (enableSpeedToggle) enableSpeedToggle.checked = CONFIG.PAINTING_SPEED_ENABLED;
@@ -7511,9 +7446,9 @@ import {
       // AUTO_CAPTCHA_ENABLED is always true - no toggle to set
 
       const cooldownSlider = document.getElementById('cooldownSlider');
+      const cooldownInput = document.getElementById('cooldownInput');
       if (cooldownSlider) cooldownSlider.value = state.cooldownChargeThreshold;
-      const cooldownValue = document.getElementById('cooldownValue');
-      if (cooldownValue) cooldownValue.textContent = state.cooldownChargeThreshold;
+      if (cooldownInput) cooldownInput.value = state.cooldownChargeThreshold;
 
       const overlayOpacitySlider = document.getElementById('overlayOpacitySlider');
       if (overlayOpacitySlider) overlayOpacitySlider.value = state.overlayOpacity;
