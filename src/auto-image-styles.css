@@ -340,6 +340,7 @@
 .wplace-status-section {
   margin-bottom: 6px;
   padding: 8px;
+  border-radius: var(--wplace-radius, 12px);
 
   /* Theme-specific styling applied via theme files */
 }
@@ -406,7 +407,7 @@
 
 .wplace-btn {
   padding: 8px 12px;
-  border: none;
+  border: 1px solid rgb(255 255 255 / 10%);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -417,6 +418,13 @@
   position: relative;
   overflow: hidden;
   font-weight: 500;
+  
+  /* Default styling - themes can override these */
+  background: linear-gradient(135deg, #222 0%, #4a4a4a 100%);
+  color: var(--wplace-text);
+  border-radius: var(--wplace-btn-radius, 16px);
+  font-family: var(--wplace-font);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 20%);
 
   /* Theme-specific styling applied via theme files */
 }
@@ -437,6 +445,7 @@
   width: 100%;
   height: 100%;
   transition: left 0.5s ease;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 10%), transparent);
 
   /* Theme-specific styling applied via theme files */
 }
@@ -451,6 +460,7 @@
 
 .wplace-btn:hover:not(:disabled) {
   transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 30%);
 
   /* Theme-specific styling applied via theme files */
 }
@@ -459,7 +469,18 @@
   transform: translateY(0);
 }
 
-/* Button variants moved to theme files */
+/* Default button variants - themes can override these */
+.wplace-btn-upload {
+  background: rgb(111 66 193 / 10%) !important;
+  border: 2px dashed var(--wplace-highlight) !important;
+  color: var(--wplace-highlight) !important;
+}
+
+.wplace-btn-upload:hover:not(:disabled) {
+  background: rgb(111 66 193 / 15%) !important;
+  border-color: var(--wplace-highlight) !important;
+  box-shadow: 0 4px 12px rgb(111 66 193 / 20%) !important;
+}
 
 /* ========================= */
 /* Stats and progress        */
@@ -574,6 +595,7 @@
   padding: 6px;
   border: 1px solid;
   font-size: 11px;
+  border-radius: var(--wplace-radius, 12px);
 
   /* Theme-specific styling applied via theme files */
 }
@@ -1027,11 +1049,36 @@
   text-align: center;
   animation: slide-down 0.3s ease-out;
   box-shadow: var(--wplace-shadow-notification);
+  
+  /* Default fallback background - themes override this */
+  background: rgb(0 0 0 / 90%);
+  border-radius: var(--wplace-radius);
+  border: 1px solid rgb(255 255 255 / 20%);
+  backdrop-filter: var(--wplace-backdrop);
 
   /* Theme-specific styling applied via theme files */
 }
 
-/* Alert styling moved to theme files */
+/* Default alert type styles - themes can override these */
+.wplace-alert-info {
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
+}
+
+.wplace-alert-success {
+  background: linear-gradient(135deg, #27ae60, #229954);
+  color: white;
+}
+
+.wplace-alert-warning {
+  background: linear-gradient(135deg, #f39c12, #e67e22);
+  color: white;
+}
+
+.wplace-alert-error {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  color: white;
+}
 
 /* ========================= */
 /* Modal overlay helpers     */

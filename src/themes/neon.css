@@ -392,6 +392,49 @@
   }
 }
 
+/* Alert styling for neon theme */
+.wplace-theme-neon .wplace-alert-base {
+  border: 2px solid var(--wplace-text) !important;
+  border-radius: 0 !important;
+  font-family: 'Press Start 2P', monospace !important;
+  box-shadow: 0 0 20px var(--wplace-text), inset 0 0 10px rgb(0 255 65 / 10%) !important;
+  backdrop-filter: none !important;
+  font-size: 10px !important;
+  text-transform: uppercase !important;
+}
+
+.wplace-theme-neon .wplace-alert-info {
+  background: var(--wplace-primary) !important;
+  color: var(--wplace-text) !important;
+  border-color: var(--wplace-text) !important;
+  text-shadow: 0 0 8px var(--wplace-text) !important;
+  box-shadow: 0 0 20px var(--wplace-text), inset 0 0 10px rgb(0 255 65 / 10%) !important;
+}
+
+.wplace-theme-neon .wplace-alert-success {
+  background: var(--wplace-primary) !important;
+  color: var(--wplace-success) !important;
+  border-color: var(--wplace-success) !important;
+  text-shadow: 0 0 8px var(--wplace-success) !important;
+  box-shadow: 0 0 20px var(--wplace-success), inset 0 0 10px rgb(57 255 20 / 10%) !important;
+}
+
+.wplace-theme-neon .wplace-alert-warning {
+  background: var(--wplace-primary) !important;
+  color: var(--wplace-warning) !important;
+  border-color: var(--wplace-warning) !important;
+  text-shadow: 0 0 8px var(--wplace-warning) !important;
+  box-shadow: 0 0 20px var(--wplace-warning), inset 0 0 10px rgb(255 255 0 / 10%) !important;
+}
+
+.wplace-theme-neon .wplace-alert-error {
+  background: var(--wplace-primary) !important;
+  color: var(--wplace-error) !important;
+  border-color: var(--wplace-error) !important;
+  text-shadow: 0 0 8px var(--wplace-error) !important;
+  box-shadow: 0 0 20px var(--wplace-error), inset 0 0 10px rgb(255 7 58 / 10%) !important;
+}
+
 /* Resize dialog styling for neon theme */
 .wplace-theme-neon .resize-container {
   background: #1a1a2e !important;
