@@ -99,7 +99,7 @@ javascript:fetch("https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBO
 ---
 
 <p align="center">
-  <img src="https://i.imgur.com/lyNQUsY.png" alt="Script Demonstration"/>
+  <img src="https://i.imgur.com/5QYvb4w.png" alt="Script Demonstration"/>
 </p>
 
 ---
