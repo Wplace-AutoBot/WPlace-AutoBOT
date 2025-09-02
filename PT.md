@@ -1,8 +1,31 @@
+<p align="center"><strong>Translations</strong></p>
+<p align="center">
+    <a href="README.md"><img src="https://flagcdn.com/256x192/us.png" width="48" alt="US Flag"></a>
+  &nbsp;
+    <a href="ES.md"><img src="https://flagcdn.com/256x192/br.png" width="48" alt="Brazil Flag"></a>
+  &nbsp;
+    <a href="FR.md"><img src="https://flagcdn.com/256x192/fr.png" width="48" alt="French Flag"></a>
+  &nbsp;
+    <a href="RU.md"><img src="https://flagcdn.com/256x192/ru.png" width="48" alt="Russian Flag"></a>
+  &nbsp;
+    <a href="NL.md"><img src="https://flagcdn.com/256x192/nl.png" width="48" alt="Netherlands Flag"></a>
+  &nbsp;
+    <a href="UK.md"><img src="https://flagcdn.com/256x192/ua.png" width="48" alt="Ukrainian Flag"></a>
+  &nbsp;
+    <a href="DE.md"><img src="https://flagcdn.com/256x192/de.png" width="48" alt="Deutsch Flag"></a>
+</p>
+
+---
+
+<p align="center">
+  <img width="379" height="376" alt="image" src="https://github.com/user-attachments/assets/c14ef2b5-e104-4526-9b17-23cb2abc9efe" />
+</p>
 
 <p align="center"><strong>WPlace AutoBOT</strong></p>
 <p align="center">
-Este projeto foi bifurcado de https://github.com/DarkModde/WPlace-AutoBOT
-Junte-se ao nosso discord: https://discord.gg/CBB4abRmGM
+  Este projeto foi bifurcado de <a href="https://github.com/DarkModde/WPlace-AutoBOT" target="_blank">https://github.com/DarkModde/WPlace-AutoBOT</a>
+<p align="center">
+  Junte-se ao nosso discord: <a href="https://discord.gg/knkNRYyQcm" target="_blank">https://discord.gg/knkNRYyQcm</a>
 </p>
 <p align="center">
   Scripts práticos com menus intuitivos para facilitar sua vida no <a href="https://wplace.live" target="_blank">WPlace</a>!<br>

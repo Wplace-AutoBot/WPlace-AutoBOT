@@ -1,13 +1,31 @@
+<p align="center"><strong>Translations</strong></p>
 <p align="center">
-  <img width="300" height="300" alt="image" src="https://github.com/user-attachments/assets/92c38d55-37ef-4e88-bf24-9dba693fa0ab" />
+    <a href="README.md"><img src="https://flagcdn.com/256x192/us.png" width="48" alt="US Flag"></a>
+  &nbsp;
+    <a href="ES.md"><img src="https://flagcdn.com/256x192/br.png" width="48" alt="Brazil Flag"></a>
+  &nbsp;
+    <a href="FR.md"><img src="https://flagcdn.com/256x192/fr.png" width="48" alt="French Flag"></a>
+  &nbsp;
+    <a href="RU.md"><img src="https://flagcdn.com/256x192/ru.png" width="48" alt="Russian Flag"></a>
+  &nbsp;
+    <a href="UK.md"><img src="https://flagcdn.com/256x192/ua.png" width="48" alt="Ukrainian Flag"></a>
+  &nbsp;
+    <a href="DE.md"><img src="https://flagcdn.com/256x192/de.png" width="48" alt="Deutsch Flag"></a>
+  &nbsp;
+    <a href="PT.md"><img src="https://flagcdn.com/256x192/pt.png" width="48" alt="Portugal Flag"></a>
+</p>
+
+---
+
+<p align="center">
+  <img width="379" height="376" alt="image" src="https://github.com/user-attachments/assets/c14ef2b5-e104-4526-9b17-23cb2abc9efe" />
 </p>
 
 <p align="center"><strong>WPlace AutoBOT</strong></p>
 <p align="center">
-Dit project is een fork van https://github.com/DarkModde/WPlace-AutoBOT
-</p>
+  Dit project is een fork van <a href="https://github.com/DarkModde/WPlace-AutoBOT" target="_blank">https://github.com/DarkModde/WPlace-AutoBOT</a>
 <p align="center">
-  Overweeg om onze Discord te bekijken: https://discord.gg/knkNRYyQcm
+  Overweeg om onze Discord te bekijken: <a href="https://discord.gg/knkNRYyQcm" target="_blank">https://discord.gg/knkNRYyQcm</a>
 </p>
 <p align="center">
   Praktische scripts met intuïtieve menu’s om je leven makkelijker te maken op <a href="https://wplace.live" target="_blank">WPlace</a>!<br>
