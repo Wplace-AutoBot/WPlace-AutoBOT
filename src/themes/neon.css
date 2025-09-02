@@ -479,6 +479,22 @@
   box-shadow: 0 0 20px var(--wplace-error), inset 0 0 10px rgb(255 7 58 / 10%) !important;
 }
 
+/* Cooldown control styling for neon theme */
+.wplace-theme-neon .wplace-cooldown-control {
+  margin: 8px 0;
+}
+
+.wplace-theme-neon .wplace-cooldown-control label {
+  color: var(--wplace-text) !important;
+  font-weight: 500;
+  font-size: 11px;
+  text-shadow: 0 0 8px var(--wplace-text) !important;
+  font-family: var(--wplace-font) !important;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  display: block;
+}
+
 /* Resize dialog styling for neon theme */
 .wplace-theme-neon .resize-container {
   background: #1a1a2e !important;
