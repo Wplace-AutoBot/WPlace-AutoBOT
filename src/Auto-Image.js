@@ -1780,6 +1780,33 @@ import {
       return button;
     },
 
+    // Add hold-to-repeat functionality to buttons (for +/- buttons)
+    addHoldToRepeatListener: (button, callback, initialDelay = 500, repeatInterval = 100) => {
+      let timeout, interval;
+      
+      const startRepeating = () => {
+        callback(); // Execute immediately
+        timeout = setTimeout(() => {
+          interval = setInterval(callback, repeatInterval);
+        }, initialDelay);
+      };
+      
+      const stopRepeating = () => {
+        clearTimeout(timeout);
+        clearInterval(interval);
+      };
+      
+      // Handle both mouse and touch events
+      button.addEventListener('mousedown', startRepeating);
+      button.addEventListener('mouseup', stopRepeating);
+      button.addEventListener('mouseleave', stopRepeating);
+      button.addEventListener('touchstart', startRepeating);
+      button.addEventListener('touchend', stopRepeating);
+      
+      // Prevent context menu on long press
+      button.addEventListener('contextmenu', (e) => e.preventDefault());
+    },
+
     // Synchronous translation function for UI rendering
     t: (key, params = {}) => {
       // Try to get from cache first
@@ -4575,13 +4602,13 @@ import {
         });
 
         if (speedDecrease) {
-          speedDecrease.addEventListener('click', () => {
+          Utils.addHoldToRepeatListener(speedDecrease, () => {
             updateSpeed(parseInt(speedInput.value) - 1, 'button');
           });
         }
 
         if (speedIncrease) {
-          speedIncrease.addEventListener('click', () => {
+          Utils.addHoldToRepeatListener(speedIncrease, () => {
             updateSpeed(parseInt(speedInput.value) + 1, 'button');
           });
         }
@@ -6537,13 +6564,13 @@ import {
       });
 
       if (cooldownDecrease) {
-        cooldownDecrease.addEventListener('click', () => {
+        Utils.addHoldToRepeatListener(cooldownDecrease, () => {
           updateCooldown(parseInt(cooldownInput.value) - 1, 'button');
         });
       }
 
       if (cooldownIncrease) {
-        cooldownIncrease.addEventListener('click', () => {
+        Utils.addHoldToRepeatListener(cooldownIncrease, () => {
           updateCooldown(parseInt(cooldownInput.value) + 1, 'button');
         });
       }
