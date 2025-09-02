@@ -348,6 +348,7 @@
 .wplace-section {
   margin-bottom: 6px;
   padding: 8px;
+  border-radius: var(--wplace-radius, 12px);
 
   /* Theme-specific styling applied via theme files */
 }
