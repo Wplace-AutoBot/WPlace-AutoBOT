@@ -14,8 +14,10 @@
 (function () {
   'use strict';
 
+  //comment on what you are not going to use, and uncomment on what you are going to use
   const SOURCES = [
     'https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/Auto-Image.js'
+    // 'https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/Auto-Farm.js'
   ];
 
   const log = (...a) => console.log('[WPlace Auto-Image Wrapper]', ...a);
