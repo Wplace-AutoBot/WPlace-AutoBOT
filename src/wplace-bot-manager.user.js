@@ -306,7 +306,6 @@
               <input class="input" id="navUrl" placeholder="https://example.com" />
               <button class="btn" id="navGo">Go</button>
               <button class="btn" id="navReload">Reload</button>
-              <button class="btn" id="navNewTab">New tab</button>
             </div>
             <div class="actions">
               <button class="btn" id="addOpenBtn">Add new</button>
@@ -373,7 +372,6 @@
         const navUrlEl = shadow.getElementById('navUrl');
         const navGoBtn = shadow.getElementById('navGo');
         const navReloadBtn = shadow.getElementById('navReload');
-        const navNewTabBtn = shadow.getElementById('navNewTab');
         const hintTextEl = shadow.getElementById('hintText');
 
         function toast(msg, opts = {}) {
@@ -650,27 +648,6 @@
             // Set flag to auto-load manager after reload
             localStorage.setItem('wplace-auto-load-manager', 'true');
             window.location.reload();
-        });
-        navNewTabBtn.addEventListener('click', () => {
-            const u = navUrlEl.value.trim();
-            if (!u) {
-                toast('Enter a URL first', { danger: true });
-                return;
-            }
-            try {
-                // Validate URL
-                new URL(u, location.href);
-                const newTab = window.open(u, '_blank');
-                if (!newTab) {
-                    toast('Popup blocked. Please allow popups for this site.', {
-                        danger: true,
-                    });
-                } else {
-                    toast('Opened in new tab');
-                }
-            } catch {
-                toast('Please enter a valid URL', { danger: true });
-            }
         });
 
         function submitForm(runAfter) {
