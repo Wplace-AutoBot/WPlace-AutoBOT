@@ -249,7 +249,7 @@ import {
      * @returns {Array<string>} Array of theme names
      */
     const getAvailableThemes = () => Object.keys(EMBEDDED_THEMES);
-    
+
     /**
      * Get the current active theme name.
      * @returns {string} Current theme name

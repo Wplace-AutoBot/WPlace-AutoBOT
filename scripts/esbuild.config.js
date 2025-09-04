@@ -93,7 +93,7 @@ function getEmbeddedLanguages() {
 }
 
 // Plugin to replace build info placeholders
-const buildInfoPlugin = (buildTarget) => ({
+const buildInfoPlugin = buildTarget => ({
     name: 'build-info',
     setup(build) {
         build.onLoad({ filter: /Auto-Image\.js$/ }, async args => {
@@ -149,15 +149,20 @@ const buildInfoPlugin = (buildTarget) => ({
                 }).trim();
                 // Truncate long commit messages
                 if (lastCommitMessage.length > 50) {
-                    lastCommitMessage = lastCommitMessage.substring(0, 47) + '...';
+                    lastCommitMessage =
+                        lastCommitMessage.substring(0, 47) + '...';
                 }
             } catch (error) {
-                console.warn('Could not get last commit message:', error.message);
+                console.warn(
+                    'Could not get last commit message:',
+                    error.message
+                );
             }
 
             // Get environment
             const environment = process.env.NODE_ENV || 'development';
-            const envColor = environment === 'production' ? '#28a745' : '#fd7e14'; // green for prod, orange for dev
+            const envColor =
+                environment === 'production' ? '#28a745' : '#fd7e14'; // green for prod, orange for dev
 
             // Get Node.js version
             const nodeVersion = process.version;

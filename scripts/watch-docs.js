@@ -71,7 +71,9 @@ function startInotifyRecursive(dir) {
         '%w%f %e',
         dir,
     ];
-    const proc = spawn('inotifywait', args, { stdio: ['ignore', 'pipe', 'pipe'] });
+    const proc = spawn('inotifywait', args, {
+        stdio: ['ignore', 'pipe', 'pipe'],
+    });
 
     proc.stdout.setEncoding('utf8');
     proc.stdout.on('data', chunk => {
@@ -279,7 +281,7 @@ async function main() {
 
 // Run if called directly
 if (import.meta.url === `file://${process.argv[1]}`) {
-    main()
+    main();
 }
 
 export { main };

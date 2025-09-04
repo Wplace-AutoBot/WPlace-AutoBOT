@@ -77,8 +77,7 @@ function extractJSClasses(filePath) {
             const name = m[1];
             const body = m[2] || '';
             const methods = new Set();
-            const methodRegex =
-                /(?:^|\n)\s*(?:async\s+)?([A-Za-z_]\w*)\s*\(/g;
+            const methodRegex = /(?:^|\n)\s*(?:async\s+)?([A-Za-z_]\w*)\s*\(/g;
             let mm;
             while ((mm = methodRegex.exec(body)) !== null) {
                 const method = mm[1];
@@ -97,9 +96,9 @@ function extractJSClasses(filePath) {
             lines.push(
                 c.methods.length
                     ? formatList(
-                        c.methods.map(n => `.${n}()`),
-                        50
-                    )
+                          c.methods.map(n => `.${n}()`),
+                          50
+                      )
                     : '*No methods detected*'
             );
             lines.push('');
@@ -166,7 +165,8 @@ function extractJSFunctions(filePath) {
         const names = new Set();
 
         // function declarations
-        const decl = /(?:^|\n)\s*(?:export\s+)?(?:async\s+)?function\s+([A-Za-z_]\w*)\s*\(/g;
+        const decl =
+            /(?:^|\n)\s*(?:export\s+)?(?:async\s+)?function\s+([A-Za-z_]\w*)\s*\(/g;
         let m;
         while ((m = decl.exec(content)) !== null) names.add(m[1]);
 
@@ -195,11 +195,23 @@ function extractJSFunctions(filePath) {
         const lines = [];
         if (present.length) {
             lines.push('#### Flow anchors detected');
-            lines.push(formatList(present.map(n => `\`${n}()\``), 100));
+            lines.push(
+                formatList(
+                    present.map(n => `\`${n}()\``),
+                    100
+                )
+            );
             lines.push('');
         }
         lines.push('#### All detected functions');
-        lines.push(formatList(Array.from(names).sort().map(n => `\`${n}()\``), 120));
+        lines.push(
+            formatList(
+                Array.from(names)
+                    .sort()
+                    .map(n => `\`${n}()\``),
+                120
+            )
+        );
         return lines.join('\n');
     } catch (e) {
         return `*Error reading file: ${e.message}*`;
@@ -232,7 +244,12 @@ function extractI18nReport(filePath) {
         lines.push(`- Keys present in en.json: ${Object.keys(en).length}`);
         if (missing.length) {
             lines.push(`- Missing in en.json (${missing.length}):`);
-            lines.push(formatList(missing.sort().map(k => `\`${k}\``), 80));
+            lines.push(
+                formatList(
+                    missing.sort().map(k => `\`${k}\``),
+                    80
+                )
+            );
         } else {
             lines.push('- Missing in en.json: 0 ✅');
         }
@@ -250,52 +267,81 @@ function extractI18nReport(filePath) {
 async function extractJSDocFunctions(filePath) {
     try {
         const docs = await build([filePath], {});
-        
+
         if (docs && docs.length > 0) {
             // Format the documentation objects into readable markdown
-            const formatted = docs.map(doc => {
-                const parts = [];
-                
-                if (doc.name) {
-                    parts.push(`### \`${doc.name}()\``);
-                }
-                
-                if (doc.description && doc.description.children) {
-                    const desc = doc.description.children
-                        .map(child => child.value || child.children?.map(c => c.value).join('') || '')
-                        .join(' ')
-                        .trim();
-                    if (desc) parts.push(desc);
-                }
-                
-                if (doc.params && doc.params.length > 0) {
-                    parts.push('**Parameters:**');
-                    doc.params.forEach(param => {
-                        const type = param.type?.name || 'unknown';
-                        const desc = param.description?.children
-                            ?.map(child => child.value || child.children?.map(c => c.value).join('') || '')
+            const formatted = docs
+                .map(doc => {
+                    const parts = [];
+
+                    if (doc.name) {
+                        parts.push(`### \`${doc.name}()\``);
+                    }
+
+                    if (doc.description && doc.description.children) {
+                        const desc = doc.description.children
+                            .map(
+                                child =>
+                                    child.value ||
+                                    child.children
+                                        ?.map(c => c.value)
+                                        .join('') ||
+                                    ''
+                            )
                             .join(' ')
-                            .trim() || '';
-                        parts.push(`- \`${param.name}\` (\`${type}\`) - ${desc}`);
-                    });
-                }
-                
-                if (doc.returns && doc.returns.length > 0) {
-                    const ret = doc.returns[0];
-                    const type = ret.type?.name || 'unknown';
-                    const desc = ret.description?.children
-                        ?.map(child => child.value || child.children?.map(c => c.value).join('') || '')
-                        .join(' ')
-                        .trim() || '';
-                    parts.push(`**Returns:** \`${type}\` - ${desc}`);
-                }
-                
-                return parts.join('\n\n');
-            }).filter(doc => doc.trim());
-            
-            return formatted.length > 0 ? formatted.join('\n\n---\n\n') : '*No documented functions found*';
+                            .trim();
+                        if (desc) parts.push(desc);
+                    }
+
+                    if (doc.params && doc.params.length > 0) {
+                        parts.push('**Parameters:**');
+                        doc.params.forEach(param => {
+                            const type = param.type?.name || 'unknown';
+                            const desc =
+                                param.description?.children
+                                    ?.map(
+                                        child =>
+                                            child.value ||
+                                            child.children
+                                                ?.map(c => c.value)
+                                                .join('') ||
+                                            ''
+                                    )
+                                    .join(' ')
+                                    .trim() || '';
+                            parts.push(
+                                `- \`${param.name}\` (\`${type}\`) - ${desc}`
+                            );
+                        });
+                    }
+
+                    if (doc.returns && doc.returns.length > 0) {
+                        const ret = doc.returns[0];
+                        const type = ret.type?.name || 'unknown';
+                        const desc =
+                            ret.description?.children
+                                ?.map(
+                                    child =>
+                                        child.value ||
+                                        child.children
+                                            ?.map(c => c.value)
+                                            .join('') ||
+                                        ''
+                                )
+                                .join(' ')
+                                .trim() || '';
+                        parts.push(`**Returns:** \`${type}\` - ${desc}`);
+                    }
+
+                    return parts.join('\n\n');
+                })
+                .filter(doc => doc.trim());
+
+            return formatted.length > 0
+                ? formatted.join('\n\n---\n\n')
+                : '*No documented functions found*';
         }
-        
+
         return '*No documented functions found*';
     } catch (error) {
         // Fallback to manual extraction if documentation package fails
@@ -308,13 +354,17 @@ async function extractJSDocFunctions(filePath) {
 
             let match;
             while ((match = jsdocFunctionRegex.exec(content)) !== null) {
-                const functionName = match[1] || match[2] || match[3] || match[4];
+                const functionName =
+                    match[1] || match[2] || match[3] || match[4];
                 if (functionName) {
                     functions.push(`### \`${functionName}()\``);
 
                     const jsdocStart = match.index;
                     const jsdocEnd = match.index + match[0].indexOf('*/') + 2;
-                    const jsdocComment = content.substring(jsdocStart, jsdocEnd);
+                    const jsdocComment = content.substring(
+                        jsdocStart,
+                        jsdocEnd
+                    );
 
                     const description = extractJSDocDescription(jsdocComment);
                     const params = extractJSDocParams(jsdocComment);
@@ -367,8 +417,7 @@ function extractCSSComponents(filePath) {
         const content = fs.readFileSync(filePath, 'utf8');
         const components = [];
 
-        const classRegex =
-            /\.([a-zA-Z][a-zA-Z0-9_-]*(?:-[a-zA-Z0-9_-]*)*)/g;
+        const classRegex = /\.([a-zA-Z][a-zA-Z0-9_-]*(?:-[a-zA-Z0-9_-]*)*)/g;
         const classes = new Set();
 
         let match;
@@ -496,7 +545,10 @@ function extractKeyframes(filePath) {
         let m;
         while ((m = re.exec(content)) !== null) frames.push(m[1]);
         if (frames.length === 0) return '*No keyframes found*';
-        return formatList(frames.sort().map(n => `- \`@keyframes ${n}\``), 80);
+        return formatList(
+            frames.sort().map(n => `- \`@keyframes ${n}\``),
+            80
+        );
     } catch (e) {
         return `*Error reading file: ${e.message}*`;
     }
@@ -692,7 +744,9 @@ async function processDirectory(srcDir, docsDir) {
             if (TEMPLATES[ext]) {
                 const content = await TEMPLATES[ext](srcPath, item);
                 fs.writeFileSync(docPath, content);
-                console.log(`Generated: ${path.relative(process.cwd(), docPath)}`);
+                console.log(
+                    `Generated: ${path.relative(process.cwd(), docPath)}`
+                );
             }
         }
     }
@@ -727,9 +781,9 @@ function cleanOrphanedDocs(srcDir, docsDir) {
             // Handle new naming convention: baseName.originalExt.md
             const withoutMd = path.basename(item, '.md');
             const lastDotIndex = withoutMd.lastIndexOf('.');
-            
+
             let hasSource = false;
-            
+
             if (lastDotIndex === -1) {
                 // Old naming convention: baseName.md
                 const baseName = withoutMd;
@@ -741,7 +795,9 @@ function cleanOrphanedDocs(srcDir, docsDir) {
                 // New naming convention: baseName.ext.md
                 const originalExt = withoutMd.substring(lastDotIndex);
                 const baseName = withoutMd.substring(0, lastDotIndex);
-                hasSource = fs.existsSync(path.join(srcDir, baseName + originalExt));
+                hasSource = fs.existsSync(
+                    path.join(srcDir, baseName + originalExt)
+                );
             }
 
             if (!hasSource) {
