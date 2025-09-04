@@ -3780,7 +3780,6 @@
             <select id="batchModeSelect" class="wplace-settings-select">
               <option value="normal" class="wplace-settings-option">📦 Normal (Fixed Size)</option>
               <option value="random" class="wplace-settings-option">🎲 Random (Range)</option>
-              <option value="outline-first" class="wplace-settings-option">🖼️ Outline First</option>
             </select>
           </div>
           
@@ -3860,6 +3859,7 @@
               <option value="circle-in" class="wplace-settings-option">⭕ Circle In (Edges → Center)</option>
               <option value="blocks" class="wplace-settings-option">🟫 Blocks (Ordered)</option>
               <option value="shuffle-blocks" class="wplace-settings-option">🎲 Shuffle Blocks (Random)</option>
+              <option value="outline-first" class="wplace-settings-option">🖼️ Outline First</option>
             </select>
           </div>
           
@@ -6926,21 +6926,48 @@
         coords.push(...block);
       }
     } else if (mode === 'outline-first') {
-      // Outline-first: paint border pixels first, then fill inside
-      // Top row
-      for (let x = 0; x < width; x++) coords.push([x, 0]);
-      // Right column
-      for (let y = 1; y < height; y++) coords.push([width - 1, y]);
-      // Bottom row
-      for (let x = width - 2; x >= 0; x--) coords.push([x, height - 1]);
-      // Left column
-      for (let y = height - 2; y > 0; y--) coords.push([0, y]);
-      // Fill inside
-      for (let y = 1; y < height - 1; y++) {
-        for (let x = 1; x < width - 1; x++) {
-          coords.push([x, y]);
+      // Outline-first: Simple rectangular perimeter outline, then top-to-bottom fill
+      // This matches the simple approach: single pixel outline around the perimeter
+      const outlinePixels = [];
+      const interiorPixels = [];
+      
+      // 1. Paint the rectangular perimeter outline first
+      // Top row (left to right)
+      for (let x = 0; x < width; x++) {
+        outlinePixels.push([x, 0]);
+      }
+      
+      // Right column (top to bottom, excluding corner already painted)
+      for (let y = 1; y < height; y++) {
+        outlinePixels.push([width - 1, y]);
+      }
+      
+      // Bottom row (right to left, excluding corner already painted)
+      if (height > 1) {
+        for (let x = width - 2; x >= 0; x--) {
+          outlinePixels.push([x, height - 1]);
         }
       }
+      
+      // Left column (bottom to top, excluding corners already painted)
+      if (width > 1) {
+        for (let y = height - 2; y > 0; y--) {
+          outlinePixels.push([0, y]);
+        }
+      }
+      
+      // 2. Fill the interior pixels top-to-bottom, left-to-right (row-major order)
+      for (let y = 1; y < height - 1; y++) {
+        for (let x = 1; x < width - 1; x++) {
+          interiorPixels.push([x, y]);
+        }
+      }
+      
+      console.log(`🖼️ Outline-first: ${outlinePixels.length} outline pixels, ${interiorPixels.length} interior pixels`);
+      
+      // Add outline pixels first, then interior pixels
+      coords.push(...outlinePixels);
+      coords.push(...interiorPixels);
     } else {
       throw new Error(`Unknown mode: ${mode}`);
     }
