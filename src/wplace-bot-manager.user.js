@@ -11,21 +11,21 @@
 // @downloadURL  https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/wplace-bot-manager.user.js
 // ==/UserScript==
 
-(function() {
+(function () {
     'use strict';
-    
+
     const DEFAULT_URL =
-        "https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/Auto-Image.js";
-    const STORAGE_KEY = "wplace-bot-scripts-v1";
-    const BASE_URL_KEY = "wplace-bot-base-url";
-    const HOST_ID = "wplace-bot-launcher-host";
-    const POPUP_NAME = "wplace-bot-switcher";
-    const TARGET_NAME_KEY = "wplace-target-name";
+        'https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/Auto-Image.js';
+    const STORAGE_KEY = 'wplace-bot-scripts-v1';
+    const BASE_URL_KEY = 'wplace-bot-base-url';
+    const HOST_ID = 'wplace-bot-launcher-host';
+    const POPUP_NAME = 'wplace-bot-switcher';
+    const TARGET_NAME_KEY = 'wplace-target-name';
     const POPUP_W = 460;
     const POPUP_H = 620;
 
     // Add hotkey to open manager (Ctrl+Shift+M)
-    document.addEventListener('keydown', function(e) {
+    document.addEventListener('keydown', function (e) {
         if (e.ctrlKey && e.shiftKey && e.key === 'M') {
             e.preventDefault();
             loadManager();
@@ -33,9 +33,10 @@
     });
 
     // Auto-load check
-    const shouldAutoLoad = localStorage.getItem("wplace-auto-load-manager") === "true";
+    const shouldAutoLoad =
+        localStorage.getItem('wplace-auto-load-manager') === 'true';
     if (shouldAutoLoad) {
-        localStorage.removeItem("wplace-auto-load-manager");
+        localStorage.removeItem('wplace-auto-load-manager');
         loadManager();
     }
 
@@ -52,16 +53,16 @@
 
         // Utilities
         const uid = () =>
-            "s_" +
+            's_' +
             Date.now().toString(36) +
-            "_" +
+            '_' +
             Math.random().toString(36).slice(2, 8);
 
-        const escapeJs = (s) =>
+        const escapeJs = s =>
             String(s)
-                .replace(/\\/g, "\\\\")
+                .replace(/\\/g, '\\\\')
                 .replace(/'/g, "\\'")
-                .replace(/\r?\n/g, " ");
+                .replace(/\r?\n/g, ' ');
 
         function safeParse(json, fallback) {
             try {
@@ -78,17 +79,17 @@
             if (!Array.isArray(arr)) return [];
             return arr
                 .filter(
-                    (x) =>
+                    x =>
                         x &&
-                        typeof x === "object" &&
-                        typeof x.url === "string" &&
-                        typeof x.title === "string"
+                        typeof x === 'object' &&
+                        typeof x.url === 'string' &&
+                        typeof x.title === 'string'
                 )
-                .map((x) => ({
+                .map(x => ({
                     id: String(x.id || uid()),
                     url: String(x.url),
-                    title: String(x.title || "Untitled"),
-                    note: String(x.note || ""),
+                    title: String(x.title || 'Untitled'),
+                    note: String(x.note || ''),
                     createdAt: Number(x.createdAt || Date.now()),
                     lastUsedAt: Number(x.lastUsedAt || 0),
                 }));
@@ -102,25 +103,25 @@
             try {
                 const u = new URL(input, location.href);
                 const path = u.pathname;
-                const seg = path.split("/");
+                const seg = path.split('/');
                 if (
                     seg.length > 0 &&
                     seg[seg.length - 1] &&
-                    seg[seg.length - 1].includes(".")
+                    seg[seg.length - 1].includes('.')
                 ) {
                     seg.pop();
                 }
-                return (u.origin + seg.join("/")).replace(/\/+$/, "");
+                return (u.origin + seg.join('/')).replace(/\/+$/, '');
             } catch {
-                const noHash = input.split("#")[0].split("?")[0];
-                return noHash.replace(/\/[^/]*$/, "").replace(/\/+$/, "");
+                const noHash = input.split('#')[0].split('?')[0];
+                return noHash.replace(/\/[^/]*$/, '').replace(/\/+$/, '');
             }
         }
 
         // Build a javascript: URL that runs your blob-loader in target window
         function makeJsBlobLoaderUrl(scriptUrl, baseUrl) {
             const u = escapeJs(scriptUrl);
-            const b = escapeJs(baseUrl || "");
+            const b = escapeJs(baseUrl || '');
             const snippet =
                 "(async()=>{try{if('" +
                 b +
@@ -133,22 +134,23 @@
                 "';const t=await (await fetch(u,{cache:'no-store'})).text();" +
                 "const o=URL.createObjectURL(new Blob([t],{type:'application/javascript'}));" +
                 "var s=document.createElement('script');s.src=o;s.async=true;" +
-                "s.onload=()=>URL.revokeObjectURL(o);" +
-                "(document.body||document.head||document.documentElement).appendChild(s);" +
+                's.onload=()=>URL.revokeObjectURL(o);' +
+                '(document.body||document.head||document.documentElement).appendChild(s);' +
                 "}catch(e){alert('Failed to load script: '+(e&&e.message||e))}})();";
-            return "javascript:" + encodeURIComponent(snippet);
+            return 'javascript:' + encodeURIComponent(snippet);
         }
 
         function ensureTargetName() {
             // Persist a stable window.name for this tab so popup can reacquire it
-            let name = "";
+            let name = '';
             try {
-                name = localStorage.getItem(TARGET_NAME_KEY) || "";
+                name = localStorage.getItem(TARGET_NAME_KEY) || '';
             } catch {}
             if (name && window.name === name) return name;
 
             if (!window.name || !/^wplace-target-/.test(window.name)) {
-                name = "wplace-target-" + Math.random().toString(36).slice(2, 8);
+                name =
+                    'wplace-target-' + Math.random().toString(36).slice(2, 8);
                 try {
                     window.name = name;
                 } catch {}
@@ -169,8 +171,8 @@
             scripts.push({
                 id: uid(),
                 url: DEFAULT_URL,
-                title: "WPlace Auto-Image",
-                note: "Fetches and runs Auto-Image.js from GitHub (trusted only).",
+                title: 'WPlace Auto-Image',
+                note: 'Fetches and runs Auto-Image.js from GitHub (trusted only).',
                 createdAt: Date.now(),
                 lastUsedAt: 0,
             });
@@ -178,17 +180,17 @@
         }
 
         // Host + Shadow (inline panel)
-        const host = document.createElement("div");
+        const host = document.createElement('div');
         host.id = HOST_ID;
-        host.style.position = "fixed";
-        host.style.top = "16px";
-        host.style.right = "16px";
-        host.style.zIndex = "2147483647";
+        host.style.position = 'fixed';
+        host.style.top = '16px';
+        host.style.right = '16px';
+        host.style.zIndex = '2147483647';
         document.documentElement.appendChild(host);
 
-        const shadow = host.attachShadow({ mode: "open" });
+        const shadow = host.attachShadow({ mode: 'open' });
 
-        const style = document.createElement("style");
+        const style = document.createElement('style');
         style.textContent = `
         :host { all: initial; }
         * { box-sizing: border-box; }
@@ -289,7 +291,7 @@
         .danger { background: #b91c1c; }
       `;
 
-        const wrap = document.createElement("div");
+        const wrap = document.createElement('div');
         wrap.innerHTML = `
         <div class="panel" role="dialog" aria-label="Script Launcher">
           <div class="header">
@@ -354,36 +356,36 @@
         shadow.appendChild(wrap);
 
         // Inline UI refs
-        const listEl = shadow.getElementById("list");
-        const addDetails = shadow.getElementById("addDetails");
-        const addSummary = shadow.getElementById("addSummary");
-        const fTitle = shadow.getElementById("fTitle");
-        const fUrl = shadow.getElementById("fUrl");
-        const fNote = shadow.getElementById("fNote");
-        const editingIdInput = shadow.getElementById("editingId");
-        const closeBtn = shadow.getElementById("closeBtn");
-        const exportBtn = shadow.getElementById("exportBtn");
-        const importBtn = shadow.getElementById("importBtn");
-        const addOpenBtn = shadow.getElementById("addOpenBtn");
-        const formEl = shadow.getElementById("form");
-        const cancelEditBtn = shadow.getElementById("cancelEditBtn");
-        const saveRunBtn = shadow.getElementById("saveRunBtn");
-        const navUrlEl = shadow.getElementById("navUrl");
-        const navGoBtn = shadow.getElementById("navGo");
-        const navReloadBtn = shadow.getElementById("navReload");
-        const navNewTabBtn = shadow.getElementById("navNewTab");
-        const hintTextEl = shadow.getElementById("hintText");
+        const listEl = shadow.getElementById('list');
+        const addDetails = shadow.getElementById('addDetails');
+        const addSummary = shadow.getElementById('addSummary');
+        const fTitle = shadow.getElementById('fTitle');
+        const fUrl = shadow.getElementById('fUrl');
+        const fNote = shadow.getElementById('fNote');
+        const editingIdInput = shadow.getElementById('editingId');
+        const closeBtn = shadow.getElementById('closeBtn');
+        const exportBtn = shadow.getElementById('exportBtn');
+        const importBtn = shadow.getElementById('importBtn');
+        const addOpenBtn = shadow.getElementById('addOpenBtn');
+        const formEl = shadow.getElementById('form');
+        const cancelEditBtn = shadow.getElementById('cancelEditBtn');
+        const saveRunBtn = shadow.getElementById('saveRunBtn');
+        const navUrlEl = shadow.getElementById('navUrl');
+        const navGoBtn = shadow.getElementById('navGo');
+        const navReloadBtn = shadow.getElementById('navReload');
+        const navNewTabBtn = shadow.getElementById('navNewTab');
+        const hintTextEl = shadow.getElementById('hintText');
 
         function toast(msg, opts = {}) {
-            const t = document.createElement("div");
-            t.className = "toast" + (opts.danger ? " danger" : "");
+            const t = document.createElement('div');
+            t.className = 'toast' + (opts.danger ? ' danger' : '');
             t.textContent = msg;
             shadow.appendChild(t);
             setTimeout(() => t.remove(), opts.ms || 1600);
         }
 
         function updateUIState() {
-            const devMode = localStorage.getItem("dev-mode") === "true";
+            const devMode = localStorage.getItem('dev-mode') === 'true';
 
             if (hasRunScript && !devMode) {
                 // Script has been run and not in dev mode - show reload required state
@@ -417,24 +419,26 @@
         }
 
         function resetForm() {
-            editingIdInput.value = "";
-            fTitle.value = "";
-            fUrl.value = "";
-            fNote.value = "";
-            addSummary.textContent = "Add / Edit script";
+            editingIdInput.value = '';
+            fTitle.value = '';
+            fUrl.value = '';
+            fNote.value = '';
+            addSummary.textContent = 'Add / Edit script';
         }
 
         function openAdd(prefill) {
             if (prefill) {
-                editingIdInput.value = prefill.id || "";
-                fTitle.value = prefill.title || "";
-                fUrl.value = prefill.url || "";
-                fNote.value = prefill.note || "";
-                addSummary.textContent = prefill.id ? "Edit script" : "Add script";
+                editingIdInput.value = prefill.id || '';
+                fTitle.value = prefill.title || '';
+                fUrl.value = prefill.url || '';
+                fNote.value = prefill.note || '';
+                addSummary.textContent = prefill.id
+                    ? 'Edit script'
+                    : 'Add script';
             } else {
                 resetForm();
                 fUrl.value = DEFAULT_URL;
-                fTitle.value = "WPlace Auto-Image";
+                fTitle.value = 'WPlace Auto-Image';
             }
             addDetails.open = true;
             setTimeout(() => fTitle.focus(), 0);
@@ -442,57 +446,58 @@
 
         function render() {
             const items = sortedScripts();
-            listEl.innerHTML = "";
+            listEl.innerHTML = '';
 
             if (!items.length) {
-                const empty = document.createElement("div");
-                empty.className = "small";
-                empty.style.padding = "6px";
-                empty.textContent = "No scripts yet. Add one below.";
+                const empty = document.createElement('div');
+                empty.className = 'small';
+                empty.style.padding = '6px';
+                empty.textContent = 'No scripts yet. Add one below.';
                 listEl.appendChild(empty);
                 return;
             }
 
             const hotCap = 10;
             items.forEach((s, i) => {
-                const li = document.createElement("li");
-                li.className = "item";
+                const li = document.createElement('li');
+                li.className = 'item';
                 li.dataset.id = s.id;
 
-                const hk = document.createElement("div");
-                hk.className = "hk";
-                hk.textContent = i < hotCap ? (i === 9 ? "0" : String(i + 1)) : "•";
+                const hk = document.createElement('div');
+                hk.className = 'hk';
+                hk.textContent =
+                    i < hotCap ? (i === 9 ? '0' : String(i + 1)) : '•';
 
-                const titleBtn = document.createElement("button");
-                titleBtn.className = "titleBtn";
+                const titleBtn = document.createElement('button');
+                titleBtn.className = 'titleBtn';
                 titleBtn.title = s.url;
-                titleBtn.textContent = s.title || "(Untitled)";
-                titleBtn.addEventListener("click", () => runScriptInline(s.id));
+                titleBtn.textContent = s.title || '(Untitled)';
+                titleBtn.addEventListener('click', () => runScriptInline(s.id));
 
-                const note = document.createElement("div");
-                note.className = "note";
+                const note = document.createElement('div');
+                note.className = 'note';
                 note.textContent = s.note || s.url;
 
-                const actions = document.createElement("div");
-                actions.className = "actionsRow";
+                const actions = document.createElement('div');
+                actions.className = 'actionsRow';
 
-                const runB = document.createElement("button");
-                runB.className = "btn";
-                runB.textContent = "Run";
-                runB.addEventListener("click", () => runScriptInline(s.id));
+                const runB = document.createElement('button');
+                runB.className = 'btn';
+                runB.textContent = 'Run';
+                runB.addEventListener('click', () => runScriptInline(s.id));
 
-                const editB = document.createElement("button");
-                editB.className = "btn";
-                editB.textContent = "Edit";
-                editB.addEventListener("click", () => openAdd(s));
+                const editB = document.createElement('button');
+                editB.className = 'btn';
+                editB.textContent = 'Edit';
+                editB.addEventListener('click', () => openAdd(s));
 
-                const delB = document.createElement("button");
-                delB.className = "btn";
-                delB.textContent = "Delete";
-                delB.addEventListener("click", () => {
+                const delB = document.createElement('button');
+                delB.className = 'btn';
+                delB.textContent = 'Delete';
+                delB.addEventListener('click', () => {
                     const ok = confirm(`Delete "${s.title}"?`);
                     if (!ok) return;
-                    scripts = scripts.filter((x) => x.id !== s.id);
+                    scripts = scripts.filter(x => x.id !== s.id);
                     saveScripts(scripts);
                     render();
                 });
@@ -511,17 +516,17 @@
 
         // Inline runner (current page): fetch + blob + <script>
         async function runScriptInline(id) {
-            const s = scripts.find((x) => x.id === id);
+            const s = scripts.find(x => x.id === id);
             if (!s) return;
 
             // Check if dev-mode is enabled to bypass reload requirement
-            const devMode = localStorage.getItem("dev-mode") === "true";
+            const devMode = localStorage.getItem('dev-mode') === 'true';
 
             // Prevent multiple script execution without reload (unless dev-mode)
             if (hasRunScript && !devMode) {
                 toast("Click 'Reload' button first to run another script", {
                     danger: true,
-                    ms: 4000
+                    ms: 4000,
                 });
                 return;
             }
@@ -532,17 +537,20 @@
             } catch {}
 
             try {
-                const res = await fetch(s.url, { cache: "no-store" });
-                if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+                const res = await fetch(s.url, { cache: 'no-store' });
+                if (!res.ok)
+                    throw new Error(`HTTP ${res.status} ${res.statusText}`);
                 const code = await res.text();
 
-                const blob = new Blob([code], { type: "application/javascript" });
+                const blob = new Blob([code], {
+                    type: 'application/javascript',
+                });
                 const blobUrl = URL.createObjectURL(blob);
-                const scriptEl = document.createElement("script");
+                const scriptEl = document.createElement('script');
                 scriptEl.src = blobUrl;
                 scriptEl.async = true;
 
-                scriptEl.addEventListener("load", () => {
+                scriptEl.addEventListener('load', () => {
                     URL.revokeObjectURL(blobUrl);
                     setTimeout(() => scriptEl.remove(), 0);
                     s.lastUsedAt = Date.now();
@@ -555,31 +563,33 @@
                     updateUIState();
 
                     // Check if dev-mode is enabled to bypass reload requirement
-                    const devMode = localStorage.getItem("dev-mode") === "true";
+                    const devMode = localStorage.getItem('dev-mode') === 'true';
                     if (!devMode) {
                         // Inform user that reload is needed for next script
                         setTimeout(() => {
-                            toast("Reload page to run another script", {
+                            toast('Reload page to run another script', {
                                 ms: 5000,
-                                danger: false
+                                danger: false,
                             });
                         }, 1500); // Show after initial success message
                     } else {
-                        toast("Dev mode: Reload not required", { ms: 3000 });
+                        toast('Dev mode: Reload not required', { ms: 3000 });
                     }
                 });
 
-                scriptEl.addEventListener("error", (ev) => {
+                scriptEl.addEventListener('error', ev => {
                     URL.revokeObjectURL(blobUrl);
                     const msg =
                         (ev && ev.message) ||
-                        "Script failed to load or was blocked (CSP?).";
+                        'Script failed to load or was blocked (CSP?).';
                     alert(`Failed to execute script via blob URL: ${msg}`);
                 });
 
-                (document.body || document.head || document.documentElement).appendChild(
-                    scriptEl
-                );
+                (
+                    document.body ||
+                    document.head ||
+                    document.documentElement
+                ).appendChild(scriptEl);
             } catch (err) {
                 alert(`Failed to load script: ${err.message || err}`);
             }
@@ -587,22 +597,22 @@
 
         // Keyboard for inline panel
         function onKeyDown(e) {
-            const tag = (e.target && e.target.tagName) || "";
+            const tag = (e.target && e.target.tagName) || '';
             if (
-                tag === "INPUT" ||
-                tag === "TEXTAREA" ||
+                tag === 'INPUT' ||
+                tag === 'TEXTAREA' ||
                 (e.target && e.target.isContentEditable)
             ) {
                 return;
             }
-            if (e.key === "Escape") {
+            if (e.key === 'Escape') {
                 close();
                 e.preventDefault();
                 return;
             }
-            if (e.key >= "0" && e.key <= "9") {
+            if (e.key >= '0' && e.key <= '9') {
                 const items = sortedScripts();
-                const idx = e.key === "0" ? 9 : Number(e.key) - 1;
+                const idx = e.key === '0' ? 9 : Number(e.key) - 1;
                 if (idx >= 0 && idx < items.length && idx < 10) {
                     runScriptInline(items[idx].id);
                     e.preventDefault();
@@ -611,53 +621,55 @@
         }
 
         function close() {
-            window.removeEventListener("keydown", onKeyDown, true);
+            window.removeEventListener('keydown', onKeyDown, true);
             host.remove();
         }
 
         // Wire inline UI controls
-        closeBtn.addEventListener("click", close);
-        addOpenBtn.addEventListener("click", () => openAdd());
-        cancelEditBtn.addEventListener("click", () => {
+        closeBtn.addEventListener('click', close);
+        addOpenBtn.addEventListener('click', () => openAdd());
+        cancelEditBtn.addEventListener('click', () => {
             resetForm();
             addDetails.open = false;
         });
-        formEl.addEventListener("submit", (e) => {
+        formEl.addEventListener('submit', e => {
             e.preventDefault();
             submitForm(false);
         });
-        saveRunBtn.addEventListener("click", () => submitForm(true));
-        navGoBtn.addEventListener("click", () => {
+        saveRunBtn.addEventListener('click', () => submitForm(true));
+        navGoBtn.addEventListener('click', () => {
             const u = navUrlEl.value.trim();
             if (!u) return;
             try {
                 window.location.assign(u);
             } catch (e) {
-                alert("Navigation failed: " + (e.message || e));
+                alert('Navigation failed: ' + (e.message || e));
             }
         });
-        navReloadBtn.addEventListener("click", () => {
+        navReloadBtn.addEventListener('click', () => {
             // Set flag to auto-load manager after reload
-            localStorage.setItem("wplace-auto-load-manager", "true");
+            localStorage.setItem('wplace-auto-load-manager', 'true');
             window.location.reload();
         });
-        navNewTabBtn.addEventListener("click", () => {
+        navNewTabBtn.addEventListener('click', () => {
             const u = navUrlEl.value.trim();
             if (!u) {
-                toast("Enter a URL first", { danger: true });
+                toast('Enter a URL first', { danger: true });
                 return;
             }
             try {
                 // Validate URL
                 new URL(u, location.href);
-                const newTab = window.open(u, "_blank");
+                const newTab = window.open(u, '_blank');
                 if (!newTab) {
-                    toast("Popup blocked. Please allow popups for this site.", { danger: true });
+                    toast('Popup blocked. Please allow popups for this site.', {
+                        danger: true,
+                    });
                 } else {
-                    toast("Opened in new tab");
+                    toast('Opened in new tab');
                 }
             } catch {
-                toast("Please enter a valid URL", { danger: true });
+                toast('Please enter a valid URL', { danger: true });
             }
         });
 
@@ -668,18 +680,18 @@
             const note = fNote.value.trim();
 
             if (!title || !url) {
-                alert("Title and URL are required.");
+                alert('Title and URL are required.');
                 return;
             }
             try {
                 new URL(url, location.href);
             } catch {
-                alert("Please enter a valid URL.");
+                alert('Please enter a valid URL.');
                 return;
             }
 
             if (id) {
-                const idx = scripts.findIndex((x) => x.id === id);
+                const idx = scripts.findIndex(x => x.id === id);
                 if (idx >= 0) {
                     scripts[idx] = { ...scripts[idx], title, url, note };
                 }
@@ -703,62 +715,61 @@
             addDetails.open = false;
         }
 
-        exportBtn.addEventListener("click", async () => {
+        exportBtn.addEventListener('click', async () => {
             try {
                 const data = JSON.stringify(scripts, null, 2);
                 await navigator.clipboard.writeText(data);
-                toast("Exported to clipboard");
+                toast('Exported to clipboard');
             } catch {
-                prompt("Copy your scripts JSON:", JSON.stringify(scripts));
+                prompt('Copy your scripts JSON:', JSON.stringify(scripts));
             }
         });
 
-        importBtn.addEventListener("click", () => {
+        importBtn.addEventListener('click', () => {
             const txt = prompt(
-                "Paste scripts JSON (array of {title,url,note,...}):",
-                "[]"
+                'Paste scripts JSON (array of {title,url,note,...}):',
+                '[]'
             );
             if (!txt) return;
             const arr = safeParse(txt, null);
             if (!Array.isArray(arr)) {
-                alert("Invalid JSON (expected an array).");
+                alert('Invalid JSON (expected an array).');
                 return;
             }
             const mapped = arr
-                .filter((x) => x && typeof x.url === "string")
-                .map((x) => ({
+                .filter(x => x && typeof x.url === 'string')
+                .map(x => ({
                     id: String(x.id || uid()),
                     url: String(x.url),
-                    title: String(x.title || "Untitled"),
-                    note: String(x.note || ""),
+                    title: String(x.title || 'Untitled'),
+                    note: String(x.note || ''),
                     createdAt: Number(x.createdAt || Date.now()),
                     lastUsedAt: Number(x.lastUsedAt || 0),
                 }));
             if (!mapped.length) {
-                alert("No valid items found.");
+                alert('No valid items found.');
                 return;
             }
             const merge = confirm(
-                "Merge into existing list?\nOK = Merge\nCancel = Replace"
+                'Merge into existing list?\nOK = Merge\nCancel = Replace'
             );
             scripts = merge ? [...scripts, ...mapped] : mapped;
             saveScripts(scripts);
             render();
-            toast("Import complete");
+            toast('Import complete');
         });
 
-        window.addEventListener("keydown", onKeyDown, true);
+        window.addEventListener('keydown', onKeyDown, true);
         render();
         updateUIState(); // Set initial UI state
 
         // Show welcome message for first-time users
         if (shouldAutoLoad) {
-            toast("WPlace Bot Manager reloaded!", { ms: 2000 });
+            toast('WPlace Bot Manager reloaded!', { ms: 2000 });
         } else {
             setTimeout(() => {
-                toast("Press Ctrl+Shift+M to open/close manager", { ms: 3000 });
+                toast('Press Ctrl+Shift+M to open/close manager', { ms: 3000 });
             }, 1000);
         }
     }
-
 })();
