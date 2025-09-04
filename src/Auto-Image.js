@@ -237,12 +237,29 @@ import {
         COORDINATE_BLOCK_HEIGHT: 2,
     };
 
+    /**
+     * Get the current active theme name.
+     * @returns {string} Current theme name
+     */
     const getCurrentTheme = () => CONFIG.THEMES[CONFIG.currentTheme];
 
     // Helper functions for embedded themes
+    /**
+     * Get list of available theme names.
+     * @returns {Array<string>} Array of theme names
+     */
     const getAvailableThemes = () => Object.keys(EMBEDDED_THEMES);
+    
+    /**
+     * Get the current active theme name.
+     * @returns {string} Current theme name
+     */
     const getCurrentThemeName = () => CONFIG.currentTheme;
 
+    /**
+     * Switch to a different theme by name.
+     * @param {string} themeName - The name of the theme to switch to
+     */
     const switchTheme = themeName => {
         if (CONFIG.THEMES[themeName]) {
             CONFIG.currentTheme = themeName;
@@ -256,7 +273,10 @@ import {
         }
     };
 
-    // Add this helper (place it after getCurrentTheme/switchTheme definitions)
+    /**
+     * Apply the current theme to the document by setting CSS classes and variables.
+     * Updates the document element classes and injects theme-specific CSS.
+     */
     function applyTheme() {
         const theme = getCurrentTheme();
         // Toggle theme class on documentElement so CSS vars cascade to our UI
@@ -333,6 +353,9 @@ import {
         setVar('--wplace-border-color', 'rgba(255,255,255,0.1)');
     }
 
+    /**
+     * Save the current theme preference to localStorage.
+     */
     const saveThemePreference = () => {
         try {
             localStorage.setItem('wplace-theme', CONFIG.currentTheme);
@@ -341,6 +364,9 @@ import {
         }
     };
 
+    /**
+     * Load the saved theme preference from localStorage.
+     */
     const loadThemePreference = () => {
         try {
             const saved = localStorage.getItem('wplace-theme');
@@ -374,7 +400,12 @@ import {
         'uk',
     ];
 
-    // Function to load translations from JSON file with retry mechanism
+    /**
+     * Load translations for a specific language from embedded assets.
+     * @param {string} language - The language code to load (e.g., 'en', 'ru', 'pt')
+     * @param {number} [retryCount=0] - Current retry attempt count
+     * @returns {Promise<Object|null>} The loaded translations object or null if failed
+     */
     const loadTranslations = async (language, retryCount = 0) => {
         if (loadedTranslations[language]) {
             return loadedTranslations[language];
@@ -409,6 +440,11 @@ import {
         return null;
     };
 
+    /**
+     * Load and set the user's language preference.
+     * Checks saved preference, browser locale, and falls back to English.
+     * @returns {Promise<void>}
+     */
     const loadLanguagePreference = async () => {
         const savedLanguage = localStorage.getItem('wplace_language');
         const browserLocale = navigator.language;
@@ -487,7 +523,10 @@ import {
         }
     };
 
-    // Initialize translations function
+    /**
+     * Initialize the translation system by loading English fallback and user preference.
+     * @returns {Promise<void>}
+     */
     const initializeTranslations = async () => {
         try {
             console.log('🌐 Initializing translation system...');
@@ -545,7 +584,13 @@ import {
         },
     };
 
-    // Safe translation function with multiple fallback levels
+    /**
+     * Get translated text for a given key with fallback support.
+     * Falls back through: current language → English → hardcoded fallback → key itself.
+     * @param {string} key - The translation key to look up
+     * @param {Object} [replacements={}] - Object with placeholder replacements like {count: 5}
+     * @returns {string} The translated text or the key if no translation found
+     */
     const getText = (key, replacements = {}) => {
         // Try current language first
         let text = loadedTranslations[state.language]?.[key];
@@ -1205,6 +1250,10 @@ import {
     const MAX_BATCH_RETRIES = 10; // Maximum attempts for batch sending
     const TOKEN_LIFETIME = 240000; // 4 minutes (tokens typically last 5 min, use 4 for safety)
 
+    /**
+     * Set a new Turnstile token and update expiry time.
+     * @param {string} token - The Turnstile token to set
+     */
     function setTurnstileToken(token) {
         if (_resolveToken) {
             _resolveToken(token);
@@ -1215,16 +1264,28 @@ import {
         console.log('✅ Turnstile token set successfully');
     }
 
+    /**
+     * Check if the current Turnstile token is valid and not expired.
+     * @returns {boolean} True if token exists and hasn't expired
+     */
     function isTokenValid() {
         return turnstileToken && Date.now() < tokenExpiryTime;
     }
 
+    /**
+     * Invalidate the current Turnstile token by clearing it and expiry time.
+     */
     function invalidateToken() {
         turnstileToken = null;
         tokenExpiryTime = 0;
         console.log('🗑️ Token invalidated, will force fresh generation');
     }
 
+    /**
+     * Ensure a valid Turnstile token is available, generating one if needed.
+     * @param {boolean} [forceRefresh=false] - Force generation of a new token even if current is valid
+     * @returns {Promise<string|null>} The valid token or null if generation failed
+     */
     async function ensureToken(forceRefresh = false) {
         // Return cached token if still valid and not forcing refresh
         if (isTokenValid() && !forceRefresh) {
@@ -1269,6 +1330,11 @@ import {
         }
     }
 
+    /**
+     * Handle Turnstile CAPTCHA generation with retry logic.
+     * Attempts to obtain sitekey and generate token using invisible method.
+     * @returns {Promise<string|null>} The generated token or null if failed
+     */
     async function handleCaptchaWithRetry() {
         const startTime = performance.now();
 
@@ -1336,6 +1402,10 @@ import {
         }
     }
 
+    /**
+     * Fallback method for CAPTCHA token generation when primary method fails.
+     * @returns {Promise<string|null>} The fallback token or null if not implemented
+     */
     async function handleCaptchaFallback() {
         // Implementation for fallback token generation would go here
         // This is a placeholder for browser automation fallback
@@ -1343,6 +1413,10 @@ import {
         return null;
     }
 
+    /**
+     * Inject and execute a JavaScript function in the page context.
+     * @param {Function} callback - The function to inject and execute
+     */
     function inject(callback) {
         const script = document.createElement('script');
         script.textContent = `(${callback})();`;
@@ -1456,6 +1530,10 @@ import {
         }
     });
 
+    /**
+     * Detect the user's language from the backend API or browser settings.
+     * @returns {Promise<void>}
+     */
     async function detectLanguage() {
         try {
             const response = await fetch('https://backend.wplace.live/me', {
@@ -3383,6 +3461,10 @@ import {
     let updateStats = isManualRefresh => {};
     let updateDataButtons = () => {};
 
+    /**
+     * Update the active color palette based on user selections.
+     * Filters available colors to only include selected ones.
+     */
     function updateActiveColorPalette() {
         state.activeColorPalette = [];
         const activeSwatches = document.querySelectorAll(
@@ -3405,6 +3487,11 @@ import {
         }
     }
 
+    /**
+     * Toggle selection of all colors in the palette.
+     * @param {boolean} select - Whether to select (true) or deselect (false) all colors
+     * @param {boolean} [showingUnavailable=false] - Whether unavailable colors are currently shown
+     */
     function toggleAllColors(select, showingUnavailable = false) {
         const swatches = document.querySelectorAll('.wplace-color-swatch');
         if (swatches) {
@@ -3422,6 +3509,10 @@ import {
         updateActiveColorPalette();
     }
 
+    /**
+     * Deselect all paid colors from the active palette.
+     * Keeps only free colors selected.
+     */
     function unselectAllPaidColors() {
         const swatches = document.querySelectorAll('.wplace-color-swatch');
         if (swatches) {
@@ -3438,6 +3529,10 @@ import {
         updateActiveColorPalette();
     }
 
+    /**
+     * Initialize the color palette UI within a container element.
+     * @param {HTMLElement} container - The container element to populate with color options
+     */
     function initializeColorPalette(container) {
         const colorsContainer = container.querySelector('#colors-container');
         const showAllToggle = container.querySelector('#showAllColorsToggle');
@@ -3556,6 +3651,10 @@ import {
             ?.addEventListener('click', () => unselectAllPaidColors());
     }
 
+    /**
+     * Handle CAPTCHA generation and validation process.
+     * @returns {Promise<void>}
+     */
     async function handleCaptcha() {
         const startTime = performance.now();
 
@@ -3787,6 +3886,11 @@ import {
         });
     }
 
+    /**
+     * Create and initialize the main user interface.
+     * Sets up the control panel, overlays, event handlers, and theme application.
+     * @returns {Promise<void>}
+     */
     async function createUI() {
         await detectLanguage();
 
@@ -3864,7 +3968,11 @@ import {
         border-bottom: 1px solid rgba(255,255,255,0.1);
         font-family: 'Courier New', monospace;
       ">
-        Build: __BUILD_DATE__ <br /> Commit: __COMMIT_HASH__ <br /> Branch: __BRANCH_NAME__
+        Build: __BUILD_DATE__ | Target: __BUILD_TARGET__ <br />
+        Commit: __COMMIT_HASH__ | Branch: __BRANCH_NAME__ <br />
+        Git: <span style="color: __GIT_STATUS_COLOR__;">__GIT_STATUS__</span> | Env: <span style="color: __ENVIRONMENT_COLOR__;">__ENVIRONMENT__</span> <br />
+        Last: __LAST_COMMIT_MESSAGE__ <br />
+        Node: __NODE_VERSION__
       </div>
     `
             : '';
@@ -7464,11 +7572,23 @@ import {
         NotificationManager.syncFromState();
     }
 
+    /**
+     * Calculate milliseconds needed to reach target charges from current level.
+     * @param {number} current - Current number of charges
+     * @param {number} target - Target number of charges to reach
+     * @param {number} cooldown - Cooldown time per charge in milliseconds
+     * @param {number} [intervalMs=0] - Additional interval time
+     * @returns {number} Time in milliseconds to reach target
+     */
     function getMsToTargetCharges(current, target, cooldown, intervalMs = 0) {
         const remainingCharges = target - current;
         return Math.max(0, remainingCharges * cooldown - intervalMs);
     }
 
+    /**
+     * Update the charges threshold UI with current interval information.
+     * @param {number} intervalMs - The interval time in milliseconds
+     */
     function updateChargesThresholdUI(intervalMs) {
         if (state.stopFlag) return;
 
@@ -7493,6 +7613,17 @@ import {
         );
     }
 
+    /**
+     * Generate coordinate array for painting pixels in the specified order.
+     * @param {number} width - Image width in pixels
+     * @param {number} height - Image height in pixels
+     * @param {string} mode - Coordinate generation mode ('rows', 'columns', 'blocks')
+     * @param {string} direction - Starting direction ('top-left', 'bottom-left', etc.)
+     * @param {boolean} snake - Whether to use snake pattern (reverse alternate rows/columns)
+     * @param {number} blockWidth - Width of blocks (for block mode)
+     * @param {number} blockHeight - Height of blocks (for block mode)
+     * @returns {Array<{x: number, y: number}>} Array of coordinate objects
+     */
     function generateCoordinates(
         width,
         height,
@@ -7665,6 +7796,11 @@ import {
         return coords;
     }
 
+    /**
+     * Flush a batch of pixels by sending them to the backend.
+     * @param {Array} pixelBatch - Array of pixel objects to send
+     * @returns {Promise<void>}
+     */
     async function flushPixelBatch(pixelBatch) {
         if (!pixelBatch || pixelBatch.pixels.length === 0) return true;
 
@@ -7719,6 +7855,11 @@ import {
         return success;
     }
 
+    /**
+     * Main image processing function that handles the painting workflow.
+     * Converts image pixels to canvas coordinates, matches colors, and sends batches.
+     * @returns {Promise<void>}
+     */
     async function processImage() {
         const { width, height, pixels } = state.imageData;
         const { x: startX, y: startY } = state.startPosition;
@@ -8128,6 +8269,10 @@ import {
     }
 
     // Helper function to calculate batch size based on mode
+    /**
+     * Calculate the optimal batch size for pixel painting based on current settings.
+     * @returns {number} The calculated batch size
+     */
     function calculateBatchSize() {
         let targetBatchSize;
 
@@ -8152,6 +8297,14 @@ import {
     }
 
     // Helper function to retry batch until success with exponential backoff
+    /**
+     * Send a pixel batch with automatic retry logic.
+     * @param {Array} pixelBatch - Array of pixel objects to send
+     * @param {number} regionX - Region X coordinate
+     * @param {number} regionY - Region Y coordinate
+     * @param {number} [maxRetries=MAX_BATCH_RETRIES] - Maximum retry attempts
+     * @returns {Promise<boolean>} True if successful, false if all retries failed
+     */
     async function sendBatchWithRetry(
         pixels,
         regionX,
@@ -8214,6 +8367,13 @@ import {
         return false;
     }
 
+    /**
+     * Send a batch of pixels to the backend API.
+     * @param {Array} pixelBatch - Array of pixel objects with x, y, and color data
+     * @param {number} regionX - Region X coordinate
+     * @param {number} regionY - Region Y coordinate
+     * @returns {Promise<boolean>} True if request was successful
+     */
     async function sendPixelBatch(pixelBatch, regionX, regionY) {
         let token = turnstileToken;
 
@@ -8311,6 +8471,9 @@ import {
         }
     }
 
+    /**
+     * Save current bot settings to localStorage for persistence.
+     */
     function saveBotSettings() {
         try {
             const settings = {
@@ -8373,6 +8536,9 @@ import {
         }
     }
 
+    /**
+     * Load bot settings from localStorage and apply them to current state.
+     */
     function loadBotSettings() {
         try {
             const saved = localStorage.getItem('wplace-bot-settings');

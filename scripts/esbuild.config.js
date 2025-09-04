@@ -93,7 +93,7 @@ function getEmbeddedLanguages() {
 }
 
 // Plugin to replace build info placeholders
-const buildInfoPlugin = {
+const buildInfoPlugin = (buildTarget) => ({
     name: 'build-info',
     setup(build) {
         build.onLoad({ filter: /Auto-Image\.js$/ }, async args => {
@@ -125,11 +125,55 @@ const buildInfoPlugin = {
                 console.warn('Could not get git branch name:', error.message);
             }
 
+            // Get git status (clean/dirty)
+            let gitStatus = 'clean';
+            let gitStatusColor = '#28a745'; // green
+            try {
+                const statusOutput = execSync('git status --porcelain', {
+                    encoding: 'utf8',
+                });
+                if (statusOutput.trim().length > 0) {
+                    gitStatus = 'dirty';
+                    gitStatusColor = '#dc3545'; // red
+                }
+            } catch (error) {
+                gitStatus = 'unknown';
+                gitStatusColor = '#6c757d'; // gray
+            }
+
+            // Get last commit message
+            let lastCommitMessage = 'unknown';
+            try {
+                lastCommitMessage = execSync('git log -1 --pretty=%s', {
+                    encoding: 'utf8',
+                }).trim();
+                // Truncate long commit messages
+                if (lastCommitMessage.length > 50) {
+                    lastCommitMessage = lastCommitMessage.substring(0, 47) + '...';
+                }
+            } catch (error) {
+                console.warn('Could not get last commit message:', error.message);
+            }
+
+            // Get environment
+            const environment = process.env.NODE_ENV || 'development';
+            const envColor = environment === 'production' ? '#28a745' : '#fd7e14'; // green for prod, orange for dev
+
+            // Get Node.js version
+            const nodeVersion = process.version;
+
             // Replace placeholders
             contents = contents
                 .replace(/__BUILD_DATE__/g, buildDate)
                 .replace(/__COMMIT_HASH__/g, commitHash)
-                .replace(/__BRANCH_NAME__/g, branchName);
+                .replace(/__BRANCH_NAME__/g, branchName)
+                .replace(/__BUILD_TARGET__/g, buildTarget)
+                .replace(/__GIT_STATUS__/g, gitStatus)
+                .replace(/__GIT_STATUS_COLOR__/g, gitStatusColor)
+                .replace(/__LAST_COMMIT_MESSAGE__/g, lastCommitMessage)
+                .replace(/__ENVIRONMENT__/g, environment)
+                .replace(/__ENVIRONMENT_COLOR__/g, envColor)
+                .replace(/__NODE_VERSION__/g, nodeVersion);
 
             return {
                 contents,
@@ -137,7 +181,7 @@ const buildInfoPlugin = {
             };
         });
     },
-};
+});
 
 // Plugin to inject embedded assets
 const assetInjectPlugin = {
@@ -211,6 +255,12 @@ const targets = {
         outfile: './dist/auto-image.standalone.js',
         minify: false,
         sourcemap: false,
+        plugins: [
+            buildInfoPlugin('standalone'),
+            cssEmbedPlugin,
+            jsonEmbedPlugin,
+            assetInjectPlugin,
+        ],
     },
 
     userscript: {
@@ -221,6 +271,12 @@ const targets = {
         banner: {
             js: getUserscriptHeader(),
         },
+        plugins: [
+            buildInfoPlugin('userscript'),
+            cssEmbedPlugin,
+            jsonEmbedPlugin,
+            assetInjectPlugin,
+        ],
     },
 
     bookmarklet: {
@@ -229,6 +285,12 @@ const targets = {
         minify: true,
         sourcemap: false,
         globalName: 'WPlaceAutoBot',
+        plugins: [
+            buildInfoPlugin('bookmarklet'),
+            cssEmbedPlugin,
+            jsonEmbedPlugin,
+            assetInjectPlugin,
+        ],
     },
 };
 
