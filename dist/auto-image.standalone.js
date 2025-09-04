@@ -7721,7 +7721,7 @@ input[type="range"] {
         border-bottom: 1px solid rgba(255,255,255,0.1);
         font-family: 'Courier New', monospace;
       ">
-        Build: 2025-09-02 22:33:31 <br /> Commit: fd4382d
+        Build: 2025-09-02 23:09:15 <br /> Commit: ef18daa
       </div>
     ` : "";
       const container = document.createElement("div");
