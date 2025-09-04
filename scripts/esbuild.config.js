@@ -96,25 +96,30 @@ function getEmbeddedLanguages() {
 const buildInfoPlugin = {
     name: 'build-info',
     setup(build) {
-        build.onLoad({ filter: /Auto-Image\.js$/ }, async (args) => {
+        build.onLoad({ filter: /Auto-Image\.js$/ }, async args => {
             let contents = fs.readFileSync(args.path, 'utf8');
-            
+
             // Get build date
-            const buildDate = new Date().toISOString().replace('T', ' ').substring(0, 19);
-            
+            const buildDate = new Date()
+                .toISOString()
+                .replace('T', ' ')
+                .substring(0, 19);
+
             // Get commit hash
             let commitHash = 'unknown';
             try {
-                commitHash = execSync('git rev-parse --short HEAD', { encoding: 'utf8' }).trim();
+                commitHash = execSync('git rev-parse --short HEAD', {
+                    encoding: 'utf8',
+                }).trim();
             } catch (error) {
                 console.warn('Could not get git commit hash:', error.message);
             }
-            
+
             // Replace placeholders
             contents = contents
                 .replace(/__BUILD_DATE__/g, buildDate)
                 .replace(/__COMMIT_HASH__/g, commitHash);
-            
+
             return {
                 contents,
                 loader: 'js',
@@ -177,7 +182,12 @@ const baseConfig = {
     bundle: true,
     target: ['chrome89', 'firefox88', 'safari14'],
     format: 'iife',
-    plugins: [buildInfoPlugin, cssEmbedPlugin, jsonEmbedPlugin, assetInjectPlugin],
+    plugins: [
+        buildInfoPlugin,
+        cssEmbedPlugin,
+        jsonEmbedPlugin,
+        assetInjectPlugin,
+    ],
     define: {
         'process.env.NODE_ENV': '"production"',
     },

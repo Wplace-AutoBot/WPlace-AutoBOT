@@ -10,83 +10,87 @@
 /* Default :root CSS variables for 100% classic theme compliance */
 /* These ensure the bot works perfectly even if theme files fail to load */
 :root {
-  /* Classic theme colors - exact upstream main values */
-  --wplace-primary: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
-  --wplace-secondary: linear-gradient(135deg, #111 0%, #2a2a2a 100%);
-  --wplace-accent: #222;
-  --wplace-text: #fff;
-  --wplace-highlight: #775ce3;
-  --wplace-highlight-secondary: #d3a4ff;
-  --wplace-success: #0f0;
-  --wplace-error: #f00;
-  --wplace-warning: #fa0;
+    /* Classic theme colors - exact upstream main values */
+    --wplace-primary: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
+    --wplace-secondary: linear-gradient(135deg, #111 0%, #2a2a2a 100%);
+    --wplace-accent: #222;
+    --wplace-text: #fff;
+    --wplace-highlight: #775ce3;
+    --wplace-highlight-secondary: #d3a4ff;
+    --wplace-success: #0f0;
+    --wplace-error: #f00;
+    --wplace-warning: #fa0;
 
-  /* UI properties */
-  --wplace-radius: 12px;
-  --wplace-btn-radius: 16px;
-  --wplace-border-style: solid;
-  --wplace-border-width: 1px;
-  --wplace-border-color: #222;
-  --wplace-shadow: 0 8px 32px rgb(0 0 0 / 60%), 0 0 0 1px rgb(255 255 255 / 10%);
-  --wplace-backdrop: blur(10px);
-  --wplace-font: 'Segoe UI', roboto, sans-serif;
+    /* UI properties */
+    --wplace-radius: 12px;
+    --wplace-btn-radius: 16px;
+    --wplace-border-style: solid;
+    --wplace-border-width: 1px;
+    --wplace-border-color: #222;
+    --wplace-shadow:
+        0 8px 32px rgb(0 0 0 / 60%), 0 0 0 1px rgb(255 255 255 / 10%);
+    --wplace-backdrop: blur(10px);
+    --wplace-font: 'Segoe UI', roboto, sans-serif;
 
-  /* Z-index layers */
-  --wplace-z-overlay: 10000;
-  --wplace-z-alert: 10002;
-  --wplace-z-settings: 10002;
+    /* Z-index layers */
+    --wplace-z-overlay: 10000;
+    --wplace-z-alert: 10002;
+    --wplace-z-settings: 10002;
 
-  /* Feature toggles */
-  --wplace-scanline: 0;
-  --wplace-pixel-blink: 0;
+    /* Feature toggles */
+    --wplace-scanline: 0;
+    --wplace-pixel-blink: 0;
 
-  /* Icon colors */
-  --wplace-icon-primary: #4facfe;
-  --wplace-icon-secondary: #00f2fe;
-  --wplace-icon-palette: #f093fb;
+    /* Icon colors */
+    --wplace-icon-primary: #4facfe;
+    --wplace-icon-secondary: #00f2fe;
+    --wplace-icon-palette: #f093fb;
 
-  /* Additional UI colors */
-  --wplace-danger: #ff6a6a;
-  --wplace-danger-dark: #ff4757;
-  --wplace-muted-text: #fffb;
+    /* Additional UI colors */
+    --wplace-danger: #ff6a6a;
+    --wplace-danger-dark: #ff4757;
+    --wplace-muted-text: #fffb;
 
-  /* Text variants */
-  --wplace-text-secondary: rgb(255 255 255 / 90%);
-  --wplace-text-muted: rgb(255 255 255 / 70%);
-  --wplace-text-dim: rgb(255 255 255 / 60%);
-  --wplace-text-faded: rgb(255 255 255 / 80%);
+    /* Text variants */
+    --wplace-text-secondary: rgb(255 255 255 / 90%);
+    --wplace-text-muted: rgb(255 255 255 / 70%);
+    --wplace-text-dim: rgb(255 255 255 / 60%);
+    --wplace-text-faded: rgb(255 255 255 / 80%);
 
-  /* Background variants */
-  --wplace-bg-input: rgb(255 255 255 / 15%);
-  --wplace-bg-subtle: rgb(255 255 255 / 10%);
-  --wplace-bg-faint: rgb(255 255 255 / 8%);
-  --wplace-bg-ghost: rgb(255 255 255 / 6%);
-  --wplace-bg-whisper: rgb(255 255 255 / 5%);
+    /* Background variants */
+    --wplace-bg-input: rgb(255 255 255 / 15%);
+    --wplace-bg-subtle: rgb(255 255 255 / 10%);
+    --wplace-bg-faint: rgb(255 255 255 / 8%);
+    --wplace-bg-ghost: rgb(255 255 255 / 6%);
+    --wplace-bg-whisper: rgb(255 255 255 / 5%);
 
-  /* Border variants */
-  --wplace-border-subtle: rgb(255 255 255 / 20%);
-  --wplace-border-faint: rgb(255 255 255 / 15%);
-  --wplace-border-ghost: rgb(255 255 255 / 10%);
-  --wplace-border-ultra-faint: rgb(255 255 255 / 5%);
+    /* Border variants */
+    --wplace-border-subtle: rgb(255 255 255 / 20%);
+    --wplace-border-faint: rgb(255 255 255 / 15%);
+    --wplace-border-ghost: rgb(255 255 255 / 10%);
+    --wplace-border-ultra-faint: rgb(255 255 255 / 5%);
 
-  /* Shadow variants */
-  --wplace-shadow-drag: 0 12px 40px rgb(0 0 0 / 80%), 0 0 0 2px rgb(255 255 255 / 20%);
-  --wplace-shadow-notification: 0 4px 12px rgb(0 0 0 / 30%);
-  --wplace-shadow-slider-thumb: 0 3px 6px rgb(0 0 0 / 30%), 0 0 0 2px var(--wplace-icon-primary);
-  --wplace-shadow-slider-hover: 0 4px 8px rgb(0 0 0 / 40%), 0 0 0 3px var(--wplace-icon-primary);
+    /* Shadow variants */
+    --wplace-shadow-drag:
+        0 12px 40px rgb(0 0 0 / 80%), 0 0 0 2px rgb(255 255 255 / 20%);
+    --wplace-shadow-notification: 0 4px 12px rgb(0 0 0 / 30%);
+    --wplace-shadow-slider-thumb:
+        0 3px 6px rgb(0 0 0 / 30%), 0 0 0 2px var(--wplace-icon-primary);
+    --wplace-shadow-slider-hover:
+        0 4px 8px rgb(0 0 0 / 40%), 0 0 0 3px var(--wplace-icon-primary);
 
-  /* Animation colors */
-  --wplace-pulse-start: rgb(0 255 0 / 70%);
-  --wplace-pulse-mid: rgb(0 255 0 / 0%);
-  --wplace-pulse-end: rgb(0 255 0 / 0%);
+    /* Animation colors */
+    --wplace-pulse-start: rgb(0 255 0 / 70%);
+    --wplace-pulse-mid: rgb(0 255 0 / 0%);
+    --wplace-pulse-end: rgb(0 255 0 / 0%);
 
-  /* Slider colors - defaults for classic compatibility */
-  --wplace-slider-thumb-bg: white;
-  --wplace-slider-track-bg: linear-gradient(
-    to right,
-    var(--wplace-icon-primary) 0%,
-    var(--wplace-icon-secondary) 100%
-  );
+    /* Slider colors - defaults for classic compatibility */
+    --wplace-slider-thumb-bg: white;
+    --wplace-slider-track-bg: linear-gradient(
+        to right,
+        var(--wplace-icon-primary) 0%,
+        var(--wplace-icon-secondary) 100%
+    );
 }
 
 /* Theme classes are now defined in separate files */
@@ -97,90 +101,90 @@
 /* Core animations (shared)  */
 /* ========================= */
 @keyframes neon-glow {
-  0%,
-  100% {
-    text-shadow:
-      0 0 5px currentcolor,
-      0 0 10px currentcolor,
-      0 0 15px currentcolor;
-  }
+    0%,
+    100% {
+        text-shadow:
+            0 0 5px currentcolor,
+            0 0 10px currentcolor,
+            0 0 15px currentcolor;
+    }
 
-  50% {
-    text-shadow:
-      0 0 2px currentcolor,
-      0 0 5px currentcolor,
-      0 0 8px currentcolor;
-  }
+    50% {
+        text-shadow:
+            0 0 2px currentcolor,
+            0 0 5px currentcolor,
+            0 0 8px currentcolor;
+    }
 }
 
 @keyframes pixel-blink {
-  0%,
-  50% {
-    opacity: 1;
-  }
+    0%,
+    50% {
+        opacity: 1;
+    }
 
-  51%,
-  100% {
-    opacity: 0.7;
-  }
+    51%,
+    100% {
+        opacity: 0.7;
+    }
 }
 
 @keyframes scanline {
-  0% {
-    transform: translateY(-100%);
-  }
+    0% {
+        transform: translateY(-100%);
+    }
 
-  100% {
-    transform: translateY(400px);
-  }
+    100% {
+        transform: translateY(400px);
+    }
 }
 
 @keyframes pulse {
-  0% {
-    box-shadow: 0 0 0 0 var(--wplace-pulse-start);
-  }
+    0% {
+        box-shadow: 0 0 0 0 var(--wplace-pulse-start);
+    }
 
-  70% {
-    box-shadow: 0 0 0 10px var(--wplace-pulse-mid);
-  }
+    70% {
+        box-shadow: 0 0 0 10px var(--wplace-pulse-mid);
+    }
 
-  100% {
-    box-shadow: 0 0 0 0 var(--wplace-pulse-end);
-  }
+    100% {
+        box-shadow: 0 0 0 0 var(--wplace-pulse-end);
+    }
 }
 
 @keyframes slide-in {
-  from {
-    transform: translateY(-10px);
-    opacity: 0;
-  }
+    from {
+        transform: translateY(-10px);
+        opacity: 0;
+    }
 
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 @keyframes slide-down {
-  from {
-    transform: translateX(-50%) translateY(-20px);
-    opacity: 0;
-  }
+    from {
+        transform: translateX(-50%) translateY(-20px);
+        opacity: 0;
+    }
 
-  to {
-    transform: translateX(-50%) translateY(0);
-    opacity: 1;
-  }
+    to {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
 }
 
 @keyframes shimmer {
-  0% {
-    transform: translateX(-100%);
-  }
+    0% {
+        transform: translateX(-100%);
+    }
 
-  100% {
-    transform: translateX(100%);
-  }
+    100% {
+        transform: translateX(100%);
+    }
 }
 
 /* ========================= */
@@ -188,417 +192,424 @@
 /* Align with JS structure   */
 /* ========================= */
 #wplace-image-bot-container {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  width: 280px;
-  max-height: calc(100vh - 40px);
-  padding: 0;
-  z-index: 9998;
-  animation: slide-in 0.4s ease-out;
-  overflow: hidden auto;
-  transition: all 0.3s ease;
-  user-select: none;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: 280px;
+    max-height: calc(100vh - 40px);
+    padding: 0;
+    z-index: 9998;
+    animation: slide-in 0.4s ease-out;
+    overflow: hidden auto;
+    transition: all 0.3s ease;
+    user-select: none;
 
-  /* Default classic theme styling for 100% compliance */
-  background: var(--wplace-primary);
-  color: var(--wplace-text);
-  border-radius: var(--wplace-radius);
-  box-shadow: var(--wplace-shadow);
-  font-family: var(--wplace-font);
-  backdrop-filter: var(--wplace-backdrop);
-  border: var(--wplace-border-width) var(--wplace-border-style) var(--wplace-border-color);
+    /* Default classic theme styling for 100% compliance */
+    background: var(--wplace-primary);
+    color: var(--wplace-text);
+    border-radius: var(--wplace-radius);
+    box-shadow: var(--wplace-shadow);
+    font-family: var(--wplace-font);
+    backdrop-filter: var(--wplace-backdrop);
+    border: var(--wplace-border-width) var(--wplace-border-style)
+        var(--wplace-border-color);
 }
 
 #wplace-image-bot-container.wplace-dragging {
-  transition: none;
-  box-shadow: var(--wplace-shadow-drag);
-  transform: scale(1.02);
-  z-index: 9999;
+    transition: none;
+    box-shadow: var(--wplace-shadow-drag);
+    transform: scale(1.02);
+    z-index: 9999;
 }
 
 #wplace-image-bot-container.wplace-compact {
-  width: 240px;
+    width: 240px;
 }
 
 #wplace-image-bot-container.wplace-minimized {
-  width: 200px;
-  height: auto;
-  overflow: hidden;
+    width: 200px;
+    height: auto;
+    overflow: hidden;
 }
 
 /* Stats container sits to the right of main (280 + 30 = 330) */
 #wplace-stats-container {
-  position: fixed;
-  top: 20px;
-  left: 310px;
-  width: 230px;
-  max-height: calc(100vh - 40px);
-  padding: 0;
-  z-index: 9997;
-  animation: slide-in 0.4s ease-out;
-  overflow-y: auto;
-  transition: all 0.3s ease;
-  user-select: none;
-  display: none;
+    position: fixed;
+    top: 20px;
+    left: 310px;
+    width: 230px;
+    max-height: calc(100vh - 40px);
+    padding: 0;
+    z-index: 9997;
+    animation: slide-in 0.4s ease-out;
+    overflow-y: auto;
+    transition: all 0.3s ease;
+    user-select: none;
+    display: none;
 
-  /* Default classic theme styling for 100% compliance */
-  background: var(--wplace-primary);
-  color: var(--wplace-text);
-  border-radius: var(--wplace-radius);
-  box-shadow: var(--wplace-shadow);
-  font-family: var(--wplace-font);
-  backdrop-filter: var(--wplace-backdrop);
-  border: var(--wplace-border-width) var(--wplace-border-style) var(--wplace-border-color);
+    /* Default classic theme styling for 100% compliance */
+    background: var(--wplace-primary);
+    color: var(--wplace-text);
+    border-radius: var(--wplace-radius);
+    box-shadow: var(--wplace-shadow);
+    font-family: var(--wplace-font);
+    backdrop-filter: var(--wplace-backdrop);
+    border: var(--wplace-border-width) var(--wplace-border-style)
+        var(--wplace-border-color);
 }
 
 #wplace-stats-container.wplace-dragging {
-  transition: none;
+    transition: none;
 }
 
 /* Back-compat for legacy class (some earlier CSS used this) */
 .wplace-drag-active {
-  transition: none !important;
-  box-shadow: var(--wplace-shadow-drag) !important;
-  transform: scale(1.02) !important;
-  z-index: 9999 !important;
+    transition: none !important;
+    box-shadow: var(--wplace-shadow-drag) !important;
+    transform: scale(1.02) !important;
+    z-index: 9999 !important;
 }
 
 /* ========================= */
 /* Header and content blocks */
 /* ========================= */
 .wplace-header {
-  padding: 8px 12px;
-  font-size: 13px;
-  font-weight: 700;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: move;
-  user-select: none;
-  border-bottom: 1px solid var(--wplace-border-ghost);
-  transition: background 0.2s ease;
-  position: relative;
-  z-index: 2;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: move;
+    user-select: none;
+    border-bottom: 1px solid var(--wplace-border-ghost);
+    transition: background 0.2s ease;
+    position: relative;
+    z-index: 2;
 
-  /* Default styling for 100% classic compliance */
-  background: var(--wplace-secondary);
-  color: var(--wplace-highlight);
-  text-shadow: 0 1px 2px rgb(0 0 0 / 50%);
+    /* Default styling for 100% classic compliance */
+    background: var(--wplace-secondary);
+    color: var(--wplace-highlight);
+    text-shadow: 0 1px 2px rgb(0 0 0 / 50%);
 }
 
 .wplace-header-title {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .wplace-header-controls {
-  display: flex;
-  gap: 6px;
+    display: flex;
+    gap: 6px;
 }
 
 .wplace-header-btn {
-  border: none;
-  cursor: pointer;
-  width: 18px;
-  height: 18px;
-  padding: 0;
-  font-size: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
 
-  /* Default styling for 100% classic compliance */
-  background: rgb(255 255 255 / 10%);
-  color: var(--wplace-text);
-  border-radius: 4px;
-  font-family: var(--wplace-font);
+    /* Default styling for 100% classic compliance */
+    background: rgb(255 255 255 / 10%);
+    color: var(--wplace-text);
+    border-radius: 4px;
+    font-family: var(--wplace-font);
 }
 
 .wplace-header-btn:hover {
-  transform: scale(1.1);
+    transform: scale(1.1);
 
-  /* Default styling for 100% classic compliance */
-  background: var(--wplace-accent);
-  color: var(--wplace-text);
+    /* Default styling for 100% classic compliance */
+    background: var(--wplace-accent);
+    color: var(--wplace-text);
 }
 
 .wplace-content {
-  display: block;
-  position: relative;
-  z-index: 2;
-  padding: 12px;
+    display: block;
+    position: relative;
+    z-index: 2;
+    padding: 12px;
 }
 
 .wplace-content.wplace-hidden {
-  display: none;
+    display: none;
 }
 
 /* Sections */
 .wplace-status-section {
-  margin-bottom: 6px;
-  padding: 8px;
-  border-radius: var(--wplace-radius, 12px);
+    margin-bottom: 6px;
+    padding: 8px;
+    border-radius: var(--wplace-radius, 12px);
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-section {
-  margin-bottom: 6px;
-  padding: 8px;
-  border-radius: var(--wplace-radius, 12px);
+    margin-bottom: 6px;
+    padding: 8px;
+    border-radius: var(--wplace-radius, 12px);
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-section-title {
-  font-size: 11px;
-  font-weight: 600;
-  margin-bottom: 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  gap: 6px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    gap: 6px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-section-title i.arrow {
-  transition: transform 0.3s ease;
+    transition: transform 0.3s ease;
 }
 
 .wplace-section.collapsed .wplace-section-title i.arrow {
-  transform: rotate(-90deg);
+    transform: rotate(-90deg);
 }
 
 /* ========================= */
 /* Controls and buttons      */
 /* ========================= */
 .wplace-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .wplace-cooldown-control {
-  margin-top: 8px;
+    margin-top: 8px;
 }
 
 .wplace-section.collapsed .wplace-controls,
 .wplace-section.collapsed .wplace-cooldown-control {
-  max-height: 0;
-  opacity: 0;
-  pointer-events: none;
+    max-height: 0;
+    opacity: 0;
+    pointer-events: none;
 }
 
 .wplace-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
 }
 
 .wplace-row.single {
-  grid-template-columns: 1fr;
+    grid-template-columns: 1fr;
 }
 
 .wplace-btn {
-  padding: 8px 12px;
-  border: 1px solid rgb(255 255 255 / 10%);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  font-size: 11px;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  font-weight: 500;
-  
-  /* Default styling - themes can override these */
-  background: linear-gradient(135deg, #222 0%, #4a4a4a 100%);
-  color: var(--wplace-text);
-  border-radius: var(--wplace-btn-radius, 16px);
-  font-family: var(--wplace-font);
-  box-shadow: 0 2px 8px rgb(0 0 0 / 20%);
+    padding: 8px 12px;
+    border: 1px solid rgb(255 255 255 / 10%);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 11px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    font-weight: 500;
 
-  /* Theme-specific styling applied via theme files */
+    /* Default styling - themes can override these */
+    background: linear-gradient(135deg, #222 0%, #4a4a4a 100%);
+    color: var(--wplace-text);
+    border-radius: var(--wplace-btn-radius, 16px);
+    font-family: var(--wplace-font);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 20%);
+
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none !important;
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  transition: left 0.5s ease;
-  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 10%), transparent);
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    transition: left 0.5s ease;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgb(255 255 255 / 10%),
+        transparent
+    );
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-btn:disabled::before {
-  display: none;
+    display: none;
 }
 
 .wplace-btn:hover:not(:disabled)::before {
-  left: 100%;
+    left: 100%;
 }
 
 .wplace-btn:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgb(0 0 0 / 30%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 30%);
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-btn:active:not(:disabled) {
-  transform: translateY(0);
+    transform: translateY(0);
 }
 
 /* Default button variants - themes can override these */
 .wplace-btn-upload {
-  background: rgb(111 66 193 / 10%) !important;
-  border: 2px dashed var(--wplace-highlight) !important;
-  color: var(--wplace-highlight) !important;
+    background: rgb(111 66 193 / 10%) !important;
+    border: 2px dashed var(--wplace-highlight) !important;
+    color: var(--wplace-highlight) !important;
 }
 
 .wplace-btn-upload:hover:not(:disabled) {
-  background: rgb(111 66 193 / 15%) !important;
-  border-color: var(--wplace-highlight) !important;
-  box-shadow: 0 4px 12px rgb(111 66 193 / 20%) !important;
+    background: rgb(111 66 193 / 15%) !important;
+    border-color: var(--wplace-highlight) !important;
+    box-shadow: 0 4px 12px rgb(111 66 193 / 20%) !important;
 }
 
 /* ========================= */
 /* Stats and progress        */
 /* ========================= */
 .wplace-stats {
-  margin-bottom: 8px;
-  padding: 8px;
+    margin-bottom: 8px;
+    padding: 8px;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-stat-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 4px 0;
-  font-size: 11px;
-  border-bottom: 1px solid var(--wplace-border-ultra-faint);
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    font-size: 11px;
+    border-bottom: 1px solid var(--wplace-border-ultra-faint);
 }
 
 .wplace-stat-item:last-child {
-  border-bottom: none;
+    border-bottom: none;
 }
 
 .wplace-stat-label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  opacity: 0.9;
-  font-size: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    opacity: 0.9;
+    font-size: 10px;
 }
 
 .wplace-stat-value {
-  font-weight: 600;
+    font-weight: 600;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-colors-section {
-  margin-top: 10px;
-  padding-top: 8px;
-  border-top: 1px solid var(--wplace-border-ultra-faint);
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid var(--wplace-border-ultra-faint);
 }
 
 .wplace-stat-colors-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(16px, 1fr));
-  gap: 4px;
-  margin-top: 8px;
-  padding: 4px;
-  max-height: 80px;
-  overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(16px, 1fr));
+    gap: 4px;
+    margin-top: 8px;
+    padding: 4px;
+    max-height: 80px;
+    overflow-y: auto;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-colors-placeholder {
-  text-align: center;
-  color: #888;
-  padding: 20px;
-  font-style: italic;
+    text-align: center;
+    color: #888;
+    padding: 20px;
+    font-style: italic;
 }
 
 .wplace-cooldown-value {
-  font-weight: bold;
-  min-width: 20px;
-  text-align: center;
-  display: inline-block;
+    font-weight: bold;
+    min-width: 20px;
+    text-align: center;
+    display: inline-block;
 }
 
 .wplace-stat-color-swatch {
-  width: 16px;
-  height: 16px;
+    width: 16px;
+    height: 16px;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 /* Progress */
 .wplace-progress {
-  width: 100%;
-  margin: 8px 0;
-  overflow: hidden;
-  height: 6px;
-  position: relative;
+    width: 100%;
+    margin: 8px 0;
+    overflow: hidden;
+    height: 6px;
+    position: relative;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-progress-bar {
-  height: 6px;
-  transition: width 0.5s ease;
-  position: relative;
+    height: 6px;
+    transition: width 0.5s ease;
+    position: relative;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-progress-bar::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  animation: shimmer 2s infinite;
+    content: '';
+    position: absolute;
+    inset: 0;
+    animation: shimmer 2s infinite;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 /* ========================= */
 /* Status blocks             */
 /* ========================= */
 .wplace-status {
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-  padding: 6px;
-  border: 1px solid;
-  font-size: 11px;
-  border-radius: var(--wplace-radius, 12px);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    padding: 6px;
+    border: 1px solid;
+    font-size: 11px;
+    border-radius: var(--wplace-radius, 12px);
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 /* Status styling moved to theme files */
@@ -607,369 +618,367 @@
 /* Resize dialog             */
 /* ========================= */
 .resize-container {
-  display: none;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  padding: 20px;
-  z-index: 10000;
-  width: 90%;
-  max-width: 700px;
-  max-height: 90%;
-  overflow: auto;
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    z-index: 10000;
+    width: 90%;
+    max-width: 700px;
+    max-height: 90%;
+    overflow: auto;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .resize-preview-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 15px 0;
-  height: 300px;
-  overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 15px 0;
+    height: 300px;
+    overflow: hidden;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .resize-canvas-stack {
-  position: relative;
-  transform-origin: center center;
-  display: inline-block;
+    position: relative;
+    transform-origin: center center;
+    display: inline-block;
 }
 
 .resize-base-canvas,
 .resize-mask-canvas {
-  position: absolute;
-  left: 0;
-  top: 0;
-  image-rendering: -moz-crisp-edges;
-  image-rendering: pixelated;
+    position: absolute;
+    left: 0;
+    top: 0;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: pixelated;
 }
 
 .resize-mask-canvas {
-  pointer-events: auto;
+    pointer-events: auto;
 }
 
 .resize-tools {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  margin-top: 8px;
-  font-size: 12px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 8px;
+    font-size: 12px;
 }
 
 /* Missing button hover styles */
 .resize-tools button {
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: 1px solid var(--wplace-border-subtle);
-  background: var(--wplace-bg-ghost);
-  color: var(--wplace-text);
-  cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--wplace-border-subtle);
+    background: var(--wplace-bg-ghost);
+    color: var(--wplace-text);
+    cursor: pointer;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 /* Button active states moved to theme files */
 
 .resize-controls {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
-  align-items: center;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    align-items: center;
 }
 
 .resize-slider {
-  width: 100%;
-  height: 4px;
-  border: none;
-  outline: none;
-  -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    border: none;
+    outline: none;
+    -webkit-appearance: none;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .resize-zoom-controls {
-  grid-column: 1 / -1;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 15px;
-  flex-wrap: wrap;
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 15px;
+    flex-wrap: wrap;
 }
 
 .resize-buttons {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
 }
-
 
 /* ========================= */
 /* Color grid                */
 /* ========================= */
 .wplace-color-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-  gap: 10px;
-  padding-top: 8px;
-  max-height: 300px;
-  overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    gap: 10px;
+    padding-top: 8px;
+    max-height: 300px;
+    overflow-y: auto;
 }
 
 .wplace-color-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
 }
 
 .wplace-color-item-name {
-  font-size: 9px;
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 100%;
+    font-size: 9px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-color-swatch {
-  width: 22px;
-  height: 22px;
-  cursor: pointer;
-  transition:
-    transform 0.1s ease,
-    box-shadow 0.2s ease;
-  position: relative;
-  margin: 0 auto;
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    transition:
+        transform 0.1s ease,
+        box-shadow 0.2s ease;
+    position: relative;
+    margin: 0 auto;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-color-swatch.unavailable {
-  border-style: dashed;
-  cursor: not-allowed;
+    border-style: dashed;
+    cursor: not-allowed;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-color-swatch:hover {
-  transform: scale(1.1);
-  z-index: 1;
+    transform: scale(1.1);
+    z-index: 1;
 }
 
 .wplace-color-swatch:not(.active) {
-  opacity: 0.3;
+    opacity: 0.3;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-color-swatch.unavailable:not(.active) {
-  opacity: 0.2;
+    opacity: 0.2;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-color-swatch.active::after {
-  content: '✔';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: var(--wplace-text);
-  font-size: 12px;
-  font-weight: bold;
+    content: '✔';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--wplace-text);
+    font-size: 12px;
+    font-weight: bold;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-color-divider {
-  border: none;
-  height: 1px;
-  margin: 8px 0;
+    border: none;
+    height: 1px;
+    margin: 8px 0;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 /* ========================= */
 /* Cooldown controls         */
 /* ========================= */
 .wplace-cooldown-control label {
-  font-size: 11px;
-  margin-bottom: 4px;
-  display: block;
+    font-size: 11px;
+    margin-bottom: 4px;
+    display: block;
 }
 
 .wplace-slider-container {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .wplace-slider {
-  flex: 1;
-  -webkit-appearance: none;
-  appearance: none;
-  height: 4px;
-  outline: none;
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    outline: none;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 14px;
-  height: 14px;
-  cursor: pointer;
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 /* ========================= */
 /* Settings container (base) */
 /* ========================= */
 #wplace-settings-container {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  padding: 0;
-  z-index: 10002;
-  display: none;
-  min-width: 420px;
-  max-width: 480px;
-  overflow: hidden;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 0;
+    z-index: 10002;
+    display: none;
+    min-width: 420px;
+    max-width: 480px;
+    overflow: hidden;
 
-  /* Default classic theme styling for 100% compliance */
-  background: var(--wplace-primary);
-  color: var(--wplace-text);
-  border-radius: var(--wplace-radius);
-  box-shadow: var(--wplace-shadow);
-  font-family: var(--wplace-font);
-  backdrop-filter: var(--wplace-backdrop);
-  border: var(--wplace-border-width) var(--wplace-border-style) var(--wplace-border-color);
+    /* Default classic theme styling for 100% compliance */
+    background: var(--wplace-primary);
+    color: var(--wplace-text);
+    border-radius: var(--wplace-radius);
+    box-shadow: var(--wplace-shadow);
+    font-family: var(--wplace-font);
+    backdrop-filter: var(--wplace-backdrop);
+    border: var(--wplace-border-width) var(--wplace-border-style)
+        var(--wplace-border-color);
 }
 
 #wplace-settings-container.show {
-  display: block;
-  animation: settings-slide-in 0.4s ease-out;
+    display: block;
+    animation: settings-slide-in 0.4s ease-out;
 }
 
 @keyframes settings-slide-in {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.9);
-  }
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9);
+    }
 
-  to {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
 }
 
 @keyframes settings-fade-out {
-  from {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
+    from {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
 
-  to {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.9);
-  }
+    to {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9);
+    }
 }
 
 .wplace-settings {
-  padding: 16px;
-  max-height: 400px;
-  overflow-y: auto;
+    padding: 16px;
+    max-height: 400px;
+    overflow-y: auto;
 }
 
 .wplace-setting-section {
-  margin-bottom: 20px;
-  padding: 12px;
+    margin-bottom: 20px;
+    padding: 12px;
 }
 
 /* ========================= */
 /* Form controls             */
 /* ========================= */
 .wplace-select {
-  width: 100%;
-  padding: 8px 12px;
-  font-size: 14px;
-  margin-bottom: 10px;
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 14px;
+    margin-bottom: 10px;
 }
 
 .wplace-select:focus {
-  outline: none;
+    outline: none;
 }
 
 .wplace-description {
-  font-size: 12px;
-  opacity: 0.8;
-  line-height: 1.4;
+    font-size: 12px;
+    opacity: 0.8;
+    line-height: 1.4;
 }
 
 /* Speed controls */
 .wplace-speed-control {
-  margin-top: 12px;
-  padding: 12px;
+    margin-top: 12px;
+    padding: 12px;
 }
 
 .wplace-speed-label {
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
-  font-size: 13px;
-  font-weight: 600;
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 600;
 }
 
 .wplace-speed-label i {
-  margin-right: 6px;
+    margin-right: 6px;
 }
-
 
 .wplace-speed-slider {
-  flex: 1;
-  height: 8px;
-  outline: none;
-  -webkit-appearance: none;
-  appearance: none;
-  cursor: pointer;
-  background: var(--wplace-slider-track-bg);
-  border-radius: 4px;
+    flex: 1;
+    height: 8px;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    background: var(--wplace-slider-track-bg);
+    border-radius: 4px;
 }
 
-
 .wplace-speed-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-speed-slider::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-speed-display {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  min-width: 90px;
-  justify-content: flex-end;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 90px;
+    justify-content: flex-end;
 }
 
 /* ========================= */
@@ -977,163 +986,163 @@
 /* ========================= */
 /* Hidden invisible widget host (token generator) */
 .wplace-turnstile-hidden {
-  position: fixed !important;
-  left: -99999px !important;
-  top: -99999px !important;
-  width: 1px !important;
-  height: 1px !important;
-  pointer-events: none !important;
-  opacity: 0 !important;
-  visibility: hidden !important;
-  z-index: -99999 !important;
-  overflow: hidden !important;
+    position: fixed !important;
+    left: -99999px !important;
+    top: -99999px !important;
+    width: 1px !important;
+    height: 1px !important;
+    pointer-events: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    z-index: -99999 !important;
+    overflow: hidden !important;
 }
 
 /* Visible overlay (interactive fallback) */
 .wplace-turnstile-overlay {
-  position: fixed !important;
-  bottom: 20px !important;
-  right: 20px !important;
-  z-index: 99999 !important;
-  padding: 20px !important;
-  min-width: 300px !important;
-  max-width: 400px !important;
+    position: fixed !important;
+    bottom: 20px !important;
+    right: 20px !important;
+    z-index: 99999 !important;
+    padding: 20px !important;
+    min-width: 300px !important;
+    max-width: 400px !important;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-turnstile-title {
-  font:
-    600 12px/1.3 'Segoe UI',
-    sans-serif !important;
-  margin-bottom: 8px !important;
-  opacity: 0.9 !important;
+    font:
+        600 12px/1.3 'Segoe UI',
+        sans-serif !important;
+    margin-bottom: 8px !important;
+    opacity: 0.9 !important;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-turnstile-host {
-  width: 100% !important;
-  min-height: 70px !important;
+    width: 100% !important;
+    min-height: 70px !important;
 }
 
 .wplace-turnstile-hide-btn {
-  position: absolute !important;
-  top: 6px !important;
-  right: 6px !important;
-  font-size: 11px !important;
-  background: transparent !important;
-  padding: 2px 6px !important;
-  cursor: pointer !important;
-  transition: background 0.2s ease !important;
+    position: absolute !important;
+    top: 6px !important;
+    right: 6px !important;
+    font-size: 11px !important;
+    background: transparent !important;
+    padding: 2px 6px !important;
+    cursor: pointer !important;
+    transition: background 0.2s ease !important;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-turnstile-hide-btn:hover {
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 /* ========================= */
 /* Alert system (used by JS) */
 /* ========================= */
 .wplace-alert-base {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 12px 20px;
-  color: var(--wplace-text);
-  font-weight: 600;
-  z-index: 10002;
-  max-width: 400px;
-  text-align: center;
-  animation: slide-down 0.3s ease-out;
-  box-shadow: var(--wplace-shadow-notification);
-  
-  /* Default fallback background - themes override this */
-  background: rgb(0 0 0 / 90%);
-  border-radius: var(--wplace-radius);
-  border: 1px solid rgb(255 255 255 / 20%);
-  backdrop-filter: var(--wplace-backdrop);
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 20px;
+    color: var(--wplace-text);
+    font-weight: 600;
+    z-index: 10002;
+    max-width: 400px;
+    text-align: center;
+    animation: slide-down 0.3s ease-out;
+    box-shadow: var(--wplace-shadow-notification);
 
-  /* Theme-specific styling applied via theme files */
+    /* Default fallback background - themes override this */
+    background: rgb(0 0 0 / 90%);
+    border-radius: var(--wplace-radius);
+    border: 1px solid rgb(255 255 255 / 20%);
+    backdrop-filter: var(--wplace-backdrop);
+
+    /* Theme-specific styling applied via theme files */
 }
 
 /* Default alert type styles - themes can override these */
 .wplace-alert-info {
-  background: linear-gradient(135deg, #3498db, #2980b9);
-  color: white;
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
 }
 
 .wplace-alert-success {
-  background: linear-gradient(135deg, #27ae60, #229954);
-  color: white;
+    background: linear-gradient(135deg, #27ae60, #229954);
+    color: white;
 }
 
 .wplace-alert-warning {
-  background: linear-gradient(135deg, #f39c12, #e67e22);
-  color: white;
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+    color: white;
 }
 
 .wplace-alert-error {
-  background: linear-gradient(135deg, #e74c3c, #c0392b);
-  color: white;
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
 }
 
 /* ========================= */
 /* Modal overlay helpers     */
 /* ========================= */
 .wplace-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 100002;
-  display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 100002;
+    display: none;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-overlay.show {
-  display: block;
+    display: block;
 }
 
 /* Overlay visibility helpers */
 .wplace-overlay-hidden {
-  display: none !important;
+    display: none !important;
 }
 
 .wplace-overlay-visible {
-  display: block !important;
+    display: block !important;
 }
 
 /* ========================= */
 /* Responsive tweaks         */
 /* ========================= */
 @media (width <= 768px) {
-  #wplace-image-bot-container {
-    left: 10px;
-    width: calc(100vw - 20px);
-    max-height: calc(100vh - 20px);
-  }
+    #wplace-image-bot-container {
+        left: 10px;
+        width: calc(100vw - 20px);
+        max-height: calc(100vh - 20px);
+    }
 
-  #wplace-stats-container {
-    display: none !important; /* hide secondary panel on small screens */
-  }
+    #wplace-stats-container {
+        display: none !important; /* hide secondary panel on small screens */
+    }
 
-  .wplace-alert-base {
-    max-width: 90vw;
-    margin: 0 5vw;
-  }
+    .wplace-alert-base {
+        max-width: 90vw;
+        margin: 0 5vw;
+    }
 
-  .wplace-turnstile-overlay {
-    bottom: 10px !important;
-    right: 10px !important;
-    left: 10px !important;
-    min-width: auto !important;
-  }
+    .wplace-turnstile-overlay {
+        bottom: 10px !important;
+        right: 10px !important;
+        left: 10px !important;
+        min-width: auto !important;
+    }
 }
 
 /* Auto light/dark support moved to theme files */
@@ -1142,40 +1151,40 @@
 /* Settings container variants (optional) */
 /* ===================================== */
 .wplace-settings-container-base {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 100001;
-  display: none;
-  min-width: 400px;
-  max-width: 500px;
-  max-height: 100vh;
-  overflow-y: auto;
-  animation: slide-in 0.3s ease-out;
-  border: 1px solid var(--wplace-border-ghost);
-  padding: 0;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 100001;
+    display: none;
+    min-width: 400px;
+    max-width: 500px;
+    max-height: 100vh;
+    overflow-y: auto;
+    animation: slide-in 0.3s ease-out;
+    border: 1px solid var(--wplace-border-ghost);
+    padding: 0;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-settings-container-base.show {
-  display: block;
+    display: block;
 }
 
 /* ===================================== */
 /* Utility styles                         */
 /* ===================================== */
 .wplace-paint-effect {
-  animation: pulse 0.5s ease-out;
+    animation: pulse 0.5s ease-out;
 }
 
 .wplace-settings-error {
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-stats-container.hidden {
-  display: none;
+    display: none;
 }
 
 /* Theme-specific effects are now in separate theme files */
@@ -1186,342 +1195,342 @@
 
 /* Settings content container */
 .wplace-settings-content {
-  padding: 25px 25px 0;
-  max-height: 67vh;
-  overflow-y: auto;
+    padding: 25px 25px 0;
+    max-height: 67vh;
+    overflow-y: auto;
 }
 
 /* Settings section containers */
 .wplace-settings-section {
-  margin-bottom: 25px;
+    margin-bottom: 25px;
 }
 
 /* Section labels */
 .wplace-settings-section-label {
-  margin-bottom: 12px;
-  color: var(--wplace-text);
-  font-weight: 500;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+    margin-bottom: 12px;
+    color: var(--wplace-text);
+    font-weight: 500;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 /* Icon colors */
 .wplace-icon-key {
-  font-size: 16px;
+    font-size: 16px;
 }
 
 .wplace-icon-robot {
-  font-size: 16px;
+    font-size: 16px;
 }
 
 .wplace-icon-speed {
-  font-size: 16px;
+    font-size: 16px;
 }
 
 .wplace-icon-bell {
-  font-size: 16px;
+    font-size: 16px;
 }
 
 .wplace-icon-palette {
-  font-size: 16px;
+    font-size: 16px;
 }
 
 .wplace-icon-globe {
-  font-size: 16px;
+    font-size: 16px;
 }
 
 .wplace-icon-paint {
-  font-size: 16px;
+    font-size: 16px;
 }
 
 /* Section wrapper styling */
 .wplace-settings-section-wrapper {
-  padding: 18px;
+    padding: 18px;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 /* Select dropdowns */
 .wplace-settings-select {
-  width: 100%;
-  padding: 12px 16px;
-  font-size: 14px;
-  outline: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-family: inherit;
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 14px;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-settings-option {
-  padding: 10px;
+    padding: 10px;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 /* Settings description text */
 .wplace-settings-description {
-  font-size: 12px;
-  color: var(--wplace-text-muted);
-  margin: 8px 0 0;
+    font-size: 12px;
+    color: var(--wplace-text-muted);
+    margin: 8px 0 0;
 }
 
 /* Batch Controls */
 .wplace-batch-controls {
-  padding: 18px;
-  margin-bottom: 15px;
+    padding: 18px;
+    margin-bottom: 15px;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-random-batch-controls {
-  display: none;
+    display: none;
 }
 
 /* Speed Slider Container */
 .wplace-speed-slider-container {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
 }
 
-
 .wplace-speed-value {
-  min-width: 100px;
-  text-align: center;
-  padding: 8px 12px;
-  font-weight: bold;
-  font-size: 13px;
+    min-width: 100px;
+    text-align: center;
+    padding: 8px 12px;
+    font-weight: bold;
+    font-size: 13px;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-speed-labels {
-  display: flex;
-  justify-content: space-between;
-  color: var(--wplace-text-muted);
-  font-size: 11px;
-  margin: 4px 0;
-  padding: 0;
-  width: 100%;
-  min-height: 16px;
-  position: relative;
+    display: flex;
+    justify-content: space-between;
+    color: var(--wplace-text-muted);
+    font-size: 11px;
+    margin: 4px 0;
+    padding: 0;
+    width: 100%;
+    min-height: 16px;
+    position: relative;
 }
 
 .wplace-speed-min {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-weight: 500;
-  position: absolute;
-  left: 20px;
-  transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 500;
+    position: absolute;
+    left: 20px;
+    transform: translateX(-50%);
 }
 
 .wplace-speed-max {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-weight: 500;
-  position: absolute;
-  right: 20px;
-  transform: translateX(50%);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 500;
+    position: absolute;
+    right: 20px;
+    transform: translateX(50%);
 }
 
 .wplace-speed-min i,
 .wplace-speed-max i {
-  font-size: 10px;
-  opacity: 0.8;
+    font-size: 10px;
+    opacity: 0.8;
 }
 
 /* Random Batch Controls */
 .wplace-random-batch-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
 }
 
 .wplace-random-batch-label {
-  display: block;
-  color: var(--wplace-text-faded);
-  font-size: 12px;
-  margin-bottom: 8px;
+    display: block;
+    color: var(--wplace-text-faded);
+    font-size: 12px;
+    margin-bottom: 8px;
 }
 
 .wplace-icon-min {
-  color: var(--wplace-icon-primary);
-  margin-right: 4px;
+    color: var(--wplace-icon-primary);
+    margin-right: 4px;
 }
 
 .wplace-icon-max {
-  color: var(--wplace-icon-secondary);
-  margin-right: 4px;
+    color: var(--wplace-icon-secondary);
+    margin-right: 4px;
 }
 
 .wplace-settings-number-input {
-  width: 100%;
-  padding: 10px 12px;
-  background: var(--wplace-bg-input);
-  color: var(--wplace-text);
-  border: 1px solid var(--wplace-border-subtle);
-  border-radius: 8px;
-  font-size: 13px;
-  outline: none;
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--wplace-bg-input);
+    color: var(--wplace-text);
+    border: 1px solid var(--wplace-border-subtle);
+    border-radius: 8px;
+    font-size: 13px;
+    outline: none;
 }
 
 .wplace-random-batch-description {
-  font-size: 11px;
-  color: var(--wplace-text-dim);
-  margin: 8px 0 0;
-  text-align: center;
+    font-size: 11px;
+    color: var(--wplace-text-dim);
+    margin: 8px 0 0;
+    text-align: center;
 }
 
 /* Speed Control Toggle */
 .wplace-speed-control-toggle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--wplace-text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--wplace-text);
 }
 
 .wplace-speed-checkbox {
-  cursor: pointer;
+    cursor: pointer;
 }
 
 /* Overlay Settings */
 .wplace-overlay-opacity-control {
-  margin-bottom: 15px;
+    margin-bottom: 15px;
 }
 
 .wplace-overlay-opacity-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
 }
 
 .wplace-overlay-opacity-label {
-  font-weight: 500;
-  font-size: 13px;
+    font-weight: 500;
+    font-size: 13px;
 }
 
 .wplace-overlay-opacity-value {
-  min-width: 40px;
-  text-align: center;
-  background: var(--wplace-accent);
-  color: var(--wplace-text);
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 12px;
-  border: var(--wplace-border-width) var(--wplace-border-style) var(--wplace-border-color);
+    min-width: 40px;
+    text-align: center;
+    background: var(--wplace-accent);
+    color: var(--wplace-text);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    border: var(--wplace-border-width) var(--wplace-border-style)
+        var(--wplace-border-color);
 }
 
 .wplace-overlay-opacity-slider {
-  width: 100%;
-  -webkit-appearance: none;
-  height: 8px;
-  outline: none;
-  cursor: pointer;
+    width: 100%;
+    -webkit-appearance: none;
+    height: 8px;
+    outline: none;
+    cursor: pointer;
 }
 
 .wplace-settings-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
 }
 
 .wplace-settings-toggle-title {
-  font-weight: 500;
+    font-weight: 500;
 }
 
 .wplace-settings-toggle-description {
-  font-size: 12px;
-  margin: 4px 0 0;
-  color: var(--wplace-muted-text);
+    font-size: 12px;
+    margin: 4px 0 0;
+    color: var(--wplace-muted-text);
 }
 
 .wplace-settings-checkbox {
-  cursor: pointer;
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
-  accent-color: var(--wplace-highlight);
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    accent-color: var(--wplace-highlight);
 }
 
 /* Notifications */
 .wplace-notifications-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .wplace-notification-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .wplace-notification-checkbox {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
 }
 
 .wplace-notification-interval {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .wplace-notification-interval-input {
-  width: 70px;
-  padding: 6px 8px;
-  border-radius: 6px;
-  border: 1px solid var(--wplace-border-subtle);
-  background: var(--wplace-bg-faint);
-  color: var(--wplace-text);
+    width: 70px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--wplace-border-subtle);
+    background: var(--wplace-bg-faint);
+    color: var(--wplace-text);
 }
 
 .wplace-notification-buttons {
-  display: flex;
-  gap: 10px;
+    display: flex;
+    gap: 10px;
 }
 
 .wplace-notification-perm-btn,
 .wplace-notification-test-btn {
-  flex: 1;
+    flex: 1;
 }
 
 /* Settings Footer */
 .wplace-settings-footer {
-  border-top: 1px solid var(--wplace-border-ghost);
-  padding: 20px;
-  position: sticky;
-  bottom: 0;
-  background: var(--wplace-secondary);
+    border-top: 1px solid var(--wplace-border-ghost);
+    padding: 20px;
+    position: sticky;
+    bottom: 0;
+    background: var(--wplace-secondary);
 }
 
 /* Settings select option styling moved to theme files */
 /* Settings description styling moved to theme files */
 
 .wplace-settings-apply-btn {
-  width: 100%;
-  border: none;
-  padding: 10px 16px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  justify-content: center;
+    width: 100%;
+    border: none;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 /* ===================================== */
@@ -1530,245 +1539,249 @@
 
 /* Resize dialog title */
 .resize-dialog-title {
-  margin-top: 0;
-  color: var(--wplace-text);
+    margin-top: 0;
+    color: var(--wplace-text);
 }
 
 /* Resize control labels */
 .resize-control-label {
-  display: block;
-  margin-bottom: 8px;
-  font-size: 14px;
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
 }
 
 .resize-checkbox-label {
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
-  font-size: 14px;
-  gap: 8px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 14px;
+    gap: 8px;
 }
 
 /* Zoom controls */
 
 .resize-zoom-btn {
-  padding: 4px 8px;
+    padding: 4px 8px;
 }
 
 .resize-zoom-slider {
-  max-width: 220px;
+    max-width: 220px;
 }
 
 .resize-zoom-value {
-  margin-left: 6px;
-  min-width: 48px;
-  text-align: right;
-  opacity: 0.85;
-  font-size: 12px;
+    margin-left: 6px;
+    min-width: 48px;
+    text-align: right;
+    opacity: 0.85;
+    font-size: 12px;
 }
 
 .resize-camera-help {
-  font-size: 11px;
-  opacity: 0.75;
-  margin-left: auto;
+    font-size: 11px;
+    opacity: 0.75;
+    margin-left: auto;
 }
 
 /* Canvas positioning */
 .resize-pan-stage {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
 }
 
 .resize-canvas-positioned {
-  position: absolute;
-  left: 0;
-  top: 0;
-  transform-origin: top left;
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform-origin: top left;
 }
 
 /* Resize tools */
 .resize-tools-container {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  align-items: center;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
 }
 
 .resize-brush-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .resize-brush-control {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  justify-content: space-between;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: space-between;
 }
 
 .resize-tool-label {
-  font-size: 12px;
-  opacity: 0.85;
+    font-size: 12px;
+    opacity: 0.85;
 }
 
 .resize-tool-input-group {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .resize-tool-slider {
-  width: 120px;
+    width: 120px;
 }
 
 .resize-tool-value {
-  font-size: 12px;
-  opacity: 0.85;
-  min-width: 18px;
-  text-align: center;
+    font-size: 12px;
+    opacity: 0.85;
+    min-width: 18px;
+    text-align: center;
 }
 
 .resize-mode-controls {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .resize-mode-group {
-  display: flex;
-  gap: 6px;
+    display: flex;
+    gap: 6px;
 }
 
 .resize-mode-btn,
 .resize-clear-btn,
 .resize-invert-btn {
-  padding: 4px 8px;
-  font-size: 12px;
+    padding: 4px 8px;
+    font-size: 12px;
 }
 
 .resize-shortcut-help {
-  opacity: 0.8;
-  font-size: 12px;
+    opacity: 0.8;
+    font-size: 12px;
 }
 
 /* Color palette section */
 .resize-color-palette-section {
-  margin-top: 15px;
+    margin-top: 15px;
 }
 
 .resize-color-toggle-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
 }
 
 .resize-color-checkbox {
-  cursor: pointer;
+    cursor: pointer;
 }
 
 /* Advanced color section */
 .resize-advanced-color-section {
-  margin-top: 15px;
+    margin-top: 15px;
 }
 
 .resize-advanced-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .resize-advanced-label {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-size: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 12px;
 }
 
 .resize-advanced-label-text {
-  font-weight: 600;
+    font-weight: 600;
 }
 
 .resize-advanced-select {
-  padding: 6px 8px;
-  border-radius: 6px;
-  border: 1px solid var(--wplace-border-faint);
-  background: var(--wplace-bg-whisper);
-  color: var(--wplace-text);
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--wplace-border-faint);
+    background: var(--wplace-bg-whisper);
+    color: var(--wplace-text);
 }
 
 .resize-advanced-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
 }
 
 .resize-advanced-toggle-content {
-  flex: 1;
+    flex: 1;
 }
 
 .resize-advanced-description {
-  margin-top: 2px;
-  opacity: 0.65;
+    margin-top: 2px;
+    opacity: 0.65;
 }
 
 .resize-advanced-checkbox {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
 }
 
 .resize-chroma-weight-control {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .resize-chroma-weight-header {
-  display: flex;
-  justify-content: space-between;
-  font-size: 11px;
-  margin-bottom: 4px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    margin-bottom: 4px;
 }
 
 .resize-chroma-weight-value {
-  background: var(--wplace-bg-faint);
-  padding: 2px 6px;
-  border-radius: 4px;
+    background: var(--wplace-bg-faint);
+    padding: 2px 6px;
+    border-radius: 4px;
 }
 
 .resize-chroma-weight-slider {
-  width: 100%;
+    width: 100%;
 }
 
 .resize-threshold-controls {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
 }
 
 .resize-threshold-label {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-size: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 12px;
 }
 
 .resize-threshold-input {
-  padding: 6px 8px;
-  border-radius: 6px;
-  border: 1px solid var(--wplace-border-faint);
-  background: var(--wplace-bg-whisper);
-  color: var(--wplace-text);
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--wplace-border-faint);
+    background: var(--wplace-bg-whisper);
+    color: var(--wplace-text);
 }
 
 .resize-reset-advanced-btn {
-  background: linear-gradient(135deg, var(--wplace-danger), var(--wplace-danger-dark));
-  font-size: 11px;
+    background: linear-gradient(
+        135deg,
+        var(--wplace-danger),
+        var(--wplace-danger-dark)
+    );
+    font-size: 11px;
 }
 
 /* ===================================== */
@@ -1777,86 +1790,85 @@
 
 /* Overlay styles exact match */
 .resize-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 9999;
-  display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    display: none;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 /* Settings animations - removed duplicate, handled above */
 
 /* Settings Header Styling */
 .wplace-settings-header {
-  background: var(--wplace-accent);
-  padding: 20px;
-  border-bottom: 1px solid var(--wplace-border-color);
-  cursor: move;
+    background: var(--wplace-accent);
+    padding: 20px;
+    border-bottom: 1px solid var(--wplace-border-color);
+    cursor: move;
 }
 
 .wplace-settings-title-wrapper {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .wplace-settings-title {
-  margin: 0;
-  color: var(--wplace-text);
-  font-size: 20px;
-  font-weight: 300;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+    margin: 0;
+    color: var(--wplace-text);
+    font-size: 20px;
+    font-weight: 300;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .wplace-settings-icon {
-  font-size: 18px;
-  color: var(--wplace-highlight);
-  animation: spin 2s linear infinite;
+    font-size: 18px;
+    color: var(--wplace-highlight);
+    animation: spin 2s linear infinite;
 }
 
 .wplace-settings-close-btn {
-  background: rgb(34 34 34 / 40%);
-  color: var(--wplace-text);
-  border: 1px solid var(--wplace-border-color);
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  font-size: 14px;
-  font-weight: 300;
+    background: rgb(34 34 34 / 40%);
+    color: var(--wplace-text);
+    border: 1px solid var(--wplace-border-color);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    font-weight: 300;
 }
 
 .wplace-settings-close-btn:hover {
-  background: rgb(255 0 0 / 40%);
-  transform: scale(1.1);
+    background: rgb(255 0 0 / 40%);
+    transform: scale(1.1);
 }
 
 @keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
+    from {
+        transform: rotate(0deg);
+    }
 
-  to {
-    transform: rotate(360deg);
-  }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* Font styling corrections */
 .resize-controls label {
-  font-size: 12px;
-  color: var(--wplace-text);
+    font-size: 12px;
+    color: var(--wplace-text);
 }
-
 
 /* Additional precision fixes for exact upstream main matching */
 /* Status default styling moved to theme files */
@@ -1866,124 +1878,123 @@
 /* Settings header styling moved to theme files */
 /* All remaining settings styling moved to theme files */
 
-
 /* Icon styling moved to theme files */
 .wplace-icon-eye {
-  font-size: 16px;
+    font-size: 16px;
 }
 
 /* Overlay Settings Controls */
 .wplace-overlay-opacity-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: var(--wplace-slider-thumb-bg);
-  box-shadow: var(--wplace-shadow-slider-thumb);
-  cursor: pointer;
-  transition: all 0.2s ease;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--wplace-slider-thumb-bg);
+    box-shadow: var(--wplace-shadow-slider-thumb);
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .wplace-overlay-opacity-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
-  box-shadow: var(--wplace-shadow-slider-hover);
+    transform: scale(1.2);
+    box-shadow: var(--wplace-shadow-slider-hover);
 }
 
 /* Coordinate Generation Controls */
 .wplace-icon-route {
-  color: var(--wplace-icon-primary);
-  font-size: 16px;
+    color: var(--wplace-icon-primary);
+    font-size: 16px;
 }
 
 .wplace-icon-table {
-  color: var(--wplace-icon-palette);
-  margin-right: 6px;
+    color: var(--wplace-icon-palette);
+    margin-right: 6px;
 }
 
 .wplace-icon-compass {
-  color: var(--wplace-icon-secondary);
-  margin-right: 6px;
+    color: var(--wplace-icon-secondary);
+    margin-right: 6px;
 }
 
 /* Pixel Filter Controls */
 .wplace-pixel-filter-controls {
-  padding: 18px;
-  margin-bottom: 15px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+    padding: 18px;
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 /* Snake Pattern Controls */
 .wplace-snake-pattern-controls {
-  padding: 18px;
-  margin-bottom: 15px;
+    padding: 18px;
+    margin-bottom: 15px;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 /* Block Size Controls */
 .wplace-block-size-controls {
-  padding: 18px;
-  margin-bottom: 15px;
+    padding: 18px;
+    margin-bottom: 15px;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-block-size-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
 }
 
 .wplace-block-size-label {
-  display: block;
-  color: var(--wplace-text-faded);
-  font-size: 12px;
-  margin-bottom: 8px;
+    display: block;
+    color: var(--wplace-text-faded);
+    font-size: 12px;
+    margin-bottom: 8px;
 }
 
 .wplace-icon-width {
-  color: var(--wplace-icon-primary);
-  margin-right: 4px;
+    color: var(--wplace-icon-primary);
+    margin-right: 4px;
 }
 
 .wplace-icon-height {
-  color: var(--wplace-icon-secondary);
-  margin-right: 4px;
+    color: var(--wplace-icon-secondary);
+    margin-right: 4px;
 }
 
 .wplace-block-size-description {
-  font-size: 11px;
-  color: var(--wplace-text-dim);
-  margin: 8px 0 0;
-  text-align: center;
+    font-size: 11px;
+    color: var(--wplace-text-dim);
+    margin: 8px 0 0;
+    text-align: center;
 }
 
 /* Random Block Controls */
 .wplace-shuffle-block-size-controls {
-  display: none;
+    display: none;
 }
 
 /* Batch Mode Controls */
 .wplace-mode-selection {
-  margin-bottom: 15px;
+    margin-bottom: 15px;
 }
 
 .wplace-mode-label {
-  display: block;
-  margin-bottom: 8px;
-  color: var(--wplace-text-secondary);
-  font-weight: 500;
-  font-size: 14px;
+    display: block;
+    margin-bottom: 8px;
+    color: var(--wplace-text-secondary);
+    font-weight: 500;
+    font-size: 14px;
 }
 
 .wplace-icon-dice {
-  color: var(--wplace-icon-palette);
-  margin-right: 6px;
+    color: var(--wplace-icon-palette);
+    margin-right: 6px;
 }
 
 /* ========================= */
@@ -1991,105 +2002,107 @@
 /* ========================= */
 
 /* Vertical Layout - Slider on top, controls below */
-.wplace-speed-slider-container, 
+.wplace-speed-slider-container,
 .wplace-slider-container {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin: 8px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 8px 0;
 }
 
-.wplace-speed-slider, 
+.wplace-speed-slider,
 .wplace-slider {
-  width: 100%;
-  height: 6px;
-  background: rgba(255,255,255,0.2);
-  border-radius: 3px;
-  outline: none;
-  -webkit-appearance: none;
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+    outline: none;
+    -webkit-appearance: none;
 }
 
-.wplace-speed-slider::-webkit-slider-thumb, 
+.wplace-speed-slider::-webkit-slider-thumb,
 .wplace-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: #4facfe;
-  cursor: pointer;
-  transition: all 0.2s ease;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #4facfe;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-.wplace-speed-slider::-webkit-slider-thumb:hover, 
+.wplace-speed-slider::-webkit-slider-thumb:hover,
 .wplace-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.4), 0 0 0 3px #4facfe;
+    transform: scale(1.2);
+    box-shadow:
+        0 4px 8px rgba(0, 0, 0, 0.4),
+        0 0 0 3px #4facfe;
 }
 
 /* Controls row - input group + unit label */
-.wplace-speed-controls, 
+.wplace-speed-controls,
 .wplace-cooldown-controls {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
 }
 
 /* Input group with +/- buttons */
-.wplace-speed-input-group, 
+.wplace-speed-input-group,
 .wplace-cooldown-input-group {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  background: rgba(255,255,255,0.05);
-  border-radius: 4px;
-  padding: 2px;
-  flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    padding: 2px;
+    flex-shrink: 0;
 }
 
 /* Small +/- buttons */
 .wplace-input-btn-small {
-  background: transparent;
-  color: #4facfe;
-  border: none;
-  border-radius: 2px;
-  width: 16px;
-  height: 18px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 11px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
+    background: transparent;
+    color: #4facfe;
+    border: none;
+    border-radius: 2px;
+    width: 16px;
+    height: 18px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
 }
 
 .wplace-input-btn-small:hover {
-  background: rgba(79, 172, 254, 0.15);
-  color: white;
+    background: rgba(79, 172, 254, 0.15);
+    color: white;
 }
 
 .wplace-input-btn-small:active {
-  background: rgba(79, 172, 254, 0.3);
+    background: rgba(79, 172, 254, 0.3);
 }
 
 /* Number input fields */
-.wplace-speed-input, 
+.wplace-speed-input,
 .wplace-cooldown-input {
-  background: rgba(0,0,0,0.3);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 3px;
-  color: white;
-  padding: 2px 6px;
-  font-size: 12px;
-  width: 42px;
-  text-align: center;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-  
-  /* Hide native HTML number input spin buttons */
-  -moz-appearance: textfield; /* Firefox */
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    color: white;
+    padding: 2px 6px;
+    font-size: 12px;
+    width: 42px;
+    text-align: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+
+    /* Hide native HTML number input spin buttons */
+    -moz-appearance: textfield; /* Firefox */
 }
 
 /* Hide WebKit spin buttons */
@@ -2097,24 +2110,24 @@
 .wplace-speed-input::-webkit-inner-spin-button,
 .wplace-cooldown-input::-webkit-outer-spin-button,
 .wplace-cooldown-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+    -webkit-appearance: none;
+    margin: 0;
 }
 
-.wplace-speed-input:focus, 
+.wplace-speed-input:focus,
 .wplace-cooldown-input:focus {
-  outline: none;
-  background: rgba(0,0,0,0.5);
-  border-color: #4facfe;
-  box-shadow: 0 0 0 1px rgba(79, 172, 254, 0.3);
+    outline: none;
+    background: rgba(0, 0, 0, 0.5);
+    border-color: #4facfe;
+    box-shadow: 0 0 0 1px rgba(79, 172, 254, 0.3);
 }
 
 /* Unit labels */
-.wplace-speed-unit, 
+.wplace-speed-unit,
 .wplace-cooldown-unit {
-  color: rgba(255,255,255,0.7);
-  font-size: 11px;
-  min-width: 35px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 11px;
+    min-width: 35px;
 }
 
 /* ========================= */
@@ -2123,138 +2136,166 @@
 
 /* Keyframes for animations */
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 @keyframes settings-slide-in {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
 }
 
 @keyframes settings-fade-out {
-  from {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.9);
-  }
+    from {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9);
+    }
 }
 
 /* Overlay opacity slider */
 #overlayOpacitySlider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: white;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.3), 0 0 0 2px #4facfe;
-  cursor: pointer;
-  transition: all 0.2s ease;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: white;
+    box-shadow:
+        0 3px 6px rgba(0, 0, 0, 0.3),
+        0 0 0 2px #4facfe;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 #overlayOpacitySlider::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.4), 0 0 0 3px #4facfe;
+    transform: scale(1.2);
+    box-shadow:
+        0 4px 8px rgba(0, 0, 0, 0.4),
+        0 0 0 3px #4facfe;
 }
 
 #overlayOpacitySlider::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: white;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.3), 0 0 0 2px #4facfe;
-  cursor: pointer;
-  border: none;
-  transition: all 0.2s ease;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: white;
+    box-shadow:
+        0 3px 6px rgba(0, 0, 0, 0.3),
+        0 0 0 2px #4facfe;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
 }
 
 /* Theme and language selects */
-#themeSelect:hover, #languageSelect:hover {
-  border-color: rgba(255,255,255,0.4);
-  background: rgba(255,255,255,0.2);
-  transform: translateY(-1px);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+#themeSelect:hover,
+#languageSelect:hover {
+    border-color: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
 }
 
-#themeSelect:focus, #languageSelect:focus {
-  border-color: #4facfe;
-  box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.3);
+#themeSelect:focus,
+#languageSelect:focus {
+    border-color: #4facfe;
+    box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.3);
 }
 
-#themeSelect option, #languageSelect option {
-  background: #2d3748;
-  color: white;
-  padding: 10px;
-  border-radius: 6px;
+#themeSelect option,
+#languageSelect option {
+    background: #2d3748;
+    color: white;
+    padding: 10px;
+    border-radius: 6px;
 }
 
-#themeSelect option:hover, #languageSelect option:hover {
-  background: #4a5568;
+#themeSelect option:hover,
+#languageSelect option:hover {
+    background: #4a5568;
 }
 
 /* Dragging state */
 .wplace-dragging {
-  opacity: 0.9;
-  box-shadow: 0 30px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.2);
-  transition: none;
+    opacity: 0.9;
+    box-shadow:
+        0 30px 60px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.2);
+    transition: none;
 }
 
 /* Settings header interactions */
 .wplace-settings-header:hover {
-  background: rgba(255,255,255,0.15) !important;
+    background: rgba(255, 255, 255, 0.15) !important;
 }
 
 .wplace-settings-header:active {
-  background: rgba(255,255,255,0.2) !important;
+    background: rgba(255, 255, 255, 0.2) !important;
 }
 
 /* ========================= */
 /* Dynamic Warning Banner    */
 /* ========================= */
 .wplace-warning-banner {
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  z-index: 10001;
-  background: rgba(255, 193, 7, 0.95);
-  color: #212529;
-  padding: 12px 16px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  border: 1px solid rgba(255, 193, 7, 0.8);
-  max-width: 300px;
-  word-wrap: break-word;
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 10001;
+    background: rgba(255, 193, 7, 0.95);
+    color: #212529;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 193, 7, 0.8);
+    max-width: 300px;
+    word-wrap: break-word;
 }
 
 /* ========================= */
 /* Settings Container Theme  */
 /* ========================= */
 .wplace-settings-container-themed {
-  min-width: 420px;
-  max-width: 480px;
-  z-index: 99999;
-  color: var(--theme-text, white);
-  font-family: var(--theme-font-family, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif);
-  box-shadow: var(--theme-box-shadow, 0 20px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1));
-  backdrop-filter: var(--theme-backdrop-filter, blur(10px));
-  overflow: hidden;
-  animation: settings-slide-in 0.4s ease-out;
+    min-width: 420px;
+    max-width: 480px;
+    z-index: 99999;
+    color: var(--theme-text, white);
+    font-family: var(
+        --theme-font-family,
+        'Segoe UI',
+        Tahoma,
+        Geneva,
+        Verdana,
+        sans-serif
+    );
+    box-shadow: var(
+        --theme-box-shadow,
+        0 20px 40px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.1)
+    );
+    backdrop-filter: var(--theme-backdrop-filter, blur(10px));
+    overflow: hidden;
+    animation: settings-slide-in 0.4s ease-out;
 }
 
 .wplace-settings-container-themed.glow-effect {
-  box-shadow: var(--theme-box-shadow, 0 20px 40px rgba(0,0,0,0.3)), 
-             0 0 30px var(--theme-glow-color, #00ffff);
+    box-shadow:
+        var(--theme-box-shadow, 0 20px 40px rgba(0, 0, 0, 0.3)),
+        0 0 30px var(--theme-glow-color, #00ffff);
 }
 
 /* Theme-aware dynamic text colors */
@@ -2263,59 +2304,59 @@
 .wplace-settings-toggle-title,
 .wplace-settings-toggle-description,
 .resize-dialog-title {
-  color: var(--theme-text, white) !important;
+    color: var(--theme-text, white) !important;
 }
 
 .wplace-icon-eye {
-  color: var(--theme-highlight, #48dbfb) !important;
+    color: var(--theme-highlight, #48dbfb) !important;
 }
 
 /* Dynamic accent color for checkboxes and inputs */
 .wplace-settings-checkbox,
 .wplace-slider,
-input[type="range"] {
-  accent-color: var(--theme-highlight, #48dbfb);
+input[type='range'] {
+    accent-color: var(--theme-highlight, #48dbfb);
 }
 
 /* ========================= */
 /* Reusable CSS Classes      */
 /* ========================= */
 .wplace-btn-primary {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 16px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .wplace-btn-secondary {
-  background: rgba(255,255,255,0.1);
-  color: white;
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 8px;
-  padding: 8px 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 .wplace-modern-card {
-  background: rgba(255,255,255,0.1);
-  border-radius: 12px;
-  padding: 18px;
-  border: 1px solid rgba(255,255,255,0.1);
-  backdrop-filter: blur(5px);
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
 }
 
 .wplace-gradient-text {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  font-weight: bold;
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: bold;
 }
