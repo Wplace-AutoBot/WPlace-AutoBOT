@@ -149,4 +149,4 @@ This documentation summarizes classes, CSS variables, media queries, and keyfram
 
 ---
 
-*Auto-generated documentation — Last updated: 2025-09-04T15:16:15.364Z*
+*Auto-generated documentation — Last updated: 2025-09-04T15:30:03.841Z*

@@ -155,4 +155,4 @@ This documentation summarizes structure of the JSON payload to help discover key
 
 ---
 
-*Auto-generated documentation — Last updated: 2025-09-04T15:16:15.361Z*
+*Auto-generated documentation — Last updated: 2025-09-04T15:30:03.834Z*

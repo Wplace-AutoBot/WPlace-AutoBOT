@@ -11,6 +11,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { build } from 'documentation';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -245,44 +246,96 @@ function extractI18nReport(filePath) {
  * Existing basic extractors (kept and improved where helpful)
  */
 
-// Extract JSDoc functions (kept as-is, supplements richer detection)
-function extractJSDocFunctions(filePath) {
+// Use documentation package for proper JSDoc extraction
+async function extractJSDocFunctions(filePath) {
     try {
-        const content = fs.readFileSync(filePath, 'utf8');
-        const functions = [];
-
-        const jsdocFunctionRegex =
-            /\/\*\*[\s\S]*?\*\/\s*(?:export\s+)?(?:async\s+)?(?:function\s+(\w+)|const\s+(\w+)\s*=|let\s+(\w+)\s*=|var\s+(\w+)\s*=)/g;
-
-        let match;
-        while ((match = jsdocFunctionRegex.exec(content)) !== null) {
-            const functionName = match[1] || match[2] || match[3] || match[4];
-            if (functionName) {
-                functions.push(`### \`${functionName}()\``);
-
-                const jsdocStart = match.index;
-                const jsdocEnd = match.index + match[0].indexOf('*/') + 2;
-                const jsdocComment = content.substring(jsdocStart, jsdocEnd);
-
-                const description = extractJSDocDescription(jsdocComment);
-                const params = extractJSDocParams(jsdocComment);
-                const returns = extractJSDocReturns(jsdocComment);
-
-                if (description) functions.push(description);
-                if (params.length > 0) {
-                    functions.push('**Parameters:**');
-                    params.forEach(param => functions.push(`- ${param}`));
+        const docs = await build([filePath], {});
+        
+        if (docs && docs.length > 0) {
+            // Format the documentation objects into readable markdown
+            const formatted = docs.map(doc => {
+                const parts = [];
+                
+                if (doc.name) {
+                    parts.push(`### \`${doc.name}()\``);
                 }
-                if (returns) functions.push(`**Returns:** ${returns}`);
-                functions.push('');
-            }
+                
+                if (doc.description && doc.description.children) {
+                    const desc = doc.description.children
+                        .map(child => child.value || child.children?.map(c => c.value).join('') || '')
+                        .join(' ')
+                        .trim();
+                    if (desc) parts.push(desc);
+                }
+                
+                if (doc.params && doc.params.length > 0) {
+                    parts.push('**Parameters:**');
+                    doc.params.forEach(param => {
+                        const type = param.type?.name || 'unknown';
+                        const desc = param.description?.children
+                            ?.map(child => child.value || child.children?.map(c => c.value).join('') || '')
+                            .join(' ')
+                            .trim() || '';
+                        parts.push(`- \`${param.name}\` (\`${type}\`) - ${desc}`);
+                    });
+                }
+                
+                if (doc.returns && doc.returns.length > 0) {
+                    const ret = doc.returns[0];
+                    const type = ret.type?.name || 'unknown';
+                    const desc = ret.description?.children
+                        ?.map(child => child.value || child.children?.map(c => c.value).join('') || '')
+                        .join(' ')
+                        .trim() || '';
+                    parts.push(`**Returns:** \`${type}\` - ${desc}`);
+                }
+                
+                return parts.join('\n\n');
+            }).filter(doc => doc.trim());
+            
+            return formatted.length > 0 ? formatted.join('\n\n---\n\n') : '*No documented functions found*';
         }
-
-        return functions.length > 0
-            ? functions.join('\n')
-            : '*No documented functions found*';
+        
+        return '*No documented functions found*';
     } catch (error) {
-        return `*Error reading file: ${error.message}*`;
+        // Fallback to manual extraction if documentation package fails
+        try {
+            const content = fs.readFileSync(filePath, 'utf8');
+            const functions = [];
+
+            const jsdocFunctionRegex =
+                /\/\*\*[\s\S]*?\*\/\s*(?:export\s+)?(?:async\s+)?(?:function\s+(\w+)|const\s+(\w+)\s*=|let\s+(\w+)\s*=|var\s+(\w+)\s*=)/g;
+
+            let match;
+            while ((match = jsdocFunctionRegex.exec(content)) !== null) {
+                const functionName = match[1] || match[2] || match[3] || match[4];
+                if (functionName) {
+                    functions.push(`### \`${functionName}()\``);
+
+                    const jsdocStart = match.index;
+                    const jsdocEnd = match.index + match[0].indexOf('*/') + 2;
+                    const jsdocComment = content.substring(jsdocStart, jsdocEnd);
+
+                    const description = extractJSDocDescription(jsdocComment);
+                    const params = extractJSDocParams(jsdocComment);
+                    const returns = extractJSDocReturns(jsdocComment);
+
+                    if (description) functions.push(description);
+                    if (params.length > 0) {
+                        functions.push('**Parameters:**');
+                        params.forEach(param => functions.push(`- ${param}`));
+                    }
+                    if (returns) functions.push(`**Returns:** ${returns}`);
+                    functions.push('');
+                }
+            }
+
+            return functions.length > 0
+                ? functions.join('\n')
+                : '*No documented functions found*';
+        } catch (fallbackError) {
+            return `*Error reading file: ${fallbackError.message}*`;
+        }
     }
 }
 
@@ -515,7 +568,7 @@ function getRelatedFiles(filePath) {
  * JS template now includes class/object/function analysis and i18n report.
  */
 const TEMPLATES = {
-    '.js': (filePath, fileName) => {
+    '.js': async (filePath, fileName) => {
         const rel = path.relative(SRC_DIR, filePath);
         const content = readFileSafe(filePath) || '';
         const sizeKB = (content.length / 1024).toFixed(1);
@@ -523,7 +576,7 @@ const TEMPLATES = {
         const classInfo = extractJSClasses(filePath);
         const objectInfo = extractJSObjects(filePath);
         const functionInfo = extractJSFunctions(filePath);
-        const jsdocInfo = extractJSDocFunctions(filePath);
+        const jsdocInfo = await extractJSDocFunctions(filePath);
         const i18nInfo = extractI18nReport(filePath);
 
         return `# ${fileName} Documentation
@@ -616,20 +669,20 @@ ${extractJSONStructure(filePath)}
 /**
  * Recursively process directory structure
  */
-function processDirectory(srcDir, docsDir) {
+async function processDirectory(srcDir, docsDir) {
     if (!fs.existsSync(docsDir)) {
         fs.mkdirSync(docsDir, { recursive: true });
     }
 
     const items = fs.readdirSync(srcDir);
 
-    items.forEach(item => {
+    for (const item of items) {
         const srcPath = path.join(srcDir, item);
         const stats = fs.statSync(srcPath);
 
         if (stats.isDirectory()) {
             const docsSubDir = path.join(docsDir, item);
-            processDirectory(srcPath, docsSubDir);
+            await processDirectory(srcPath, docsSubDir);
         } else if (stats.isFile()) {
             const ext = path.extname(item);
             const baseName = path.basename(item, ext);
@@ -637,12 +690,12 @@ function processDirectory(srcDir, docsDir) {
             const docPath = path.join(docsDir, docFileName);
 
             if (TEMPLATES[ext]) {
-                const content = TEMPLATES[ext](srcPath, item);
+                const content = await TEMPLATES[ext](srcPath, item);
                 fs.writeFileSync(docPath, content);
                 console.log(`Generated: ${path.relative(process.cwd(), docPath)}`);
             }
         }
-    });
+    }
 }
 
 /**
@@ -707,14 +760,14 @@ function cleanOrphanedDocs(srcDir, docsDir) {
 /**
  * Main execution
  */
-function main() {
+async function main() {
     console.log('🚀 Generating documentation structure...');
     console.log(`Source: ${SRC_DIR}`);
     console.log(`Docs:   ${DOCS_SRC_DIR}`);
     console.log();
 
     cleanOrphanedDocs(SRC_DIR, DOCS_SRC_DIR);
-    processDirectory(SRC_DIR, DOCS_SRC_DIR);
+    await processDirectory(SRC_DIR, DOCS_SRC_DIR);
 
     console.log();
     console.log('✅ Documentation generation complete!');
