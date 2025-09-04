@@ -12,83 +12,87 @@
 /* Default :root CSS variables for 100% classic theme compliance */
 /* These ensure the bot works perfectly even if theme files fail to load */
 :root {
-  /* Classic theme colors - exact upstream main values */
-  --wplace-primary: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
-  --wplace-secondary: linear-gradient(135deg, #111 0%, #2a2a2a 100%);
-  --wplace-accent: #222;
-  --wplace-text: #fff;
-  --wplace-highlight: #775ce3;
-  --wplace-highlight-secondary: #d3a4ff;
-  --wplace-success: #0f0;
-  --wplace-error: #f00;
-  --wplace-warning: #fa0;
+    /* Classic theme colors - exact upstream main values */
+    --wplace-primary: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
+    --wplace-secondary: linear-gradient(135deg, #111 0%, #2a2a2a 100%);
+    --wplace-accent: #222;
+    --wplace-text: #fff;
+    --wplace-highlight: #775ce3;
+    --wplace-highlight-secondary: #d3a4ff;
+    --wplace-success: #0f0;
+    --wplace-error: #f00;
+    --wplace-warning: #fa0;
 
-  /* UI properties */
-  --wplace-radius: 12px;
-  --wplace-btn-radius: 16px;
-  --wplace-border-style: solid;
-  --wplace-border-width: 1px;
-  --wplace-border-color: #222;
-  --wplace-shadow: 0 8px 32px rgb(0 0 0 / 60%), 0 0 0 1px rgb(255 255 255 / 10%);
-  --wplace-backdrop: blur(10px);
-  --wplace-font: 'Segoe UI', roboto, sans-serif;
+    /* UI properties */
+    --wplace-radius: 12px;
+    --wplace-btn-radius: 16px;
+    --wplace-border-style: solid;
+    --wplace-border-width: 1px;
+    --wplace-border-color: #222;
+    --wplace-shadow:
+        0 8px 32px rgb(0 0 0 / 60%), 0 0 0 1px rgb(255 255 255 / 10%);
+    --wplace-backdrop: blur(10px);
+    --wplace-font: 'Segoe UI', roboto, sans-serif;
 
-  /* Z-index layers */
-  --wplace-z-overlay: 10000;
-  --wplace-z-alert: 10002;
-  --wplace-z-settings: 10002;
+    /* Z-index layers */
+    --wplace-z-overlay: 10000;
+    --wplace-z-alert: 10002;
+    --wplace-z-settings: 10002;
 
-  /* Feature toggles */
-  --wplace-scanline: 0;
-  --wplace-pixel-blink: 0;
+    /* Feature toggles */
+    --wplace-scanline: 0;
+    --wplace-pixel-blink: 0;
 
-  /* Icon colors */
-  --wplace-icon-primary: #4facfe;
-  --wplace-icon-secondary: #00f2fe;
-  --wplace-icon-palette: #f093fb;
+    /* Icon colors */
+    --wplace-icon-primary: #4facfe;
+    --wplace-icon-secondary: #00f2fe;
+    --wplace-icon-palette: #f093fb;
 
-  /* Additional UI colors */
-  --wplace-danger: #ff6a6a;
-  --wplace-danger-dark: #ff4757;
-  --wplace-muted-text: #fffb;
+    /* Additional UI colors */
+    --wplace-danger: #ff6a6a;
+    --wplace-danger-dark: #ff4757;
+    --wplace-muted-text: #fffb;
 
-  /* Text variants */
-  --wplace-text-secondary: rgb(255 255 255 / 90%);
-  --wplace-text-muted: rgb(255 255 255 / 70%);
-  --wplace-text-dim: rgb(255 255 255 / 60%);
-  --wplace-text-faded: rgb(255 255 255 / 80%);
+    /* Text variants */
+    --wplace-text-secondary: rgb(255 255 255 / 90%);
+    --wplace-text-muted: rgb(255 255 255 / 70%);
+    --wplace-text-dim: rgb(255 255 255 / 60%);
+    --wplace-text-faded: rgb(255 255 255 / 80%);
 
-  /* Background variants */
-  --wplace-bg-input: rgb(255 255 255 / 15%);
-  --wplace-bg-subtle: rgb(255 255 255 / 10%);
-  --wplace-bg-faint: rgb(255 255 255 / 8%);
-  --wplace-bg-ghost: rgb(255 255 255 / 6%);
-  --wplace-bg-whisper: rgb(255 255 255 / 5%);
+    /* Background variants */
+    --wplace-bg-input: rgb(255 255 255 / 15%);
+    --wplace-bg-subtle: rgb(255 255 255 / 10%);
+    --wplace-bg-faint: rgb(255 255 255 / 8%);
+    --wplace-bg-ghost: rgb(255 255 255 / 6%);
+    --wplace-bg-whisper: rgb(255 255 255 / 5%);
 
-  /* Border variants */
-  --wplace-border-subtle: rgb(255 255 255 / 20%);
-  --wplace-border-faint: rgb(255 255 255 / 15%);
-  --wplace-border-ghost: rgb(255 255 255 / 10%);
-  --wplace-border-ultra-faint: rgb(255 255 255 / 5%);
+    /* Border variants */
+    --wplace-border-subtle: rgb(255 255 255 / 20%);
+    --wplace-border-faint: rgb(255 255 255 / 15%);
+    --wplace-border-ghost: rgb(255 255 255 / 10%);
+    --wplace-border-ultra-faint: rgb(255 255 255 / 5%);
 
-  /* Shadow variants */
-  --wplace-shadow-drag: 0 12px 40px rgb(0 0 0 / 80%), 0 0 0 2px rgb(255 255 255 / 20%);
-  --wplace-shadow-notification: 0 4px 12px rgb(0 0 0 / 30%);
-  --wplace-shadow-slider-thumb: 0 3px 6px rgb(0 0 0 / 30%), 0 0 0 2px var(--wplace-icon-primary);
-  --wplace-shadow-slider-hover: 0 4px 8px rgb(0 0 0 / 40%), 0 0 0 3px var(--wplace-icon-primary);
+    /* Shadow variants */
+    --wplace-shadow-drag:
+        0 12px 40px rgb(0 0 0 / 80%), 0 0 0 2px rgb(255 255 255 / 20%);
+    --wplace-shadow-notification: 0 4px 12px rgb(0 0 0 / 30%);
+    --wplace-shadow-slider-thumb:
+        0 3px 6px rgb(0 0 0 / 30%), 0 0 0 2px var(--wplace-icon-primary);
+    --wplace-shadow-slider-hover:
+        0 4px 8px rgb(0 0 0 / 40%), 0 0 0 3px var(--wplace-icon-primary);
 
-  /* Animation colors */
-  --wplace-pulse-start: rgb(0 255 0 / 70%);
-  --wplace-pulse-mid: rgb(0 255 0 / 0%);
-  --wplace-pulse-end: rgb(0 255 0 / 0%);
+    /* Animation colors */
+    --wplace-pulse-start: rgb(0 255 0 / 70%);
+    --wplace-pulse-mid: rgb(0 255 0 / 0%);
+    --wplace-pulse-end: rgb(0 255 0 / 0%);
 
-  /* Slider colors - defaults for classic compatibility */
-  --wplace-slider-thumb-bg: white;
-  --wplace-slider-track-bg: linear-gradient(
-    to right,
-    var(--wplace-icon-primary) 0%,
-    var(--wplace-icon-secondary) 100%
-  );
+    /* Slider colors - defaults for classic compatibility */
+    --wplace-slider-thumb-bg: white;
+    --wplace-slider-track-bg: linear-gradient(
+        to right,
+        var(--wplace-icon-primary) 0%,
+        var(--wplace-icon-secondary) 100%
+    );
 }
 
 /* Theme classes are now defined in separate files */
@@ -99,90 +103,90 @@
 /* Core animations (shared)  */
 /* ========================= */
 @keyframes neon-glow {
-  0%,
-  100% {
-    text-shadow:
-      0 0 5px currentcolor,
-      0 0 10px currentcolor,
-      0 0 15px currentcolor;
-  }
+    0%,
+    100% {
+        text-shadow:
+            0 0 5px currentcolor,
+            0 0 10px currentcolor,
+            0 0 15px currentcolor;
+    }
 
-  50% {
-    text-shadow:
-      0 0 2px currentcolor,
-      0 0 5px currentcolor,
-      0 0 8px currentcolor;
-  }
+    50% {
+        text-shadow:
+            0 0 2px currentcolor,
+            0 0 5px currentcolor,
+            0 0 8px currentcolor;
+    }
 }
 
 @keyframes pixel-blink {
-  0%,
-  50% {
-    opacity: 1;
-  }
+    0%,
+    50% {
+        opacity: 1;
+    }
 
-  51%,
-  100% {
-    opacity: 0.7;
-  }
+    51%,
+    100% {
+        opacity: 0.7;
+    }
 }
 
 @keyframes scanline {
-  0% {
-    transform: translateY(-100%);
-  }
+    0% {
+        transform: translateY(-100%);
+    }
 
-  100% {
-    transform: translateY(400px);
-  }
+    100% {
+        transform: translateY(400px);
+    }
 }
 
 @keyframes pulse {
-  0% {
-    box-shadow: 0 0 0 0 var(--wplace-pulse-start);
-  }
+    0% {
+        box-shadow: 0 0 0 0 var(--wplace-pulse-start);
+    }
 
-  70% {
-    box-shadow: 0 0 0 10px var(--wplace-pulse-mid);
-  }
+    70% {
+        box-shadow: 0 0 0 10px var(--wplace-pulse-mid);
+    }
 
-  100% {
-    box-shadow: 0 0 0 0 var(--wplace-pulse-end);
-  }
+    100% {
+        box-shadow: 0 0 0 0 var(--wplace-pulse-end);
+    }
 }
 
 @keyframes slide-in {
-  from {
-    transform: translateY(-10px);
-    opacity: 0;
-  }
+    from {
+        transform: translateY(-10px);
+        opacity: 0;
+    }
 
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 @keyframes slide-down {
-  from {
-    transform: translateX(-50%) translateY(-20px);
-    opacity: 0;
-  }
+    from {
+        transform: translateX(-50%) translateY(-20px);
+        opacity: 0;
+    }
 
-  to {
-    transform: translateX(-50%) translateY(0);
-    opacity: 1;
-  }
+    to {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
 }
 
 @keyframes shimmer {
-  0% {
-    transform: translateX(-100%);
-  }
+    0% {
+        transform: translateX(-100%);
+    }
 
-  100% {
-    transform: translateX(100%);
-  }
+    100% {
+        transform: translateX(100%);
+    }
 }
 
 /* ========================= */
@@ -190,417 +194,424 @@
 /* Align with JS structure   */
 /* ========================= */
 #wplace-image-bot-container {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  width: 280px;
-  max-height: calc(100vh - 40px);
-  padding: 0;
-  z-index: 9998;
-  animation: slide-in 0.4s ease-out;
-  overflow: hidden auto;
-  transition: all 0.3s ease;
-  user-select: none;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: 280px;
+    max-height: calc(100vh - 40px);
+    padding: 0;
+    z-index: 9998;
+    animation: slide-in 0.4s ease-out;
+    overflow: hidden auto;
+    transition: all 0.3s ease;
+    user-select: none;
 
-  /* Default classic theme styling for 100% compliance */
-  background: var(--wplace-primary);
-  color: var(--wplace-text);
-  border-radius: var(--wplace-radius);
-  box-shadow: var(--wplace-shadow);
-  font-family: var(--wplace-font);
-  backdrop-filter: var(--wplace-backdrop);
-  border: var(--wplace-border-width) var(--wplace-border-style) var(--wplace-border-color);
+    /* Default classic theme styling for 100% compliance */
+    background: var(--wplace-primary);
+    color: var(--wplace-text);
+    border-radius: var(--wplace-radius);
+    box-shadow: var(--wplace-shadow);
+    font-family: var(--wplace-font);
+    backdrop-filter: var(--wplace-backdrop);
+    border: var(--wplace-border-width) var(--wplace-border-style)
+        var(--wplace-border-color);
 }
 
 #wplace-image-bot-container.wplace-dragging {
-  transition: none;
-  box-shadow: var(--wplace-shadow-drag);
-  transform: scale(1.02);
-  z-index: 9999;
+    transition: none;
+    box-shadow: var(--wplace-shadow-drag);
+    transform: scale(1.02);
+    z-index: 9999;
 }
 
 #wplace-image-bot-container.wplace-compact {
-  width: 240px;
+    width: 240px;
 }
 
 #wplace-image-bot-container.wplace-minimized {
-  width: 200px;
-  height: auto;
-  overflow: hidden;
+    width: 200px;
+    height: auto;
+    overflow: hidden;
 }
 
 /* Stats container sits to the right of main (280 + 30 = 330) */
 #wplace-stats-container {
-  position: fixed;
-  top: 20px;
-  left: 310px;
-  width: 230px;
-  max-height: calc(100vh - 40px);
-  padding: 0;
-  z-index: 9997;
-  animation: slide-in 0.4s ease-out;
-  overflow-y: auto;
-  transition: all 0.3s ease;
-  user-select: none;
-  display: none;
+    position: fixed;
+    top: 20px;
+    left: 310px;
+    width: 230px;
+    max-height: calc(100vh - 40px);
+    padding: 0;
+    z-index: 9997;
+    animation: slide-in 0.4s ease-out;
+    overflow-y: auto;
+    transition: all 0.3s ease;
+    user-select: none;
+    display: none;
 
-  /* Default classic theme styling for 100% compliance */
-  background: var(--wplace-primary);
-  color: var(--wplace-text);
-  border-radius: var(--wplace-radius);
-  box-shadow: var(--wplace-shadow);
-  font-family: var(--wplace-font);
-  backdrop-filter: var(--wplace-backdrop);
-  border: var(--wplace-border-width) var(--wplace-border-style) var(--wplace-border-color);
+    /* Default classic theme styling for 100% compliance */
+    background: var(--wplace-primary);
+    color: var(--wplace-text);
+    border-radius: var(--wplace-radius);
+    box-shadow: var(--wplace-shadow);
+    font-family: var(--wplace-font);
+    backdrop-filter: var(--wplace-backdrop);
+    border: var(--wplace-border-width) var(--wplace-border-style)
+        var(--wplace-border-color);
 }
 
 #wplace-stats-container.wplace-dragging {
-  transition: none;
+    transition: none;
 }
 
 /* Back-compat for legacy class (some earlier CSS used this) */
 .wplace-drag-active {
-  transition: none !important;
-  box-shadow: var(--wplace-shadow-drag) !important;
-  transform: scale(1.02) !important;
-  z-index: 9999 !important;
+    transition: none !important;
+    box-shadow: var(--wplace-shadow-drag) !important;
+    transform: scale(1.02) !important;
+    z-index: 9999 !important;
 }
 
 /* ========================= */
 /* Header and content blocks */
 /* ========================= */
 .wplace-header {
-  padding: 8px 12px;
-  font-size: 13px;
-  font-weight: 700;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: move;
-  user-select: none;
-  border-bottom: 1px solid var(--wplace-border-ghost);
-  transition: background 0.2s ease;
-  position: relative;
-  z-index: 2;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: move;
+    user-select: none;
+    border-bottom: 1px solid var(--wplace-border-ghost);
+    transition: background 0.2s ease;
+    position: relative;
+    z-index: 2;
 
-  /* Default styling for 100% classic compliance */
-  background: var(--wplace-secondary);
-  color: var(--wplace-highlight);
-  text-shadow: 0 1px 2px rgb(0 0 0 / 50%);
+    /* Default styling for 100% classic compliance */
+    background: var(--wplace-secondary);
+    color: var(--wplace-highlight);
+    text-shadow: 0 1px 2px rgb(0 0 0 / 50%);
 }
 
 .wplace-header-title {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .wplace-header-controls {
-  display: flex;
-  gap: 6px;
+    display: flex;
+    gap: 6px;
 }
 
 .wplace-header-btn {
-  border: none;
-  cursor: pointer;
-  width: 18px;
-  height: 18px;
-  padding: 0;
-  font-size: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
 
-  /* Default styling for 100% classic compliance */
-  background: rgb(255 255 255 / 10%);
-  color: var(--wplace-text);
-  border-radius: 4px;
-  font-family: var(--wplace-font);
+    /* Default styling for 100% classic compliance */
+    background: rgb(255 255 255 / 10%);
+    color: var(--wplace-text);
+    border-radius: 4px;
+    font-family: var(--wplace-font);
 }
 
 .wplace-header-btn:hover {
-  transform: scale(1.1);
+    transform: scale(1.1);
 
-  /* Default styling for 100% classic compliance */
-  background: var(--wplace-accent);
-  color: var(--wplace-text);
+    /* Default styling for 100% classic compliance */
+    background: var(--wplace-accent);
+    color: var(--wplace-text);
 }
 
 .wplace-content {
-  display: block;
-  position: relative;
-  z-index: 2;
-  padding: 12px;
+    display: block;
+    position: relative;
+    z-index: 2;
+    padding: 12px;
 }
 
 .wplace-content.wplace-hidden {
-  display: none;
+    display: none;
 }
 
 /* Sections */
 .wplace-status-section {
-  margin-bottom: 6px;
-  padding: 8px;
-  border-radius: var(--wplace-radius, 12px);
+    margin-bottom: 6px;
+    padding: 8px;
+    border-radius: var(--wplace-radius, 12px);
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-section {
-  margin-bottom: 6px;
-  padding: 8px;
-  border-radius: var(--wplace-radius, 12px);
+    margin-bottom: 6px;
+    padding: 8px;
+    border-radius: var(--wplace-radius, 12px);
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-section-title {
-  font-size: 11px;
-  font-weight: 600;
-  margin-bottom: 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  gap: 6px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    gap: 6px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-section-title i.arrow {
-  transition: transform 0.3s ease;
+    transition: transform 0.3s ease;
 }
 
 .wplace-section.collapsed .wplace-section-title i.arrow {
-  transform: rotate(-90deg);
+    transform: rotate(-90deg);
 }
 
 /* ========================= */
 /* Controls and buttons      */
 /* ========================= */
 .wplace-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .wplace-cooldown-control {
-  margin-top: 8px;
+    margin-top: 8px;
 }
 
 .wplace-section.collapsed .wplace-controls,
 .wplace-section.collapsed .wplace-cooldown-control {
-  max-height: 0;
-  opacity: 0;
-  pointer-events: none;
+    max-height: 0;
+    opacity: 0;
+    pointer-events: none;
 }
 
 .wplace-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
 }
 
 .wplace-row.single {
-  grid-template-columns: 1fr;
+    grid-template-columns: 1fr;
 }
 
 .wplace-btn {
-  padding: 8px 12px;
-  border: 1px solid rgb(255 255 255 / 10%);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  font-size: 11px;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  font-weight: 500;
-  
-  /* Default styling - themes can override these */
-  background: linear-gradient(135deg, #222 0%, #4a4a4a 100%);
-  color: var(--wplace-text);
-  border-radius: var(--wplace-btn-radius, 16px);
-  font-family: var(--wplace-font);
-  box-shadow: 0 2px 8px rgb(0 0 0 / 20%);
+    padding: 8px 12px;
+    border: 1px solid rgb(255 255 255 / 10%);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 11px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    font-weight: 500;
 
-  /* Theme-specific styling applied via theme files */
+    /* Default styling - themes can override these */
+    background: linear-gradient(135deg, #222 0%, #4a4a4a 100%);
+    color: var(--wplace-text);
+    border-radius: var(--wplace-btn-radius, 16px);
+    font-family: var(--wplace-font);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 20%);
+
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none !important;
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  transition: left 0.5s ease;
-  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 10%), transparent);
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    transition: left 0.5s ease;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgb(255 255 255 / 10%),
+        transparent
+    );
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-btn:disabled::before {
-  display: none;
+    display: none;
 }
 
 .wplace-btn:hover:not(:disabled)::before {
-  left: 100%;
+    left: 100%;
 }
 
 .wplace-btn:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgb(0 0 0 / 30%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 30%);
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-btn:active:not(:disabled) {
-  transform: translateY(0);
+    transform: translateY(0);
 }
 
 /* Default button variants - themes can override these */
 .wplace-btn-upload {
-  background: rgb(111 66 193 / 10%) !important;
-  border: 2px dashed var(--wplace-highlight) !important;
-  color: var(--wplace-highlight) !important;
+    background: rgb(111 66 193 / 10%) !important;
+    border: 2px dashed var(--wplace-highlight) !important;
+    color: var(--wplace-highlight) !important;
 }
 
 .wplace-btn-upload:hover:not(:disabled) {
-  background: rgb(111 66 193 / 15%) !important;
-  border-color: var(--wplace-highlight) !important;
-  box-shadow: 0 4px 12px rgb(111 66 193 / 20%) !important;
+    background: rgb(111 66 193 / 15%) !important;
+    border-color: var(--wplace-highlight) !important;
+    box-shadow: 0 4px 12px rgb(111 66 193 / 20%) !important;
 }
 
 /* ========================= */
 /* Stats and progress        */
 /* ========================= */
 .wplace-stats {
-  margin-bottom: 8px;
-  padding: 8px;
+    margin-bottom: 8px;
+    padding: 8px;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-stat-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 4px 0;
-  font-size: 11px;
-  border-bottom: 1px solid var(--wplace-border-ultra-faint);
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    font-size: 11px;
+    border-bottom: 1px solid var(--wplace-border-ultra-faint);
 }
 
 .wplace-stat-item:last-child {
-  border-bottom: none;
+    border-bottom: none;
 }
 
 .wplace-stat-label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  opacity: 0.9;
-  font-size: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    opacity: 0.9;
+    font-size: 10px;
 }
 
 .wplace-stat-value {
-  font-weight: 600;
+    font-weight: 600;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-colors-section {
-  margin-top: 10px;
-  padding-top: 8px;
-  border-top: 1px solid var(--wplace-border-ultra-faint);
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid var(--wplace-border-ultra-faint);
 }
 
 .wplace-stat-colors-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(16px, 1fr));
-  gap: 4px;
-  margin-top: 8px;
-  padding: 4px;
-  max-height: 80px;
-  overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(16px, 1fr));
+    gap: 4px;
+    margin-top: 8px;
+    padding: 4px;
+    max-height: 80px;
+    overflow-y: auto;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-colors-placeholder {
-  text-align: center;
-  color: #888;
-  padding: 20px;
-  font-style: italic;
+    text-align: center;
+    color: #888;
+    padding: 20px;
+    font-style: italic;
 }
 
 .wplace-cooldown-value {
-  font-weight: bold;
-  min-width: 20px;
-  text-align: center;
-  display: inline-block;
+    font-weight: bold;
+    min-width: 20px;
+    text-align: center;
+    display: inline-block;
 }
 
 .wplace-stat-color-swatch {
-  width: 16px;
-  height: 16px;
+    width: 16px;
+    height: 16px;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 /* Progress */
 .wplace-progress {
-  width: 100%;
-  margin: 8px 0;
-  overflow: hidden;
-  height: 6px;
-  position: relative;
+    width: 100%;
+    margin: 8px 0;
+    overflow: hidden;
+    height: 6px;
+    position: relative;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-progress-bar {
-  height: 6px;
-  transition: width 0.5s ease;
-  position: relative;
+    height: 6px;
+    transition: width 0.5s ease;
+    position: relative;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-progress-bar::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  animation: shimmer 2s infinite;
+    content: '';
+    position: absolute;
+    inset: 0;
+    animation: shimmer 2s infinite;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 /* ========================= */
 /* Status blocks             */
 /* ========================= */
 .wplace-status {
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-  padding: 6px;
-  border: 1px solid;
-  font-size: 11px;
-  border-radius: var(--wplace-radius, 12px);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    padding: 6px;
+    border: 1px solid;
+    font-size: 11px;
+    border-radius: var(--wplace-radius, 12px);
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 /* Status styling moved to theme files */
@@ -609,369 +620,367 @@
 /* Resize dialog             */
 /* ========================= */
 .resize-container {
-  display: none;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  padding: 20px;
-  z-index: 10000;
-  width: 90%;
-  max-width: 700px;
-  max-height: 90%;
-  overflow: auto;
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    z-index: 10000;
+    width: 90%;
+    max-width: 700px;
+    max-height: 90%;
+    overflow: auto;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .resize-preview-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 15px 0;
-  height: 300px;
-  overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 15px 0;
+    height: 300px;
+    overflow: hidden;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .resize-canvas-stack {
-  position: relative;
-  transform-origin: center center;
-  display: inline-block;
+    position: relative;
+    transform-origin: center center;
+    display: inline-block;
 }
 
 .resize-base-canvas,
 .resize-mask-canvas {
-  position: absolute;
-  left: 0;
-  top: 0;
-  image-rendering: -moz-crisp-edges;
-  image-rendering: pixelated;
+    position: absolute;
+    left: 0;
+    top: 0;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: pixelated;
 }
 
 .resize-mask-canvas {
-  pointer-events: auto;
+    pointer-events: auto;
 }
 
 .resize-tools {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  margin-top: 8px;
-  font-size: 12px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 8px;
+    font-size: 12px;
 }
 
 /* Missing button hover styles */
 .resize-tools button {
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: 1px solid var(--wplace-border-subtle);
-  background: var(--wplace-bg-ghost);
-  color: var(--wplace-text);
-  cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--wplace-border-subtle);
+    background: var(--wplace-bg-ghost);
+    color: var(--wplace-text);
+    cursor: pointer;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 /* Button active states moved to theme files */
 
 .resize-controls {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
-  align-items: center;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    align-items: center;
 }
 
 .resize-slider {
-  width: 100%;
-  height: 4px;
-  border: none;
-  outline: none;
-  -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    border: none;
+    outline: none;
+    -webkit-appearance: none;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .resize-zoom-controls {
-  grid-column: 1 / -1;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 15px;
-  flex-wrap: wrap;
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 15px;
+    flex-wrap: wrap;
 }
 
 .resize-buttons {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
 }
-
 
 /* ========================= */
 /* Color grid                */
 /* ========================= */
 .wplace-color-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-  gap: 10px;
-  padding-top: 8px;
-  max-height: 300px;
-  overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    gap: 10px;
+    padding-top: 8px;
+    max-height: 300px;
+    overflow-y: auto;
 }
 
 .wplace-color-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
 }
 
 .wplace-color-item-name {
-  font-size: 9px;
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 100%;
+    font-size: 9px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-color-swatch {
-  width: 22px;
-  height: 22px;
-  cursor: pointer;
-  transition:
-    transform 0.1s ease,
-    box-shadow 0.2s ease;
-  position: relative;
-  margin: 0 auto;
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    transition:
+        transform 0.1s ease,
+        box-shadow 0.2s ease;
+    position: relative;
+    margin: 0 auto;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-color-swatch.unavailable {
-  border-style: dashed;
-  cursor: not-allowed;
+    border-style: dashed;
+    cursor: not-allowed;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-color-swatch:hover {
-  transform: scale(1.1);
-  z-index: 1;
+    transform: scale(1.1);
+    z-index: 1;
 }
 
 .wplace-color-swatch:not(.active) {
-  opacity: 0.3;
+    opacity: 0.3;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-color-swatch.unavailable:not(.active) {
-  opacity: 0.2;
+    opacity: 0.2;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-color-swatch.active::after {
-  content: '\u2714';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: var(--wplace-text);
-  font-size: 12px;
-  font-weight: bold;
+    content: '\u2714';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--wplace-text);
+    font-size: 12px;
+    font-weight: bold;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-color-divider {
-  border: none;
-  height: 1px;
-  margin: 8px 0;
+    border: none;
+    height: 1px;
+    margin: 8px 0;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 /* ========================= */
 /* Cooldown controls         */
 /* ========================= */
 .wplace-cooldown-control label {
-  font-size: 11px;
-  margin-bottom: 4px;
-  display: block;
+    font-size: 11px;
+    margin-bottom: 4px;
+    display: block;
 }
 
 .wplace-slider-container {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .wplace-slider {
-  flex: 1;
-  -webkit-appearance: none;
-  appearance: none;
-  height: 4px;
-  outline: none;
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    outline: none;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 14px;
-  height: 14px;
-  cursor: pointer;
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 /* ========================= */
 /* Settings container (base) */
 /* ========================= */
 #wplace-settings-container {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  padding: 0;
-  z-index: 10002;
-  display: none;
-  min-width: 420px;
-  max-width: 480px;
-  overflow: hidden;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 0;
+    z-index: 10002;
+    display: none;
+    min-width: 420px;
+    max-width: 480px;
+    overflow: hidden;
 
-  /* Default classic theme styling for 100% compliance */
-  background: var(--wplace-primary);
-  color: var(--wplace-text);
-  border-radius: var(--wplace-radius);
-  box-shadow: var(--wplace-shadow);
-  font-family: var(--wplace-font);
-  backdrop-filter: var(--wplace-backdrop);
-  border: var(--wplace-border-width) var(--wplace-border-style) var(--wplace-border-color);
+    /* Default classic theme styling for 100% compliance */
+    background: var(--wplace-primary);
+    color: var(--wplace-text);
+    border-radius: var(--wplace-radius);
+    box-shadow: var(--wplace-shadow);
+    font-family: var(--wplace-font);
+    backdrop-filter: var(--wplace-backdrop);
+    border: var(--wplace-border-width) var(--wplace-border-style)
+        var(--wplace-border-color);
 }
 
 #wplace-settings-container.show {
-  display: block;
-  animation: settings-slide-in 0.4s ease-out;
+    display: block;
+    animation: settings-slide-in 0.4s ease-out;
 }
 
 @keyframes settings-slide-in {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.9);
-  }
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9);
+    }
 
-  to {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
 }
 
 @keyframes settings-fade-out {
-  from {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
+    from {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
 
-  to {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.9);
-  }
+    to {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9);
+    }
 }
 
 .wplace-settings {
-  padding: 16px;
-  max-height: 400px;
-  overflow-y: auto;
+    padding: 16px;
+    max-height: 400px;
+    overflow-y: auto;
 }
 
 .wplace-setting-section {
-  margin-bottom: 20px;
-  padding: 12px;
+    margin-bottom: 20px;
+    padding: 12px;
 }
 
 /* ========================= */
 /* Form controls             */
 /* ========================= */
 .wplace-select {
-  width: 100%;
-  padding: 8px 12px;
-  font-size: 14px;
-  margin-bottom: 10px;
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 14px;
+    margin-bottom: 10px;
 }
 
 .wplace-select:focus {
-  outline: none;
+    outline: none;
 }
 
 .wplace-description {
-  font-size: 12px;
-  opacity: 0.8;
-  line-height: 1.4;
+    font-size: 12px;
+    opacity: 0.8;
+    line-height: 1.4;
 }
 
 /* Speed controls */
 .wplace-speed-control {
-  margin-top: 12px;
-  padding: 12px;
+    margin-top: 12px;
+    padding: 12px;
 }
 
 .wplace-speed-label {
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
-  font-size: 13px;
-  font-weight: 600;
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 600;
 }
 
 .wplace-speed-label i {
-  margin-right: 6px;
+    margin-right: 6px;
 }
-
 
 .wplace-speed-slider {
-  flex: 1;
-  height: 8px;
-  outline: none;
-  -webkit-appearance: none;
-  appearance: none;
-  cursor: pointer;
-  background: var(--wplace-slider-track-bg);
-  border-radius: 4px;
+    flex: 1;
+    height: 8px;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    background: var(--wplace-slider-track-bg);
+    border-radius: 4px;
 }
 
-
 .wplace-speed-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-speed-slider::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-speed-display {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  min-width: 90px;
-  justify-content: flex-end;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 90px;
+    justify-content: flex-end;
 }
 
 /* ========================= */
@@ -979,163 +988,163 @@
 /* ========================= */
 /* Hidden invisible widget host (token generator) */
 .wplace-turnstile-hidden {
-  position: fixed !important;
-  left: -99999px !important;
-  top: -99999px !important;
-  width: 1px !important;
-  height: 1px !important;
-  pointer-events: none !important;
-  opacity: 0 !important;
-  visibility: hidden !important;
-  z-index: -99999 !important;
-  overflow: hidden !important;
+    position: fixed !important;
+    left: -99999px !important;
+    top: -99999px !important;
+    width: 1px !important;
+    height: 1px !important;
+    pointer-events: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    z-index: -99999 !important;
+    overflow: hidden !important;
 }
 
 /* Visible overlay (interactive fallback) */
 .wplace-turnstile-overlay {
-  position: fixed !important;
-  bottom: 20px !important;
-  right: 20px !important;
-  z-index: 99999 !important;
-  padding: 20px !important;
-  min-width: 300px !important;
-  max-width: 400px !important;
+    position: fixed !important;
+    bottom: 20px !important;
+    right: 20px !important;
+    z-index: 99999 !important;
+    padding: 20px !important;
+    min-width: 300px !important;
+    max-width: 400px !important;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-turnstile-title {
-  font:
-    600 12px/1.3 'Segoe UI',
-    sans-serif !important;
-  margin-bottom: 8px !important;
-  opacity: 0.9 !important;
+    font:
+        600 12px/1.3 'Segoe UI',
+        sans-serif !important;
+    margin-bottom: 8px !important;
+    opacity: 0.9 !important;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-turnstile-host {
-  width: 100% !important;
-  min-height: 70px !important;
+    width: 100% !important;
+    min-height: 70px !important;
 }
 
 .wplace-turnstile-hide-btn {
-  position: absolute !important;
-  top: 6px !important;
-  right: 6px !important;
-  font-size: 11px !important;
-  background: transparent !important;
-  padding: 2px 6px !important;
-  cursor: pointer !important;
-  transition: background 0.2s ease !important;
+    position: absolute !important;
+    top: 6px !important;
+    right: 6px !important;
+    font-size: 11px !important;
+    background: transparent !important;
+    padding: 2px 6px !important;
+    cursor: pointer !important;
+    transition: background 0.2s ease !important;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-turnstile-hide-btn:hover {
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 /* ========================= */
 /* Alert system (used by JS) */
 /* ========================= */
 .wplace-alert-base {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 12px 20px;
-  color: var(--wplace-text);
-  font-weight: 600;
-  z-index: 10002;
-  max-width: 400px;
-  text-align: center;
-  animation: slide-down 0.3s ease-out;
-  box-shadow: var(--wplace-shadow-notification);
-  
-  /* Default fallback background - themes override this */
-  background: rgb(0 0 0 / 90%);
-  border-radius: var(--wplace-radius);
-  border: 1px solid rgb(255 255 255 / 20%);
-  backdrop-filter: var(--wplace-backdrop);
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 20px;
+    color: var(--wplace-text);
+    font-weight: 600;
+    z-index: 10002;
+    max-width: 400px;
+    text-align: center;
+    animation: slide-down 0.3s ease-out;
+    box-shadow: var(--wplace-shadow-notification);
 
-  /* Theme-specific styling applied via theme files */
+    /* Default fallback background - themes override this */
+    background: rgb(0 0 0 / 90%);
+    border-radius: var(--wplace-radius);
+    border: 1px solid rgb(255 255 255 / 20%);
+    backdrop-filter: var(--wplace-backdrop);
+
+    /* Theme-specific styling applied via theme files */
 }
 
 /* Default alert type styles - themes can override these */
 .wplace-alert-info {
-  background: linear-gradient(135deg, #3498db, #2980b9);
-  color: white;
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
 }
 
 .wplace-alert-success {
-  background: linear-gradient(135deg, #27ae60, #229954);
-  color: white;
+    background: linear-gradient(135deg, #27ae60, #229954);
+    color: white;
 }
 
 .wplace-alert-warning {
-  background: linear-gradient(135deg, #f39c12, #e67e22);
-  color: white;
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+    color: white;
 }
 
 .wplace-alert-error {
-  background: linear-gradient(135deg, #e74c3c, #c0392b);
-  color: white;
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
 }
 
 /* ========================= */
 /* Modal overlay helpers     */
 /* ========================= */
 .wplace-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 100002;
-  display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 100002;
+    display: none;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-overlay.show {
-  display: block;
+    display: block;
 }
 
 /* Overlay visibility helpers */
 .wplace-overlay-hidden {
-  display: none !important;
+    display: none !important;
 }
 
 .wplace-overlay-visible {
-  display: block !important;
+    display: block !important;
 }
 
 /* ========================= */
 /* Responsive tweaks         */
 /* ========================= */
 @media (width <= 768px) {
-  #wplace-image-bot-container {
-    left: 10px;
-    width: calc(100vw - 20px);
-    max-height: calc(100vh - 20px);
-  }
+    #wplace-image-bot-container {
+        left: 10px;
+        width: calc(100vw - 20px);
+        max-height: calc(100vh - 20px);
+    }
 
-  #wplace-stats-container {
-    display: none !important; /* hide secondary panel on small screens */
-  }
+    #wplace-stats-container {
+        display: none !important; /* hide secondary panel on small screens */
+    }
 
-  .wplace-alert-base {
-    max-width: 90vw;
-    margin: 0 5vw;
-  }
+    .wplace-alert-base {
+        max-width: 90vw;
+        margin: 0 5vw;
+    }
 
-  .wplace-turnstile-overlay {
-    bottom: 10px !important;
-    right: 10px !important;
-    left: 10px !important;
-    min-width: auto !important;
-  }
+    .wplace-turnstile-overlay {
+        bottom: 10px !important;
+        right: 10px !important;
+        left: 10px !important;
+        min-width: auto !important;
+    }
 }
 
 /* Auto light/dark support moved to theme files */
@@ -1144,40 +1153,40 @@
 /* Settings container variants (optional) */
 /* ===================================== */
 .wplace-settings-container-base {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 100001;
-  display: none;
-  min-width: 400px;
-  max-width: 500px;
-  max-height: 100vh;
-  overflow-y: auto;
-  animation: slide-in 0.3s ease-out;
-  border: 1px solid var(--wplace-border-ghost);
-  padding: 0;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 100001;
+    display: none;
+    min-width: 400px;
+    max-width: 500px;
+    max-height: 100vh;
+    overflow-y: auto;
+    animation: slide-in 0.3s ease-out;
+    border: 1px solid var(--wplace-border-ghost);
+    padding: 0;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-settings-container-base.show {
-  display: block;
+    display: block;
 }
 
 /* ===================================== */
 /* Utility styles                         */
 /* ===================================== */
 .wplace-paint-effect {
-  animation: pulse 0.5s ease-out;
+    animation: pulse 0.5s ease-out;
 }
 
 .wplace-settings-error {
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-stats-container.hidden {
-  display: none;
+    display: none;
 }
 
 /* Theme-specific effects are now in separate theme files */
@@ -1188,342 +1197,342 @@
 
 /* Settings content container */
 .wplace-settings-content {
-  padding: 25px 25px 0;
-  max-height: 67vh;
-  overflow-y: auto;
+    padding: 25px 25px 0;
+    max-height: 67vh;
+    overflow-y: auto;
 }
 
 /* Settings section containers */
 .wplace-settings-section {
-  margin-bottom: 25px;
+    margin-bottom: 25px;
 }
 
 /* Section labels */
 .wplace-settings-section-label {
-  margin-bottom: 12px;
-  color: var(--wplace-text);
-  font-weight: 500;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+    margin-bottom: 12px;
+    color: var(--wplace-text);
+    font-weight: 500;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 /* Icon colors */
 .wplace-icon-key {
-  font-size: 16px;
+    font-size: 16px;
 }
 
 .wplace-icon-robot {
-  font-size: 16px;
+    font-size: 16px;
 }
 
 .wplace-icon-speed {
-  font-size: 16px;
+    font-size: 16px;
 }
 
 .wplace-icon-bell {
-  font-size: 16px;
+    font-size: 16px;
 }
 
 .wplace-icon-palette {
-  font-size: 16px;
+    font-size: 16px;
 }
 
 .wplace-icon-globe {
-  font-size: 16px;
+    font-size: 16px;
 }
 
 .wplace-icon-paint {
-  font-size: 16px;
+    font-size: 16px;
 }
 
 /* Section wrapper styling */
 .wplace-settings-section-wrapper {
-  padding: 18px;
+    padding: 18px;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 /* Select dropdowns */
 .wplace-settings-select {
-  width: 100%;
-  padding: 12px 16px;
-  font-size: 14px;
-  outline: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-family: inherit;
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 14px;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-settings-option {
-  padding: 10px;
+    padding: 10px;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 /* Settings description text */
 .wplace-settings-description {
-  font-size: 12px;
-  color: var(--wplace-text-muted);
-  margin: 8px 0 0;
+    font-size: 12px;
+    color: var(--wplace-text-muted);
+    margin: 8px 0 0;
 }
 
 /* Batch Controls */
 .wplace-batch-controls {
-  padding: 18px;
-  margin-bottom: 15px;
+    padding: 18px;
+    margin-bottom: 15px;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-random-batch-controls {
-  display: none;
+    display: none;
 }
 
 /* Speed Slider Container */
 .wplace-speed-slider-container {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
 }
 
-
 .wplace-speed-value {
-  min-width: 100px;
-  text-align: center;
-  padding: 8px 12px;
-  font-weight: bold;
-  font-size: 13px;
+    min-width: 100px;
+    text-align: center;
+    padding: 8px 12px;
+    font-weight: bold;
+    font-size: 13px;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-speed-labels {
-  display: flex;
-  justify-content: space-between;
-  color: var(--wplace-text-muted);
-  font-size: 11px;
-  margin: 4px 0;
-  padding: 0;
-  width: 100%;
-  min-height: 16px;
-  position: relative;
+    display: flex;
+    justify-content: space-between;
+    color: var(--wplace-text-muted);
+    font-size: 11px;
+    margin: 4px 0;
+    padding: 0;
+    width: 100%;
+    min-height: 16px;
+    position: relative;
 }
 
 .wplace-speed-min {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-weight: 500;
-  position: absolute;
-  left: 20px;
-  transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 500;
+    position: absolute;
+    left: 20px;
+    transform: translateX(-50%);
 }
 
 .wplace-speed-max {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-weight: 500;
-  position: absolute;
-  right: 20px;
-  transform: translateX(50%);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 500;
+    position: absolute;
+    right: 20px;
+    transform: translateX(50%);
 }
 
 .wplace-speed-min i,
 .wplace-speed-max i {
-  font-size: 10px;
-  opacity: 0.8;
+    font-size: 10px;
+    opacity: 0.8;
 }
 
 /* Random Batch Controls */
 .wplace-random-batch-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
 }
 
 .wplace-random-batch-label {
-  display: block;
-  color: var(--wplace-text-faded);
-  font-size: 12px;
-  margin-bottom: 8px;
+    display: block;
+    color: var(--wplace-text-faded);
+    font-size: 12px;
+    margin-bottom: 8px;
 }
 
 .wplace-icon-min {
-  color: var(--wplace-icon-primary);
-  margin-right: 4px;
+    color: var(--wplace-icon-primary);
+    margin-right: 4px;
 }
 
 .wplace-icon-max {
-  color: var(--wplace-icon-secondary);
-  margin-right: 4px;
+    color: var(--wplace-icon-secondary);
+    margin-right: 4px;
 }
 
 .wplace-settings-number-input {
-  width: 100%;
-  padding: 10px 12px;
-  background: var(--wplace-bg-input);
-  color: var(--wplace-text);
-  border: 1px solid var(--wplace-border-subtle);
-  border-radius: 8px;
-  font-size: 13px;
-  outline: none;
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--wplace-bg-input);
+    color: var(--wplace-text);
+    border: 1px solid var(--wplace-border-subtle);
+    border-radius: 8px;
+    font-size: 13px;
+    outline: none;
 }
 
 .wplace-random-batch-description {
-  font-size: 11px;
-  color: var(--wplace-text-dim);
-  margin: 8px 0 0;
-  text-align: center;
+    font-size: 11px;
+    color: var(--wplace-text-dim);
+    margin: 8px 0 0;
+    text-align: center;
 }
 
 /* Speed Control Toggle */
 .wplace-speed-control-toggle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--wplace-text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--wplace-text);
 }
 
 .wplace-speed-checkbox {
-  cursor: pointer;
+    cursor: pointer;
 }
 
 /* Overlay Settings */
 .wplace-overlay-opacity-control {
-  margin-bottom: 15px;
+    margin-bottom: 15px;
 }
 
 .wplace-overlay-opacity-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
 }
 
 .wplace-overlay-opacity-label {
-  font-weight: 500;
-  font-size: 13px;
+    font-weight: 500;
+    font-size: 13px;
 }
 
 .wplace-overlay-opacity-value {
-  min-width: 40px;
-  text-align: center;
-  background: var(--wplace-accent);
-  color: var(--wplace-text);
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 12px;
-  border: var(--wplace-border-width) var(--wplace-border-style) var(--wplace-border-color);
+    min-width: 40px;
+    text-align: center;
+    background: var(--wplace-accent);
+    color: var(--wplace-text);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    border: var(--wplace-border-width) var(--wplace-border-style)
+        var(--wplace-border-color);
 }
 
 .wplace-overlay-opacity-slider {
-  width: 100%;
-  -webkit-appearance: none;
-  height: 8px;
-  outline: none;
-  cursor: pointer;
+    width: 100%;
+    -webkit-appearance: none;
+    height: 8px;
+    outline: none;
+    cursor: pointer;
 }
 
 .wplace-settings-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
 }
 
 .wplace-settings-toggle-title {
-  font-weight: 500;
+    font-weight: 500;
 }
 
 .wplace-settings-toggle-description {
-  font-size: 12px;
-  margin: 4px 0 0;
-  color: var(--wplace-muted-text);
+    font-size: 12px;
+    margin: 4px 0 0;
+    color: var(--wplace-muted-text);
 }
 
 .wplace-settings-checkbox {
-  cursor: pointer;
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
-  accent-color: var(--wplace-highlight);
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    accent-color: var(--wplace-highlight);
 }
 
 /* Notifications */
 .wplace-notifications-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .wplace-notification-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .wplace-notification-checkbox {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
 }
 
 .wplace-notification-interval {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .wplace-notification-interval-input {
-  width: 70px;
-  padding: 6px 8px;
-  border-radius: 6px;
-  border: 1px solid var(--wplace-border-subtle);
-  background: var(--wplace-bg-faint);
-  color: var(--wplace-text);
+    width: 70px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--wplace-border-subtle);
+    background: var(--wplace-bg-faint);
+    color: var(--wplace-text);
 }
 
 .wplace-notification-buttons {
-  display: flex;
-  gap: 10px;
+    display: flex;
+    gap: 10px;
 }
 
 .wplace-notification-perm-btn,
 .wplace-notification-test-btn {
-  flex: 1;
+    flex: 1;
 }
 
 /* Settings Footer */
 .wplace-settings-footer {
-  border-top: 1px solid var(--wplace-border-ghost);
-  padding: 20px;
-  position: sticky;
-  bottom: 0;
-  background: var(--wplace-secondary);
+    border-top: 1px solid var(--wplace-border-ghost);
+    padding: 20px;
+    position: sticky;
+    bottom: 0;
+    background: var(--wplace-secondary);
 }
 
 /* Settings select option styling moved to theme files */
 /* Settings description styling moved to theme files */
 
 .wplace-settings-apply-btn {
-  width: 100%;
-  border: none;
-  padding: 10px 16px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  justify-content: center;
+    width: 100%;
+    border: none;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 /* ===================================== */
@@ -1532,245 +1541,249 @@
 
 /* Resize dialog title */
 .resize-dialog-title {
-  margin-top: 0;
-  color: var(--wplace-text);
+    margin-top: 0;
+    color: var(--wplace-text);
 }
 
 /* Resize control labels */
 .resize-control-label {
-  display: block;
-  margin-bottom: 8px;
-  font-size: 14px;
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
 }
 
 .resize-checkbox-label {
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
-  font-size: 14px;
-  gap: 8px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 14px;
+    gap: 8px;
 }
 
 /* Zoom controls */
 
 .resize-zoom-btn {
-  padding: 4px 8px;
+    padding: 4px 8px;
 }
 
 .resize-zoom-slider {
-  max-width: 220px;
+    max-width: 220px;
 }
 
 .resize-zoom-value {
-  margin-left: 6px;
-  min-width: 48px;
-  text-align: right;
-  opacity: 0.85;
-  font-size: 12px;
+    margin-left: 6px;
+    min-width: 48px;
+    text-align: right;
+    opacity: 0.85;
+    font-size: 12px;
 }
 
 .resize-camera-help {
-  font-size: 11px;
-  opacity: 0.75;
-  margin-left: auto;
+    font-size: 11px;
+    opacity: 0.75;
+    margin-left: auto;
 }
 
 /* Canvas positioning */
 .resize-pan-stage {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
 }
 
 .resize-canvas-positioned {
-  position: absolute;
-  left: 0;
-  top: 0;
-  transform-origin: top left;
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform-origin: top left;
 }
 
 /* Resize tools */
 .resize-tools-container {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  align-items: center;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
 }
 
 .resize-brush-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .resize-brush-control {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  justify-content: space-between;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: space-between;
 }
 
 .resize-tool-label {
-  font-size: 12px;
-  opacity: 0.85;
+    font-size: 12px;
+    opacity: 0.85;
 }
 
 .resize-tool-input-group {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .resize-tool-slider {
-  width: 120px;
+    width: 120px;
 }
 
 .resize-tool-value {
-  font-size: 12px;
-  opacity: 0.85;
-  min-width: 18px;
-  text-align: center;
+    font-size: 12px;
+    opacity: 0.85;
+    min-width: 18px;
+    text-align: center;
 }
 
 .resize-mode-controls {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .resize-mode-group {
-  display: flex;
-  gap: 6px;
+    display: flex;
+    gap: 6px;
 }
 
 .resize-mode-btn,
 .resize-clear-btn,
 .resize-invert-btn {
-  padding: 4px 8px;
-  font-size: 12px;
+    padding: 4px 8px;
+    font-size: 12px;
 }
 
 .resize-shortcut-help {
-  opacity: 0.8;
-  font-size: 12px;
+    opacity: 0.8;
+    font-size: 12px;
 }
 
 /* Color palette section */
 .resize-color-palette-section {
-  margin-top: 15px;
+    margin-top: 15px;
 }
 
 .resize-color-toggle-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
 }
 
 .resize-color-checkbox {
-  cursor: pointer;
+    cursor: pointer;
 }
 
 /* Advanced color section */
 .resize-advanced-color-section {
-  margin-top: 15px;
+    margin-top: 15px;
 }
 
 .resize-advanced-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .resize-advanced-label {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-size: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 12px;
 }
 
 .resize-advanced-label-text {
-  font-weight: 600;
+    font-weight: 600;
 }
 
 .resize-advanced-select {
-  padding: 6px 8px;
-  border-radius: 6px;
-  border: 1px solid var(--wplace-border-faint);
-  background: var(--wplace-bg-whisper);
-  color: var(--wplace-text);
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--wplace-border-faint);
+    background: var(--wplace-bg-whisper);
+    color: var(--wplace-text);
 }
 
 .resize-advanced-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
 }
 
 .resize-advanced-toggle-content {
-  flex: 1;
+    flex: 1;
 }
 
 .resize-advanced-description {
-  margin-top: 2px;
-  opacity: 0.65;
+    margin-top: 2px;
+    opacity: 0.65;
 }
 
 .resize-advanced-checkbox {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
 }
 
 .resize-chroma-weight-control {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .resize-chroma-weight-header {
-  display: flex;
-  justify-content: space-between;
-  font-size: 11px;
-  margin-bottom: 4px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    margin-bottom: 4px;
 }
 
 .resize-chroma-weight-value {
-  background: var(--wplace-bg-faint);
-  padding: 2px 6px;
-  border-radius: 4px;
+    background: var(--wplace-bg-faint);
+    padding: 2px 6px;
+    border-radius: 4px;
 }
 
 .resize-chroma-weight-slider {
-  width: 100%;
+    width: 100%;
 }
 
 .resize-threshold-controls {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
 }
 
 .resize-threshold-label {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-size: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 12px;
 }
 
 .resize-threshold-input {
-  padding: 6px 8px;
-  border-radius: 6px;
-  border: 1px solid var(--wplace-border-faint);
-  background: var(--wplace-bg-whisper);
-  color: var(--wplace-text);
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--wplace-border-faint);
+    background: var(--wplace-bg-whisper);
+    color: var(--wplace-text);
 }
 
 .resize-reset-advanced-btn {
-  background: linear-gradient(135deg, var(--wplace-danger), var(--wplace-danger-dark));
-  font-size: 11px;
+    background: linear-gradient(
+        135deg,
+        var(--wplace-danger),
+        var(--wplace-danger-dark)
+    );
+    font-size: 11px;
 }
 
 /* ===================================== */
@@ -1779,86 +1792,85 @@
 
 /* Overlay styles exact match */
 .resize-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 9999;
-  display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    display: none;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 /* Settings animations - removed duplicate, handled above */
 
 /* Settings Header Styling */
 .wplace-settings-header {
-  background: var(--wplace-accent);
-  padding: 20px;
-  border-bottom: 1px solid var(--wplace-border-color);
-  cursor: move;
+    background: var(--wplace-accent);
+    padding: 20px;
+    border-bottom: 1px solid var(--wplace-border-color);
+    cursor: move;
 }
 
 .wplace-settings-title-wrapper {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .wplace-settings-title {
-  margin: 0;
-  color: var(--wplace-text);
-  font-size: 20px;
-  font-weight: 300;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+    margin: 0;
+    color: var(--wplace-text);
+    font-size: 20px;
+    font-weight: 300;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .wplace-settings-icon {
-  font-size: 18px;
-  color: var(--wplace-highlight);
-  animation: spin 2s linear infinite;
+    font-size: 18px;
+    color: var(--wplace-highlight);
+    animation: spin 2s linear infinite;
 }
 
 .wplace-settings-close-btn {
-  background: rgb(34 34 34 / 40%);
-  color: var(--wplace-text);
-  border: 1px solid var(--wplace-border-color);
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  font-size: 14px;
-  font-weight: 300;
+    background: rgb(34 34 34 / 40%);
+    color: var(--wplace-text);
+    border: 1px solid var(--wplace-border-color);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    font-weight: 300;
 }
 
 .wplace-settings-close-btn:hover {
-  background: rgb(255 0 0 / 40%);
-  transform: scale(1.1);
+    background: rgb(255 0 0 / 40%);
+    transform: scale(1.1);
 }
 
 @keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
+    from {
+        transform: rotate(0deg);
+    }
 
-  to {
-    transform: rotate(360deg);
-  }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* Font styling corrections */
 .resize-controls label {
-  font-size: 12px;
-  color: var(--wplace-text);
+    font-size: 12px;
+    color: var(--wplace-text);
 }
-
 
 /* Additional precision fixes for exact upstream main matching */
 /* Status default styling moved to theme files */
@@ -1868,124 +1880,123 @@
 /* Settings header styling moved to theme files */
 /* All remaining settings styling moved to theme files */
 
-
 /* Icon styling moved to theme files */
 .wplace-icon-eye {
-  font-size: 16px;
+    font-size: 16px;
 }
 
 /* Overlay Settings Controls */
 .wplace-overlay-opacity-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: var(--wplace-slider-thumb-bg);
-  box-shadow: var(--wplace-shadow-slider-thumb);
-  cursor: pointer;
-  transition: all 0.2s ease;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--wplace-slider-thumb-bg);
+    box-shadow: var(--wplace-shadow-slider-thumb);
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .wplace-overlay-opacity-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
-  box-shadow: var(--wplace-shadow-slider-hover);
+    transform: scale(1.2);
+    box-shadow: var(--wplace-shadow-slider-hover);
 }
 
 /* Coordinate Generation Controls */
 .wplace-icon-route {
-  color: var(--wplace-icon-primary);
-  font-size: 16px;
+    color: var(--wplace-icon-primary);
+    font-size: 16px;
 }
 
 .wplace-icon-table {
-  color: var(--wplace-icon-palette);
-  margin-right: 6px;
+    color: var(--wplace-icon-palette);
+    margin-right: 6px;
 }
 
 .wplace-icon-compass {
-  color: var(--wplace-icon-secondary);
-  margin-right: 6px;
+    color: var(--wplace-icon-secondary);
+    margin-right: 6px;
 }
 
 /* Pixel Filter Controls */
 .wplace-pixel-filter-controls {
-  padding: 18px;
-  margin-bottom: 15px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+    padding: 18px;
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 /* Snake Pattern Controls */
 .wplace-snake-pattern-controls {
-  padding: 18px;
-  margin-bottom: 15px;
+    padding: 18px;
+    margin-bottom: 15px;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 /* Block Size Controls */
 .wplace-block-size-controls {
-  padding: 18px;
-  margin-bottom: 15px;
+    padding: 18px;
+    margin-bottom: 15px;
 
-  /* Theme-specific styling applied via theme files */
+    /* Theme-specific styling applied via theme files */
 }
 
 .wplace-block-size-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
 }
 
 .wplace-block-size-label {
-  display: block;
-  color: var(--wplace-text-faded);
-  font-size: 12px;
-  margin-bottom: 8px;
+    display: block;
+    color: var(--wplace-text-faded);
+    font-size: 12px;
+    margin-bottom: 8px;
 }
 
 .wplace-icon-width {
-  color: var(--wplace-icon-primary);
-  margin-right: 4px;
+    color: var(--wplace-icon-primary);
+    margin-right: 4px;
 }
 
 .wplace-icon-height {
-  color: var(--wplace-icon-secondary);
-  margin-right: 4px;
+    color: var(--wplace-icon-secondary);
+    margin-right: 4px;
 }
 
 .wplace-block-size-description {
-  font-size: 11px;
-  color: var(--wplace-text-dim);
-  margin: 8px 0 0;
-  text-align: center;
+    font-size: 11px;
+    color: var(--wplace-text-dim);
+    margin: 8px 0 0;
+    text-align: center;
 }
 
 /* Random Block Controls */
 .wplace-shuffle-block-size-controls {
-  display: none;
+    display: none;
 }
 
 /* Batch Mode Controls */
 .wplace-mode-selection {
-  margin-bottom: 15px;
+    margin-bottom: 15px;
 }
 
 .wplace-mode-label {
-  display: block;
-  margin-bottom: 8px;
-  color: var(--wplace-text-secondary);
-  font-weight: 500;
-  font-size: 14px;
+    display: block;
+    margin-bottom: 8px;
+    color: var(--wplace-text-secondary);
+    font-weight: 500;
+    font-size: 14px;
 }
 
 .wplace-icon-dice {
-  color: var(--wplace-icon-palette);
-  margin-right: 6px;
+    color: var(--wplace-icon-palette);
+    margin-right: 6px;
 }
 
 /* ========================= */
@@ -1993,105 +2004,107 @@
 /* ========================= */
 
 /* Vertical Layout - Slider on top, controls below */
-.wplace-speed-slider-container, 
+.wplace-speed-slider-container,
 .wplace-slider-container {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin: 8px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 8px 0;
 }
 
-.wplace-speed-slider, 
+.wplace-speed-slider,
 .wplace-slider {
-  width: 100%;
-  height: 6px;
-  background: rgba(255,255,255,0.2);
-  border-radius: 3px;
-  outline: none;
-  -webkit-appearance: none;
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+    outline: none;
+    -webkit-appearance: none;
 }
 
-.wplace-speed-slider::-webkit-slider-thumb, 
+.wplace-speed-slider::-webkit-slider-thumb,
 .wplace-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: #4facfe;
-  cursor: pointer;
-  transition: all 0.2s ease;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #4facfe;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-.wplace-speed-slider::-webkit-slider-thumb:hover, 
+.wplace-speed-slider::-webkit-slider-thumb:hover,
 .wplace-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.4), 0 0 0 3px #4facfe;
+    transform: scale(1.2);
+    box-shadow:
+        0 4px 8px rgba(0, 0, 0, 0.4),
+        0 0 0 3px #4facfe;
 }
 
 /* Controls row - input group + unit label */
-.wplace-speed-controls, 
+.wplace-speed-controls,
 .wplace-cooldown-controls {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
 }
 
 /* Input group with +/- buttons */
-.wplace-speed-input-group, 
+.wplace-speed-input-group,
 .wplace-cooldown-input-group {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  background: rgba(255,255,255,0.05);
-  border-radius: 4px;
-  padding: 2px;
-  flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    padding: 2px;
+    flex-shrink: 0;
 }
 
 /* Small +/- buttons */
 .wplace-input-btn-small {
-  background: transparent;
-  color: #4facfe;
-  border: none;
-  border-radius: 2px;
-  width: 16px;
-  height: 18px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 11px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
+    background: transparent;
+    color: #4facfe;
+    border: none;
+    border-radius: 2px;
+    width: 16px;
+    height: 18px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
 }
 
 .wplace-input-btn-small:hover {
-  background: rgba(79, 172, 254, 0.15);
-  color: white;
+    background: rgba(79, 172, 254, 0.15);
+    color: white;
 }
 
 .wplace-input-btn-small:active {
-  background: rgba(79, 172, 254, 0.3);
+    background: rgba(79, 172, 254, 0.3);
 }
 
 /* Number input fields */
-.wplace-speed-input, 
+.wplace-speed-input,
 .wplace-cooldown-input {
-  background: rgba(0,0,0,0.3);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 3px;
-  color: white;
-  padding: 2px 6px;
-  font-size: 12px;
-  width: 42px;
-  text-align: center;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-  
-  /* Hide native HTML number input spin buttons */
-  -moz-appearance: textfield; /* Firefox */
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    color: white;
+    padding: 2px 6px;
+    font-size: 12px;
+    width: 42px;
+    text-align: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+
+    /* Hide native HTML number input spin buttons */
+    -moz-appearance: textfield; /* Firefox */
 }
 
 /* Hide WebKit spin buttons */
@@ -2099,24 +2112,24 @@
 .wplace-speed-input::-webkit-inner-spin-button,
 .wplace-cooldown-input::-webkit-outer-spin-button,
 .wplace-cooldown-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+    -webkit-appearance: none;
+    margin: 0;
 }
 
-.wplace-speed-input:focus, 
+.wplace-speed-input:focus,
 .wplace-cooldown-input:focus {
-  outline: none;
-  background: rgba(0,0,0,0.5);
-  border-color: #4facfe;
-  box-shadow: 0 0 0 1px rgba(79, 172, 254, 0.3);
+    outline: none;
+    background: rgba(0, 0, 0, 0.5);
+    border-color: #4facfe;
+    box-shadow: 0 0 0 1px rgba(79, 172, 254, 0.3);
 }
 
 /* Unit labels */
-.wplace-speed-unit, 
+.wplace-speed-unit,
 .wplace-cooldown-unit {
-  color: rgba(255,255,255,0.7);
-  font-size: 11px;
-  min-width: 35px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 11px;
+    min-width: 35px;
 }
 
 /* ========================= */
@@ -2125,138 +2138,166 @@
 
 /* Keyframes for animations */
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 @keyframes settings-slide-in {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
 }
 
 @keyframes settings-fade-out {
-  from {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.9);
-  }
+    from {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9);
+    }
 }
 
 /* Overlay opacity slider */
 #overlayOpacitySlider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: white;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.3), 0 0 0 2px #4facfe;
-  cursor: pointer;
-  transition: all 0.2s ease;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: white;
+    box-shadow:
+        0 3px 6px rgba(0, 0, 0, 0.3),
+        0 0 0 2px #4facfe;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 #overlayOpacitySlider::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.4), 0 0 0 3px #4facfe;
+    transform: scale(1.2);
+    box-shadow:
+        0 4px 8px rgba(0, 0, 0, 0.4),
+        0 0 0 3px #4facfe;
 }
 
 #overlayOpacitySlider::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: white;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.3), 0 0 0 2px #4facfe;
-  cursor: pointer;
-  border: none;
-  transition: all 0.2s ease;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: white;
+    box-shadow:
+        0 3px 6px rgba(0, 0, 0, 0.3),
+        0 0 0 2px #4facfe;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
 }
 
 /* Theme and language selects */
-#themeSelect:hover, #languageSelect:hover {
-  border-color: rgba(255,255,255,0.4);
-  background: rgba(255,255,255,0.2);
-  transform: translateY(-1px);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+#themeSelect:hover,
+#languageSelect:hover {
+    border-color: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
 }
 
-#themeSelect:focus, #languageSelect:focus {
-  border-color: #4facfe;
-  box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.3);
+#themeSelect:focus,
+#languageSelect:focus {
+    border-color: #4facfe;
+    box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.3);
 }
 
-#themeSelect option, #languageSelect option {
-  background: #2d3748;
-  color: white;
-  padding: 10px;
-  border-radius: 6px;
+#themeSelect option,
+#languageSelect option {
+    background: #2d3748;
+    color: white;
+    padding: 10px;
+    border-radius: 6px;
 }
 
-#themeSelect option:hover, #languageSelect option:hover {
-  background: #4a5568;
+#themeSelect option:hover,
+#languageSelect option:hover {
+    background: #4a5568;
 }
 
 /* Dragging state */
 .wplace-dragging {
-  opacity: 0.9;
-  box-shadow: 0 30px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.2);
-  transition: none;
+    opacity: 0.9;
+    box-shadow:
+        0 30px 60px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.2);
+    transition: none;
 }
 
 /* Settings header interactions */
 .wplace-settings-header:hover {
-  background: rgba(255,255,255,0.15) !important;
+    background: rgba(255, 255, 255, 0.15) !important;
 }
 
 .wplace-settings-header:active {
-  background: rgba(255,255,255,0.2) !important;
+    background: rgba(255, 255, 255, 0.2) !important;
 }
 
 /* ========================= */
 /* Dynamic Warning Banner    */
 /* ========================= */
 .wplace-warning-banner {
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  z-index: 10001;
-  background: rgba(255, 193, 7, 0.95);
-  color: #212529;
-  padding: 12px 16px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  border: 1px solid rgba(255, 193, 7, 0.8);
-  max-width: 300px;
-  word-wrap: break-word;
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 10001;
+    background: rgba(255, 193, 7, 0.95);
+    color: #212529;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 193, 7, 0.8);
+    max-width: 300px;
+    word-wrap: break-word;
 }
 
 /* ========================= */
 /* Settings Container Theme  */
 /* ========================= */
 .wplace-settings-container-themed {
-  min-width: 420px;
-  max-width: 480px;
-  z-index: 99999;
-  color: var(--theme-text, white);
-  font-family: var(--theme-font-family, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif);
-  box-shadow: var(--theme-box-shadow, 0 20px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1));
-  backdrop-filter: var(--theme-backdrop-filter, blur(10px));
-  overflow: hidden;
-  animation: settings-slide-in 0.4s ease-out;
+    min-width: 420px;
+    max-width: 480px;
+    z-index: 99999;
+    color: var(--theme-text, white);
+    font-family: var(
+        --theme-font-family,
+        'Segoe UI',
+        Tahoma,
+        Geneva,
+        Verdana,
+        sans-serif
+    );
+    box-shadow: var(
+        --theme-box-shadow,
+        0 20px 40px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.1)
+    );
+    backdrop-filter: var(--theme-backdrop-filter, blur(10px));
+    overflow: hidden;
+    animation: settings-slide-in 0.4s ease-out;
 }
 
 .wplace-settings-container-themed.glow-effect {
-  box-shadow: var(--theme-box-shadow, 0 20px 40px rgba(0,0,0,0.3)), 
-             0 0 30px var(--theme-glow-color, #00ffff);
+    box-shadow:
+        var(--theme-box-shadow, 0 20px 40px rgba(0, 0, 0, 0.3)),
+        0 0 30px var(--theme-glow-color, #00ffff);
 }
 
 /* Theme-aware dynamic text colors */
@@ -2265,791 +2306,67 @@
 .wplace-settings-toggle-title,
 .wplace-settings-toggle-description,
 .resize-dialog-title {
-  color: var(--theme-text, white) !important;
+    color: var(--theme-text, white) !important;
 }
 
 .wplace-icon-eye {
-  color: var(--theme-highlight, #48dbfb) !important;
+    color: var(--theme-highlight, #48dbfb) !important;
 }
 
 /* Dynamic accent color for checkboxes and inputs */
 .wplace-settings-checkbox,
 .wplace-slider,
-input[type="range"] {
-  accent-color: var(--theme-highlight, #48dbfb);
+input[type='range'] {
+    accent-color: var(--theme-highlight, #48dbfb);
 }
 
 /* ========================= */
 /* Reusable CSS Classes      */
 /* ========================= */
 .wplace-btn-primary {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 16px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .wplace-btn-secondary {
-  background: rgba(255,255,255,0.1);
-  color: white;
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 8px;
-  padding: 8px 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 .wplace-modern-card {
-  background: rgba(255,255,255,0.1);
-  border-radius: 12px;
-  padding: 18px;
-  border: 1px solid rgba(255,255,255,0.1);
-  backdrop-filter: blur(5px);
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
 }
 
 .wplace-gradient-text {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  font-weight: bold;
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: bold;
 }
 `;
   var EMBEDDED_THEMES = {
-    "classic-light": "/* WPlace Auto-Image Bot - Classic Light Theme */\n\n/* Clean, bright theme based on classic design with light backgrounds */\n\n.wplace-theme-classic-light {\n  /* === CORE COLORS === */\n  --wplace-primary: #fff;           /* Clean white */\n  --wplace-secondary: #f8f9fa;         /* Light gray */\n  --wplace-accent: #e9ecef;            /* Lighter gray */\n  --wplace-text: #212529;              /* Dark text */\n  --wplace-highlight: #6f42c1;         /* Purple highlight */\n  --wplace-success: #28a745;           /* Bootstrap green */\n  --wplace-error: #dc3545;             /* Bootstrap red */\n  --wplace-warning: #ffc107;           /* Bootstrap yellow */\n\n  /* === UI PROPERTIES === */\n  --wplace-radius: 8px;\n  --wplace-btn-radius: 12px;\n  --wplace-border-style: solid;\n  --wplace-border-width: 1px;\n  --wplace-border-color: #415a77;\n  --wplace-shadow: 0 8px 32px rgb(0 0 0 / 15%), 0 0 0 1px rgb(0 0 0 / 8%);\n  --wplace-backdrop: blur(10px);\n  --wplace-font: 'Segoe UI', roboto, sans-serif;\n\n  /* === EXTENDED COLOR PALETTE === */\n\n  /* Icon colors */\n  --wplace-icon-primary: #4facfe;      /* Light blue */\n  --wplace-icon-secondary: #00f2fe;    /* Cyan */\n  --wplace-icon-palette: #f093fb;      /* Pink */\n  \n  /* Additional UI colors */\n  --wplace-danger: #dc3545;            /* Bootstrap red */\n  --wplace-danger-dark: #c82333;       /* Darker red */\n  --wplace-muted-text: rgb(33 37 41 / 70%);\n  --wplace-highlight-secondary: #d3a4ff;\n  \n  /* Text variants */\n  --wplace-text-secondary: rgb(33 37 41 / 90%);\n  --wplace-text-muted: rgb(33 37 41 / 70%);\n  --wplace-text-dim: rgb(33 37 41 / 60%);\n  --wplace-text-faded: rgb(33 37 41 / 80%);\n\n  /* Background variants */\n  --wplace-bg-input:     #f3f3f3; /* neutral-100 */\n  --wplace-bg-subtle:    #f3f3f3; /* neutral-100 \u2014 hover */\n  --wplace-bg-faint:     #e0e0e0; /* neutral-200 */\n  --wplace-bg-ghost:     #d1d1d1; /* neutral-300 */\n  --wplace-bg-whisper:   #e0e0e0; /* can be used as whisper on hover */\n\n  /* Border variants */\n  --wplace-border-subtle:      #d1d1d1; /* neutral-300 */\n  --wplace-border-faint:       #e0e0e0; /* neutral-200 */\n  --wplace-border-ghost:       #e0e0e0; /* neutral-200 */\n  --wplace-border-ultra-faint: #e0e0e0; /* neutral-200 \u2014 very faint */\n  \n  /* Shadow variants */\n  --wplace-shadow-drag: 0 12px 40px rgb(0 0 0 / 20%), 0 0 0 2px rgb(111 66 193 / 30%);\n  --wplace-shadow-notification: 0 4px 12px rgb(0 0 0 / 15%);\n  --wplace-shadow-slider-thumb: 0 3px 6px rgb(0 0 0 / 20%), 0 0 0 2px var(--wplace-icon-primary);\n  --wplace-shadow-slider-hover: 0 4px 8px rgb(0 0 0 / 25%), 0 0 0 3px var(--wplace-icon-primary);\n  \n  /* Animation colors */\n  --wplace-pulse-start: rgb(40 167 69 / 70%);\n  --wplace-pulse-mid: rgb(40 167 69 / 0%);\n  --wplace-pulse-end: rgb(40 167 69 / 0%);\n  \n  /* Slider colors */\n  --wplace-slider-thumb-bg: #6f42c1;\n  --wplace-slider-track-bg: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);\n}\n\n/* === COMPONENT STYLING === */\n\n/* Main container with clean light styling */\n.wplace-theme-classic-light #wplace-image-bot-container {\n  background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%) !important;\n  color: var(--wplace-text) !important;\n  border: 1px solid rgb(0 0 0 / 15%) !important;\n  border-radius: 12px !important;\n  box-shadow: 0 8px 32px rgb(0 0 0 / 15%), 0 0 0 1px rgb(0 0 0 / 8%) !important;\n  font-family: 'Segoe UI', Roboto, sans-serif !important;\n  backdrop-filter: blur(10px) !important;\n}\n\n\n/* Stats container with proper contrast */\n.wplace-theme-classic-light #wplace-stats-container {\n  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;\n  border: 1px solid rgb(0 0 0 / 20%) !important;\n  border-radius: 12px !important;\n  box-shadow: 0 8px 32px rgb(0 0 0 / 15%) !important;\n  font-family: 'Segoe UI', Roboto, sans-serif !important;\n  color: var(--wplace-text) !important;\n  position: fixed !important;\n  overflow: hidden !important;\n  z-index: 9998 !important;\n}\n\n/* Headers with light gradient */\n.wplace-theme-classic-light .wplace-header {\n  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;\n  color: var(--wplace-highlight) !important;\n  border-bottom: 1px solid rgb(0 0 0 / 15%) !important;\n  text-shadow: none !important;\n}\n\n/* Stats header styling */\n.wplace-theme-classic-light #wplace-stats-container .wplace-header {\n  background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%) !important;\n  color: var(--wplace-text) !important;\n  border-bottom: 1px solid rgb(0 0 0 / 20%) !important;\n  text-shadow: none !important;\n  font-weight: 600 !important;\n}\n\n/* Stats title specific styling */\n.wplace-theme-classic-light #wplace-stats-container .wplace-header .wplace-stats-title {\n  color: var(--wplace-text) !important;\n  text-shadow: none !important;\n}\n\n/* Comprehensive text and element styling for light theme - scoped to bot containers only */\n\n.wplace-theme-classic-light .wplace-status,\n.wplace-theme-classic-light .wplace-stats,\n.wplace-theme-classic-light .wplace-section,\n.wplace-theme-classic-light .wplace-controls,\n.wplace-theme-classic-light .wplace-data-management,\n.wplace-theme-classic-light .wplace-cooldown-settings {\n  color: var(--wplace-text) !important;\n}\n\n/* Buttons with light styling */\n.wplace-theme-classic-light .wplace-btn {\n  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;\n  border: 1px solid rgb(0 0 0 / 20%) !important;\n  border-radius: 12px !important;\n  color: var(--wplace-text) !important;\n  font-family: 'Segoe UI', Roboto, sans-serif !important;\n  font-weight: 500 !important;\n  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;\n}\n\n/* Data management section buttons */\n.wplace-theme-classic-light .wplace-data-management .wplace-btn {\n  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;\n  border: 1px solid rgb(0 0 0 / 20%) !important;\n  color: #212529 !important;\n  font-weight: 500 !important;\n}\n\n.wplace-theme-classic-light .wplace-btn:hover:not(:disabled) {\n  background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%) !important;\n  box-shadow: 0 4px 12px rgb(0 0 0 / 15%) !important;\n  transform: translateY(-1px) !important;\n}\n\n.wplace-theme-classic-light .wplace-data-management .wplace-btn:hover:not(:disabled) {\n  background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%) !important;\n  box-shadow: 0 4px 12px rgb(0 0 0 / 15%) !important;\n}\n\n/* Settings dialog */\n.wplace-theme-classic-light #wplace-settings-container {\n  background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%) !important;\n  border: 1px solid rgb(0 0 0 / 15%) !important;\n  border-radius: 12px !important;\n  box-shadow: 0 16px 48px rgb(0 0 0 / 20%), 0 0 0 1px rgb(0 0 0 / 8%) !important;\n  font-family: 'Segoe UI', Roboto, sans-serif !important;\n  backdrop-filter: blur(10px) !important;\n  color: var(--wplace-text) !important;\n}\n\n/* Settings dialog text elements */\n.wplace-theme-classic-light .wplace-stat-colors-grid * {\n  color: var(--wplace-text) !important;\n  font-weight: 500 !important;\n}\n\n.wplace-theme-classic-light #wplace-settings-container * {\n  color: var(--wplace-text) !important;\n}\n\n.wplace-theme-classic-light #wplace-settings-container .wplace-settings-section-wrapper * {\n  color: var(--wplace-text) !important;\n}\n\n/* Color palette text labels */\n.wplace-theme-classic-light .wplace-color-label {\n  color: var(--wplace-text) !important;\n  font-weight: 500 !important;\n  text-shadow: none !important;\n}\n\n.wplace-theme-classic-light .wplace-color-name {\n  color: var(--wplace-text) !important;\n  font-weight: 500 !important;\n}\n\n.wplace-theme-classic-light .wplace-color-item-name {\n  color: #000 !important;\n  font-weight: 600 !important;\n  text-shadow: none !important;\n}\n\n/* Resize dialog */\n.wplace-theme-classic-light .resize-container {\n  background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%) !important;\n  border: 1px solid rgb(0 0 0 / 15%) !important;\n  border-radius: 12px !important;\n  box-shadow: 0 16px 48px rgb(0 0 0 / 20%), 0 0 0 1px rgb(0 0 0 / 8%) !important;\n  font-family: 'Segoe UI', Roboto, sans-serif !important;\n  backdrop-filter: blur(10px) !important;\n}\n\n/* Settings header */\n.wplace-theme-classic-light .wplace-settings-header {\n  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;\n  border-bottom: 1px solid rgb(0 0 0 / 15%) !important;\n}\n\n.wplace-theme-classic-light .wplace-settings-title {\n  color: var(--wplace-text) !important;\n  text-shadow: none !important;\n}\n\n.wplace-theme-classic-light .wplace-settings-close-btn {\n  background: rgb(0 0 0 / 5%) !important;\n  border: 1px solid rgb(0 0 0 / 20%) !important;\n  border-radius: 50% !important;\n  color: var(--wplace-text) !important;\n  transition: all 0.3s ease !important;\n}\n\n.wplace-theme-classic-light .wplace-settings-close-btn:hover {\n  background: rgb(220 53 69 / 10%) !important;\n  border-color: var(--wplace-error) !important;\n  box-shadow: 0 0 12px rgb(220 53 69 / 30%) !important;\n}\n\n/* Section titles */\n.wplace-theme-classic-light .wplace-section-title {\n  color: var(--wplace-highlight) !important;\n  text-shadow: none !important;\n  font-weight: 600 !important;\n}\n\n/* Button variants with classic light colors */\n.wplace-theme-classic-light .wplace-btn-start {\n  background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;\n  color: white !important;\n  font-weight: 600 !important;\n}\n\n.wplace-theme-classic-light .wplace-btn-start:hover:not(:disabled) {\n  box-shadow: 0 4px 12px rgb(40 167 69 / 40%) !important;\n}\n\n.wplace-theme-classic-light .wplace-btn-stop {\n  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;\n  color: white !important;\n  font-weight: 600 !important;\n}\n\n.wplace-theme-classic-light .wplace-btn-stop:hover:not(:disabled) {\n  box-shadow: 0 4px 12px rgb(220 53 69 / 40%) !important;\n}\n\n.wplace-theme-classic-light .wplace-btn-upload {\n  background: rgb(111 66 193 / 10%) !important;\n  border: 2px dashed var(--wplace-highlight) !important;\n  color: var(--wplace-highlight) !important;\n}\n\n.wplace-theme-classic-light .wplace-btn-upload:hover:not(:disabled) {\n  background: rgb(111 66 193 / 15%) !important;\n  box-shadow: 0 4px 12px rgb(111 66 193 / 20%) !important;\n}\n\n/* Progress bars with clean light styling */\n.wplace-theme-classic-light .wplace-progress {\n  background: rgb(0 0 0 / 10%) !important;\n  border: 1px solid rgb(0 0 0 / 15%) !important;\n  border-radius: 12px !important;\n}\n\n.wplace-theme-classic-light .wplace-progress-bar {\n  background: linear-gradient(135deg, #6f42c1 0%, #9370db 100%) !important;\n  box-shadow: none !important;\n}\n\n.wplace-theme-classic-light .wplace-progress-bar::after {\n  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 30%), transparent) !important;\n}\n\n/* Status indicators with light colors */\n.wplace-theme-classic-light .status-success {\n  background: rgb(40 167 69 / 10%) !important;\n  border-color: var(--wplace-success) !important;\n  color: var(--wplace-success) !important;\n  box-shadow: 0 0 15px rgb(40 167 69 / 20%) !important;\n  text-shadow: none !important;\n}\n\n.wplace-theme-classic-light .status-error {\n  background: rgb(220 53 69 / 10%) !important;\n  border-color: var(--wplace-error) !important;\n  color: var(--wplace-error) !important;\n  box-shadow: 0 0 15px rgb(220 53 69 / 20%) !important;\n  text-shadow: none !important;\n}\n\n.wplace-theme-classic-light .status-default {\n  background: rgb(111 66 193 / 10%) !important;\n  border-color: var(--wplace-highlight) !important;\n  color: var(--wplace-highlight) !important;\n  text-shadow: none !important;\n}\n\n.wplace-theme-classic-light .wplace-stat-label {\n  color: var(--wplace-text) !important;\n  text-shadow: none !important;\n  font-weight: 500 !important;\n}\n\n.wplace-theme-classic-light .wplace-stat-value {\n  color: var(--wplace-highlight) !important;\n  text-shadow: none !important;\n  font-weight: 600 !important;\n}\n\n/* Sections with light styling */\n.wplace-theme-classic-light .wplace-section {\n  background: rgb(0 0 0 / 3%) !important;\n  border: 1px solid rgb(0 0 0 / 10%) !important;\n  border-radius: 12px !important;\n}\n\n.wplace-theme-classic-light .wplace-status-section {\n  background: rgb(0 0 0 / 3%) !important;\n  border: 1px solid rgb(0 0 0 / 10%) !important;\n  border-radius: 12px !important;\n}\n\n.wplace-theme-classic-light .wplace-settings-section-wrapper {\n  background: rgb(0 0 0 / 3%) !important;\n  border: 1px solid rgb(0 0 0 / 10%) !important;\n  border-radius: 12px !important;\n}\n\n/* Form controls with light styling */\n.wplace-theme-classic-light .wplace-settings-select {\n  background: #fff !important;\n  border: 1px solid rgb(0 0 0 / 20%) !important;\n  border-radius: 8px !important;\n  color: var(--wplace-text) !important;\n  font-family: 'Segoe UI', Roboto, sans-serif !important;\n  box-shadow: 0 2px 8px rgb(0 0 0 / 10%) !important;\n}\n\n.wplace-theme-classic-light .wplace-settings-select:focus {\n  border-color: var(--wplace-highlight) !important;\n  box-shadow: 0 0 0 2px rgb(111 66 193 / 30%) !important;\n}\n\n/* Dropdown menu options */\n.wplace-theme-classic-light .wplace-settings-select option {\n  background: #fff !important;\n  color: var(--wplace-text) !important;\n}\n\n.wplace-theme-classic-light .wplace-settings-option {\n  background: #fff !important;\n  color: var(--wplace-text) !important;\n}\n\n/* Sliders with classic gradient */\n.wplace-theme-classic-light .wplace-speed-slider {\n  background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%) !important;\n  border-radius: 4px !important;\n}\n\n.wplace-theme-classic-light .wplace-overlay-opacity-slider {\n  background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%) !important;\n  border-radius: 4px !important;\n}\n\n.wplace-theme-classic-light .wplace-slider {\n  background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%) !important;\n  border-radius: 4px !important;\n}\n\n.wplace-theme-classic-light .wplace-slider::-webkit-slider-thumb {\n  -webkit-appearance: none;\n  width: 16px;\n  height: 16px;\n  border-radius: 50%;\n  background: var(--wplace-slider-thumb-bg);\n  border: 1px solid rgb(0 0 0 / 20%);\n  cursor: pointer;\n  transition: all 0.2s ease;\n  box-shadow: 0 2px 4px rgb(0 0 0 / 20%);\n}\n\n.wplace-theme-classic-light .wplace-speed-value {\n  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;\n  border-radius: 8px !important;\n  color: white !important;\n  font-weight: 600 !important;\n  box-shadow: 0 3px 10px rgb(79 172 254 / 30%) !important;\n  border: 1px solid rgb(0 0 0 / 10%) !important;\n}\n\n/* Settings labels */\n.wplace-theme-classic-light .wplace-settings-section-label {\n  color: var(--wplace-highlight) !important;\n  text-shadow: none !important;\n  font-family: 'Segoe UI', Roboto, sans-serif !important;\n  font-weight: 600 !important;\n}\n\n/* Icon colors for classic light theme */\n.wplace-theme-classic-light .wplace-icon-key { color: #4facfe; }\n.wplace-theme-classic-light .wplace-icon-robot { color: #4facfe; }\n.wplace-theme-classic-light .wplace-icon-speed { color: #4facfe; }\n.wplace-theme-classic-light .wplace-icon-bell { color: #ffc107; }\n.wplace-theme-classic-light .wplace-icon-palette { color: #f093fb; }\n.wplace-theme-classic-light .wplace-icon-globe { color: #ffeaa7; }\n.wplace-theme-classic-light .wplace-icon-paint { color: #4facfe; }\n.wplace-theme-classic-light .wplace-icon-eye { color: #6f42c1; }\n\n/* Clean light theme animations */\n@keyframes light-shimmer {\n  0% {\n    transform: translateX(-100%);\n  }\n\n  100% {\n    transform: translateX(200%);\n  }\n}\n\n/* Turnstile/CF checkbox overlay - CRITICAL FIX */\n.wplace-theme-classic-light .wplace-turnstile-overlay {\n  background: rgb(255 255 255 / 98%) !important;\n  border-radius: 12px !important;\n  box-shadow: 0 8px 32px rgb(0 0 0 / 30%) !important;\n  backdrop-filter: blur(10px) !important;\n  border: 1px solid rgb(0 0 0 / 20%) !important;\n  color: var(--wplace-text) !important;\n  font-family: 'Segoe UI', Roboto, sans-serif !important;\n}\n\n.wplace-theme-classic-light .wplace-turnstile-title {\n  color: var(--wplace-text) !important;\n}\n\n.wplace-theme-classic-light .wplace-turnstile-hide-btn {\n  color: var(--wplace-text) !important;\n  border: 1px solid rgb(0 0 0 / 20%) !important;\n  border-radius: 6px !important;\n  background: rgb(0 0 0 / 5%) !important;\n}\n\n.wplace-theme-classic-light .wplace-turnstile-hide-btn:hover {\n  background: rgb(0 0 0 / 10%) !important;\n}\n\n/* Dual control layout styling for classic light theme */\n.wplace-theme-classic-light .wplace-dual-control-compact {\n  display: flex;\n  flex-direction: row;\n  align-items: center;\n  gap: 12px;\n  margin: 8px 0;\n  flex-wrap: wrap;\n}\n\n.wplace-theme-classic-light .wplace-slider-container-compact {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  flex: 1;\n  min-width: 160px;\n}\n\n.wplace-theme-classic-light .wplace-speed-slider-container-compact {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  flex: 1;\n  min-width: 160px;\n}\n\n.wplace-theme-classic-light .wplace-input-group-compact {\n  display: flex;\n  align-items: center;\n  gap: 4px;\n  flex-shrink: 0;\n}\n\n.wplace-theme-classic-light .wplace-input-btn-compact {\n  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);\n  color: white;\n  border: none;\n  border-radius: 4px;\n  width: 22px;\n  height: 22px;\n  cursor: pointer;\n  font-weight: bold;\n  font-size: 12px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  transition: all 0.2s ease;\n  box-shadow: 0 2px 4px rgba(0,0,0,0.2);\n}\n\n.wplace-theme-classic-light .wplace-input-btn-compact:hover {\n  transform: translateY(-1px);\n  box-shadow: 0 4px 8px rgba(0,0,0,0.3);\n  background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);\n}\n\n.wplace-theme-classic-light .wplace-input-btn-compact:active {\n  transform: translateY(0);\n  box-shadow: 0 2px 4px rgba(0,0,0,0.2);\n}\n\n.wplace-theme-classic-light .wplace-number-input-compact {\n  background: #fff;\n  border: 1px solid rgb(0 0 0 / 20%);\n  border-radius: 4px;\n  color: var(--wplace-text);\n  padding: 4px 8px;\n  font-size: 12px;\n  width: 50px;\n  text-align: center;\n  transition: all 0.2s ease;\n  height: 22px;\n}\n\n.wplace-theme-classic-light .wplace-number-input-compact:focus {\n  outline: none;\n  border-color: #4facfe;\n  box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.3);\n  background: #f8f9fa;\n}\n\n.wplace-theme-classic-light .wplace-input-label-compact {\n  color: var(--wplace-text);\n  font-size: 11px;\n  margin-left: 4px;\n  white-space: nowrap;\n}\n\n.wplace-theme-classic-light .wplace-batch-size-header {\n  margin-bottom: 8px;\n}\n\n.wplace-theme-classic-light .wplace-batch-size-label {\n  color: var(--wplace-highlight);\n  font-weight: 500;\n  font-size: 13px;\n}\n\n/* Cooldown control styling for classic light theme */\n.wplace-theme-classic-light .wplace-cooldown-control {\n  margin: 12px 0;\n}\n\n.wplace-theme-classic-light .wplace-cooldown-control label {\n  color: var(--wplace-highlight);\n  font-weight: 500;\n  font-size: 13px;\n  margin-bottom: 8px;\n  display: block;\n}\n\n/* Color swatches with light styling */\n.wplace-theme-classic-light .wplace-color-swatch {\n  border: 1px solid rgb(0 0 0 / 20%) !important;\n  border-radius: 4px !important;\n  box-shadow: 0 2px 8px rgb(0 0 0 / 10%) !important;\n}\n\n.wplace-theme-classic-light .wplace-color-swatch:hover {\n  box-shadow: 0 4px 16px rgb(111 66 193 / 30%) !important;\n  transform: translateY(-1px);\n}\n\n.wplace-theme-classic-light .wplace-stat-colors-grid {\n  background: rgb(0 0 0 / 5%) !important;\n  border-radius: 8px !important;\n  border: 1px solid rgb(0 0 0 / 10%) !important;\n}\n\n/* Alert styling for classic light theme */\n.wplace-theme-classic-light .wplace-alert-base {\n  border-radius: var(--wplace-radius) !important;\n  font-family: 'Segoe UI', Roboto, sans-serif !important;\n  box-shadow: 0 8px 32px rgb(0 0 0 / 25%), 0 0 0 1px rgb(0 0 0 / 10%) !important;\n  backdrop-filter: blur(10px) !important;\n}\n\n.wplace-theme-classic-light .wplace-alert-info {\n  background: linear-gradient(135deg, #3498db, #2980b9) !important;\n  color: white !important;\n  box-shadow: 0 8px 32px rgb(52 152 219 / 30%), 0 0 0 1px rgb(0 0 0 / 10%) !important;\n}\n\n.wplace-theme-classic-light .wplace-alert-success {\n  background: linear-gradient(135deg, #28a745, #20c997) !important;\n  color: white !important;\n  box-shadow: 0 8px 32px rgb(40 167 69 / 30%), 0 0 0 1px rgb(0 0 0 / 10%) !important;\n}\n\n.wplace-theme-classic-light .wplace-alert-warning {\n  background: linear-gradient(135deg, #ffc107, #ff8c00) !important;\n  color: #000 !important;\n  box-shadow: 0 8px 32px rgb(255 193 7 / 30%), 0 0 0 1px rgb(0 0 0 / 10%) !important;\n}\n\n.wplace-theme-classic-light .wplace-alert-error {\n  background: linear-gradient(135deg, #dc3545, #c82333) !important;\n  color: white !important;\n  box-shadow: 0 8px 32px rgb(220 53 69 / 30%), 0 0 0 1px rgb(0 0 0 / 10%) !important;\n}\n\n/* Input field styling for light theme - Higher specificity */\nbody .wplace-theme-classic-light .wplace-speed-input,\nbody .wplace-theme-classic-light .wplace-cooldown-input,\n.wplace-theme-classic-light .wplace-speed-input,\n.wplace-theme-classic-light .wplace-cooldown-input {\n  background: #f8f9fa !important;\n  border: 1px solid #d1d1d1 !important;\n  color: #212529 !important;\n  border-radius: 6px !important;\n}\n\nbody .wplace-theme-classic-light .wplace-speed-input:focus,\nbody .wplace-theme-classic-light .wplace-cooldown-input:focus,\n.wplace-theme-classic-light .wplace-speed-input:focus,\n.wplace-theme-classic-light .wplace-cooldown-input:focus {\n  background: #ffffff !important;\n  border-color: #6f42c1 !important;\n  color: #212529 !important;\n  box-shadow: 0 0 0 2px rgba(111, 66, 193, 0.2) !important;\n}\n\n/* Input group background for light theme - Higher specificity */\nbody .wplace-theme-classic-light .wplace-speed-input-group,\nbody .wplace-theme-classic-light .wplace-cooldown-input-group,\n.wplace-theme-classic-light .wplace-speed-input-group,\n.wplace-theme-classic-light .wplace-cooldown-input-group {\n  background: #e9ecef !important;\n  border: 1px solid #d1d1d1 !important;\n  border-radius: 8px !important;\n}\n\n/* Button styling for light theme - Higher specificity */\nbody .wplace-theme-classic-light .wplace-input-btn-small,\n.wplace-theme-classic-light .wplace-input-btn-small {\n  background: #ffffff !important;\n  border: 1px solid #d1d1d1 !important;\n  color: #212529 !important;\n  border-radius: 6px !important;\n  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;\n}\n\nbody .wplace-theme-classic-light .wplace-input-btn-small:hover,\n.wplace-theme-classic-light .wplace-input-btn-small:hover {\n  background: #f8f9fa !important;\n  border-color: #6f42c1 !important;\n  color: #212529 !important;\n  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15) !important;\n}\n\nbody .wplace-theme-classic-light .wplace-input-btn-small:active,\n.wplace-theme-classic-light .wplace-input-btn-small:active {\n  background: #e9ecef !important;\n  color: #212529 !important;\n  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1) !important;\n}\n",
-    "classic": `/* WPlace Auto-Image Bot - Classic Theme */
-/* Clean, modern UI with gradients and subtle effects */
-
-.wplace-theme-classic {
-  --wplace-primary: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
-  --wplace-secondary: linear-gradient(135deg, #111 0%, #2a2a2a 100%);
-  --wplace-accent: #222;
-  --wplace-text: #fff;
-  --wplace-highlight: #775ce3;
-  --wplace-success: #0f0;
-  --wplace-error: #f00;
-  --wplace-warning: #fa0;
-  --wplace-radius: 12px;
-  --wplace-btn-radius: 16px;
-  --wplace-shadow: 0 8px 32px rgb(0 0 0 / 60%), 0 0 0 1px rgb(255 255 255 / 10%);
-  --wplace-backdrop: blur(10px);
-  --wplace-font: 'Segoe UI', roboto, sans-serif;
-  --wplace-scanline: 0;
-  --wplace-pixel-blink: 0;
-
-  /* Icon colors */
-  --wplace-icon-primary: #4facfe;
-  --wplace-icon-secondary: #00f2fe;
-  --wplace-icon-palette: #f093fb;
-  
-  /* Additional UI colors */
-  --wplace-danger: #ff6a6a;
-  --wplace-danger-dark: #ff4757;
-  --wplace-muted-text: #fffB;
-  --wplace-highlight-secondary: #d3a4ff;
-  
-  /* Slider colors */
-  --wplace-slider-track-bg: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
-}
-
-/* Classic theme container styling */
-:root #wplace-image-bot-container,
-.wplace-theme-classic #wplace-image-bot-container {
-  background: var(--wplace-primary);
-  color: var(--wplace-text);
-  border-radius: var(--wplace-radius);
-  box-shadow: var(--wplace-shadow);
-  font-family: var(--wplace-font);
-  backdrop-filter: var(--wplace-backdrop);
-  border: var(--wplace-border-width) var(--wplace-border-style) var(--wplace-border-color);
-}
-
-:root #wplace-stats-container,
-.wplace-theme-classic #wplace-stats-container {
-  background: var(--wplace-primary);
-  color: var(--wplace-text);
-  border-radius: var(--wplace-radius);
-  box-shadow: var(--wplace-shadow);
-  font-family: var(--wplace-font);
-  backdrop-filter: var(--wplace-backdrop);
-  border: var(--wplace-border-width) var(--wplace-border-style) var(--wplace-border-color);
-}
-
-:root #wplace-settings-container,
-.wplace-theme-classic #wplace-settings-container {
-  background: var(--wplace-primary);
-  color: var(--wplace-text);
-  border-radius: var(--wplace-radius);
-  box-shadow: var(--wplace-shadow);
-  font-family: var(--wplace-font);
-  backdrop-filter: var(--wplace-backdrop);
-  border: var(--wplace-border-width) var(--wplace-border-style) var(--wplace-border-color);
-}
-
-:root .wplace-header,
-.wplace-theme-classic .wplace-header {
-  background: var(--wplace-secondary);
-  color: var(--wplace-highlight);
-  text-shadow: 0 1px 2px rgb(0 0 0 / 50%);
-}
-
-:root .wplace-section-title,
-.wplace-theme-classic .wplace-section-title {
-  color: var(--wplace-highlight);
-}
-
-:root .wplace-stat-value,
-.wplace-theme-classic .wplace-stat-value {
-  color: var(--wplace-highlight);
-}
-
-:root .wplace-status-section,
-.wplace-theme-classic .wplace-status-section {
-  border-radius: var(--wplace-radius);
-  background: rgb(255 255 255 / 3%);
-  border: 1px solid rgb(255 255 255 / 10%);
-}
-
-:root .wplace-section,
-.wplace-theme-classic .wplace-section {
-  border-radius: var(--wplace-radius);
-  background: rgb(255 255 255 / 3%);
-}
-
-:root .wplace-stats,
-.wplace-theme-classic .wplace-stats {
-  border-radius: var(--wplace-radius);
-  background: rgb(255 255 255 / 3%);
-  border: 1px solid rgb(255 255 255 / 10%);
-}
-
-:root .wplace-status,
-.wplace-theme-classic .wplace-status {
-  border-radius: var(--wplace-radius);
-}
-
-:root .wplace-alert-base,
-.wplace-theme-classic .wplace-alert-base {
-  border-radius: var(--wplace-radius);
-  font-family: var(--wplace-font);
-}
-
-:root .wplace-settings-container-base,
-.wplace-theme-classic .wplace-settings-container-base {
-  font-family: var(--wplace-font);
-  border-radius: var(--wplace-radius);
-  background: var(--wplace-primary);
-  color: var(--wplace-text);
-  box-shadow: var(--wplace-shadow);
-  backdrop-filter: var(--wplace-backdrop);
-}
-
-/* Button styling for classic theme */
-:root .wplace-btn,
-.wplace-theme-classic .wplace-btn {
-  background: linear-gradient(135deg, #222 0%, #4a4a4a 100%);
-  border: 1px solid rgb(255 255 255 / 10%);
-  color: var(--wplace-text);
-  border-radius: var(--wplace-btn-radius);
-  font-family: var(--wplace-font);
-}
-
-:root .wplace-btn::before,
-.wplace-theme-classic .wplace-btn::before {
-  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 10%), transparent);
-}
-
-:root .wplace-btn:disabled,
-.wplace-theme-classic .wplace-btn:disabled {
-  box-shadow: none !important;
-}
-
-:root .wplace-btn:hover:not(:disabled),
-.wplace-theme-classic .wplace-btn:hover:not(:disabled) {
-  box-shadow: 0 4px 12px rgb(0 0 0 / 40%);
-}
-
-:root .wplace-btn-overlay.active,
-.wplace-theme-classic .wplace-btn-overlay.active {
-  background: linear-gradient(135deg, #29b6f6 0%, #8e2de2 100%);
-  box-shadow: 0 0 15px #8e2de2;
-}
-
-/* Button variants - exact upstream main colors */
-:root .wplace-btn-primary,
-.wplace-theme-classic .wplace-btn-primary {
-  background: linear-gradient(135deg, #222 0%, #6a5acd 100%);
-  color: var(--wplace-text);
-}
-
-:root .wplace-btn-upload,
-.wplace-theme-classic .wplace-btn-upload {
-  background: linear-gradient(135deg, #111 0%, #4a4a4a 100%);
-  color: var(--wplace-text);
-  border: 1px dashed var(--wplace-highlight) !important;
-}
-
-:root .wplace-btn-start,
-.wplace-theme-classic .wplace-btn-start {
-  background: linear-gradient(135deg, var(--wplace-success) 0%, #228b22 100%);
-  color: white;
-}
-
-:root .wplace-btn-stop,
-.wplace-theme-classic .wplace-btn-stop {
-  background: linear-gradient(135deg, var(--wplace-error) 0%, #dc143c 100%);
-  color: white;
-}
-
-:root .wplace-btn-select,
-.wplace-theme-classic .wplace-btn-select {
-  background: linear-gradient(135deg, var(--wplace-highlight) 0%, #9370db 100%);
-  color: white;
-}
-
-:root .wplace-btn-file,
-.wplace-theme-classic .wplace-btn-file {
-  background: linear-gradient(135deg, #ff8c00 0%, #ff7f50 100%);
-  color: white;
-}
-
-:root .wplace-btn.active,
-:root .wplace-btn[aria-pressed="true"],
-.wplace-theme-classic .wplace-btn.active,
-.wplace-theme-classic .wplace-btn[aria-pressed="true"] {
-  background: var(--wplace-highlight) !important;
-  color: #000 !important;
-  border-color: var(--wplace-text) !important;
-  box-shadow: 0 0 8px rgb(0 0 0 / 25%) inset, 0 0 6px rgb(0 0 0 / 20%) !important;
-}
-
-:root .wplace-btn.active i,
-:root .wplace-btn[aria-pressed="true"] i,
-.wplace-theme-classic .wplace-btn.active i,
-.wplace-theme-classic .wplace-btn[aria-pressed="true"] i {
-  filter: drop-shadow(0 0 3px #000); 
-}
-
-:root .mask-mode-group .wplace-btn.active,
-:root .mask-mode-group .wplace-btn[aria-pressed="true"],
-.wplace-theme-classic .mask-mode-group .wplace-btn.active,
-.wplace-theme-classic .mask-mode-group .wplace-btn[aria-pressed="true"] {
-  background: var(--wplace-highlight);
-  color: #000;
-  border-color: var(--wplace-text);
-  box-shadow: 0 0 8px rgb(0 0 0 / 25%) inset, 0 0 6px rgb(0 0 0 / 20%);
-}
-
-/* Status styling for classic theme */
-:root .status-default,
-.wplace-theme-classic .status-default {
-  background: rgb(255 255 255 / 10%);
-  border-color: var(--wplace-text);
-  color: var(--wplace-text);
-}
-
-:root .status-success,
-.wplace-theme-classic .status-success {
-  background: rgb(0 255 0 / 10%);
-  border-color: var(--wplace-success);
-  color: var(--wplace-success);
-  box-shadow: 0 0 15px var(--wplace-success);
-}
-
-:root .status-error,
-.wplace-theme-classic .status-error {
-  background: rgb(255 0 0 / 10%);
-  border-color: var(--wplace-error);
-  color: var(--wplace-error);
-  box-shadow: 0 0 15px var(--wplace-error);
-}
-
-:root .status-warning,
-.wplace-theme-classic .status-warning {
-  background: rgb(255 165 0 / 10%);
-  border-color: var(--wplace-warning);
-  color: var(--wplace-warning);
-  box-shadow: 0 0 15px var(--wplace-warning);
-}
-
-:root .wplace-status.status-default,
-.wplace-theme-classic .wplace-status.status-default {
-  color: var(--wplace-text);
-  background: rgb(255 255 255 / 10%);
-  border-color: var(--wplace-text);
-}
-
-/* Alert styling for classic theme */
-:root .wplace-alert-info,
-.wplace-theme-classic .wplace-alert-info {
-  background: linear-gradient(135deg, #3498db, #2980b9);
-  box-shadow: 0 4px 12px rgb(52 152 219 / 30%);
-}
-
-:root .wplace-alert-success,
-.wplace-theme-classic .wplace-alert-success {
-  background: linear-gradient(135deg, #27ae60, #229954);
-  box-shadow: 0 4px 12px rgb(39 174 96 / 30%);
-}
-
-:root .wplace-alert-warning,
-.wplace-theme-classic .wplace-alert-warning {
-  background: linear-gradient(135deg, #f39c12, #e67e22);
-  box-shadow: 0 4px 12px rgb(243 156 18 / 30%);
-}
-
-:root .wplace-alert-error,
-.wplace-theme-classic .wplace-alert-error {
-  background: linear-gradient(135deg, #e74c3c, #c0392b);
-  box-shadow: 0 4px 12px rgb(231 76 60 / 30%);
-}
-
-/* Progress bar styling for classic theme */
-:root .wplace-progress,
-.wplace-theme-classic .wplace-progress {
-  background: rgb(0 0 0 / 30%);
-  border: 1px solid rgb(255 255 255 / 10%);
-  border-radius: var(--wplace-radius);
-}
-
-:root .wplace-progress-bar,
-.wplace-theme-classic .wplace-progress-bar {
-  background: linear-gradient(135deg, var(--wplace-highlight) 0%, #9370db 100%);
-}
-
-:root .wplace-progress-bar::after,
-.wplace-theme-classic .wplace-progress-bar::after {
-  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 30%), transparent);
-}
-
-/* Header and sections styling for classic theme */
-:root .wplace-header-btn,
-.wplace-theme-classic .wplace-header-btn {
-  background: rgb(255 255 255 / 10%);
-  color: var(--wplace-highlight);
-  border-radius: 4px;
-  font-family: var(--wplace-font);
-}
-
-:root .wplace-header-btn:hover,
-.wplace-theme-classic .wplace-header-btn:hover {
-  background: #222;
-  color: var(--wplace-text);
-}
-
-/* Font and typography for classic theme */
-:root .wplace-turnstile-overlay,
-.wplace-theme-classic .wplace-turnstile-overlay {
-  background: rgb(0 0 0 / 90%) !important;
-  border-radius: var(--wplace-radius) !important;
-  box-shadow: 0 8px 32px rgb(0 0 0 / 40%) !important;
-  backdrop-filter: var(--wplace-backdrop) !important;
-  border: 1px solid rgb(255 255 255 / 20%) !important;
-  color: var(--wplace-text) !important;
-  font-family: var(--wplace-font) !important;
-}
-
-/* Auto light/dark support for classic theme */
-@media (prefers-color-scheme: light) {
-  :root .theme-auto,
-  .wplace-theme-classic .theme-auto {
-    --wplace-primary: #fff;
-    --wplace-secondary: #f5f5f5;
-    --wplace-accent: #007acc;
-    --wplace-text: #333;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  :root .theme-auto,
-  .wplace-theme-classic .theme-auto {
-    --wplace-primary: #1e1e1e;
-    --wplace-secondary: #2d2d30;
-    --wplace-accent: var(--wplace-highlight);
-    --wplace-text: #fff;
-  }
-}
-
-/* Border and color styling for classic theme */
-:root .wplace-color-item-name,
-.wplace-theme-classic .wplace-color-item-name {
-  color: #ccc;
-}
-
-:root .wplace-color-swatch,
-.wplace-theme-classic .wplace-color-swatch {
-  border: 1px solid rgb(255 255 255 / 20%);
-  border-radius: 4px;
-}
-
-:root .wplace-stat-color-swatch,
-.wplace-theme-classic .wplace-stat-color-swatch {
-  border-radius: 3px;
-  border: 1px solid rgb(255 255 255 / 10%);
-  box-shadow: inset 0 0 2px rgb(0 0 0 / 50%);
-}
-
-:root .resize-tools button,
-.wplace-theme-classic .resize-tools button {
-  border-radius: 6px;
-  border: 1px solid rgb(255 255 255 / 20%);
-  background: rgb(255 255 255 / 6%);
-  color: #fff;
-}
-
-:root .resize-slider,
-.wplace-theme-classic .resize-slider {
-  background: #ccc;
-  border-radius: var(--wplace-radius);
-}
-
-/* Text effects and filters for classic theme */
-:root .wplace-color-swatch:not(.active),
-.wplace-theme-classic .wplace-color-swatch:not(.active) {
-  filter: grayscale(80%);
-}
-
-:root .wplace-color-swatch.unavailable,
-.wplace-theme-classic .wplace-color-swatch.unavailable {
-  border-color: #666;
-}
-
-:root .wplace-color-swatch.unavailable:not(.active),
-.wplace-theme-classic .wplace-color-swatch.unavailable:not(.active) {
-  filter: grayscale(90%);
-}
-
-:root .wplace-color-swatch.active::after,
-.wplace-theme-classic .wplace-color-swatch.active::after {
-  text-shadow: 0 0 3px black;
-}
-
-/* Icon colors for classic theme */
-:root .wplace-icon-key,
-.wplace-theme-classic .wplace-icon-key {
-  color: #4facfe; 
-}
-
-:root .wplace-icon-robot,
-.wplace-theme-classic .wplace-icon-robot {
-  color: #4facfe; 
-}
-
-:root .wplace-icon-speed,
-.wplace-theme-classic .wplace-icon-speed {
-  color: #4facfe; 
-}
-
-:root .wplace-icon-bell,
-.wplace-theme-classic .wplace-icon-bell {
-  color: #ffd166; 
-}
-
-:root .wplace-icon-palette,
-.wplace-theme-classic .wplace-icon-palette {
-  color: #f093fb; 
-}
-
-:root .wplace-icon-globe,
-.wplace-theme-classic .wplace-icon-globe {
-  color: #ffeaa7;
-}
-
-:root .wplace-icon-paint,
-.wplace-theme-classic .wplace-icon-paint {
-  color: #4facfe;
-}
-
-:root .wplace-icon-eye,
-.wplace-theme-classic .wplace-icon-eye {
-  color: var(--wplace-highlight);
-}
-
-/* Form controls and sliders for classic theme */
-:root .wplace-slider,
-.wplace-theme-classic .wplace-slider {
-  background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
-  border-radius: 4px;
-}
-
-:root .wplace-slider::-webkit-slider-thumb,
-.wplace-theme-classic .wplace-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--wplace-slider-thumb-bg);
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-:root .wplace-speed-slider,
-.wplace-theme-classic .wplace-speed-slider {
-  background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
-  border-radius: 4px;
-}
-
-:root .wplace-speed-slider::-webkit-slider-thumb,
-.wplace-theme-classic .wplace-speed-slider::-webkit-slider-thumb {
-  border-radius: 50%;
-  border: 2px solid;
-}
-
-:root .wplace-speed-slider::-moz-range-thumb,
-.wplace-theme-classic .wplace-speed-slider::-moz-range-thumb {
-  border-radius: 50%;
-  border: 2px solid;
-}
-
-:root .wplace-turnstile-title,
-.wplace-theme-classic .wplace-turnstile-title {
-  color: var(--wplace-text) !important;
-}
-
-:root .wplace-turnstile-hide-btn,
-.wplace-theme-classic .wplace-turnstile-hide-btn {
-  color: var(--wplace-text) !important;
-  border: 1px solid rgb(255 255 255 / 20%) !important;
-  border-radius: 6px !important;
-}
-
-:root .wplace-turnstile-hide-btn:hover,
-.wplace-theme-classic .wplace-turnstile-hide-btn:hover {
-  background: rgb(255 255 255 / 10%) !important;
-}
-
-:root .wplace-settings-select,
-.wplace-theme-classic .wplace-settings-select {
-  background: rgb(255 255 255 / 15%);
-  color: white;
-  border: 1px solid rgb(255 255 255 / 20%);
-  border-radius: 8px;
-  box-shadow: 0 3px 10px rgb(0 0 0 / 10%);
-}
-
-:root .wplace-settings-option,
-.wplace-theme-classic .wplace-settings-option {
-  background: #2d3748;
-  color: white;
-}
-
-:root .wplace-stat-colors-grid,
-.wplace-theme-classic .wplace-stat-colors-grid {
-  background: rgb(0 0 0 / 20%);
-  border-radius: 4px;
-}
-
-:root .resize-overlay,
-.wplace-theme-classic .resize-overlay {
-  background: rgb(0 0 0 / 80%);
-}
-
-:root .wplace-overlay,
-.wplace-theme-classic .wplace-overlay {
-  background: rgb(0 0 0 / 80%);
-}
-
-:root .wplace-settings-error,
-.wplace-theme-classic .wplace-settings-error {
-  background: rgb(255 0 0 / 40%) !important;
-}
-
-/* Settings sections and batch controls for classic theme */
-:root .wplace-settings-section-wrapper,
-.wplace-theme-classic .wplace-settings-section-wrapper {
-  background: rgb(255 255 255 / 10%);
-  border-radius: var(--wplace-radius);
-  border: 1px solid rgb(255 255 255 / 10%);
-}
-
-:root .wplace-batch-controls,
-.wplace-theme-classic .wplace-batch-controls {
-  background: rgb(255 255 255 / 10%);
-  border-radius: var(--wplace-radius);
-  border: 1px solid rgb(255 255 255 / 10%);
-}
-
-:root .wplace-overlay-opacity-slider,
-.wplace-theme-classic .wplace-overlay-opacity-slider {
-  background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
-  border-radius: 4px;
-}
-
-:root .wplace-speed-value,
-.wplace-theme-classic .wplace-speed-value {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-  border-radius: 8px;
-  color: white;
-  box-shadow: 0 3px 10px rgb(79 172 254 / 30%);
-  border: 1px solid rgb(255 255 255 / 20%);
-}
-
-/* Additional elements for classic theme */
-:root .wplace-color-divider,
-.wplace-theme-classic .wplace-color-divider {
-  background: rgb(255 255 255 / 10%);
-}
-
-:root .wplace-settings-select option,
-.wplace-theme-classic .wplace-settings-select option {
-  background: #2d3748;
-  color: white;
-}
-
-:root .wplace-settings-description,
-.wplace-theme-classic .wplace-settings-description {
-  color: rgb(255 255 255 / 70%);
-}
-
-:root .wplace-settings-apply-btn,
-.wplace-theme-classic .wplace-settings-apply-btn {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-  color: white;
-  border-radius: 8px;
-}
-
-/* Dual control layout styling for classic theme */
-:root .wplace-dual-control-compact,
-.wplace-theme-classic .wplace-dual-control-compact {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 12px;
-  margin: 8px 0;
-  flex-wrap: wrap;
-}
-
-:root .wplace-slider-container-compact,
-.wplace-theme-classic .wplace-slider-container-compact {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-  min-width: 160px;
-}
-
-:root .wplace-speed-slider-container-compact,
-.wplace-theme-classic .wplace-speed-slider-container-compact {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-  min-width: 160px;
-}
-
-:root .wplace-input-group-compact,
-.wplace-theme-classic .wplace-input-group-compact {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  flex-shrink: 0;
-}
-
-:root .wplace-input-btn-compact,
-.wplace-theme-classic .wplace-input-btn-compact {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  width: 22px;
-  height: 22px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-
-:root .wplace-input-btn-compact:hover,
-.wplace-theme-classic .wplace-input-btn-compact:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-  background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
-}
-
-:root .wplace-input-btn-compact:active,
-.wplace-theme-classic .wplace-input-btn-compact:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-
-:root .wplace-number-input-compact,
-.wplace-theme-classic .wplace-number-input-compact {
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 4px;
-  color: white;
-  padding: 4px 8px;
-  font-size: 12px;
-  width: 50px;
-  text-align: center;
-  transition: all 0.2s ease;
-  height: 22px;
-}
-
-:root .wplace-number-input-compact:focus,
-.wplace-theme-classic .wplace-number-input-compact:focus {
-  outline: none;
-  border-color: #4facfe;
-  box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.3);
-  background: rgba(255,255,255,0.15);
-}
-
-:root .wplace-input-label-compact,
-.wplace-theme-classic .wplace-input-label-compact {
-  color: rgba(255,255,255,0.8);
-  font-size: 11px;
-  margin-left: 4px;
-  white-space: nowrap;
-}
-
-:root .wplace-batch-size-header,
-.wplace-theme-classic .wplace-batch-size-header {
-  margin-bottom: 8px;
-}
-
-:root .wplace-batch-size-label,
-.wplace-theme-classic .wplace-batch-size-label {
-  color: var(--wplace-highlight);
-  font-weight: 500;
-  font-size: 13px;
-}
-
-/* Cooldown control styling for classic theme */
-:root .wplace-cooldown-control,
-.wplace-theme-classic .wplace-cooldown-control {
-  margin: 12px 0;
-}
-
-:root .wplace-cooldown-control label,
-.wplace-theme-classic .wplace-cooldown-control label {
-  color: var(--wplace-highlight);
-  font-weight: 500;
-  font-size: 13px;
-  margin-bottom: 8px;
-  display: block;
-}
-/* Resize dialog styling for classic theme */
-:root .resize-container,
-.wplace-theme-classic .resize-container {
-  background: #000;
-  border: 1px solid #fff;
-  border-radius: 12px;
-  box-shadow: 0 0 20px rgb(0 0 0 / 50%);
-}
-`,
-    "neon": "/* WPlace Auto-Image Bot - Neon Theme */\n/* Retro cyberpunk aesthetic with green neon glow effects */\n\n.wplace-theme-neon {\n  /* Neon theme colors - matching upstream main neon theme */\n  --wplace-primary: #1a1a2e;\n  --wplace-secondary: #16213e;\n  --wplace-accent: #0f3460;\n  --wplace-text: #00ff41;\n  --wplace-highlight: #ff6b35;\n  --wplace-success: #39ff14;\n  --wplace-error: #ff073a;\n  --wplace-warning: #ff0;\n\n  /* Neon UI properties */\n  --wplace-radius: 0;\n  --wplace-border-style: solid;\n  --wplace-border-width: 2px;\n  --wplace-border-color: #00ff41;\n  --wplace-shadow: 0 0 20px rgb(0 255 65 / 30%), inset 0 0 20px rgb(0 255 65 / 10%);\n  --wplace-backdrop: none;\n  --wplace-font: 'Press Start 2P', monospace, 'Courier New';\n\n  /* Z-index layers */\n  --wplace-z-overlay: 10000;\n  --wplace-z-alert: 10002;\n  --wplace-z-settings: 10002;\n\n  /* Feature toggles */\n  --wplace-scanline: 1;\n  --wplace-pixel-blink: 1;\n\n  /* Icon colors - neon variants */\n  --wplace-icon-primary: #00ff41;\n  --wplace-icon-secondary: #39ff14;\n  --wplace-icon-palette: #ff6b35;\n  \n  /* Additional UI colors - neon variants */\n  --wplace-danger: #ff073a;\n  --wplace-danger-dark: #cc0531;\n  --wplace-muted-text: #00ff4180;\n  --wplace-highlight-secondary: #fa0;\n  \n  /* Text variants - neon style */\n  --wplace-text-secondary: #00ff41dd;\n  --wplace-text-muted: #00ff41bb;\n  --wplace-text-dim: #00ff4199;\n  --wplace-text-faded: #00ff41cc;\n  \n  /* Background variants - neon style */\n  --wplace-bg-input: rgb(0 255 65 / 15%);\n  --wplace-bg-subtle: rgb(0 255 65 / 8%);\n  --wplace-bg-faint: rgb(0 255 65 / 5%);\n  --wplace-bg-ghost: rgb(0 255 65 / 3%);\n  --wplace-bg-whisper: rgb(0 255 65 / 2%);\n  \n  /* Border variants - neon style */\n  --wplace-border-subtle: rgb(0 255 65 / 40%);\n  --wplace-border-faint: rgb(0 255 65 / 25%);\n  --wplace-border-ghost: rgb(0 255 65 / 15%);\n  --wplace-border-ultra-faint: rgb(0 255 65 / 8%);\n  \n  /* Shadow variants - neon style */\n  --wplace-shadow-drag: 0 12px 40px rgb(0 255 65 / 60%), 0 0 0 2px rgb(0 255 65 / 80%), 0 0 20px rgb(0 255 65 / 30%);\n  --wplace-shadow-notification: 0 4px 12px rgb(0 255 65 / 40%), 0 0 15px rgb(0 255 65 / 20%);\n  --wplace-shadow-slider-thumb: 0 3px 6px rgb(0 255 65 / 50%), 0 0 0 2px var(--wplace-icon-primary), 0 0 10px rgb(0 255 65 / 30%);\n  --wplace-shadow-slider-hover: 0 4px 8px rgb(0 255 65 / 60%), 0 0 0 3px var(--wplace-icon-primary), 0 0 15px rgb(0 255 65 / 40%);\n  \n  /* Animation colors - neon style */\n  --wplace-pulse-start: rgb(0 255 65 / 80%);\n  --wplace-pulse-mid: rgb(0 255 65 / 0%);\n  --wplace-pulse-end: rgb(0 255 65 / 0%);\n  \n  /* Slider colors - neon style */\n  --wplace-slider-thumb-bg: #00ff41;\n}\n\n/* Neon-specific styling overrides */\n.wplace-theme-neon #wplace-image-bot-container {\n  background: var(--wplace-primary) !important;\n  border: 2px solid var(--wplace-text) !important;\n  border-radius: 0 !important;\n  box-shadow: 0 0 20px var(--wplace-text), inset 0 0 20px rgb(0 255 65 / 10%) !important;\n  font-family: var(--wplace-font) !important;\n}\n\n.wplace-theme-neon #wplace-stats-container {\n  background: var(--wplace-primary) !important;\n  border: 2px solid var(--wplace-text) !important;\n  border-radius: 0 !important;\n  box-shadow: 0 0 20px var(--wplace-text), inset 0 0 20px rgb(0 255 65 / 10%) !important;\n  font-family: var(--wplace-font) !important;\n  position: fixed !important;\n  overflow: hidden !important;\n  z-index: 9998 !important;\n}\n\n.wplace-theme-neon .wplace-header {\n  background: var(--wplace-secondary) !important;\n  border-bottom: 1px solid var(--wplace-text) !important;\n  color: var(--wplace-text) !important;\n  text-shadow: 0 0 10px var(--wplace-text) !important;\n  font-family: var(--wplace-font) !important;\n}\n\n.wplace-theme-neon .wplace-section {\n  background: rgb(22 33 62 / 50%) !important;\n  border: 1px solid var(--wplace-text) !important;\n  border-radius: 0 !important;\n}\n\n.wplace-theme-neon .wplace-status-section {\n  background: rgb(22 33 62 / 50%) !important;\n  border: 1px solid var(--wplace-text) !important;\n  border-radius: 0 !important;\n}\n\n.wplace-theme-neon .wplace-section-title {\n  color: var(--wplace-text) !important;\n  text-shadow: 0 0 8px var(--wplace-text) !important;\n  text-transform: uppercase !important;\n  font-family: var(--wplace-font) !important;\n  font-size: 10px !important;\n}\n\n.wplace-theme-neon .wplace-btn {\n  background: var(--wplace-secondary) !important;\n  border: 1px solid var(--wplace-text) !important;\n  border-radius: 0 !important;\n  color: var(--wplace-text) !important;\n  text-shadow: 0 0 5px var(--wplace-text) !important;\n  font-family: var(--wplace-font) !important;\n  font-size: 9px !important;\n  text-transform: uppercase !important;\n}\n\n/* Pixel blinking and neon glow animation for buttons */\n.wplace-theme-neon .wplace-btn:hover:not(:disabled) {\n  box-shadow: 0 0 15px var(--wplace-text), inset 0 0 15px rgb(0 255 65 / 10%) !important;\n  animation: pixel-blink 0.5s infinite, neon-glow 1s ease-in-out infinite alternate !important;\n}\n\n.wplace-theme-neon .wplace-btn-start {\n  background: var(--wplace-secondary) !important;\n  border-color: var(--wplace-success) !important;\n  color: var(--wplace-success) !important;\n  text-shadow: 0 0 8px var(--wplace-success) !important;\n}\n\n.wplace-theme-neon .wplace-btn-stop {\n  background: var(--wplace-secondary) !important;\n  border-color: var(--wplace-error) !important;\n  color: var(--wplace-error) !important;\n  text-shadow: 0 0 8px var(--wplace-error) !important;\n}\n\n.wplace-theme-neon .wplace-btn-upload {\n  background: var(--wplace-secondary) !important;\n  border: 1px dashed var(--wplace-highlight) !important;\n  color: var(--wplace-highlight) !important;\n  text-shadow: 0 0 8px var(--wplace-highlight) !important;\n}\n\n.wplace-theme-neon .wplace-btn-select {\n  background: var(--wplace-secondary) !important;\n  border-color: var(--wplace-highlight) !important;\n  color: var(--wplace-highlight) !important;\n  text-shadow: 0 0 8px var(--wplace-highlight) !important;\n}\n\n.wplace-theme-neon .wplace-btn-file {\n  background: var(--wplace-secondary) !important;\n  border-color: var(--wplace-warning) !important;\n  color: var(--wplace-warning) !important;\n  text-shadow: 0 0 8px var(--wplace-warning) !important;\n}\n\n.wplace-theme-neon .wplace-progress {\n  background: rgb(0 0 0 / 80%) !important;\n  border: 1px solid var(--wplace-text) !important;\n  border-radius: 0 !important;\n}\n\n.wplace-theme-neon .wplace-progress-bar {\n  background: linear-gradient(90deg, var(--wplace-success) 0%, var(--wplace-text) 100%) !important;\n  box-shadow: 0 0 10px var(--wplace-success) !important;\n}\n\n.wplace-theme-neon .wplace-stat-value {\n  color: var(--wplace-text) !important;\n  text-shadow: 0 0 5px var(--wplace-text) !important;\n}\n\n.wplace-theme-neon .status-success {\n  background: rgb(57 255 20 / 10%) !important;\n  border-color: var(--wplace-success) !important;\n  color: var(--wplace-success) !important;\n  box-shadow: 0 0 15px var(--wplace-success) !important;\n  text-shadow: 0 0 8px var(--wplace-success) !important;\n}\n\n.wplace-theme-neon .status-error {\n  background: rgb(255 7 58 / 10%) !important;\n  border-color: var(--wplace-error) !important;\n  color: var(--wplace-error) !important;\n  box-shadow: 0 0 15px var(--wplace-error) !important;\n  text-shadow: 0 0 8px var(--wplace-error) !important;\n}\n\n.wplace-theme-neon .status-default {\n  background: rgb(0 255 65 / 10%) !important;\n  border-color: var(--wplace-text) !important;\n  color: var(--wplace-text) !important;\n  text-shadow: 0 0 5px var(--wplace-text) !important;\n}\n\n/* Settings dialog neon styling */\n.wplace-theme-neon #wplace-settings-container {\n  background: var(--wplace-primary) !important;\n  border: 2px solid var(--wplace-text) !important;\n  border-radius: 0 !important;\n  box-shadow: 0 0 30px var(--wplace-text), inset 0 0 30px rgb(0 255 65 / 10%) !important;\n  font-family: var(--wplace-font) !important;\n}\n\n.wplace-theme-neon .wplace-settings-header {\n  background: var(--wplace-secondary) !important;\n  border-bottom: 1px solid var(--wplace-text) !important;\n}\n\n.wplace-theme-neon .wplace-settings-header h3 {\n  color: var(--wplace-text) !important;\n  text-shadow: 0 0 10px var(--wplace-text) !important;\n  font-family: var(--wplace-font) !important;\n  font-size: 16px !important;\n  text-transform: uppercase !important;\n}\n\n.wplace-theme-neon .wplace-settings-close-btn {\n  background: var(--wplace-secondary) !important;\n  border: 1px solid var(--wplace-text) !important;\n  border-radius: 0 !important;\n  color: var(--wplace-text) !important;\n}\n\n.wplace-theme-neon .wplace-settings-close-btn:hover {\n  background: var(--wplace-error) !important;\n  box-shadow: 0 0 15px var(--wplace-error) !important;\n}\n\n.wplace-theme-neon .wplace-settings-section-wrapper {\n  background: rgb(22 33 62 / 30%) !important;\n  border: 1px solid var(--wplace-text) !important;\n  border-radius: 0 !important;\n}\n\n.wplace-theme-neon .wplace-settings-select {\n  background: var(--wplace-secondary) !important;\n  border: 1px solid var(--wplace-text) !important;\n  border-radius: 0 !important;\n  color: var(--wplace-text) !important;\n  font-family: var(--wplace-font) !important;\n  font-size: 11px !important;\n}\n\n.wplace-theme-neon .wplace-settings-section-label {\n  color: var(--wplace-text) !important;\n  text-shadow: 0 0 8px var(--wplace-text) !important;\n  font-family: var(--wplace-font) !important;\n  font-size: 12px !important;\n  text-transform: uppercase !important;\n}\n\n.wplace-theme-neon .wplace-speed-value {\n  background: var(--wplace-secondary) !important;\n  border: 1px solid var(--wplace-text) !important;\n  border-radius: 0 !important;\n  color: var(--wplace-text) !important;\n  text-shadow: 0 0 8px var(--wplace-text) !important;\n  font-family: var(--wplace-font) !important;\n  box-shadow: 0 0 10px rgb(0 255 65 / 30%) !important;\n}\n\n.wplace-theme-neon .wplace-overlay-opacity-value {\n  background: var(--wplace-secondary) !important;\n  border: 1px solid var(--wplace-text) !important;\n  border-radius: 0 !important;\n  color: var(--wplace-text) !important;\n  text-shadow: 0 0 5px var(--wplace-text) !important;\n}\n\n/* Neon slider styling */\n.wplace-theme-neon .wplace-slider,\n.wplace-theme-neon .wplace-speed-slider,\n.wplace-theme-neon .wplace-overlay-opacity-slider {\n  background: var(--wplace-secondary) !important;\n  border: 1px solid var(--wplace-text) !important;\n  border-radius: 0 !important;\n  box-shadow: 0 0 10px rgb(0 255 65 / 30%) !important;\n}\n\n.wplace-theme-neon .wplace-slider::-webkit-slider-thumb,\n.wplace-theme-neon .wplace-speed-slider::-webkit-slider-thumb,\n.wplace-theme-neon .wplace-overlay-opacity-slider::-webkit-slider-thumb {\n  -webkit-appearance: none;\n  width: 16px;\n  height: 16px;\n  border-radius: 0 !important;\n  background: var(--wplace-slider-thumb-bg) !important;\n  border: 2px solid var(--wplace-text) !important;\n  cursor: pointer;\n  transition: all 0.2s ease;\n  box-shadow: 0 0 8px rgb(0 255 65 / 50%) !important;\n}\n\n.wplace-theme-neon .wplace-slider::-webkit-slider-thumb:hover,\n.wplace-theme-neon .wplace-speed-slider::-webkit-slider-thumb:hover,\n.wplace-theme-neon .wplace-overlay-opacity-slider::-webkit-slider-thumb:hover {\n  transform: scale(1.1);\n  box-shadow: 0 0 15px var(--wplace-text) !important;\n}\n\n/* Scanline animation for neon theme */\n.wplace-theme-neon #wplace-image-bot-container::before {\n  content: '';\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  height: 2px;\n  background: linear-gradient(90deg, transparent, var(--wplace-text), transparent);\n  z-index: 1;\n  pointer-events: none;\n  animation: scanline 3s linear infinite;\n  opacity: 0.7;\n}\n\n\n.wplace-theme-neon #wplace-stats-container::before {\n  content: '';\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  height: 2px;\n  background: linear-gradient(90deg, transparent, var(--wplace-text), transparent);\n  z-index: 1;\n  pointer-events: none;\n  animation: scanline-stats 4s linear infinite;\n  opacity: 0.7;\n}\n\n\n/* Text glow animations */\n@keyframes neon-glow {\n  0%, 100% {\n    text-shadow: 0 0 5px currentcolor, 0 0 10px currentcolor, 0 0 15px currentcolor;\n  }\n\n  50% {\n    text-shadow: 0 0 2px currentcolor, 0 0 5px currentcolor, 0 0 8px currentcolor;\n  }\n}\n\n@keyframes pixel-blink {\n  0%, 50% {\n    opacity: 1;\n  }\n\n  51%, 100% {\n    opacity: 0.7;\n  }\n}\n\n@keyframes scanline {\n  0% {\n    transform: translateY(-100%);\n  }\n\n  100% {\n    transform: translateY(400px);\n  }\n}\n\n@keyframes scanline-stats {\n  0% {\n    transform: translateY(-100%);\n  }\n\n  100% {\n    transform: translateY(300px);\n  }\n}\n\n/* Dual control layout styling for neon theme */\n.wplace-theme-neon .wplace-dual-control-compact {\n  display: flex;\n  flex-direction: row;\n  align-items: center;\n  gap: 8px;\n  margin: 6px 0;\n  flex-wrap: wrap;\n}\n\n.wplace-theme-neon .wplace-slider-container-compact {\n  display: flex;\n  align-items: center;\n  gap: 6px;\n  flex: 1;\n  min-width: 160px;\n}\n\n.wplace-theme-neon .wplace-speed-slider-container-compact {\n  display: flex;\n  align-items: center;\n  gap: 6px;\n  flex: 1;\n  min-width: 160px;\n}\n\n.wplace-theme-neon .wplace-input-group-compact {\n  display: flex;\n  align-items: center;\n  gap: 3px;\n  flex-shrink: 0;\n}\n\n.wplace-theme-neon .wplace-input-btn-compact {\n  background: var(--wplace-secondary) !important;\n  border: 1px solid var(--wplace-text) !important;\n  border-radius: 0 !important;\n  font-family: 'Press Start 2P', monospace !important;\n  box-shadow: 0 0 20px var(--wplace-text), inset 0 0 10px rgb(0 255 65 / 10%) !important;\n  backdrop-filter: none !important;\n  font-size: 10px !important;\n  text-transform: uppercase !important;\n}\n\n/* Alert styling for neon theme */\n.wplace-theme-neon .wplace-alert-base {\n  border: 2px solid var(--wplace-text) !important;\n  border-radius: 0 !important;\n  font-family: 'Press Start 2P', monospace !important;\n  box-shadow: 0 0 20px var(--wplace-text), inset 0 0 10px rgb(0 255 65 / 10%) !important;\n  backdrop-filter: none !important;\n  font-size: 10px !important;\n  text-transform: uppercase !important;\n}\n\n.wplace-theme-neon .wplace-alert-info {\n  background: var(--wplace-primary) !important;\n  color: var(--wplace-text) !important;\n  border-color: var(--wplace-text) !important;\n  text-shadow: 0 0 8px var(--wplace-text) !important;\n  box-shadow: 0 0 20px var(--wplace-text), inset 0 0 10px rgb(0 255 65 / 10%) !important;\n}\n\n.wplace-theme-neon .wplace-alert-success {\n  background: var(--wplace-primary) !important;\n  color: var(--wplace-success) !important;\n  border-color: var(--wplace-success) !important;\n  text-shadow: 0 0 8px var(--wplace-success) !important;\n  box-shadow: 0 0 20px var(--wplace-success), inset 0 0 10px rgb(57 255 20 / 10%) !important;\n}\n\n.wplace-theme-neon .wplace-alert-warning {\n  background: var(--wplace-primary) !important;\n  color: var(--wplace-warning) !important;\n  border-color: var(--wplace-warning) !important;\n  text-shadow: 0 0 8px var(--wplace-warning) !important;\n  box-shadow: 0 0 20px var(--wplace-warning), inset 0 0 10px rgb(255 255 0 / 10%) !important;\n}\n\n.wplace-theme-neon .wplace-alert-error {\n  background: var(--wplace-primary) !important;\n  color: var(--wplace-error) !important;\n  border-color: var(--wplace-error) !important;\n  text-shadow: 0 0 8px var(--wplace-error) !important;\n  box-shadow: 0 0 20px var(--wplace-error), inset 0 0 10px rgb(255 7 58 / 10%) !important;\n}\n\n/* Cooldown control styling for neon theme */\n.wplace-theme-neon .wplace-cooldown-control {\n  margin: 8px 0;\n}\n\n.wplace-theme-neon .wplace-cooldown-control label {\n  color: var(--wplace-text) !important;\n  font-weight: 500;\n  font-size: 11px;\n  text-shadow: 0 0 8px var(--wplace-text) !important;\n  font-family: var(--wplace-font) !important;\n  text-transform: uppercase;\n  margin-bottom: 6px;\n  display: block;\n}\n\n/* Resize dialog styling for neon theme */\n.wplace-theme-neon .resize-container {\n  background: #1a1a2e !important;\n  border: 3px solid #00ff41 !important;\n  border-radius: 0 !important;\n  box-shadow: 0 0 30px rgb(0 255 65 / 50%) !important;\n  font-family: 'Press Start 2P', monospace !important;\n}\n\n/* Input field styling for neon theme */\n.wplace-theme-neon .wplace-speed-input,\n.wplace-theme-neon .wplace-cooldown-input {\n  background: var(--wplace-secondary) !important;\n  border: 2px solid var(--wplace-text) !important;\n  border-radius: 0 !important;\n  color: var(--wplace-text) !important;\n  text-shadow: 0 0 8px var(--wplace-text) !important;\n  font-family: 'Press Start 2P', monospace !important;\n  font-size: 10px !important;\n  box-shadow: 0 0 10px rgb(0 255 65 / 30%) !important;\n  text-align: center !important;\n  width: 50px !important;\n}\n\n.wplace-theme-neon .wplace-speed-input:focus,\n.wplace-theme-neon .wplace-cooldown-input:focus {\n  background: var(--wplace-primary) !important;\n  box-shadow: 0 0 20px var(--wplace-text), inset 0 0 10px rgb(0 255 65 / 20%) !important;\n  text-shadow: 0 0 12px var(--wplace-text) !important;\n}\n\n/* Button styling for neon theme */\n.wplace-theme-neon .wplace-input-btn-small {\n  background: var(--wplace-secondary) !important;\n  border: 2px solid var(--wplace-text) !important;\n  border-radius: 0 !important;\n  color: var(--wplace-text) !important;\n  text-shadow: 0 0 8px var(--wplace-text) !important;\n  font-family: 'Press Start 2P', monospace !important;\n  font-size: 10px !important;\n  width: 24px !important;\n  height: 24px !important;\n  box-shadow: 0 0 10px rgb(0 255 65 / 30%) !important;\n}\n\n.wplace-theme-neon .wplace-input-btn-small:hover {\n  box-shadow: 0 0 20px var(--wplace-text), inset 0 0 15px rgb(0 255 65 / 20%) !important;\n  animation: pixel-blink 0.5s infinite, neon-glow 1s ease-in-out infinite alternate !important;\n}\n\n/* Speed/Cooldown unit labels for neon theme */\n.wplace-theme-neon .wplace-speed-unit,\n.wplace-theme-neon .wplace-cooldown-unit {\n  color: var(--wplace-text) !important;\n  text-shadow: 0 0 8px var(--wplace-text) !important;\n  font-family: 'Press Start 2P', monospace !important;\n  font-size: 9px !important;\n  text-transform: uppercase !important;\n}\n\n/* Min/Max labels for neon theme */\n.wplace-theme-neon .wplace-speed-labels {\n  padding: 0 !important;\n  width: 100% !important;\n  min-height: 16px !important;\n}\n\n.wplace-theme-neon .wplace-speed-min,\n.wplace-theme-neon .wplace-speed-max {\n  color: var(--wplace-text) !important;\n  text-shadow: 0 0 8px var(--wplace-text) !important;\n  font-family: 'Press Start 2P', monospace !important;\n  font-size: 9px !important;\n  text-transform: uppercase !important;\n  gap: 6px !important;\n}\n\n.wplace-theme-neon .wplace-speed-min i,\n.wplace-theme-neon .wplace-speed-max i {\n  text-shadow: 0 0 5px currentColor !important;\n}\n\n"
+    "classic-light": "/* WPlace Auto-Image Bot - Classic Light Theme */\n\n/* Clean, bright theme based on classic design with light backgrounds */\n\n.wplace-theme-classic-light {\n    /* === CORE COLORS === */\n    --wplace-primary: #fff; /* Clean white */\n    --wplace-secondary: #f8f9fa; /* Light gray */\n    --wplace-accent: #e9ecef; /* Lighter gray */\n    --wplace-text: #212529; /* Dark text */\n    --wplace-highlight: #6f42c1; /* Purple highlight */\n    --wplace-success: #28a745; /* Bootstrap green */\n    --wplace-error: #dc3545; /* Bootstrap red */\n    --wplace-warning: #ffc107; /* Bootstrap yellow */\n\n    /* === UI PROPERTIES === */\n    --wplace-radius: 8px;\n    --wplace-btn-radius: 12px;\n    --wplace-border-style: solid;\n    --wplace-border-width: 1px;\n    --wplace-border-color: #415a77;\n    --wplace-shadow: 0 8px 32px rgb(0 0 0 / 15%), 0 0 0 1px rgb(0 0 0 / 8%);\n    --wplace-backdrop: blur(10px);\n    --wplace-font: 'Segoe UI', roboto, sans-serif;\n\n    /* === EXTENDED COLOR PALETTE === */\n\n    /* Icon colors */\n    --wplace-icon-primary: #4facfe; /* Light blue */\n    --wplace-icon-secondary: #00f2fe; /* Cyan */\n    --wplace-icon-palette: #f093fb; /* Pink */\n\n    /* Additional UI colors */\n    --wplace-danger: #dc3545; /* Bootstrap red */\n    --wplace-danger-dark: #c82333; /* Darker red */\n    --wplace-muted-text: rgb(33 37 41 / 70%);\n    --wplace-highlight-secondary: #d3a4ff;\n\n    /* Text variants */\n    --wplace-text-secondary: rgb(33 37 41 / 90%);\n    --wplace-text-muted: rgb(33 37 41 / 70%);\n    --wplace-text-dim: rgb(33 37 41 / 60%);\n    --wplace-text-faded: rgb(33 37 41 / 80%);\n\n    /* Background variants */\n    --wplace-bg-input: #f3f3f3; /* neutral-100 */\n    --wplace-bg-subtle: #f3f3f3; /* neutral-100 \u2014 hover */\n    --wplace-bg-faint: #e0e0e0; /* neutral-200 */\n    --wplace-bg-ghost: #d1d1d1; /* neutral-300 */\n    --wplace-bg-whisper: #e0e0e0; /* can be used as whisper on hover */\n\n    /* Border variants */\n    --wplace-border-subtle: #d1d1d1; /* neutral-300 */\n    --wplace-border-faint: #e0e0e0; /* neutral-200 */\n    --wplace-border-ghost: #e0e0e0; /* neutral-200 */\n    --wplace-border-ultra-faint: #e0e0e0; /* neutral-200 \u2014 very faint */\n\n    /* Shadow variants */\n    --wplace-shadow-drag:\n        0 12px 40px rgb(0 0 0 / 20%), 0 0 0 2px rgb(111 66 193 / 30%);\n    --wplace-shadow-notification: 0 4px 12px rgb(0 0 0 / 15%);\n    --wplace-shadow-slider-thumb:\n        0 3px 6px rgb(0 0 0 / 20%), 0 0 0 2px var(--wplace-icon-primary);\n    --wplace-shadow-slider-hover:\n        0 4px 8px rgb(0 0 0 / 25%), 0 0 0 3px var(--wplace-icon-primary);\n\n    /* Animation colors */\n    --wplace-pulse-start: rgb(40 167 69 / 70%);\n    --wplace-pulse-mid: rgb(40 167 69 / 0%);\n    --wplace-pulse-end: rgb(40 167 69 / 0%);\n\n    /* Slider colors */\n    --wplace-slider-thumb-bg: #6f42c1;\n    --wplace-slider-track-bg: linear-gradient(\n        to right,\n        #4facfe 0%,\n        #00f2fe 100%\n    );\n}\n\n/* === COMPONENT STYLING === */\n\n/* Main container with clean light styling */\n.wplace-theme-classic-light #wplace-image-bot-container {\n    background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%) !important;\n    color: var(--wplace-text) !important;\n    border: 1px solid rgb(0 0 0 / 15%) !important;\n    border-radius: 12px !important;\n    box-shadow:\n        0 8px 32px rgb(0 0 0 / 15%),\n        0 0 0 1px rgb(0 0 0 / 8%) !important;\n    font-family: 'Segoe UI', Roboto, sans-serif !important;\n    backdrop-filter: blur(10px) !important;\n}\n\n/* Stats container with proper contrast */\n.wplace-theme-classic-light #wplace-stats-container {\n    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;\n    border: 1px solid rgb(0 0 0 / 20%) !important;\n    border-radius: 12px !important;\n    box-shadow: 0 8px 32px rgb(0 0 0 / 15%) !important;\n    font-family: 'Segoe UI', Roboto, sans-serif !important;\n    color: var(--wplace-text) !important;\n    position: fixed !important;\n    overflow: hidden !important;\n    z-index: 9998 !important;\n}\n\n/* Headers with light gradient */\n.wplace-theme-classic-light .wplace-header {\n    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;\n    color: var(--wplace-highlight) !important;\n    border-bottom: 1px solid rgb(0 0 0 / 15%) !important;\n    text-shadow: none !important;\n}\n\n/* Stats header styling */\n.wplace-theme-classic-light #wplace-stats-container .wplace-header {\n    background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%) !important;\n    color: var(--wplace-text) !important;\n    border-bottom: 1px solid rgb(0 0 0 / 20%) !important;\n    text-shadow: none !important;\n    font-weight: 600 !important;\n}\n\n/* Stats title specific styling */\n.wplace-theme-classic-light\n    #wplace-stats-container\n    .wplace-header\n    .wplace-stats-title {\n    color: var(--wplace-text) !important;\n    text-shadow: none !important;\n}\n\n/* Comprehensive text and element styling for light theme - scoped to bot containers only */\n\n.wplace-theme-classic-light .wplace-status,\n.wplace-theme-classic-light .wplace-stats,\n.wplace-theme-classic-light .wplace-section,\n.wplace-theme-classic-light .wplace-controls,\n.wplace-theme-classic-light .wplace-data-management,\n.wplace-theme-classic-light .wplace-cooldown-settings {\n    color: var(--wplace-text) !important;\n}\n\n/* Buttons with light styling */\n.wplace-theme-classic-light .wplace-btn {\n    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;\n    border: 1px solid rgb(0 0 0 / 20%) !important;\n    border-radius: 12px !important;\n    color: var(--wplace-text) !important;\n    font-family: 'Segoe UI', Roboto, sans-serif !important;\n    font-weight: 500 !important;\n    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;\n}\n\n/* Data management section buttons */\n.wplace-theme-classic-light .wplace-data-management .wplace-btn {\n    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;\n    border: 1px solid rgb(0 0 0 / 20%) !important;\n    color: #212529 !important;\n    font-weight: 500 !important;\n}\n\n.wplace-theme-classic-light .wplace-btn:hover:not(:disabled) {\n    background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%) !important;\n    box-shadow: 0 4px 12px rgb(0 0 0 / 15%) !important;\n    transform: translateY(-1px) !important;\n}\n\n.wplace-theme-classic-light\n    .wplace-data-management\n    .wplace-btn:hover:not(:disabled) {\n    background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%) !important;\n    box-shadow: 0 4px 12px rgb(0 0 0 / 15%) !important;\n}\n\n/* Settings dialog */\n.wplace-theme-classic-light #wplace-settings-container {\n    background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%) !important;\n    border: 1px solid rgb(0 0 0 / 15%) !important;\n    border-radius: 12px !important;\n    box-shadow:\n        0 16px 48px rgb(0 0 0 / 20%),\n        0 0 0 1px rgb(0 0 0 / 8%) !important;\n    font-family: 'Segoe UI', Roboto, sans-serif !important;\n    backdrop-filter: blur(10px) !important;\n    color: var(--wplace-text) !important;\n}\n\n/* Settings dialog text elements */\n.wplace-theme-classic-light .wplace-stat-colors-grid * {\n    color: var(--wplace-text) !important;\n    font-weight: 500 !important;\n}\n\n.wplace-theme-classic-light #wplace-settings-container * {\n    color: var(--wplace-text) !important;\n}\n\n.wplace-theme-classic-light\n    #wplace-settings-container\n    .wplace-settings-section-wrapper\n    * {\n    color: var(--wplace-text) !important;\n}\n\n/* Color palette text labels */\n.wplace-theme-classic-light .wplace-color-label {\n    color: var(--wplace-text) !important;\n    font-weight: 500 !important;\n    text-shadow: none !important;\n}\n\n.wplace-theme-classic-light .wplace-color-name {\n    color: var(--wplace-text) !important;\n    font-weight: 500 !important;\n}\n\n.wplace-theme-classic-light .wplace-color-item-name {\n    color: #000 !important;\n    font-weight: 600 !important;\n    text-shadow: none !important;\n}\n\n/* Resize dialog */\n.wplace-theme-classic-light .resize-container {\n    background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%) !important;\n    border: 1px solid rgb(0 0 0 / 15%) !important;\n    border-radius: 12px !important;\n    box-shadow:\n        0 16px 48px rgb(0 0 0 / 20%),\n        0 0 0 1px rgb(0 0 0 / 8%) !important;\n    font-family: 'Segoe UI', Roboto, sans-serif !important;\n    backdrop-filter: blur(10px) !important;\n}\n\n/* Settings header */\n.wplace-theme-classic-light .wplace-settings-header {\n    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;\n    border-bottom: 1px solid rgb(0 0 0 / 15%) !important;\n}\n\n.wplace-theme-classic-light .wplace-settings-title {\n    color: var(--wplace-text) !important;\n    text-shadow: none !important;\n}\n\n.wplace-theme-classic-light .wplace-settings-close-btn {\n    background: rgb(0 0 0 / 5%) !important;\n    border: 1px solid rgb(0 0 0 / 20%) !important;\n    border-radius: 50% !important;\n    color: var(--wplace-text) !important;\n    transition: all 0.3s ease !important;\n}\n\n.wplace-theme-classic-light .wplace-settings-close-btn:hover {\n    background: rgb(220 53 69 / 10%) !important;\n    border-color: var(--wplace-error) !important;\n    box-shadow: 0 0 12px rgb(220 53 69 / 30%) !important;\n}\n\n/* Section titles */\n.wplace-theme-classic-light .wplace-section-title {\n    color: var(--wplace-highlight) !important;\n    text-shadow: none !important;\n    font-weight: 600 !important;\n}\n\n/* Button variants with classic light colors */\n.wplace-theme-classic-light .wplace-btn-start {\n    background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;\n    color: white !important;\n    font-weight: 600 !important;\n}\n\n.wplace-theme-classic-light .wplace-btn-start:hover:not(:disabled) {\n    box-shadow: 0 4px 12px rgb(40 167 69 / 40%) !important;\n}\n\n.wplace-theme-classic-light .wplace-btn-stop {\n    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;\n    color: white !important;\n    font-weight: 600 !important;\n}\n\n.wplace-theme-classic-light .wplace-btn-stop:hover:not(:disabled) {\n    box-shadow: 0 4px 12px rgb(220 53 69 / 40%) !important;\n}\n\n.wplace-theme-classic-light .wplace-btn-upload {\n    background: rgb(111 66 193 / 10%) !important;\n    border: 2px dashed var(--wplace-highlight) !important;\n    color: var(--wplace-highlight) !important;\n}\n\n.wplace-theme-classic-light .wplace-btn-upload:hover:not(:disabled) {\n    background: rgb(111 66 193 / 15%) !important;\n    box-shadow: 0 4px 12px rgb(111 66 193 / 20%) !important;\n}\n\n/* Progress bars with clean light styling */\n.wplace-theme-classic-light .wplace-progress {\n    background: rgb(0 0 0 / 10%) !important;\n    border: 1px solid rgb(0 0 0 / 15%) !important;\n    border-radius: 12px !important;\n}\n\n.wplace-theme-classic-light .wplace-progress-bar {\n    background: linear-gradient(135deg, #6f42c1 0%, #9370db 100%) !important;\n    box-shadow: none !important;\n}\n\n.wplace-theme-classic-light .wplace-progress-bar::after {\n    background: linear-gradient(\n        90deg,\n        transparent,\n        rgb(255 255 255 / 30%),\n        transparent\n    ) !important;\n}\n\n/* Status indicators with light colors */\n.wplace-theme-classic-light .status-success {\n    background: rgb(40 167 69 / 10%) !important;\n    border-color: var(--wplace-success) !important;\n    color: var(--wplace-success) !important;\n    box-shadow: 0 0 15px rgb(40 167 69 / 20%) !important;\n    text-shadow: none !important;\n}\n\n.wplace-theme-classic-light .status-error {\n    background: rgb(220 53 69 / 10%) !important;\n    border-color: var(--wplace-error) !important;\n    color: var(--wplace-error) !important;\n    box-shadow: 0 0 15px rgb(220 53 69 / 20%) !important;\n    text-shadow: none !important;\n}\n\n.wplace-theme-classic-light .status-default {\n    background: rgb(111 66 193 / 10%) !important;\n    border-color: var(--wplace-highlight) !important;\n    color: var(--wplace-highlight) !important;\n    text-shadow: none !important;\n}\n\n.wplace-theme-classic-light .wplace-stat-label {\n    color: var(--wplace-text) !important;\n    text-shadow: none !important;\n    font-weight: 500 !important;\n}\n\n.wplace-theme-classic-light .wplace-stat-value {\n    color: var(--wplace-highlight) !important;\n    text-shadow: none !important;\n    font-weight: 600 !important;\n}\n\n/* Sections with light styling */\n.wplace-theme-classic-light .wplace-section {\n    background: rgb(0 0 0 / 3%) !important;\n    border: 1px solid rgb(0 0 0 / 10%) !important;\n    border-radius: 12px !important;\n}\n\n.wplace-theme-classic-light .wplace-status-section {\n    background: rgb(0 0 0 / 3%) !important;\n    border: 1px solid rgb(0 0 0 / 10%) !important;\n    border-radius: 12px !important;\n}\n\n.wplace-theme-classic-light .wplace-settings-section-wrapper {\n    background: rgb(0 0 0 / 3%) !important;\n    border: 1px solid rgb(0 0 0 / 10%) !important;\n    border-radius: 12px !important;\n}\n\n/* Form controls with light styling */\n.wplace-theme-classic-light .wplace-settings-select {\n    background: #fff !important;\n    border: 1px solid rgb(0 0 0 / 20%) !important;\n    border-radius: 8px !important;\n    color: var(--wplace-text) !important;\n    font-family: 'Segoe UI', Roboto, sans-serif !important;\n    box-shadow: 0 2px 8px rgb(0 0 0 / 10%) !important;\n}\n\n.wplace-theme-classic-light .wplace-settings-select:focus {\n    border-color: var(--wplace-highlight) !important;\n    box-shadow: 0 0 0 2px rgb(111 66 193 / 30%) !important;\n}\n\n/* Dropdown menu options */\n.wplace-theme-classic-light .wplace-settings-select option {\n    background: #fff !important;\n    color: var(--wplace-text) !important;\n}\n\n.wplace-theme-classic-light .wplace-settings-option {\n    background: #fff !important;\n    color: var(--wplace-text) !important;\n}\n\n/* Sliders with classic gradient */\n.wplace-theme-classic-light .wplace-speed-slider {\n    background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%) !important;\n    border-radius: 4px !important;\n}\n\n.wplace-theme-classic-light .wplace-overlay-opacity-slider {\n    background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%) !important;\n    border-radius: 4px !important;\n}\n\n.wplace-theme-classic-light .wplace-slider {\n    background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%) !important;\n    border-radius: 4px !important;\n}\n\n.wplace-theme-classic-light .wplace-slider::-webkit-slider-thumb {\n    -webkit-appearance: none;\n    width: 16px;\n    height: 16px;\n    border-radius: 50%;\n    background: var(--wplace-slider-thumb-bg);\n    border: 1px solid rgb(0 0 0 / 20%);\n    cursor: pointer;\n    transition: all 0.2s ease;\n    box-shadow: 0 2px 4px rgb(0 0 0 / 20%);\n}\n\n.wplace-theme-classic-light .wplace-speed-value {\n    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;\n    border-radius: 8px !important;\n    color: white !important;\n    font-weight: 600 !important;\n    box-shadow: 0 3px 10px rgb(79 172 254 / 30%) !important;\n    border: 1px solid rgb(0 0 0 / 10%) !important;\n}\n\n/* Settings labels */\n.wplace-theme-classic-light .wplace-settings-section-label {\n    color: var(--wplace-highlight) !important;\n    text-shadow: none !important;\n    font-family: 'Segoe UI', Roboto, sans-serif !important;\n    font-weight: 600 !important;\n}\n\n/* Icon colors for classic light theme */\n.wplace-theme-classic-light .wplace-icon-key {\n    color: #4facfe;\n}\n.wplace-theme-classic-light .wplace-icon-robot {\n    color: #4facfe;\n}\n.wplace-theme-classic-light .wplace-icon-speed {\n    color: #4facfe;\n}\n.wplace-theme-classic-light .wplace-icon-bell {\n    color: #ffc107;\n}\n.wplace-theme-classic-light .wplace-icon-palette {\n    color: #f093fb;\n}\n.wplace-theme-classic-light .wplace-icon-globe {\n    color: #ffeaa7;\n}\n.wplace-theme-classic-light .wplace-icon-paint {\n    color: #4facfe;\n}\n.wplace-theme-classic-light .wplace-icon-eye {\n    color: #6f42c1;\n}\n\n/* Clean light theme animations */\n@keyframes light-shimmer {\n    0% {\n        transform: translateX(-100%);\n    }\n\n    100% {\n        transform: translateX(200%);\n    }\n}\n\n/* Turnstile/CF checkbox overlay - CRITICAL FIX */\n.wplace-theme-classic-light .wplace-turnstile-overlay {\n    background: rgb(255 255 255 / 98%) !important;\n    border-radius: 12px !important;\n    box-shadow: 0 8px 32px rgb(0 0 0 / 30%) !important;\n    backdrop-filter: blur(10px) !important;\n    border: 1px solid rgb(0 0 0 / 20%) !important;\n    color: var(--wplace-text) !important;\n    font-family: 'Segoe UI', Roboto, sans-serif !important;\n}\n\n.wplace-theme-classic-light .wplace-turnstile-title {\n    color: var(--wplace-text) !important;\n}\n\n.wplace-theme-classic-light .wplace-turnstile-hide-btn {\n    color: var(--wplace-text) !important;\n    border: 1px solid rgb(0 0 0 / 20%) !important;\n    border-radius: 6px !important;\n    background: rgb(0 0 0 / 5%) !important;\n}\n\n.wplace-theme-classic-light .wplace-turnstile-hide-btn:hover {\n    background: rgb(0 0 0 / 10%) !important;\n}\n\n/* Dual control layout styling for classic light theme */\n.wplace-theme-classic-light .wplace-dual-control-compact {\n    display: flex;\n    flex-direction: row;\n    align-items: center;\n    gap: 12px;\n    margin: 8px 0;\n    flex-wrap: wrap;\n}\n\n.wplace-theme-classic-light .wplace-slider-container-compact {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    flex: 1;\n    min-width: 160px;\n}\n\n.wplace-theme-classic-light .wplace-speed-slider-container-compact {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    flex: 1;\n    min-width: 160px;\n}\n\n.wplace-theme-classic-light .wplace-input-group-compact {\n    display: flex;\n    align-items: center;\n    gap: 4px;\n    flex-shrink: 0;\n}\n\n.wplace-theme-classic-light .wplace-input-btn-compact {\n    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);\n    color: white;\n    border: none;\n    border-radius: 4px;\n    width: 22px;\n    height: 22px;\n    cursor: pointer;\n    font-weight: bold;\n    font-size: 12px;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    transition: all 0.2s ease;\n    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);\n}\n\n.wplace-theme-classic-light .wplace-input-btn-compact:hover {\n    transform: translateY(-1px);\n    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);\n    background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);\n}\n\n.wplace-theme-classic-light .wplace-input-btn-compact:active {\n    transform: translateY(0);\n    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);\n}\n\n.wplace-theme-classic-light .wplace-number-input-compact {\n    background: #fff;\n    border: 1px solid rgb(0 0 0 / 20%);\n    border-radius: 4px;\n    color: var(--wplace-text);\n    padding: 4px 8px;\n    font-size: 12px;\n    width: 50px;\n    text-align: center;\n    transition: all 0.2s ease;\n    height: 22px;\n}\n\n.wplace-theme-classic-light .wplace-number-input-compact:focus {\n    outline: none;\n    border-color: #4facfe;\n    box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.3);\n    background: #f8f9fa;\n}\n\n.wplace-theme-classic-light .wplace-input-label-compact {\n    color: var(--wplace-text);\n    font-size: 11px;\n    margin-left: 4px;\n    white-space: nowrap;\n}\n\n.wplace-theme-classic-light .wplace-batch-size-header {\n    margin-bottom: 8px;\n}\n\n.wplace-theme-classic-light .wplace-batch-size-label {\n    color: var(--wplace-highlight);\n    font-weight: 500;\n    font-size: 13px;\n}\n\n/* Cooldown control styling for classic light theme */\n.wplace-theme-classic-light .wplace-cooldown-control {\n    margin: 12px 0;\n}\n\n.wplace-theme-classic-light .wplace-cooldown-control label {\n    color: var(--wplace-highlight);\n    font-weight: 500;\n    font-size: 13px;\n    margin-bottom: 8px;\n    display: block;\n}\n\n/* Color swatches with light styling */\n.wplace-theme-classic-light .wplace-color-swatch {\n    border: 1px solid rgb(0 0 0 / 20%) !important;\n    border-radius: 4px !important;\n    box-shadow: 0 2px 8px rgb(0 0 0 / 10%) !important;\n}\n\n.wplace-theme-classic-light .wplace-color-swatch:hover {\n    box-shadow: 0 4px 16px rgb(111 66 193 / 30%) !important;\n    transform: translateY(-1px);\n}\n\n.wplace-theme-classic-light .wplace-stat-colors-grid {\n    background: rgb(0 0 0 / 5%) !important;\n    border-radius: 8px !important;\n    border: 1px solid rgb(0 0 0 / 10%) !important;\n}\n\n/* Alert styling for classic light theme */\n.wplace-theme-classic-light .wplace-alert-base {\n    border-radius: var(--wplace-radius) !important;\n    font-family: 'Segoe UI', Roboto, sans-serif !important;\n    box-shadow:\n        0 8px 32px rgb(0 0 0 / 25%),\n        0 0 0 1px rgb(0 0 0 / 10%) !important;\n    backdrop-filter: blur(10px) !important;\n}\n\n.wplace-theme-classic-light .wplace-alert-info {\n    background: linear-gradient(135deg, #3498db, #2980b9) !important;\n    color: white !important;\n    box-shadow:\n        0 8px 32px rgb(52 152 219 / 30%),\n        0 0 0 1px rgb(0 0 0 / 10%) !important;\n}\n\n.wplace-theme-classic-light .wplace-alert-success {\n    background: linear-gradient(135deg, #28a745, #20c997) !important;\n    color: white !important;\n    box-shadow:\n        0 8px 32px rgb(40 167 69 / 30%),\n        0 0 0 1px rgb(0 0 0 / 10%) !important;\n}\n\n.wplace-theme-classic-light .wplace-alert-warning {\n    background: linear-gradient(135deg, #ffc107, #ff8c00) !important;\n    color: #000 !important;\n    box-shadow:\n        0 8px 32px rgb(255 193 7 / 30%),\n        0 0 0 1px rgb(0 0 0 / 10%) !important;\n}\n\n.wplace-theme-classic-light .wplace-alert-error {\n    background: linear-gradient(135deg, #dc3545, #c82333) !important;\n    color: white !important;\n    box-shadow:\n        0 8px 32px rgb(220 53 69 / 30%),\n        0 0 0 1px rgb(0 0 0 / 10%) !important;\n}\n\n/* Input field styling for light theme - Higher specificity */\nbody .wplace-theme-classic-light .wplace-speed-input,\nbody .wplace-theme-classic-light .wplace-cooldown-input,\n.wplace-theme-classic-light .wplace-speed-input,\n.wplace-theme-classic-light .wplace-cooldown-input {\n    background: #f8f9fa !important;\n    border: 1px solid #d1d1d1 !important;\n    color: #212529 !important;\n    border-radius: 6px !important;\n}\n\nbody .wplace-theme-classic-light .wplace-speed-input:focus,\nbody .wplace-theme-classic-light .wplace-cooldown-input:focus,\n.wplace-theme-classic-light .wplace-speed-input:focus,\n.wplace-theme-classic-light .wplace-cooldown-input:focus {\n    background: #ffffff !important;\n    border-color: #6f42c1 !important;\n    color: #212529 !important;\n    box-shadow: 0 0 0 2px rgba(111, 66, 193, 0.2) !important;\n}\n\n/* Input group background for light theme - Higher specificity */\nbody .wplace-theme-classic-light .wplace-speed-input-group,\nbody .wplace-theme-classic-light .wplace-cooldown-input-group,\n.wplace-theme-classic-light .wplace-speed-input-group,\n.wplace-theme-classic-light .wplace-cooldown-input-group {\n    background: #e9ecef !important;\n    border: 1px solid #d1d1d1 !important;\n    border-radius: 8px !important;\n}\n\n/* Button styling for light theme - Higher specificity */\nbody .wplace-theme-classic-light .wplace-input-btn-small,\n.wplace-theme-classic-light .wplace-input-btn-small {\n    background: #ffffff !important;\n    border: 1px solid #d1d1d1 !important;\n    color: #212529 !important;\n    border-radius: 6px !important;\n    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;\n}\n\nbody .wplace-theme-classic-light .wplace-input-btn-small:hover,\n.wplace-theme-classic-light .wplace-input-btn-small:hover {\n    background: #f8f9fa !important;\n    border-color: #6f42c1 !important;\n    color: #212529 !important;\n    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15) !important;\n}\n\nbody .wplace-theme-classic-light .wplace-input-btn-small:active,\n.wplace-theme-classic-light .wplace-input-btn-small:active {\n    background: #e9ecef !important;\n    color: #212529 !important;\n    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1) !important;\n}\n",
+    "classic": "/* WPlace Auto-Image Bot - Classic Theme */\n/* Clean, modern UI with gradients and subtle effects */\n\n.wplace-theme-classic {\n    --wplace-primary: linear-gradient(135deg, #000 0%, #1a1a1a 100%);\n    --wplace-secondary: linear-gradient(135deg, #111 0%, #2a2a2a 100%);\n    --wplace-accent: #222;\n    --wplace-text: #fff;\n    --wplace-highlight: #775ce3;\n    --wplace-success: #0f0;\n    --wplace-error: #f00;\n    --wplace-warning: #fa0;\n    --wplace-radius: 12px;\n    --wplace-btn-radius: 16px;\n    --wplace-shadow:\n        0 8px 32px rgb(0 0 0 / 60%), 0 0 0 1px rgb(255 255 255 / 10%);\n    --wplace-backdrop: blur(10px);\n    --wplace-font: 'Segoe UI', roboto, sans-serif;\n    --wplace-scanline: 0;\n    --wplace-pixel-blink: 0;\n\n    /* Icon colors */\n    --wplace-icon-primary: #4facfe;\n    --wplace-icon-secondary: #00f2fe;\n    --wplace-icon-palette: #f093fb;\n\n    /* Additional UI colors */\n    --wplace-danger: #ff6a6a;\n    --wplace-danger-dark: #ff4757;\n    --wplace-muted-text: #fffb;\n    --wplace-highlight-secondary: #d3a4ff;\n\n    /* Slider colors */\n    --wplace-slider-track-bg: linear-gradient(\n        to right,\n        #4facfe 0%,\n        #00f2fe 100%\n    );\n}\n\n/* Classic theme container styling */\n:root #wplace-image-bot-container,\n.wplace-theme-classic #wplace-image-bot-container {\n    background: var(--wplace-primary);\n    color: var(--wplace-text);\n    border-radius: var(--wplace-radius);\n    box-shadow: var(--wplace-shadow);\n    font-family: var(--wplace-font);\n    backdrop-filter: var(--wplace-backdrop);\n    border: var(--wplace-border-width) var(--wplace-border-style)\n        var(--wplace-border-color);\n}\n\n:root #wplace-stats-container,\n.wplace-theme-classic #wplace-stats-container {\n    background: var(--wplace-primary);\n    color: var(--wplace-text);\n    border-radius: var(--wplace-radius);\n    box-shadow: var(--wplace-shadow);\n    font-family: var(--wplace-font);\n    backdrop-filter: var(--wplace-backdrop);\n    border: var(--wplace-border-width) var(--wplace-border-style)\n        var(--wplace-border-color);\n}\n\n:root #wplace-settings-container,\n.wplace-theme-classic #wplace-settings-container {\n    background: var(--wplace-primary);\n    color: var(--wplace-text);\n    border-radius: var(--wplace-radius);\n    box-shadow: var(--wplace-shadow);\n    font-family: var(--wplace-font);\n    backdrop-filter: var(--wplace-backdrop);\n    border: var(--wplace-border-width) var(--wplace-border-style)\n        var(--wplace-border-color);\n}\n\n:root .wplace-header,\n.wplace-theme-classic .wplace-header {\n    background: var(--wplace-secondary);\n    color: var(--wplace-highlight);\n    text-shadow: 0 1px 2px rgb(0 0 0 / 50%);\n}\n\n:root .wplace-section-title,\n.wplace-theme-classic .wplace-section-title {\n    color: var(--wplace-highlight);\n}\n\n:root .wplace-stat-value,\n.wplace-theme-classic .wplace-stat-value {\n    color: var(--wplace-highlight);\n}\n\n:root .wplace-status-section,\n.wplace-theme-classic .wplace-status-section {\n    border-radius: var(--wplace-radius);\n    background: rgb(255 255 255 / 3%);\n    border: 1px solid rgb(255 255 255 / 10%);\n}\n\n:root .wplace-section,\n.wplace-theme-classic .wplace-section {\n    border-radius: var(--wplace-radius);\n    background: rgb(255 255 255 / 3%);\n}\n\n:root .wplace-stats,\n.wplace-theme-classic .wplace-stats {\n    border-radius: var(--wplace-radius);\n    background: rgb(255 255 255 / 3%);\n    border: 1px solid rgb(255 255 255 / 10%);\n}\n\n:root .wplace-status,\n.wplace-theme-classic .wplace-status {\n    border-radius: var(--wplace-radius);\n}\n\n:root .wplace-alert-base,\n.wplace-theme-classic .wplace-alert-base {\n    border-radius: var(--wplace-radius);\n    font-family: var(--wplace-font);\n}\n\n:root .wplace-settings-container-base,\n.wplace-theme-classic .wplace-settings-container-base {\n    font-family: var(--wplace-font);\n    border-radius: var(--wplace-radius);\n    background: var(--wplace-primary);\n    color: var(--wplace-text);\n    box-shadow: var(--wplace-shadow);\n    backdrop-filter: var(--wplace-backdrop);\n}\n\n/* Button styling for classic theme */\n:root .wplace-btn,\n.wplace-theme-classic .wplace-btn {\n    background: linear-gradient(135deg, #222 0%, #4a4a4a 100%);\n    border: 1px solid rgb(255 255 255 / 10%);\n    color: var(--wplace-text);\n    border-radius: var(--wplace-btn-radius);\n    font-family: var(--wplace-font);\n}\n\n:root .wplace-btn::before,\n.wplace-theme-classic .wplace-btn::before {\n    background: linear-gradient(\n        90deg,\n        transparent,\n        rgb(255 255 255 / 10%),\n        transparent\n    );\n}\n\n:root .wplace-btn:disabled,\n.wplace-theme-classic .wplace-btn:disabled {\n    box-shadow: none !important;\n}\n\n:root .wplace-btn:hover:not(:disabled),\n.wplace-theme-classic .wplace-btn:hover:not(:disabled) {\n    box-shadow: 0 4px 12px rgb(0 0 0 / 40%);\n}\n\n:root .wplace-btn-overlay.active,\n.wplace-theme-classic .wplace-btn-overlay.active {\n    background: linear-gradient(135deg, #29b6f6 0%, #8e2de2 100%);\n    box-shadow: 0 0 15px #8e2de2;\n}\n\n/* Button variants - exact upstream main colors */\n:root .wplace-btn-primary,\n.wplace-theme-classic .wplace-btn-primary {\n    background: linear-gradient(135deg, #222 0%, #6a5acd 100%);\n    color: var(--wplace-text);\n}\n\n:root .wplace-btn-upload,\n.wplace-theme-classic .wplace-btn-upload {\n    background: linear-gradient(135deg, #111 0%, #4a4a4a 100%);\n    color: var(--wplace-text);\n    border: 1px dashed var(--wplace-highlight) !important;\n}\n\n:root .wplace-btn-start,\n.wplace-theme-classic .wplace-btn-start {\n    background: linear-gradient(135deg, var(--wplace-success) 0%, #228b22 100%);\n    color: white;\n}\n\n:root .wplace-btn-stop,\n.wplace-theme-classic .wplace-btn-stop {\n    background: linear-gradient(135deg, var(--wplace-error) 0%, #dc143c 100%);\n    color: white;\n}\n\n:root .wplace-btn-select,\n.wplace-theme-classic .wplace-btn-select {\n    background: linear-gradient(\n        135deg,\n        var(--wplace-highlight) 0%,\n        #9370db 100%\n    );\n    color: white;\n}\n\n:root .wplace-btn-file,\n.wplace-theme-classic .wplace-btn-file {\n    background: linear-gradient(135deg, #ff8c00 0%, #ff7f50 100%);\n    color: white;\n}\n\n:root .wplace-btn.active,\n:root .wplace-btn[aria-pressed='true'],\n.wplace-theme-classic .wplace-btn.active,\n.wplace-theme-classic .wplace-btn[aria-pressed='true'] {\n    background: var(--wplace-highlight) !important;\n    color: #000 !important;\n    border-color: var(--wplace-text) !important;\n    box-shadow:\n        0 0 8px rgb(0 0 0 / 25%) inset,\n        0 0 6px rgb(0 0 0 / 20%) !important;\n}\n\n:root .wplace-btn.active i,\n:root .wplace-btn[aria-pressed='true'] i,\n.wplace-theme-classic .wplace-btn.active i,\n.wplace-theme-classic .wplace-btn[aria-pressed='true'] i {\n    filter: drop-shadow(0 0 3px #000);\n}\n\n:root .mask-mode-group .wplace-btn.active,\n:root .mask-mode-group .wplace-btn[aria-pressed='true'],\n.wplace-theme-classic .mask-mode-group .wplace-btn.active,\n.wplace-theme-classic .mask-mode-group .wplace-btn[aria-pressed='true'] {\n    background: var(--wplace-highlight);\n    color: #000;\n    border-color: var(--wplace-text);\n    box-shadow:\n        0 0 8px rgb(0 0 0 / 25%) inset,\n        0 0 6px rgb(0 0 0 / 20%);\n}\n\n/* Status styling for classic theme */\n:root .status-default,\n.wplace-theme-classic .status-default {\n    background: rgb(255 255 255 / 10%);\n    border-color: var(--wplace-text);\n    color: var(--wplace-text);\n}\n\n:root .status-success,\n.wplace-theme-classic .status-success {\n    background: rgb(0 255 0 / 10%);\n    border-color: var(--wplace-success);\n    color: var(--wplace-success);\n    box-shadow: 0 0 15px var(--wplace-success);\n}\n\n:root .status-error,\n.wplace-theme-classic .status-error {\n    background: rgb(255 0 0 / 10%);\n    border-color: var(--wplace-error);\n    color: var(--wplace-error);\n    box-shadow: 0 0 15px var(--wplace-error);\n}\n\n:root .status-warning,\n.wplace-theme-classic .status-warning {\n    background: rgb(255 165 0 / 10%);\n    border-color: var(--wplace-warning);\n    color: var(--wplace-warning);\n    box-shadow: 0 0 15px var(--wplace-warning);\n}\n\n:root .wplace-status.status-default,\n.wplace-theme-classic .wplace-status.status-default {\n    color: var(--wplace-text);\n    background: rgb(255 255 255 / 10%);\n    border-color: var(--wplace-text);\n}\n\n/* Alert styling for classic theme */\n:root .wplace-alert-info,\n.wplace-theme-classic .wplace-alert-info {\n    background: linear-gradient(135deg, #3498db, #2980b9);\n    box-shadow: 0 4px 12px rgb(52 152 219 / 30%);\n}\n\n:root .wplace-alert-success,\n.wplace-theme-classic .wplace-alert-success {\n    background: linear-gradient(135deg, #27ae60, #229954);\n    box-shadow: 0 4px 12px rgb(39 174 96 / 30%);\n}\n\n:root .wplace-alert-warning,\n.wplace-theme-classic .wplace-alert-warning {\n    background: linear-gradient(135deg, #f39c12, #e67e22);\n    box-shadow: 0 4px 12px rgb(243 156 18 / 30%);\n}\n\n:root .wplace-alert-error,\n.wplace-theme-classic .wplace-alert-error {\n    background: linear-gradient(135deg, #e74c3c, #c0392b);\n    box-shadow: 0 4px 12px rgb(231 76 60 / 30%);\n}\n\n/* Progress bar styling for classic theme */\n:root .wplace-progress,\n.wplace-theme-classic .wplace-progress {\n    background: rgb(0 0 0 / 30%);\n    border: 1px solid rgb(255 255 255 / 10%);\n    border-radius: var(--wplace-radius);\n}\n\n:root .wplace-progress-bar,\n.wplace-theme-classic .wplace-progress-bar {\n    background: linear-gradient(\n        135deg,\n        var(--wplace-highlight) 0%,\n        #9370db 100%\n    );\n}\n\n:root .wplace-progress-bar::after,\n.wplace-theme-classic .wplace-progress-bar::after {\n    background: linear-gradient(\n        90deg,\n        transparent,\n        rgb(255 255 255 / 30%),\n        transparent\n    );\n}\n\n/* Header and sections styling for classic theme */\n:root .wplace-header-btn,\n.wplace-theme-classic .wplace-header-btn {\n    background: rgb(255 255 255 / 10%);\n    color: var(--wplace-highlight);\n    border-radius: 4px;\n    font-family: var(--wplace-font);\n}\n\n:root .wplace-header-btn:hover,\n.wplace-theme-classic .wplace-header-btn:hover {\n    background: #222;\n    color: var(--wplace-text);\n}\n\n/* Font and typography for classic theme */\n:root .wplace-turnstile-overlay,\n.wplace-theme-classic .wplace-turnstile-overlay {\n    background: rgb(0 0 0 / 90%) !important;\n    border-radius: var(--wplace-radius) !important;\n    box-shadow: 0 8px 32px rgb(0 0 0 / 40%) !important;\n    backdrop-filter: var(--wplace-backdrop) !important;\n    border: 1px solid rgb(255 255 255 / 20%) !important;\n    color: var(--wplace-text) !important;\n    font-family: var(--wplace-font) !important;\n}\n\n/* Auto light/dark support for classic theme */\n@media (prefers-color-scheme: light) {\n    :root .theme-auto,\n    .wplace-theme-classic .theme-auto {\n        --wplace-primary: #fff;\n        --wplace-secondary: #f5f5f5;\n        --wplace-accent: #007acc;\n        --wplace-text: #333;\n    }\n}\n\n@media (prefers-color-scheme: dark) {\n    :root .theme-auto,\n    .wplace-theme-classic .theme-auto {\n        --wplace-primary: #1e1e1e;\n        --wplace-secondary: #2d2d30;\n        --wplace-accent: var(--wplace-highlight);\n        --wplace-text: #fff;\n    }\n}\n\n/* Border and color styling for classic theme */\n:root .wplace-color-item-name,\n.wplace-theme-classic .wplace-color-item-name {\n    color: #ccc;\n}\n\n:root .wplace-color-swatch,\n.wplace-theme-classic .wplace-color-swatch {\n    border: 1px solid rgb(255 255 255 / 20%);\n    border-radius: 4px;\n}\n\n:root .wplace-stat-color-swatch,\n.wplace-theme-classic .wplace-stat-color-swatch {\n    border-radius: 3px;\n    border: 1px solid rgb(255 255 255 / 10%);\n    box-shadow: inset 0 0 2px rgb(0 0 0 / 50%);\n}\n\n:root .resize-tools button,\n.wplace-theme-classic .resize-tools button {\n    border-radius: 6px;\n    border: 1px solid rgb(255 255 255 / 20%);\n    background: rgb(255 255 255 / 6%);\n    color: #fff;\n}\n\n:root .resize-slider,\n.wplace-theme-classic .resize-slider {\n    background: #ccc;\n    border-radius: var(--wplace-radius);\n}\n\n/* Text effects and filters for classic theme */\n:root .wplace-color-swatch:not(.active),\n.wplace-theme-classic .wplace-color-swatch:not(.active) {\n    filter: grayscale(80%);\n}\n\n:root .wplace-color-swatch.unavailable,\n.wplace-theme-classic .wplace-color-swatch.unavailable {\n    border-color: #666;\n}\n\n:root .wplace-color-swatch.unavailable:not(.active),\n.wplace-theme-classic .wplace-color-swatch.unavailable:not(.active) {\n    filter: grayscale(90%);\n}\n\n:root .wplace-color-swatch.active::after,\n.wplace-theme-classic .wplace-color-swatch.active::after {\n    text-shadow: 0 0 3px black;\n}\n\n/* Icon colors for classic theme */\n:root .wplace-icon-key,\n.wplace-theme-classic .wplace-icon-key {\n    color: #4facfe;\n}\n\n:root .wplace-icon-robot,\n.wplace-theme-classic .wplace-icon-robot {\n    color: #4facfe;\n}\n\n:root .wplace-icon-speed,\n.wplace-theme-classic .wplace-icon-speed {\n    color: #4facfe;\n}\n\n:root .wplace-icon-bell,\n.wplace-theme-classic .wplace-icon-bell {\n    color: #ffd166;\n}\n\n:root .wplace-icon-palette,\n.wplace-theme-classic .wplace-icon-palette {\n    color: #f093fb;\n}\n\n:root .wplace-icon-globe,\n.wplace-theme-classic .wplace-icon-globe {\n    color: #ffeaa7;\n}\n\n:root .wplace-icon-paint,\n.wplace-theme-classic .wplace-icon-paint {\n    color: #4facfe;\n}\n\n:root .wplace-icon-eye,\n.wplace-theme-classic .wplace-icon-eye {\n    color: var(--wplace-highlight);\n}\n\n/* Form controls and sliders for classic theme */\n:root .wplace-slider,\n.wplace-theme-classic .wplace-slider {\n    background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);\n    border-radius: 4px;\n}\n\n:root .wplace-slider::-webkit-slider-thumb,\n.wplace-theme-classic .wplace-slider::-webkit-slider-thumb {\n    -webkit-appearance: none;\n    width: 16px;\n    height: 16px;\n    border-radius: 50%;\n    background: var(--wplace-slider-thumb-bg);\n    border: none;\n    cursor: pointer;\n    transition: all 0.2s ease;\n}\n\n:root .wplace-speed-slider,\n.wplace-theme-classic .wplace-speed-slider {\n    background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);\n    border-radius: 4px;\n}\n\n:root .wplace-speed-slider::-webkit-slider-thumb,\n.wplace-theme-classic .wplace-speed-slider::-webkit-slider-thumb {\n    border-radius: 50%;\n    border: 2px solid;\n}\n\n:root .wplace-speed-slider::-moz-range-thumb,\n.wplace-theme-classic .wplace-speed-slider::-moz-range-thumb {\n    border-radius: 50%;\n    border: 2px solid;\n}\n\n:root .wplace-turnstile-title,\n.wplace-theme-classic .wplace-turnstile-title {\n    color: var(--wplace-text) !important;\n}\n\n:root .wplace-turnstile-hide-btn,\n.wplace-theme-classic .wplace-turnstile-hide-btn {\n    color: var(--wplace-text) !important;\n    border: 1px solid rgb(255 255 255 / 20%) !important;\n    border-radius: 6px !important;\n}\n\n:root .wplace-turnstile-hide-btn:hover,\n.wplace-theme-classic .wplace-turnstile-hide-btn:hover {\n    background: rgb(255 255 255 / 10%) !important;\n}\n\n:root .wplace-settings-select,\n.wplace-theme-classic .wplace-settings-select {\n    background: rgb(255 255 255 / 15%);\n    color: white;\n    border: 1px solid rgb(255 255 255 / 20%);\n    border-radius: 8px;\n    box-shadow: 0 3px 10px rgb(0 0 0 / 10%);\n}\n\n:root .wplace-settings-option,\n.wplace-theme-classic .wplace-settings-option {\n    background: #2d3748;\n    color: white;\n}\n\n:root .wplace-stat-colors-grid,\n.wplace-theme-classic .wplace-stat-colors-grid {\n    background: rgb(0 0 0 / 20%);\n    border-radius: 4px;\n}\n\n:root .resize-overlay,\n.wplace-theme-classic .resize-overlay {\n    background: rgb(0 0 0 / 80%);\n}\n\n:root .wplace-overlay,\n.wplace-theme-classic .wplace-overlay {\n    background: rgb(0 0 0 / 80%);\n}\n\n:root .wplace-settings-error,\n.wplace-theme-classic .wplace-settings-error {\n    background: rgb(255 0 0 / 40%) !important;\n}\n\n/* Settings sections and batch controls for classic theme */\n:root .wplace-settings-section-wrapper,\n.wplace-theme-classic .wplace-settings-section-wrapper {\n    background: rgb(255 255 255 / 10%);\n    border-radius: var(--wplace-radius);\n    border: 1px solid rgb(255 255 255 / 10%);\n}\n\n:root .wplace-batch-controls,\n.wplace-theme-classic .wplace-batch-controls {\n    background: rgb(255 255 255 / 10%);\n    border-radius: var(--wplace-radius);\n    border: 1px solid rgb(255 255 255 / 10%);\n}\n\n:root .wplace-overlay-opacity-slider,\n.wplace-theme-classic .wplace-overlay-opacity-slider {\n    background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);\n    border-radius: 4px;\n}\n\n:root .wplace-speed-value,\n.wplace-theme-classic .wplace-speed-value {\n    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);\n    border-radius: 8px;\n    color: white;\n    box-shadow: 0 3px 10px rgb(79 172 254 / 30%);\n    border: 1px solid rgb(255 255 255 / 20%);\n}\n\n/* Additional elements for classic theme */\n:root .wplace-color-divider,\n.wplace-theme-classic .wplace-color-divider {\n    background: rgb(255 255 255 / 10%);\n}\n\n:root .wplace-settings-select option,\n.wplace-theme-classic .wplace-settings-select option {\n    background: #2d3748;\n    color: white;\n}\n\n:root .wplace-settings-description,\n.wplace-theme-classic .wplace-settings-description {\n    color: rgb(255 255 255 / 70%);\n}\n\n:root .wplace-settings-apply-btn,\n.wplace-theme-classic .wplace-settings-apply-btn {\n    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);\n    color: white;\n    border-radius: 8px;\n}\n\n/* Dual control layout styling for classic theme */\n:root .wplace-dual-control-compact,\n.wplace-theme-classic .wplace-dual-control-compact {\n    display: flex;\n    flex-direction: row;\n    align-items: center;\n    gap: 12px;\n    margin: 8px 0;\n    flex-wrap: wrap;\n}\n\n:root .wplace-slider-container-compact,\n.wplace-theme-classic .wplace-slider-container-compact {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    flex: 1;\n    min-width: 160px;\n}\n\n:root .wplace-speed-slider-container-compact,\n.wplace-theme-classic .wplace-speed-slider-container-compact {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    flex: 1;\n    min-width: 160px;\n}\n\n:root .wplace-input-group-compact,\n.wplace-theme-classic .wplace-input-group-compact {\n    display: flex;\n    align-items: center;\n    gap: 4px;\n    flex-shrink: 0;\n}\n\n:root .wplace-input-btn-compact,\n.wplace-theme-classic .wplace-input-btn-compact {\n    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);\n    color: white;\n    border: none;\n    border-radius: 4px;\n    width: 22px;\n    height: 22px;\n    cursor: pointer;\n    font-weight: bold;\n    font-size: 12px;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    transition: all 0.2s ease;\n    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);\n}\n\n:root .wplace-input-btn-compact:hover,\n.wplace-theme-classic .wplace-input-btn-compact:hover {\n    transform: translateY(-1px);\n    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);\n    background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);\n}\n\n:root .wplace-input-btn-compact:active,\n.wplace-theme-classic .wplace-input-btn-compact:active {\n    transform: translateY(0);\n    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);\n}\n\n:root .wplace-number-input-compact,\n.wplace-theme-classic .wplace-number-input-compact {\n    background: rgba(255, 255, 255, 0.1);\n    border: 1px solid rgba(255, 255, 255, 0.2);\n    border-radius: 4px;\n    color: white;\n    padding: 4px 8px;\n    font-size: 12px;\n    width: 50px;\n    text-align: center;\n    transition: all 0.2s ease;\n    height: 22px;\n}\n\n:root .wplace-number-input-compact:focus,\n.wplace-theme-classic .wplace-number-input-compact:focus {\n    outline: none;\n    border-color: #4facfe;\n    box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.3);\n    background: rgba(255, 255, 255, 0.15);\n}\n\n:root .wplace-input-label-compact,\n.wplace-theme-classic .wplace-input-label-compact {\n    color: rgba(255, 255, 255, 0.8);\n    font-size: 11px;\n    margin-left: 4px;\n    white-space: nowrap;\n}\n\n:root .wplace-batch-size-header,\n.wplace-theme-classic .wplace-batch-size-header {\n    margin-bottom: 8px;\n}\n\n:root .wplace-batch-size-label,\n.wplace-theme-classic .wplace-batch-size-label {\n    color: var(--wplace-highlight);\n    font-weight: 500;\n    font-size: 13px;\n}\n\n/* Cooldown control styling for classic theme */\n:root .wplace-cooldown-control,\n.wplace-theme-classic .wplace-cooldown-control {\n    margin: 12px 0;\n}\n\n:root .wplace-cooldown-control label,\n.wplace-theme-classic .wplace-cooldown-control label {\n    color: var(--wplace-highlight);\n    font-weight: 500;\n    font-size: 13px;\n    margin-bottom: 8px;\n    display: block;\n}\n/* Resize dialog styling for classic theme */\n:root .resize-container,\n.wplace-theme-classic .resize-container {\n    background: #000;\n    border: 1px solid #fff;\n    border-radius: 12px;\n    box-shadow: 0 0 20px rgb(0 0 0 / 50%);\n}\n",
+    "neon": "/* WPlace Auto-Image Bot - Neon Theme */\n/* Retro cyberpunk aesthetic with green neon glow effects */\n\n.wplace-theme-neon {\n    /* Neon theme colors - matching upstream main neon theme */\n    --wplace-primary: #1a1a2e;\n    --wplace-secondary: #16213e;\n    --wplace-accent: #0f3460;\n    --wplace-text: #00ff41;\n    --wplace-highlight: #ff6b35;\n    --wplace-success: #39ff14;\n    --wplace-error: #ff073a;\n    --wplace-warning: #ff0;\n\n    /* Neon UI properties */\n    --wplace-radius: 0;\n    --wplace-border-style: solid;\n    --wplace-border-width: 2px;\n    --wplace-border-color: #00ff41;\n    --wplace-shadow:\n        0 0 20px rgb(0 255 65 / 30%), inset 0 0 20px rgb(0 255 65 / 10%);\n    --wplace-backdrop: none;\n    --wplace-font: 'Press Start 2P', monospace, 'Courier New';\n\n    /* Z-index layers */\n    --wplace-z-overlay: 10000;\n    --wplace-z-alert: 10002;\n    --wplace-z-settings: 10002;\n\n    /* Feature toggles */\n    --wplace-scanline: 1;\n    --wplace-pixel-blink: 1;\n\n    /* Icon colors - neon variants */\n    --wplace-icon-primary: #00ff41;\n    --wplace-icon-secondary: #39ff14;\n    --wplace-icon-palette: #ff6b35;\n\n    /* Additional UI colors - neon variants */\n    --wplace-danger: #ff073a;\n    --wplace-danger-dark: #cc0531;\n    --wplace-muted-text: #00ff4180;\n    --wplace-highlight-secondary: #fa0;\n\n    /* Text variants - neon style */\n    --wplace-text-secondary: #00ff41dd;\n    --wplace-text-muted: #00ff41bb;\n    --wplace-text-dim: #00ff4199;\n    --wplace-text-faded: #00ff41cc;\n\n    /* Background variants - neon style */\n    --wplace-bg-input: rgb(0 255 65 / 15%);\n    --wplace-bg-subtle: rgb(0 255 65 / 8%);\n    --wplace-bg-faint: rgb(0 255 65 / 5%);\n    --wplace-bg-ghost: rgb(0 255 65 / 3%);\n    --wplace-bg-whisper: rgb(0 255 65 / 2%);\n\n    /* Border variants - neon style */\n    --wplace-border-subtle: rgb(0 255 65 / 40%);\n    --wplace-border-faint: rgb(0 255 65 / 25%);\n    --wplace-border-ghost: rgb(0 255 65 / 15%);\n    --wplace-border-ultra-faint: rgb(0 255 65 / 8%);\n\n    /* Shadow variants - neon style */\n    --wplace-shadow-drag:\n        0 12px 40px rgb(0 255 65 / 60%), 0 0 0 2px rgb(0 255 65 / 80%),\n        0 0 20px rgb(0 255 65 / 30%);\n    --wplace-shadow-notification:\n        0 4px 12px rgb(0 255 65 / 40%), 0 0 15px rgb(0 255 65 / 20%);\n    --wplace-shadow-slider-thumb:\n        0 3px 6px rgb(0 255 65 / 50%), 0 0 0 2px var(--wplace-icon-primary),\n        0 0 10px rgb(0 255 65 / 30%);\n    --wplace-shadow-slider-hover:\n        0 4px 8px rgb(0 255 65 / 60%), 0 0 0 3px var(--wplace-icon-primary),\n        0 0 15px rgb(0 255 65 / 40%);\n\n    /* Animation colors - neon style */\n    --wplace-pulse-start: rgb(0 255 65 / 80%);\n    --wplace-pulse-mid: rgb(0 255 65 / 0%);\n    --wplace-pulse-end: rgb(0 255 65 / 0%);\n\n    /* Slider colors - neon style */\n    --wplace-slider-thumb-bg: #00ff41;\n}\n\n/* Neon-specific styling overrides */\n.wplace-theme-neon #wplace-image-bot-container {\n    background: var(--wplace-primary) !important;\n    border: 2px solid var(--wplace-text) !important;\n    border-radius: 0 !important;\n    box-shadow:\n        0 0 20px var(--wplace-text),\n        inset 0 0 20px rgb(0 255 65 / 10%) !important;\n    font-family: var(--wplace-font) !important;\n}\n\n.wplace-theme-neon #wplace-stats-container {\n    background: var(--wplace-primary) !important;\n    border: 2px solid var(--wplace-text) !important;\n    border-radius: 0 !important;\n    box-shadow:\n        0 0 20px var(--wplace-text),\n        inset 0 0 20px rgb(0 255 65 / 10%) !important;\n    font-family: var(--wplace-font) !important;\n    position: fixed !important;\n    overflow: hidden !important;\n    z-index: 9998 !important;\n}\n\n.wplace-theme-neon .wplace-header {\n    background: var(--wplace-secondary) !important;\n    border-bottom: 1px solid var(--wplace-text) !important;\n    color: var(--wplace-text) !important;\n    text-shadow: 0 0 10px var(--wplace-text) !important;\n    font-family: var(--wplace-font) !important;\n}\n\n.wplace-theme-neon .wplace-section {\n    background: rgb(22 33 62 / 50%) !important;\n    border: 1px solid var(--wplace-text) !important;\n    border-radius: 0 !important;\n}\n\n.wplace-theme-neon .wplace-status-section {\n    background: rgb(22 33 62 / 50%) !important;\n    border: 1px solid var(--wplace-text) !important;\n    border-radius: 0 !important;\n}\n\n.wplace-theme-neon .wplace-section-title {\n    color: var(--wplace-text) !important;\n    text-shadow: 0 0 8px var(--wplace-text) !important;\n    text-transform: uppercase !important;\n    font-family: var(--wplace-font) !important;\n    font-size: 10px !important;\n}\n\n.wplace-theme-neon .wplace-btn {\n    background: var(--wplace-secondary) !important;\n    border: 1px solid var(--wplace-text) !important;\n    border-radius: 0 !important;\n    color: var(--wplace-text) !important;\n    text-shadow: 0 0 5px var(--wplace-text) !important;\n    font-family: var(--wplace-font) !important;\n    font-size: 9px !important;\n    text-transform: uppercase !important;\n}\n\n/* Pixel blinking and neon glow animation for buttons */\n.wplace-theme-neon .wplace-btn:hover:not(:disabled) {\n    box-shadow:\n        0 0 15px var(--wplace-text),\n        inset 0 0 15px rgb(0 255 65 / 10%) !important;\n    animation:\n        pixel-blink 0.5s infinite,\n        neon-glow 1s ease-in-out infinite alternate !important;\n}\n\n.wplace-theme-neon .wplace-btn-start {\n    background: var(--wplace-secondary) !important;\n    border-color: var(--wplace-success) !important;\n    color: var(--wplace-success) !important;\n    text-shadow: 0 0 8px var(--wplace-success) !important;\n}\n\n.wplace-theme-neon .wplace-btn-stop {\n    background: var(--wplace-secondary) !important;\n    border-color: var(--wplace-error) !important;\n    color: var(--wplace-error) !important;\n    text-shadow: 0 0 8px var(--wplace-error) !important;\n}\n\n.wplace-theme-neon .wplace-btn-upload {\n    background: var(--wplace-secondary) !important;\n    border: 1px dashed var(--wplace-highlight) !important;\n    color: var(--wplace-highlight) !important;\n    text-shadow: 0 0 8px var(--wplace-highlight) !important;\n}\n\n.wplace-theme-neon .wplace-btn-select {\n    background: var(--wplace-secondary) !important;\n    border-color: var(--wplace-highlight) !important;\n    color: var(--wplace-highlight) !important;\n    text-shadow: 0 0 8px var(--wplace-highlight) !important;\n}\n\n.wplace-theme-neon .wplace-btn-file {\n    background: var(--wplace-secondary) !important;\n    border-color: var(--wplace-warning) !important;\n    color: var(--wplace-warning) !important;\n    text-shadow: 0 0 8px var(--wplace-warning) !important;\n}\n\n.wplace-theme-neon .wplace-progress {\n    background: rgb(0 0 0 / 80%) !important;\n    border: 1px solid var(--wplace-text) !important;\n    border-radius: 0 !important;\n}\n\n.wplace-theme-neon .wplace-progress-bar {\n    background: linear-gradient(\n        90deg,\n        var(--wplace-success) 0%,\n        var(--wplace-text) 100%\n    ) !important;\n    box-shadow: 0 0 10px var(--wplace-success) !important;\n}\n\n.wplace-theme-neon .wplace-stat-value {\n    color: var(--wplace-text) !important;\n    text-shadow: 0 0 5px var(--wplace-text) !important;\n}\n\n.wplace-theme-neon .status-success {\n    background: rgb(57 255 20 / 10%) !important;\n    border-color: var(--wplace-success) !important;\n    color: var(--wplace-success) !important;\n    box-shadow: 0 0 15px var(--wplace-success) !important;\n    text-shadow: 0 0 8px var(--wplace-success) !important;\n}\n\n.wplace-theme-neon .status-error {\n    background: rgb(255 7 58 / 10%) !important;\n    border-color: var(--wplace-error) !important;\n    color: var(--wplace-error) !important;\n    box-shadow: 0 0 15px var(--wplace-error) !important;\n    text-shadow: 0 0 8px var(--wplace-error) !important;\n}\n\n.wplace-theme-neon .status-default {\n    background: rgb(0 255 65 / 10%) !important;\n    border-color: var(--wplace-text) !important;\n    color: var(--wplace-text) !important;\n    text-shadow: 0 0 5px var(--wplace-text) !important;\n}\n\n/* Settings dialog neon styling */\n.wplace-theme-neon #wplace-settings-container {\n    background: var(--wplace-primary) !important;\n    border: 2px solid var(--wplace-text) !important;\n    border-radius: 0 !important;\n    box-shadow:\n        0 0 30px var(--wplace-text),\n        inset 0 0 30px rgb(0 255 65 / 10%) !important;\n    font-family: var(--wplace-font) !important;\n}\n\n.wplace-theme-neon .wplace-settings-header {\n    background: var(--wplace-secondary) !important;\n    border-bottom: 1px solid var(--wplace-text) !important;\n}\n\n.wplace-theme-neon .wplace-settings-header h3 {\n    color: var(--wplace-text) !important;\n    text-shadow: 0 0 10px var(--wplace-text) !important;\n    font-family: var(--wplace-font) !important;\n    font-size: 16px !important;\n    text-transform: uppercase !important;\n}\n\n.wplace-theme-neon .wplace-settings-close-btn {\n    background: var(--wplace-secondary) !important;\n    border: 1px solid var(--wplace-text) !important;\n    border-radius: 0 !important;\n    color: var(--wplace-text) !important;\n}\n\n.wplace-theme-neon .wplace-settings-close-btn:hover {\n    background: var(--wplace-error) !important;\n    box-shadow: 0 0 15px var(--wplace-error) !important;\n}\n\n.wplace-theme-neon .wplace-settings-section-wrapper {\n    background: rgb(22 33 62 / 30%) !important;\n    border: 1px solid var(--wplace-text) !important;\n    border-radius: 0 !important;\n}\n\n.wplace-theme-neon .wplace-settings-select {\n    background: var(--wplace-secondary) !important;\n    border: 1px solid var(--wplace-text) !important;\n    border-radius: 0 !important;\n    color: var(--wplace-text) !important;\n    font-family: var(--wplace-font) !important;\n    font-size: 11px !important;\n}\n\n.wplace-theme-neon .wplace-settings-section-label {\n    color: var(--wplace-text) !important;\n    text-shadow: 0 0 8px var(--wplace-text) !important;\n    font-family: var(--wplace-font) !important;\n    font-size: 12px !important;\n    text-transform: uppercase !important;\n}\n\n.wplace-theme-neon .wplace-speed-value {\n    background: var(--wplace-secondary) !important;\n    border: 1px solid var(--wplace-text) !important;\n    border-radius: 0 !important;\n    color: var(--wplace-text) !important;\n    text-shadow: 0 0 8px var(--wplace-text) !important;\n    font-family: var(--wplace-font) !important;\n    box-shadow: 0 0 10px rgb(0 255 65 / 30%) !important;\n}\n\n.wplace-theme-neon .wplace-overlay-opacity-value {\n    background: var(--wplace-secondary) !important;\n    border: 1px solid var(--wplace-text) !important;\n    border-radius: 0 !important;\n    color: var(--wplace-text) !important;\n    text-shadow: 0 0 5px var(--wplace-text) !important;\n}\n\n/* Neon slider styling */\n.wplace-theme-neon .wplace-slider,\n.wplace-theme-neon .wplace-speed-slider,\n.wplace-theme-neon .wplace-overlay-opacity-slider {\n    background: var(--wplace-secondary) !important;\n    border: 1px solid var(--wplace-text) !important;\n    border-radius: 0 !important;\n    box-shadow: 0 0 10px rgb(0 255 65 / 30%) !important;\n}\n\n.wplace-theme-neon .wplace-slider::-webkit-slider-thumb,\n.wplace-theme-neon .wplace-speed-slider::-webkit-slider-thumb,\n.wplace-theme-neon .wplace-overlay-opacity-slider::-webkit-slider-thumb {\n    -webkit-appearance: none;\n    width: 16px;\n    height: 16px;\n    border-radius: 0 !important;\n    background: var(--wplace-slider-thumb-bg) !important;\n    border: 2px solid var(--wplace-text) !important;\n    cursor: pointer;\n    transition: all 0.2s ease;\n    box-shadow: 0 0 8px rgb(0 255 65 / 50%) !important;\n}\n\n.wplace-theme-neon .wplace-slider::-webkit-slider-thumb:hover,\n.wplace-theme-neon .wplace-speed-slider::-webkit-slider-thumb:hover,\n.wplace-theme-neon .wplace-overlay-opacity-slider::-webkit-slider-thumb:hover {\n    transform: scale(1.1);\n    box-shadow: 0 0 15px var(--wplace-text) !important;\n}\n\n/* Scanline animation for neon theme */\n.wplace-theme-neon #wplace-image-bot-container::before {\n    content: '';\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    height: 2px;\n    background: linear-gradient(\n        90deg,\n        transparent,\n        var(--wplace-text),\n        transparent\n    );\n    z-index: 1;\n    pointer-events: none;\n    animation: scanline 3s linear infinite;\n    opacity: 0.7;\n}\n\n.wplace-theme-neon #wplace-stats-container::before {\n    content: '';\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    height: 2px;\n    background: linear-gradient(\n        90deg,\n        transparent,\n        var(--wplace-text),\n        transparent\n    );\n    z-index: 1;\n    pointer-events: none;\n    animation: scanline-stats 4s linear infinite;\n    opacity: 0.7;\n}\n\n/* Text glow animations */\n@keyframes neon-glow {\n    0%,\n    100% {\n        text-shadow:\n            0 0 5px currentcolor,\n            0 0 10px currentcolor,\n            0 0 15px currentcolor;\n    }\n\n    50% {\n        text-shadow:\n            0 0 2px currentcolor,\n            0 0 5px currentcolor,\n            0 0 8px currentcolor;\n    }\n}\n\n@keyframes pixel-blink {\n    0%,\n    50% {\n        opacity: 1;\n    }\n\n    51%,\n    100% {\n        opacity: 0.7;\n    }\n}\n\n@keyframes scanline {\n    0% {\n        transform: translateY(-100%);\n    }\n\n    100% {\n        transform: translateY(400px);\n    }\n}\n\n@keyframes scanline-stats {\n    0% {\n        transform: translateY(-100%);\n    }\n\n    100% {\n        transform: translateY(300px);\n    }\n}\n\n/* Dual control layout styling for neon theme */\n.wplace-theme-neon .wplace-dual-control-compact {\n    display: flex;\n    flex-direction: row;\n    align-items: center;\n    gap: 8px;\n    margin: 6px 0;\n    flex-wrap: wrap;\n}\n\n.wplace-theme-neon .wplace-slider-container-compact {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    flex: 1;\n    min-width: 160px;\n}\n\n.wplace-theme-neon .wplace-speed-slider-container-compact {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    flex: 1;\n    min-width: 160px;\n}\n\n.wplace-theme-neon .wplace-input-group-compact {\n    display: flex;\n    align-items: center;\n    gap: 3px;\n    flex-shrink: 0;\n}\n\n.wplace-theme-neon .wplace-input-btn-compact {\n    background: var(--wplace-secondary) !important;\n    border: 1px solid var(--wplace-text) !important;\n    border-radius: 0 !important;\n    font-family: 'Press Start 2P', monospace !important;\n    box-shadow:\n        0 0 20px var(--wplace-text),\n        inset 0 0 10px rgb(0 255 65 / 10%) !important;\n    backdrop-filter: none !important;\n    font-size: 10px !important;\n    text-transform: uppercase !important;\n}\n\n/* Alert styling for neon theme */\n.wplace-theme-neon .wplace-alert-base {\n    border: 2px solid var(--wplace-text) !important;\n    border-radius: 0 !important;\n    font-family: 'Press Start 2P', monospace !important;\n    box-shadow:\n        0 0 20px var(--wplace-text),\n        inset 0 0 10px rgb(0 255 65 / 10%) !important;\n    backdrop-filter: none !important;\n    font-size: 10px !important;\n    text-transform: uppercase !important;\n}\n\n.wplace-theme-neon .wplace-alert-info {\n    background: var(--wplace-primary) !important;\n    color: var(--wplace-text) !important;\n    border-color: var(--wplace-text) !important;\n    text-shadow: 0 0 8px var(--wplace-text) !important;\n    box-shadow:\n        0 0 20px var(--wplace-text),\n        inset 0 0 10px rgb(0 255 65 / 10%) !important;\n}\n\n.wplace-theme-neon .wplace-alert-success {\n    background: var(--wplace-primary) !important;\n    color: var(--wplace-success) !important;\n    border-color: var(--wplace-success) !important;\n    text-shadow: 0 0 8px var(--wplace-success) !important;\n    box-shadow:\n        0 0 20px var(--wplace-success),\n        inset 0 0 10px rgb(57 255 20 / 10%) !important;\n}\n\n.wplace-theme-neon .wplace-alert-warning {\n    background: var(--wplace-primary) !important;\n    color: var(--wplace-warning) !important;\n    border-color: var(--wplace-warning) !important;\n    text-shadow: 0 0 8px var(--wplace-warning) !important;\n    box-shadow:\n        0 0 20px var(--wplace-warning),\n        inset 0 0 10px rgb(255 255 0 / 10%) !important;\n}\n\n.wplace-theme-neon .wplace-alert-error {\n    background: var(--wplace-primary) !important;\n    color: var(--wplace-error) !important;\n    border-color: var(--wplace-error) !important;\n    text-shadow: 0 0 8px var(--wplace-error) !important;\n    box-shadow:\n        0 0 20px var(--wplace-error),\n        inset 0 0 10px rgb(255 7 58 / 10%) !important;\n}\n\n/* Cooldown control styling for neon theme */\n.wplace-theme-neon .wplace-cooldown-control {\n    margin: 8px 0;\n}\n\n.wplace-theme-neon .wplace-cooldown-control label {\n    color: var(--wplace-text) !important;\n    font-weight: 500;\n    font-size: 11px;\n    text-shadow: 0 0 8px var(--wplace-text) !important;\n    font-family: var(--wplace-font) !important;\n    text-transform: uppercase;\n    margin-bottom: 6px;\n    display: block;\n}\n\n/* Resize dialog styling for neon theme */\n.wplace-theme-neon .resize-container {\n    background: #1a1a2e !important;\n    border: 3px solid #00ff41 !important;\n    border-radius: 0 !important;\n    box-shadow: 0 0 30px rgb(0 255 65 / 50%) !important;\n    font-family: 'Press Start 2P', monospace !important;\n}\n\n/* Input field styling for neon theme */\n.wplace-theme-neon .wplace-speed-input,\n.wplace-theme-neon .wplace-cooldown-input {\n    background: var(--wplace-secondary) !important;\n    border: 2px solid var(--wplace-text) !important;\n    border-radius: 0 !important;\n    color: var(--wplace-text) !important;\n    text-shadow: 0 0 8px var(--wplace-text) !important;\n    font-family: 'Press Start 2P', monospace !important;\n    font-size: 10px !important;\n    box-shadow: 0 0 10px rgb(0 255 65 / 30%) !important;\n    text-align: center !important;\n    width: 50px !important;\n}\n\n.wplace-theme-neon .wplace-speed-input:focus,\n.wplace-theme-neon .wplace-cooldown-input:focus {\n    background: var(--wplace-primary) !important;\n    box-shadow:\n        0 0 20px var(--wplace-text),\n        inset 0 0 10px rgb(0 255 65 / 20%) !important;\n    text-shadow: 0 0 12px var(--wplace-text) !important;\n}\n\n/* Button styling for neon theme */\n.wplace-theme-neon .wplace-input-btn-small {\n    background: var(--wplace-secondary) !important;\n    border: 2px solid var(--wplace-text) !important;\n    border-radius: 0 !important;\n    color: var(--wplace-text) !important;\n    text-shadow: 0 0 8px var(--wplace-text) !important;\n    font-family: 'Press Start 2P', monospace !important;\n    font-size: 10px !important;\n    width: 24px !important;\n    height: 24px !important;\n    box-shadow: 0 0 10px rgb(0 255 65 / 30%) !important;\n}\n\n.wplace-theme-neon .wplace-input-btn-small:hover {\n    box-shadow:\n        0 0 20px var(--wplace-text),\n        inset 0 0 15px rgb(0 255 65 / 20%) !important;\n    animation:\n        pixel-blink 0.5s infinite,\n        neon-glow 1s ease-in-out infinite alternate !important;\n}\n\n/* Speed/Cooldown unit labels for neon theme */\n.wplace-theme-neon .wplace-speed-unit,\n.wplace-theme-neon .wplace-cooldown-unit {\n    color: var(--wplace-text) !important;\n    text-shadow: 0 0 8px var(--wplace-text) !important;\n    font-family: 'Press Start 2P', monospace !important;\n    font-size: 9px !important;\n    text-transform: uppercase !important;\n}\n\n/* Min/Max labels for neon theme */\n.wplace-theme-neon .wplace-speed-labels {\n    padding: 0 !important;\n    width: 100% !important;\n    min-height: 16px !important;\n}\n\n.wplace-theme-neon .wplace-speed-min,\n.wplace-theme-neon .wplace-speed-max {\n    color: var(--wplace-text) !important;\n    text-shadow: 0 0 8px var(--wplace-text) !important;\n    font-family: 'Press Start 2P', monospace !important;\n    font-size: 9px !important;\n    text-transform: uppercase !important;\n    gap: 6px !important;\n}\n\n.wplace-theme-neon .wplace-speed-min i,\n.wplace-theme-neon .wplace-speed-max i {\n    text-shadow: 0 0 5px currentColor !important;\n}\n"
   };
   var EMBEDDED_LANGUAGES = {
     "en": {
@@ -4993,7 +4310,11 @@ input[type="range"] {
         7: { id: 8, name: "Orange", rgb: { r: 255, g: 127, b: 39 } },
         8: { id: 9, name: "Gold", rgb: { r: 246, g: 170, b: 9 } },
         9: { id: 10, name: "Yellow", rgb: { r: 249, g: 221, b: 59 } },
-        10: { id: 11, name: "Light Yellow", rgb: { r: 255, g: 250, b: 188 } },
+        10: {
+          id: 11,
+          name: "Light Yellow",
+          rgb: { r: 255, g: 250, b: 188 }
+        },
         11: { id: 12, name: "Dark Green", rgb: { r: 14, g: 185, b: 104 } },
         12: { id: 13, name: "Green", rgb: { r: 19, g: 230, b: 123 } },
         13: { id: 14, name: "Light Green", rgb: { r: 135, g: 255, b: 94 } },
@@ -5005,36 +4326,76 @@ input[type="range"] {
         19: { id: 18, name: "Dark Blue", rgb: { r: 40, g: 80, b: 158 } },
         20: { id: 19, name: "Blue", rgb: { r: 64, g: 147, b: 228 } },
         21: { id: 21, name: "Indigo", rgb: { r: 107, g: 80, b: 246 } },
-        22: { id: 22, name: "Light Indigo", rgb: { r: 153, g: 177, b: 251 } },
+        22: {
+          id: 22,
+          name: "Light Indigo",
+          rgb: { r: 153, g: 177, b: 251 }
+        },
         23: { id: 23, name: "Dark Purple", rgb: { r: 120, g: 12, b: 153 } },
         24: { id: 24, name: "Purple", rgb: { r: 170, g: 56, b: 185 } },
-        25: { id: 25, name: "Light Purple", rgb: { r: 224, g: 159, b: 249 } },
+        25: {
+          id: 25,
+          name: "Light Purple",
+          rgb: { r: 224, g: 159, b: 249 }
+        },
         26: { id: 26, name: "Dark Pink", rgb: { r: 203, g: 0, b: 122 } },
         27: { id: 27, name: "Pink", rgb: { r: 236, g: 31, b: 128 } },
         28: { id: 28, name: "Light Pink", rgb: { r: 243, g: 141, b: 169 } },
         29: { id: 29, name: "Dark Brown", rgb: { r: 104, g: 70, b: 52 } },
         30: { id: 30, name: "Brown", rgb: { r: 149, g: 104, b: 42 } },
         31: { id: 31, name: "Beige", rgb: { r: 248, g: 178, b: 119 } },
-        32: { id: 52, name: "Light Beige", rgb: { r: 255, g: 197, b: 165 } },
-        33: { id: 32, name: "Medium Gray", rgb: { r: 170, g: 170, b: 170 } },
+        32: {
+          id: 52,
+          name: "Light Beige",
+          rgb: { r: 255, g: 197, b: 165 }
+        },
+        33: {
+          id: 32,
+          name: "Medium Gray",
+          rgb: { r: 170, g: 170, b: 170 }
+        },
         34: { id: 33, name: "Dark Red", rgb: { r: 165, g: 14, b: 30 } },
         35: { id: 34, name: "Light Red", rgb: { r: 250, g: 128, b: 114 } },
         36: { id: 35, name: "Dark Orange", rgb: { r: 228, g: 92, b: 26 } },
-        37: { id: 37, name: "Dark Goldenrod", rgb: { r: 156, g: 132, b: 49 } },
+        37: {
+          id: 37,
+          name: "Dark Goldenrod",
+          rgb: { r: 156, g: 132, b: 49 }
+        },
         38: { id: 38, name: "Goldenrod", rgb: { r: 197, g: 173, b: 49 } },
-        39: { id: 39, name: "Light Goldenrod", rgb: { r: 232, g: 212, b: 95 } },
+        39: {
+          id: 39,
+          name: "Light Goldenrod",
+          rgb: { r: 232, g: 212, b: 95 }
+        },
         40: { id: 40, name: "Dark Olive", rgb: { r: 74, g: 107, b: 58 } },
         41: { id: 41, name: "Olive", rgb: { r: 90, g: 148, b: 74 } },
-        42: { id: 42, name: "Light Olive", rgb: { r: 132, g: 197, b: 115 } },
+        42: {
+          id: 42,
+          name: "Light Olive",
+          rgb: { r: 132, g: 197, b: 115 }
+        },
         43: { id: 43, name: "Dark Cyan", rgb: { r: 15, g: 121, b: 159 } },
         44: { id: 45, name: "Light Blue", rgb: { r: 125, g: 199, b: 255 } },
         45: { id: 46, name: "Dark Indigo", rgb: { r: 77, g: 49, b: 184 } },
-        46: { id: 47, name: "Dark Slate Blue", rgb: { r: 74, g: 66, b: 132 } },
+        46: {
+          id: 47,
+          name: "Dark Slate Blue",
+          rgb: { r: 74, g: 66, b: 132 }
+        },
         47: { id: 48, name: "Slate Blue", rgb: { r: 122, g: 113, b: 196 } },
-        48: { id: 49, name: "Light Slate Blue", rgb: { r: 181, g: 174, b: 241 } },
+        48: {
+          id: 49,
+          name: "Light Slate Blue",
+          rgb: { r: 181, g: 174, b: 241 }
+        },
         49: { id: 53, name: "Dark Peach", rgb: { r: 155, g: 82, b: 73 } },
         50: { id: 54, name: "Peach", rgb: { r: 209, g: 128, b: 120 } },
-        51: { id: 55, name: "Light Peach", rgb: { r: 250, g: 182, b: 164 } },
+        51: {
+          id: 55,
+          name: "Light Peach",
+          rgb: { r: 250, g: 182, b: 164 }
+        },
         52: { id: 50, name: "Light Brown", rgb: { r: 219, g: 164, b: 99 } },
         53: { id: 56, name: "Dark Tan", rgb: { r: 123, g: 99, b: 82 } },
         54: { id: 57, name: "Tan", rgb: { r: 156, g: 132, b: 107 } },
@@ -5042,10 +4403,18 @@ input[type="range"] {
         56: { id: 51, name: "Dark Beige", rgb: { r: 209, g: 128, b: 81 } },
         57: { id: 61, name: "Dark Stone", rgb: { r: 109, g: 100, b: 63 } },
         58: { id: 62, name: "Stone", rgb: { r: 148, g: 140, b: 107 } },
-        59: { id: 63, name: "Light Stone", rgb: { r: 205, g: 197, b: 158 } },
+        59: {
+          id: 63,
+          name: "Light Stone",
+          rgb: { r: 205, g: 197, b: 158 }
+        },
         60: { id: 58, name: "Dark Slate", rgb: { r: 51, g: 57, b: 65 } },
         61: { id: 59, name: "Slate", rgb: { r: 109, g: 117, b: 141 } },
-        62: { id: 60, name: "Light Slate", rgb: { r: 179, g: 185, b: 209 } },
+        62: {
+          id: 60,
+          name: "Light Slate",
+          rgb: { r: 179, g: 185, b: 209 }
+        },
         63: { id: 0, name: "Transparent", rgb: null }
       },
       // --- END: Color data ---
@@ -5183,11 +4552,17 @@ input[type="range"] {
       setVar("--wplace-success", theme.success);
       setVar("--wplace-error", theme.error);
       setVar("--wplace-warning", theme.warning);
-      setVar("--wplace-font", theme.fontFamily || "'Segoe UI', Roboto, sans-serif");
+      setVar(
+        "--wplace-font",
+        theme.fontFamily || "'Segoe UI', Roboto, sans-serif"
+      );
       setVar("--wplace-radius", "" + (theme.borderRadius || "12px"));
       setVar("--wplace-border-style", "" + (theme.borderStyle || "solid"));
       setVar("--wplace-border-width", "" + (theme.borderWidth || "1px"));
-      setVar("--wplace-backdrop", "" + (theme.backdropFilter || "blur(10px)"));
+      setVar(
+        "--wplace-backdrop",
+        "" + (theme.backdropFilter || "blur(10px)")
+      );
       setVar("--wplace-border-color", "rgba(255,255,255,0.1)");
     }
     const saveThemePreference = () => {
@@ -5239,7 +4614,9 @@ input[type="range"] {
           console.warn(`\u274C Invalid translation format for ${language}`);
         }
       } else {
-        console.warn(`\u274C Language ${language} not found in embedded assets`);
+        console.warn(
+          `\u274C Language ${language} not found in embedded assets`
+        );
       }
       return null;
     };
@@ -5251,7 +4628,9 @@ input[type="range"] {
       try {
         if (savedLanguage && AVAILABLE_LANGUAGES.includes(savedLanguage)) {
           selectedLanguage = savedLanguage;
-          console.log(`\u{1F504} Using saved language preference: ${selectedLanguage}`);
+          console.log(
+            `\u{1F504} Using saved language preference: ${selectedLanguage}`
+          );
         } else if (AVAILABLE_LANGUAGES.includes(browserLocale)) {
           selectedLanguage = browserLocale;
           localStorage.setItem("wplace_language", browserLocale);
@@ -5261,7 +4640,9 @@ input[type="range"] {
           localStorage.setItem("wplace_language", browserLanguage);
           console.log(`\u{1F504} Using browser language: ${selectedLanguage}`);
         } else {
-          console.log(`\u{1F504} No matching language found, using English fallback`);
+          console.log(
+            `\u{1F504} No matching language found, using English fallback`
+          );
         }
         state.language = selectedLanguage;
         if (selectedLanguage !== "en" && !loadedTranslations[selectedLanguage]) {
@@ -5300,19 +4681,29 @@ input[type="range"] {
         if (!loadedTranslations["en"]) {
           const englishLoaded = await loadTranslations("en");
           if (!englishLoaded) {
-            console.warn("\u26A0\uFE0F Failed to load English translations from CDN, using fallback");
-            showTranslationWarning("\u26A0\uFE0F Translation loading failed, using basic fallbacks");
+            console.warn(
+              "\u26A0\uFE0F Failed to load English translations from CDN, using fallback"
+            );
+            showTranslationWarning(
+              "\u26A0\uFE0F Translation loading failed, using basic fallbacks"
+            );
           }
         }
         await loadLanguagePreference();
-        console.log(`\u2705 Translation system initialized. Active language: ${state.language}`);
+        console.log(
+          `\u2705 Translation system initialized. Active language: ${state.language}`
+        );
       } catch (error) {
         console.error("\u274C Translation initialization failed:", error);
         if (!state.language) {
           state.language = "en";
         }
-        console.warn("\u26A0\uFE0F Using fallback translations due to initialization failure");
-        showTranslationWarning("\u26A0\uFE0F Translation system error, using basic English");
+        console.warn(
+          "\u26A0\uFE0F Using fallback translations due to initialization failure"
+        );
+        showTranslationWarning(
+          "\u26A0\uFE0F Translation system error, using basic English"
+        );
       }
     };
     const FALLBACK_TEXT = {
@@ -5345,9 +4736,15 @@ input[type="range"] {
         console.warn(`\u26A0\uFE0F Missing translation for key: ${key}`);
         return key;
       }
-      return Object.entries(replacements).reduce((result, [placeholder, value]) => {
-        return result.replace(new RegExp(`\\{${placeholder}\\}`, "g"), value);
-      }, text);
+      return Object.entries(replacements).reduce(
+        (result, [placeholder, value]) => {
+          return result.replace(
+            new RegExp(`\\{${placeholder}\\}`, "g"),
+            value
+          );
+        },
+        text
+      );
     };
     const state = {
       running: false,
@@ -5500,7 +4897,9 @@ input[type="range"] {
         }
         const currentHash = this._generateProcessHash();
         if (this.lastProcessedHash === currentHash && this.chunkedTiles.size > 0) {
-          console.log(`\u{1F4E6} Using cached overlay chunks (${this.chunkedTiles.size} tiles)`);
+          console.log(
+            `\u{1F4E6} Using cached overlay chunks (${this.chunkedTiles.size} tiles)`
+          );
           return;
         }
         this.processPromise = this._doProcessImageIntoChunks();
@@ -5570,16 +4969,35 @@ input[type="range"] {
         const imgStartY = (ty - startRegionY) * this.tileSize - startPixelY;
         const sX = Math.max(0, imgStartX);
         const sY = Math.max(0, imgStartY);
-        const sW = Math.min(imageWidth - sX, this.tileSize - (sX - imgStartX));
-        const sH = Math.min(imageHeight - sY, this.tileSize - (sY - imgStartY));
+        const sW = Math.min(
+          imageWidth - sX,
+          this.tileSize - (sX - imgStartX)
+        );
+        const sH = Math.min(
+          imageHeight - sY,
+          this.tileSize - (sY - imgStartY)
+        );
         if (sW <= 0 || sH <= 0)
           return null;
         const dX = Math.max(0, -imgStartX);
         const dY = Math.max(0, -imgStartY);
-        const chunkCanvas = new OffscreenCanvas(this.tileSize, this.tileSize);
+        const chunkCanvas = new OffscreenCanvas(
+          this.tileSize,
+          this.tileSize
+        );
         const chunkCtx = chunkCanvas.getContext("2d");
         chunkCtx.imageSmoothingEnabled = false;
-        chunkCtx.drawImage(this.imageBitmap, sX, sY, sW, sH, dX, dY, sW, sH);
+        chunkCtx.drawImage(
+          this.imageBitmap,
+          sX,
+          sY,
+          sW,
+          sH,
+          dX,
+          dY,
+          sW,
+          sH
+        );
         if (state.blueMarbleEnabled) {
           const imageData = chunkCtx.getImageData(dX, dY, sW, sH);
           const data = imageData.data;
@@ -5612,7 +5030,10 @@ input[type="range"] {
               try {
                 let canvas, ctx;
                 if (typeof OffscreenCanvas !== "undefined") {
-                  canvas = new OffscreenCanvas(originalBitmap.width, originalBitmap.height);
+                  canvas = new OffscreenCanvas(
+                    originalBitmap.width,
+                    originalBitmap.height
+                  );
                   ctx = canvas.getContext("2d");
                 } else {
                   canvas = document.createElement("canvas");
@@ -5622,21 +5043,37 @@ input[type="range"] {
                 }
                 ctx.imageSmoothingEnabled = false;
                 ctx.drawImage(originalBitmap, 0, 0);
-                const imgData = ctx.getImageData(0, 0, originalBitmap.width, originalBitmap.height);
+                const imgData = ctx.getImageData(
+                  0,
+                  0,
+                  originalBitmap.width,
+                  originalBitmap.height
+                );
                 this.originalTilesData.set(tileKey, {
                   w: originalBitmap.width,
                   h: originalBitmap.height,
                   data: new Uint8ClampedArray(imgData.data)
                 });
               } catch (e) {
-                console.warn("OverlayManager: could not cache ImageData for", tileKey, e);
+                console.warn(
+                  "OverlayManager: could not cache ImageData for",
+                  tileKey,
+                  e
+                );
               }
             } catch (e) {
-              console.warn("OverlayManager: could not create original bitmap for", tileKey, e);
+              console.warn(
+                "OverlayManager: could not create original bitmap for",
+                tileKey,
+                e
+              );
             }
             if (chunkBitmap) {
               try {
-                finalBlob = await this._compositeTileOptimized(blobData, chunkBitmap);
+                finalBlob = await this._compositeTileOptimized(
+                  blobData,
+                  chunkBitmap
+                );
               } catch (e) {
                 console.error("Error compositing overlay:", e);
                 finalBlob = blobData;
@@ -5666,7 +5103,13 @@ input[type="range"] {
           const a = d[idx + 3];
           if (!state.paintTransparentPixels && a < alphaThresh) {
             if (window._overlayDebug)
-              console.debug("OverlayManager: pixel transparent (cached), skipping", tileKey, x, y, a);
+              console.debug(
+                "OverlayManager: pixel transparent (cached), skipping",
+                tileKey,
+                x,
+                y,
+                a
+              );
             return null;
           }
           return [d[idx], d[idx + 1], d[idx + 2], a];
@@ -5676,7 +5119,13 @@ input[type="range"] {
           const bitmap = this.originalTiles.get(tileKey);
           if (!bitmap) {
             if (attempt === maxRetries) {
-              console.warn("OverlayManager: no bitmap for", tileKey, "after", maxRetries, "attempts");
+              console.warn(
+                "OverlayManager: no bitmap for",
+                tileKey,
+                "after",
+                maxRetries,
+                "attempts"
+              );
             } else {
               await Utils.sleep(50 * attempt);
             }
@@ -5685,7 +5134,10 @@ input[type="range"] {
           try {
             let canvas, ctx;
             if (typeof OffscreenCanvas !== "undefined") {
-              canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+              canvas = new OffscreenCanvas(
+                bitmap.width,
+                bitmap.height
+              );
               ctx = canvas.getContext("2d");
             } else {
               canvas = document.createElement("canvas");
@@ -5701,12 +5153,24 @@ input[type="range"] {
             const a = data[3];
             if (!state.paintTransparentPixels && a < alphaThresh) {
               if (window._overlayDebug)
-                console.debug("OverlayManager: pixel transparent (fallback)", tileKey, x, y, a);
+                console.debug(
+                  "OverlayManager: pixel transparent (fallback)",
+                  tileKey,
+                  x,
+                  y,
+                  a
+                );
               return null;
             }
             return [data[0], data[1], data[2], a];
           } catch (e) {
-            console.warn("OverlayManager: failed to read pixel (attempt", attempt, ")", tileKey, e);
+            console.warn(
+              "OverlayManager: failed to read pixel (attempt",
+              attempt,
+              ")",
+              tileKey,
+              e
+            );
             if (attempt < maxRetries) {
               await Utils.sleep(50 * attempt);
             } else {
@@ -5723,7 +5187,10 @@ input[type="range"] {
       }
       async _compositeTileOptimized(originalBlob, overlayBitmap) {
         const originalBitmap = await createImageBitmap(originalBlob);
-        const canvas = new OffscreenCanvas(originalBitmap.width, originalBitmap.height);
+        const canvas = new OffscreenCanvas(
+          originalBitmap.width,
+          originalBitmap.height
+        );
         const ctx = canvas.getContext("2d");
         ctx.imageSmoothingEnabled = false;
         ctx.drawImage(originalBitmap, 0, 0);
@@ -5771,9 +5238,13 @@ input[type="range"] {
             console.log("waitForTiles: stopped by user");
             return false;
           }
-          const missing = requiredTiles.filter((key) => !this.originalTiles.has(key));
+          const missing = requiredTiles.filter(
+            (key) => !this.originalTiles.has(key)
+          );
           if (missing.length === 0) {
-            console.log(`\u2705 All ${requiredTiles.length} required tiles are loaded`);
+            console.log(
+              `\u2705 All ${requiredTiles.length} required tiles are loaded`
+            );
             return true;
           }
           await Utils.sleep(100);
@@ -5832,7 +5303,9 @@ input[type="range"] {
           console.log("\u2705 Token captured and cached successfully");
           return token;
         }
-        console.log("\u26A0\uFE0F Invisible Turnstile failed, forcing browser automation...");
+        console.log(
+          "\u26A0\uFE0F Invisible Turnstile failed, forcing browser automation..."
+        );
         const fallbackToken = await handleCaptchaFallback();
         if (fallbackToken && fallbackToken.length > 20) {
           setTurnstileToken(fallbackToken);
@@ -5867,10 +5340,14 @@ input[type="range"] {
           token = preGeneratedToken;
         } else {
           if (isTokenValid()) {
-            console.log("\u267B\uFE0F Using existing cached token (from previous session)");
+            console.log(
+              "\u267B\uFE0F Using existing cached token (from previous session)"
+            );
             token = turnstileToken;
           } else {
-            console.log("\u{1F510} Generating new token with executeTurnstile...");
+            console.log(
+              "\u{1F510} Generating new token with executeTurnstile..."
+            );
             token = await Utils.executeTurnstile(sitekey, "paint");
             if (token)
               setTurnstileToken(token);
@@ -5878,14 +5355,21 @@ input[type="range"] {
         }
         if (token && typeof token === "string" && token.length > 20) {
           const elapsed = Math.round(performance.now() - startTime);
-          console.log(`\u2705 Turnstile token generated successfully in ${elapsed}ms`);
+          console.log(
+            `\u2705 Turnstile token generated successfully in ${elapsed}ms`
+          );
           return token;
         } else {
-          throw new Error(`Invalid or empty token received - Length: ${(token == null ? void 0 : token.length) || 0}`);
+          throw new Error(
+            `Invalid or empty token received - Length: ${(token == null ? void 0 : token.length) || 0}`
+          );
         }
       } catch (error) {
         const elapsed = Math.round(performance.now() - startTime);
-        console.error(`\u274C Turnstile token generation failed after ${elapsed}ms:`, error);
+        console.error(
+          `\u274C Turnstile token generation failed after ${elapsed}ms:`,
+          error
+        );
         throw error;
       }
     }
@@ -5925,7 +5409,13 @@ input[type="range"] {
                 console.log(
                   `\u{1F50D}\u2705 Turnstile Token Captured - Type: ${typeof payload.t}, Value: ${payload.t ? typeof payload.t === "string" ? payload.t.length > 50 ? payload.t.substring(0, 50) + "..." : payload.t : JSON.stringify(payload.t) : "null/undefined"}, Length: ${((_a = payload.t) == null ? void 0 : _a.length) || 0}`
                 );
-                window.postMessage({ source: "turnstile-capture", token: payload.t }, "*");
+                window.postMessage(
+                  {
+                    source: "turnstile-capture",
+                    token: payload.t
+                  },
+                  "*"
+                );
               }
             } catch (_) {
             }
@@ -5970,7 +5460,9 @@ input[type="range"] {
         setTurnstileToken(token);
         if ((_a = document.querySelector("#statusText")) == null ? void 0 : _a.textContent.includes("CAPTCHA")) {
           Utils.showAlert(Utils.t("tokenCapturedSuccess"), "success");
-          updateUI("colorsFound", "success", { count: state.availableColors.length });
+          updateUI("colorsFound", "success", {
+            count: state.availableColors.length
+          });
         }
       }
     });
@@ -6124,9 +5616,14 @@ input[type="range"] {
           try {
             console.log("\u{1F504} Reusing existing Turnstile widget...");
             const token = await Promise.race([
-              window.turnstile.execute(this._turnstileWidgetId, { action }),
+              window.turnstile.execute(this._turnstileWidgetId, {
+                action
+              }),
               new Promise(
-                (_, reject) => setTimeout(() => reject(new Error("Execute timeout")), 15e3)
+                (_, reject) => setTimeout(
+                  () => reject(new Error("Execute timeout")),
+                  15e3
+                )
               )
             ]);
             if (token && token.length > 20) {
@@ -6134,10 +5631,16 @@ input[type="range"] {
               return token;
             }
           } catch (error) {
-            console.log("\uFFFD Widget reuse failed, will create a fresh widget:", error.message);
+            console.log(
+              "\uFFFD Widget reuse failed, will create a fresh widget:",
+              error.message
+            );
           }
         }
-        const invisibleToken = await this.createTurnstileWidget(sitekey, action);
+        const invisibleToken = await this.createTurnstileWidget(
+          sitekey,
+          action
+        );
         if (invisibleToken && invisibleToken.length > 20) {
           return invisibleToken;
         }
@@ -6151,15 +5654,22 @@ input[type="range"] {
             if (this._turnstileWidgetId && ((_a = window.turnstile) == null ? void 0 : _a.remove)) {
               try {
                 window.turnstile.remove(this._turnstileWidgetId);
-                console.log("\u{1F9F9} Cleaned up existing Turnstile widget");
+                console.log(
+                  "\u{1F9F9} Cleaned up existing Turnstile widget"
+                );
               } catch (e) {
-                console.warn("\u26A0\uFE0F Widget cleanup warning:", e.message);
+                console.warn(
+                  "\u26A0\uFE0F Widget cleanup warning:",
+                  e.message
+                );
               }
             }
             const container = this.ensureTurnstileContainer();
             container.innerHTML = "";
             if (!((_b = window.turnstile) == null ? void 0 : _b.render)) {
-              console.error("\u274C Turnstile not available for rendering");
+              console.error(
+                "\u274C Turnstile not available for rendering"
+              );
               resolve(null);
               return;
             }
@@ -6185,7 +5695,12 @@ input[type="range"] {
             Promise.race([
               window.turnstile.execute(widgetId, { action }),
               new Promise(
-                (_, reject) => setTimeout(() => reject(new Error("Invisible execute timeout")), 12e3)
+                (_, reject) => setTimeout(
+                  () => reject(
+                    new Error("Invisible execute timeout")
+                  ),
+                  12e3
+                )
               )
             ]).then(resolve).catch(() => resolve(null));
           } catch (e) {
@@ -6203,13 +5718,18 @@ input[type="range"] {
               try {
                 window.turnstile.remove(this._turnstileWidgetId);
               } catch (e) {
-                console.warn("\u26A0\uFE0F Widget cleanup warning:", e.message);
+                console.warn(
+                  "\u26A0\uFE0F Widget cleanup warning:",
+                  e.message
+                );
               }
             }
             const overlay = this.ensureTurnstileOverlayContainer();
             overlay.classList.remove("wplace-overlay-hidden");
             overlay.style.display = "block";
-            const host = overlay.querySelector("#turnstile-overlay-host");
+            const host = overlay.querySelector(
+              "#turnstile-overlay-host"
+            );
             host.innerHTML = "";
             const timeout = setTimeout(() => {
               console.warn("\u23F0 Interactive Turnstile widget timeout");
@@ -6226,11 +5746,15 @@ input[type="range"] {
                 clearTimeout(timeout);
                 overlay.classList.add("wplace-overlay-hidden");
                 overlay.style.display = "none";
-                console.log("\u2705 Interactive Turnstile completed successfully");
+                console.log(
+                  "\u2705 Interactive Turnstile completed successfully"
+                );
                 if (typeof token === "string" && token.length > 20) {
                   resolve(token);
                 } else {
-                  console.warn("\u274C Invalid token from interactive widget");
+                  console.warn(
+                    "\u274C Invalid token from interactive widget"
+                  );
                   resolve(null);
                 }
               },
@@ -6238,7 +5762,10 @@ input[type="range"] {
                 clearTimeout(timeout);
                 overlay.classList.add("wplace-overlay-hidden");
                 overlay.style.display = "none";
-                console.warn("\u274C Interactive Turnstile error:", error);
+                console.warn(
+                  "\u274C Interactive Turnstile error:",
+                  error
+                );
                 resolve(null);
               }
             });
@@ -6248,13 +5775,20 @@ input[type="range"] {
               clearTimeout(timeout);
               overlay.classList.add("wplace-overlay-hidden");
               overlay.style.display = "none";
-              console.warn("\u274C Failed to create interactive Turnstile widget");
+              console.warn(
+                "\u274C Failed to create interactive Turnstile widget"
+              );
               resolve(null);
             } else {
-              console.log("\u2705 Interactive Turnstile widget created, waiting for user interaction...");
+              console.log(
+                "\u2705 Interactive Turnstile widget created, waiting for user interaction..."
+              );
             }
           } catch (e) {
-            console.error("\u274C Interactive Turnstile creation failed:", e);
+            console.error(
+              "\u274C Interactive Turnstile creation failed:",
+              e
+            );
             resolve(null);
           }
         });
@@ -6303,12 +5837,16 @@ input[type="range"] {
           console.log(`\u{1F50D} Testing sitekey from ${source}:`, sitekey);
           const token = await this.executeTurnstile(sitekey);
           if (token && token.length >= 20) {
-            console.log(`\u2705 Valid token generated from ${source} sitekey`);
+            console.log(
+              `\u2705 Valid token generated from ${source} sitekey`
+            );
             setTurnstileToken(token);
             this._cachedSitekey = sitekey;
             return { sitekey, token };
           } else {
-            console.log(`\u274C Failed to get token from ${source} sitekey`);
+            console.log(
+              `\u274C Failed to get token from ${source} sitekey`
+            );
             return null;
           }
         };
@@ -6324,7 +5862,10 @@ input[type="range"] {
           const turnstileEl = document.querySelector(".cf-turnstile");
           if ((_a = turnstileEl == null ? void 0 : turnstileEl.dataset) == null ? void 0 : _a.sitekey) {
             const sitekey = turnstileEl.dataset.sitekey;
-            const result = await trySitekey(sitekey, "turnstile element");
+            const result = await trySitekey(
+              sitekey,
+              "turnstile element"
+            );
             if (result) {
               return result;
             }
@@ -6340,7 +5881,10 @@ input[type="range"] {
             }
           }
           if (window.__TURNSTILE_SITEKEY) {
-            const result = await trySitekey(window.__TURNSTILE_SITEKEY, "global variable");
+            const result = await trySitekey(
+              window.__TURNSTILE_SITEKEY,
+              "global variable"
+            );
             if (result) {
               return result;
             }
@@ -6353,7 +5897,10 @@ input[type="range"] {
             );
             if (match && match[1]) {
               const extracted = match[1].replace(/['"]/g, "");
-              const result = await trySitekey(extracted, "script content");
+              const result = await trySitekey(
+                extracted,
+                "script content"
+              );
               if (result) {
                 return result;
               }
@@ -6425,8 +5972,14 @@ input[type="range"] {
           timeout = setTimeout(() => {
             const acceleratingRepeat = () => {
               callback();
-              currentInterval = Math.max(minInterval, currentInterval * acceleration);
-              interval = setTimeout(acceleratingRepeat, currentInterval);
+              currentInterval = Math.max(
+                minInterval,
+                currentInterval * acceleration
+              );
+              interval = setTimeout(
+                acceleratingRepeat,
+                currentInterval
+              );
             };
             acceleratingRepeat();
           }, initialDelay);
@@ -6471,10 +6024,15 @@ input[type="range"] {
         }
         let text = ((_c = FALLBACK_TEXT[state.language]) == null ? void 0 : _c[key]) || ((_d = FALLBACK_TEXT.en) == null ? void 0 : _d[key]) || key;
         Object.keys(params).forEach((param) => {
-          text = text.replace(new RegExp(`\\{${param}\\}`, "g"), params[param]);
+          text = text.replace(
+            new RegExp(`\\{${param}\\}`, "g"),
+            params[param]
+          );
         });
         if (text === key && key !== "undefined") {
-          console.warn(`\u26A0\uFE0F Missing translation for key: ${key} (language: ${state.language})`);
+          console.warn(
+            `\u26A0\uFE0F Missing translation for key: ${key} (language: ${state.language})`
+          );
         }
         return text;
       },
@@ -6490,7 +6048,9 @@ input[type="range"] {
           }, 300);
         }, 4e3);
       },
-      colorDistance: (a, b) => Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2) + Math.pow(a[2] - b[2], 2)),
+      colorDistance: (a, b) => Math.sqrt(
+        Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2) + Math.pow(a[2] - b[2], 2)
+      ),
       _labCache: /* @__PURE__ */ new Map(),
       // key: (r<<16)|(g<<8)|b  value: [L,a,b]
       _rgbToLab: (r, g, b) => {
@@ -6601,7 +6161,10 @@ input[type="range"] {
             (c) => c.rgb[0] >= whiteThreshold && c.rgb[1] >= whiteThreshold && c.rgb[2] >= whiteThreshold
           );
           if (whiteEntry) {
-            const result2 = { id: whiteEntry.id, rgb: [...whiteEntry.rgb] };
+            const result2 = {
+              id: whiteEntry.id,
+              rgb: [...whiteEntry.rgb]
+            };
             colorCache.set(cacheKey, result2);
             return result2;
           }
@@ -6629,7 +6192,11 @@ input[type="range"] {
             }
           }
         } else {
-          const [Lt, at, bt] = Utils._lab(targetRgb[0], targetRgb[1], targetRgb[2]);
+          const [Lt, at, bt] = Utils._lab(
+            targetRgb[0],
+            targetRgb[1],
+            targetRgb[2]
+          );
           const targetChroma = Math.sqrt(at * at + bt * bt);
           const penaltyWeight = state.enableChromaPenalty ? state.chromaPenaltyWeight || 0.15 : 0;
           for (let i = 0; i < availableColors.length; i++) {
@@ -6709,7 +6276,9 @@ input[type="range"] {
         input.click();
       }),
       extractAvailableColors: () => {
-        const colorElements = document.querySelectorAll('.tooltip button[id^="color-"]');
+        const colorElements = document.querySelectorAll(
+          '.tooltip button[id^="color-"]'
+        );
         if (colorElements.length === 0) {
           console.log("\u274C No color elements found on page");
           return null;
@@ -6722,11 +6291,15 @@ input[type="range"] {
             return;
           const rgbStr = el.style.backgroundColor.match(/\d+/g);
           if (!rgbStr || rgbStr.length < 3) {
-            console.warn(`Skipping color element ${el.id} \u2014 cannot parse RGB`);
+            console.warn(
+              `Skipping color element ${el.id} \u2014 cannot parse RGB`
+            );
             return;
           }
           const rgb = rgbStr.map(Number);
-          const colorInfo = Object.values(CONFIG.COLOR_MAP).find((color) => color.id === id);
+          const colorInfo = Object.values(CONFIG.COLOR_MAP).find(
+            (color) => color.id === id
+          );
           const name = colorInfo ? colorInfo.name : `Unknown Color ${id}`;
           const colorData = { id, name, rgb };
           if (!el.querySelector("svg")) {
@@ -6737,8 +6310,12 @@ input[type="range"] {
         });
         console.log("=== CAPTURED COLORS STATUS ===");
         console.log(`Total available colors: ${availableColors.length}`);
-        console.log(`Total unavailable colors: ${unavailableColors.length}`);
-        console.log(`Total colors scanned: ${availableColors.length + unavailableColors.length}`);
+        console.log(
+          `Total unavailable colors: ${unavailableColors.length}`
+        );
+        console.log(
+          `Total colors scanned: ${availableColors.length + unavailableColors.length}`
+        );
         if (availableColors.length > 0) {
           console.log("\n--- AVAILABLE COLORS ---");
           availableColors.forEach((color, index) => {
@@ -6778,7 +6355,9 @@ input[type="range"] {
           return 0;
         const paintingSpeedDelay = state.paintingSpeed > 0 ? 1e3 / state.paintingSpeed : 1e3;
         const timeFromSpeed = remainingPixels * paintingSpeedDelay;
-        const cyclesNeeded = Math.ceil(remainingPixels / Math.max(charges, 1));
+        const cyclesNeeded = Math.ceil(
+          remainingPixels / Math.max(charges, 1)
+        );
         const timeFromCharges = cyclesNeeded * cooldown;
         return timeFromSpeed + timeFromCharges;
       },
@@ -6886,7 +6465,11 @@ input[type="range"] {
           const width = (_a = migrated.imageData) == null ? void 0 : _a.width;
           const height = (_b = migrated.imageData) == null ? void 0 : _b.height;
           if (migrated.paintedMap && width && height) {
-            const data = Utils.packPaintedMapToBase64(migrated.paintedMap, width, height);
+            const data = Utils.packPaintedMapToBase64(
+              migrated.paintedMap,
+              width,
+              height
+            );
             migrated.paintedMapPacked = { width, height, data };
           }
           delete migrated.paintedMap;
@@ -6913,7 +6496,11 @@ input[type="range"] {
             const width = (_a = migrated.imageData) == null ? void 0 : _a.width;
             const height = (_b = migrated.imageData) == null ? void 0 : _b.height;
             if (migrated.paintedMap && width && height) {
-              const data = Utils.packPaintedMapToBase64(migrated.paintedMap, width, height);
+              const data = Utils.packPaintedMapToBase64(
+                migrated.paintedMap,
+                width,
+                height
+              );
               migrated.paintedMapPacked = { width, height, data };
             }
             delete migrated.paintedMap;
@@ -6921,7 +6508,10 @@ input[type="range"] {
           migrated.version = "2.1";
           return migrated;
         } catch (e) {
-          console.warn("Migration to v2.1 failed, using original data:", e);
+          console.warn(
+            "Migration to v2.1 failed, using original data:",
+            e
+          );
           return saved;
         }
       },
@@ -6946,7 +6536,10 @@ input[type="range"] {
           }
           return migrated;
         } catch (e) {
-          console.warn("Migration to v2.2 failed, using original data:", e);
+          console.warn(
+            "Migration to v2.2 failed, using original data:",
+            e
+          );
           return data;
         }
       },
@@ -7014,7 +6607,10 @@ input[type="range"] {
       saveProgress: () => {
         try {
           const progressData = Utils.buildProgressData(state);
-          localStorage.setItem("wplace-bot-progress", JSON.stringify(progressData));
+          localStorage.setItem(
+            "wplace-bot-progress",
+            JSON.stringify(progressData)
+          );
           return true;
         } catch (error) {
           console.error("Error saving progress:", error);
@@ -7030,7 +6626,10 @@ input[type="range"] {
           const migrated = Utils.migrateProgress(data);
           if (migrated && migrated !== data) {
             try {
-              localStorage.setItem("wplace-bot-progress", JSON.stringify(migrated));
+              localStorage.setItem(
+                "wplace-bot-progress",
+                JSON.stringify(migrated)
+              );
             } catch {
             }
           }
@@ -7079,7 +6678,9 @@ input[type="range"] {
           if (savedData.imageData) {
             state.imageData = {
               ...savedData.imageData,
-              pixels: new Uint8ClampedArray(savedData.imageData.pixels)
+              pixels: new Uint8ClampedArray(
+                savedData.imageData.pixels
+              )
             };
             try {
               const canvas = document.createElement("canvas");
@@ -7098,14 +6699,23 @@ input[type="range"] {
               proc.ctx = ctx;
               state.imageData.processor = proc;
             } catch (e) {
-              console.warn("Could not rebuild processor from saved image data:", e);
+              console.warn(
+                "Could not rebuild processor from saved image data:",
+                e
+              );
             }
           }
           if (savedData.paintedMapPacked && savedData.paintedMapPacked.data) {
             const { width, height, data } = savedData.paintedMapPacked;
-            state.paintedMap = Utils.unpackPaintedMapFromBase64(data, width, height);
+            state.paintedMap = Utils.unpackPaintedMapFromBase64(
+              data,
+              width,
+              height
+            );
           } else if (savedData.paintedMap) {
-            state.paintedMap = savedData.paintedMap.map((row) => Array.from(row));
+            state.paintedMap = savedData.paintedMap.map(
+              (row) => Array.from(row)
+            );
           }
           return true;
         } catch (error) {
@@ -7117,7 +6727,10 @@ input[type="range"] {
         try {
           const progressData = Utils.buildProgressData();
           const filename = `wplace-bot-progress-${(/* @__PURE__ */ new Date()).toISOString().slice(0, 19).replace(/:/g, "-")}.json`;
-          Utils.createFileDownloader(JSON.stringify(progressData, null, 2), filename);
+          Utils.createFileDownloader(
+            JSON.stringify(progressData, null, 2),
+            filename
+          );
           return true;
         } catch (error) {
           console.error("Error saving to file:", error);
@@ -7149,12 +6762,18 @@ input[type="range"] {
             state.imageData.width,
             state.imageData.height
           );
-          const canvas = new OffscreenCanvas(state.imageData.width, state.imageData.height);
+          const canvas = new OffscreenCanvas(
+            state.imageData.width,
+            state.imageData.height
+          );
           const ctx = canvas.getContext("2d");
           ctx.putImageData(imageData, 0, 0);
           const imageBitmap = await canvas.transferToImageBitmap();
           await overlayManager.setImage(imageBitmap);
-          await overlayManager.setPosition(state.startPosition, state.region);
+          await overlayManager.setPosition(
+            state.startPosition,
+            state.region
+          );
           overlayManager.enable();
           const toggleOverlayBtn = document.getElementById("toggleOverlayBtn");
           if (toggleOverlayBtn) {
@@ -7168,7 +6787,12 @@ input[type="range"] {
           return false;
         }
       },
-      updateCoordinateUI({ mode, directionControls, snakeControls, blockControls }) {
+      updateCoordinateUI({
+        mode,
+        directionControls,
+        snakeControls,
+        blockControls
+      }) {
         const isLinear = mode === "rows" || mode === "columns";
         const isBlock = mode === "blocks" || mode === "shuffle-blocks";
         if (directionControls)
@@ -7209,7 +6833,12 @@ input[type="range"] {
         };
       }
       getPixelData() {
-        return this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height).data;
+        return this.ctx.getImageData(
+          0,
+          0,
+          this.canvas.width,
+          this.canvas.height
+        ).data;
       }
       resize(newWidth, newHeight) {
         const tempCanvas = document.createElement("canvas");
@@ -7245,14 +6874,19 @@ input[type="range"] {
             colors: [color],
             t: turnstileToken
           };
-          const res = await fetch(`https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`, {
-            method: "POST",
-            headers: { "Content-Type": "text/plain;charset=UTF-8" },
-            credentials: "include",
-            body: JSON.stringify(payload)
-          });
+          const res = await fetch(
+            `https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "text/plain;charset=UTF-8" },
+              credentials: "include",
+              body: JSON.stringify(payload)
+            }
+          );
           if (res.status === 403) {
-            console.error("\u274C 403 Forbidden. Turnstile token might be invalid or expired.");
+            console.error(
+              "\u274C 403 Forbidden. Turnstile token might be invalid or expired."
+            );
             turnstileToken = null;
             tokenPromise = new Promise((resolve) => {
               _resolveToken = resolve;
@@ -7302,7 +6936,10 @@ input[type="range"] {
       },
       async requestPermission() {
         if (!("Notification" in window)) {
-          Utils.showAlert(Utils.t("notificationsNotSupported"), "warning");
+          Utils.showAlert(
+            Utils.t("notificationsNotSupported"),
+            "warning"
+          );
           return "denied";
         }
         if (Notification.permission === "granted")
@@ -7356,7 +6993,11 @@ input[type="range"] {
               max: state.maxCharges,
               threshold: state.cooldownChargeThreshold
             });
-            this.notify(Utils.t("chargesReadyNotification"), msg, "wplace-notify-charges");
+            this.notify(
+              Utils.t("chargesReadyNotification"),
+              msg,
+              "wplace-notify-charges"
+            );
             state._lastChargesNotifyAt = now;
           }
           state._lastChargesBelow = false;
@@ -7403,7 +7044,9 @@ input[type="range"] {
     function updateActiveColorPalette() {
       var _a;
       state.activeColorPalette = [];
-      const activeSwatches = document.querySelectorAll(".wplace-color-swatch.active");
+      const activeSwatches = document.querySelectorAll(
+        ".wplace-color-swatch.active"
+      );
       if (activeSwatches) {
         activeSwatches.forEach((swatch) => {
           const rgbStr = swatch.getAttribute("data-rgb");
@@ -7435,7 +7078,10 @@ input[type="range"] {
       const swatches = document.querySelectorAll(".wplace-color-swatch");
       if (swatches) {
         swatches.forEach((swatch) => {
-          const colorId = parseInt(swatch.getAttribute("data-color-id"), 10);
+          const colorId = parseInt(
+            swatch.getAttribute("data-color-id"),
+            10
+          );
           if (!isNaN(colorId) && colorId >= 32) {
             swatch.classList.toggle("active", false);
           }
@@ -7459,7 +7105,9 @@ input[type="range"] {
         colorsContainer.innerHTML = "";
         let availableCount = 0;
         let totalCount = 0;
-        const allColors = Object.values(CONFIG.COLOR_MAP).filter((color) => color.rgb !== null);
+        const allColors = Object.values(CONFIG.COLOR_MAP).filter(
+          (color) => color.rgb !== null
+        );
         allColors.forEach((colorData) => {
           const { id, name, rgb } = colorData;
           const rgbKey = `${rgb.r},${rgb.g},${rgb.b}`;
@@ -7515,14 +7163,22 @@ input[type="range"] {
           populateColors(e.target.checked);
         });
       }
-      (_a = container.querySelector("#selectAllBtn")) == null ? void 0 : _a.addEventListener("click", () => toggleAllColors(true, showAllToggle == null ? void 0 : showAllToggle.checked));
-      (_b = container.querySelector("#unselectAllBtn")) == null ? void 0 : _b.addEventListener("click", () => toggleAllColors(false, showAllToggle == null ? void 0 : showAllToggle.checked));
+      (_a = container.querySelector("#selectAllBtn")) == null ? void 0 : _a.addEventListener(
+        "click",
+        () => toggleAllColors(true, showAllToggle == null ? void 0 : showAllToggle.checked)
+      );
+      (_b = container.querySelector("#unselectAllBtn")) == null ? void 0 : _b.addEventListener(
+        "click",
+        () => toggleAllColors(false, showAllToggle == null ? void 0 : showAllToggle.checked)
+      );
       (_c = container.querySelector("#unselectPaidBtn")) == null ? void 0 : _c.addEventListener("click", () => unselectAllPaidColors());
     }
     async function handleCaptcha() {
       const startTime = performance.now();
       if (state.tokenSource === "manual") {
-        console.log("\u{1F3AF} Manual token source selected - using pixel placement automation");
+        console.log(
+          "\u{1F3AF} Manual token source selected - using pixel placement automation"
+        );
         return await handleCaptchaFallback();
       }
       try {
@@ -7542,13 +7198,19 @@ input[type="range"] {
         }
         let token = null;
         if (preGeneratedToken && typeof preGeneratedToken === "string" && preGeneratedToken.length > 20) {
-          console.log("\u267B\uFE0F Reusing pre-generated token from sitekey detection phase");
+          console.log(
+            "\u267B\uFE0F Reusing pre-generated token from sitekey detection phase"
+          );
           token = preGeneratedToken;
         } else if (isTokenValid()) {
-          console.log("\u267B\uFE0F Using existing cached token (from previous operation)");
+          console.log(
+            "\u267B\uFE0F Using existing cached token (from previous operation)"
+          );
           token = turnstileToken;
         } else {
-          console.log("\u{1F510} No valid pre-generated or cached token, creating new one...");
+          console.log(
+            "\u{1F510} No valid pre-generated or cached token, creating new one..."
+          );
           token = await Utils.executeTurnstile(sitekey, "paint");
           if (token) {
             setTurnstileToken(token);
@@ -7559,7 +7221,9 @@ input[type="range"] {
         );
         if (typeof token === "string" && token.length > 20) {
           const duration = Math.round(performance.now() - startTime);
-          console.log(`\u2705 Turnstile token generated successfully in ${duration}ms`);
+          console.log(
+            `\u2705 Turnstile token generated successfully in ${duration}ms`
+          );
           return token;
         } else {
           throw new Error(
@@ -7570,7 +7234,10 @@ input[type="range"] {
         }
       } catch (error) {
         const duration = Math.round(performance.now() - startTime);
-        console.error(`\u274C Turnstile token generation failed after ${duration}ms:`, error);
+        console.error(
+          `\u274C Turnstile token generation failed after ${duration}ms:`,
+          error
+        );
         if (state.tokenSource === "hybrid") {
           console.log(
             "\u{1F504} Hybrid mode: Generator failed, automatically switching to manual pixel placement..."
@@ -7600,15 +7267,27 @@ input[type="range"] {
               1e4
             );
             if (!mainPaintBtn)
-              throw new Error("Could not find the main paint button.");
+              throw new Error(
+                "Could not find the main paint button."
+              );
             mainPaintBtn.click();
             await Utils.sleep(500);
-            const transBtn = await Utils.waitForSelector("button#color-0", 200, 5e3);
+            const transBtn = await Utils.waitForSelector(
+              "button#color-0",
+              200,
+              5e3
+            );
             if (!transBtn)
-              throw new Error("Could not find the transparent color button.");
+              throw new Error(
+                "Could not find the transparent color button."
+              );
             transBtn.click();
             await Utils.sleep(500);
-            const canvas = await Utils.waitForSelector("canvas", 200, 5e3);
+            const canvas = await Utils.waitForSelector(
+              "canvas",
+              200,
+              5e3
+            );
             if (!canvas)
               throw new Error("Could not find the canvas element.");
             canvas.setAttribute("tabindex", "0");
@@ -7646,7 +7325,11 @@ input[type="range"] {
                   "button.btn.btn-primary.btn-lg, button.btn.btn-primary.sm\\:btn-xl"
                 );
                 if (!confirmBtn) {
-                  const allPrimary = Array.from(document.querySelectorAll("button.btn-primary"));
+                  const allPrimary = Array.from(
+                    document.querySelectorAll(
+                      "button.btn-primary"
+                    )
+                  );
                   confirmBtn = allPrimary.length ? allPrimary[allPrimary.length - 1] : null;
                 }
                 if (confirmBtn) {
@@ -7670,9 +7353,13 @@ input[type="range"] {
     async function createUI() {
       var _a, _b;
       await detectLanguage();
-      const existingContainer = document.getElementById("wplace-image-bot-container");
+      const existingContainer = document.getElementById(
+        "wplace-image-bot-container"
+      );
       const existingStats = document.getElementById("wplace-stats-container");
-      const existingSettings = document.getElementById("wplace-settings-container");
+      const existingSettings = document.getElementById(
+        "wplace-settings-container"
+      );
       const existingResizeContainer = document.querySelector(".resize-container");
       const existingResizeOverlay = document.querySelector(".resize-overlay");
       if (existingContainer)
@@ -7690,9 +7377,9 @@ input[type="range"] {
       const theme = getCurrentTheme();
       applyTheme();
       function appendLinkOnce(href, attributes = {}) {
-        const exists = Array.from(document.head.querySelectorAll("link")).some(
-          (link2) => link2.href === href
-        );
+        const exists = Array.from(
+          document.head.querySelectorAll("link")
+        ).some((link2) => link2.href === href);
         if (exists)
           return;
         const link = document.createElement("link");
@@ -7703,9 +7390,13 @@ input[type="range"] {
         }
         document.head.appendChild(link);
       }
-      appendLinkOnce("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css");
+      appendLinkOnce(
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      );
       if (theme.fontFamily.includes("Press Start 2P")) {
-        appendLinkOnce("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
+        appendLinkOnce(
+          "https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+        );
       }
       const styleElement = document.createElement("style");
       styleElement.textContent = EMBEDDED_CSS;
@@ -7721,7 +7412,11 @@ input[type="range"] {
         border-bottom: 1px solid rgba(255,255,255,0.1);
         font-family: 'Courier New', monospace;
       ">
-        Build: 2025-09-02 23:09:15 <br /> Commit: ef18daa
+        Build: 2025-09-04 16:23:57 | Target: standalone <br />
+        Commit: e93dc06 | Branch: dx-improvment <br />
+        Git: <span style="color: #dc3545;">dirty</span> | Env: <span style="color: #fd7e14;">development</span> <br />
+        Last: Merge upstream/dev into dx-improvment branch <br />
+        Node: v18.19.1
       </div>
     ` : "";
       const container = document.createElement("div");
@@ -7895,14 +7590,32 @@ input[type="range"] {
       const themeBackground = theme.primary ? `linear-gradient(135deg, ${theme.primary} 0%, ${theme.secondary || theme.primary} 100%)` : `linear-gradient(135deg, #667eea 0%, #764ba2 100%)`;
       settingsContainer.className = "wplace-settings-container-base wplace-settings-container-themed";
       settingsContainer.style.background = themeBackground;
-      settingsContainer.style.setProperty("--theme-text", theme.text || "white");
-      settingsContainer.style.setProperty("--theme-font-family", theme.fontFamily || "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif");
-      settingsContainer.style.setProperty("--theme-box-shadow", theme.boxShadow || "0 20px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1)");
-      settingsContainer.style.setProperty("--theme-backdrop-filter", theme.backdropFilter || "blur(10px)");
-      settingsContainer.style.setProperty("--theme-highlight", theme.highlight || "#48dbfb");
+      settingsContainer.style.setProperty(
+        "--theme-text",
+        theme.text || "white"
+      );
+      settingsContainer.style.setProperty(
+        "--theme-font-family",
+        theme.fontFamily || "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+      );
+      settingsContainer.style.setProperty(
+        "--theme-box-shadow",
+        theme.boxShadow || "0 20px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1)"
+      );
+      settingsContainer.style.setProperty(
+        "--theme-backdrop-filter",
+        theme.backdropFilter || "blur(10px)"
+      );
+      settingsContainer.style.setProperty(
+        "--theme-highlight",
+        theme.highlight || "#48dbfb"
+      );
       if ((_a = theme.animations) == null ? void 0 : _a.glow) {
         settingsContainer.classList.add("glow-effect");
-        settingsContainer.style.setProperty("--theme-glow-color", theme.highlight || theme.neon || "#00ffff");
+        settingsContainer.style.setProperty(
+          "--theme-glow-color",
+          theme.highlight || theme.neon || "#00ffff"
+        );
       }
       settingsContainer.innerHTML = `
       <div class="wplace-settings-header">
@@ -8621,22 +8334,32 @@ input[type="range"] {
           }, 300);
         });
         applySettingsBtn.addEventListener("click", () => {
-          const colorAlgorithmSelect = document.getElementById("colorAlgorithmSelect");
+          const colorAlgorithmSelect = document.getElementById(
+            "colorAlgorithmSelect"
+          );
           if (colorAlgorithmSelect)
             state.colorMatchingAlgorithm = colorAlgorithmSelect.value;
-          const enableChromaPenaltyToggle = document.getElementById("enableChromaPenaltyToggle");
+          const enableChromaPenaltyToggle = document.getElementById(
+            "enableChromaPenaltyToggle"
+          );
           if (enableChromaPenaltyToggle)
             state.enableChromaPenalty = enableChromaPenaltyToggle.checked;
-          const chromaPenaltyWeightSlider = document.getElementById("chromaPenaltyWeightSlider");
+          const chromaPenaltyWeightSlider = document.getElementById(
+            "chromaPenaltyWeightSlider"
+          );
           if (chromaPenaltyWeightSlider)
             state.chromaPenaltyWeight = parseFloat(chromaPenaltyWeightSlider.value) || 0.15;
-          const transparencyThresholdInput = document.getElementById("transparencyThresholdInput");
+          const transparencyThresholdInput = document.getElementById(
+            "transparencyThresholdInput"
+          );
           if (transparencyThresholdInput) {
             const v = parseInt(transparencyThresholdInput.value, 10);
             if (!isNaN(v) && v >= 0 && v <= 255)
               state.customTransparencyThreshold = v;
           }
-          const whiteThresholdInput = document.getElementById("whiteThresholdInput");
+          const whiteThresholdInput = document.getElementById(
+            "whiteThresholdInput"
+          );
           if (whiteThresholdInput) {
             const v = parseInt(whiteThresholdInput.value, 10);
             if (!isNaN(v) && v >= 200 && v <= 255)
@@ -8645,8 +8368,12 @@ input[type="range"] {
           CONFIG.TRANSPARENCY_THRESHOLD = state.customTransparencyThreshold;
           CONFIG.WHITE_THRESHOLD = state.customWhiteThreshold;
           const notifEnabledToggle = document.getElementById("notifEnabledToggle");
-          const notifOnChargesToggle = document.getElementById("notifOnChargesToggle");
-          const notifOnlyUnfocusedToggle = document.getElementById("notifOnlyUnfocusedToggle");
+          const notifOnChargesToggle = document.getElementById(
+            "notifOnChargesToggle"
+          );
+          const notifOnlyUnfocusedToggle = document.getElementById(
+            "notifOnlyUnfocusedToggle"
+          );
           const notifIntervalInput = document.getElementById("notifIntervalInput");
           if (notifEnabledToggle)
             state.notificationsEnabled = !!notifEnabledToggle.checked;
@@ -8670,21 +8397,29 @@ input[type="range"] {
           tokenSourceSelect.addEventListener("change", (e) => {
             state.tokenSource = e.target.value;
             saveBotSettings();
-            console.log(`\u{1F511} Token source changed to: ${state.tokenSource}`);
+            console.log(
+              `\u{1F511} Token source changed to: ${state.tokenSource}`
+            );
             const sourceNames = {
               generator: "Automatic Generator",
               hybrid: "Generator + Auto Fallback",
               manual: "Manual Pixel Placement"
             };
             Utils.showAlert(
-              Utils.t("tokenSourceSet", { source: sourceNames[state.tokenSource] }),
+              Utils.t("tokenSourceSet", {
+                source: sourceNames[state.tokenSource]
+              }),
               "success"
             );
           });
         }
         const batchModeSelect = settingsContainer.querySelector("#batchModeSelect");
-        const normalBatchControls = settingsContainer.querySelector("#normalBatchControls");
-        const randomBatchControls = settingsContainer.querySelector("#randomBatchControls");
+        const normalBatchControls = settingsContainer.querySelector(
+          "#normalBatchControls"
+        );
+        const randomBatchControls = settingsContainer.querySelector(
+          "#randomBatchControls"
+        );
         const randomBatchMin = settingsContainer.querySelector("#randomBatchMin");
         const randomBatchMax = settingsContainer.querySelector("#randomBatchMax");
         if (batchModeSelect) {
@@ -8755,10 +8490,18 @@ input[type="range"] {
             switchTheme(newTheme);
           });
         }
-        const overlayOpacitySlider = settingsContainer.querySelector("#overlayOpacitySlider");
-        const overlayOpacityValue = settingsContainer.querySelector("#overlayOpacityValue");
-        const enableBlueMarbleToggle = settingsContainer.querySelector("#enableBlueMarbleToggle");
-        const settingsPaintWhiteToggle = settingsContainer.querySelector("#settingsPaintWhiteToggle");
+        const overlayOpacitySlider = settingsContainer.querySelector(
+          "#overlayOpacitySlider"
+        );
+        const overlayOpacityValue = settingsContainer.querySelector(
+          "#overlayOpacityValue"
+        );
+        const enableBlueMarbleToggle = settingsContainer.querySelector(
+          "#enableBlueMarbleToggle"
+        );
+        const settingsPaintWhiteToggle = settingsContainer.querySelector(
+          "#settingsPaintWhiteToggle"
+        );
         const settingsPaintTransparentToggle = settingsContainer.querySelector(
           "#settingsPaintTransparentToggle"
         );
@@ -8774,7 +8517,9 @@ input[type="range"] {
           settingsPaintWhiteToggle.addEventListener("change", (e) => {
             state.paintWhitePixels = e.target.checked;
             saveBotSettings();
-            console.log(`\u{1F3A8} Paint white pixels: ${state.paintWhitePixels ? "ON" : "OFF"}`);
+            console.log(
+              `\u{1F3A8} Paint white pixels: ${state.paintWhitePixels ? "ON" : "OFF"}`
+            );
             const statusText2 = state.paintWhitePixels ? "White pixels in the template will be painted" : "White pixels will be skipped";
             Utils.showAlert(statusText2, "success");
           });
@@ -8797,7 +8542,10 @@ input[type="range"] {
         const speedIncrease = settingsContainer.querySelector("#speedIncrease");
         if (speedSlider && speedInput) {
           const updateSpeed = (newValue, source) => {
-            const speed = Math.max(CONFIG.PAINTING_SPEED.MIN, Math.min(CONFIG.PAINTING_SPEED.MAX, parseInt(newValue)));
+            const speed = Math.max(
+              CONFIG.PAINTING_SPEED.MIN,
+              Math.min(CONFIG.PAINTING_SPEED.MAX, parseInt(newValue))
+            );
             state.paintingSpeed = speed;
             if (source !== "slider")
               speedSlider.value = speed;
@@ -8832,15 +8580,23 @@ input[type="range"] {
             }
           });
         }
-        const notifPermBtn = settingsContainer.querySelector("#notifRequestPermBtn");
+        const notifPermBtn = settingsContainer.querySelector(
+          "#notifRequestPermBtn"
+        );
         const notifTestBtn = settingsContainer.querySelector("#notifTestBtn");
         if (notifPermBtn) {
           notifPermBtn.addEventListener("click", async () => {
             const perm = await NotificationManager.requestPermission();
             if (perm === "granted")
-              Utils.showAlert(Utils.t("notificationsEnabled"), "success");
+              Utils.showAlert(
+                Utils.t("notificationsEnabled"),
+                "success"
+              );
             else
-              Utils.showAlert(Utils.t("notificationsPermissionDenied"), "warning");
+              Utils.showAlert(
+                Utils.t("notificationsPermissionDenied"),
+                "warning"
+              );
           });
         }
         if (notifTestBtn) {
@@ -8860,7 +8616,9 @@ input[type="range"] {
       const heightValue = resizeContainer.querySelector("#heightValue");
       const keepAspect = resizeContainer.querySelector("#keepAspect");
       const paintWhiteToggle = resizeContainer.querySelector("#paintWhiteToggle");
-      const paintTransparentToggle = resizeContainer.querySelector("#paintTransparentToggle");
+      const paintTransparentToggle = resizeContainer.querySelector(
+        "#paintTransparentToggle"
+      );
       const zoomSlider = resizeContainer.querySelector("#zoomSlider");
       const zoomValue = resizeContainer.querySelector("#zoomValue");
       const zoomInBtn = resizeContainer.querySelector("#zoomInBtn");
@@ -8876,11 +8634,19 @@ input[type="range"] {
       const maskCtx = maskCanvas.getContext("2d");
       const confirmResize = resizeContainer.querySelector("#confirmResize");
       const cancelResize = resizeContainer.querySelector("#cancelResize");
-      const downloadPreviewBtn = resizeContainer.querySelector("#downloadPreviewBtn");
+      const downloadPreviewBtn = resizeContainer.querySelector(
+        "#downloadPreviewBtn"
+      );
       const clearIgnoredBtn = resizeContainer.querySelector("#clearIgnoredBtn");
-      const coordinateModeSelect = settingsContainer.querySelector("#coordinateModeSelect");
-      const coordinateDirectionSelect = settingsContainer.querySelector("#coordinateDirectionSelect");
-      const coordinateSnakeToggle = settingsContainer.querySelector("#coordinateSnakeToggle");
+      const coordinateModeSelect = settingsContainer.querySelector(
+        "#coordinateModeSelect"
+      );
+      const coordinateDirectionSelect = settingsContainer.querySelector(
+        "#coordinateDirectionSelect"
+      );
+      const coordinateSnakeToggle = settingsContainer.querySelector(
+        "#coordinateSnakeToggle"
+      );
       const directionControls = settingsContainer.querySelector("#directionControls");
       const snakeControls = settingsContainer.querySelector("#snakeControls");
       const blockControls = settingsContainer.querySelector("#blockControls");
@@ -8894,7 +8660,9 @@ input[type="range"] {
         paintUnavailablePixelsToggle.addEventListener("change", (e) => {
           state.paintUnavailablePixels = e.target.checked;
           saveBotSettings();
-          console.log(`\u{1F3A8} Paint unavailable colors: ${state.paintUnavailablePixels ? "ON" : "OFF"}`);
+          console.log(
+            `\u{1F3A8} Paint unavailable colors: ${state.paintUnavailablePixels ? "ON" : "OFF"}`
+          );
           const statusText2 = state.paintUnavailablePixels ? "Unavailable template colors will be painted with the closest available color" : "Unavailable template colors will be skipped";
           Utils.showAlert(statusText2, "success");
         });
@@ -8910,8 +8678,13 @@ input[type="range"] {
             blockControls
           });
           saveBotSettings();
-          console.log(`\u{1F504} Coordinate mode changed to: ${state.coordinateMode}`);
-          Utils.showAlert(`Coordinate mode set to: ${state.coordinateMode}`, "success");
+          console.log(
+            `\u{1F504} Coordinate mode changed to: ${state.coordinateMode}`
+          );
+          Utils.showAlert(
+            `Coordinate mode set to: ${state.coordinateMode}`,
+            "success"
+          );
         });
       }
       if (coordinateDirectionSelect) {
@@ -8919,8 +8692,13 @@ input[type="range"] {
         coordinateDirectionSelect.addEventListener("change", (e) => {
           state.coordinateDirection = e.target.value;
           saveBotSettings();
-          console.log(`\u{1F9ED} Coordinate direction changed to: ${state.coordinateDirection}`);
-          Utils.showAlert(`Coordinate direction set to: ${state.coordinateDirection}`, "success");
+          console.log(
+            `\u{1F9ED} Coordinate direction changed to: ${state.coordinateDirection}`
+          );
+          Utils.showAlert(
+            `Coordinate direction set to: ${state.coordinateDirection}`,
+            "success"
+          );
         });
       }
       if (coordinateSnakeToggle) {
@@ -8928,7 +8706,9 @@ input[type="range"] {
         coordinateSnakeToggle.addEventListener("change", (e) => {
           state.coordinateSnake = e.target.checked;
           saveBotSettings();
-          console.log(`\u{1F40D} Snake pattern ${state.coordinateSnake ? "enabled" : "disabled"}`);
+          console.log(
+            `\u{1F40D} Snake pattern ${state.coordinateSnake ? "enabled" : "disabled"}`
+          );
           Utils.showAlert(
             `Snake pattern ${state.coordinateSnake ? "enabled" : "disabled"}`,
             "success"
@@ -8989,8 +8769,14 @@ input[type="range"] {
         toggleOverlayBtn.addEventListener("click", () => {
           const isEnabled = overlayManager.toggle();
           toggleOverlayBtn.classList.toggle("active", isEnabled);
-          toggleOverlayBtn.setAttribute("aria-pressed", isEnabled ? "true" : "false");
-          Utils.showAlert(isEnabled ? Utils.t("overlayEnabled") : Utils.t("overlayDisabled"), "info");
+          toggleOverlayBtn.setAttribute(
+            "aria-pressed",
+            isEnabled ? "true" : "false"
+          );
+          Utils.showAlert(
+            isEnabled ? Utils.t("overlayEnabled") : Utils.t("overlayDisabled"),
+            "info"
+          );
         });
       }
       if (state.minimized) {
@@ -9026,7 +8812,10 @@ input[type="range"] {
       if (loadBtn) {
         loadBtn.addEventListener("click", () => {
           if (!state.initialSetupComplete) {
-            Utils.showAlert(Utils.t("pleaseWaitInitialSetup"), "warning");
+            Utils.showAlert(
+              Utils.t("pleaseWaitInitialSetup"),
+              "warning"
+            );
             return;
           }
           const savedData = Utils.loadProgress();
@@ -9049,7 +8838,10 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
               updateDataButtons();
               updateStats();
               Utils.restoreOverlayFromData().catch((error) => {
-                console.error("Failed to restore overlay from localStorage:", error);
+                console.error(
+                  "Failed to restore overlay from localStorage:",
+                  error
+                );
               });
               if (!state.colorsChecked) {
                 uploadBtn.disabled = false;
@@ -9061,7 +8853,10 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
                 startBtn.disabled = false;
               }
             } else {
-              Utils.showAlert(Utils.t("errorLoadingProgress"), "error");
+              Utils.showAlert(
+                Utils.t("errorLoadingProgress"),
+                "error"
+              );
             }
           }
         });
@@ -9091,7 +8886,10 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
               updateDataButtons();
               await updateStats();
               await Utils.restoreOverlayFromData().catch((error) => {
-                console.error("Failed to restore overlay from file:", error);
+                console.error(
+                  "Failed to restore overlay from file:",
+                  error
+                );
               });
               if (state.colorsChecked) {
                 uploadBtn.disabled = false;
@@ -9124,8 +8922,12 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
         }
       };
       function updateChargeStatsDisplay(intervalMs) {
-        const currentChargesEl = document.getElementById("wplace-stat-charges-value");
-        const fullChargeEl = document.getElementById("wplace-stat-fullcharge-value");
+        const currentChargesEl = document.getElementById(
+          "wplace-stat-charges-value"
+        );
+        const fullChargeEl = document.getElementById(
+          "wplace-stat-fullcharge-value"
+        );
         if (!fullChargeEl && !currentChargesEl)
           return;
         if (!state.fullChargeData) {
@@ -9146,7 +8948,12 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
         }
         state.displayCharges = Math.max(0, displayCharges);
         state.preciseCurrentCharges = cappedCharges;
-        const remainingMs = getMsToTargetCharges(cappedCharges, max, state.cooldown, intervalMs);
+        const remainingMs = getMsToTargetCharges(
+          cappedCharges,
+          max,
+          state.cooldown,
+          intervalMs
+        );
         const timeText = Utils.msToTimeText(remainingMs);
         if (currentChargesEl) {
           currentChargesEl.innerHTML = `${state.displayCharges} / ${state.maxCharges}`;
@@ -9206,7 +9013,9 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
         }
         let imageStatsHTML = "";
         if (state.imageLoaded) {
-          const progress = state.totalPixels > 0 ? Math.round(state.paintedPixels / state.totalPixels * 100) : 0;
+          const progress = state.totalPixels > 0 ? Math.round(
+            state.paintedPixels / state.totalPixels * 100
+          ) : 0;
           const remainingPixels = state.totalPixels - state.paintedPixels;
           state.estimatedTime = Utils.calculateEstimatedTime(
             remainingPixels,
@@ -9431,8 +9240,19 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
               await baseProcessor.load();
             }
             baseCtx.clearRect(0, 0, newWidth, newHeight);
-            baseCtx.drawImage(baseProcessor.img, 0, 0, newWidth, newHeight);
-            maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+            baseCtx.drawImage(
+              baseProcessor.img,
+              0,
+              0,
+              newWidth,
+              newHeight
+            );
+            maskCtx.clearRect(
+              0,
+              0,
+              maskCanvas.width,
+              maskCanvas.height
+            );
             if (_maskImageData2)
               maskCtx.putImageData(_maskImageData2, 0, 0);
             updateZoomLayout();
@@ -9472,9 +9292,18 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
               if (!eligible[nidx])
                 return;
               const base = nidx * 3;
-              work[base] = Math.min(255, Math.max(0, work[base] + er * factor));
-              work[base + 1] = Math.min(255, Math.max(0, work[base + 1] + eg * factor));
-              work[base + 2] = Math.min(255, Math.max(0, work[base + 2] + eb * factor));
+              work[base] = Math.min(
+                255,
+                Math.max(0, work[base] + er * factor)
+              );
+              work[base + 1] = Math.min(
+                255,
+                Math.max(0, work[base + 1] + eg * factor)
+              );
+              work[base + 2] = Math.min(
+                255,
+                Math.max(0, work[base + 2] + eb * factor)
+              );
             };
             for (let y = 0; y < h; y++) {
               for (let x = 0; x < w; x++) {
@@ -9513,7 +9342,12 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
                 data[i + 3] = 0;
                 continue;
               }
-              const [nr, ng, nb] = Utils.findClosestPaletteColor(r, g, b, state.activeColorPalette);
+              const [nr, ng, nb] = Utils.findClosestPaletteColor(
+                r,
+                g,
+                b,
+                state.activeColorPalette
+              );
               data[i] = nr;
               data[i + 1] = ng;
               data[i + 2] = nb;
@@ -9530,7 +9364,9 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
         };
         const onWidthInput = () => {
           if (keepAspect.checked) {
-            heightSlider.value = Math.round(parseInt(widthSlider.value, 10) / aspectRatio);
+            heightSlider.value = Math.round(
+              parseInt(widthSlider.value, 10) / aspectRatio
+            );
           }
           _updateResizePreview();
           const curW = parseInt(widthSlider.value, 10);
@@ -9548,7 +9384,9 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
         };
         const onHeightInput = () => {
           if (keepAspect.checked) {
-            widthSlider.value = Math.round(parseInt(heightSlider.value, 10) * aspectRatio);
+            widthSlider.value = Math.round(
+              parseInt(heightSlider.value, 10) * aspectRatio
+            );
           }
           _updateResizePreview();
           const curW = parseInt(widthSlider.value, 10);
@@ -9628,9 +9466,15 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
           applyZoom(parseFloat(zoomSlider.value));
         });
         if (zoomInBtn)
-          zoomInBtn.addEventListener("click", () => applyZoom(parseFloat(zoomSlider.value) + 0.1));
+          zoomInBtn.addEventListener(
+            "click",
+            () => applyZoom(parseFloat(zoomSlider.value) + 0.1)
+          );
         if (zoomOutBtn)
-          zoomOutBtn.addEventListener("click", () => applyZoom(parseFloat(zoomSlider.value) - 0.1));
+          zoomOutBtn.addEventListener(
+            "click",
+            () => applyZoom(parseFloat(zoomSlider.value) - 0.1)
+          );
         const computeFitZoom = () => {
           const wrapRect = panStage == null ? void 0 : panStage.getBoundingClientRect();
           if (!wrapRect)
@@ -9676,7 +9520,10 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
           if (!panModeBtn)
             return;
           panModeBtn.classList.toggle("active", panMode);
-          panModeBtn.setAttribute("aria-pressed", panMode ? "true" : "false");
+          panModeBtn.setAttribute(
+            "aria-pressed",
+            panMode ? "true" : "false"
+          );
         };
         if (panModeBtn) {
           updatePanModeBtn();
@@ -9740,8 +9587,14 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
               const cx = e.clientX - rect.left - panX;
               const cy = e.clientY - rect.top - panY;
               const before = _zoomLevel;
-              const step = Math.max(0.05, Math.min(0.5, Math.abs(e.deltaY) > 20 ? 0.2 : 0.1));
-              const next = Math.max(0.05, Math.min(20, before + (e.deltaY > 0 ? -step : step)));
+              const step = Math.max(
+                0.05,
+                Math.min(0.5, Math.abs(e.deltaY) > 20 ? 0.2 : 0.1)
+              );
+              const next = Math.max(
+                0.05,
+                Math.min(20, before + (e.deltaY > 0 ? -step : step))
+              );
               if (next === before)
                 return;
               const scale = next / before;
@@ -9780,7 +9633,10 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
                 }
               } else if (e.touches.length === 2) {
                 const [a, b] = e.touches;
-                lastTouchDist = Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
+                lastTouchDist = Math.hypot(
+                  b.clientX - a.clientX,
+                  b.clientY - a.clientY
+                );
               }
             },
             { passive: true }
@@ -9798,13 +9654,19 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
               } else if (e.touches.length === 2 && lastTouchDist != null) {
                 e.preventDefault();
                 const [a, b] = e.touches;
-                const dist = Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
+                const dist = Math.hypot(
+                  b.clientX - a.clientX,
+                  b.clientY - a.clientY
+                );
                 const rect = panStage.getBoundingClientRect();
                 const centerX = (a.clientX + b.clientX) / 2 - rect.left - panX;
                 const centerY = (a.clientY + b.clientY) / 2 - rect.top - panY;
                 const before = _zoomLevel;
                 const scale = dist / (lastTouchDist || dist);
-                const next = Math.max(0.05, Math.min(20, before * scale));
+                const next = Math.max(
+                  0.05,
+                  Math.min(20, before * scale)
+                );
                 if (next !== before) {
                   panX = panX - centerX * (next / before - 1);
                   panY = panY - centerY * (next / before - 1);
@@ -9829,9 +9691,15 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
             _updateResizePreview();
           };
           if (window.requestIdleCallback) {
-            _previewTimer2 = setTimeout(() => requestIdleCallback(run, { timeout: 150 }), 50);
+            _previewTimer2 = setTimeout(
+              () => requestIdleCallback(run, { timeout: 150 }),
+              50
+            );
           } else {
-            _previewTimer2 = setTimeout(() => requestAnimationFrame(run), 50);
+            _previewTimer2 = setTimeout(
+              () => requestAnimationFrame(run),
+              50
+            );
           }
         };
         const markDragStart = () => {
@@ -9859,7 +9727,9 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
         let rowColSize = 1;
         let maskMode = "ignore";
         const brushEl = resizeContainer.querySelector("#maskBrushSize");
-        const brushValEl = resizeContainer.querySelector("#maskBrushSizeValue");
+        const brushValEl = resizeContainer.querySelector(
+          "#maskBrushSizeValue"
+        );
         const btnIgnore = resizeContainer.querySelector("#maskModeIgnore");
         const btnUnignore = resizeContainer.querySelector("#maskModeUnignore");
         const btnToggle = resizeContainer.querySelector("#maskModeToggle");
@@ -9904,7 +9774,10 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
         if (btnIgnore)
           btnIgnore.addEventListener("click", () => setMode("ignore"));
         if (btnUnignore)
-          btnUnignore.addEventListener("click", () => setMode("unignore"));
+          btnUnignore.addEventListener(
+            "click",
+            () => setMode("unignore")
+          );
         if (btnToggle)
           btnToggle.addEventListener("click", () => setMode("toggle"));
         updateModeButtons();
@@ -10168,9 +10041,18 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
               if (!eligible[nidx])
                 return;
               const base = nidx * 3;
-              work[base] = Math.min(255, Math.max(0, work[base] + er * factor));
-              work[base + 1] = Math.min(255, Math.max(0, work[base + 1] + eg * factor));
-              work[base + 2] = Math.min(255, Math.max(0, work[base + 2] + eb * factor));
+              work[base] = Math.min(
+                255,
+                Math.max(0, work[base] + er * factor)
+              );
+              work[base + 1] = Math.min(
+                255,
+                Math.max(0, work[base + 1] + eg * factor)
+              );
+              work[base + 2] = Math.min(
+                255,
+                Math.max(0, work[base + 2] + eb * factor)
+              );
             };
             for (let y = 0; y < h; y++) {
               for (let x = 0; x < w; x++) {
@@ -10215,7 +10097,12 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
                 continue;
               }
               totalValidPixels++;
-              const [nr, ng, nb] = Utils.findClosestPaletteColor(r, g, b, state.activeColorPalette);
+              const [nr, ng, nb] = Utils.findClosestPaletteColor(
+                r,
+                g,
+                b,
+                state.activeColorPalette
+              );
               data[i] = nr;
               data[i + 1] = ng;
               data[i + 2] = nb;
@@ -10342,7 +10229,9 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
           if (!state.colorsChecked) {
             state.availableColors = availableColors;
             state.colorsChecked = true;
-            updateUI("colorsFound", "success", { count: availableColors.length });
+            updateUI("colorsFound", "success", {
+              count: availableColors.length
+            });
             updateStats();
             selectPosBtn.disabled = false;
             if (state.imageLoaded) {
@@ -10365,7 +10254,11 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
             let totalValidPixels = 0;
             for (let i = 0; i < pixels.length; i += 4) {
               const isTransparent = !state.paintTransparentPixels && pixels[i + 3] < (state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD);
-              const isWhiteAndSkipped = !state.paintWhitePixels && Utils.isWhitePixel(pixels[i], pixels[i + 1], pixels[i + 2]);
+              const isWhiteAndSkipped = !state.paintWhitePixels && Utils.isWhitePixel(
+                pixels[i],
+                pixels[i + 1],
+                pixels[i + 2]
+              );
               if (!isTransparent && !isWhiteAndSkipped) {
                 totalValidPixels++;
               }
@@ -10401,7 +10294,9 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
             }
             updateStats();
             updateDataButtons();
-            updateUI("imageLoaded", "success", { count: totalValidPixels });
+            updateUI("imageLoaded", "success", {
+              count: totalValidPixels
+            });
           } catch {
             updateUI("imageError", "error");
           }
@@ -10412,7 +10307,10 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
           if (state.imageLoaded && state.imageData.processor && state.colorsChecked) {
             showResizeDialog(state.imageData.processor);
           } else if (!state.colorsChecked) {
-            Utils.showAlert(Utils.t("uploadImageFirstColors"), "warning");
+            Utils.showAlert(
+              Utils.t("uploadImageFirstColors"),
+              "warning"
+            );
           }
         });
       }
@@ -10434,7 +10332,9 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
                 const clonedResponse = response.clone();
                 const data = await clonedResponse.json();
                 if ((data == null ? void 0 : data.painted) === 1) {
-                  const regionMatch = url.match(/\/pixel\/(\d+)\/(\d+)/);
+                  const regionMatch = url.match(
+                    /\/pixel\/(\d+)\/(\d+)/
+                  );
                   if (regionMatch && regionMatch.length >= 3) {
                     state.region = {
                       x: Number.parseInt(regionMatch[1]),
@@ -10448,7 +10348,10 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
                       y: payload.coords[1]
                     };
                     state.lastPosition = { x: 0, y: 0 };
-                    await overlayManager.setPosition(state.startPosition, state.region);
+                    await overlayManager.setPosition(
+                      state.startPosition,
+                      state.region
+                    );
                     if (state.imageLoaded) {
                       startBtn.disabled = false;
                     }
@@ -10532,7 +10435,9 @@ Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels
       const checkSavedProgress = () => {
         const savedData = Utils.loadProgress();
         if (savedData && savedData.state.paintedPixels > 0) {
-          const savedDate = new Date(savedData.timestamp).toLocaleString();
+          const savedDate = new Date(
+            savedData.timestamp
+          ).toLocaleString();
           const progress = Math.round(
             savedData.state.paintedPixels / savedData.state.totalPixels * 100
           );
@@ -10549,7 +10454,10 @@ ${Utils.t("clickLoadToContinue")}`,
       setTimeout(checkSavedProgress, 1e3);
       if (cooldownSlider && cooldownInput) {
         const updateCooldown = (newValue, source) => {
-          const threshold = Math.max(1, Math.min(state.maxCharges || 999, parseInt(newValue)));
+          const threshold = Math.max(
+            1,
+            Math.min(state.maxCharges || 999, parseInt(newValue))
+          );
           state.cooldownChargeThreshold = threshold;
           if (source !== "slider")
             cooldownSlider.value = threshold;
@@ -10688,7 +10596,10 @@ ${Utils.t("clickLoadToContinue")}`,
           for (let y = cy - r; y <= cy + r; y++) {
             for (let x = cx - r; x <= cx + r; x++) {
               if (x >= 0 && x < width && y >= 0 && y < height) {
-                const dist = Math.max(Math.abs(x - cx), Math.abs(y - cy));
+                const dist = Math.max(
+                  Math.abs(x - cx),
+                  Math.abs(y - cy)
+                );
                 if (dist === r)
                   coords.push([x, y]);
               }
@@ -10703,7 +10614,10 @@ ${Utils.t("clickLoadToContinue")}`,
           for (let y = cy - r; y <= cy + r; y++) {
             for (let x = cx - r; x <= cx + r; x++) {
               if (x >= 0 && x < width && y >= 0 && y < height) {
-                const dist = Math.max(Math.abs(x - cx), Math.abs(y - cy));
+                const dist = Math.max(
+                  Math.abs(x - cx),
+                  Math.abs(y - cy)
+                );
                 if (dist === r)
                   coords.push([x, y]);
               }
@@ -10752,7 +10666,12 @@ ${Utils.t("clickLoadToContinue")}`,
       if (success) {
         pixelBatch.pixels.forEach((p) => {
           state.paintedPixels++;
-          Utils.markPixelPainted(p.x, p.y, pixelBatch.regionX, pixelBatch.regionY);
+          Utils.markPixelPainted(
+            p.x,
+            p.y,
+            pixelBatch.regionX,
+            pixelBatch.regionY
+          );
         });
         state.fullChargeData = {
           ...state.fullChargeData,
@@ -10770,7 +10689,9 @@ ${Utils.t("clickLoadToContinue")}`,
           await Utils.sleep(totalDelay);
         }
       } else {
-        console.error(`\u274C Batch failed permanently after retries. Stopping painting.`);
+        console.error(
+          `\u274C Batch failed permanently after retries. Stopping painting.`
+        );
         state.stopFlag = true;
         updateUI("paintingBatchFailed", "error");
       }
@@ -10817,7 +10738,12 @@ ${Utils.t("clickLoadToContinue")}`,
             eligible: false,
             reason: "white"
           };
-        let targetRgb = Utils.isWhitePixel(r, g, b) ? [255, 255, 255] : Utils.findClosestPaletteColor(r, g, b, state.activeColorPalette);
+        let targetRgb = Utils.isWhitePixel(r, g, b) ? [255, 255, 255] : Utils.findClosestPaletteColor(
+          r,
+          g,
+          b,
+          state.activeColorPalette
+        );
         const mappedTargetColorId = Utils.resolveColor(
           targetRgb,
           state.availableColors,
@@ -10834,11 +10760,20 @@ ${Utils.t("clickLoadToContinue")}`,
             mappedColorId: mappedTargetColorId.id
           };
         }
-        return { eligible: true, r, g, b, a, mappedColorId: mappedTargetColorId.id };
+        return {
+          eligible: true,
+          r,
+          g,
+          b,
+          a,
+          mappedColorId: mappedTargetColorId.id
+        };
       }
       function skipPixel(reason, id, rgb, x, y) {
         if (reason !== "transparent") {
-          console.log(`Skipped pixel for ${reason} (id: ${id}, (${rgb.join(", ")})) at (${x}, ${y})`);
+          console.log(
+            `Skipped pixel for ${reason} (id: ${id}, (${rgb.join(", ")})) at (${x}, ${y})`
+          );
         }
         skippedPixels[reason]++;
       }
@@ -10877,7 +10812,11 @@ ${Utils.t("clickLoadToContinue")}`,
               skipPixel(
                 targetPixelInfo.reason,
                 targetMappedColorId,
-                [targetPixelInfo.r, targetPixelInfo.g, targetPixelInfo.b],
+                [
+                  targetPixelInfo.r,
+                  targetPixelInfo.g,
+                  targetPixelInfo.b
+                ],
                 pixelX,
                 pixelY
               );
@@ -10891,13 +10830,21 @@ ${Utils.t("clickLoadToContinue")}`,
                 const success = await flushPixelBatch(pixelBatch);
                 if (success) {
                   if (CONFIG.PAINTING_SPEED_ENABLED && state.paintingSpeed > 0 && pixelBatch.pixels.length > 0) {
-                    const batchDelayFactor = Math.max(1, 100 / state.paintingSpeed);
-                    const totalDelay = Math.max(100, batchDelayFactor * pixelBatch.pixels.length);
+                    const batchDelayFactor = Math.max(
+                      1,
+                      100 / state.paintingSpeed
+                    );
+                    const totalDelay = Math.max(
+                      100,
+                      batchDelayFactor * pixelBatch.pixels.length
+                    );
                     await Utils.sleep(totalDelay);
                   }
                   updateStats();
                 } else {
-                  console.error(`\u274C Batch failed permanently after retries. Stopping painting.`);
+                  console.error(
+                    `\u274C Batch failed permanently after retries. Stopping painting.`
+                  );
                   state.stopFlag = true;
                   updateUI("paintingBatchFailed", "error");
                   break outerLoop;
@@ -10910,7 +10857,10 @@ ${Utils.t("clickLoadToContinue")}`,
               };
             }
             try {
-              const tileKeyParts = [pixelBatch.regionX, pixelBatch.regionY];
+              const tileKeyParts = [
+                pixelBatch.regionX,
+                pixelBatch.regionY
+              ];
               const tilePixelRGBA = await overlayManager.getTilePixelColor(
                 tileKeyParts[0],
                 tileKeyParts[1],
@@ -10927,7 +10877,11 @@ ${Utils.t("clickLoadToContinue")}`,
                   skipPixel(
                     "alreadyPainted",
                     targetMappedColorId,
-                    [targetPixelInfo.r, targetPixelInfo.g, targetPixelInfo.b],
+                    [
+                      targetPixelInfo.r,
+                      targetPixelInfo.g,
+                      targetPixelInfo.b
+                    ],
                     pixelX,
                     pixelY
                   );
@@ -10942,8 +10896,14 @@ ${Utils.t("clickLoadToContinue")}`,
                 );
               }
             } catch (e) {
-              console.error(`[DEBUG] Error checking existing pixel at (${pixelX}, ${pixelY}):`, e);
-              updateUI("paintingPixelCheckFailed", "error", { x: pixelX, y: pixelY });
+              console.error(
+                `[DEBUG] Error checking existing pixel at (${pixelX}, ${pixelY}):`,
+                e
+              );
+              updateUI("paintingPixelCheckFailed", "error", {
+                x: pixelX,
+                y: pixelY
+              });
               state.stopFlag = true;
               break outerLoop;
             }
@@ -10962,7 +10922,9 @@ ${Utils.t("clickLoadToContinue")}`,
               );
               const success = await flushPixelBatch(pixelBatch);
               if (!success) {
-                console.error(`\u274C Batch failed permanently after retries. Stopping painting.`);
+                console.error(
+                  `\u274C Batch failed permanently after retries. Stopping painting.`
+                );
                 state.stopFlag = true;
                 updateUI("paintingBatchFailed", "error");
                 break outerLoop;
@@ -10989,7 +10951,9 @@ ${Utils.t("clickLoadToContinue")}`,
             }
           }
         if (pixelBatch && pixelBatch.pixels.length > 0 && !state.stopFlag) {
-          console.log(`\u{1F3C1} Sending final batch with ${pixelBatch.pixels.length} pixels`);
+          console.log(
+            `\u{1F3C1} Sending final batch with ${pixelBatch.pixels.length} pixels`
+          );
           const success = await flushPixelBatch(pixelBatch);
           if (!success) {
             console.warn(
@@ -11005,7 +10969,9 @@ ${Utils.t("clickLoadToContinue")}`,
       if (state.stopFlag) {
         Utils.saveProgress();
       } else {
-        updateUI("paintingComplete", "success", { count: state.paintedPixels });
+        updateUI("paintingComplete", "success", {
+          count: state.paintedPixels
+        });
         state.lastPosition = { x: 0, y: 0 };
         Utils.saveProgress();
         overlayManager.clear();
@@ -11019,8 +10985,12 @@ ${Utils.t("clickLoadToContinue")}`,
       console.log(`   Painted: ${state.paintedPixels}`);
       console.log(`   Skipped - Transparent: ${skippedPixels.transparent}`);
       console.log(`   Skipped - White (disabled): ${skippedPixels.white}`);
-      console.log(`   Skipped - Already painted: ${skippedPixels.alreadyPainted}`);
-      console.log(`   Skipped - Color Unavailable: ${skippedPixels.colorUnavailable}`);
+      console.log(
+        `   Skipped - Already painted: ${skippedPixels.alreadyPainted}`
+      );
+      console.log(
+        `   Skipped - Color Unavailable: ${skippedPixels.colorUnavailable}`
+      );
       console.log(
         `   Total processed: ${state.paintedPixels + skippedPixels.transparent + skippedPixels.white + skippedPixels.alreadyPainted + skippedPixels.colorUnavailable}`
       );
@@ -11032,7 +11002,9 @@ ${Utils.t("clickLoadToContinue")}`,
         const min = Math.max(1, state.randomBatchMin);
         const max = Math.max(min, state.randomBatchMax);
         targetBatchSize = Math.floor(Math.random() * (max - min + 1)) + min;
-        console.log(`\u{1F3B2} Random batch size generated: ${targetBatchSize} (range: ${min}-${max})`);
+        console.log(
+          `\u{1F3B2} Random batch size generated: ${targetBatchSize} (range: ${min}-${max})`
+        );
       } else {
         targetBatchSize = state.paintingSpeed;
       }
@@ -11052,20 +11024,30 @@ ${Utils.t("clickLoadToContinue")}`,
           console.log(`\u2705 Batch succeeded on attempt ${attempt}`);
           return true;
         } else if (result === "token_error") {
-          console.log(`\u{1F511} Token error on attempt ${attempt}, regenerating...`);
+          console.log(
+            `\u{1F511} Token error on attempt ${attempt}, regenerating...`
+          );
           updateUI("captchaSolving", "warning");
           try {
             await handleCaptcha();
             attempt--;
             continue;
           } catch (e) {
-            console.error(`\u274C Token regeneration failed on attempt ${attempt}:`, e);
+            console.error(
+              `\u274C Token regeneration failed on attempt ${attempt}:`,
+              e
+            );
             updateUI("captchaFailed", "error");
             await Utils.sleep(5e3);
           }
         } else {
-          console.warn(`\u26A0\uFE0F Batch failed on attempt ${attempt}, retrying...`);
-          const baseDelay = Math.min(1e3 * Math.pow(2, attempt - 1), 3e4);
+          console.warn(
+            `\u26A0\uFE0F Batch failed on attempt ${attempt}, retrying...`
+          );
+          const baseDelay = Math.min(
+            1e3 * Math.pow(2, attempt - 1),
+            3e4
+          );
           const jitter = Math.random() * 1e3;
           await Utils.sleep(baseDelay + jitter);
         }
@@ -11104,19 +11086,24 @@ ${Utils.t("clickLoadToContinue")}`,
       }
       try {
         const payload = { coords, colors, t: token };
-        const res = await fetch(`https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=UTF-8" },
-          credentials: "include",
-          body: JSON.stringify(payload)
-        });
+        const res = await fetch(
+          `https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=UTF-8" },
+            credentials: "include",
+            body: JSON.stringify(payload)
+          }
+        );
         if (res.status === 403) {
           let data2 = null;
           try {
             data2 = await res.json();
           } catch (_) {
           }
-          console.error("\u274C 403 Forbidden. Turnstile token might be invalid or expired.");
+          console.error(
+            "\u274C 403 Forbidden. Turnstile token might be invalid or expired."
+          );
           try {
             console.log("\u{1F504} Regenerating Turnstile token after 403...");
             token = await handleCaptcha();
@@ -11126,7 +11113,9 @@ ${Utils.t("clickLoadToContinue")}`,
               `https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`,
               {
                 method: "POST",
-                headers: { "Content-Type": "text/plain;charset=UTF-8" },
+                headers: {
+                  "Content-Type": "text/plain;charset=UTF-8"
+                },
                 credentials: "include",
                 body: JSON.stringify(retryPayload)
               }
@@ -11171,7 +11160,9 @@ ${Utils.t("clickLoadToContinue")}`,
           // "generator", "hybrid", or "manual"
           minimized: state.minimized,
           overlayOpacity: state.overlayOpacity,
-          blueMarbleEnabled: (_b = document.getElementById("enableBlueMarbleToggle")) == null ? void 0 : _b.checked,
+          blueMarbleEnabled: (_b = document.getElementById(
+            "enableBlueMarbleToggle"
+          )) == null ? void 0 : _b.checked,
           ditheringEnabled: state.ditheringEnabled,
           colorMatchingAlgorithm: state.colorMatchingAlgorithm,
           enableChromaPenalty: state.enableChromaPenalty,
@@ -11191,7 +11182,9 @@ ${Utils.t("clickLoadToContinue")}`,
           resizeIgnoreMask: state.resizeIgnoreMask && state.resizeSettings && state.resizeSettings.width * state.resizeSettings.height === state.resizeIgnoreMask.length ? {
             w: state.resizeSettings.width,
             h: state.resizeSettings.height,
-            data: btoa(String.fromCharCode(...state.resizeIgnoreMask))
+            data: btoa(
+              String.fromCharCode(...state.resizeIgnoreMask)
+            )
           } : null,
           // Notifications
           notificationsEnabled: state.notificationsEnabled,
@@ -11201,7 +11194,10 @@ ${Utils.t("clickLoadToContinue")}`,
           originalImage: state.originalImage
         };
         CONFIG.PAINTING_SPEED_ENABLED = settings.paintingSpeedEnabled;
-        localStorage.setItem("wplace-bot-settings", JSON.stringify(settings));
+        localStorage.setItem(
+          "wplace-bot-settings",
+          JSON.stringify(settings)
+        );
       } catch (e) {
         console.warn("Could not save bot settings:", e);
       }
@@ -11256,16 +11252,24 @@ ${Utils.t("clickLoadToContinue")}`,
         } else {
           state.resizeIgnoreMask = null;
         }
-        const coordinateModeSelect = document.getElementById("coordinateModeSelect");
+        const coordinateModeSelect = document.getElementById(
+          "coordinateModeSelect"
+        );
         if (coordinateModeSelect)
           coordinateModeSelect.value = state.coordinateMode;
-        const coordinateDirectionSelect = document.getElementById("coordinateDirectionSelect");
+        const coordinateDirectionSelect = document.getElementById(
+          "coordinateDirectionSelect"
+        );
         if (coordinateDirectionSelect)
           coordinateDirectionSelect.value = state.coordinateDirection;
-        const coordinateSnakeToggle = document.getElementById("coordinateSnakeToggle");
+        const coordinateSnakeToggle = document.getElementById(
+          "coordinateSnakeToggle"
+        );
         if (coordinateSnakeToggle)
           coordinateSnakeToggle.checked = state.coordinateSnake;
-        const settingsContainer = document.getElementById("wplace-settings-container");
+        const settingsContainer = document.getElementById(
+          "wplace-settings-container"
+        );
         const directionControls = settingsContainer.querySelector("#directionControls");
         const snakeControls = settingsContainer.querySelector("#snakeControls");
         const blockControls = settingsContainer.querySelector("#blockControls");
@@ -11275,11 +11279,15 @@ ${Utils.t("clickLoadToContinue")}`,
           snakeControls,
           blockControls
         });
-        const paintUnavailablePixelsToggle = document.getElementById("paintUnavailablePixelsToggle");
+        const paintUnavailablePixelsToggle = document.getElementById(
+          "paintUnavailablePixelsToggle"
+        );
         if (paintUnavailablePixelsToggle) {
           paintUnavailablePixelsToggle.checked = state.paintUnavailablePixels;
         }
-        const settingsPaintWhiteToggle = settingsContainer.querySelector("#settingsPaintWhiteToggle");
+        const settingsPaintWhiteToggle = settingsContainer.querySelector(
+          "#settingsPaintWhiteToggle"
+        );
         if (settingsPaintWhiteToggle) {
           settingsPaintWhiteToggle.checked = state.paintWhitePixels;
         }
@@ -11301,8 +11309,12 @@ ${Utils.t("clickLoadToContinue")}`,
         const batchModeSelect = document.getElementById("batchModeSelect");
         if (batchModeSelect)
           batchModeSelect.value = state.batchMode;
-        const normalBatchControls = document.getElementById("normalBatchControls");
-        const randomBatchControls = document.getElementById("randomBatchControls");
+        const normalBatchControls = document.getElementById(
+          "normalBatchControls"
+        );
+        const randomBatchControls = document.getElementById(
+          "randomBatchControls"
+        );
         if (normalBatchControls && randomBatchControls) {
           if (state.batchMode === "random") {
             normalBatchControls.style.display = "none";
@@ -11324,43 +11336,63 @@ ${Utils.t("clickLoadToContinue")}`,
           cooldownSlider.value = state.cooldownChargeThreshold;
         if (cooldownInput)
           cooldownInput.value = state.cooldownChargeThreshold;
-        const overlayOpacitySlider = document.getElementById("overlayOpacitySlider");
+        const overlayOpacitySlider = document.getElementById(
+          "overlayOpacitySlider"
+        );
         if (overlayOpacitySlider)
           overlayOpacitySlider.value = state.overlayOpacity;
-        const overlayOpacityValue = document.getElementById("overlayOpacityValue");
+        const overlayOpacityValue = document.getElementById(
+          "overlayOpacityValue"
+        );
         if (overlayOpacityValue)
           overlayOpacityValue.textContent = `${Math.round(state.overlayOpacity * 100)}%`;
-        const enableBlueMarbleToggle = document.getElementById("enableBlueMarbleToggle");
+        const enableBlueMarbleToggle = document.getElementById(
+          "enableBlueMarbleToggle"
+        );
         if (enableBlueMarbleToggle)
           enableBlueMarbleToggle.checked = state.blueMarbleEnabled;
         const tokenSourceSelect = document.getElementById("tokenSourceSelect");
         if (tokenSourceSelect)
           tokenSourceSelect.value = state.tokenSource;
-        const colorAlgorithmSelect = document.getElementById("colorAlgorithmSelect");
+        const colorAlgorithmSelect = document.getElementById(
+          "colorAlgorithmSelect"
+        );
         if (colorAlgorithmSelect)
           colorAlgorithmSelect.value = state.colorMatchingAlgorithm;
-        const enableChromaPenaltyToggle = document.getElementById("enableChromaPenaltyToggle");
+        const enableChromaPenaltyToggle = document.getElementById(
+          "enableChromaPenaltyToggle"
+        );
         if (enableChromaPenaltyToggle)
           enableChromaPenaltyToggle.checked = state.enableChromaPenalty;
-        const chromaPenaltyWeightSlider = document.getElementById("chromaPenaltyWeightSlider");
+        const chromaPenaltyWeightSlider = document.getElementById(
+          "chromaPenaltyWeightSlider"
+        );
         if (chromaPenaltyWeightSlider)
           chromaPenaltyWeightSlider.value = state.chromaPenaltyWeight;
         const chromaWeightValue = document.getElementById("chromaWeightValue");
         if (chromaWeightValue)
           chromaWeightValue.textContent = state.chromaPenaltyWeight;
-        const transparencyThresholdInput = document.getElementById("transparencyThresholdInput");
+        const transparencyThresholdInput = document.getElementById(
+          "transparencyThresholdInput"
+        );
         if (transparencyThresholdInput)
           transparencyThresholdInput.value = state.customTransparencyThreshold;
-        const whiteThresholdInput = document.getElementById("whiteThresholdInput");
+        const whiteThresholdInput = document.getElementById(
+          "whiteThresholdInput"
+        );
         if (whiteThresholdInput)
           whiteThresholdInput.value = state.customWhiteThreshold;
         const notifEnabledToggle = document.getElementById("notifEnabledToggle");
         if (notifEnabledToggle)
           notifEnabledToggle.checked = state.notificationsEnabled;
-        const notifOnChargesToggle = document.getElementById("notifOnChargesToggle");
+        const notifOnChargesToggle = document.getElementById(
+          "notifOnChargesToggle"
+        );
         if (notifOnChargesToggle)
           notifOnChargesToggle.checked = state.notifyOnChargesReached;
-        const notifOnlyUnfocusedToggle = document.getElementById("notifOnlyUnfocusedToggle");
+        const notifOnlyUnfocusedToggle = document.getElementById(
+          "notifOnlyUnfocusedToggle"
+        );
         if (notifOnlyUnfocusedToggle)
           notifOnlyUnfocusedToggle.checked = state.notifyOnlyWhenUnfocused;
         const notifIntervalInput = document.getElementById("notifIntervalInput");
@@ -11372,9 +11404,15 @@ ${Utils.t("clickLoadToContinue")}`,
       }
     }
     console.log("\u{1F680} WPlace Auto-Image with Turnstile Token Generator loaded");
-    console.log("\u{1F511} Turnstile token generator: ALWAYS ENABLED (Background mode)");
-    console.log("\u{1F3AF} Manual pixel captcha solving: Available as fallback/alternative");
-    console.log("\u{1F4F1} Turnstile widgets: DISABLED - pure background token generation only!");
+    console.log(
+      "\u{1F511} Turnstile token generator: ALWAYS ENABLED (Background mode)"
+    );
+    console.log(
+      "\u{1F3AF} Manual pixel captcha solving: Available as fallback/alternative"
+    );
+    console.log(
+      "\u{1F4F1} Turnstile widgets: DISABLED - pure background token generation only!"
+    );
     function enableFileOperations() {
       state.initialSetupComplete = true;
       const loadBtn = document.querySelector("#loadBtn");
@@ -11414,7 +11452,9 @@ ${Utils.t("clickLoadToContinue")}`,
     }
     async function initializeTokenGenerator() {
       if (isTokenValid()) {
-        console.log("\u2705 Valid token already available, skipping initialization");
+        console.log(
+          "\u2705 Valid token already available, skipping initialization"
+        );
         updateUI("tokenReady", "success");
         enableFileOperations();
         return;
@@ -11424,7 +11464,9 @@ ${Utils.t("clickLoadToContinue")}`,
         updateUI("initializingToken", "default");
         console.log("Attempting to load Turnstile script...");
         await Utils.loadTurnstile();
-        console.log("Turnstile script loaded. Attempting to generate token...");
+        console.log(
+          "Turnstile script loaded. Attempting to generate token..."
+        );
         const token = await handleCaptchaWithRetry();
         if (token) {
           setTurnstileToken(token);
@@ -11440,7 +11482,10 @@ ${Utils.t("clickLoadToContinue")}`,
           enableFileOperations();
         }
       } catch (error) {
-        console.error("\u274C Critical error during Turnstile initialization:", error);
+        console.error(
+          "\u274C Critical error during Turnstile initialization:",
+          error
+        );
         updateUI("tokenRetryLater", "warning");
         enableFileOperations();
       }
@@ -11450,14 +11495,22 @@ ${Utils.t("clickLoadToContinue")}`,
     createUI().then(() => {
       setTimeout(initializeTokenGenerator, 1e3);
       const advancedInit = () => {
-        const chromaSlider = document.getElementById("chromaPenaltyWeightSlider");
+        const chromaSlider = document.getElementById(
+          "chromaPenaltyWeightSlider"
+        );
         const chromaValue = document.getElementById("chromaWeightValue");
         const resetBtn = document.getElementById("resetAdvancedColorBtn");
         const algoSelect = document.getElementById("colorAlgorithmSelect");
-        const chromaToggle = document.getElementById("enableChromaPenaltyToggle");
-        const transInput = document.getElementById("transparencyThresholdInput");
+        const chromaToggle = document.getElementById(
+          "enableChromaPenaltyToggle"
+        );
+        const transInput = document.getElementById(
+          "transparencyThresholdInput"
+        );
         const whiteInput = document.getElementById("whiteThresholdInput");
-        const ditherToggle = document.getElementById("enableDitheringToggle");
+        const ditherToggle = document.getElementById(
+          "enableDitheringToggle"
+        );
         if (algoSelect)
           algoSelect.addEventListener("change", (e) => {
             state.colorMatchingAlgorithm = e.target.value;
@@ -11514,7 +11567,9 @@ ${Utils.t("clickLoadToContinue")}`,
             const a = document.getElementById("colorAlgorithmSelect");
             if (a)
               a.value = "lab";
-            const ct = document.getElementById("enableChromaPenaltyToggle");
+            const ct = document.getElementById(
+              "enableChromaPenaltyToggle"
+            );
             if (ct)
               ct.checked = true;
             if (chromaSlider)
@@ -11526,7 +11581,10 @@ ${Utils.t("clickLoadToContinue")}`,
             if (whiteInput)
               whiteInput.value = 250;
             _updateResizePreview();
-            Utils.showAlert(Utils.t("advancedColorSettingsReset"), "success");
+            Utils.showAlert(
+              Utils.t("advancedColorSettingsReset"),
+              "success"
+            );
           });
       };
       setTimeout(advancedInit, 500);
