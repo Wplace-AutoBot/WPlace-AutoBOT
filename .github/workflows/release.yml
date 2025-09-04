@@ -2,7 +2,7 @@ name: Auto Release
 
 on:
     push:
-        branches: [main, dev, better-cd]
+        branches: [main]
 
 permissions:
     contents: write
