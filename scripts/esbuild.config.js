@@ -115,10 +115,21 @@ const buildInfoPlugin = {
                 console.warn('Could not get git commit hash:', error.message);
             }
 
+            // Get branch name
+            let branchName = 'unknown';
+            try {
+                branchName = execSync('git rev-parse --abbrev-ref HEAD', {
+                    encoding: 'utf8',
+                }).trim();
+            } catch (error) {
+                console.warn('Could not get git branch name:', error.message);
+            }
+
             // Replace placeholders
             contents = contents
                 .replace(/__BUILD_DATE__/g, buildDate)
-                .replace(/__COMMIT_HASH__/g, commitHash);
+                .replace(/__COMMIT_HASH__/g, commitHash)
+                .replace(/__BRANCH_NAME__/g, branchName);
 
             return {
                 contents,

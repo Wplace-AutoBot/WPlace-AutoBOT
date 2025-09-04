@@ -3864,7 +3864,7 @@ import {
         border-bottom: 1px solid rgba(255,255,255,0.1);
         font-family: 'Courier New', monospace;
       ">
-        Build: __BUILD_DATE__ <br /> Commit: __COMMIT_HASH__
+        Build: __BUILD_DATE__ <br /> Commit: __COMMIT_HASH__ <br /> Branch: __BRANCH_NAME__
       </div>
     `
             : '';
