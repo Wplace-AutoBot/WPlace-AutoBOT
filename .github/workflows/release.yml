@@ -47,7 +47,13 @@ jobs:
 
                   Commit: ${{ github.sha }}
 
-                  **Files with stable URLs:**
+                  **Stable Direct URLs (raw files):**
+                  - https://github.com/Staninna/WPlace-AutoBOT/releases/latest/download/auto-image.standalone.js
+                  - https://github.com/Staninna/WPlace-AutoBOT/releases/latest/download/auto-image.userscript.js
+                  - https://github.com/Staninna/WPlace-AutoBOT/releases/latest/download/auto-image.bookmarklet.js
+                  - https://github.com/Staninna/WPlace-AutoBOT/releases/latest/download/auto-image.bookmarklet.txt
+
+                  **Files included:**
                   - \`auto-image.standalone.js\` - Standalone version
                   - \`auto-image.userscript.js\` - Userscript version
                   - \`auto-image.bookmarklet.js\` - Bookmarklet JavaScript
