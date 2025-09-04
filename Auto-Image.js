@@ -11,7 +11,7 @@
       MAX: 1000, // Maximum 1000 pixels batch size
       DEFAULT: 5, // Default 5 pixels batch size
     },
-  BATCH_MODE: 'normal', // "normal" or "random" - default to normal
+  BATCH_MODE: 'normal', // "normal", "random", or "outline-first" - default to normal
     RANDOM_BATCH_RANGE: {
       MIN: 3, // Random range minimum
       MAX: 20, // Random range maximum
@@ -558,7 +558,7 @@
     estimatedTime: 0,
     language: 'en',
     paintingSpeed: CONFIG.PAINTING_SPEED.DEFAULT, // pixels batch size
-  batchMode: CONFIG.BATCH_MODE, // "normal" or "random"
+  batchMode: CONFIG.BATCH_MODE, // "normal", "random", or "outline-first"
     randomBatchMin: CONFIG.RANDOM_BATCH_RANGE.MIN, // Random range minimum
     randomBatchMax: CONFIG.RANDOM_BATCH_RANGE.MAX, // Random range maximum
     cooldownChargeThreshold: CONFIG.COOLDOWN_CHARGE_THRESHOLD,
@@ -3780,6 +3780,7 @@
             <select id="batchModeSelect" class="wplace-settings-select">
               <option value="normal" class="wplace-settings-option">📦 Normal (Fixed Size)</option>
               <option value="random" class="wplace-settings-option">🎲 Random (Range)</option>
+              <option value="outline-first" class="wplace-settings-option">🖼️ Outline First</option>
             </select>
           </div>
           
@@ -3859,7 +3860,6 @@
               <option value="circle-in" class="wplace-settings-option">⭕ Circle In (Edges → Center)</option>
               <option value="blocks" class="wplace-settings-option">🟫 Blocks (Ordered)</option>
               <option value="shuffle-blocks" class="wplace-settings-option">🎲 Shuffle Blocks (Random)</option>
-              <option value="outline-first" class="wplace-settings-option">🖼️ Outline First</option>
             </select>
           </div>
           
