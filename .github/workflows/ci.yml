@@ -1,0 +1,39 @@
+name: CI
+
+on:
+    push:
+        branches: [main, hotfix/**, feature/**]
+    pull_request:
+        branches: [main, dev]
+
+jobs:
+    ci:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: '18'
+                  cache: 'npm'
+
+            - run: npm ci
+
+            - name: Format check
+              run: npm run format:check
+
+            - name: Build
+              run: npm run build:all
+
+            - name: Validate
+              run: |
+                  for file in dist/auto-image.{standalone,userscript,bookmarklet}.js dist/auto-image.bookmarklet.txt; do
+                      test -s "$file" || (echo "Missing or empty: $file" && exit 1)
+                  done
+                  echo "✅ All outputs validated"
+
+            - uses: actions/upload-artifact@v4
+              with:
+                  name: build-outputs
+                  path: dist/
+                  retention-days: 30

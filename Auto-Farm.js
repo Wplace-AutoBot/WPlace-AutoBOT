@@ -1,4 +1,5 @@
-(async () => {
+// eslint-disable-next-line prettier/prettier
+; (async () => {
   const CONFIG = {
     START_X: 742,
     START_Y: 1148,
@@ -11,8 +12,8 @@
       text: '#ffffff',
       highlight: '#775ce3',
       success: '#00ff00',
-      error: '#ff0000'
-    }
+      error: '#ff0000',
+    },
   };
 
   const state = {
@@ -25,10 +26,10 @@
     menuOpen: false,
     language: 'en',
     autoRefresh: true,
-    pausedForManual: false
+    pausedForManual: false,
   };
 
-  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const waitForSelector = async (selector, interval = 200, timeout = 5000) => {
     const start = Date.now();
     while (Date.now() - start < timeout) {
@@ -58,8 +59,7 @@
             paintLoop();
           }
         }
-      } catch (e) {
-      }
+      } catch (e) {}
     }
     return originalFetch(url, options);
   };
@@ -68,7 +68,7 @@
     try {
       const res = await fetch(url, {
         credentials: 'include',
-        ...options
+        ...options,
       });
       return await res.json();
     } catch (e) {
@@ -78,19 +78,23 @@
 
   const getRandomPosition = () => ({
     x: Math.floor(Math.random() * CONFIG.PIXELS_PER_LINE),
-    y: Math.floor(Math.random() * CONFIG.PIXELS_PER_LINE)
+    y: Math.floor(Math.random() * CONFIG.PIXELS_PER_LINE),
   });
 
   const paintPixel = async (x, y) => {
     const randomColor = Math.floor(Math.random() * 31) + 1;
     const url = `https://backend.wplace.live/s0/pixel/${CONFIG.START_X}/${CONFIG.START_Y}`;
-    const payload = JSON.stringify({ coords: [x, y], colors: [randomColor], t: capturedCaptchaToken });
+    const payload = JSON.stringify({
+      coords: [x, y],
+      colors: [randomColor],
+      t: capturedCaptchaToken,
+    });
     try {
       const res = await originalFetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
         credentials: 'include',
-        body: payload
+        body: payload,
       });
       if (res.status === 403) {
         console.error('❌ 403 Forbidden. CAPTCHA token might be invalid or expired.');
@@ -112,7 +116,7 @@
       state.charges = {
         count: Math.floor(data.charges.count),
         max: Math.floor(data.charges.max),
-        cooldownMs: data.charges.cooldownMs
+        cooldownMs: data.charges.cooldownMs,
       };
       if (state.userInfo.level) {
         state.userInfo.level = Math.floor(state.userInfo.level);
@@ -140,9 +144,14 @@
   const paintLoop = async () => {
     while (state.running) {
       const { count, cooldownMs } = state.charges;
-      
+
       if (count < 1) {
-        updateUI(state.language === 'pt' ? `⌛ Sem cargas. Esperando ${Math.ceil(cooldownMs/1000)}s...` : `⌛ No charges. Waiting ${Math.ceil(cooldownMs/1000)}s...`, 'status');
+        updateUI(
+          state.language === 'pt'
+            ? `⌛ Sem cargas. Esperando ${Math.ceil(cooldownMs / 1000)}s...`
+            : `⌛ No charges. Waiting ${Math.ceil(cooldownMs / 1000)}s...`,
+          'status'
+        );
         await sleep(cooldownMs);
         await getCharge();
         continue;
@@ -176,7 +185,9 @@
               : '❌ CAPTCHA token expired. Waiting for Paint button...',
             'error'
           );
-          const mainPaintBtn = await waitForSelector('button.btn.btn-primary.btn-lg, button.btn-primary.sm\\:btn-xl');
+          const mainPaintBtn = await waitForSelector(
+            'button.btn.btn-primary.btn-lg, button.btn-primary.sm\\:btn-xl'
+          );
           if (mainPaintBtn) mainPaintBtn.click();
           await sleep(500);
           updateUI(
@@ -196,10 +207,14 @@
             const moveEvt = new MouseEvent('mousemove', {
               clientX: centerX,
               clientY: centerY,
-              bubbles: true
+              bubbles: true,
             });
             canvas.dispatchEvent(moveEvt);
-            const keyDown = new KeyboardEvent('keydown', { key: ' ', code: 'Space', bubbles: true });
+            const keyDown = new KeyboardEvent('keydown', {
+              key: ' ',
+              code: 'Space',
+              bubbles: true,
+            });
             const keyUp = new KeyboardEvent('keyup', { key: ' ', code: 'Space', bubbles: true });
             canvas.dispatchEvent(keyDown);
             canvas.dispatchEvent(keyUp);
@@ -242,21 +257,21 @@
         await sleep(1000);
         continue;
       }
-      
+
       if (paintResult?.painted === 1) {
         state.paintedCount++;
-        state.lastPixel = { 
+        state.lastPixel = {
           x: CONFIG.START_X + randomPos.x,
           y: CONFIG.START_Y + randomPos.y,
-          time: new Date() 
+          time: new Date(),
         };
         state.charges.count--;
-        
+
         document.getElementById('paintEffect').style.animation = 'pulse 0.5s';
         setTimeout(() => {
           document.getElementById('paintEffect').style.animation = '';
         }, 500);
-        
+
         updateUI(state.language === 'pt' ? '✅ Pixel pintado!' : '✅ Pixel painted!', 'success');
       } else {
         updateUI(state.language === 'pt' ? '❌ Falha ao pintar' : '❌ Failed to paint', 'error');
@@ -283,7 +298,7 @@
         70% { box-shadow: 0 0 0 10px rgba(0, 255, 0, 0); }
         100% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0); }
       }
-      @keyframes slideIn {
+      @keyframes slide-in {
         from { transform: translateY(20px); opacity: 0; }
         to { transform: translateY(0); opacity: 1; }
       }
@@ -300,7 +315,7 @@
         z-index: 9999;
         font-family: 'Segoe UI', Roboto, sans-serif;
         color: ${CONFIG.THEME.text};
-        animation: slideIn 0.4s ease-out;
+        animation: slide-in 0.4s ease-out;
         overflow: hidden;
       }
       .wplace-header {
@@ -417,25 +432,25 @@
 
     const translations = {
       pt: {
-        title: "WPlace Auto-Farm",
-        start: "Iniciar",
-        stop: "Parar",
-        ready: "Pronto para começar",
-        user: "Usuário",
-        pixels: "Pixels",
-        charges: "Cargas",
-        level: "Level"
+        title: 'WPlace Auto-Farm',
+        start: 'Iniciar',
+        stop: 'Parar',
+        ready: 'Pronto para começar',
+        user: 'Usuário',
+        pixels: 'Pixels',
+        charges: 'Cargas',
+        level: 'Level',
       },
       en: {
-        title: "WPlace Auto-Farm",
-        start: "Start",
-        stop: "Stop",
-        ready: "Ready to start",
-        user: "User",
-        pixels: "Pixels",
-        charges: "Charges",
-        level: "Level"
-      }
+        title: 'WPlace Auto-Farm',
+        start: 'Start',
+        stop: 'Stop',
+        ready: 'Ready to start',
+        user: 'User',
+        pixels: 'Pixels',
+        charges: 'Charges',
+        level: 'Level',
+      },
     };
 
     const t = translations[state.language] || translations.en;
@@ -480,17 +495,20 @@
         </div>
       </div>
     `;
-    
+
     document.body.appendChild(panel);
-    
+
     const header = panel.querySelector('.wplace-header');
-    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-    
+    let pos1 = 0,
+      pos2 = 0,
+      pos3 = 0,
+      pos4 = 0;
+
     header.onmousedown = dragMouseDown;
-    
+
     function dragMouseDown(e) {
       if (e.target.closest('.wplace-header-btn')) return;
-      
+
       e = e || window.event;
       e.preventDefault();
       pos3 = e.clientX;
@@ -498,7 +516,7 @@
       document.onmouseup = closeDragElement;
       document.onmousemove = elementDrag;
     }
-    
+
     function elementDrag(e) {
       e = e || window.event;
       e.preventDefault();
@@ -506,35 +524,43 @@
       pos2 = pos4 - e.clientY;
       pos3 = e.clientX;
       pos4 = e.clientY;
-      panel.style.top = (panel.offsetTop - pos2) + "px";
-      panel.style.left = (panel.offsetLeft - pos1) + "px";
+      panel.style.top = panel.offsetTop - pos2 + 'px';
+      panel.style.left = panel.offsetLeft - pos1 + 'px';
     }
-    
+
     function closeDragElement() {
       document.onmouseup = null;
       document.onmousemove = null;
     }
-    
+
     const toggleBtn = panel.querySelector('#toggleBtn');
     const minimizeBtn = panel.querySelector('#minimizeBtn');
     const statusText = panel.querySelector('#statusText');
     const content = panel.querySelector('.wplace-content');
     const statsArea = panel.querySelector('#statsArea');
-    
+
     toggleBtn.addEventListener('click', () => {
       state.running = !state.running;
-      
+
       if (state.running && !capturedCaptchaToken) {
-        updateUI(state.language === 'pt' ? '❌ Token não capturado. Clique em qualquer pixel primeiro.' : '❌ CAPTCHA token not captured. Please click any pixel manually first.', 'error');
+        updateUI(
+          state.language === 'pt'
+            ? '❌ Token não capturado. Clique em qualquer pixel primeiro.'
+            : '❌ CAPTCHA token not captured. Please click any pixel manually first.',
+          'error'
+        );
         state.running = false;
         return;
       }
-  
+
       if (state.running) {
         toggleBtn.innerHTML = `<i class="fas fa-stop"></i> <span>${t.stop}</span>`;
         toggleBtn.classList.remove('wplace-btn-primary');
         toggleBtn.classList.add('wplace-btn-stop');
-        updateUI(state.language === 'pt' ? '🚀 Pintura iniciada!' : '🚀 Painting started!', 'success');
+        updateUI(
+          state.language === 'pt' ? '🚀 Pintura iniciada!' : '🚀 Painting started!',
+          'success'
+        );
         paintLoop();
       } else {
         toggleBtn.innerHTML = `<i class="fas fa-play"></i> <span>${t.start}</span>`;
@@ -544,18 +570,18 @@
         updateUI(state.language === 'pt' ? '⏹️ Parado' : '⏹️ Stopped', 'default');
       }
     });
-    
+
     minimizeBtn.addEventListener('click', () => {
       state.minimized = !state.minimized;
       content.style.display = state.minimized ? 'none' : 'block';
       minimizeBtn.innerHTML = `<i class="fas fa-${state.minimized ? 'expand' : 'minus'}"></i>`;
     });
-    
+
     const autoRefreshCheckbox = panel.querySelector('#autoRefreshCheckbox');
     autoRefreshCheckbox.addEventListener('change', () => {
       state.autoRefresh = autoRefreshCheckbox.checked;
     });
-    
+
     window.addEventListener('beforeunload', () => {
       state.menuOpen = false;
     });
@@ -568,7 +594,7 @@
       statusText.className = `wplace-status status-${type}`;
       statusText.style.animation = 'none';
       void statusText.offsetWidth;
-      statusText.style.animation = 'slideIn 0.3s ease-out';
+      statusText.style.animation = 'slide-in 0.3s ease-out';
     }
   };
 
@@ -578,22 +604,22 @@
     if (statsArea) {
       const t = {
         pt: {
-          user: "Usuário",
-          pixels: "Pixels",
-          charges: "Cargas",
-          level: "Level"
+          user: 'Usuário',
+          pixels: 'Pixels',
+          charges: 'Cargas',
+          level: 'Level',
         },
         en: {
-          user: "User",
-          pixels: "Pixels",
-          charges: "Charges",
-          level: "Level"
-        }
+          user: 'User',
+          pixels: 'Pixels',
+          charges: 'Charges',
+          level: 'Level',
+        },
       }[state.language] || {
-        user: "User",
-        pixels: "Pixels",
-        charges: "Charges",
-        level: "Level"
+        user: 'User',
+        pixels: 'Pixels',
+        charges: 'Charges',
+        level: 'Level',
       };
 
       statsArea.innerHTML = `

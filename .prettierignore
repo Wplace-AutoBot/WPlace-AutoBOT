@@ -1,0 +1,6 @@
+dist/**.js
+AccountSwapper/**.js
+AccountSwapper/**.json
+Auto-Farm.js
+package-lock.json
+*.md

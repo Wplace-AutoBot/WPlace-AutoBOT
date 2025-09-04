@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "WPlace Cookie Setter",
+  "version": "1.0.0",
+  "permissions": [
+    "cookies",
+    "webRequest",
+    "scripting",
+    "tabs",
+    "storage",
+    "browsingData",
+    "webNavigation"
+  ],
+  "host_permissions": [
+    "https://backend.wplace.live/*",
+    "https://wplace.live/*",
+    "https://*.wplace.live/*"
+  ],
+  "background": { "service_worker": "background.js" },
+  "content_scripts": [
+    {
+      "matches": ["https://wplace.live/*", "https://*.wplace.live/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

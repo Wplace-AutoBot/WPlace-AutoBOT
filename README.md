@@ -1,3 +1,7 @@
+<p align="center">
+  <img width="379" height="376" alt="image" src="https://github.com/user-attachments/assets/c14ef2b5-e104-4526-9b17-23cb2abc9efe" />
+</p>
+
 <p align="center"><strong>WPlace AutoBOT</strong></p>
 <p align="center">
 This project was fork from https://github.com/DarkModde/WPlace-AutoBOT
@@ -15,8 +19,14 @@ This project was fork from https://github.com/DarkModde/WPlace-AutoBOT
 <br>
 
 <p align="center">
-  <sub><strong>It wasn't me who "hacked" WPlace and placed that giant Herobrine there...<br>
-  But if you're wondering: yes! These scripts were made by a Brazilian and VietNamese. HUEHUE!</strong></sub>
+  If you're wondering—yes! These scripts were Developed by a team consisting of Brazilians, Vietnamese, and Indonesians. HUEHUE!</strong></sub>
+  <p align="center">
+  <img src="https://cdn.jsdelivr.net/gh/hjnilsson/country-flags/svg/br.svg" alt="Brazil" width="32"/>
+  &nbsp;
+  <img src="https://cdn.jsdelivr.net/gh/hjnilsson/country-flags/svg/vn.svg" alt="Vietnam" width="32"/>
+  &nbsp;
+  <img src="https://cdn.jsdelivr.net/gh/hjnilsson/country-flags/svg/id.svg" alt="Indonesia" width="32"/>
+</p>
 </p>
 
 ---
@@ -69,10 +79,28 @@ javascript:fetch("https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBO
 
 <br>
 
+### ✨┃Features
+
+- [x] Automatically farms droplets/levels
+- [x] Correct Color Pixel Skip
+- [x] Overlay(you dont need bluemarble anymore)
+- [x] Paint over multiple tiles
+- [x] Multi Account Auto Switcher Via Other Branch ; https://github.com/Wplace-AutoBot/WPlace-AutoBOT/tree/Acc-switch (Ram Efficient LOL)
+- [x] AutoCaptcha Solver With Turnstile Token Generator
+- [x] Wider Paint Control Options
+- [x] Advance Color Processing
+- [x] MultiLanguage Support
+- [x] Multi account through save and load feature
+- [x] Works on mobile :P
+
+
+---
+
+
 ---
 
 <p align="center">
-  <img src="https://i.imgur.com/VbHh9jI.png" alt="Script Demonstration"/>
+  <img src="https://i.imgur.com/5QYvb4w.png" alt="Script Demonstration"/>
 </p>
 
 ---
@@ -80,12 +108,18 @@ javascript:fetch("https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBO
 ### 📋┃To-do
 
 - [x] Making AutoFarm working
-- [ ] Merge both scripts into one  
-- [x] Fix script bugs  
-- [] Add new options
-- [ ] Tutorials
+- [ ] Merge both scripts into one
+- [x] Add Overlay system
+- [x] Add Cross Tiles Support
+- [x] Add AutoCaptcha Solver
+- [x] Add Correct Color Pixel Skip
+- [x] Separate Css
 
 ---
+
+- Contributors:  
+  <img src="https://contrib.rocks/image?repo=Wplace-AutoBot/WPlace-AutoBOT" alt="Contributors" />
+
 
 <p align="center">
   <a href="#"><img src="https://komarev.com/ghpvc/?username=WPlace-AutoBOT&style=for-the-badge&label=Views:&color=gray"/></a>
