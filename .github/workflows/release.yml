@@ -40,7 +40,7 @@ jobs:
               run: |
                   echo "🔍 Validating build outputs..."
                   validation_failed=false
-                  
+
                   for file in dist/auto-image.{standalone,userscript,bookmarklet}.js dist/auto-image.bookmarklet.txt; do
                       if [[ ! -f "$file" ]]; then
                           echo "❌ Missing file: $file" >&2
@@ -58,12 +58,12 @@ jobs:
                           fi
                       fi
                   done
-                  
+
                   if [[ "$validation_failed" == "true" ]]; then
                       echo "❌ Build validation failed" >&2
                       exit 1
                   fi
-                  
+
                   echo "✅ All build outputs validated successfully"
 
             - name: Generate version tag
@@ -78,7 +78,7 @@ jobs:
                   GH_TOKEN: ${{ github.token }}
               run: |
                   echo "🚀 Creating release ${{ steps.version.outputs.tag }}..."
-                  
+
                   if ! gh release create ${{ steps.version.outputs.tag }} \
                       --title "Auto Release ${{ steps.version.outputs.tag }}" \
                       --notes "Automated release from ${{ github.ref_name }} branch
@@ -103,5 +103,5 @@ jobs:
                       echo "❌ Failed to create release" >&2
                       exit 1
                   fi
-                  
+
                   echo "✅ Release ${{ steps.version.outputs.tag }} created successfully"
