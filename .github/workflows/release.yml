@@ -18,17 +18,53 @@ jobs:
                   node-version: '18'
                   cache: 'npm'
 
-            - run: npm ci
+            - name: Install dependencies
+              run: |
+                  echo "📦 Installing dependencies..."
+                  if ! npm ci; then
+                      echo "❌ Failed to install dependencies" >&2
+                      exit 1
+                  fi
+                  echo "✅ Dependencies installed successfully"
 
-            - name: Build
-              run: npm run build:all
+            - name: Build with error handling
+              run: |
+                  echo "🔨 Building release artifacts..."
+                  if ! npm run build:all; then
+                      echo "❌ Build failed" >&2
+                      exit 1
+                  fi
+                  echo "✅ Build completed successfully"
 
             - name: Validate build outputs
               run: |
+                  echo "🔍 Validating build outputs..."
+                  validation_failed=false
+                  
                   for file in dist/auto-image.{standalone,userscript,bookmarklet}.js dist/auto-image.bookmarklet.txt; do
-                      test -s "$file" || (echo "Missing or empty: $file" && exit 1)
+                      if [[ ! -f "$file" ]]; then
+                          echo "❌ Missing file: $file" >&2
+                          validation_failed=true
+                      elif [[ ! -s "$file" ]]; then
+                          echo "❌ Empty file: $file" >&2
+                          validation_failed=true
+                      else
+                          size=$(stat -c%s "$file" 2>/dev/null || echo 0)
+                          if [[ $size -lt 100 ]]; then
+                              echo "⚠️ Suspiciously small file: $file ($size bytes)" >&2
+                              validation_failed=true
+                          else
+                              echo "✅ Valid: $file ($size bytes)"
+                          fi
+                      fi
                   done
-                  echo "✅ All outputs validated"
+                  
+                  if [[ "$validation_failed" == "true" ]]; then
+                      echo "❌ Build validation failed" >&2
+                      exit 1
+                  fi
+                  
+                  echo "✅ All build outputs validated successfully"
 
             - name: Generate version tag
               id: version
@@ -41,7 +77,9 @@ jobs:
               env:
                   GH_TOKEN: ${{ github.token }}
               run: |
-                  gh release create ${{ steps.version.outputs.tag }} \
+                  echo "🚀 Creating release ${{ steps.version.outputs.tag }}..."
+                  
+                  if ! gh release create ${{ steps.version.outputs.tag }} \
                       --title "Auto Release ${{ steps.version.outputs.tag }}" \
                       --notes "Automated release from ${{ github.ref_name }} branch
 
@@ -61,4 +99,9 @@ jobs:
                       dist/auto-image.standalone.js \
                       dist/auto-image.userscript.js \
                       dist/auto-image.bookmarklet.js \
-                      dist/auto-image.bookmarklet.txt
+                      dist/auto-image.bookmarklet.txt; then
+                      echo "❌ Failed to create release" >&2
+                      exit 1
+                  fi
+                  
+                  echo "✅ Release ${{ steps.version.outputs.tag }} created successfully"
