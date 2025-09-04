@@ -38,62 +38,21 @@ jobs:
                   echo "Generated version: $VERSION"
 
             - name: Create Release
-              uses: actions/create-release@v1
               env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              with:
-                  tag_name: ${{ steps.version.outputs.tag }}
-                  release_name: Auto Release ${{ steps.version.outputs.tag }}
-                  body: |
-                      Automated release from main branch
-                      
-                      Commit: ${{ github.sha }}
-                      
-                      **Files with stable URLs:**
-                      - `auto-image.standalone.js` - Standalone version
-                      - `auto-image.userscript.js` - Userscript version  
-                      - `auto-image.bookmarklet.js` - Bookmarklet JavaScript
-                      - `auto-image.bookmarklet.txt` - Bookmarklet text
-                  draft: false
-                  prerelease: false
-              id: create_release
+                  GH_TOKEN: ${{ github.token }}
+              run: |
+                  gh release create ${{ steps.version.outputs.tag }} \
+                      --title "Auto Release ${{ steps.version.outputs.tag }}" \
+                      --notes "Automated release from ${{ github.ref_name }} branch
 
-            - name: Upload standalone
-              uses: actions/upload-release-asset@v1
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              with:
-                  upload_url: ${{ steps.create_release.outputs.upload_url }}
-                  asset_path: dist/auto-image.standalone.js
-                  asset_name: auto-image.standalone.js
-                  asset_content_type: application/javascript
+                  Commit: ${{ github.sha }}
 
-            - name: Upload userscript
-              uses: actions/upload-release-asset@v1
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              with:
-                  upload_url: ${{ steps.create_release.outputs.upload_url }}
-                  asset_path: dist/auto-image.userscript.js
-                  asset_name: auto-image.userscript.js
-                  asset_content_type: application/javascript
-
-            - name: Upload bookmarklet JS
-              uses: actions/upload-release-asset@v1
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              with:
-                  upload_url: ${{ steps.create_release.outputs.upload_url }}
-                  asset_path: dist/auto-image.bookmarklet.js
-                  asset_name: auto-image.bookmarklet.js
-                  asset_content_type: application/javascript
-
-            - name: Upload bookmarklet text
-              uses: actions/upload-release-asset@v1
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              with:
-                  upload_url: ${{ steps.create_release.outputs.upload_url }}
-                  asset_path: dist/auto-image.bookmarklet.txt
-                  asset_name: auto-image.bookmarklet.txt
-                  asset_content_type: text/plain
+                  **Files with stable URLs:**
+                  - \`auto-image.standalone.js\` - Standalone version
+                  - \`auto-image.userscript.js\` - Userscript version
+                  - \`auto-image.bookmarklet.js\` - Bookmarklet JavaScript
+                  - \`auto-image.bookmarklet.txt\` - Bookmarklet text" \
+                      dist/auto-image.standalone.js \
+                      dist/auto-image.userscript.js \
+                      dist/auto-image.bookmarklet.js \
+                      dist/auto-image.bookmarklet.txt
