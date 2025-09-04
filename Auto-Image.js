@@ -6790,6 +6790,85 @@
     );
   }
 
+  // Special coordinate generation function for outline-first mode with pixel data access
+  function generateOutlineFirstCoordinates(width, height, pixels) {
+    console.log('🖼️ Generating outline-first coordinates (silhouette via 8-neighborhood)...');
+
+    // 8-neighborhood (including diagonals)
+    const neighbors = [
+      [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1], [1, -1],
+    ];
+
+    const transparencyThreshold = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
+    const idxOf = (x, y) => y * width + x;
+
+    // Eligibility: whether the pixel should be painted respecting transparency/white settings
+    function isEligible(x, y) {
+      if (x < 0 || x >= width || y < 0 || y >= height) return false;
+      const i = (y * width + x) * 4;
+      if (i < 0 || i + 3 >= pixels.length) return false;
+      const r = pixels[i], g = pixels[i + 1], b = pixels[i + 2], a = pixels[i + 3];
+      if (a < transparencyThreshold) return !!state.paintTransparentPixels; // only if user opted in
+      if (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b)) return false;
+      return true;
+    }
+
+    // Build silhouette edge set: eligible pixel with any ineligible or out-of-bounds neighbor (8-neighborhood)
+    const edgeSet = new Set();
+    const eligibleSet = new Set();
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        if (!isEligible(x, y)) continue;
+        eligibleSet.add(idxOf(x, y));
+        let isEdge = false;
+        for (const [dx, dy] of neighbors) {
+          const nx = x + dx, ny = y + dy;
+          if (nx < 0 || nx >= width || ny < 0 || ny >= height) { isEdge = true; break; }
+          if (!isEligible(nx, ny)) { isEdge = true; break; }
+        }
+        if (isEdge) edgeSet.add(idxOf(x, y));
+      }
+    }
+
+    // Order edges by connected traversal (BFS) to trace outlines naturally
+    const visited = new Set();
+    const orderedOutline = [];
+    const keyToXY = (k) => [k % width, Math.floor(k / width)];
+    const seeds = Array.from(edgeSet.values()).sort((a, b) => a - b); // row-major
+    for (const seed of seeds) {
+      if (visited.has(seed)) continue;
+      const queue = [seed];
+      visited.add(seed);
+      while (queue.length) {
+        const cur = queue.shift();
+        orderedOutline.push(keyToXY(cur));
+        const [cx, cy] = keyToXY(cur);
+        for (const [dx, dy] of neighbors) {
+          const nx = cx + dx, ny = cy + dy;
+          if (nx < 0 || nx >= width || ny < 0 || ny >= height) continue;
+          const nk = idxOf(nx, ny);
+          if (!visited.has(nk) && edgeSet.has(nk)) { visited.add(nk); queue.push(nk); }
+        }
+      }
+    }
+
+    // Build interior strictly row-major: all eligible minus edges
+    const interiors = [];
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const k = idxOf(x, y);
+        if (eligibleSet.has(k) && !edgeSet.has(k)) interiors.push([x, y]);
+      }
+    }
+
+    console.log(`✏️ Outline-first prepared: edges=${orderedOutline.length}, fill=${interiors.length}`);
+
+    const coords = [];
+    coords.push(...orderedOutline);
+    coords.push(...interiors);
+    return coords;
+  }
+
   function generateCoordinates(width, height, mode, direction, snake, blockWidth, blockHeight) {
     const coords = [];
     console.log(
@@ -6925,49 +7004,6 @@
       for (const block of blocks) {
         coords.push(...block);
       }
-    } else if (mode === 'outline-first') {
-      // Outline-first: Simple rectangular perimeter outline, then top-to-bottom fill
-      // This matches the simple approach: single pixel outline around the perimeter
-      const outlinePixels = [];
-      const interiorPixels = [];
-      
-      // 1. Paint the rectangular perimeter outline first
-      // Top row (left to right)
-      for (let x = 0; x < width; x++) {
-        outlinePixels.push([x, 0]);
-      }
-      
-      // Right column (top to bottom, excluding corner already painted)
-      for (let y = 1; y < height; y++) {
-        outlinePixels.push([width - 1, y]);
-      }
-      
-      // Bottom row (right to left, excluding corner already painted)
-      if (height > 1) {
-        for (let x = width - 2; x >= 0; x--) {
-          outlinePixels.push([x, height - 1]);
-        }
-      }
-      
-      // Left column (bottom to top, excluding corners already painted)
-      if (width > 1) {
-        for (let y = height - 2; y > 0; y--) {
-          outlinePixels.push([0, y]);
-        }
-      }
-      
-      // 2. Fill the interior pixels top-to-bottom, left-to-right (row-major order)
-      for (let y = 1; y < height - 1; y++) {
-        for (let x = 1; x < width - 1; x++) {
-          interiorPixels.push([x, y]);
-        }
-      }
-      
-      console.log(`🖼️ Outline-first: ${outlinePixels.length} outline pixels, ${interiorPixels.length} interior pixels`);
-      
-      // Add outline pixels first, then interior pixels
-      coords.push(...outlinePixels);
-      coords.push(...interiorPixels);
     } else {
       throw new Error(`Unknown mode: ${mode}`);
     }
@@ -7116,15 +7152,23 @@
     }
 
     try {
-      const coords = generateCoordinates(
-        width,
-        height,
-        state.coordinateMode,
-        state.coordinateDirection,
-        state.coordinateSnake,
-        state.blockWidth,
-        state.blockHeight
-      );
+      let coords;
+      
+      if (state.coordinateMode === 'outline-first') {
+        // Special handling for outline-first mode - needs access to pixel data
+        coords = generateOutlineFirstCoordinates(width, height, pixels);
+      } else {
+        // Normal coordinate generation for other modes
+        coords = generateCoordinates(
+          width,
+          height,
+          state.coordinateMode,
+          state.coordinateDirection,
+          state.coordinateSnake,
+          state.blockWidth,
+          state.blockHeight
+        );
+      }
 
       outerLoop: for (const [x, y] of coords) {
         if (state.stopFlag) {
