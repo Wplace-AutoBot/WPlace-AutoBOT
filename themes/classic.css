@@ -590,6 +590,131 @@
   border-radius: 8px;
 }
 
+/* Dual control layout styling for classic theme */
+:root .wplace-dual-control-compact,
+.wplace-theme-classic .wplace-dual-control-compact {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  margin: 8px 0;
+  flex-wrap: wrap;
+}
+
+:root .wplace-slider-container-compact,
+.wplace-theme-classic .wplace-slider-container-compact {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 160px;
+}
+
+:root .wplace-speed-slider-container-compact,
+.wplace-theme-classic .wplace-speed-slider-container-compact {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 160px;
+}
+
+:root .wplace-input-group-compact,
+.wplace-theme-classic .wplace-input-group-compact {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+:root .wplace-input-btn-compact,
+.wplace-theme-classic .wplace-input-btn-compact {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+:root .wplace-input-btn-compact:hover,
+.wplace-theme-classic .wplace-input-btn-compact:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+}
+
+:root .wplace-input-btn-compact:active,
+.wplace-theme-classic .wplace-input-btn-compact:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+:root .wplace-number-input-compact,
+.wplace-theme-classic .wplace-number-input-compact {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 4px;
+  color: white;
+  padding: 4px 8px;
+  font-size: 12px;
+  width: 50px;
+  text-align: center;
+  transition: all 0.2s ease;
+  height: 22px;
+}
+
+:root .wplace-number-input-compact:focus,
+.wplace-theme-classic .wplace-number-input-compact:focus {
+  outline: none;
+  border-color: #4facfe;
+  box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.3);
+  background: rgba(255,255,255,0.15);
+}
+
+:root .wplace-input-label-compact,
+.wplace-theme-classic .wplace-input-label-compact {
+  color: rgba(255,255,255,0.8);
+  font-size: 11px;
+  margin-left: 4px;
+  white-space: nowrap;
+}
+
+:root .wplace-batch-size-header,
+.wplace-theme-classic .wplace-batch-size-header {
+  margin-bottom: 8px;
+}
+
+:root .wplace-batch-size-label,
+.wplace-theme-classic .wplace-batch-size-label {
+  color: var(--wplace-highlight);
+  font-weight: 500;
+  font-size: 13px;
+}
+
+/* Cooldown control styling for classic theme */
+:root .wplace-cooldown-control,
+.wplace-theme-classic .wplace-cooldown-control {
+  margin: 12px 0;
+}
+
+:root .wplace-cooldown-control label,
+.wplace-theme-classic .wplace-cooldown-control label {
+  color: var(--wplace-highlight);
+  font-weight: 500;
+  font-size: 13px;
+  margin-bottom: 8px;
+  display: block;
+}
+
 /* Resize dialog styling for classic theme */
 :root .resize-container,
 .wplace-theme-classic .resize-container {

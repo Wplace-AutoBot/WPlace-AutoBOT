@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="300" height="300" alt="image" src="https://github.com/user-attachments/assets/92c38d55-37ef-4e88-bf24-9dba693fa0ab" />
+  <img width="379" height="376" alt="image" src="https://github.com/user-attachments/assets/c14ef2b5-e104-4526-9b17-23cb2abc9efe" />
 </p>
 
 <p align="center"><strong>WPlace AutoBOT</strong></p>
@@ -43,7 +43,7 @@ This project was fork from https://github.com/DarkModde/WPlace-AutoBOT
 ### 🎯┃Auto-Farm
 #### AUTOFARM USES CHARGES TO GET LEVELS, IT DOES NOT DRAW AN IMAGE FOR YOU. PLEASE USE AUTO-IMAGE FOR THAT
 ```js
-javascript:fetch("https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/Auto-Farm.js").then(t=>t.text()).then(eval);
+javascript:(async()=>{ const u='https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/Auto-Image.js'; const c=await (await fetch(u,{cache:'no-store'})).text(); const blob=new Blob([c],{type:'application/javascript'}); const url=URL.createObjectURL(blob); const s=document.createElement('script'); s.src=url; document.body.appendChild(s); })();
 ```
 
 ### 🖼️┃Auto-Image
@@ -87,6 +87,7 @@ javascript:fetch("https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBO
 - [x] Paint over multiple tiles
 - [x] Multi Account Auto Switcher Via Other Branch ; https://github.com/Wplace-AutoBot/WPlace-AutoBOT/tree/Acc-switch (Ram Efficient LOL)
 - [x] AutoCaptcha Solver With Turnstile Token Generator
+- [x] Wider Paint Control Options
 - [x] Advance Color Processing
 - [x] MultiLanguage Support
 - [x] Multi account through save and load feature
@@ -99,7 +100,7 @@ javascript:fetch("https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBO
 ---
 
 <p align="center">
-  <img src="https://i.imgur.com/lyNQUsY.png" alt="Script Demonstration"/>
+  <img src="https://i.imgur.com/5QYvb4w.png" alt="Script Demonstration"/>
 </p>
 
 ---
