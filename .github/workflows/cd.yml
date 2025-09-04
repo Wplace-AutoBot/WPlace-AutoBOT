@@ -43,6 +43,10 @@ jobs:
                   mkdir -p public/production
                   cp -r dist/* public/production/
 
+            - name: Build files for all branches
+              run: |
+                  npm run build:all
+
             - name: Configure Pages
               uses: actions/configure-pages@v5
 
@@ -143,13 +147,30 @@ jobs:
                     git fetch --depth=1 origin "$BR"
                     git archive --format=tar FETCH_HEAD | tar -x -C "public/$SAFE"
 
+                    # Build files for this branch
+                    if [[ -f "public/$SAFE/package.json" ]]; then
+                      cd "public/$SAFE"
+                      if npm ci --silent 2>/dev/null && npm run build:all --silent 2>/dev/null; then
+                        echo "✅ Built files for branch $BR"
+                        # Copy built files to root of branch directory for direct access
+                        if [[ -d "dist" ]]; then
+                          cp dist/auto-image.*.js . 2>/dev/null || true
+                          cp dist/auto-image.*.txt . 2>/dev/null || true
+                        fi
+                      else
+                        echo "⚠️ Build failed for branch $BR, serving source files only"
+                      fi
+                      cd ../..
+                    fi
+
                     # Keep only static assets; prune empty dirs
                     rm -rf "public/$SAFE/.git" "public/$SAFE/.github" \
                            "public/$SAFE/node_modules"
                     find "public/$SAFE" -type f ! \
                       \( -name '*.html' -o -name '*.js' -o -name '*.css' -o \
                          -name '*.json' -o -name '*.png' -o -name '*.jpg' -o \
-                         -name '*.jpeg' -o -name '*.gif' -o -name '*.svg' \) \
+                         -name '*.jpeg' -o -name '*.gif' -o -name '*.svg' -o \
+                         -name '*.txt' \) \
                       -delete
                     find "public/$SAFE" -type d -empty -delete
 
