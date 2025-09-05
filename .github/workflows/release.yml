@@ -18,6 +18,16 @@ jobs:
                   node-version: '18'
                   cache: 'npm'
 
+            - uses: actions/cache@v4
+              with:
+                  path: |
+                      node_modules
+                      dist
+                  key: ${{ runner.os }}-release-${{ hashFiles('**/package-lock.json') }}-${{ github.sha }}
+                  restore-keys: |
+                      ${{ runner.os }}-release-${{ hashFiles('**/package-lock.json') }}-
+                      ${{ runner.os }}-release-
+
             - name: Install dependencies
               run: |
                   echo "📦 Installing dependencies..."

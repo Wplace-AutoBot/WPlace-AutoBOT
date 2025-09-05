@@ -35,6 +35,17 @@ jobs:
                   node-version: '18'
                   cache: 'npm'
 
+            - uses: actions/cache@v4
+              with:
+                  path: |
+                      node_modules
+                      public/production
+                  key: ${{ runner.os }}-cd-${{ hashFiles('**/package-lock.json') }}-${{ github.ref_name }}-${{ github.sha }}
+                  restore-keys: |
+                      ${{ runner.os }}-cd-${{ hashFiles('**/package-lock.json') }}-${{ github.ref_name }}-
+                      ${{ runner.os }}-cd-${{ hashFiles('**/package-lock.json') }}-
+                      ${{ runner.os }}-cd-
+
             - name: Install dependencies
               run: npm ci
 
