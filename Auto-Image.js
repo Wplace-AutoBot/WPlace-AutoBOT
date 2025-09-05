@@ -299,6 +299,7 @@
     'ja',
     'ko',
     'uk',
+    'es-MX'
   ];
 
   // Function to load translations from JSON file with retry mechanism
@@ -3993,6 +3994,7 @@
               <option value="ru" ${state.language === 'ru' ? 'selected' : ''} class="wplace-settings-option">🇷🇺 Русский</option>
               <option value="uk" ${state.language === 'uk' ? 'selected' : ''} class="wplace-settings-option">🇺🇦 Українська</option>
               <option value="en" ${state.language === 'en' ? 'selected' : ''} class="wplace-settings-option">🇺🇸 English</option>
+              <option value="es-MX" ${state.language === 'es-MX' ? 'selected' : ''} class="wplace-settings-option">🇲🇽 Español</option>
               <option value="pt" ${state.language === 'pt' ? 'selected' : ''} class="wplace-settings-option">🇧🇷 Português</option>
               <option value="fr" ${state.language === 'fr' ? 'selected' : ''} class="wplace-settings-option">🇫🇷 Français</option>
               <option value="tr" ${state.language === 'tr' ? 'selected' : ''} class="wplace-settings-option">🇹🇷 Türkçe</option>
