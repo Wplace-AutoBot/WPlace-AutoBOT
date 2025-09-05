@@ -40,6 +40,11 @@ npm run build
 
 3) Start a development workflow (pick one)
 
+- **Script Manager (Recommended for users):**
+  - Install the userscript manager: [WPlace Bot Manager](https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/src/wplace-bot-manager.user.js)
+  - Visit https://wplace.live and press **Ctrl+Shift+M**
+  - Add your development scripts with custom URLs for easy testing
+
 - Userscript (Tampermonkey/Violentmonkey):
 
   ```bash
@@ -246,6 +251,7 @@ Security note: Your tunnel token is a secret. Keep it in .env (already
 WPlace-AutoBOT/
 ├── src/        # Source code (runtime)
 │ ├── Auto-Image.js   # Main script
+│ ├── wplace-bot-manager.user.js  # Userscript manager for easy script switching
 │ ├── auto-image-styles.css
 │ ├── lang/     # Embedded translations (JSON)
 │ └── themes/     # Embedded themes (CSS)
@@ -461,6 +467,13 @@ The CI pipeline automatically:
 
 Choose any method below to load your local/tunneled build into wplace.live.
 
+0) **Script Manager (Recommended)**
+
+- Install the [WPlace Bot Manager](https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/src/wplace-bot-manager.user.js) userscript
+- Visit https://wplace.live and press **Ctrl+Shift+M**
+- Add your development script URLs (tunnel or local URLs) to the manager
+- Use hotkeys 1-9 to quickly run different scripts during development
+
 1) Console injection (standalone)
 
 - With tunnel:
@@ -492,7 +505,7 @@ Choose any method below to load your local/tunneled build into wplace.live.
 npm run dev:tunnel
 ```
 
-- Then use recipe (1) or (3) against the tunnel URL
+- Then use recipe (0), (1) or (3) against the tunnel URL
 
 Debug tips:
 

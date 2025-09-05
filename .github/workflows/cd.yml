@@ -29,6 +29,30 @@ jobs:
               with:
                   fetch-depth: 1
 
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '18'
+                  cache: 'npm'
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Build production files (main branch only)
+              if: github.ref == 'refs/heads/main'
+              run: |
+                  echo "🔨 Building production files..."
+                  if ! npm run build:all; then
+                      echo "❌ Production build failed" >&2
+                      exit 1
+                  fi
+                  mkdir -p public/production
+                  if ! cp -r dist/* public/production/; then
+                      echo "❌ Failed to copy production files" >&2
+                      exit 1
+                  fi
+                  echo "✅ Production build completed successfully"
+
             - name: Configure Pages
               uses: actions/configure-pages@v5
 
@@ -257,13 +281,64 @@ jobs:
                     git fetch --depth=1 origin "$BR"
                     git archive --format=tar FETCH_HEAD | tar -x -C "public/$SAFE"
 
+                    # Build files for this branch with proper error handling
+                    if [[ -f "public/$SAFE/package.json" ]]; then
+                      cd "public/$SAFE"
+                      echo "🔨 Building files for branch $BR..."
+                      
+                      # Install dependencies with error handling
+                      if ! npm ci; then
+                        echo "❌ Failed to install dependencies for branch $BR" >&2
+                        cd ../..
+                        continue
+                      fi
+                      
+                      # Build with error handling
+                      if npm run build:all; then
+                        echo "✅ Successfully built files for branch $BR"
+                        
+                        # Validate build outputs exist and have reasonable size
+                        build_success=true
+                        if [[ -d "dist" ]]; then
+                          for file in dist/auto-image.*.js dist/auto-image.*.txt; do
+                            if [[ -f "$file" ]]; then
+                              size=$(stat -c%s "$file" 2>/dev/null || echo 0)
+                              if [[ $size -lt 100 ]]; then
+                                echo "⚠️ Build output $file is suspiciously small ($size bytes)" >&2
+                                build_success=false
+                              fi
+                            fi
+                          done
+                          
+                          if [[ "$build_success" == "true" ]]; then
+                            # Copy built files to root of branch directory for direct access
+                            if cp dist/auto-image.*.js . && cp dist/auto-image.*.txt .; then
+                              echo "✅ Build artifacts copied successfully for branch $BR"
+                            else
+                              echo "⚠️ Failed to copy some build artifacts for branch $BR" >&2
+                            fi
+                          else
+                            echo "⚠️ Build validation failed for branch $BR, serving source files only" >&2
+                          fi
+                        else
+                          echo "⚠️ No dist directory found for branch $BR, serving source files only" >&2
+                        fi
+                      else
+                        echo "❌ Build failed for branch $BR, serving source files only" >&2
+                      fi
+                      cd ../..
+                    else
+                      echo "ℹ️ No package.json found for branch $BR, serving source files only"
+                    fi
+
                     # Keep only static assets; prune empty dirs
                     rm -rf "public/$SAFE/.git" "public/$SAFE/.github" \
                            "public/$SAFE/node_modules"
                     find "public/$SAFE" -type f ! \
                       \( -name '*.html' -o -name '*.js' -o -name '*.css' -o \
                          -name '*.json' -o -name '*.png' -o -name '*.jpg' -o \
-                         -name '*.jpeg' -o -name '*.gif' -o -name '*.svg' \) \
+                         -name '*.jpeg' -o -name '*.gif' -o -name '*.svg' -o \
+                         -name '*.txt' \) \
                       -delete
                     find "public/$SAFE" -type d -empty -delete
 

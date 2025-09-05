@@ -40,6 +40,14 @@ This project was fork from https://github.com/DarkModde/WPlace-AutoBOT
 
 <br>
 
+### 🎯┃Script Manager (Recommended)
+#### Userscript manager that makes it easy to switch between and run different WPlace bot scripts
+**Installation:**
+1. Install [Tampermonkey](https://www.tampermonkey.net/) or [Violentmonkey](https://violentmonkey.github.io/) in your browser
+2. Click this link to install: [WPlace Bot Manager](https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/src/wplace-bot-manager.user.js)
+3. Visit https://wplace.live and press **Ctrl+Shift+M** to open the manager
+4. Click any script to run it, or use hotkeys 1-9 for quick access
+
 ### 🎯┃Auto-Farm
 #### AUTOFARM USES CHARGES TO GET LEVELS, IT DOES NOT DRAW AN IMAGE FOR YOU. PLEASE USE AUTO-IMAGE FOR THAT
 ```js
@@ -81,6 +89,7 @@ javascript:fetch("https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBO
 
 ### ✨┃Features
 
+- [x] **Script Manager** - Easy-to-use userscript for managing multiple bots with hotkeys
 - [x] Automatically farms droplets/levels
 - [x] Correct Color Pixel Skip
 - [x] Overlay(you dont need bluemarble anymore)
