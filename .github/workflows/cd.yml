@@ -2,7 +2,9 @@ name: Pages – aggregate all branches
 
 on:
     push:
-        branches: ['**']
+        branches: ['main', 'dev']
+    pull_request:
+        branches: ['main', 'dev']
     workflow_dispatch:
 
 permissions:
