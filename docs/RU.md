@@ -1,6 +1,6 @@
 <p align="center"><strong>Translations</strong></p>
 <p align="center">
-    <a href="README.md"><img src="https://flagcdn.com/256x192/us.png" width="48" alt="US Flag"></a>
+    <a href="../README.md"><img src="https://flagcdn.com/256x192/us.png" width="48" alt="US Flag"></a>
   &nbsp;
     <a href="ES.md"><img src="https://flagcdn.com/256x192/br.png" width="48" alt="Brazil Flag"></a>
   &nbsp;

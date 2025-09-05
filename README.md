@@ -1,18 +1,18 @@
 <p align="center"><strong>Translations</strong></p>
 <p align="center">
-    <a href="ES.md"><img src="https://flagcdn.com/256x192/br.png" width="48" alt="Brazil Flag"></a>
+    <a href="docs/ES.md"><img src="https://flagcdn.com/256x192/br.png" width="48" alt="Brazil Flag"></a>
   &nbsp;
-    <a href="FR.md"><img src="https://flagcdn.com/256x192/fr.png" width="48" alt="French Flag"></a>
+    <a href="docs/FR.md"><img src="https://flagcdn.com/256x192/fr.png" width="48" alt="French Flag"></a>
   &nbsp;
-    <a href="RU.md"><img src="https://flagcdn.com/256x192/ru.png" width="48" alt="Russian Flag"></a>
+    <a href="docs/RU.md"><img src="https://flagcdn.com/256x192/ru.png" width="48" alt="Russian Flag"></a>
   &nbsp;
-    <a href="NL.md"><img src="https://flagcdn.com/256x192/nl.png" width="48" alt="Netherlands Flag"></a>
+    <a href="docs/NL.md"><img src="https://flagcdn.com/256x192/nl.png" width="48" alt="Netherlands Flag"></a>
   &nbsp;
-    <a href="UK.md"><img src="https://flagcdn.com/256x192/ua.png" width="48" alt="Ukrainian Flag"></a>
+    <a href="docs/UK.md"><img src="https://flagcdn.com/256x192/ua.png" width="48" alt="Ukrainian Flag"></a>
   &nbsp;
-    <a href="DE.md"><img src="https://flagcdn.com/256x192/de.png" width="48" alt="Deutsch Flag"></a>
+    <a href="docs/DE.md"><img src="https://flagcdn.com/256x192/de.png" width="48" alt="Deutsch Flag"></a>
   &nbsp;
-    <a href="PT.md"><img src="https://flagcdn.com/256x192/pt.png" width="48" alt="Portugal Flag"></a>
+    <a href="docs/PT.md"><img src="https://flagcdn.com/256x192/pt.png" width="48" alt="Portugal Flag"></a>
 </p>
 
 ---
