@@ -593,16 +593,21 @@
         // Keyboard for inline panel
         function onKeyDown(e) {
             // Check if we're dealing with shadow DOM retargeting
-            const actualTarget = e.composedPath ? e.composedPath()[0] : e.target;
-            const actualTag = (actualTarget && actualTarget.tagName || '').toUpperCase();
-            
+            const actualTarget = e.composedPath
+                ? e.composedPath()[0]
+                : e.target;
+            const actualTag = (
+                (actualTarget && actualTarget.tagName) ||
+                ''
+            ).toUpperCase();
+
             // Always allow ESC to close
             if (e.key === 'Escape') {
                 close();
                 e.preventDefault();
                 return;
             }
-            
+
             // Don't trigger hotkeys when typing in input fields anywhere
             // Use actualTag to check the real target element
             if (
@@ -612,7 +617,7 @@
             ) {
                 return;
             }
-            
+
             // Only handle numeric hotkeys when not in an input field
             if (e.key >= '0' && e.key <= '9') {
                 const items = sortedScripts();
