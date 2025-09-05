@@ -224,10 +224,7 @@ jobs:
                     }
                   </style>
                   <h1><span class="emoji">🚀</span>WPlace AutoBOT</h1>
-                  <div class="subtitle">Branch File Browser - Practical scripts with intuitive menus</div>
-                  <div class="header-info">
-                    <p>Explore files from different branches of the WPlace AutoBOT project. Perfect for reviewing changes, accessing documentation, or downloading specific script versions.</p>
-                  </div>
+                  <div class="subtitle">Branch File Browser</div>
                   <input id="q" placeholder="🔍 Filter branches..." />
                   <div id="list"></div>
                   <script>window.__branches=window.__branches||[];</script>
