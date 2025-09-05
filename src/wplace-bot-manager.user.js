@@ -19,10 +19,7 @@
     const STORAGE_KEY = 'wplace-bot-scripts-v1';
     const BASE_URL_KEY = 'wplace-bot-base-url';
     const HOST_ID = 'wplace-bot-launcher-host';
-    const POPUP_NAME = 'wplace-bot-switcher';
     const TARGET_NAME_KEY = 'wplace-target-name';
-    const POPUP_W = 460;
-    const POPUP_H = 620;
 
     // Add hotkey to open manager (Ctrl+Shift+M)
     document.addEventListener('keydown', function (e) {
@@ -595,19 +592,28 @@
 
         // Keyboard for inline panel
         function onKeyDown(e) {
-            const tag = (e.target && e.target.tagName) || '';
-            if (
-                tag === 'INPUT' ||
-                tag === 'TEXTAREA' ||
-                (e.target && e.target.isContentEditable)
-            ) {
-                return;
-            }
+            // Check if we're dealing with shadow DOM retargeting
+            const actualTarget = e.composedPath ? e.composedPath()[0] : e.target;
+            const actualTag = (actualTarget && actualTarget.tagName || '').toUpperCase();
+            
+            // Always allow ESC to close
             if (e.key === 'Escape') {
                 close();
                 e.preventDefault();
                 return;
             }
+            
+            // Don't trigger hotkeys when typing in input fields anywhere
+            // Use actualTag to check the real target element
+            if (
+                actualTag === 'INPUT' ||
+                actualTag === 'TEXTAREA' ||
+                (actualTarget && actualTarget.isContentEditable)
+            ) {
+                return;
+            }
+            
+            // Only handle numeric hotkeys when not in an input field
             if (e.key >= '0' && e.key <= '9') {
                 const items = sortedScripts();
                 const idx = e.key === '0' ? 9 : Number(e.key) - 1;
