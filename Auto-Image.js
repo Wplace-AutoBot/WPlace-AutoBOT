@@ -198,7 +198,6 @@
     COORDINATE_SNAKE: true,
     COORDINATE_BLOCK_WIDTH: 6,
     COORDINATE_BLOCK_HEIGHT: 2,
-    autoSwap: true,
   };
 
   const getCurrentTheme = () => CONFIG.THEMES[CONFIG.currentTheme];
@@ -565,6 +564,7 @@
     cooldownChargeThreshold: CONFIG.COOLDOWN_CHARGE_THRESHOLD,
     chargesThresholdInterval: null,
     tokenSource: CONFIG.TOKEN_SOURCE, // "generator" or "manual"
+    autoSwap: true,
     initialSetupComplete: false, // Track if initial startup setup is complete (only happens once)
     overlayOpacity: CONFIG.OVERLAY.OPACITY_DEFAULT,
     blueMarbleEnabled: CONFIG.OVERLAY.BLUE_MARBLE_DEFAULT,
@@ -2879,162 +2879,6 @@
     return null;
   }
 
-  // IMAGE PROCESSOR CLASS
-  class ImageProcessor {
-    constructor(imageSrc) {
-      this.imageSrc = imageSrc;
-      this.img = null;
-      this.canvas = null;
-      this.ctx = null;
-    }
-
-    async load() {
-      return new Promise((resolve, reject) => {
-        this.img = new Image();
-        this.img.crossOrigin = 'anonymous';
-        this.img.onload = () => {
-          this.canvas = document.createElement('canvas');
-          this.ctx = this.canvas.getContext('2d');
-          this.canvas.width = this.img.width;
-          this.canvas.height = this.img.height;
-          this.ctx.drawImage(this.img, 0, 0);
-          resolve();
-        };
-        this.img.onerror = reject;
-        this.img.src = this.imageSrc;
-      });
-    }
-
-    getDimensions() {
-      return {
-        width: this.canvas.width,
-        height: this.canvas.height,
-      };
-    }
-
-    getPixelData() {
-      return this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height).data;
-    }
-
-    resize(newWidth, newHeight) {
-      const tempCanvas = document.createElement('canvas');
-      const tempCtx = tempCanvas.getContext('2d');
-
-      tempCanvas.width = newWidth;
-      tempCanvas.height = newHeight;
-
-      tempCtx.imageSmoothingEnabled = false;
-      tempCtx.drawImage(this.canvas, 0, 0, newWidth, newHeight);
-
-      this.canvas.width = newWidth;
-      this.canvas.height = newHeight;
-      this.ctx.imageSmoothingEnabled = false;
-      this.ctx.drawImage(tempCanvas, 0, 0);
-
-      return this.ctx.getImageData(0, 0, newWidth, newHeight).data;
-    }
-
-    generatePreview(width, height) {
-      const previewCanvas = document.createElement('canvas');
-      const previewCtx = previewCanvas.getContext('2d');
-
-      previewCanvas.width = width;
-      previewCanvas.height = height;
-
-      previewCtx.imageSmoothingEnabled = false;
-      previewCtx.drawImage(this.img, 0, 0, width, height);
-
-      return previewCanvas.toDataURL();
-    }
-  }
-
-  // WPLACE API SERVICE
-  const WPlaceService = {
-    async paintPixelInRegion(regionX, regionY, pixelX, pixelY, color) {
-      try {
-        await ensureToken();
-        if (!turnstileToken) return 'token_error';
-        const payload = {
-          coords: [pixelX, pixelY],
-          colors: [color],
-          t: turnstileToken,
-          fp: randStr(10),
-        };
-        var token = await createWasmToken(regionX, regionY, payload);
-        const res = await fetch(`https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=UTF-8', 'x-pawtect-token': token },
-          credentials: 'include',
-          body: JSON.stringify(payload),
-        });
-        if (res.status === 403) {
-          console.error('❌ 403 Forbidden. Turnstile token might be invalid or expired.');
-          turnstileToken = null;
-          tokenPromise = new Promise((resolve) => {
-            _resolveToken = resolve;
-          });
-          return 'token_error';
-        }
-        const data = await res.json();
-        return data?.painted === 1;
-      } catch (e) {
-        console.error('Paint request failed:', e);
-        return false;
-      }
-    },
-
-    async getCharges() {
-      const defaultResult = {
-        charges: 0,
-        max: 1,
-        cooldown: CONFIG.COOLDOWN_DEFAULT,
-        droplets: 0,
-      };
-
-      try {
-        const res = await fetch('https://backend.wplace.live/me', {
-          credentials: 'include',
-        });
-
-        if (!res.ok) {
-          console.error(`Failed to get charges: HTTP ${res.status}`);
-          return defaultResult;
-        }
-
-        const data = await res.json();
-
-        return {
-          id: data.id,
-          charges: data.charges?.count ?? 0,
-          max: data.charges?.max ?? 1,
-          cooldown: data.charges?.cooldownMs ?? CONFIG.COOLDOWN_DEFAULT,
-          droplets: data.droplets || 0,
-        };
-      } catch (e) {
-        console.error('Failed to get charges:', e);
-        return defaultResult;
-      }
-    },
-
-    async fetchCheck() {
-      try {
-        const res = await fetch("https://backend.wplace.live/me", {
-          credentials: "include",
-        })
-        const data = await res.json()
-        return {
-          ID: data.id,
-          Charges: data.charges.count,
-          Max: data.charges.max,
-          Droplets: data.droplets
-        }
-      } catch (e) {
-        console.error("Failed to get ID:", e)
-        return {}
-      }
-    }
-  };
-
   async function purchase(type) {
     // loadThemePreference()
     let id;
@@ -3339,6 +3183,162 @@
           }
       }
   }
+
+  // IMAGE PROCESSOR CLASS
+  class ImageProcessor {
+    constructor(imageSrc) {
+      this.imageSrc = imageSrc;
+      this.img = null;
+      this.canvas = null;
+      this.ctx = null;
+    }
+
+    async load() {
+      return new Promise((resolve, reject) => {
+        this.img = new Image();
+        this.img.crossOrigin = 'anonymous';
+        this.img.onload = () => {
+          this.canvas = document.createElement('canvas');
+          this.ctx = this.canvas.getContext('2d');
+          this.canvas.width = this.img.width;
+          this.canvas.height = this.img.height;
+          this.ctx.drawImage(this.img, 0, 0);
+          resolve();
+        };
+        this.img.onerror = reject;
+        this.img.src = this.imageSrc;
+      });
+    }
+
+    getDimensions() {
+      return {
+        width: this.canvas.width,
+        height: this.canvas.height,
+      };
+    }
+
+    getPixelData() {
+      return this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height).data;
+    }
+
+    resize(newWidth, newHeight) {
+      const tempCanvas = document.createElement('canvas');
+      const tempCtx = tempCanvas.getContext('2d');
+
+      tempCanvas.width = newWidth;
+      tempCanvas.height = newHeight;
+
+      tempCtx.imageSmoothingEnabled = false;
+      tempCtx.drawImage(this.canvas, 0, 0, newWidth, newHeight);
+
+      this.canvas.width = newWidth;
+      this.canvas.height = newHeight;
+      this.ctx.imageSmoothingEnabled = false;
+      this.ctx.drawImage(tempCanvas, 0, 0);
+
+      return this.ctx.getImageData(0, 0, newWidth, newHeight).data;
+    }
+
+    generatePreview(width, height) {
+      const previewCanvas = document.createElement('canvas');
+      const previewCtx = previewCanvas.getContext('2d');
+
+      previewCanvas.width = width;
+      previewCanvas.height = height;
+
+      previewCtx.imageSmoothingEnabled = false;
+      previewCtx.drawImage(this.img, 0, 0, width, height);
+
+      return previewCanvas.toDataURL();
+    }
+  }
+
+  // WPLACE API SERVICE
+  const WPlaceService = {
+    async paintPixelInRegion(regionX, regionY, pixelX, pixelY, color) {
+      try {
+        await ensureToken();
+        if (!turnstileToken) return 'token_error';
+        const payload = {
+          coords: [pixelX, pixelY],
+          colors: [color],
+          t: turnstileToken,
+          fp: randStr(10),
+        };
+        var token = await createWasmToken(regionX, regionY, payload);
+        const res = await fetch(`https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=UTF-8', 'x-pawtect-token': token },
+          credentials: 'include',
+          body: JSON.stringify(payload),
+        });
+        if (res.status === 403) {
+          console.error('❌ 403 Forbidden. Turnstile token might be invalid or expired.');
+          turnstileToken = null;
+          tokenPromise = new Promise((resolve) => {
+            _resolveToken = resolve;
+          });
+          return 'token_error';
+        }
+        const data = await res.json();
+        return data?.painted === 1;
+      } catch (e) {
+        console.error('Paint request failed:', e);
+        return false;
+      }
+    },
+
+    async getCharges() {
+      const defaultResult = {
+        charges: 0,
+        max: 1,
+        cooldown: CONFIG.COOLDOWN_DEFAULT,
+        droplets: 0,
+      };
+
+      try {
+        const res = await fetch('https://backend.wplace.live/me', {
+          credentials: 'include',
+        });
+
+        if (!res.ok) {
+          console.error(`Failed to get charges: HTTP ${res.status}`);
+          return defaultResult;
+        }
+
+        const data = await res.json();
+
+        return {
+          id: data.id,
+          charges: data.charges?.count ?? 0,
+          max: data.charges?.max ?? 1,
+          cooldown: data.charges?.cooldownMs ?? CONFIG.COOLDOWN_DEFAULT,
+          droplets: data.droplets || 0,
+        };
+      } catch (e) {
+        console.error('Failed to get charges:', e);
+        return defaultResult;
+      }
+    },
+
+    async fetchCheck() {
+      try {
+        const res = await fetch("https://backend.wplace.live/me", {
+          credentials: "include",
+        })
+        const data = await res.json()
+        return {
+          ID: data.id,
+          Charges: data.charges.count,
+          Max: data.charges.max,
+          Droplets: data.droplets
+        }
+      } catch (e) {
+        console.error("Failed to get ID:", e)
+        return {}
+      }
+    }
+  };
 
   // Desktop Notification Manager
   const NotificationManager = {
@@ -3816,6 +3816,7 @@
     if (existingResizeOverlay) existingResizeOverlay.remove();
 
     loadThemePreference();
+    loadBotSettings();
     await initializeTranslations();
 
     const theme = getCurrentTheme();
@@ -3984,6 +3985,15 @@
             </div>
           </div>
         </div>
+        <div class="wplace-section" id="all-accounts-section">
+            <div class="wplace-section-title">
+                <i class="fas fa-users"></i>
+                <span>All Accounts</span>
+            </div>
+            <div id="accountsListArea" class="accounts-list-container">
+                <div class="wplace-stat-item" style="opacity: 0.5;">Click the <i class="fas fa-users-cog"></i> icon to load accounts.</div>
+            </div>
+        </div>
       </div>
     `;
 
@@ -4032,15 +4042,6 @@
               )}</div>
             </div>
           </div>
-        </div>
-        <div class="wplace-section" id="all-accounts-section">
-            <div class="wplace-section-title">
-                <i class="fas fa-users"></i>
-                <span>All Accounts</span>
-            </div>
-            <div id="accountsListArea" class="accounts-list-container">
-                <div class="wplace-stat-item" style="opacity: 0.5;">Click the <i class="fas fa-users-cog"></i> icon to load accounts.</div>
-            </div>
         </div>
       </div>
     `;
@@ -5003,9 +5004,11 @@
 
         const autoSwapToggle = statsContainer.querySelector("#autoSwapToggle");
         if (autoSwapToggle) {
-            autoSwapToggle.checked = CONFIG.autoSwap;
+            autoSwapToggle.checked = state.autoSwap;
             autoSwapToggle.addEventListener('change', (e) => {
-                CONFIG.autoSwap = e.target.checked;
+                state.autoSwap = e.target.checked;
+                saveBotSettings(); // <-- PERSIST CHANGE
+                Utils.showAlert(`Account Swapper ${state.autoSwap ? 'enabled' : 'disabled'}.`, 'info');
             });
         }
         refreshChargesBtn.addEventListener('click', async () => {
@@ -5822,6 +5825,20 @@
           .join('');
       }
 
+      // Sync with the accounts list BEFORE rendering stats that depend on it
+      if (state.allAccountsInfo && state.allAccountsInfo.length > 0 && chargesData.id) {
+          const currentAccountInList = state.allAccountsInfo.find(acc => acc.ID === chargesData.id);
+          if (currentAccountInList) {
+              currentAccountInList.Charges = state.displayCharges;
+              currentAccountInList.Max = state.maxCharges;
+              currentAccountInList.Droplets = chargesData.droplets;
+              // Re-render the detailed list to show the updated charge count
+              if (typeof renderAccountsList === 'function') {
+                  renderAccountsList();
+              }
+          }
+      }
+
       let totalChargesHTML = '';
       if (state.allAccountsInfo && state.allAccountsInfo.length > 0) {
           const totalCharges = state.allAccountsInfo.reduce((sum, acc) => sum + Math.floor(acc.Charges || 0), 0);
@@ -5829,7 +5846,7 @@
           totalChargesHTML = `
               <div class="wplace-stat-item">
                   <div class="wplace-stat-label"><i class="fas fa-layer-group"></i> Total Charges</div>
-                  <div class="wplace-stat-value">${totalCharges}/${totalMaxCharges}</div>
+                  <div class="wplace-stat-value">${totalCharges} / ${totalMaxCharges}</div>
               </div>
           `;
       }
@@ -5867,18 +5884,6 @@
                 : ''
             }
         `;
-
-      // Sync with the accounts list
-      if (state.allAccountsInfo && state.allAccountsInfo.length > 0 && chargesData.id) {
-          const currentAccountInList = state.allAccountsInfo.find(acc => acc.ID === chargesData.id);
-          if (currentAccountInList) {
-              currentAccountInList.Charges = state.displayCharges;
-              currentAccountInList.Max = state.maxCharges;
-              currentAccountInList.Droplets = chargesData.droplets;
-              // Re-render the list to show the updated charge count
-              renderAccountsList && renderAccountsList();
-          }
-      }
 
       updateChargeStatsDisplay(intervalMs);
     };
@@ -7797,8 +7802,9 @@
           pixelBatch.pixels = [];
         }
 
-        if (state.displayCharges < state.cooldownChargeThreshold && !state.stopFlag) {
-          if (!CONFIG.autoSwap) {
+        if (!state.autoSwap) {
+          // Original wait logic for single-account mode
+          if (state.displayCharges < state.cooldownChargeThreshold && !state.stopFlag) {
             await Utils.dynamicSleep(() => {
               if (state.displayCharges >= state.cooldownChargeThreshold) {
                 NotificationManager.maybeNotifyChargesReached(true);
@@ -7811,8 +7817,11 @@
                 state.cooldown
               );
             });
-          } else {
-            console.log("⚠️ Charges too low, swapping to next account...");
+          }
+        } else {
+          // New auto-swap logic
+          if (state.displayCharges < 1 && !state.stopFlag) {
+            console.log("⚠️ Charges are 0, swapping to next account...");
 
             const accounts = JSON.parse(localStorage.getItem("accounts")) || [];
             if (accounts.length === 0) {
@@ -7883,8 +7892,6 @@
         }
       }
     } finally {
-      if (window._chargesInterval) clearInterval(window._chargesInterval);
-      window._chargesInterval = null;
     }
 
     if (state.stopFlag) {
@@ -8094,7 +8101,7 @@
         randomBatchMin: state.randomBatchMin,
         randomBatchMax: state.randomBatchMax,
         cooldownChargeThreshold: state.cooldownChargeThreshold,
-        autoSwap: CONFIG.autoSwap,
+        autoSwap: state.autoSwap,
         tokenSource: state.tokenSource, // "generator", "hybrid", or "manual"
         minimized: state.minimized,
         overlayOpacity: state.overlayOpacity,
@@ -8151,7 +8158,7 @@
       state.randomBatchMax = settings.randomBatchMax || CONFIG.RANDOM_BATCH_RANGE.MAX;
       state.cooldownChargeThreshold =
         settings.cooldownChargeThreshold || CONFIG.COOLDOWN_CHARGE_THRESHOLD;
-      CONFIG.autoSwap = settings.autoSwap ?? true;
+      state.autoSwap = settings.autoSwap ?? true;
       state.tokenSource = settings.tokenSource || CONFIG.TOKEN_SOURCE; // Default to "generator"
       state.minimized = settings.minimized ?? false;
       CONFIG.PAINTING_SPEED_ENABLED = settings.paintingSpeedEnabled ?? false;
@@ -8282,9 +8289,6 @@
       if (cooldownSlider) cooldownSlider.value = state.cooldownChargeThreshold;
       if (cooldownInput) cooldownInput.value = state.cooldownChargeThreshold;
       if (cooldownValue) cooldownValue.textContent = `${Utils.t('charges')}`;
-
-      const autoSwapToggle = document.getElementById('autoSwapToggle');
-      if (autoSwapToggle) autoSwapToggle.checked = CONFIG.autoSwap;
 
       const overlayOpacitySlider = document.getElementById('overlayOpacitySlider');
       if (overlayOpacitySlider) overlayOpacitySlider.value = state.overlayOpacity;
