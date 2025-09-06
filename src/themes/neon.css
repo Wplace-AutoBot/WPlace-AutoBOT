@@ -633,3 +633,42 @@
 .wplace-theme-neon .wplace-speed-max i {
     text-shadow: 0 0 5px currentColor !important;
 }
+
+/* Turnstile overlay styling for neon theme */
+.wplace-theme-neon .wplace-turnstile-overlay {
+    background: var(--wplace-primary) !important;
+    border: 2px solid var(--wplace-text) !important;
+    border-radius: 0 !important;
+    box-shadow:
+        0 0 30px var(--wplace-text),
+        inset 0 0 20px rgb(0 255 65 / 10%) !important;
+    color: var(--wplace-text) !important;
+    font-family: var(--wplace-font) !important;
+}
+
+.wplace-theme-neon .wplace-turnstile-title {
+    color: var(--wplace-text) !important;
+    text-shadow: 0 0 10px var(--wplace-text) !important;
+    font-family: var(--wplace-font) !important;
+    font-size: 10px !important;
+    text-transform: uppercase !important;
+}
+
+.wplace-theme-neon .wplace-turnstile-hide-btn {
+    background: var(--wplace-secondary) !important;
+    border: 1px solid var(--wplace-text) !important;
+    border-radius: 0 !important;
+    color: var(--wplace-text) !important;
+    text-shadow: 0 0 8px var(--wplace-text) !important;
+    font-family: var(--wplace-font) !important;
+    font-size: 8px !important;
+    text-transform: uppercase !important;
+}
+
+.wplace-theme-neon .wplace-turnstile-hide-btn:hover {
+    background: var(--wplace-error) !important;
+    box-shadow: 0 0 15px var(--wplace-error) !important;
+    animation:
+        pixel-blink 0.5s infinite,
+        neon-glow 1s ease-in-out infinite alternate !important;
+}

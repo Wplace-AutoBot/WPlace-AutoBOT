@@ -1,628 +1,15 @@
+import { EMBEDDED_CSS } from 'embedded-assets';
+import { CONFIG } from './config.js';
 import {
-    EMBEDDED_CSS,
-    EMBEDDED_THEMES,
-    EMBEDDED_LANGUAGES,
-} from 'embedded-assets';
+    getCurrentTheme,
+    switchTheme,
+    applyTheme,
+    loadThemePreference,
+} from './theme.js';
+import { initializeTranslations, t, setLanguage } from './translations.js';
+import { TurnstileManager, TurnstileError } from './auth/index.js';
 
 (async () => {
-    // CONFIGURATION CONSTANTS
-    const CONFIG = {
-        COOLDOWN_DEFAULT: 31000,
-        TRANSPARENCY_THRESHOLD: 100,
-        WHITE_THRESHOLD: 250,
-        LOG_INTERVAL: 10,
-        PAINTING_SPEED: {
-            MIN: 1, // Minimum 1 pixel batch size
-            MAX: 1000, // Maximum 1000 pixels batch size
-            DEFAULT: 5, // Default 5 pixels batch size
-        },
-        BATCH_MODE: 'normal', // "normal" or "random" - default to normal
-        RANDOM_BATCH_RANGE: {
-            MIN: 3, // Random range minimum
-            MAX: 20, // Random range maximum
-        },
-        PAINTING_SPEED_ENABLED: false, // On by default
-        AUTO_CAPTCHA_ENABLED: true, // Turnstile generator enabled by default
-        TOKEN_SOURCE: 'generator', // "generator", "manual", or "hybrid" - default to generator
-        COOLDOWN_CHARGE_THRESHOLD: 1, // Default wait threshold
-        // Desktop Notifications (defaults)
-        NOTIFICATIONS: {
-            ENABLED: false,
-            ON_CHARGES_REACHED: true,
-            ONLY_WHEN_UNFOCUSED: true,
-            REPEAT_MINUTES: 5, // repeat reminder while threshold condition holds
-        },
-        OVERLAY: {
-            OPACITY_DEFAULT: 0.2,
-            BLUE_MARBLE_DEFAULT: false,
-            ditheringEnabled: false,
-        }, // --- START: Color data from colour-converter.js ---
-        // New color structure with proper ID mapping
-        COLOR_MAP: {
-            0: { id: 1, name: 'Black', rgb: { r: 0, g: 0, b: 0 } },
-            1: { id: 2, name: 'Dark Gray', rgb: { r: 60, g: 60, b: 60 } },
-            2: { id: 3, name: 'Gray', rgb: { r: 120, g: 120, b: 120 } },
-            3: { id: 4, name: 'Light Gray', rgb: { r: 210, g: 210, b: 210 } },
-            4: { id: 5, name: 'White', rgb: { r: 255, g: 255, b: 255 } },
-            5: { id: 6, name: 'Deep Red', rgb: { r: 96, g: 0, b: 24 } },
-            6: { id: 7, name: 'Red', rgb: { r: 237, g: 28, b: 36 } },
-            7: { id: 8, name: 'Orange', rgb: { r: 255, g: 127, b: 39 } },
-            8: { id: 9, name: 'Gold', rgb: { r: 246, g: 170, b: 9 } },
-            9: { id: 10, name: 'Yellow', rgb: { r: 249, g: 221, b: 59 } },
-            10: {
-                id: 11,
-                name: 'Light Yellow',
-                rgb: { r: 255, g: 250, b: 188 },
-            },
-            11: { id: 12, name: 'Dark Green', rgb: { r: 14, g: 185, b: 104 } },
-            12: { id: 13, name: 'Green', rgb: { r: 19, g: 230, b: 123 } },
-            13: { id: 14, name: 'Light Green', rgb: { r: 135, g: 255, b: 94 } },
-            14: { id: 15, name: 'Dark Teal', rgb: { r: 12, g: 129, b: 110 } },
-            15: { id: 16, name: 'Teal', rgb: { r: 16, g: 174, b: 166 } },
-            16: { id: 17, name: 'Light Teal', rgb: { r: 19, g: 225, b: 190 } },
-            17: { id: 20, name: 'Cyan', rgb: { r: 96, g: 247, b: 242 } },
-            18: { id: 44, name: 'Light Cyan', rgb: { r: 187, g: 250, b: 242 } },
-            19: { id: 18, name: 'Dark Blue', rgb: { r: 40, g: 80, b: 158 } },
-            20: { id: 19, name: 'Blue', rgb: { r: 64, g: 147, b: 228 } },
-            21: { id: 21, name: 'Indigo', rgb: { r: 107, g: 80, b: 246 } },
-            22: {
-                id: 22,
-                name: 'Light Indigo',
-                rgb: { r: 153, g: 177, b: 251 },
-            },
-            23: { id: 23, name: 'Dark Purple', rgb: { r: 120, g: 12, b: 153 } },
-            24: { id: 24, name: 'Purple', rgb: { r: 170, g: 56, b: 185 } },
-            25: {
-                id: 25,
-                name: 'Light Purple',
-                rgb: { r: 224, g: 159, b: 249 },
-            },
-            26: { id: 26, name: 'Dark Pink', rgb: { r: 203, g: 0, b: 122 } },
-            27: { id: 27, name: 'Pink', rgb: { r: 236, g: 31, b: 128 } },
-            28: { id: 28, name: 'Light Pink', rgb: { r: 243, g: 141, b: 169 } },
-            29: { id: 29, name: 'Dark Brown', rgb: { r: 104, g: 70, b: 52 } },
-            30: { id: 30, name: 'Brown', rgb: { r: 149, g: 104, b: 42 } },
-            31: { id: 31, name: 'Beige', rgb: { r: 248, g: 178, b: 119 } },
-            32: {
-                id: 52,
-                name: 'Light Beige',
-                rgb: { r: 255, g: 197, b: 165 },
-            },
-            33: {
-                id: 32,
-                name: 'Medium Gray',
-                rgb: { r: 170, g: 170, b: 170 },
-            },
-            34: { id: 33, name: 'Dark Red', rgb: { r: 165, g: 14, b: 30 } },
-            35: { id: 34, name: 'Light Red', rgb: { r: 250, g: 128, b: 114 } },
-            36: { id: 35, name: 'Dark Orange', rgb: { r: 228, g: 92, b: 26 } },
-            37: {
-                id: 37,
-                name: 'Dark Goldenrod',
-                rgb: { r: 156, g: 132, b: 49 },
-            },
-            38: { id: 38, name: 'Goldenrod', rgb: { r: 197, g: 173, b: 49 } },
-            39: {
-                id: 39,
-                name: 'Light Goldenrod',
-                rgb: { r: 232, g: 212, b: 95 },
-            },
-            40: { id: 40, name: 'Dark Olive', rgb: { r: 74, g: 107, b: 58 } },
-            41: { id: 41, name: 'Olive', rgb: { r: 90, g: 148, b: 74 } },
-            42: {
-                id: 42,
-                name: 'Light Olive',
-                rgb: { r: 132, g: 197, b: 115 },
-            },
-            43: { id: 43, name: 'Dark Cyan', rgb: { r: 15, g: 121, b: 159 } },
-            44: { id: 45, name: 'Light Blue', rgb: { r: 125, g: 199, b: 255 } },
-            45: { id: 46, name: 'Dark Indigo', rgb: { r: 77, g: 49, b: 184 } },
-            46: {
-                id: 47,
-                name: 'Dark Slate Blue',
-                rgb: { r: 74, g: 66, b: 132 },
-            },
-            47: { id: 48, name: 'Slate Blue', rgb: { r: 122, g: 113, b: 196 } },
-            48: {
-                id: 49,
-                name: 'Light Slate Blue',
-                rgb: { r: 181, g: 174, b: 241 },
-            },
-            49: { id: 53, name: 'Dark Peach', rgb: { r: 155, g: 82, b: 73 } },
-            50: { id: 54, name: 'Peach', rgb: { r: 209, g: 128, b: 120 } },
-            51: {
-                id: 55,
-                name: 'Light Peach',
-                rgb: { r: 250, g: 182, b: 164 },
-            },
-            52: { id: 50, name: 'Light Brown', rgb: { r: 219, g: 164, b: 99 } },
-            53: { id: 56, name: 'Dark Tan', rgb: { r: 123, g: 99, b: 82 } },
-            54: { id: 57, name: 'Tan', rgb: { r: 156, g: 132, b: 107 } },
-            55: { id: 36, name: 'Light Tan', rgb: { r: 214, g: 181, b: 148 } },
-            56: { id: 51, name: 'Dark Beige', rgb: { r: 209, g: 128, b: 81 } },
-            57: { id: 61, name: 'Dark Stone', rgb: { r: 109, g: 100, b: 63 } },
-            58: { id: 62, name: 'Stone', rgb: { r: 148, g: 140, b: 107 } },
-            59: {
-                id: 63,
-                name: 'Light Stone',
-                rgb: { r: 205, g: 197, b: 158 },
-            },
-            60: { id: 58, name: 'Dark Slate', rgb: { r: 51, g: 57, b: 65 } },
-            61: { id: 59, name: 'Slate', rgb: { r: 109, g: 117, b: 141 } },
-            62: {
-                id: 60,
-                name: 'Light Slate',
-                rgb: { r: 179, g: 185, b: 209 },
-            },
-            63: { id: 0, name: 'Transparent', rgb: null },
-        }, // --- END: Color data ---
-        // CSS Classes moved to src/auto-image-styles.css
-        THEMES: {
-            'Classic Autobot': {
-                primary: '#000000',
-                secondary: '#111111',
-                accent: '#222222',
-                text: '#ffffff',
-                highlight: '#775ce3',
-                success: '#00ff00',
-                error: '#ff0000',
-                warning: '#ffaa00',
-                fontFamily: "'Segoe UI', Roboto, sans-serif",
-                borderRadius: '12px',
-                borderStyle: 'solid',
-                borderWidth: '1px',
-                boxShadow:
-                    '0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.1)',
-                backdropFilter: 'blur(10px)',
-                animations: {
-                    glow: false,
-                    scanline: false,
-                    'pixel-blink': false,
-                },
-            },
-            'Classic Light': {
-                primary: '#ffffff',
-                secondary: '#f8f9fa',
-                accent: '#e9ecef',
-                text: '#212529',
-                highlight: '#6f42c1',
-                success: '#28a745',
-                error: '#dc3545',
-                warning: '#ffc107',
-                fontFamily: "'Segoe UI', Roboto, sans-serif",
-                borderRadius: '12px',
-                borderStyle: 'solid',
-                borderWidth: '1px',
-                boxShadow:
-                    '0 8px 32px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.08)',
-                backdropFilter: 'blur(10px)',
-                animations: {
-                    glow: false,
-                    scanline: false,
-                    'pixel-blink': false,
-                },
-            },
-            'Neon Retro': {
-                primary: '#1a1a2e',
-                secondary: '#16213e',
-                accent: '#0f3460',
-                text: '#00ff41',
-                highlight: '#ff6b35',
-                success: '#39ff14',
-                error: '#ff073a',
-                warning: '#ffff00',
-                neon: '#00ffff',
-                purple: '#bf00ff',
-                pink: '#ff1493',
-                fontFamily: "'Press Start 2P', monospace",
-                borderRadius: '0',
-                borderStyle: 'solid',
-                borderWidth: '3px',
-                boxShadow:
-                    '0 0 20px rgba(0, 255, 65, 0.3), inset 0 0 20px rgba(0, 255, 65, 0.1)',
-                backdropFilter: 'none',
-                animations: {
-                    glow: true,
-                    scanline: true,
-                    'pixel-blink': true,
-                },
-            },
-        },
-        currentTheme: 'Classic Autobot',
-        PAINT_UNAVAILABLE: true,
-        COORDINATE_MODE: 'rows',
-        COORDINATE_DIRECTION: 'bottom-left',
-        COORDINATE_SNAKE: true,
-        COORDINATE_BLOCK_WIDTH: 6,
-        COORDINATE_BLOCK_HEIGHT: 2,
-    };
-
-    /**
-     * Get the current active theme name.
-     * @returns {string} Current theme name
-     */
-    const getCurrentTheme = () => CONFIG.THEMES[CONFIG.currentTheme];
-
-    // Helper functions for embedded themes
-    /**
-     * Get list of available theme names.
-     * @returns {Array<string>} Array of theme names
-     */
-    const getAvailableThemes = () => Object.keys(EMBEDDED_THEMES);
-
-    /**
-     * Get the current active theme name.
-     * @returns {string} Current theme name
-     */
-    const getCurrentThemeName = () => CONFIG.currentTheme;
-
-    /**
-     * Switch to a different theme by name.
-     * @param {string} themeName - The name of the theme to switch to
-     */
-    const switchTheme = themeName => {
-        if (CONFIG.THEMES[themeName]) {
-            CONFIG.currentTheme = themeName;
-            saveThemePreference();
-
-            // APPLY THEME VARS/CLASS (new)
-            applyTheme();
-
-            // Recreate UI (kept for now)
-            createUI();
-        }
-    };
-
-    /**
-     * Apply the current theme to the document by setting CSS classes and variables.
-     * Updates the document element classes and injects theme-specific CSS.
-     */
-    function applyTheme() {
-        const theme = getCurrentTheme();
-        // Toggle theme class on documentElement so CSS vars cascade to our UI
-        document.documentElement.classList.remove(
-            'wplace-theme-classic',
-            'wplace-theme-classic-light',
-            'wplace-theme-neon'
-        );
-
-        // Map CONFIG theme names to CSS class names
-        const themeClassMapping = {
-            'Classic Autobot': 'wplace-theme-classic',
-            'Classic Light': 'wplace-theme-classic-light',
-            'Neon Retro': 'wplace-theme-neon',
-        };
-
-        const themeClass =
-            themeClassMapping[CONFIG.currentTheme] || 'wplace-theme-classic';
-
-        document.documentElement.classList.add(themeClass);
-
-        // Inject embedded theme CSS
-        const existingThemeStyle = document.getElementById('wplace-theme-css');
-        if (existingThemeStyle) {
-            existingThemeStyle.remove();
-        }
-
-        // Inject new theme CSS from embedded themes
-        const themeName = getCurrentThemeName();
-        // Map CONFIG theme names to embedded theme file names
-        const themeFileMapping = {
-            'Classic Autobot': 'classic',
-            'Classic Light': 'classic-light',
-            'Neon Retro': 'neon',
-        };
-
-        const themeFileName = themeFileMapping[themeName] || 'classic';
-        if (EMBEDDED_THEMES[themeFileName]) {
-            const style = document.createElement('style');
-            style.id = 'wplace-theme-css';
-            style.textContent = EMBEDDED_THEMES[themeFileName];
-            document.head.appendChild(style);
-        }
-
-        // Also set CSS variables explicitly in case you want runtime overrides
-        const root = document.documentElement;
-        const setVar = (k, v) => {
-            try {
-                root.style.setProperty(k, v);
-            } catch {}
-        };
-
-        setVar('--wplace-primary', theme.primary);
-        setVar('--wplace-secondary', theme.secondary);
-        setVar('--wplace-accent', theme.accent);
-        setVar('--wplace-text', theme.text);
-        setVar('--wplace-highlight', theme.highlight);
-        setVar('--wplace-success', theme.success);
-        setVar('--wplace-error', theme.error);
-        setVar('--wplace-warning', theme.warning);
-
-        // Typography + look
-        setVar(
-            '--wplace-font',
-            theme.fontFamily || "'Segoe UI', Roboto, sans-serif"
-        );
-        setVar('--wplace-radius', '' + (theme.borderRadius || '12px'));
-        setVar('--wplace-border-style', '' + (theme.borderStyle || 'solid'));
-        setVar('--wplace-border-width', '' + (theme.borderWidth || '1px'));
-        setVar(
-            '--wplace-backdrop',
-            '' + (theme.backdropFilter || 'blur(10px)')
-        );
-        setVar('--wplace-border-color', 'rgba(255,255,255,0.1)');
-    }
-
-    /**
-     * Save the current theme preference to localStorage.
-     */
-    const saveThemePreference = () => {
-        try {
-            localStorage.setItem('wplace-theme', CONFIG.currentTheme);
-        } catch (e) {
-            console.warn('Could not save theme preference:', e);
-        }
-    };
-
-    /**
-     * Load the saved theme preference from localStorage.
-     */
-    const loadThemePreference = () => {
-        try {
-            const saved = localStorage.getItem('wplace-theme');
-            if (saved && CONFIG.THEMES[saved]) {
-                CONFIG.currentTheme = saved;
-            }
-        } catch (e) {
-            console.warn('Could not load theme preference:', e);
-        }
-    };
-
-    // Simple translation cache
-    const translationCache = new Map();
-
-    // Dynamically loaded translations
-    let loadedTranslations = {};
-
-    // Available languages
-    const AVAILABLE_LANGUAGES = [
-        'en',
-        'ru',
-        'pt',
-        'vi',
-        'fr',
-        'id',
-        'tr',
-        'zh-CN',
-        'zh-TW',
-        'ja',
-        'ko',
-        'uk',
-    ];
-
-    /**
-     * Load translations for a specific language from embedded assets.
-     * @param {string} language - The language code to load (e.g., 'en', 'ru', 'pt')
-     * @param {number} [retryCount=0] - Current retry attempt count
-     * @returns {Promise<Object|null>} The loaded translations object or null if failed
-     */
-    const loadTranslations = async (language, retryCount = 0) => {
-        if (loadedTranslations[language]) {
-            return loadedTranslations[language];
-        }
-
-        // Load translations from embedded assets
-        if (EMBEDDED_LANGUAGES[language]) {
-            const translations = EMBEDDED_LANGUAGES[language];
-
-            // Validate that translations is an object with keys
-            if (
-                typeof translations === 'object' &&
-                translations !== null &&
-                Object.keys(translations).length > 0
-            ) {
-                loadedTranslations[language] = translations;
-                console.log(
-                    `📚 Loaded ${language} translations successfully from embedded assets (${
-                        Object.keys(translations).length
-                    } keys)`
-                );
-                return translations;
-            } else {
-                console.warn(`❌ Invalid translation format for ${language}`);
-            }
-        } else {
-            console.warn(
-                `❌ Language ${language} not found in embedded assets`
-            );
-        }
-
-        return null;
-    };
-
-    /**
-     * Load and set the user's language preference.
-     * Checks saved preference, browser locale, and falls back to English.
-     * @returns {Promise<void>}
-     */
-    const loadLanguagePreference = async () => {
-        const savedLanguage = localStorage.getItem('wplace_language');
-        const browserLocale = navigator.language;
-        const browserLanguage = browserLocale.split('-')[0];
-
-        let selectedLanguage = 'en'; // Default fallback
-
-        try {
-            // Check if we have the saved language available
-            if (savedLanguage && AVAILABLE_LANGUAGES.includes(savedLanguage)) {
-                selectedLanguage = savedLanguage;
-                console.log(
-                    `🔄 Using saved language preference: ${selectedLanguage}`
-                );
-            }
-            // Try full locale match (e.g. "zh-CN", "zh-TW" etc)
-            else if (AVAILABLE_LANGUAGES.includes(browserLocale)) {
-                selectedLanguage = browserLocale;
-                localStorage.setItem('wplace_language', browserLocale);
-                console.log(`🔄 Using browser locale: ${selectedLanguage}`);
-            }
-            // Try base language match (e.g. "en" for "en-US" or "en-GB" etc)
-            else if (AVAILABLE_LANGUAGES.includes(browserLanguage)) {
-                selectedLanguage = browserLanguage;
-                localStorage.setItem('wplace_language', browserLanguage);
-                console.log(`🔄 Using browser language: ${selectedLanguage}`);
-            }
-            // Use English as fallback
-            else {
-                console.log(
-                    `🔄 No matching language found, using English fallback`
-                );
-            }
-
-            // Set the language in state first
-            state.language = selectedLanguage;
-
-            // Only load translations if not already loaded and not English (which should already be loaded)
-            if (
-                selectedLanguage !== 'en' &&
-                !loadedTranslations[selectedLanguage]
-            ) {
-                const loaded = await loadTranslations(selectedLanguage);
-                if (!loaded) {
-                    console.warn(
-                        `⚠️ Failed to load ${selectedLanguage} translations, falling back to English`
-                    );
-                    state.language = 'en';
-                    localStorage.setItem('wplace_language', 'en');
-                }
-            }
-        } catch (error) {
-            console.error(`❌ Error in loadLanguagePreference:`, error);
-            state.language = 'en'; // Always ensure we have a valid language
-        }
-    };
-
-    // Simple user notification function for critical issues
-    const showTranslationWarning = message => {
-        try {
-            // Create a simple temporary notification banner
-            const warning = document.createElement('div');
-            warning.className = 'wplace-warning-banner';
-            warning.textContent = message;
-            document.body.appendChild(warning);
-
-            // Auto-remove after 8 seconds
-            setTimeout(() => {
-                if (warning.parentNode) {
-                    warning.remove();
-                }
-            }, 8000);
-        } catch (e) {
-            // If DOM manipulation fails, just log
-            console.warn('Failed to show translation warning UI:', e);
-        }
-    };
-
-    /**
-     * Initialize the translation system by loading English fallback and user preference.
-     * @returns {Promise<void>}
-     */
-    const initializeTranslations = async () => {
-        try {
-            console.log('🌐 Initializing translation system...');
-
-            // Always ensure English is loaded as fallback first
-            if (!loadedTranslations['en']) {
-                const englishLoaded = await loadTranslations('en');
-                if (!englishLoaded) {
-                    console.warn(
-                        '⚠️ Failed to load English translations from CDN, using fallback'
-                    );
-                    showTranslationWarning(
-                        '⚠️ Translation loading failed, using basic fallbacks'
-                    );
-                }
-            }
-
-            // Then load user's language preference
-            await loadLanguagePreference();
-
-            console.log(
-                `✅ Translation system initialized. Active language: ${state.language}`
-            );
-        } catch (error) {
-            console.error('❌ Translation initialization failed:', error);
-            // Ensure state has a valid language even if loading fails
-            if (!state.language) {
-                state.language = 'en';
-            }
-            console.warn(
-                '⚠️ Using fallback translations due to initialization failure'
-            );
-            showTranslationWarning(
-                '⚠️ Translation system error, using basic English'
-            );
-        }
-    };
-
-    // Emergency fallback TEXT (minimal)
-    const FALLBACK_TEXT = {
-        en: {
-            title: 'WPlace Auto-Image',
-            toggleOverlay: 'Toggle Overlay',
-            scanColors: 'Scan Colors',
-            uploadImage: 'Upload Image',
-            resizeImage: 'Resize Image',
-            selectPosition: 'Select Position',
-            startPainting: 'Start Painting',
-            stopPainting: 'Stop Painting',
-            progress: 'Progress',
-            pixels: 'Pixels',
-            charges: 'Charges',
-            batchSize: 'Batch Size',
-            initMessage: "Click 'Upload Image' to begin",
-        },
-    };
-
-    /**
-     * Get translated text for a given key with fallback support.
-     * Falls back through: current language → English → hardcoded fallback → key itself.
-     * @param {string} key - The translation key to look up
-     * @param {Object} [replacements={}] - Object with placeholder replacements like {count: 5}
-     * @returns {string} The translated text or the key if no translation found
-     */
-    const getText = (key, replacements = {}) => {
-        // Try current language first
-        let text = loadedTranslations[state.language]?.[key];
-
-        // Fallback to English translations
-        if (!text && state.language !== 'en') {
-            text = loadedTranslations['en']?.[key];
-        }
-
-        // Fallback to hardcoded English
-        if (!text) {
-            text = FALLBACK_TEXT['en']?.[key];
-        }
-
-        // Last resort - return the key itself
-        if (!text) {
-            console.warn(`⚠️ Missing translation for key: ${key}`);
-            return key;
-        }
-
-        // Handle string replacements like {count}, {time}, etc.
-        return Object.entries(replacements).reduce(
-            (result, [placeholder, value]) => {
-                return result.replace(
-                    new RegExp(`\\{${placeholder}\\}`, 'g'),
-                    value
-                );
-            },
-            text
-        );
-    };
-
     // GLOBAL STATE
     const state = {
         running: false,
@@ -1376,7 +763,8 @@ import {
                     console.log(
                         '🔐 Generating new token with executeTurnstile...'
                     );
-                    token = await Utils.executeTurnstile(sitekey, 'paint');
+                    const result = await Utils.obtainSitekeyAndToken();
+                    token = result.token;
                     if (token) setTurnstileToken(token);
                 }
             }
@@ -1610,488 +998,75 @@ import {
                 endTileX: startRegionX + Math.floor((endPixelX - 1) / tileSize),
                 endTileY: startRegionY + Math.floor((endPixelY - 1) / tileSize),
             };
-        }, // Turnstile Generator Integration - Optimized with widget reuse and proper cleanup
-        turnstileLoaded: false,
-        _turnstileContainer: null,
-        _turnstileOverlay: null,
-        _turnstileWidgetId: null,
-        _lastSitekey: null,
-
-        async loadTurnstile() {
-            // If Turnstile is already present, just resolve.
-            if (window.turnstile) {
-                this.turnstileLoaded = true;
-                return Promise.resolve();
-            }
-
-            return new Promise((resolve, reject) => {
-                // Avoid adding the script twice
-                if (
-                    document.querySelector(
-                        'script[src^="https://challenges.cloudflare.com/turnstile/v0/api.js"]'
-                    )
-                ) {
-                    const checkReady = () => {
-                        if (window.turnstile) {
-                            this.turnstileLoaded = true;
-                            resolve();
-                        } else {
-                            setTimeout(checkReady, 100);
-                        }
-                    };
-                    return checkReady();
-                }
-
-                const script = document.createElement('script');
-                script.src =
-                    'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
-                script.async = true;
-                script.defer = true;
-                script.onload = () => {
-                    this.turnstileLoaded = true;
-                    console.log('✅ Turnstile script loaded successfully');
-                    resolve();
-                };
-                script.onerror = () => {
-                    console.error('❌ Failed to load Turnstile script');
-                    reject(new Error('Failed to load Turnstile'));
-                };
-                document.head.appendChild(script);
-            });
         },
 
-        // Create or reuse the turnstile container - completely hidden for token generation
-        ensureTurnstileContainer() {
-            if (
-                !this._turnstileContainer ||
-                !document.body.contains(this._turnstileContainer)
-            ) {
-                // Clean up old container if it exists
-                if (this._turnstileContainer) {
-                    this._turnstileContainer.remove();
-                }
-
-                this._turnstileContainer = document.createElement('div');
-                this._turnstileContainer.className = 'wplace-turnstile-hidden';
-                this._turnstileContainer.setAttribute('aria-hidden', 'true');
-                this._turnstileContainer.id = 'turnstile-widget-container';
-                document.body.appendChild(this._turnstileContainer);
-            }
-            return this._turnstileContainer;
-        },
-
-        // Interactive overlay container for visible widgets when needed
-        ensureTurnstileOverlayContainer() {
-            if (
-                this._turnstileOverlay &&
-                document.body.contains(this._turnstileOverlay)
-            ) {
-                return this._turnstileOverlay;
-            }
-
-            const overlay = document.createElement('div');
-            overlay.id = 'turnstile-overlay-container';
-            overlay.className =
-                'wplace-turnstile-overlay wplace-overlay-hidden';
-
-            const title = document.createElement('div');
-            title.textContent = Utils.t('turnstileInstructions');
-            title.className = 'wplace-turnstile-title';
-
-            const host = document.createElement('div');
-            host.id = 'turnstile-overlay-host';
-            host.className = 'wplace-turnstile-host';
-
-            const hideBtn = document.createElement('button');
-            hideBtn.textContent = Utils.t('hideTurnstileBtn');
-            hideBtn.className = 'wplace-turnstile-hide-btn';
-            hideBtn.addEventListener('click', () => overlay.remove());
-
-            overlay.appendChild(title);
-            overlay.appendChild(host);
-            overlay.appendChild(hideBtn);
-            document.body.appendChild(overlay);
-
-            this._turnstileOverlay = overlay;
-            return overlay;
-        },
-
-        async executeTurnstile(sitekey, action = 'paint') {
-            await this.loadTurnstile();
-
-            // Try reusing existing widget first if sitekey matches
-            if (
-                this._turnstileWidgetId &&
-                this._lastSitekey === sitekey &&
-                window.turnstile?.execute
-            ) {
-                try {
-                    console.log('🔄 Reusing existing Turnstile widget...');
-                    const token = await Promise.race([
-                        window.turnstile.execute(this._turnstileWidgetId, {
-                            action,
-                        }),
-                        new Promise((_, reject) =>
-                            setTimeout(
-                                () => reject(new Error('Execute timeout')),
-                                15000
-                            )
-                        ),
-                    ]);
-                    if (token && token.length > 20) {
-                        console.log('✅ Token generated via widget reuse');
-                        return token;
-                    }
-                } catch (error) {
-                    console.log(
-                        '� Widget reuse failed, will create a fresh widget:',
-                        error.message
-                    );
-                }
-            }
-
-            // Try invisible widget first
-            const invisibleToken = await this.createTurnstileWidget(
-                sitekey,
-                action
-            );
-            if (invisibleToken && invisibleToken.length > 20) {
-                return invisibleToken;
-            }
-
-            console.log('� Falling back to interactive Turnstile (visible).');
-            return await this.createTurnstileWidgetInteractive(sitekey, action);
-        },
-
-        async createTurnstileWidget(sitekey, action) {
-            return new Promise(resolve => {
-                try {
-                    // Force cleanup of any existing widget
-                    if (this._turnstileWidgetId && window.turnstile?.remove) {
-                        try {
-                            window.turnstile.remove(this._turnstileWidgetId);
-                            console.log(
-                                '🧹 Cleaned up existing Turnstile widget'
-                            );
-                        } catch (e) {
-                            console.warn(
-                                '⚠️ Widget cleanup warning:',
-                                e.message
-                            );
-                        }
-                    }
-
-                    const container = this.ensureTurnstileContainer();
-                    container.innerHTML = '';
-
-                    // Verify Turnstile is available
-                    if (!window.turnstile?.render) {
-                        console.error(
-                            '❌ Turnstile not available for rendering'
-                        );
-                        resolve(null);
-                        return;
-                    }
-
-                    console.log('🔧 Creating invisible Turnstile widget...');
-                    const widgetId = window.turnstile.render(container, {
-                        sitekey,
-                        action,
-                        size: 'invisible',
-                        retry: 'auto',
-                        'retry-interval': 8000,
-                        callback: token => {
-                            console.log('✅ Invisible Turnstile callback');
-                            resolve(token);
-                        },
-                        'error-callback': () => resolve(null),
-                        'timeout-callback': () => resolve(null),
-                    });
-
-                    this._turnstileWidgetId = widgetId;
-                    this._lastSitekey = sitekey;
-
-                    if (!widgetId) {
-                        return resolve(null);
-                    }
-
-                    // Execute the widget and race with timeout
-                    Promise.race([
-                        window.turnstile.execute(widgetId, { action }),
-                        new Promise((_, reject) =>
-                            setTimeout(
-                                () =>
-                                    reject(
-                                        new Error('Invisible execute timeout')
-                                    ),
-                                12000
-                            )
-                        ),
-                    ])
-                        .then(resolve)
-                        .catch(() => resolve(null));
-                } catch (e) {
-                    console.error('❌ Invisible Turnstile creation failed:', e);
-                    resolve(null);
-                }
-            });
-        },
-
-        async createTurnstileWidgetInteractive(sitekey, action) {
-            // Create a visible widget that users can interact with if needed
-            console.log('🔄 Creating interactive Turnstile widget (visible)');
-
-            return new Promise(resolve => {
-                try {
-                    // Force cleanup of any existing widget
-                    if (this._turnstileWidgetId && window.turnstile?.remove) {
-                        try {
-                            window.turnstile.remove(this._turnstileWidgetId);
-                        } catch (e) {
-                            console.warn(
-                                '⚠️ Widget cleanup warning:',
-                                e.message
-                            );
-                        }
-                    }
-
-                    const overlay = this.ensureTurnstileOverlayContainer();
-                    overlay.classList.remove('wplace-overlay-hidden');
-                    overlay.style.display = 'block';
-
-                    const host = overlay.querySelector(
-                        '#turnstile-overlay-host'
-                    );
-                    host.innerHTML = '';
-
-                    // Set a timeout for interactive mode
-                    const timeout = setTimeout(() => {
-                        console.warn('⏰ Interactive Turnstile widget timeout');
-                        overlay.classList.add('wplace-overlay-hidden');
-                        overlay.style.display = 'none';
-                        resolve(null);
-                    }, 60000); // 60 seconds for user interaction
-
-                    const widgetId = window.turnstile.render(host, {
-                        sitekey,
-                        action,
-                        size: 'normal',
-                        theme: 'light',
-                        callback: token => {
-                            clearTimeout(timeout);
-                            overlay.classList.add('wplace-overlay-hidden');
-                            overlay.style.display = 'none';
-                            console.log(
-                                '✅ Interactive Turnstile completed successfully'
-                            );
-
-                            if (
-                                typeof token === 'string' &&
-                                token.length > 20
-                            ) {
-                                resolve(token);
-                            } else {
-                                console.warn(
-                                    '❌ Invalid token from interactive widget'
-                                );
-                                resolve(null);
-                            }
-                        },
-                        'error-callback': error => {
-                            clearTimeout(timeout);
-                            overlay.classList.add('wplace-overlay-hidden');
-                            overlay.style.display = 'none';
-                            console.warn(
-                                '❌ Interactive Turnstile error:',
-                                error
-                            );
-                            resolve(null);
-                        },
-                    });
-
-                    this._turnstileWidgetId = widgetId;
-                    this._lastSitekey = sitekey;
-
-                    if (!widgetId) {
-                        clearTimeout(timeout);
-                        overlay.classList.add('wplace-overlay-hidden');
-                        overlay.style.display = 'none';
-                        console.warn(
-                            '❌ Failed to create interactive Turnstile widget'
-                        );
-                        resolve(null);
-                    } else {
-                        console.log(
-                            '✅ Interactive Turnstile widget created, waiting for user interaction...'
-                        );
-                    }
-                } catch (e) {
-                    console.error(
-                        '❌ Interactive Turnstile creation failed:',
-                        e
-                    );
-                    resolve(null);
-                }
-            });
-        },
-
-        // Cleanup method for when the script is disabled/reloaded
-        cleanupTurnstile() {
-            if (this._turnstileWidgetId && window.turnstile?.remove) {
-                try {
-                    window.turnstile.remove(this._turnstileWidgetId);
-                } catch (e) {
-                    console.warn('Failed to cleanup Turnstile widget:', e);
-                }
-            }
-
-            if (
-                this._turnstileContainer &&
-                document.body.contains(this._turnstileContainer)
-            ) {
-                this._turnstileContainer.remove();
-            }
-
-            if (
-                this._turnstileOverlay &&
-                document.body.contains(this._turnstileOverlay)
-            ) {
-                this._turnstileOverlay.remove();
-            }
-
-            this._turnstileWidgetId = null;
-            this._turnstileContainer = null;
-            this._turnstileOverlay = null;
-            this._lastSitekey = null;
-        },
+        turnstileManager: new TurnstileManager({
+            theme: 'light',
+            size: 'normal',
+            retryInterval: 5000,
+        }),
 
         async obtainSitekeyAndToken(fallback = '0x4AAAAAABpqJe8FO0N84q0F') {
-            // Cache sitekey to avoid repeated DOM queries
-            if (this._cachedSitekey) {
-                console.log('🔍 Using cached sitekey:', this._cachedSitekey);
-
-                return isTokenValid()
-                    ? {
-                          sitekey: this._cachedSitekey,
-                          token: turnstileToken,
-                      }
-                    : { sitekey: this._cachedSitekey, token: null };
-            }
-
-            // List of potential sitekeys to try
-            const potentialSitekeys = [
-                '0x4AAAAAABpqJe8FO0N84q0F', // WPlace common sitekey
-                '0x4AAAAAAAJ7xjKAp6Mt_7zw', // Alternative WPlace sitekey
-                '0x4AAAAAADm5QWx6Ov2LNF2g', // Another common sitekey
-            ];
-            const trySitekey = async (sitekey, source) => {
-                if (!sitekey || sitekey.length < 10) return null;
-
-                console.log(`🔍 Testing sitekey from ${source}:`, sitekey);
-                const token = await this.executeTurnstile(sitekey);
-
-                if (token && token.length >= 20) {
-                    console.log(
-                        `✅ Valid token generated from ${source} sitekey`
-                    );
-                    setTurnstileToken(token);
-                    this._cachedSitekey = sitekey;
-                    return { sitekey, token };
-                } else {
-                    console.log(
-                        `❌ Failed to get token from ${source} sitekey`
-                    );
-                    return null;
-                }
-            };
-
             try {
-                // 1️⃣ data-sitekey attribute
-                const sitekeySel = document.querySelector('[data-sitekey]');
-                if (sitekeySel) {
-                    const sitekey = sitekeySel.getAttribute('data-sitekey');
-                    const result = await trySitekey(sitekey, 'data attribute');
-                    if (result) {
-                        return result;
-                    }
+                // If we have a valid cached token, return it
+                if (isTokenValid() && turnstileToken) {
+                    console.log('🔍 Using valid cached token');
+                    return { sitekey: fallback, token: turnstileToken };
                 }
 
-                // 2️⃣ Turnstile element
-                const turnstileEl = document.querySelector('.cf-turnstile');
-                if (turnstileEl?.dataset?.sitekey) {
-                    const sitekey = turnstileEl.dataset.sitekey;
-                    const result = await trySitekey(
-                        sitekey,
-                        'turnstile element'
-                    );
-                    if (result) {
-                        return result;
-                    }
-                }
-
-                // 3️⃣ Meta tags
-                const metaTags = document.querySelectorAll(
-                    'meta[name*="turnstile"], meta[property*="turnstile"]'
-                );
-                for (const meta of metaTags) {
-                    const content = meta.getAttribute('content');
-                    const result = await trySitekey(content, 'meta tag');
-                    if (result) {
-                        return result;
-                    }
-                }
-
-                // 4️⃣ Global variable
-                if (window.__TURNSTILE_SITEKEY) {
-                    const result = await trySitekey(
-                        window.__TURNSTILE_SITEKEY,
-                        'global variable'
-                    );
-                    if (result) {
-                        return result;
-                    }
-                }
-
-                // 5️⃣ Script tags
-                const scripts = document.querySelectorAll('script');
-                for (const script of scripts) {
-                    const content = script.textContent || script.innerHTML;
-                    const match = content.match(
-                        /(?:sitekey|data-sitekey)['"\s\[\]:\=\(]*['"]?([0-9a-zA-Z_-]{20,})['"]?/i
-                    );
-                    if (match && match[1]) {
-                        const extracted = match[1].replace(/['"]/g, '');
-                        const result = await trySitekey(
-                            extracted,
-                            'script content'
-                        );
-                        if (result) {
-                            return result;
+                // Try to detect sitekey from page or use fallback
+                let sitekey = fallback;
+                try {
+                    // Try to find sitekey on the page
+                    const sitekeySel = document.querySelector('[data-sitekey]');
+                    if (sitekeySel) {
+                        sitekey = sitekeySel.getAttribute('data-sitekey');
+                        console.log('🔍 Found sitekey in DOM:', sitekey);
+                    } else {
+                        const turnstileEl =
+                            document.querySelector('.cf-turnstile');
+                        if (turnstileEl?.dataset?.sitekey) {
+                            sitekey = turnstileEl.dataset.sitekey;
+                            console.log(
+                                '🔍 Found sitekey in Turnstile element:',
+                                sitekey
+                            );
                         }
                     }
+                } catch (e) {
+                    console.warn(
+                        '⚠️ Error detecting sitekey, using fallback:',
+                        e.message
+                    );
                 }
 
-                // 6️⃣ Known potential sitekeys
-                console.log('🔍 Testing known potential sitekeys...');
-                for (const testSitekey of potentialSitekeys) {
-                    const result = await trySitekey(testSitekey, 'known list');
-                    if (result) {
-                        return result;
-                    }
+                console.log('🔐 Generating new token with TurnstileManager...');
+                console.log('🔍 Using sitekey:', sitekey);
+
+                // Initialize TurnstileManager (it handles its own UI)
+                console.log('⚡ Initializing TurnstileManager...');
+                await this.turnstileManager.initialize(sitekey);
+                console.log('✅ TurnstileManager initialized successfully');
+
+                console.log('🎲 Solving Turnstile challenge...');
+                const token = await this.turnstileManager.solve();
+                console.log(
+                    '🎯 Turnstile solve completed, token length:',
+                    token ? token.length : 'null'
+                );
+
+                if (token && token.length >= 20) {
+                    console.log('✅ Valid token generated');
+                    setTurnstileToken(token);
+                    return { sitekey, token };
+                } else {
+                    console.log('❌ Failed to generate token');
+                    return { sitekey, token: null };
                 }
             } catch (error) {
-                console.warn('⚠️ Error during sitekey detection:', error);
+                console.error('❌ Error in obtainSitekeyAndToken:', error);
+                return { sitekey: fallback, token: null };
             }
-
-            // 7️⃣ Fallback
-            console.log('🔧 Trying fallback sitekey:', fallback);
-            const fallbackResult = await trySitekey(fallback, 'fallback');
-            if (fallbackResult) {
-                return fallbackResult;
-            }
-
-            console.error('❌ No working sitekey or token found.');
-            return { sitekey: null, token: null };
         },
 
         createElement: (tag, props = {}, children = []) => {
@@ -2189,58 +1164,9 @@ import {
             button.addEventListener('contextmenu', e => e.preventDefault());
         },
 
-        // Synchronous translation function for UI rendering
+        // Translation function wrapper
         t: (key, params = {}) => {
-            // Try to get from cache first
-            const cacheKey = `${state.language}_${key}`;
-            if (translationCache.has(cacheKey)) {
-                let text = translationCache.get(cacheKey);
-                Object.keys(params).forEach(param => {
-                    text = text.replace(`{${param}}`, params[param]);
-                });
-                return text;
-            }
-
-            // Try dynamically loaded translations (already loaded)
-            if (loadedTranslations[state.language]?.[key]) {
-                let text = loadedTranslations[state.language][key];
-                // Cache for future use
-                translationCache.set(cacheKey, text);
-                Object.keys(params).forEach(param => {
-                    text = text.replace(`{${param}}`, params[param]);
-                });
-                return text;
-            }
-
-            // Fallback to English if current language failed
-            if (state.language !== 'en' && loadedTranslations['en']?.[key]) {
-                let text = loadedTranslations['en'][key];
-                Object.keys(params).forEach(param => {
-                    text = text.replace(`{${param}}`, params[param]);
-                });
-                return text;
-            }
-
-            // Final fallback to emergency fallback or key
-            let text =
-                FALLBACK_TEXT[state.language]?.[key] ||
-                FALLBACK_TEXT.en?.[key] ||
-                key;
-            Object.keys(params).forEach(param => {
-                text = text.replace(
-                    new RegExp(`\\{${param}\\}`, 'g'),
-                    params[param]
-                );
-            });
-
-            // Log missing translations for debugging
-            if (text === key && key !== 'undefined') {
-                console.warn(
-                    `⚠️ Missing translation for key: ${key} (language: ${state.language})`
-                );
-            }
-
-            return text;
+            return t(key, params, state);
         },
 
         showAlert: (message, type = 'info') => {
@@ -3686,7 +2612,7 @@ import {
 
             // Add additional checks before token generation
             if (!window.turnstile) {
-                await Utils.loadTurnstile();
+                // TurnstileManager will be initialized when needed
             }
 
             let token = null;
@@ -3912,7 +2838,7 @@ import {
         if (existingResizeOverlay) existingResizeOverlay.remove();
 
         loadThemePreference();
-        await initializeTranslations();
+        await initializeTranslations(state);
 
         const theme = getCurrentTheme();
         applyTheme(); // <- new: set CSS vars and theme class before building UI
@@ -5208,11 +4134,8 @@ import {
             if (languageSelect) {
                 languageSelect.addEventListener('change', async e => {
                     const newLanguage = e.target.value;
-                    state.language = newLanguage;
-                    localStorage.setItem('wplace_language', newLanguage);
 
-                    // Load the new language translations
-                    await loadTranslations(newLanguage);
+                    await setLanguage(newLanguage, state);
 
                     setTimeout(() => {
                         settingsContainer.style.display = 'none';
@@ -5226,6 +4149,8 @@ import {
                 themeSelect.addEventListener('change', e => {
                     const newTheme = e.target.value;
                     switchTheme(newTheme);
+                    // Recreate UI after theme switch
+                    createUI();
                 });
             }
 
@@ -8880,7 +7805,7 @@ import {
             updateUI('initializingToken', 'default');
 
             console.log('Attempting to load Turnstile script...');
-            await Utils.loadTurnstile();
+            // TurnstileManager will be initialized when needed
             console.log(
                 'Turnstile script loaded. Attempting to generate token...'
             );
@@ -9018,7 +7943,7 @@ import {
 
         // Add cleanup on page unload
         window.addEventListener('beforeunload', () => {
-            Utils.cleanupTurnstile();
+            Utils.turnstileManager.destroy();
         });
     });
 })();
