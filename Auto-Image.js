@@ -5691,6 +5691,7 @@
       }
 
       if (
+        !state.autoSwap &&
         state.displayCharges < state.cooldownChargeThreshold &&
         !state.stopFlag &&
         state.running
@@ -7802,23 +7803,7 @@
           pixelBatch.pixels = [];
         }
 
-        if (!state.autoSwap) {
-          // Original wait logic for single-account mode
-          if (state.displayCharges < state.cooldownChargeThreshold && !state.stopFlag) {
-            await Utils.dynamicSleep(() => {
-              if (state.displayCharges >= state.cooldownChargeThreshold) {
-                NotificationManager.maybeNotifyChargesReached(true);
-                return 0;
-              }
-              if (state.stopFlag) return 0;
-              return getMsToTargetCharges(
-                state.preciseCurrentCharges,
-                state.cooldownChargeThreshold,
-                state.cooldown
-              );
-            });
-          }
-        } else {
+        if (state.autoSwap) {
           // New auto-swap logic
           if (state.displayCharges < 1 && !state.stopFlag) {
             console.log("⚠️ Charges are 0, swapping to next account...");
@@ -7873,6 +7858,22 @@
                 console.error("❌ Failed to swap account after multiple retries. Stopping loop.");
                 state.stopFlag = true;
             }
+          }
+        } else {
+          // Original wait logic for single-account mode
+          if (state.displayCharges < state.cooldownChargeThreshold && !state.stopFlag) {
+            await Utils.dynamicSleep(() => {
+              if (state.displayCharges >= state.cooldownChargeThreshold) {
+                NotificationManager.maybeNotifyChargesReached(true);
+                return 0;
+              }
+              if (state.stopFlag) return 0;
+              return getMsToTargetCharges(
+                state.preciseCurrentCharges,
+                state.cooldownChargeThreshold,
+                state.cooldown
+              );
+            });
           }
         }
 
