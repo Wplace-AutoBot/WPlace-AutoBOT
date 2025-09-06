@@ -16,14 +16,17 @@ export class TurnstileManager {
     _getTurnstileTheme() {
         const currentTheme = getCurrentThemeName();
         console.log('🎨 Current bot theme:', currentTheme);
-        
+
         // Map bot themes to Turnstile themes
         if (currentTheme === 'Classic Light') {
             return 'light';
-        } else if (currentTheme === 'Classic Autobot' || currentTheme === 'Neon Retro') {
+        } else if (
+            currentTheme === 'Classic Autobot' ||
+            currentTheme === 'Neon Retro'
+        ) {
             return 'dark';
         }
-        
+
         // Default to dark for unknown themes
         return 'dark';
     }
@@ -65,7 +68,10 @@ export class TurnstileManager {
 
         // Get current theme colors
         const theme = getCurrentTheme();
-        console.log('🎨 Applying theme to Turnstile overlay:', getCurrentThemeName());
+        console.log(
+            '🎨 Applying theme to Turnstile overlay:',
+            getCurrentThemeName()
+        );
 
         const overlay = document.createElement('div');
         overlay.id = 'turnstile-overlay-container';
@@ -125,11 +131,13 @@ export class TurnstileManager {
             font-family: ${theme.fontFamily} !important;
         `;
         hideBtn.addEventListener('click', () => overlay.remove());
-        
+
         // Theme-specific hover effects
         const isLightTheme = getCurrentThemeName() === 'Classic Light';
         hideBtn.addEventListener('mouseenter', () => {
-            hideBtn.style.background = isLightTheme ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)';
+            hideBtn.style.background = isLightTheme
+                ? 'rgba(0,0,0,0.1)'
+                : 'rgba(255,255,255,0.1)';
         });
         hideBtn.addEventListener('mouseleave', () => {
             hideBtn.style.background = 'transparent';
@@ -149,7 +157,7 @@ export class TurnstileManager {
             // Use normal interactive widget like main branch fallback
             const turnstileTheme = this._getTurnstileTheme();
             console.log('🎨 Using Turnstile theme:', turnstileTheme);
-            
+
             const config = {
                 sitekey: this.siteKey,
                 size: 'normal',
