@@ -1190,6 +1190,7 @@
   }
   const randStr = (len, chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789') =>
     [...Array(len)].map(() => chars[(crypto?.getRandomValues?.(new Uint32Array(1))[0] % chars.length) || Math.floor(Math.random() * chars.length)]).join('')
+  const fpStr32 = randStr(32);
   async function handleCaptchaFallback() {
     // Implementation for fallback token generation would go here
     // This is a placeholder for browser automation fallback
@@ -2822,7 +2823,7 @@
           coords: [pixelX, pixelY],
           colors: [color],
           t: turnstileToken,
-          fp: randStr(32),
+          fp: fpStr32,
         };
         var token = await createWasmToken(regionX, regionY, payload);
         const res = await fetch(`https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`, {
@@ -7383,7 +7384,7 @@
     }
 
     try {
-      const payload = { coords, colors, t: token, fp: randStr(32) };
+      const payload = { coords, colors, t: token, fp: fpStr32 };
       var wasmtoken = await createWasmToken(regionX, regionY, payload);
       const res = await fetch(`https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`, {
         method: 'POST',
@@ -7406,7 +7407,7 @@
           turnstileToken = token;
 
           // Retry the request with new token
-          const retryPayload = { coords, colors, t: token, fp: randStr(32) };
+          const retryPayload = { coords, colors, t: token, fp: fpStr32 };
           var wasmtoken = await createWasmToken(regionX, regionY, retryPayload);
           const retryRes = await fetch(
             `https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`,
