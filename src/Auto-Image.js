@@ -227,7 +227,7 @@ import {
                     'pixel-blink': true,
                 },
             },
-            'Acrylic': {
+            Acrylic: {
                 primary: '#00000080',
                 secondary: '#00000040',
                 accent: 'rgba(0,0,0,0.75)',
@@ -247,7 +247,7 @@ import {
                     scanline: false,
                     'pixel-blink': false,
                 },
-            }
+            },
         },
         currentTheme: 'Classic Autobot',
         PAINT_UNAVAILABLE: true,
@@ -305,11 +305,13 @@ import {
             'Classic Autobot': 'wplace-theme-classic',
             'Classic Light': 'wplace-theme-classic-light',
             'Neon Retro': 'wplace-theme-neon',
-            'Acrylic': 'wplace-theme-acrylic',
+            Acrylic: 'wplace-theme-acrylic',
         };
 
         // Toggle theme class on documentElement so CSS vars cascade to our UI
-        document.documentElement.classList.remove(...Object.values(themeClassMapping));
+        document.documentElement.classList.remove(
+            ...Object.values(themeClassMapping)
+        );
 
         const themeClass =
             themeClassMapping[CONFIG.currentTheme] || 'wplace-theme-classic';
@@ -329,7 +331,7 @@ import {
             'Classic Autobot': 'classic',
             'Classic Light': 'classic-light',
             'Neon Retro': 'neon',
-            'Acrylic': 'acrylic',
+            Acrylic: 'acrylic',
         };
 
         const themeFileName = themeFileMapping[themeName] || 'classic';
