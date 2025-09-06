@@ -7,8 +7,8 @@
 // @match        https://wplace.live/*
 // @grant        none
 // @run-at       document-end
-// @updateURL    https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/wplace-bot-manager.user.js
-// @downloadURL  https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/wplace-bot-manager.user.js
+// @updateURL    https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/scripts/wplace-bot-manager.user.js
+// @downloadURL  https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/scripts/wplace-bot-manager.user.js
 // ==/UserScript==
 
 (function () {
