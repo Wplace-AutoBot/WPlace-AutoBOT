@@ -1,1 +1,2659 @@
-(function(_0x4a23a3,_0x50cbf6){const _0x14b05a=_0x31e4,_0x5a19f6=_0x4a23a3();while(!![]){try{const _0x54b297=parseInt(_0x14b05a(0x263))/0x1+-parseInt(_0x14b05a(0x1b3))/0x2*(-parseInt(_0x14b05a(0x23a))/0x3)+parseInt(_0x14b05a(0x279))/0x4+-parseInt(_0x14b05a(0x1fd))/0x5+-parseInt(_0x14b05a(0x323))/0x6*(-parseInt(_0x14b05a(0x24f))/0x7)+-parseInt(_0x14b05a(0x2f1))/0x8+-parseInt(_0x14b05a(0x28c))/0x9*(parseInt(_0x14b05a(0x14b))/0xa);if(_0x54b297===_0x50cbf6)break;else _0x5a19f6['push'](_0x5a19f6['shift']());}catch(_0x2ba2d2){_0x5a19f6['push'](_0x5a19f6['shift']());}}}(_0x783c,0x22610));function _0x31e4(_0x38e310,_0x2ac8ca){const _0x783c43=_0x783c();return _0x31e4=function(_0x31e465,_0x190418){_0x31e465=_0x31e465-0x12a;let _0x57ad6b=_0x783c43[_0x31e465];return _0x57ad6b;},_0x31e4(_0x38e310,_0x2ac8ca);}function _0x783c(){const _0x178b71=['Debug\x20console\x20cleared','No\x20valid\x20token,\x20generating...','POST','Failed\x20to\x20generate\x20WASM\x20token:\x20','BUTTON','1.\x20Load\x20a\x20progress\x20file\x20using\x20\x22Load\x20Progress\x20File\x22','1151712NMQatW','Complete\x20the\x20verification','Instructions\x20for\x20autonomous\x20operation:','Testing\x20known\x20potential\x20sitekeys...','WPlace\x20Autonomous\x20Repair\x20Tool','OFF','_lastSitekey','getCharges','disabled','querySelector','Invalid\x20JSON\x20file','click','clientX','2.0','transition','tokenRetryTimer','autoRepairEnabled','paint','info','5.\x20Monitor\x20debug\x20console\x20for\x20autonomous\x20operation\x20logs','flex','isWhitePixel','Interactive\x20Turnstile\x20widget\x20created,\x20waiting\x20for\x20user\x20interaction...',')\x20with\x20color\x20','Found\x20transparent\x20color\x20button,\x20clicking...','turnstile-widget-container','object',')\x20in\x20region\x20(','3.0','Auth\x20data\x20captured:\x20User\x20ID\x20','scale(0.8)','region','AUTONOMOUS_MODE','script[src^=\x22https://challenges.cloudflare.com/turnstile/v0/api.js\x22]','repairBtn','Reusing\x20existing\x20Turnstile\x20widget...','clientY','Request\x20URL\x20set:\x20','getTilePixelColor','volume','min','value','auth-monitor','readAsText','running','margin-bottom:\x2020px;','\x20(autonomous:\x20','auto','Manual\x20token\x20generation\x20requested','Using\x20cached\x20sitekey:\x20','496008MhGdjP','_sitekeyAttempts','%),\x20found\x20','Repairing\x20{count}\x20damaged\x20pixels...','substring','keydown','.cf-turnstile','Token\x20generation\x20failed:\x20','Charges:\x20','Light\x20Green','Available\x20colors:\x20','#66bb6a','waitForSelector','now','autoRepairTimer','getImageData','obtainSitekeyAndToken','):\x20','Load\x20error:\x20','\x0a\x20\x20\x20\x20\x20\x20position:\x20fixed;\x20top:\x2020px;\x20left:\x2020px;\x20z-index:\x2010000;\x0a\x20\x20\x20\x20\x20\x20background:\x20linear-gradient(135deg,\x20#1e3c72\x200%,\x20#2a5298\x20100%);\x0a\x20\x20\x20\x20\x20\x20border:\x201px\x20solid\x20rgba(255,255,255,0.1);\x0a\x20\x20\x20\x20\x20\x20border-radius:\x2012px;\x20min-width:\x20520px;\x20max-width:\x20600px;\x0a\x20\x20\x20\x20\x20\x20box-shadow:\x200\x208px\x2032px\x20rgba(0,0,0,0.6);\x0a\x20\x20\x20\x20\x20\x20color:\x20white;\x20font-family:\x20\x27Segoe\x20UI\x27,\x20Arial,\x20sans-serif;\x0a\x20\x20\x20\x20\x20\x20backdrop-filter:\x20blur(10px);\x0a\x20\x20\x20\x20\x20\x20resize:\x20both;\x20overflow:\x20hidden;\x0a\x20\x20\x20\x20','reason','scrollHeight','tokenSourceSelect','apply','\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22margin-bottom:\x2015px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<img\x20src=\x22https://i.imgur.com/uJ2FRUM.png\x22\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20alt=\x22Attack\x22\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20style=\x22width:\x2080px;\x20height:\x2080px;\x20border-radius:\x2010px;\x20object-fit:\x20cover;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<h2\x20style=\x22color:\x20#ff4444;\x20margin:\x2010px\x200;\x20font-size:\x2018px;\x20font-weight:\x20bold;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20PIXEL\x20ART\x20ATTACKED!\x0a\x20\x20\x20\x20\x20\x20\x20\x20</h2>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<p\x20style=\x22margin:\x205px\x200;\x20font-size:\x2014px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20Detected\x20','auto-image-tile','chargesInfo','):\x20expected\x20color\x20','[data-sitekey]','cleanupTurnstile','Creating\x20invisible\x20Turnstile\x20widget...','Autonomous\x20mode:\x20will\x20retry\x20scan\x20in\x2030\x20seconds','Cleaned\x20up\x20existing\x20Turnstile\x20widget','getAttribute','Advanced\x20token\x20system\x20ready','imageLoaded','readyState','url','turnstile-overlay-host','round','\x20pixels','Initial\x20autonomous\x20token\x20ready','render','Function\x20call\x20error:\x20','Testing\x20sitekey\x20from\x20','Damage\x20at\x20(','Beige','Restarting\x20auto\x20repair\x20with\x20new\x20interval','add','includes','3.\x20Tool\x20will\x20automatically\x20scan\x20and\x20repair\x20damage','Autonomous\x20repair\x20check\x20triggered','tokenPreloadBuffer','Repair\x20failed','painted','keys','open','Brown','Turnstile\x20script\x20loaded\x20successfully','Detection\x20method\x20failed:\x20','.png','autoTokenRefresh','4.\x20Tokens\x20will\x20be\x20generated\x20and\x20refreshed\x20automatically','Manual\x20mode\x20ready\x20-\x20Load\x20file\x20and\x20enable\x20auto\x20repair\x20to\x20start','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20id=\x22chargesInfo\x22\x20style=\x22font-size:\x2012px;\x20color:\x20#90caf9;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20Charges:\x200/1\x20(cooldown:\x2031s)\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20id=\x22tokenInfo\x22\x20style=\x22font-size:\x2011px;\x20color:\x20#81c784;\x20margin-top:\x205px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20Token:\x20Initializing...\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20id=\x22systemInfo\x22\x20style=\x22font-size:\x2010px;\x20color:\x20#ffcc80;\x20margin-top:\x203px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20System:\x20AUTONOMOUS\x20|\x20Token:\x20GENERATOR\x20|\x20Auto-refresh:\x20ON\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22margin-bottom:\x2015px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20id=\x22loadFileBtn\x22\x20style=\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20background:\x20linear-gradient(135deg,\x20#4facfe\x200%,\x20#00f2fe\x20100%);\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20color:\x20white;\x20border:\x20none;\x20border-radius:\x208px;\x20padding:\x2010px\x2016px;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20cursor:\x20pointer;\x20font-weight:\x20500;\x20margin-right:\x208px;\x20margin-bottom:\x208px;\x20font-size:\x2012px;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20📁\x20','main-title','lastAttackState','wplace-repair-tool','#ff6b6b','checked','querySelectorAll','Pink','_cachedSitekey','width','Autonomous\x20mode:\x20starting\x20auto\x20repair\x20after\x20file\x20load','.json','\x20not\x20available,\x20requesting\x20load...','Invalid\x20or\x20empty\x20token\x20received\x20-\x20Length:\x20','prototype','Paint\x20SUCCESS\x20for\x20(','Paint\x20request\x20failed\x20with\x20status\x20','delete','onerror','MAX_RETRIES',')\x20-\x20server\x20response:\x20','_turnstileOverlay','turnstile','length','Failed\x20to\x20create\x20interactive\x20Turnstile\x20widget','body','log','Widget\x20cleanup\x20warning:\x20','Turnstile\x20execution\x20failed:\x20','onload','All\x20','MANUAL','Dark\x20Blue','script-monitor',';\x0a\x20\x20\x20\x20\x20\x20\x20\x20box-shadow:\x200\x204px\x2012px\x20rgba(0,0,0,0.3);\x0a\x20\x20\x20\x20\x20\x20\x20\x20max-width:\x20300px;\x20word-wrap:\x20break-word;\x0a\x20\x20\x20\x20\x20\x20','pixels','\x0a\x20\x20\x20\x20\x20\x20<div\x20id=\x22window-header\x22\x20style=\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20background:\x20rgba(255,255,255,0.1);\x20padding:\x2012px\x2020px;\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20border-radius:\x2012px\x2012px\x200\x200;\x20cursor:\x20grab;\x20user-select:\x20none;\x0a\x20\x20\x20\x20\x20\x20\x20\x20display:\x20flex;\x20justify-content:\x20space-between;\x20align-items:\x20center;\x0a\x20\x20\x20\x20\x20\x20\x20\x20border-bottom:\x201px\x20solid\x20rgba(255,255,255,0.1);\x0a\x20\x20\x20\x20\x20\x20\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<h3\x20id=\x22main-title\x22\x20style=\x22margin:\x200;\x20color:\x20#fff;\x20font-size:\x2018px;\x20min-height:\x2022px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20WPlace\x20Autonomous\x20Repair\x20Tool\x0a\x20\x20\x20\x20\x20\x20\x20\x20</h3>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22display:\x20flex;\x20gap:\x208px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20id=\x22minimizeBtn\x22\x20style=\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20background:\x20#ffc107;\x20border:\x20none;\x20width:\x2020px;\x20height:\x2020px;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20border-radius:\x2050%;\x20cursor:\x20pointer;\x20font-size:\x2012px;\x20color:\x20#000;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x22>−</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20id=\x22closeBtn\x22\x20style=\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20background:\x20#dc3545;\x20border:\x20none;\x20width:\x2020px;\x20height:\x2020px;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20border-radius:\x2050%;\x20cursor:\x20pointer;\x20font-size:\x2012px;\x20color:\x20white;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x22>×</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x0a\x20\x20\x20\x20\x20\x20<div\x20id=\x22window-content\x22\x20style=\x22padding:\x2020px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22margin-bottom:\x2020px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20id=\x22status\x22\x20style=\x22font-size:\x2014px;\x20color:\x20#b3d9ff;\x20margin-bottom:\x2010px;\x20min-height:\x2020px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','#44ff44','\x20damaged','version','WPlace\x20Autonomous\x20Repair\x20Tool\x20ready\x20for\x20operation','push','•\x20Sophisticated\x20token\x20management\x20with\x20preloading','Starting\x20autonomous\x20damage\x20scan...','Clear\x20Debug','createFileUploader','_interceptedMethod','linear-gradient(135deg,\x20#f093fb\x200%,\x20#f5576c\x20100%)','Red','Could\x20not\x20find\x20the\x20main\x20paint\x20button.','color','text/plain;charset=UTF-8','max','Widget\x20reuse\x20failed:\x20','tagName','Auto-CAPTCHA\x20timed\x20out.','random','0x4AAAAAAAJ7xjKAp6Mt_7zw','xhr_request','Light\x20Yellow','Waiting\x20for\x20','TRANSPARENCY_THRESHOLD','state','script','Repair\x20check\x20skipped\x20-\x20manual\x20repair\x20in\x20progress','Confirmation\x20attempt\x20',')...','\x20pixels,\x20found\x20','50WvZhfH','addDebugLog','createTurnstileWidget','Failed\x20to\x20load\x20Turnstile','loadFromFile','unhandledrejection','setAttribute','Yellow','async','_turnstileContainer','#turnstile-overlay-host','forEach','No\x20image\x20data\x20or\x20position\x20for\x20scanning','paintPixelInRegion','Auto-cached\x20tile:\x20','Page\x20hidden\x20-\x20autonomous\x20systems\x20continue\x20running','button.btn.btn-primary.btn-lg,\x20button.btn.btn-primary.sm\x5c:btn-xl','headers',';\x0a\x20\x20\x20\x20\x20\x20min-width:\x20350px;\x20max-width:\x20450px;\x0a\x20\x20\x20\x20','Damage\x20detected:\x20{count}\x20pixels','🔍✅\x20Enhanced\x20Token\x20Captured\x20-\x20Length:\x20','\x0a\x20\x20\x20\x20\x20\x20</div>','onchange','sqrt','Invisible\x20execute\x20timeout','Retrying\x20token\x20generation\x20in\x20','known\x20list','https://cdn.pixabay.com/download/audio/2025/03/21/audio_9bec51b17f.mp3?filename=glass-break-316720.mp3','div','Token:\x20Not\x20generated\x20or\x20expired','assign','set','__wbindgen_malloc\x20function\x20not\x20found','Failed\x20to\x20create\x20tile\x20bitmap:\x20','dispatchEvent','opacity','count','executeTurnstile','button.btn.btn-primary.btn-lg,\x20button.btn-primary.sm\x5c:btn-xl','Token\x20captured\x20and\x20cached\x20successfully','scrollTop','Interactive\x20Turnstile\x20completed\x20successfully','Tile\x20','getRandomValues','\x0a\x20\x20\x20\x20\x20\x20\x20\x20position:\x20fixed;\x20top:\x200;\x20left:\x200;\x20width:\x20100%;\x20height:\x20100%;\x0a\x20\x20\x20\x20\x20\x20\x20\x20background:\x20rgba(0,0,0,0.8);\x20z-index:\x2010001;\x20display:\x20none;\x0a\x20\x20\x20\x20\x20\x20\x20\x20justify-content:\x20center;\x20align-items:\x20center;\x20flex-direction:\x20column;\x0a\x20\x20\x20\x20\x20\x20\x20\x20color:\x20white;\x20font-family:\x20\x27Segoe\x20UI\x27,\x20Arial,\x20sans-serif;\x0a\x20\x20\x20\x20\x20\x20','\x20(Enhanced\x20System)</h4>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20id=\x22clearDebugBtn\x22\x20style=\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20background:\x20rgba(255,255,255,0.2);\x20color:\x20white;\x20border:\x20none;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20border-radius:\x204px;\x20padding:\x204px\x208px;\x20font-size:\x2012px;\x20cursor:\x20pointer;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','type','mousedown','Indigo','AUTONOMOUS\x20MODE\x20ACTIVE\x20-\x20Tool\x20will\x20operate\x20independently','Trying\x20fallback\x20sitekey:\x20','blob','linear-gradient(135deg,\x20#ffa726\x200%,\x20#ff9800\x20100%)','ms:\x20','External\x20script\x20detected:\x20','encode','\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22margin-bottom:\x2015px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<img\x20src=\x22https://i.imgur.com/WXVkpjo.png\x22\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20alt=\x22Repaired\x22\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20style=\x22width:\x2080px;\x20height:\x2080px;\x20border-radius:\x2010px;\x20object-fit:\x20cover;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<h2\x20style=\x22color:\x20#44ff44;\x20margin:\x2010px\x200;\x20font-size:\x2018px;\x20font-weight:\x20bold;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20COMPLETELY\x20REPAIRED!\x0a\x20\x20\x20\x20\x20\x20\x20\x20</h2>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<p\x20style=\x22margin:\x205px\x200;\x20font-size:\x2014px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20All\x20pixels\x20have\x20been\x20restored!\x0a\x20\x20\x20\x20\x20\x20\x20\x20</p>\x0a\x20\x20\x20\x20\x20\x20','repairingPixels','Valid\x20token\x20generated\x20from\x20','replace','Timeout\x20waiting\x20for\x20tiles:\x20','Interactive\x20Turnstile\x20widget\x20timeout',',\x20found\x20color\x20','Cleaning\x20up\x20autonomous\x20systems...','turnstileLoaded','Initializing\x20autonomous\x20systems...','originalTiles','retryCount','Not\x20set','Starting\x20manual\x20repair\x20with\x20enhanced\x20autonomous\x20system...','repairInterval','rgb','focus','Light\x20Beige','generator','\x20|\x20Token:\x20','2.\x20Enable\x20\x22Auto\x20Repair\x22\x20to\x20start\x20autonomous\x20monitoring','fileLoaded','remove','Token\x20preload\x20scheduled\x20in\x20','warning','System:\x20','TOKEN_PRELOAD_BUFFER','Autonomous\x20repair:\x20Found\x20','Manual\x20mode\x20active\x20-\x20use\x20controls\x20for\x20manual\x20operation','User\x20ID\x20set:\x20','enabled','•\x20Autonomous\x20operation\x20with\x20smart\x20retry\x20logic','Retry\x20','#ffab91','Interactive\x20Turnstile\x20creation\x20failed:\x20','No\x20valid\x20sitekey\x20found','Manual\x20repair\x20stop\x20requested','cssText','403\x20Forbidden\x20for\x20pixel\x20(','Preloading\x20next\x20token\x20before\x20expiry...','function','Too\x20many\x20consecutive\x20failures\x20(','Force\x20refreshing\x20token...','COOLDOWN_DEFAULT','\x20required\x20tiles\x20are\x20loaded','Autonomous\x20systems\x20initialized\x20successfully','createTurnstileWidgetInteractive','Unexpected\x20function\x20result\x20format','34vkNxeN','WHITE_THRESHOLD','true','AUTONOMOUS','result','Token\x20generated\x20successfully!','s0/pixel/','floor','clearDebug','has','stopFlag','customWhiteThreshold','manual','undefined','tokenPreloadTimer','Dark\x20Purple','customTransparencyThreshold','\x20sitekey','https://backend.wplace.live/s0/pixel/','maxCharges','background','\x20damaged\x20pixels,\x20starting\x20repair','catch','Scan\x20progress:\x20','Invalid\x20token\x20from\x20interactive\x20widget','0x4AAAAAADm5QWx6Ov2LNF2g','loadTurnstile','calculateTileRange','filter','Autonomous\x20retry\x20','stringify','Failed\x20to\x20repair\x20pixel\x20(','race','Auto\x20token\x20refresh\x20','#ffc107','cooldownMs','waitForTiles','get','repairPixels','buffer','__wbindgen_malloc','Invalid\x20file\x20format','resolve','ensureTurnstileOverlayContainer','positionInfo','transform','src','Turnstile\x20token\x20generation\x20failed\x20after\x20','randomUUID','autonomousMode','backend.wplace.live/me','Token\x20error\x20during\x20repair,\x20refreshing\x20token...','Migrated\x20to\x20autonomous\x20features\x20v3.0','hidden','innerHTML','Interactive\x20Turnstile\x20error:\x20','Black','Token\x20generation\x20already\x20in\x20progress,\x20waiting...','processAndRespondToTileRequest','Please\x20load\x20a\x20progress\x20file\x20first','Initial\x20token\x20generation\x20failed,\x20will\x20retry\x20automatically',';\x20margin:\x202px\x200;\x20font-size:\x2011px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<span\x20style=\x22opacity:\x200.7;\x22>[','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20id=\x22debugConsole\x22\x20style=\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20background:\x20rgba(0,0,0,0.4);\x20border:\x201px\x20solid\x20rgba(255,255,255,0.2);\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20border-radius:\x206px;\x20padding:\x2010px;\x20height:\x20300px;\x20overflow-y:\x20auto;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20font-family:\x20\x27Courier\x20New\x27,\x20monospace;\x20font-size:\x2011px;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20color:\x20#e3f2fd;\x20line-height:\x201.3;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22color:\x20#90caf9;\x22>[Ready]\x20WPlace\x20Autonomous\x20Repair\x20Tool\x20v3.0</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22color:\x20#81c784;\x22>[Info]\x20Advanced\x20injection\x20+\x20Enhanced\x20token\x20management</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22color:\x20#ffcc80;\x22>[Info]\x20Autonomous\x20mode\x20with\x20smart\x20retry\x20and\x20preloading</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22color:\x20#c5e1a5;\x22>[Info]\x20','imageInfo','\x20damaged\x20pixels!\x0a\x20\x20\x20\x20\x20\x20\x20\x20</p>\x0a\x20\x20\x20\x20\x20\x20','selected',')\x20[','•\x20Adaptive\x20repair\x20algorithms\x20with\x20failure\x20handling','Invisible\x20Turnstile\x20creation\x20failed:\x20','generateTokenBtn','Turnstile\x20not\x20available\x20for\x20rendering','parse','toUpperCase','Purple','819940qNusZX','Loading\x20progress\x20file...','debugLogs','Repair\x20completed:\x20{repaired}\x20pixels\x20fixed','getBoundingClientRect','head','displayCharges','AUTO_TOKEN_REFRESH','decode','Token\x20generation\x20failed','Error\x20checking\x20pixel\x20(','_turnstileWidgetId','Waiting\x20for\x20charges...\x20(','minimizeBtn','paint_request','Autonomous\x20mode:\x20will\x20retry\x20repair\x20in\x2060\x20seconds','\x20|\x20Auto-refresh:\x20','•\x20Draggable\x20window\x20with\x20minimize/close\x20controls','turnstileInstructions','then','closeBtn','autoRepairInterval','Turnstile\x20token\x20generated\x20successfully\x20in\x20','Light\x20Teal','from','Page\x20visible\x20-\x20autonomous\x20systems\x20active','default','Scan\x20complete.\x20Checked\x20','Autonomous\x20mode\x20active','Failed\x20to\x20get\x20token\x20from\x20','SELECT','Load\x20Progress\x20File','WASM\x20initialized\x20successfully','Autonomous\x20token\x20refresh\x20failed:\x20','onreadystatechange','peaceful','join','debugConsole','tabindex','damageDetected','cooldown','tokenInfo','file','•\x20Enhanced\x20tile\x20interception\x20and\x20caching','turnstile-overlay-container','Unhandled\x20promise\x20rejection\x20in\x20autonomous\x20mode:\x20','),\x20pausing\x20repair','https://backend.wplace.live/me','ensureTurnstileContainer','#ffa726','pow','Paint\x20request\x20error\x20for\x20(','Autonomous\x20repair:\x20No\x20damage\x20detected','\x20available','execute','loadingPromises','Orange','image/png','Error\x20setting\x20user\x20ID:\x20','Could\x20not\x20find\x20the\x20canvas\x20element.','attack','12255KYMLHk','\x20style=\x22margin-right:\x206px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span>Auto\x20Token\x20Refresh</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</label>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<select\x20id=\x22tokenSourceSelect\x22\x20style=\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20padding:\x204px\x208px;\x20border-radius:\x204px;\x20font-size:\x2011px;\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20background:\x20white;\x20color:\x20#333;\x20border:\x201px\x20solid\x20#ccc;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<option\x20value=\x22generator\x22\x20','px)','\x0a\x20\x20\x20\x20\x20\x20\x20\x20position:\x20fixed;\x20top:\x2020px;\x20right:\x2020px;\x20z-index:\x2010000;\x0a\x20\x20\x20\x20\x20\x20\x20\x20padding:\x2012px\x2016px;\x20border-radius:\x208px;\x20color:\x20white;\x20font-weight:\x20500;\x0a\x20\x20\x20\x20\x20\x20\x20\x20background:\x20','getContext','call','Starting\x20autonomous\x20repair\x20of\x20','opacity\x200.5s\x20ease','message','INPUT','Check\x20Interval\x20(seconds)','TOKEN_SOURCE','Dark\x20Green','Cyan','drawImage','Region:\x20(','\x20consecutive\x20failures]','Auto\x20repair\x20stopped','send','⏸️\x20Stop\x20Repair','addEventListener','7RswhHJ','height','appendChild','textContent','All\x20token\x20generation\x20methods\x20failed','showAlert','Error\x20reading\x20pixel\x20from\x20tile\x20','sleep','Token:\x20Valid\x20(expires\x20in\x20','invisible','mousemove','Could\x20not\x20find\x20the\x20transparent\x20color\x20button.','Invalidating\x20current\x20token\x20due\x20to\x20source\x20change','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20position:\x20absolute;\x20left:\x20-9999px;\x20top:\x20-9999px;\x20width:\x201px;\x20height:\x201px;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20overflow:\x20hidden;\x20visibility:\x20hidden;\x20opacity:\x200;\x20pointer-events:\x20none;\x0a\x20\x20\x20\x20\x20\x20\x20\x20','Paint\x20transparent\x20pixels:\x20','Progress\x20file\x20loaded\x20successfully','\x20remaining)','success','Teal','attack-notification','229007uwRSLf','Failed\x20to\x20load\x20Turnstile\x20script','Unknown\x20error','Global\x20error\x20in\x20autonomous\x20mode:\x20','clone','imageData','•\x20Advanced\x20injection\x20with\x20multi-source\x20token\x20capture','parentNode','🔄\x20Generating...','match','warn','linear-gradient(135deg,\x20#43e97b\x200%,\x20#38f9d7\x20100%)','Autonomous\x20mode:\x20proceeding\x20with\x20','status','Dark\x20Pink','__wbindgen_free','systemInfo','debug','auth','RETRY_DELAY_BASE','#64b5f6','Auto\x20repair\x20started\x20(every\x20{interval}s)','433452KzfvbX','\x20-\x20Length:\x20','_interceptedUrl','charges','statusText','Light\x20Pink','button','Token\x20generated\x20via\x20widget\x20reuse','<div\x20style=\x22color:\x20','Repair\x20stopped\x20by\x20user\x20request','cursor','slice','content','Space','tokenSystemReady','>Hybrid</option>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<option\x20value=\x22manual\x22\x20','#17a2b8','</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20','paintWhitePixels','73287pfXvFu','autoRepairStopped','postMessage','SCRIPT','canvas','attacked','#81c784','\x20seconds','Using\x20existing\x20cached\x20token','Starting\x20confirmation\x20loop...','Auto-CAPTCHA\x20process\x20failed:\x20','Turnstile\x20error:\x20','Failed\x20to\x20parse\x20paint\x20request\x20payload:','dataset',']</span>\x20','noDamageDetected','target','enableAutoRepair','resolveColor','0x4AAAAAABpqJe8FO0N84q0F','mouseup','No\x20valid\x20token\x20for\x20autonomous\x20repair,\x20generating...','ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789','/2\x20for\x20pixel\x20(','isArray','style','accept','error','Tile\x20loading\x20progress:\x20','availableColors','White','Token\x20expiring\x20soon,\x20refreshing...','Gold','hideTurnstileBtn','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20id=\x22repairBtn\x22\x20style=\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20background:\x20linear-gradient(135deg,\x20#f093fb\x200%,\x20#f5576c\x20100%);\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20color:\x20white;\x20border:\x20none;\x20border-radius:\x208px;\x20padding:\x2010px\x2016px;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20cursor:\x20pointer;\x20font-weight:\x20500;\x20margin-right:\x208px;\x20margin-bottom:\x208px;\x20font-size:\x2012px;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x22\x20disabled>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20🔧\x20','tokenSource','Cleanup\x20completed','timestamp',',\x20Preview:\x20','scriptSrc','\x20loaded','hybrid','tileSize','No\x20current\x20pixel\x20data\x20for\x20(','\x20(cooldown:\x20','none','Repaired\x20pixel\x20(','paintTransparentPixels','\x20tiles\x20(80%+\x20loaded)','🔧\x20','contains','Position:\x20(','No\x20working\x20sitekey\x20or\x20token\x20found\x20after\x20all\x20attempts.','Creating\x20interactive\x20Turnstile\x20widget\x20(visible)','startPosition','\x20rows\x20(','windowMinimized','No\x20valid\x20token\x20available\x20for\x20paint\x20request','originalTilesData','originalColor','Generating\x20new\x20token\x20with\x20executeTurnstile...','createElement','Token\x20captured\x20from\x20','map','normal','change','Migrating\x20old\x20progress\x20data\x20format...','Starting\x20automated\x20CAPTCHA\x20solving...','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20id=\x22generateTokenBtn\x22\x20style=\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20background:\x20linear-gradient(135deg,\x20#43e97b\x200%,\x20#38f9d7\x20100%);\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20color:\x20white;\x20border:\x20none;\x20border-radius:\x208px;\x20padding:\x2010px\x2016px;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20cursor:\x20pointer;\x20font-weight:\x20500;\x20font-size:\x2012px;\x20margin-bottom:\x208px;\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20🎯\x20Force\x20Token\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22margin-bottom:\x2015px;\x20padding:\x2015px;\x20background:\x20rgba(255,255,255,0.1);\x20border-radius:\x208px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22margin-bottom:\x2010px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<label\x20style=\x22display:\x20flex;\x20align-items:\x20center;\x20cursor:\x20pointer;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x20type=\x22checkbox\x22\x20id=\x22autoRepairEnabled\x22\x20style=\x22margin-right:\x208px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span>','Error\x20during\x20sitekey\x20detection:\x20','getElementById','Light\x20Purple','•\x20Visual\x20notifications\x20and\x20audio\x20alerts','Error\x20updating\x20charges:\x20','token_error','repaired','turnstile-capture','include','display','Falling\x20back\x20to\x20interactive\x20Turnstile\x20(visible)','>Generator</option>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<option\x20value=\x22hybrid\x22\x20','defer','unknown','fallback','imageSmoothingEnabled','colorsInfo','...','Failed\x20to\x20cache\x20tile\x20ImageData:\x20','Light\x20Indigo','data','autonomousModeActive','string','Using\x20sitekey:\x20','fetch','Failed\x20to\x20cleanup\x20Turnstile\x20widget:\x20'];_0x783c=function(){return _0x178b71;};return _0x783c();};((async()=>{const _0x40b50f=_0x31e4,_0x25ad89={'COOLDOWN_DEFAULT':0x7918,'TRANSPARENCY_THRESHOLD':0x64,'WHITE_THRESHOLD':0xfa,'LOG_INTERVAL':0xa,'PAINTING_SPEED':{'MIN':0x1,'MAX':0x3e8,'DEFAULT':0x5},'TOKEN_SOURCE':_0x40b50f(0x195),'AUTONOMOUS_MODE':![],'AUTO_TOKEN_REFRESH':!![],'TOKEN_PRELOAD_BUFFER':0xea60,'MAX_RETRIES':0xa,'RETRY_DELAY_BASE':0x3e8,'COLOR_MAP':{0x0:{'id':0x1,'name':_0x40b50f(0x1eb),'rgb':{'r':0x0,'g':0x0,'b':0x0}},0x1:{'id':0x2,'name':'Dark\x20Gray','rgb':{'r':0x3c,'g':0x3c,'b':0x3c}},0x2:{'id':0x3,'name':'Gray','rgb':{'r':0x78,'g':0x78,'b':0x78}},0x3:{'id':0x4,'name':'Light\x20Gray','rgb':{'r':0xd2,'g':0xd2,'b':0xd2}},0x4:{'id':0x5,'name':_0x40b50f(0x2aa),'rgb':{'r':0xff,'g':0xff,'b':0xff}},0x5:{'id':0x6,'name':'Deep\x20Red','rgb':{'r':0x60,'g':0x0,'b':0x18}},0x6:{'id':0x7,'name':_0x40b50f(0x137),'rgb':{'r':0xed,'g':0x1c,'b':0x24}},0x7:{'id':0x8,'name':_0x40b50f(0x235),'rgb':{'r':0xff,'g':0x7f,'b':0x27}},0x8:{'id':0x9,'name':_0x40b50f(0x2ac),'rgb':{'r':0xf6,'g':0xaa,'b':0x9}},0x9:{'id':0xa,'name':_0x40b50f(0x152),'rgb':{'r':0xf9,'g':0xdd,'b':0x3b}},0xa:{'id':0xb,'name':_0x40b50f(0x142),'rgb':{'r':0xff,'g':0xfa,'b':0xbc}},0xb:{'id':0xc,'name':_0x40b50f(0x246),'rgb':{'r':0xe,'g':0xb9,'b':0x68}},0xc:{'id':0xd,'name':'Green','rgb':{'r':0x13,'g':0xe6,'b':0x7b}},0xd:{'id':0xe,'name':_0x40b50f(0x32c),'rgb':{'r':0x87,'g':0xff,'b':0x5e}},0xe:{'id':0xf,'name':'Dark\x20Teal','rgb':{'r':0xc,'g':0x81,'b':0x6e}},0xf:{'id':0x10,'name':_0x40b50f(0x261),'rgb':{'r':0x10,'g':0xae,'b':0xa6}},0x10:{'id':0x11,'name':_0x40b50f(0x214),'rgb':{'r':0x13,'g':0xe1,'b':0xbe}},0x11:{'id':0x14,'name':_0x40b50f(0x247),'rgb':{'r':0x60,'g':0xf7,'b':0xf2}},0x12:{'id':0x2c,'name':'Light\x20Cyan','rgb':{'r':0xbb,'g':0xfa,'b':0xf2}},0x13:{'id':0x12,'name':_0x40b50f(0x383),'rgb':{'r':0x28,'g':0x50,'b':0x9e}},0x14:{'id':0x13,'name':'Blue','rgb':{'r':0x40,'g':0x93,'b':0xe4}},0x15:{'id':0x15,'name':_0x40b50f(0x17b),'rgb':{'r':0x6b,'g':0x50,'b':0xf6}},0x16:{'id':0x16,'name':_0x40b50f(0x2e4),'rgb':{'r':0x99,'g':0xb1,'b':0xfb}},0x17:{'id':0x17,'name':_0x40b50f(0x1c2),'rgb':{'r':0x78,'g':0xc,'b':0x99}},0x18:{'id':0x18,'name':_0x40b50f(0x1fc),'rgb':{'r':0xaa,'g':0x38,'b':0xb9}},0x19:{'id':0x19,'name':_0x40b50f(0x2d3),'rgb':{'r':0xe0,'g':0x9f,'b':0xf9}},0x1a:{'id':0x1a,'name':_0x40b50f(0x271),'rgb':{'r':0xcb,'g':0x0,'b':0x7a}},0x1b:{'id':0x1b,'name':_0x40b50f(0x36a),'rgb':{'r':0xec,'g':0x1f,'b':0x80}},0x1c:{'id':0x1c,'name':_0x40b50f(0x27e),'rgb':{'r':0xf3,'g':0x8d,'b':0xa9}},0x1d:{'id':0x1d,'name':'Dark\x20Brown','rgb':{'r':0x68,'g':0x46,'b':0x34}},0x1e:{'id':0x1e,'name':_0x40b50f(0x35c),'rgb':{'r':0x95,'g':0x68,'b':0x2a}},0x1f:{'id':0x1f,'name':_0x40b50f(0x351),'rgb':{'r':0xf8,'g':0xb2,'b':0x77}},0x20:{'id':0x34,'name':_0x40b50f(0x194),'rgb':{'r':0xff,'g':0xc5,'b':0xa5}},0x3f:{'id':0x0,'name':'Transparent','rgb':null}}},_0x5757f9={'running':![],'imageLoaded':![],'totalPixels':0x0,'paintedPixels':0x0,'availableColors':[],'displayCharges':0x0,'maxCharges':0x1,'cooldown':_0x25ad89[_0x40b50f(0x1ae)],'imageData':null,'stopFlag':![],'startPosition':null,'region':null,'paintWhitePixels':!![],'paintTransparentPixels':![],'autoRepairEnabled':![],'autoRepairInterval':0x1e,'autoRepairTimer':null,'debugLogs':[],'customTransparencyThreshold':_0x25ad89[_0x40b50f(0x144)],'customWhiteThreshold':_0x25ad89[_0x40b50f(0x1b4)],'tokenSource':_0x25ad89[_0x40b50f(0x245)],'autonomousMode':_0x25ad89[_0x40b50f(0x311)],'autoTokenRefresh':_0x25ad89[_0x40b50f(0x204)],'tokenPreloadBuffer':_0x25ad89[_0x40b50f(0x19d)],'retryCount':0x0,'tokenRetryTimer':null,'tokenPreloadTimer':null,'windowMinimized':![],'lastAttackState':null},_0x32ae7a=(_0x488b71,_0x4b3f5f=_0x40b50f(0x2a2))=>[...Array(_0x488b71)][_0x40b50f(0x2cb)](()=>_0x4b3f5f[crypto?.[_0x40b50f(0x176)]?.(new Uint32Array(0x1))[0x0]%_0x4b3f5f[_0x40b50f(0x37a)]||Math[_0x40b50f(0x1ba)](Math[_0x40b50f(0x13f)]()*_0x4b3f5f[_0x40b50f(0x37a)])])['join']('');let _0x3724f5=null,_0x177ed=0x0,_0x26fce8=![],_0x44ef92=null,_0x28d0d1=new Promise(_0x508905=>{_0x44ef92=_0x508905;});const _0x5c23f2=0x3a980,_0x650323=0xa;function _0x5c5ae2(){const _0x48da55=_0x40b50f;try{const _0x2314b2=new Audio(_0x48da55(0x166));_0x2314b2[_0x48da55(0x318)]=0.5,_0x2314b2['play']()[_0x48da55(0x1c9)](()=>{console['warn']('Could\x20not\x20play\x20notification\x20sound');});}catch(_0x42295a){console['warn']('Audio\x20notification\x20failed:',_0x42295a);}}function _0x54f85b(_0x47040e,_0x1bbfc8=0x0){const _0x5ed7a6=_0x40b50f,_0x1dd9d0=document[_0x5ed7a6(0x2d2)](_0x5ed7a6(0x262));if(_0x1dd9d0)_0x1dd9d0[_0x5ed7a6(0x199)]();const _0x4a60f3=document['createElement']('div');_0x4a60f3['id']=_0x5ed7a6(0x262),_0x4a60f3[_0x5ed7a6(0x2a5)][_0x5ed7a6(0x1a8)]='\x0a\x20\x20\x20\x20\x20\x20position:\x20fixed;\x20top:\x2050%;\x20left:\x2050%;\x20transform:\x20translate(-50%,\x20-50%);\x0a\x20\x20\x20\x20\x20\x20z-index:\x2015000;\x20background:\x20rgba(0,0,0,0.9);\x20color:\x20white;\x0a\x20\x20\x20\x20\x20\x20border-radius:\x2015px;\x20padding:\x2020px;\x20text-align:\x20center;\x0a\x20\x20\x20\x20\x20\x20box-shadow:\x200\x2010px\x2030px\x20rgba(0,0,0,0.8);\x0a\x20\x20\x20\x20\x20\x20border:\x202px\x20solid\x20'+(_0x47040e===_0x5ed7a6(0x239)?'#ff4444':_0x5ed7a6(0x12c))+_0x5ed7a6(0x15d);if(_0x47040e===_0x5ed7a6(0x239))_0x4a60f3[_0x5ed7a6(0x1e9)]=_0x5ed7a6(0x33b)+_0x1bbfc8+_0x5ed7a6(0x1f3);else _0x47040e==='repaired'&&(_0x4a60f3[_0x5ed7a6(0x1e9)]=_0x5ed7a6(0x183));document[_0x5ed7a6(0x37c)][_0x5ed7a6(0x251)](_0x4a60f3),setTimeout(()=>{const _0x57f34d=_0x5ed7a6;_0x4a60f3[_0x57f34d(0x26a)]&&(_0x4a60f3['style'][_0x57f34d(0x2ff)]=_0x57f34d(0x241),_0x4a60f3[_0x57f34d(0x2a5)]['opacity']='0',setTimeout(()=>{const _0x10e668=_0x57f34d;if(_0x4a60f3[_0x10e668(0x26a)])_0x4a60f3[_0x10e668(0x199)]();},0x1f4));},0xbb8);}function _0x9d4780(){const _0x4ac820=_0x40b50f,_0x32de3d=document[_0x4ac820(0x2d2)](_0x4ac820(0x270));_0x32de3d&&!_0x5757f9['running']&&(_0x32de3d[_0x4ac820(0x1e9)]='\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22display:\x20flex;\x20align-items:\x20center;\x20gap:\x2010px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<img\x20src=\x22https://c.tenor.com/Bo5TLHiee7QAAAAd/tenor.gif\x22\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20alt=\x22Peaceful\x22\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20style=\x22width:\x2032px;\x20height:\x2032px;\x20border-radius:\x206px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20style=\x22color:\x20#81c784;\x20font-weight:\x20500;\x22>No\x20attacks\x20detected\x20-\x20All\x20secure</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20');}function _0x35682a(){const _0x5c8a05=_0x40b50f,_0x35aa29='WPlace\x20Autonomous\x20Repair\x20Tool';let _0x24b655=0x0;const _0x24bb98=document[_0x5c8a05(0x2d2)](_0x5c8a05(0x364));if(!_0x24bb98)return;function _0x403cf9(){const _0x40947c=_0x5c8a05;_0x24b655<_0x35aa29['length']?(_0x24bb98['textContent']=_0x35aa29[_0x40947c(0x327)](0x0,_0x24b655+0x1),_0x24b655++,setTimeout(_0x403cf9,0x64)):setTimeout(()=>{_0x24b655=0x0,_0x24bb98['textContent']='',setTimeout(_0x403cf9,0x3e8);},0xbb8);}_0x403cf9();}function _0x48301b(_0x46e6fc){const _0x347db4=_0x40b50f;_0x44ef92&&(_0x44ef92(_0x46e6fc),_0x44ef92=null),_0x3724f5=_0x46e6fc,_0x177ed=Date[_0x347db4(0x330)]()+_0x5c23f2,_0x51fd10[_0x347db4(0x14c)](_0x347db4(0x172),_0x347db4(0x260)),_0x5757f9[_0x347db4(0x360)]&&_0x5757f9[_0x347db4(0x1e4)]&&_0x1f4d5f();}function _0x327512(){const _0x424729=_0x40b50f;return _0x3724f5&&Date[_0x424729(0x330)]()<_0x177ed;}function _0x35c4c5(){const _0x5cd673=_0x40b50f;return _0x3724f5&&_0x177ed-Date['now']()<_0x5757f9[_0x5cd673(0x357)];}function _0xe98abc(){const _0x219012=_0x40b50f;_0x3724f5=null,_0x177ed=0x0,_0x5757f9[_0x219012(0x1c1)]&&(clearTimeout(_0x5757f9[_0x219012(0x1c1)]),_0x5757f9[_0x219012(0x1c1)]=null),_0x51fd10[_0x219012(0x14c)]('Token\x20invalidated,\x20will\x20force\x20fresh\x20generation',_0x219012(0x19b));}function _0x1f4d5f(){const _0x5093b4=_0x40b50f;_0x5757f9['tokenPreloadTimer']&&clearTimeout(_0x5757f9[_0x5093b4(0x1c1)]);const _0x5e5ced=Math[_0x5093b4(0x13b)](0x3e8,_0x177ed-Date['now']()-_0x5757f9[_0x5093b4(0x357)]);_0x5757f9[_0x5093b4(0x1c1)]=setTimeout(async()=>{const _0x28da47=_0x5093b4;if(_0x5757f9['autonomousMode']&&_0x5757f9[_0x28da47(0x360)]){_0x51fd10[_0x28da47(0x14c)](_0x28da47(0x1aa),_0x28da47(0x303));try{await _0xf634e1(!![]);}catch(_0x2f7c13){_0x51fd10[_0x28da47(0x14c)]('Token\x20preload\x20failed:\x20'+_0x2f7c13['message'],'warning');}}},_0x5e5ced),_0x51fd10[_0x5093b4(0x14c)](_0x5093b4(0x19a)+Math[_0x5093b4(0x34a)](_0x5e5ced/0x3e8)+'s',_0x5093b4(0x303));}async function _0xf634e1(_0x21b839=![]){const _0x29b053=_0x40b50f;if(_0x327512()&&!_0x21b839&&!_0x35c4c5())return _0x3724f5;(_0x21b839||_0x35c4c5())&&(_0x51fd10[_0x29b053(0x14c)](_0x21b839?_0x29b053(0x1ad):_0x29b053(0x2ab),'info'),_0xe98abc());if(_0x26fce8)return _0x51fd10[_0x29b053(0x14c)](_0x29b053(0x1ec),_0x29b053(0x303)),await _0x51fd10[_0x29b053(0x256)](0x7d0),_0x327512()?_0x3724f5:null;_0x26fce8=!![];try{_0x51fd10['addDebugLog']('Generating\x20new\x20token\x20with\x20enhanced\x20system...',_0x29b053(0x303));let _0x26eb43=null;(_0x5757f9[_0x29b053(0x2af)]==='generator'||_0x5757f9['tokenSource']===_0x29b053(0x2b5))&&(_0x26eb43=await _0x3c617f());!_0x26eb43&&(_0x5757f9[_0x29b053(0x2af)]===_0x29b053(0x1bf)||_0x5757f9[_0x29b053(0x2af)]===_0x29b053(0x2b5))&&(_0x51fd10[_0x29b053(0x14c)]('Generator\x20failed,\x20trying\x20fallback\x20automation...',_0x29b053(0x19b)),_0x26eb43=await _0x221a57());if(_0x26eb43&&_0x26eb43[_0x29b053(0x37a)]>0x14)return _0x48301b(_0x26eb43),_0x5757f9[_0x29b053(0x18e)]=0x0,_0x26eb43;_0x5c5ae2();throw new Error(_0x29b053(0x253));}catch(_0x17108d){_0x51fd10['addDebugLog'](_0x29b053(0x32a)+_0x17108d[_0x29b053(0x242)],'error');if(_0x5757f9['autonomousMode']&&_0x5757f9[_0x29b053(0x18e)]<_0x25ad89[_0x29b053(0x376)]){_0x5757f9[_0x29b053(0x18e)]++;const _0x46b225=_0x25ad89[_0x29b053(0x276)]*Math[_0x29b053(0x22f)](0x2,_0x5757f9[_0x29b053(0x18e)]-0x1);_0x51fd10[_0x29b053(0x14c)](_0x29b053(0x164)+_0x46b225+'ms\x20(attempt\x20'+_0x5757f9[_0x29b053(0x18e)]+'/'+_0x25ad89[_0x29b053(0x376)]+')',_0x29b053(0x19b)),_0x5757f9[_0x29b053(0x300)]=setTimeout(async()=>{const _0x57f2fd=_0x29b053;try{await _0xf634e1(!![]);}catch(_0x577982){_0x51fd10[_0x57f2fd(0x14c)](_0x57f2fd(0x1a3)+_0x5757f9[_0x57f2fd(0x18e)]+'\x20failed:\x20'+_0x577982[_0x57f2fd(0x242)],_0x57f2fd(0x2a7));}},_0x46b225);}return null;}finally{_0x26fce8=![];}}async function _0x3c617f(){const _0x95c305=_0x40b50f,_0x4239f9=performance['now']();try{const {sitekey:_0x2e3afa,token:_0x14a59e}=await _0x51fd10[_0x95c305(0x333)]();if(!_0x2e3afa)throw new Error(_0x95c305(0x1a6));_0x51fd10[_0x95c305(0x14c)](_0x95c305(0x2e8)+_0x2e3afa,_0x95c305(0x303));let _0x1aad20=null;_0x14a59e&&typeof _0x14a59e===_0x95c305(0x2e7)&&_0x14a59e[_0x95c305(0x37a)]>0x14?(_0x51fd10[_0x95c305(0x14c)]('Reusing\x20pre-generated\x20Turnstile\x20token','info'),_0x1aad20=_0x14a59e):_0x327512()&&!_0x35c4c5()?(_0x51fd10[_0x95c305(0x14c)](_0x95c305(0x294),_0x95c305(0x303)),_0x1aad20=_0x3724f5):(_0x51fd10[_0x95c305(0x14c)](_0x95c305(0x2c8),_0x95c305(0x303)),_0x1aad20=await _0x51fd10[_0x95c305(0x170)](_0x2e3afa,_0x95c305(0x302)));if(_0x1aad20&&typeof _0x1aad20==='string'&&_0x1aad20['length']>0x14){const _0x182551=Math[_0x95c305(0x34a)](performance[_0x95c305(0x330)]()-_0x4239f9);return _0x51fd10['addDebugLog'](_0x95c305(0x213)+_0x182551+'ms',_0x95c305(0x260)),_0x1aad20;}else throw new Error(_0x95c305(0x370)+(_0x1aad20?.['length']||0x0));}catch(_0x1a9a91){const _0x235914=Math[_0x95c305(0x34a)](performance[_0x95c305(0x330)]()-_0x4239f9);_0x51fd10[_0x95c305(0x14c)](_0x95c305(0x1e2)+_0x235914+_0x95c305(0x180)+_0x1a9a91[_0x95c305(0x242)],_0x95c305(0x2a7));throw _0x1a9a91;}}async function _0x221a57(){return new Promise(async(_0x56bb2d,_0x42caf4)=>{const _0x3972ba=_0x31e4;try{!_0x44ef92&&(_0x28d0d1=new Promise(_0x4455c6=>{_0x44ef92=_0x4455c6;}));const _0x40bf85=_0x51fd10['sleep'](0x7530)[_0x3972ba(0x210)](()=>_0x42caf4(new Error(_0x3972ba(0x13e)))),_0x367fa0=((async()=>{const _0x5edba2=_0x3972ba;_0x51fd10[_0x5edba2(0x14c)](_0x5edba2(0x2cf),'info');const _0x1d1af6=await _0x51fd10[_0x5edba2(0x32f)](_0x5edba2(0x171),0xc8,0x2710);if(!_0x1d1af6)throw new Error(_0x5edba2(0x138));_0x51fd10[_0x5edba2(0x14c)]('Found\x20paint\x20button,\x20clicking...',_0x5edba2(0x303)),_0x1d1af6[_0x5edba2(0x2fc)](),await _0x51fd10[_0x5edba2(0x256)](0x1f4);const _0x401bea=await _0x51fd10[_0x5edba2(0x32f)]('button#color-0',0xc8,0x1388);if(!_0x401bea)throw new Error(_0x5edba2(0x25a));_0x51fd10[_0x5edba2(0x14c)](_0x5edba2(0x309),_0x5edba2(0x303)),_0x401bea[_0x5edba2(0x2fc)](),await _0x51fd10[_0x5edba2(0x256)](0x1f4);const _0x3a230d=await _0x51fd10[_0x5edba2(0x32f)](_0x5edba2(0x290),0xc8,0x1388);if(!_0x3a230d)throw new Error(_0x5edba2(0x238));_0x51fd10[_0x5edba2(0x14c)]('Found\x20canvas,\x20simulating\x20interaction...',_0x5edba2(0x303)),_0x3a230d[_0x5edba2(0x151)](_0x5edba2(0x223),'0'),_0x3a230d[_0x5edba2(0x193)]();const _0x260fb7=_0x3a230d[_0x5edba2(0x201)](),_0x1f1bad=Math['round'](_0x260fb7['left']+_0x260fb7['width']/0x2),_0x410a4b=Math[_0x5edba2(0x34a)](_0x260fb7['top']+_0x260fb7[_0x5edba2(0x250)]/0x2);_0x3a230d[_0x5edba2(0x16d)](new MouseEvent('mousemove',{'clientX':_0x1f1bad,'clientY':_0x410a4b,'bubbles':!![]})),_0x3a230d[_0x5edba2(0x16d)](new KeyboardEvent(_0x5edba2(0x328),{'key':'\x20','code':_0x5edba2(0x286),'bubbles':!![]})),await _0x51fd10[_0x5edba2(0x256)](0x32),_0x3a230d[_0x5edba2(0x16d)](new KeyboardEvent('keyup',{'key':'\x20','code':_0x5edba2(0x286),'bubbles':!![]})),await _0x51fd10[_0x5edba2(0x256)](0x320),_0x51fd10[_0x5edba2(0x14c)](_0x5edba2(0x295),_0x5edba2(0x303));const _0x148695=async()=>{const _0x4aab74=_0x5edba2;let _0x1145d6=0x0;while(!_0x3724f5&&_0x1145d6<0x14){_0x1145d6++;let _0x2d2810=await _0x51fd10[_0x4aab74(0x32f)](_0x4aab74(0x15b),0x64,0x3e8);if(!_0x2d2810){const _0x4c8fa4=Array[_0x4aab74(0x215)](document[_0x4aab74(0x369)]('button.btn-primary'));_0x2d2810=_0x4c8fa4[_0x4aab74(0x37a)]?_0x4c8fa4[_0x4c8fa4[_0x4aab74(0x37a)]-0x1]:null;}_0x2d2810&&(_0x51fd10['addDebugLog'](_0x4aab74(0x148)+_0x1145d6+_0x4aab74(0x2e2),_0x4aab74(0x303)),_0x2d2810[_0x4aab74(0x2fc)]()),await _0x51fd10[_0x4aab74(0x256)](0x1f4);}};_0x148695();const _0x37f78d=await _0x28d0d1;await _0x51fd10[_0x5edba2(0x256)](0x12c),_0x51fd10[_0x5edba2(0x14c)]('Fallback\x20token\x20generation\x20completed',_0x5edba2(0x260)),_0x56bb2d(_0x37f78d);})());await Promise[_0x3972ba(0x1d3)]([_0x367fa0,_0x40bf85]);}catch(_0x153eb4){_0x51fd10[_0x3972ba(0x14c)](_0x3972ba(0x296)+_0x153eb4[_0x3972ba(0x242)],_0x3972ba(0x2a7)),_0x42caf4(_0x153eb4);}});}async function _0x149a26(_0xa8a4dd,_0x46b299,_0xed2da3){const _0x39eb94=_0x40b50f;try{const _0x54dcea=await import('/_app/immutable/chunks/BBb1ALhY.js');let _0x54dfc8;try{_0x54dfc8=await _0x54dcea['_'](),_0x51fd10[_0x39eb94(0x14c)](_0x39eb94(0x21d),'success');}catch(_0x2886fe){return _0x51fd10[_0x39eb94(0x14c)]('WASM\x20initialization\x20failed:\x20'+_0x2886fe['message'],_0x39eb94(0x2a7)),null;}try{const _0x231f0a=await fetch('https://backend.wplace.live/me',{'credentials':_0x39eb94(0x2d9)})[_0x39eb94(0x210)](_0xfae609=>_0xfae609['ok']?_0xfae609['json']():null);_0x231f0a?.['id']&&(_0x54dcea['i'](_0x231f0a['id']),_0x51fd10[_0x39eb94(0x14c)](_0x39eb94(0x1a0)+_0x231f0a['id'],_0x39eb94(0x303)));}catch(_0x8a6f6d){_0x51fd10[_0x39eb94(0x14c)](_0x39eb94(0x237)+_0x8a6f6d[_0x39eb94(0x242)],_0x39eb94(0x19b));}try{const _0x3eddbc=_0x39eb94(0x1c5)+_0xa8a4dd+'/'+_0x46b299;_0x54dcea['r']&&(_0x54dcea['r'](_0x3eddbc),_0x51fd10[_0x39eb94(0x14c)](_0x39eb94(0x316)+_0x3eddbc,_0x39eb94(0x303)));}catch(_0x191a92){_0x51fd10[_0x39eb94(0x14c)]('Error\x20setting\x20request\x20URL:\x20'+_0x191a92[_0x39eb94(0x242)],_0x39eb94(0x19b));}const _0x296e86=new TextEncoder(),_0x310339=new TextDecoder(),_0x5cf8f6=JSON['stringify'](_0xed2da3),_0x5b9131=_0x296e86[_0x39eb94(0x182)](_0x5cf8f6);let _0x4ee3f7;try{if(!_0x54dfc8[_0x39eb94(0x1db)])return _0x51fd10[_0x39eb94(0x14c)](_0x39eb94(0x16b),_0x39eb94(0x2a7)),null;_0x4ee3f7=_0x54dfc8[_0x39eb94(0x1db)](_0x5b9131[_0x39eb94(0x37a)],0x1);const _0x3fa6a1=new Uint8Array(_0x54dfc8['memory'][_0x39eb94(0x1da)],_0x4ee3f7,_0x5b9131[_0x39eb94(0x37a)]);_0x3fa6a1[_0x39eb94(0x16a)](_0x5b9131);}catch(_0x87a05e){return _0x51fd10['addDebugLog']('Memory\x20allocation\x20error:\x20'+_0x87a05e['message'],_0x39eb94(0x2a7)),null;}let _0x5dfb30,_0xe2f016,_0x5bf984;try{const _0x49386d=_0x54dfc8['get_pawtected_endpoint_payload'](_0x4ee3f7,_0x5b9131[_0x39eb94(0x37a)]);if(Array[_0x39eb94(0x2a4)](_0x49386d)&&_0x49386d[_0x39eb94(0x37a)]===0x2){[_0x5dfb30,_0xe2f016]=_0x49386d;const _0x4c0c20=new Uint8Array(_0x54dfc8['memory'][_0x39eb94(0x1da)],_0x5dfb30,_0xe2f016);_0x5bf984=_0x310339[_0x39eb94(0x205)](_0x4c0c20);}else return _0x51fd10[_0x39eb94(0x14c)](_0x39eb94(0x1b2),_0x39eb94(0x2a7)),null;}catch(_0x3c8a00){return _0x51fd10[_0x39eb94(0x14c)](_0x39eb94(0x34e)+_0x3c8a00[_0x39eb94(0x242)],_0x39eb94(0x2a7)),null;}try{_0x54dfc8[_0x39eb94(0x272)]&&_0x5dfb30&&_0xe2f016&&_0x54dfc8['__wbindgen_free'](_0x5dfb30,_0xe2f016,0x1),_0x54dfc8[_0x39eb94(0x272)]&&_0x4ee3f7&&_0x54dfc8[_0x39eb94(0x272)](_0x4ee3f7,_0x5b9131['length'],0x1);}catch(_0x3e35a5){_0x51fd10['addDebugLog']('Cleanup\x20warning:\x20'+_0x3e35a5[_0x39eb94(0x242)],_0x39eb94(0x19b));}return _0x5bf984;}catch(_0x40ac43){return _0x51fd10[_0x39eb94(0x14c)](_0x39eb94(0x2ee)+_0x40ac43[_0x39eb94(0x242)],_0x39eb94(0x2a7)),null;}}function _0xb4abb9(_0x14047b){const _0x21573e=_0x40b50f,_0x22353b=document[_0x21573e(0x2c9)]('script');_0x22353b[_0x21573e(0x252)]='('+_0x14047b+')();',document['documentElement']?.[_0x21573e(0x251)](_0x22353b),_0x22353b['remove']();}_0xb4abb9(()=>{const _0x50c212=_0x40b50f,_0x234c66=new Map(),_0x53d83a=new Set();window[_0x50c212(0x24e)](_0x50c212(0x242),_0x124935=>{const _0x31315f=_0x50c212,{source:_0x904823,blobID:_0x4f887b,blobData:_0x3f63cb}=_0x124935[_0x31315f(0x2e5)];if(_0x904823==='auto-image-overlay'&&_0x4f887b&&_0x3f63cb){const _0x6a4e2f=_0x234c66[_0x31315f(0x1d8)](_0x4f887b);typeof _0x6a4e2f===_0x31315f(0x1ab)&&_0x6a4e2f(_0x3f63cb),_0x234c66[_0x31315f(0x374)](_0x4f887b);}});const _0x225a5c=window['fetch'];window[_0x50c212(0x2e9)]=async function(..._0x144d89){const _0x38ff69=_0x50c212,_0x73fb67=await _0x225a5c[_0x38ff69(0x33a)](this,_0x144d89),_0x291073=_0x144d89[0x0]instanceof Request?_0x144d89[0x0][_0x38ff69(0x348)]:_0x144d89[0x0];if(typeof _0x291073==='string'){if(_0x291073[_0x38ff69(0x354)]('https://backend.wplace.live/s0/pixel/'))try{const _0x1cbc9d=_0x144d89[0x1]?.[_0x38ff69(0x37c)];if(_0x1cbc9d){const _0x3be941=JSON['parse'](_0x1cbc9d);_0x3be941['t']&&typeof _0x3be941['t']==='string'&&_0x3be941['t'][_0x38ff69(0x37a)]>0x14&&(!_0x53d83a[_0x38ff69(0x1bc)](_0x3be941['t'])&&(_0x53d83a[_0x38ff69(0x353)](_0x3be941['t']),console[_0x38ff69(0x37d)](_0x38ff69(0x15f)+_0x3be941['t'][_0x38ff69(0x37a)]+_0x38ff69(0x2b2)+_0x3be941['t'][_0x38ff69(0x327)](0x0,0x32)+_0x38ff69(0x2e2)),window[_0x38ff69(0x28e)]({'source':_0x38ff69(0x2d8),'token':_0x3be941['t'],'timestamp':Date[_0x38ff69(0x330)](),'source_type':_0x38ff69(0x20b)},'*'),setTimeout(()=>{_0x53d83a['delete'](_0x3be941['t']);},0x493e0)));}}catch(_0x4ccc44){console[_0x38ff69(0x26d)](_0x38ff69(0x298),_0x4ccc44);}const _0x3c6b23=_0x73fb67[_0x38ff69(0x15c)][_0x38ff69(0x1d8)]('content-type')||'';if(_0x3c6b23['includes'](_0x38ff69(0x236))&&_0x291073['includes'](_0x38ff69(0x35f))){const _0x7e9d0a=_0x73fb67[_0x38ff69(0x267)]();return new Promise(async _0x5bbc1d=>{const _0x11527c=_0x38ff69,_0x13b444=crypto[_0x11527c(0x1e3)](),_0x3efec3=await _0x7e9d0a[_0x11527c(0x17e)]();_0x234c66[_0x11527c(0x16a)](_0x13b444,_0x49bdc1=>{const _0x321299=_0x11527c;_0x5bbc1d(new Response(_0x49bdc1,{'headers':_0x7e9d0a[_0x321299(0x15c)],'status':_0x7e9d0a[_0x321299(0x270)],'statusText':_0x7e9d0a[_0x321299(0x27d)]}));}),window[_0x11527c(0x28e)]({'source':_0x11527c(0x33c),'endpoint':_0x291073,'blobID':_0x13b444,'blobData':_0x3efec3,'timestamp':Date[_0x11527c(0x330)]()},'*');});}if(_0x291073[_0x38ff69(0x354)](_0x38ff69(0x1e5))||_0x291073['includes'](_0x38ff69(0x275))){const _0x2210fe=_0x73fb67[_0x38ff69(0x267)]();_0x2210fe['json']()[_0x38ff69(0x210)](_0x453ebf=>{const _0x2fa639=_0x38ff69;_0x453ebf&&typeof _0x453ebf===_0x2fa639(0x30b)&&window[_0x2fa639(0x28e)]({'source':_0x2fa639(0x31b),'data':_0x453ebf,'timestamp':Date['now']()},'*');})[_0x38ff69(0x1c9)](()=>{});}}return _0x73fb67;};const _0x5383d9=XMLHttpRequest['prototype'][_0x50c212(0x35b)],_0x1084f9=XMLHttpRequest[_0x50c212(0x371)][_0x50c212(0x24c)];XMLHttpRequest[_0x50c212(0x371)][_0x50c212(0x35b)]=function(_0x3ea7d2,_0x4314d3,..._0x1245e5){const _0x57542b=_0x50c212;return this[_0x57542b(0x27b)]=_0x4314d3,this[_0x57542b(0x135)]=_0x3ea7d2,_0x5383d9[_0x57542b(0x23f)](this,_0x3ea7d2,_0x4314d3,..._0x1245e5);},XMLHttpRequest[_0x50c212(0x371)][_0x50c212(0x24c)]=function(_0x1bc24d){const _0x4cfb70=_0x50c212;if(this[_0x4cfb70(0x27b)]&&this['_interceptedUrl'][_0x4cfb70(0x354)]('backend.wplace.live')){const _0x5ad074=this[_0x4cfb70(0x21f)];this[_0x4cfb70(0x21f)]=function(){const _0x5ab5ad=_0x4cfb70;if(this[_0x5ab5ad(0x347)]===0x4&&this[_0x5ab5ad(0x270)]===0xc8)try{if(this[_0x5ab5ad(0x27b)][_0x5ab5ad(0x354)](_0x5ab5ad(0x1b9))&&_0x1bc24d){const _0x1011d0=JSON['parse'](_0x1bc24d);_0x1011d0['t']&&typeof _0x1011d0['t']===_0x5ab5ad(0x2e7)&&_0x1011d0['t'][_0x5ab5ad(0x37a)]>0x14&&(console[_0x5ab5ad(0x37d)]('🔍✅\x20XHR\x20Token\x20Captured\x20-\x20Length:\x20'+_0x1011d0['t']['length']),window['postMessage']({'source':_0x5ab5ad(0x2d8),'token':_0x1011d0['t'],'timestamp':Date['now'](),'source_type':_0x5ab5ad(0x141)},'*'));}}catch(_0x6d3e97){}_0x5ad074&&_0x5ad074['call'](this);};}return _0x1084f9[_0x4cfb70(0x23f)](this,_0x1bc24d);};const _0x14c178=Node[_0x50c212(0x371)][_0x50c212(0x251)];Node[_0x50c212(0x371)]['appendChild']=function(_0xe36241){const _0x2fbe69=_0x50c212;return _0xe36241[_0x2fbe69(0x13d)]===_0x2fbe69(0x28f)&&_0xe36241[_0x2fbe69(0x1e1)]&&_0xe36241['src'][_0x2fbe69(0x354)](_0x2fbe69(0x379))&&(console['log']('🔍\x20Turnstile\x20script\x20detected:',_0xe36241[_0x2fbe69(0x1e1)]),window[_0x2fbe69(0x28e)]({'source':'script-monitor','scriptSrc':_0xe36241['src'],'timestamp':Date[_0x2fbe69(0x330)]()},'*')),_0x14c178['call'](this,_0xe36241);};}),window[_0x40b50f(0x24e)](_0x40b50f(0x242),_0x4936d4=>{const _0x4b247d=_0x40b50f,{source:_0x5bd28d,endpoint:_0x42e3c4,blobID:_0x35e75c,blobData:_0x3a7302,token:_0x243f24,timestamp:_0x3b0575,source_type:_0x293950,data:_0x44494a}=_0x4936d4[_0x4b247d(0x2e5)];_0x5bd28d==='auto-image-tile'&&_0x42e3c4&&_0x35e75c&&_0x3a7302&&_0x30833f[_0x4b247d(0x1ed)](_0x4936d4[_0x4b247d(0x2e5)]),_0x5bd28d===_0x4b247d(0x2d8)&&_0x243f24&&(_0x51fd10['addDebugLog'](_0x4b247d(0x2ca)+(_0x293950||_0x4b247d(0x2de))+_0x4b247d(0x27a)+_0x243f24[_0x4b247d(0x37a)],'success'),_0x48301b(_0x243f24),_0x21981a()),_0x5bd28d===_0x4b247d(0x31b)&&_0x44494a&&(_0x51fd10[_0x4b247d(0x14c)](_0x4b247d(0x30e)+(_0x44494a['id']||'unknown'),_0x4b247d(0x303)),_0x44494a[_0x4b247d(0x27c)]&&(_0x5757f9[_0x4b247d(0x203)]=Math[_0x4b247d(0x1ba)](_0x44494a['charges'][_0x4b247d(0x16f)]||0x0),_0x5757f9['maxCharges']=Math[_0x4b247d(0x13b)](0x1,Math[_0x4b247d(0x1ba)](_0x44494a[_0x4b247d(0x27c)]['max']||0x1)),_0x5757f9[_0x4b247d(0x225)]=_0x44494a[_0x4b247d(0x27c)][_0x4b247d(0x1d6)]||_0x25ad89[_0x4b247d(0x1ae)],_0x5ed705())),_0x5bd28d===_0x4b247d(0x384)&&_0x51fd10['addDebugLog'](_0x4b247d(0x181)+_0x4936d4[_0x4b247d(0x2e5)][_0x4b247d(0x2b3)],_0x4b247d(0x303));});const _0x317bb2={'title':_0x40b50f(0x2f5),'loadFromFile':_0x40b50f(0x21c),'repairPixels':'Repair\x20Pixels','enableAutoRepair':'Enable\x20Auto\x20Repair','repairInterval':_0x40b50f(0x244),'debug':'Debug\x20Console','clearDebug':_0x40b50f(0x133),'scanningForDamage':'Scanning\x20for\x20damaged\x20pixels...','damageDetected':_0x40b50f(0x15e),'noDamageDetected':'No\x20damage\x20found','repairingPixels':_0x40b50f(0x326),'repairComplete':_0x40b50f(0x200),'autoRepairStarted':_0x40b50f(0x278),'autoRepairStopped':_0x40b50f(0x24b),'fileLoaded':_0x40b50f(0x25e),'invalidFile':_0x40b50f(0x1dc),'noImageData':'No\x20image\x20data\x20found\x20in\x20file','turnstileInstructions':_0x40b50f(0x2f2),'hideTurnstileBtn':'Hide','tokenCapturedSuccess':'Token\x20captured\x20successfully','autonomousModeActive':_0x40b50f(0x219),'tokenSystemReady':_0x40b50f(0x345)},_0x51fd10={'sleep':_0x1963e4=>new Promise(_0x57faf4=>setTimeout(_0x57faf4,_0x1963e4)),'t':(_0x236e16,_0x3b3e28={})=>{const _0x47120b=_0x40b50f;let _0x51f743=_0x317bb2[_0x236e16]||_0x236e16;return Object[_0x47120b(0x35a)](_0x3b3e28)[_0x47120b(0x156)](_0x22a8f1=>{const _0x4c916b=_0x47120b;_0x51f743=_0x51f743[_0x4c916b(0x186)]('{'+_0x22a8f1+'}',_0x3b3e28[_0x22a8f1]);}),_0x51f743;},'showAlert':(_0x14794e,_0x3d9365=_0x40b50f(0x303))=>{const _0x3bc16f=_0x40b50f,_0x4cc815=document[_0x3bc16f(0x2c9)](_0x3bc16f(0x167));_0x4cc815['style'][_0x3bc16f(0x1a8)]=_0x3bc16f(0x23d)+(_0x3d9365===_0x3bc16f(0x260)?'#28a745':_0x3d9365===_0x3bc16f(0x2a7)?'#dc3545':_0x3d9365===_0x3bc16f(0x19b)?_0x3bc16f(0x1d5):_0x3bc16f(0x289))+_0x3bc16f(0x385),_0x4cc815[_0x3bc16f(0x252)]=_0x14794e,document['body'][_0x3bc16f(0x251)](_0x4cc815),setTimeout(()=>{const _0x297c3a=_0x3bc16f;_0x4cc815[_0x297c3a(0x2a5)]['transition']='opacity\x200.3s\x20ease',_0x4cc815[_0x297c3a(0x2a5)][_0x297c3a(0x16e)]='0',setTimeout(()=>{const _0x2e97d6=_0x297c3a;if(_0x4cc815[_0x2e97d6(0x26a)])_0x4cc815[_0x2e97d6(0x199)]();},0x12c);},0xfa0);},'addDebugLog':(_0x11e4e2,_0x531b6a=_0x40b50f(0x303))=>{const _0x2d2883=_0x40b50f,_0x5cb973=new Date()['toLocaleTimeString']();_0x5757f9[_0x2d2883(0x1ff)][_0x2d2883(0x130)]({'timestamp':_0x5cb973,'message':_0x11e4e2,'type':_0x531b6a}),_0x5757f9[_0x2d2883(0x1ff)][_0x2d2883(0x37a)]>0x96&&(_0x5757f9[_0x2d2883(0x1ff)]=_0x5757f9[_0x2d2883(0x1ff)][_0x2d2883(0x284)](-0x96)),_0xdd5175(),console[_0x2d2883(0x37d)]('['+_0x5cb973+']\x20'+_0x11e4e2);},'waitForSelector':async(_0x174918,_0x59824e=0xc8,_0x2da587=0x1388)=>{const _0x4157c6=_0x40b50f,_0x4834cc=Date[_0x4157c6(0x330)]();while(Date['now']()-_0x4834cc<_0x2da587){const _0x182874=document[_0x4157c6(0x2fa)](_0x174918);if(_0x182874)return _0x182874;await _0x51fd10[_0x4157c6(0x256)](_0x59824e);}return null;},'createFileUploader':()=>new Promise((_0x3824a6,_0x46fe18)=>{const _0x2825af=_0x40b50f,_0x10d401=document[_0x2825af(0x2c9)]('input');_0x10d401[_0x2825af(0x179)]=_0x2825af(0x227),_0x10d401[_0x2825af(0x2a6)]=_0x2825af(0x36e),_0x10d401[_0x2825af(0x161)]=_0x4e19a0=>{const _0x1d2fee=_0x2825af,_0x209904=_0x4e19a0[_0x1d2fee(0x29c)]['files'][0x0];if(_0x209904){const _0x3288c6=new FileReader();_0x3288c6[_0x1d2fee(0x380)]=()=>{const _0x56f2f7=_0x1d2fee;try{const _0x42d92b=JSON[_0x56f2f7(0x1fa)](_0x3288c6[_0x56f2f7(0x1b7)]);_0x3824a6(_0x42d92b);}catch(_0x5f095b){_0x46fe18(new Error(_0x56f2f7(0x2fb)));}},_0x3288c6[_0x1d2fee(0x375)]=()=>_0x46fe18(new Error('File\x20reading\x20error')),_0x3288c6[_0x1d2fee(0x31c)](_0x209904);}else _0x46fe18(new Error('No\x20file\x20selected'));},_0x10d401[_0x2825af(0x2fc)]();}),'isWhitePixel':(_0x151ed9,_0x4a90b8,_0x3df8ed)=>{const _0xfdf66c=_0x40b50f,_0x29df6a=_0x5757f9[_0xfdf66c(0x1be)]||_0x25ad89[_0xfdf66c(0x1b4)];return _0x151ed9>=_0x29df6a&&_0x4a90b8>=_0x29df6a&&_0x3df8ed>=_0x29df6a;},'resolveColor'(_0x3c959d,_0x12a52e){const _0xaa79a2=_0x40b50f;if(!_0x12a52e||_0x12a52e[_0xaa79a2(0x37a)]===0x0)return{'id':null,'rgb':_0x3c959d};let _0x49deb0=_0x12a52e[0x0]['id'],_0x5b5fc6=[..._0x12a52e[0x0][_0xaa79a2(0x192)]],_0x30a3d8=Infinity;for(let _0x48707c=0x0;_0x48707c<_0x12a52e['length'];_0x48707c++){const _0x15b0bb=_0x12a52e[_0x48707c],[_0x4b220a,_0x4b678e,_0x134c70]=_0x15b0bb[_0xaa79a2(0x192)],_0x3d6de6=(_0x4b220a+_0x3c959d[0x0])/0x2,_0x347fb1=_0x4b220a-_0x3c959d[0x0],_0x5d388c=_0x4b678e-_0x3c959d[0x1],_0x553dd8=_0x134c70-_0x3c959d[0x2],_0x320252=Math[_0xaa79a2(0x162)](((0x200+_0x3d6de6)*_0x347fb1*_0x347fb1>>0x8)+0x4*_0x5d388c*_0x5d388c+((0x2ff-_0x3d6de6)*_0x553dd8*_0x553dd8>>0x8));if(_0x320252<_0x30a3d8){_0x30a3d8=_0x320252,_0x49deb0=_0x15b0bb['id'],_0x5b5fc6=[..._0x15b0bb[_0xaa79a2(0x192)]];if(_0x320252===0x0)break;}}return{'id':_0x49deb0,'rgb':_0x5b5fc6};},'calculateTileRange'(_0xe9f38f,_0x419d5e,_0x332848,_0x32d3c2,_0x53af8e,_0x89b3f5,_0x5a3a74=0x3e8){const _0x1678d1=_0x40b50f,_0x48ec65=_0x332848+_0x53af8e,_0x1b2305=_0x32d3c2+_0x89b3f5;return{'startTileX':_0xe9f38f+Math[_0x1678d1(0x1ba)](_0x332848/_0x5a3a74),'startTileY':_0x419d5e+Math[_0x1678d1(0x1ba)](_0x32d3c2/_0x5a3a74),'endTileX':_0xe9f38f+Math[_0x1678d1(0x1ba)]((_0x48ec65-0x1)/_0x5a3a74),'endTileY':_0x419d5e+Math[_0x1678d1(0x1ba)]((_0x1b2305-0x1)/_0x5a3a74)};},'dynamicSleep':async function(_0x1bf9cc){const _0x26a063=_0x40b50f;let _0x38bedd=Math[_0x26a063(0x13b)](0x0,await _0x1bf9cc());while(_0x38bedd>0x0){const _0xf83d01=_0x38bedd>0x1388?0x7d0:_0x38bedd>0x3e8?0x1f4:0x64;await this[_0x26a063(0x256)](Math[_0x26a063(0x319)](_0xf83d01,_0x38bedd)),_0x38bedd=Math[_0x26a063(0x13b)](0x0,await _0x1bf9cc());}},'turnstileLoaded':![],'_turnstileContainer':null,'_turnstileOverlay':null,'_turnstileWidgetId':null,'_lastSitekey':null,'_cachedSitekey':null,'_sitekeyAttempts':0x0,async 'loadTurnstile'(){const _0x1cc10b=_0x40b50f;if(window[_0x1cc10b(0x379)])return this['turnstileLoaded']=!![],Promise[_0x1cc10b(0x1dd)]();return new Promise((_0x1cb6d1,_0x347318)=>{const _0x4f32d1=_0x1cc10b;if(document[_0x4f32d1(0x2fa)](_0x4f32d1(0x312))){const _0x5cadd1=()=>{const _0x343f3a=_0x4f32d1;window['turnstile']?(this[_0x343f3a(0x18b)]=!![],_0x1cb6d1()):setTimeout(_0x5cadd1,0x64);};return _0x5cadd1();}const _0x1a06e8=document[_0x4f32d1(0x2c9)](_0x4f32d1(0x146));_0x1a06e8[_0x4f32d1(0x1e1)]='https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit',_0x1a06e8[_0x4f32d1(0x153)]=!![],_0x1a06e8[_0x4f32d1(0x2dd)]=!![],_0x1a06e8['onload']=()=>{const _0x2f6d19=_0x4f32d1;this[_0x2f6d19(0x18b)]=!![],_0x51fd10[_0x2f6d19(0x14c)](_0x2f6d19(0x35d),_0x2f6d19(0x260)),_0x1cb6d1();},_0x1a06e8[_0x4f32d1(0x375)]=()=>{const _0xcf6be4=_0x4f32d1;_0x51fd10[_0xcf6be4(0x14c)](_0xcf6be4(0x264),_0xcf6be4(0x2a7)),_0x347318(new Error(_0xcf6be4(0x14e)));},document[_0x4f32d1(0x202)][_0x4f32d1(0x251)](_0x1a06e8);});},'ensureTurnstileContainer'(){const _0x529bba=_0x40b50f;return(!this['_turnstileContainer']||!document[_0x529bba(0x37c)][_0x529bba(0x2be)](this['_turnstileContainer']))&&(this[_0x529bba(0x154)]&&this[_0x529bba(0x154)][_0x529bba(0x199)](),this['_turnstileContainer']=document[_0x529bba(0x2c9)](_0x529bba(0x167)),this[_0x529bba(0x154)]['style'][_0x529bba(0x1a8)]=_0x529bba(0x25c),this['_turnstileContainer'][_0x529bba(0x151)]('aria-hidden',_0x529bba(0x1b5)),this['_turnstileContainer']['id']=_0x529bba(0x30a),document[_0x529bba(0x37c)][_0x529bba(0x251)](this[_0x529bba(0x154)])),this[_0x529bba(0x154)];},'ensureTurnstileOverlayContainer'(){const _0x559739=_0x40b50f;if(this[_0x559739(0x378)]&&document[_0x559739(0x37c)]['contains'](this[_0x559739(0x378)]))return this[_0x559739(0x378)];const _0x3d0af9=document[_0x559739(0x2c9)](_0x559739(0x167));_0x3d0af9['id']=_0x559739(0x229),_0x3d0af9[_0x559739(0x2a5)][_0x559739(0x1a8)]=_0x559739(0x177);const _0x475509=document[_0x559739(0x2c9)]('div');_0x475509[_0x559739(0x252)]=_0x51fd10['t'](_0x559739(0x20f)),_0x475509[_0x559739(0x2a5)][_0x559739(0x1a8)]='font-size:\x2018px;\x20margin-bottom:\x2020px;\x20text-align:\x20center;';const _0x3d5fab=document[_0x559739(0x2c9)](_0x559739(0x167));_0x3d5fab['id']=_0x559739(0x349),_0x3d5fab[_0x559739(0x2a5)][_0x559739(0x1a8)]=_0x559739(0x31e);const _0x3586c4=document[_0x559739(0x2c9)](_0x559739(0x27f));return _0x3586c4[_0x559739(0x252)]=_0x51fd10['t'](_0x559739(0x2ad)),_0x3586c4[_0x559739(0x2a5)][_0x559739(0x1a8)]='\x0a\x20\x20\x20\x20\x20\x20\x20\x20background:\x20#dc3545;\x20color:\x20white;\x20border:\x20none;\x20padding:\x2010px\x2020px;\x0a\x20\x20\x20\x20\x20\x20\x20\x20border-radius:\x205px;\x20cursor:\x20pointer;\x20font-size:\x2014px;\x0a\x20\x20\x20\x20\x20\x20',_0x3586c4[_0x559739(0x24e)]('click',()=>{const _0x3e0bd3=_0x559739;_0x3d0af9[_0x3e0bd3(0x2a5)]['display']='none';}),_0x3d0af9['appendChild'](_0x475509),_0x3d0af9[_0x559739(0x251)](_0x3d5fab),_0x3d0af9[_0x559739(0x251)](_0x3586c4),document[_0x559739(0x37c)][_0x559739(0x251)](_0x3d0af9),this[_0x559739(0x378)]=_0x3d0af9,_0x3d0af9;},async 'executeTurnstile'(_0xcc5c66,_0x22061c=_0x40b50f(0x302)){const _0x68b0ad=_0x40b50f;await this[_0x68b0ad(0x1cd)]();if(this['_turnstileWidgetId']&&this[_0x68b0ad(0x2f7)]===_0xcc5c66&&window['turnstile']?.[_0x68b0ad(0x233)])try{_0x51fd10['addDebugLog'](_0x68b0ad(0x314),'info');const _0x32389f=await Promise[_0x68b0ad(0x1d3)]([window[_0x68b0ad(0x379)][_0x68b0ad(0x233)](this['_turnstileWidgetId'],{'action':_0x22061c}),new Promise((_0x38a65f,_0x1e6646)=>setTimeout(()=>_0x1e6646(new Error('Execute\x20timeout')),0x3a98))]);if(_0x32389f&&_0x32389f[_0x68b0ad(0x37a)]>0x14)return _0x51fd10['addDebugLog'](_0x68b0ad(0x280),'success'),_0x32389f;}catch(_0x41fd38){_0x51fd10[_0x68b0ad(0x14c)](_0x68b0ad(0x13c)+_0x41fd38[_0x68b0ad(0x242)],_0x68b0ad(0x19b));}const _0x497b2e=await this[_0x68b0ad(0x14d)](_0xcc5c66,_0x22061c);if(_0x497b2e&&_0x497b2e['length']>0x14)return _0x497b2e;if(_0x5757f9['autonomousMode'])return _0x51fd10[_0x68b0ad(0x14c)]('Autonomous\x20mode:\x20skipping\x20interactive\x20widget\x20to\x20avoid\x20user\x20interaction','info'),null;return _0x51fd10['addDebugLog'](_0x68b0ad(0x2db),_0x68b0ad(0x19b)),await this[_0x68b0ad(0x1b1)](_0xcc5c66,_0x22061c);},async 'createTurnstileWidget'(_0x1cf211,_0x32d179){return new Promise(_0x4b4b47=>{const _0x208c21=_0x31e4;try{if(this[_0x208c21(0x208)]&&window[_0x208c21(0x379)]?.['remove'])try{window[_0x208c21(0x379)]['remove'](this[_0x208c21(0x208)]),_0x51fd10[_0x208c21(0x14c)](_0x208c21(0x343),'info');}catch(_0x8bc8b5){_0x51fd10['addDebugLog'](_0x208c21(0x37e)+_0x8bc8b5[_0x208c21(0x242)],_0x208c21(0x19b));}const _0x250893=this[_0x208c21(0x22d)]();_0x250893[_0x208c21(0x1e9)]='';if(!window[_0x208c21(0x379)]?.[_0x208c21(0x34d)]){_0x51fd10['addDebugLog'](_0x208c21(0x1f9),'error'),_0x4b4b47(null);return;}_0x51fd10[_0x208c21(0x14c)](_0x208c21(0x341),'info');const _0x56c21e=window[_0x208c21(0x379)]['render'](_0x250893,{'sitekey':_0x1cf211,'action':_0x32d179,'size':_0x208c21(0x258),'retry':_0x208c21(0x320),'retry-interval':0x1f40,'callback':_0x3c5541=>{const _0x56b1af=_0x208c21;_0x51fd10[_0x56b1af(0x14c)]('Invisible\x20Turnstile\x20callback\x20received',_0x56b1af(0x260)),_0x4b4b47(_0x3c5541);},'error-callback':_0x15428a=>{const _0x596edb=_0x208c21;_0x51fd10[_0x596edb(0x14c)](_0x596edb(0x297)+_0x15428a,_0x596edb(0x2a7)),_0x4b4b47(null);},'timeout-callback':()=>{const _0x450115=_0x208c21;_0x51fd10[_0x450115(0x14c)]('Turnstile\x20timeout','warning'),_0x4b4b47(null);}});this['_turnstileWidgetId']=_0x56c21e,this[_0x208c21(0x2f7)]=_0x1cf211;if(!_0x56c21e)return _0x51fd10[_0x208c21(0x14c)]('Failed\x20to\x20create\x20Turnstile\x20widget',_0x208c21(0x2a7)),_0x4b4b47(null);Promise[_0x208c21(0x1d3)]([window['turnstile'][_0x208c21(0x233)](_0x56c21e,{'action':_0x32d179}),new Promise((_0x256bb1,_0x39f1ce)=>setTimeout(()=>_0x39f1ce(new Error(_0x208c21(0x163))),0x2ee0))])['then'](_0x4b4b47)[_0x208c21(0x1c9)](_0x1aad9e=>{const _0x3814d5=_0x208c21;_0x51fd10[_0x3814d5(0x14c)](_0x3814d5(0x37f)+_0x1aad9e['message'],'error'),_0x4b4b47(null);});}catch(_0x4219d5){_0x51fd10[_0x208c21(0x14c)](_0x208c21(0x1f7)+_0x4219d5[_0x208c21(0x242)],_0x208c21(0x2a7)),_0x4b4b47(null);}});},async 'createTurnstileWidgetInteractive'(_0x551900,_0x396c49){const _0x2a5e7e=_0x40b50f;return _0x51fd10[_0x2a5e7e(0x14c)](_0x2a5e7e(0x2c1),_0x2a5e7e(0x303)),new Promise(_0x3eea17=>{const _0x2359f5=_0x2a5e7e;try{if(this['_turnstileWidgetId']&&window[_0x2359f5(0x379)]?.[_0x2359f5(0x199)])try{window['turnstile'][_0x2359f5(0x199)](this[_0x2359f5(0x208)]);}catch(_0x2ca9e0){_0x51fd10[_0x2359f5(0x14c)](_0x2359f5(0x37e)+_0x2ca9e0[_0x2359f5(0x242)],_0x2359f5(0x19b));}const _0x4c30ea=this[_0x2359f5(0x1de)]();_0x4c30ea['style']['display']=_0x2359f5(0x305);const _0x2a3f9d=_0x4c30ea[_0x2359f5(0x2fa)](_0x2359f5(0x155));_0x2a3f9d[_0x2359f5(0x1e9)]='';const _0x4241aa=setTimeout(()=>{const _0x275346=_0x2359f5;_0x51fd10['addDebugLog'](_0x275346(0x188),_0x275346(0x19b)),_0x4c30ea[_0x275346(0x2a5)][_0x275346(0x2da)]='none',_0x3eea17(null);},0xea60),_0x24896d=window['turnstile'][_0x2359f5(0x34d)](_0x2a3f9d,{'sitekey':_0x551900,'action':_0x396c49,'size':_0x2359f5(0x2cc),'theme':_0x2359f5(0x320),'callback':_0x1c2a15=>{const _0x164773=_0x2359f5;clearTimeout(_0x4241aa),_0x4c30ea[_0x164773(0x2a5)]['display']='none',_0x51fd10[_0x164773(0x14c)](_0x164773(0x174),_0x164773(0x260)),typeof _0x1c2a15==='string'&&_0x1c2a15[_0x164773(0x37a)]>0x14?_0x3eea17(_0x1c2a15):(_0x51fd10['addDebugLog'](_0x164773(0x1cb),_0x164773(0x19b)),_0x3eea17(null));},'error-callback':_0x345d3b=>{const _0x893c81=_0x2359f5;clearTimeout(_0x4241aa),_0x4c30ea[_0x893c81(0x2a5)][_0x893c81(0x2da)]='none',_0x51fd10[_0x893c81(0x14c)](_0x893c81(0x1ea)+_0x345d3b,_0x893c81(0x2a7)),_0x3eea17(null);}});this[_0x2359f5(0x208)]=_0x24896d,this[_0x2359f5(0x2f7)]=_0x551900,!_0x24896d?(clearTimeout(_0x4241aa),_0x4c30ea[_0x2359f5(0x2a5)][_0x2359f5(0x2da)]=_0x2359f5(0x2b9),_0x51fd10[_0x2359f5(0x14c)](_0x2359f5(0x37b),_0x2359f5(0x2a7)),_0x3eea17(null)):_0x51fd10[_0x2359f5(0x14c)](_0x2359f5(0x307),'info');}catch(_0x46852d){_0x51fd10[_0x2359f5(0x14c)](_0x2359f5(0x1a5)+_0x46852d[_0x2359f5(0x242)],_0x2359f5(0x2a7)),_0x3eea17(null);}});},'cleanupTurnstile'(){const _0x12f981=_0x40b50f;if(this[_0x12f981(0x208)]&&window[_0x12f981(0x379)]?.[_0x12f981(0x199)])try{window[_0x12f981(0x379)][_0x12f981(0x199)](this[_0x12f981(0x208)]);}catch(_0xd13f8c){_0x51fd10['addDebugLog'](_0x12f981(0x2ea)+_0xd13f8c['message'],_0x12f981(0x19b));}this[_0x12f981(0x154)]&&document[_0x12f981(0x37c)][_0x12f981(0x2be)](this['_turnstileContainer'])&&this[_0x12f981(0x154)][_0x12f981(0x199)](),this[_0x12f981(0x378)]&&document['body'][_0x12f981(0x2be)](this[_0x12f981(0x378)])&&this[_0x12f981(0x378)]['remove'](),this[_0x12f981(0x208)]=null,this[_0x12f981(0x154)]=null,this[_0x12f981(0x378)]=null,this[_0x12f981(0x2f7)]=null;},async 'obtainSitekeyAndToken'(_0x2bef15=_0x40b50f(0x29f)){const _0x1b8e5e=_0x40b50f;if(this['_cachedSitekey']&&this[_0x1b8e5e(0x324)]<0x3)return _0x51fd10['addDebugLog'](_0x1b8e5e(0x322)+this[_0x1b8e5e(0x36b)],_0x1b8e5e(0x303)),_0x327512()?{'sitekey':this[_0x1b8e5e(0x36b)],'token':_0x3724f5}:{'sitekey':this[_0x1b8e5e(0x36b)],'token':null};const _0x107ed1=[_0x1b8e5e(0x29f),_0x1b8e5e(0x140),_0x1b8e5e(0x1cc)],_0x11c2c2=async(_0x37dcd8,_0x2d33c2)=>{const _0x5eb707=_0x1b8e5e;if(!_0x37dcd8||_0x37dcd8[_0x5eb707(0x37a)]<0xa)return null;_0x51fd10[_0x5eb707(0x14c)](_0x5eb707(0x34f)+_0x2d33c2+':\x20'+_0x37dcd8,'info');const _0x12d4c9=await this[_0x5eb707(0x170)](_0x37dcd8);return _0x12d4c9&&_0x12d4c9[_0x5eb707(0x37a)]>=0x14?(_0x51fd10[_0x5eb707(0x14c)](_0x5eb707(0x185)+_0x2d33c2+_0x5eb707(0x1c4),_0x5eb707(0x260)),_0x48301b(_0x12d4c9),this['_cachedSitekey']=_0x37dcd8,this[_0x5eb707(0x324)]=0x0,{'sitekey':_0x37dcd8,'token':_0x12d4c9}):(_0x51fd10[_0x5eb707(0x14c)](_0x5eb707(0x21a)+_0x2d33c2+_0x5eb707(0x1c4),_0x5eb707(0x19b)),null);};try{this[_0x1b8e5e(0x324)]++;const _0x2a2312=[()=>{const _0xd67d02=_0x1b8e5e,_0x4db245=document[_0xd67d02(0x2fa)](_0xd67d02(0x33f));return _0x4db245?_0x4db245[_0xd67d02(0x344)]('data-sitekey'):null;},()=>{const _0x320536=_0x1b8e5e,_0x5b0bd1=document[_0x320536(0x2fa)](_0x320536(0x329));return _0x5b0bd1?.[_0x320536(0x299)]?.['sitekey']||null;},()=>{const _0x551f1f=_0x1b8e5e,_0x119e53=document['querySelectorAll']('meta[name*=\x22turnstile\x22],\x20meta[property*=\x22turnstile\x22]');for(const _0x48c44d of _0x119e53){const _0x161e6e=_0x48c44d['getAttribute'](_0x551f1f(0x285));if(_0x161e6e&&_0x161e6e[_0x551f1f(0x37a)]>0xa)return _0x161e6e;}return null;},()=>window['__TURNSTILE_SITEKEY']||null,()=>{const _0x50370c=_0x1b8e5e,_0x1faa8a=document[_0x50370c(0x369)](_0x50370c(0x146));for(const _0x465fc3 of _0x1faa8a){const _0x3ff8e8=_0x465fc3['textContent']||_0x465fc3[_0x50370c(0x1e9)],_0x199fe8=_0x3ff8e8['match'](/(?:sitekey|data-sitekey)['"\s\[\]:\=\(]*['"]?([0-9a-zA-Z_-]{20,})['"]?/i);if(_0x199fe8&&_0x199fe8[0x1])return _0x199fe8[0x1][_0x50370c(0x186)](/['"]/g,'');}return null;}];for(const _0x594daa of _0x2a2312){try{const _0x694d3f=_0x594daa();if(_0x694d3f){const _0x370489=await _0x11c2c2(_0x694d3f,'detection\x20method');if(_0x370489)return _0x370489;}}catch(_0x1cfdaa){_0x51fd10['addDebugLog'](_0x1b8e5e(0x35e)+_0x1cfdaa['message'],_0x1b8e5e(0x19b));}}_0x51fd10[_0x1b8e5e(0x14c)](_0x1b8e5e(0x2f4),_0x1b8e5e(0x303));for(const _0x4cf589 of _0x107ed1){const _0x112659=await _0x11c2c2(_0x4cf589,_0x1b8e5e(0x165));if(_0x112659)return _0x112659;}}catch(_0x418b33){_0x51fd10[_0x1b8e5e(0x14c)](_0x1b8e5e(0x2d1)+_0x418b33['message'],_0x1b8e5e(0x19b));}_0x51fd10['addDebugLog'](_0x1b8e5e(0x17d)+_0x2bef15,_0x1b8e5e(0x303));const _0x309cc7=await _0x11c2c2(_0x2bef15,_0x1b8e5e(0x2df));if(_0x309cc7)return _0x309cc7;return _0x51fd10['addDebugLog'](_0x1b8e5e(0x2c0),_0x1b8e5e(0x2a7)),{'sitekey':null,'token':null};}};class _0x2027c7{constructor(){const _0x4e05f9=_0x40b50f;this['originalTiles']=new Map(),this[_0x4e05f9(0x2c6)]=new Map(),this[_0x4e05f9(0x2b6)]=0x3e8,this[_0x4e05f9(0x234)]=new Map(),this[_0x4e05f9(0x1e4)]=_0x5757f9[_0x4e05f9(0x1e4)];}async[_0x40b50f(0x1ed)](_0x22306a){const _0xf5dc00=_0x40b50f,{endpoint:_0x148fd8,blobID:_0x5db47b,blobData:_0x2bebce}=_0x22306a,_0x24d67a=_0x148fd8[_0xf5dc00(0x26c)](/(\d+)\/(\d+)\.png/);if(_0x24d67a){const _0x566c3a=parseInt(_0x24d67a[0x1],0xa),_0x25dbf0=parseInt(_0x24d67a[0x2],0xa),_0x2766bc=_0x566c3a+','+_0x25dbf0;try{const _0x55b20d=await createImageBitmap(_0x2bebce);this[_0xf5dc00(0x18d)][_0xf5dc00(0x16a)](_0x2766bc,_0x55b20d);try{let _0x1b54ec,_0x567164;typeof OffscreenCanvas!==_0xf5dc00(0x1c0)?(_0x1b54ec=new OffscreenCanvas(_0x55b20d['width'],_0x55b20d['height']),_0x567164=_0x1b54ec['getContext']('2d')):(_0x1b54ec=document['createElement'](_0xf5dc00(0x290)),_0x1b54ec['width']=_0x55b20d['width'],_0x1b54ec[_0xf5dc00(0x250)]=_0x55b20d['height'],_0x567164=_0x1b54ec[_0xf5dc00(0x23e)]('2d'));_0x567164['imageSmoothingEnabled']=![],_0x567164[_0xf5dc00(0x248)](_0x55b20d,0x0,0x0);const _0x2d1cdb=_0x567164[_0xf5dc00(0x332)](0x0,0x0,_0x55b20d[_0xf5dc00(0x36c)],_0x55b20d['height']);this[_0xf5dc00(0x2c6)][_0xf5dc00(0x16a)](_0x2766bc,{'w':_0x55b20d['width'],'h':_0x55b20d['height'],'data':new Uint8ClampedArray(_0x2d1cdb[_0xf5dc00(0x2e5)])}),this[_0xf5dc00(0x1e4)]&&_0x51fd10['addDebugLog'](_0xf5dc00(0x159)+_0x2766bc+'\x20('+_0x55b20d[_0xf5dc00(0x36c)]+'x'+_0x55b20d[_0xf5dc00(0x250)]+')',_0xf5dc00(0x303));}catch(_0x381ed5){_0x51fd10[_0xf5dc00(0x14c)](_0xf5dc00(0x2e3)+_0x2766bc+'\x20-\x20'+_0x381ed5[_0xf5dc00(0x242)],_0xf5dc00(0x19b));}}catch(_0x28b932){_0x51fd10['addDebugLog'](_0xf5dc00(0x16c)+_0x2766bc+'\x20-\x20'+_0x28b932['message'],_0xf5dc00(0x2a7));}}window[_0xf5dc00(0x28e)]({'source':'auto-image-overlay','blobID':_0x5db47b,'blobData':_0x2bebce},'*');}async[_0x40b50f(0x317)](_0x397de2,_0x16f564,_0x8c87ba,_0x316daa){const _0x37cb52=_0x40b50f,_0x463a40=_0x397de2+','+_0x16f564,_0x283257=_0x5757f9[_0x37cb52(0x1c3)]||_0x25ad89[_0x37cb52(0x144)],_0x53c218=this[_0x37cb52(0x2c6)][_0x37cb52(0x1d8)](_0x463a40);if(_0x53c218&&_0x53c218[_0x37cb52(0x2e5)]&&_0x53c218['w']>0x0&&_0x53c218['h']>0x0){const _0x18b6bd=Math[_0x37cb52(0x13b)](0x0,Math[_0x37cb52(0x319)](_0x53c218['w']-0x1,_0x8c87ba)),_0x1a2348=Math['max'](0x0,Math[_0x37cb52(0x319)](_0x53c218['h']-0x1,_0x316daa)),_0x9de7b8=(_0x1a2348*_0x53c218['w']+_0x18b6bd)*0x4,_0x15ff8a=_0x53c218[_0x37cb52(0x2e5)],_0x197e8e=_0x15ff8a[_0x9de7b8+0x3];if(!_0x5757f9['paintTransparentPixels']&&_0x197e8e<_0x283257)return null;return[_0x15ff8a[_0x9de7b8],_0x15ff8a[_0x9de7b8+0x1],_0x15ff8a[_0x9de7b8+0x2],_0x197e8e];}const _0x3038f6=this[_0x37cb52(0x18d)][_0x37cb52(0x1d8)](_0x463a40);if(!_0x3038f6)return this['autonomousMode']&&_0x51fd10[_0x37cb52(0x14c)](_0x37cb52(0x175)+_0x463a40+_0x37cb52(0x36f),_0x37cb52(0x19b)),null;try{let _0x1dbf04,_0x257b5f;typeof OffscreenCanvas!==_0x37cb52(0x1c0)?(_0x1dbf04=new OffscreenCanvas(_0x3038f6['width'],_0x3038f6[_0x37cb52(0x250)]),_0x257b5f=_0x1dbf04[_0x37cb52(0x23e)]('2d')):(_0x1dbf04=document[_0x37cb52(0x2c9)](_0x37cb52(0x290)),_0x1dbf04[_0x37cb52(0x36c)]=_0x3038f6['width'],_0x1dbf04[_0x37cb52(0x250)]=_0x3038f6['height'],_0x257b5f=_0x1dbf04[_0x37cb52(0x23e)]('2d'));_0x257b5f[_0x37cb52(0x2e0)]=![],_0x257b5f['drawImage'](_0x3038f6,0x0,0x0);const _0x110cdb=Math[_0x37cb52(0x13b)](0x0,Math[_0x37cb52(0x319)](_0x3038f6[_0x37cb52(0x36c)]-0x1,_0x8c87ba)),_0x22a211=Math[_0x37cb52(0x13b)](0x0,Math[_0x37cb52(0x319)](_0x3038f6['height']-0x1,_0x316daa)),_0x40d054=_0x257b5f['getImageData'](_0x110cdb,_0x22a211,0x1,0x1)['data'],_0x5d3407=_0x40d054[0x3];if(!_0x5757f9['paintTransparentPixels']&&_0x5d3407<_0x283257)return null;return[_0x40d054[0x0],_0x40d054[0x1],_0x40d054[0x2],_0x5d3407];}catch(_0x354f38){return _0x51fd10[_0x37cb52(0x14c)](_0x37cb52(0x255)+_0x463a40+':\x20'+_0x354f38[_0x37cb52(0x242)],_0x37cb52(0x2a7)),null;}}async[_0x40b50f(0x1d7)](_0x1e537f,_0xd42af5,_0x5fcf8f,_0xb76355,_0x3eec57=0x0,_0x478824=0x0,_0x15fedc=0x3a98){const _0x1311c0=_0x40b50f,{startTileX:_0x1ef8ac,startTileY:_0x2515af,endTileX:_0x31dd34,endTileY:_0x4fb9dc}=_0x51fd10[_0x1311c0(0x1ce)](_0x1e537f,_0xd42af5,_0x3eec57,_0x478824,_0x5fcf8f,_0xb76355,this[_0x1311c0(0x2b6)]),_0x1cfecb=[];for(let _0x399528=_0x2515af;_0x399528<=_0x4fb9dc;_0x399528++){for(let _0xcbff31=_0x1ef8ac;_0xcbff31<=_0x31dd34;_0xcbff31++){_0x1cfecb['push'](_0xcbff31+','+_0x399528);}}if(_0x1cfecb['length']===0x0)return!![];_0x51fd10[_0x1311c0(0x14c)](_0x1311c0(0x143)+_0x1cfecb[_0x1311c0(0x37a)]+'\x20tiles\x20(autonomous:\x20'+this[_0x1311c0(0x1e4)]+_0x1311c0(0x149),'info');const _0x13881b=Date[_0x1311c0(0x330)]();let _0x1036ed=0x0;while(Date[_0x1311c0(0x330)]()-_0x13881b<_0x15fedc){if(_0x5757f9['stopFlag'])return _0x51fd10['addDebugLog']('waitForTiles:\x20stopped\x20by\x20user','warning'),![];const _0x15bea7=_0x1cfecb['filter'](_0x17da4f=>this['originalTiles'][_0x1311c0(0x1bc)](_0x17da4f))[_0x1311c0(0x37a)],_0x4b9149=Math[_0x1311c0(0x34a)](_0x15bea7/_0x1cfecb[_0x1311c0(0x37a)]*0x64);_0x4b9149!==_0x1036ed&&_0x4b9149%0x14===0x0&&(_0x51fd10['addDebugLog'](_0x1311c0(0x2a8)+_0x15bea7+'/'+_0x1cfecb[_0x1311c0(0x37a)]+'\x20('+_0x4b9149+'%)','info'),_0x1036ed=_0x4b9149);if(_0x15bea7===_0x1cfecb[_0x1311c0(0x37a)])return _0x51fd10['addDebugLog'](_0x1311c0(0x381)+_0x1cfecb[_0x1311c0(0x37a)]+_0x1311c0(0x1af),_0x1311c0(0x260)),!![];await _0x51fd10[_0x1311c0(0x256)](this[_0x1311c0(0x1e4)]?0x1f4:0x3e8);}const _0x2e6c02=_0x1cfecb[_0x1311c0(0x1cf)](_0x4c40af=>this[_0x1311c0(0x18d)][_0x1311c0(0x1bc)](_0x4c40af))[_0x1311c0(0x37a)];_0x51fd10[_0x1311c0(0x14c)](_0x1311c0(0x187)+_0x2e6c02+'/'+_0x1cfecb[_0x1311c0(0x37a)]+_0x1311c0(0x2b4),_0x1311c0(0x19b));if(this[_0x1311c0(0x1e4)]&&_0x2e6c02>_0x1cfecb[_0x1311c0(0x37a)]*0.8)return _0x51fd10['addDebugLog'](_0x1311c0(0x26f)+_0x2e6c02+'/'+_0x1cfecb[_0x1311c0(0x37a)]+_0x1311c0(0x2bc),_0x1311c0(0x19b)),!![];return _0x2e6c02>0x0;}}const _0x30833f=new _0x2027c7(),_0x56166a={async 'paintPixelInRegion'(_0x1614ea,_0x19213c,_0xcdd62b,_0x46b18d,_0x55e9b0,_0x31424d=0x0){const _0x2350d5=_0x40b50f;try{await _0xf634e1();if(!_0x3724f5)return _0x51fd10[_0x2350d5(0x14c)](_0x2350d5(0x2c5),_0x2350d5(0x2a7)),_0x2350d5(0x2d6);const _0x26241f={'coords':[_0xcdd62b,_0x46b18d],'colors':[_0x55e9b0],'t':_0x3724f5,'fp':_0x32ae7a(0xa)},_0x500ca2=await _0x149a26(_0x1614ea,_0x19213c,_0x26241f);if(!_0x500ca2)return _0x51fd10[_0x2350d5(0x14c)]('Failed\x20to\x20generate\x20WASM\x20token',_0x2350d5(0x2a7)),![];const _0x3c31c2=await fetch(_0x2350d5(0x1c5)+_0x1614ea+'/'+_0x19213c,{'method':_0x2350d5(0x2ed),'headers':{'Content-Type':_0x2350d5(0x13a),'x-pawtect-token':_0x500ca2},'credentials':_0x2350d5(0x2d9),'body':JSON[_0x2350d5(0x1d1)](_0x26241f)});if(_0x3c31c2[_0x2350d5(0x270)]===0x193){_0x51fd10[_0x2350d5(0x14c)](_0x2350d5(0x1a9)+_0xcdd62b+','+_0x46b18d+').\x20Token\x20invalid/expired.',_0x2350d5(0x2a7)),_0xe98abc();if(_0x31424d<0x2&&_0x5757f9[_0x2350d5(0x1e4)])return _0x51fd10['addDebugLog'](_0x2350d5(0x1d0)+(_0x31424d+0x1)+_0x2350d5(0x2a3)+_0xcdd62b+','+_0x46b18d+')',_0x2350d5(0x19b)),await _0x51fd10[_0x2350d5(0x256)](0x3e8),await this[_0x2350d5(0x158)](_0x1614ea,_0x19213c,_0xcdd62b,_0x46b18d,_0x55e9b0,_0x31424d+0x1);return _0x2350d5(0x2d6);}if(!_0x3c31c2['ok'])return _0x51fd10['addDebugLog'](_0x2350d5(0x373)+_0x3c31c2[_0x2350d5(0x270)],_0x2350d5(0x2a7)),![];const _0x166d18=await _0x3c31c2['json'](),_0xc02cb9=_0x166d18?.[_0x2350d5(0x359)]===0x1;return _0xc02cb9?_0x51fd10[_0x2350d5(0x14c)](_0x2350d5(0x372)+_0xcdd62b+','+_0x46b18d+_0x2350d5(0x308)+_0x55e9b0,_0x2350d5(0x260)):_0x51fd10[_0x2350d5(0x14c)]('Paint\x20FAILED\x20for\x20('+_0xcdd62b+','+_0x46b18d+_0x2350d5(0x377)+JSON['stringify'](_0x166d18),_0x2350d5(0x2a7)),_0xc02cb9;}catch(_0x591b9a){return _0x51fd10[_0x2350d5(0x14c)](_0x2350d5(0x230)+_0xcdd62b+','+_0x46b18d+_0x2350d5(0x334)+_0x591b9a[_0x2350d5(0x242)],'error'),![];}},async 'getCharges'(){const _0x1232f2=_0x40b50f;try{const _0x1aee1f=await fetch(_0x1232f2(0x22c),{'credentials':_0x1232f2(0x2d9)});if(!_0x1aee1f['ok'])return{'charges':0x0,'max':0x1,'cooldown':_0x25ad89[_0x1232f2(0x1ae)]};const _0x4b4226=await _0x1aee1f['json']();return{'charges':_0x4b4226[_0x1232f2(0x27c)]?.[_0x1232f2(0x16f)]??0x0,'max':_0x4b4226[_0x1232f2(0x27c)]?.[_0x1232f2(0x13b)]??0x1,'cooldown':_0x4b4226[_0x1232f2(0x27c)]?.[_0x1232f2(0x1d6)]??_0x25ad89[_0x1232f2(0x1ae)]};}catch(_0x2ae471){return _0x51fd10[_0x1232f2(0x14c)]('Error\x20fetching\x20charges:\x20'+_0x2ae471[_0x1232f2(0x242)],_0x1232f2(0x19b)),{'charges':0x0,'max':0x1,'cooldown':_0x25ad89[_0x1232f2(0x1ae)]};}}};async function _0x30412e(){const _0x5ab0bc=_0x40b50f;if(!_0x5757f9['imageData']||!_0x5757f9['startPosition']||!_0x5757f9[_0x5ab0bc(0x310)])return _0x51fd10[_0x5ab0bc(0x14c)](_0x5ab0bc(0x157),'warning'),[];_0x51fd10[_0x5ab0bc(0x14c)](_0x5ab0bc(0x132),_0x5ab0bc(0x303)),_0x11fef9(_0x51fd10['t']('scanningForDamage'));const _0x443c40=[],{width:_0x5d5098,height:_0x1e87f4,pixels:_0x87f5bb}=_0x5757f9[_0x5ab0bc(0x268)],_0x9529d2=await _0x30833f[_0x5ab0bc(0x1d7)](_0x5757f9[_0x5ab0bc(0x310)]['x'],_0x5757f9[_0x5ab0bc(0x310)]['y'],_0x5d5098,_0x1e87f4,_0x5757f9[_0x5ab0bc(0x2c2)]['x'],_0x5757f9['startPosition']['y'],_0x5757f9['autonomousMode']?0x4e20:0x3a98);if(!_0x9529d2)return _0x51fd10[_0x5ab0bc(0x14c)]('Failed\x20to\x20load\x20required\x20tiles\x20for\x20scanning',_0x5ab0bc(0x2a7)),_0x5757f9['autonomousMode']&&(_0x51fd10['addDebugLog'](_0x5ab0bc(0x342),'warning'),setTimeout(()=>{const _0xfe8406=_0x5ab0bc;_0x5757f9['autoRepairEnabled']&&!_0x5757f9[_0xfe8406(0x1bd)]&&_0x30412e();},0x7530)),[];_0x51fd10[_0x5ab0bc(0x14c)]('Scanning\x20'+_0x5d5098+'x'+_0x1e87f4+'\x20image\x20for\x20damage\x20(autonomous:\x20'+_0x5757f9['autonomousMode']+_0x5ab0bc(0x149),_0x5ab0bc(0x303));let _0x5a3d39=0x0,_0x1033ed=Date['now']();for(let _0x2290b0=0x0;_0x2290b0<_0x1e87f4;_0x2290b0++){for(let _0x5ab99f=0x0;_0x5ab99f<_0x5d5098;_0x5ab99f++){if(_0x5757f9[_0x5ab0bc(0x1bd)])break;const _0x8e0727=(_0x2290b0*_0x5d5098+_0x5ab99f)*0x4,_0x1a6e01=_0x87f5bb[_0x8e0727],_0x3894e5=_0x87f5bb[_0x8e0727+0x1],_0xd57aec=_0x87f5bb[_0x8e0727+0x2],_0x3955cf=_0x87f5bb[_0x8e0727+0x3];if(!_0x5757f9[_0x5ab0bc(0x2bb)]&&_0x3955cf<_0x25ad89[_0x5ab0bc(0x144)])continue;if(!_0x5757f9[_0x5ab0bc(0x28b)]&&_0x51fd10[_0x5ab0bc(0x306)](_0x1a6e01,_0x3894e5,_0xd57aec))continue;_0x5a3d39++;const _0x333560=_0x5757f9['startPosition']['x']+_0x5ab99f,_0x48e1cd=_0x5757f9[_0x5ab0bc(0x2c2)]['y']+_0x2290b0,_0x554449=_0x5757f9[_0x5ab0bc(0x310)]['x']+Math[_0x5ab0bc(0x1ba)](_0x333560/0x3e8),_0xa8faa1=_0x5757f9[_0x5ab0bc(0x310)]['y']+Math[_0x5ab0bc(0x1ba)](_0x48e1cd/0x3e8),_0x59b9b8=_0x333560%0x3e8,_0x110a7c=_0x48e1cd%0x3e8;try{const _0x283246=await _0x30833f[_0x5ab0bc(0x317)](_0x554449,_0xa8faa1,_0x59b9b8,_0x110a7c);if(!_0x283246){!_0x5757f9[_0x5ab0bc(0x1e4)]&&_0x51fd10[_0x5ab0bc(0x14c)](_0x5ab0bc(0x2b7)+_0x5ab99f+','+_0x2290b0+')\x20-\x20tile\x20'+_0x554449+','+_0xa8faa1,_0x5ab0bc(0x19b));continue;}const _0x2aa5c1=_0x51fd10[_0x5ab0bc(0x29e)]([_0x1a6e01,_0x3894e5,_0xd57aec],_0x5757f9['availableColors']),_0x3feb74=_0x51fd10[_0x5ab0bc(0x29e)](_0x283246[_0x5ab0bc(0x284)](0x0,0x3),_0x5757f9[_0x5ab0bc(0x2a9)]);_0x2aa5c1['id']!==_0x3feb74['id']&&(_0x443c40[_0x5ab0bc(0x130)]({'x':_0x5ab99f,'y':_0x2290b0,'originalColor':_0x2aa5c1,'currentColor':_0x3feb74,'originalRgb':[_0x1a6e01,_0x3894e5,_0xd57aec],'currentRgb':_0x283246['slice'](0x0,0x3)}),(!_0x5757f9['autonomousMode']||_0x443c40[_0x5ab0bc(0x37a)]<=0xa)&&_0x51fd10[_0x5ab0bc(0x14c)](_0x5ab0bc(0x350)+_0x5ab99f+','+_0x2290b0+_0x5ab0bc(0x33e)+_0x2aa5c1['id']+_0x5ab0bc(0x189)+_0x3feb74['id'],_0x5ab0bc(0x19b)));}catch(_0x467c93){!_0x5757f9['autonomousMode']&&_0x51fd10[_0x5ab0bc(0x14c)](_0x5ab0bc(0x207)+_0x5ab99f+','+_0x2290b0+'):\x20'+_0x467c93[_0x5ab0bc(0x242)],_0x5ab0bc(0x2a7));}}if(_0x5757f9[_0x5ab0bc(0x1e4)]&&Date['now']()-_0x1033ed>0x1388)_0x51fd10[_0x5ab0bc(0x14c)](_0x5ab0bc(0x1ca)+_0x2290b0+'/'+_0x1e87f4+_0x5ab0bc(0x2c3)+Math[_0x5ab0bc(0x34a)](_0x2290b0/_0x1e87f4*0x64)+_0x5ab0bc(0x325)+_0x443c40[_0x5ab0bc(0x37a)]+_0x5ab0bc(0x12d),_0x5ab0bc(0x303)),_0x1033ed=Date[_0x5ab0bc(0x330)]();else!_0x5757f9[_0x5ab0bc(0x1e4)]&&_0x2290b0%0xa===0x0&&_0x51fd10['addDebugLog'](_0x5ab0bc(0x1ca)+_0x2290b0+'/'+_0x1e87f4+_0x5ab0bc(0x2c3)+Math[_0x5ab0bc(0x34a)](_0x2290b0/_0x1e87f4*0x64)+'%)',_0x5ab0bc(0x303));}const _0x23ce04=_0x443c40[_0x5ab0bc(0x37a)]>0x0?_0x5ab0bc(0x19b):_0x5ab0bc(0x260);return _0x51fd10[_0x5ab0bc(0x14c)](_0x5ab0bc(0x218)+_0x5a3d39+_0x5ab0bc(0x14a)+_0x443c40[_0x5ab0bc(0x37a)]+'\x20damaged',_0x23ce04),_0x443c40;}async function _0x1274b6(_0x336264){const _0x43e497=_0x40b50f;if(_0x336264[_0x43e497(0x37a)]===0x0)return _0x11fef9(_0x51fd10['t']('noDamageDetected')),0x0;_0x51fd10[_0x43e497(0x14c)](_0x43e497(0x240)+_0x336264[_0x43e497(0x37a)]+_0x43e497(0x34b),_0x43e497(0x303)),_0x11fef9(_0x51fd10['t'](_0x43e497(0x184),{'count':_0x336264[_0x43e497(0x37a)]}));let _0x23c02f=0x0,_0x5643dd=0x0;const _0x5e961d=_0x5757f9[_0x43e497(0x1e4)]?0x5:0x3;for(let _0x1da6fd=0x0;_0x1da6fd<_0x336264[_0x43e497(0x37a)];_0x1da6fd++){const _0x2af5df=_0x336264[_0x1da6fd];if(_0x5757f9[_0x43e497(0x1bd)]){_0x51fd10[_0x43e497(0x14c)](_0x43e497(0x282),_0x43e497(0x19b));break;}await _0x20b600();let _0x48e9ce=0x0;const _0x294c6f=_0x5757f9[_0x43e497(0x1e4)]?0x14:0xa;while(_0x5757f9[_0x43e497(0x203)]<0x1&&!_0x5757f9[_0x43e497(0x1bd)]&&_0x48e9ce<_0x294c6f){_0x48e9ce++;const _0x219288=_0x5757f9[_0x43e497(0x1e4)]?Math[_0x43e497(0x319)](_0x5757f9[_0x43e497(0x225)],0x2710):_0x5757f9[_0x43e497(0x225)];_0x48e9ce===0x1&&_0x51fd10['addDebugLog'](_0x43e497(0x209)+_0x5757f9[_0x43e497(0x203)]+'/'+_0x5757f9[_0x43e497(0x1c6)]+')',_0x43e497(0x303)),await _0x51fd10['dynamicSleep'](()=>{const _0x3ca6df=_0x43e497;if(_0x5757f9[_0x3ca6df(0x203)]>=0x1)return 0x0;if(_0x5757f9[_0x3ca6df(0x1bd)])return 0x0;return _0x219288;}),await _0x20b600();}if(_0x5757f9[_0x43e497(0x1bd)])break;if(_0x5757f9['displayCharges']<0x1){_0x51fd10['addDebugLog']('No\x20charges\x20available\x20after\x20waiting,\x20skipping\x20pixel\x20('+_0x2af5df['x']+','+_0x2af5df['y']+')',_0x43e497(0x19b));continue;}const _0x1a3b7d=await _0xecb679(_0x2af5df);if(_0x1a3b7d)_0x23c02f++,_0x5643dd=0x0,(!_0x5757f9[_0x43e497(0x1e4)]||_0x23c02f<=0xa||_0x23c02f%0xa===0x0)&&_0x51fd10[_0x43e497(0x14c)](_0x43e497(0x2ba)+_0x2af5df['x']+','+_0x2af5df['y']+_0x43e497(0x308)+_0x2af5df[_0x43e497(0x2c7)]['id']+'\x20['+_0x23c02f+'/'+_0x336264[_0x43e497(0x37a)]+']','success');else{_0x5643dd++,_0x51fd10[_0x43e497(0x14c)](_0x43e497(0x1d2)+_0x2af5df['x']+','+_0x2af5df['y']+_0x43e497(0x1f5)+_0x5643dd+'/'+_0x5e961d+_0x43e497(0x24a),_0x43e497(0x2a7));if(_0x5643dd>=_0x5e961d){_0x51fd10[_0x43e497(0x14c)](_0x43e497(0x1ac)+_0x5643dd+_0x43e497(0x22b),_0x43e497(0x2a7));_0x5757f9[_0x43e497(0x1e4)]&&(_0x51fd10['addDebugLog'](_0x43e497(0x20c),_0x43e497(0x19b)),setTimeout(()=>{const _0x56b063=_0x43e497;_0x5757f9[_0x56b063(0x301)]&&!_0x5757f9[_0x56b063(0x1bd)]&&_0x2fd742();},0xea60));break;}}await _0x20b600();const _0x31cedc=_0x5757f9['autonomousMode']?0x64:0xc8,_0x183de9=_0x5643dd>0x0?_0x31cedc*(_0x5643dd+0x1):_0x31cedc;await _0x51fd10[_0x43e497(0x256)](_0x183de9);}const _0x55761d=_0x51fd10['t']('repairComplete',{'repaired':_0x23c02f});return _0x11fef9(_0x55761d),_0x51fd10[_0x43e497(0x14c)](_0x55761d+'\x20('+(_0x336264[_0x43e497(0x37a)]-_0x23c02f)+_0x43e497(0x25f),_0x43e497(0x260)),_0x23c02f;}async function _0xecb679(_0x530df9){const _0x4f43aa=_0x40b50f,{x:_0x3d4fcf,y:_0x4ca373,originalColor:_0x33ffb}=_0x530df9,_0x1cb9f4=_0x5757f9[_0x4f43aa(0x2c2)]['x']+_0x3d4fcf,_0x58ed05=_0x5757f9[_0x4f43aa(0x2c2)]['y']+_0x4ca373,_0x4ead2a=_0x5757f9[_0x4f43aa(0x310)]['x']+Math[_0x4f43aa(0x1ba)](_0x1cb9f4/0x3e8),_0x4e9392=_0x5757f9[_0x4f43aa(0x310)]['y']+Math['floor'](_0x58ed05/0x3e8),_0x437e41=_0x1cb9f4%0x3e8,_0x3f8293=_0x58ed05%0x3e8;try{const _0x2e1e8b=await _0x56166a['paintPixelInRegion'](_0x4ead2a,_0x4e9392,_0x437e41,_0x3f8293,_0x33ffb['id']);if(_0x2e1e8b===_0x4f43aa(0x2d6)){_0x51fd10[_0x4f43aa(0x14c)](_0x4f43aa(0x1e6),_0x4f43aa(0x19b)),await _0xf634e1(!![]),await _0x51fd10[_0x4f43aa(0x256)](_0x5757f9[_0x4f43aa(0x1e4)]?0x1f4:0x3e8);const _0x1c2b00=await _0x56166a[_0x4f43aa(0x158)](_0x4ead2a,_0x4e9392,_0x437e41,_0x3f8293,_0x33ffb['id']);return _0x1c2b00===!![];}return _0x2e1e8b===!![];}catch(_0x28d57f){return _0x51fd10[_0x4f43aa(0x14c)]('Error\x20repairing\x20pixel\x20('+_0x3d4fcf+','+_0x4ca373+_0x4f43aa(0x334)+_0x28d57f[_0x4f43aa(0x242)],_0x4f43aa(0x2a7)),![];}}async function _0x2fd742(){const _0x45ca63=_0x40b50f;if(_0x5757f9['running']){_0x51fd10['addDebugLog'](_0x45ca63(0x147),_0x45ca63(0x303));return;}try{_0x51fd10['addDebugLog'](_0x45ca63(0x356),'info');if(!_0x327512()){_0x51fd10['addDebugLog'](_0x45ca63(0x2a1),_0x45ca63(0x19b)),await _0xf634e1(!![]);if(!_0x327512()){_0x51fd10['addDebugLog']('Failed\x20to\x20generate\x20token\x20for\x20autonomous\x20repair,\x20will\x20retry\x20next\x20cycle',_0x45ca63(0x2a7));return;}}const _0x2a9f93=await _0x30412e();if(_0x2a9f93[_0x45ca63(0x37a)]>0x0){_0x51fd10[_0x45ca63(0x14c)](_0x45ca63(0x19e)+_0x2a9f93[_0x45ca63(0x37a)]+_0x45ca63(0x1c8),_0x45ca63(0x19b)),_0x11fef9(_0x51fd10['t'](_0x45ca63(0x224),{'count':_0x2a9f93[_0x45ca63(0x37a)]})),_0x54f85b(_0x45ca63(0x239),_0x2a9f93['length']),_0x5757f9[_0x45ca63(0x365)]=_0x45ca63(0x291);const _0x368e5a=await _0x1274b6(_0x2a9f93);_0x368e5a===_0x2a9f93[_0x45ca63(0x37a)]&&(_0x54f85b(_0x45ca63(0x2d7)),_0x5757f9[_0x45ca63(0x365)]=_0x45ca63(0x2d7));}else _0x11fef9(_0x51fd10['t'](_0x45ca63(0x29b))),_0x5757f9[_0x45ca63(0x365)]!=='peaceful'&&(_0x9d4780(),_0x5757f9['lastAttackState']=_0x45ca63(0x220)),!_0x5757f9[_0x45ca63(0x1e4)]&&_0x51fd10['addDebugLog'](_0x45ca63(0x231),_0x45ca63(0x260));}catch(_0x2a87a2){_0x51fd10['addDebugLog']('Autonomous\x20repair\x20error:\x20'+_0x2a87a2[_0x45ca63(0x242)],_0x45ca63(0x2a7)),_0x5757f9['autonomousMode']&&(_0x51fd10[_0x45ca63(0x14c)]('Autonomous\x20mode:\x20will\x20retry\x20repair\x20check\x20in\x20120\x20seconds\x20due\x20to\x20error',_0x45ca63(0x19b)),setTimeout(()=>{const _0x3ea58=_0x45ca63;_0x5757f9[_0x3ea58(0x301)]&&!_0x5757f9[_0x3ea58(0x1bd)]&&_0x2fd742();},0x1d4c0));}}function _0x4af947(){const _0x27ebf1=_0x40b50f;_0x5757f9[_0x27ebf1(0x331)]&&clearInterval(_0x5757f9[_0x27ebf1(0x331)]);const _0x2f1647=_0x5757f9[_0x27ebf1(0x212)]*0x3e8;_0x5757f9[_0x27ebf1(0x331)]=setInterval(_0x2fd742,_0x2f1647);const _0x5e826e=_0x51fd10['t']('autoRepairStarted',{'interval':_0x5757f9[_0x27ebf1(0x212)]});_0x51fd10['addDebugLog'](_0x5e826e+_0x27ebf1(0x31f)+_0x5757f9[_0x27ebf1(0x1e4)]+')',_0x27ebf1(0x303)),_0x51fd10['showAlert'](_0x5e826e,_0x27ebf1(0x260)),setTimeout(_0x2fd742,0x7d0);}function _0x476431(){const _0xaaddc=_0x40b50f;_0x5757f9['autoRepairTimer']&&(clearInterval(_0x5757f9[_0xaaddc(0x331)]),_0x5757f9['autoRepairTimer']=null);const _0x1cb960=_0x51fd10['t'](_0xaaddc(0x28d));_0x51fd10['addDebugLog'](''+_0x1cb960,_0xaaddc(0x303)),_0x51fd10[_0xaaddc(0x254)](_0x1cb960,_0xaaddc(0x303));}function _0x11fef9(_0x571741){const _0x24c7c2=_0x40b50f,_0x4ce25d=document[_0x24c7c2(0x2d2)](_0x24c7c2(0x270));_0x4ce25d&&(typeof _0x571741===_0x24c7c2(0x2e7)?_0x4ce25d['innerHTML']=_0x571741:_0x4ce25d[_0x24c7c2(0x252)]=_0x571741);}function _0xdd5175(){const _0x230105=_0x40b50f,_0x54fe74=document[_0x230105(0x2d2)](_0x230105(0x222));if(!_0x54fe74)return;const _0x6170f9=_0x5757f9[_0x230105(0x1ff)][_0x230105(0x2cb)](_0x14ad0c=>{const _0x4749fa=_0x230105,_0x3014d1=_0x14ad0c['type']==='error'?_0x4749fa(0x367):_0x14ad0c['type']===_0x4749fa(0x19b)?_0x4749fa(0x22e):_0x14ad0c['type']===_0x4749fa(0x260)?_0x4749fa(0x32e):_0x4749fa(0x277);return _0x4749fa(0x281)+_0x3014d1+_0x4749fa(0x1f0)+_0x14ad0c[_0x4749fa(0x2b1)]+_0x4749fa(0x29a)+_0x14ad0c[_0x4749fa(0x242)]+_0x4749fa(0x160);})[_0x230105(0x221)]('');_0x54fe74['innerHTML']=_0x6170f9,_0x54fe74[_0x230105(0x173)]=_0x54fe74[_0x230105(0x338)];}async function _0x20b600(){const _0x4c584d=_0x40b50f;try{const {charges:_0x63b10d,max:_0x4a6959,cooldown:_0x44fdb8}=await _0x56166a[_0x4c584d(0x2f8)]();_0x5757f9['displayCharges']=Math[_0x4c584d(0x1ba)](_0x63b10d),_0x5757f9[_0x4c584d(0x1c6)]=Math[_0x4c584d(0x13b)](0x1,Math[_0x4c584d(0x1ba)](_0x4a6959)),_0x5757f9[_0x4c584d(0x225)]=_0x44fdb8,_0x5ed705();}catch(_0x5af303){!_0x5757f9[_0x4c584d(0x1e4)]&&_0x51fd10['addDebugLog'](_0x4c584d(0x2d5)+_0x5af303[_0x4c584d(0x242)],'error');}}function _0x5ed705(){const _0x19460f=_0x40b50f,_0x420ef7=document[_0x19460f(0x2d2)](_0x19460f(0x33d));_0x420ef7&&(_0x420ef7[_0x19460f(0x252)]=_0x19460f(0x32b)+_0x5757f9['displayCharges']+'/'+_0x5757f9['maxCharges']+_0x19460f(0x2b8)+Math['round'](_0x5757f9[_0x19460f(0x225)]/0x3e8)+'s)');}function _0x21981a(){const _0x76b955=_0x40b50f,_0x43a307=document[_0x76b955(0x2d2)](_0x76b955(0x226));if(_0x43a307){if(_0x327512()){const _0xd4b422=Math['round']((_0x177ed-Date[_0x76b955(0x330)]())/0x3e8);_0x43a307['textContent']=_0x76b955(0x257)+_0xd4b422+'s)',_0x43a307['style'][_0x76b955(0x139)]=_0x76b955(0x292);}else _0x43a307[_0x76b955(0x252)]=_0x76b955(0x168),_0x43a307[_0x76b955(0x2a5)]['color']=_0x76b955(0x1a4);}}function _0x509839(){const _0x204e7a=_0x40b50f,_0x519744=document[_0x204e7a(0x2d2)](_0x204e7a(0x273));if(_0x519744){const _0x862d52=_0x5757f9[_0x204e7a(0x1e4)]?_0x204e7a(0x1b6):_0x204e7a(0x382),_0x4a8b1d=_0x5757f9[_0x204e7a(0x2af)][_0x204e7a(0x1fb)]();_0x519744[_0x204e7a(0x252)]=_0x204e7a(0x19c)+_0x862d52+_0x204e7a(0x196)+_0x4a8b1d+_0x204e7a(0x20d)+(_0x5757f9[_0x204e7a(0x360)]?'ON':_0x204e7a(0x2f6));}}function _0xb4f2de(){const _0xfb5ea7=_0x40b50f,_0x4c0232=document[_0xfb5ea7(0x2d2)](_0xfb5ea7(0x366)),_0x2f4bc5=document[_0xfb5ea7(0x2d2)]('window-header');let _0x9c509f=![],_0x3916f4,_0x10d189,_0x25fa00,_0x1651d2,_0x195463=0x0,_0x4e497b=0x0;function _0x142d0b(_0x51e417){const _0x6dcc85=_0xfb5ea7;if(_0x51e417['target'][_0x6dcc85(0x13d)]===_0x6dcc85(0x2ef)||_0x51e417['target']['tagName']===_0x6dcc85(0x243)||_0x51e417[_0x6dcc85(0x29c)][_0x6dcc85(0x13d)]===_0x6dcc85(0x21b))return;_0x25fa00=_0x51e417[_0x6dcc85(0x2fd)]-_0x195463,_0x1651d2=_0x51e417[_0x6dcc85(0x315)]-_0x4e497b,(_0x51e417[_0x6dcc85(0x29c)]===_0x2f4bc5||_0x2f4bc5[_0x6dcc85(0x2be)](_0x51e417[_0x6dcc85(0x29c)]))&&(_0x9c509f=!![],_0x4c0232[_0x6dcc85(0x2a5)][_0x6dcc85(0x283)]='grabbing');}function _0x518bbd(){const _0x56e88a=_0xfb5ea7;_0x25fa00=_0x3916f4,_0x1651d2=_0x10d189,_0x9c509f=![],_0x4c0232[_0x56e88a(0x2a5)][_0x56e88a(0x283)]=_0x56e88a(0x217);}function _0x302590(_0x1f2fe0){const _0x452136=_0xfb5ea7;_0x9c509f&&(_0x1f2fe0['preventDefault'](),_0x3916f4=_0x1f2fe0[_0x452136(0x2fd)]-_0x25fa00,_0x10d189=_0x1f2fe0['clientY']-_0x1651d2,_0x195463=_0x3916f4,_0x4e497b=_0x10d189,_0x4c0232[_0x452136(0x2a5)][_0x452136(0x1e0)]='translate('+_0x3916f4+'px,\x20'+_0x10d189+_0x452136(0x23c));}_0x2f4bc5[_0xfb5ea7(0x24e)](_0xfb5ea7(0x17a),_0x142d0b),document[_0xfb5ea7(0x24e)](_0xfb5ea7(0x2a0),_0x518bbd),document[_0xfb5ea7(0x24e)](_0xfb5ea7(0x259),_0x302590);}function _0x537ce4(){const _0x2a7337=_0x40b50f,_0x4a98c5=document[_0x2a7337(0x2d2)](_0x2a7337(0x366));if(_0x4a98c5)_0x4a98c5[_0x2a7337(0x199)]();const _0x15f738=document[_0x2a7337(0x2c9)](_0x2a7337(0x167));_0x15f738['id']=_0x2a7337(0x366),_0x15f738[_0x2a7337(0x2a5)][_0x2a7337(0x1a8)]=_0x2a7337(0x336),_0x15f738['innerHTML']=_0x2a7337(0x12b)+_0x51fd10['t']('autonomousModeActive')+_0x2a7337(0x363)+_0x51fd10['t'](_0x2a7337(0x14f))+_0x2a7337(0x2ae)+_0x51fd10['t'](_0x2a7337(0x1d9))+_0x2a7337(0x2d0)+_0x51fd10['t'](_0x2a7337(0x29d))+'\x20(Enhanced)</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</label>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22display:\x20flex;\x20align-items:\x20center;\x20gap:\x2010px;\x20margin-bottom:\x2010px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<label\x20style=\x22font-size:\x2014px;\x22>'+_0x51fd10['t'](_0x2a7337(0x191))+':</label>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x20type=\x22number\x22\x20id=\x22repairInterval\x22\x20value=\x2230\x22\x20min=\x2210\x22\x20max=\x223600\x22\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20style=\x22width:\x2080px;\x20padding:\x205px;\x20border-radius:\x204px;\x20border:\x201px\x20solid\x20#ccc;\x20color:\x20#333;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20style=\x22font-size:\x2012px;\x20color:\x20#b3d9ff;\x22>seconds</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22display:\x20flex;\x20gap:\x2010px;\x20margin-bottom:\x2010px;\x20flex-wrap:\x20wrap;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<label\x20style=\x22display:\x20flex;\x20align-items:\x20center;\x20cursor:\x20pointer;\x20font-size:\x2012px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x20type=\x22checkbox\x22\x20id=\x22autoTokenRefresh\x22\x20'+(_0x5757f9[_0x2a7337(0x360)]?'checked':'')+_0x2a7337(0x23b)+(_0x5757f9[_0x2a7337(0x2af)]===_0x2a7337(0x195)?_0x2a7337(0x1f4):'')+_0x2a7337(0x2dc)+(_0x5757f9['tokenSource']===_0x2a7337(0x2b5)?_0x2a7337(0x1f4):'')+_0x2a7337(0x288)+(_0x5757f9[_0x2a7337(0x2af)]==='manual'?'selected':'')+'>Manual</option>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</select>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22margin-top:\x2010px;\x20font-size:\x2012px;\x20color:\x20#e1f5fe;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div>Image:\x20<span\x20id=\x22imageInfo\x22>Not\x20loaded</span></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div>Position:\x20<span\x20id=\x22positionInfo\x22>Not\x20set</span></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div>Colors:\x20<span\x20id=\x22colorsInfo\x22>0\x20available</span></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22margin-top:\x2015px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22display:\x20flex;\x20justify-content:\x20space-between;\x20align-items:\x20center;\x20margin-bottom:\x208px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h4\x20style=\x22margin:\x200;\x20font-size:\x2014px;\x20color:\x20#fff;\x22>📋\x20'+_0x51fd10['t'](_0x2a7337(0x274))+_0x2a7337(0x178)+_0x51fd10['t'](_0x2a7337(0x1bb))+_0x2a7337(0x1f1)+_0x51fd10['t'](_0x2a7337(0x287))+_0x2a7337(0x28a),document[_0x2a7337(0x37c)]['appendChild'](_0x15f738),_0xb4f2de(),_0x433e55(),setTimeout(()=>{_0x35682a();},0x3e8),_0x7e824();}function _0x7e824(){const _0x2607c0=_0x40b50f;_0x20b600(),setInterval(_0x20b600,0x2710),_0x21981a(),setInterval(_0x21981a,0x1388),_0x509839(),setInterval(_0x509839,0x3a98),_0x5757f9[_0x2607c0(0x360)]&&_0x5757f9[_0x2607c0(0x1e4)]&&(_0x51fd10[_0x2607c0(0x14c)]('Autonomous\x20token\x20management\x20started',_0x2607c0(0x260)),_0xf634e1());}function _0x433e55(){const _0xef710e=_0x40b50f;document[_0xef710e(0x2d2)](_0xef710e(0x20a))[_0xef710e(0x24e)]('click',()=>{const _0xb589fb=_0xef710e,_0x413b6e=document[_0xb589fb(0x2d2)]('window-content');_0x5757f9[_0xb589fb(0x2c4)]=!_0x5757f9[_0xb589fb(0x2c4)],_0x5757f9[_0xb589fb(0x2c4)]?(_0x413b6e[_0xb589fb(0x2a5)][_0xb589fb(0x2da)]=_0xb589fb(0x2b9),document['getElementById']('minimizeBtn')[_0xb589fb(0x252)]='+'):(_0x413b6e[_0xb589fb(0x2a5)][_0xb589fb(0x2da)]='block',document[_0xb589fb(0x2d2)](_0xb589fb(0x20a))[_0xb589fb(0x252)]='−');}),document[_0xef710e(0x2d2)](_0xef710e(0x211))[_0xef710e(0x24e)]('click',()=>{const _0x90968e=_0xef710e,_0x578855=document[_0x90968e(0x2d2)]('wplace-repair-tool');_0x578855&&(_0x578855[_0x90968e(0x2a5)]['transition']='opacity\x200.3s\x20ease,\x20transform\x200.3s\x20ease',_0x578855[_0x90968e(0x2a5)][_0x90968e(0x16e)]='0',_0x578855[_0x90968e(0x2a5)][_0x90968e(0x1e0)]=_0x90968e(0x30f),setTimeout(()=>{const _0x1bedc7=_0x90968e;_0x578855[_0x1bedc7(0x199)](),_0x2cdd78();},0x12c));}),document[_0xef710e(0x2d2)]('loadFileBtn')[_0xef710e(0x24e)](_0xef710e(0x2fc),async()=>{const _0x5e422c=_0xef710e;try{_0x51fd10['addDebugLog'](_0x5e422c(0x1fe),_0x5e422c(0x303));const _0x3b524f=await _0x51fd10[_0x5e422c(0x134)]();if(!_0x3b524f||!_0x3b524f[_0x5e422c(0x145)]||!_0x3b524f[_0x5e422c(0x268)])throw new Error(_0x51fd10['t']('invalidFile'));const _0x1ffc92=_0x3c8453(_0x3b524f);Object[_0x5e422c(0x169)](_0x5757f9,_0x1ffc92['state']),_0x5757f9[_0x5e422c(0x268)]={..._0x1ffc92['imageData'],'pixels':new Uint8ClampedArray(_0x1ffc92[_0x5e422c(0x268)][_0x5e422c(0x12a)])},_0x5757f9[_0x5e422c(0x346)]=!![],document[_0x5e422c(0x2d2)](_0x5e422c(0x313))['disabled']=![],document[_0x5e422c(0x2d2)](_0x5e422c(0x1f2))[_0x5e422c(0x252)]=_0x5757f9[_0x5e422c(0x268)]['width']+'x'+_0x5757f9[_0x5e422c(0x268)]['height'],document[_0x5e422c(0x2d2)](_0x5e422c(0x1df))[_0x5e422c(0x252)]=_0x5757f9[_0x5e422c(0x2c2)]?'('+_0x5757f9[_0x5e422c(0x2c2)]['x']+',\x20'+_0x5757f9['startPosition']['y']+_0x5e422c(0x30c)+_0x5757f9[_0x5e422c(0x310)]['x']+',\x20'+_0x5757f9[_0x5e422c(0x310)]['y']+')':_0x5e422c(0x18f),document[_0x5e422c(0x2d2)](_0x5e422c(0x2e1))[_0x5e422c(0x252)]=(_0x5757f9[_0x5e422c(0x2a9)]?.[_0x5e422c(0x37a)]||0x0)+_0x5e422c(0x232),_0x11fef9(_0x51fd10['t'](_0x5e422c(0x198))),_0x51fd10[_0x5e422c(0x14c)]('Loaded\x20image:\x20'+_0x5757f9['imageData'][_0x5e422c(0x36c)]+'x'+_0x5757f9[_0x5e422c(0x268)][_0x5e422c(0x250)],_0x5e422c(0x260)),_0x51fd10[_0x5e422c(0x14c)](_0x5e422c(0x2bf)+_0x5757f9[_0x5e422c(0x2c2)]?.['x']+',\x20'+_0x5757f9['startPosition']?.['y']+')',_0x5e422c(0x303)),_0x51fd10['addDebugLog'](_0x5e422c(0x249)+_0x5757f9[_0x5e422c(0x310)]?.['x']+',\x20'+_0x5757f9[_0x5e422c(0x310)]?.['y']+')',_0x5e422c(0x303)),_0x51fd10['addDebugLog'](_0x5e422c(0x32d)+(_0x5757f9[_0x5e422c(0x2a9)]?.[_0x5e422c(0x37a)]||0x0),'info'),_0x1ffc92[_0x5e422c(0x145)][_0x5e422c(0x28b)]!==undefined&&(_0x5757f9[_0x5e422c(0x28b)]=_0x1ffc92[_0x5e422c(0x145)][_0x5e422c(0x28b)],_0x51fd10['addDebugLog']('Paint\x20white\x20pixels:\x20'+_0x5757f9['paintWhitePixels'],_0x5e422c(0x303))),_0x1ffc92[_0x5e422c(0x145)]['paintTransparentPixels']!==undefined&&(_0x5757f9[_0x5e422c(0x2bb)]=_0x1ffc92['state'][_0x5e422c(0x2bb)],_0x51fd10['addDebugLog'](_0x5e422c(0x25d)+_0x5757f9[_0x5e422c(0x2bb)],_0x5e422c(0x303))),_0x51fd10[_0x5e422c(0x254)](_0x51fd10['t'](_0x5e422c(0x198)),'success'),_0x5757f9[_0x5e422c(0x1e4)]&&document[_0x5e422c(0x2d2)](_0x5e422c(0x301))[_0x5e422c(0x368)]&&(_0x51fd10['addDebugLog'](_0x5e422c(0x36d),_0x5e422c(0x303)),setTimeout(()=>{const _0xfbc323=_0x5e422c;_0x5757f9[_0xfbc323(0x301)]=!![],_0x4af947();},0x1388));}catch(_0x4a3073){_0x51fd10[_0x5e422c(0x14c)](_0x5e422c(0x335)+_0x4a3073['message'],_0x5e422c(0x2a7)),_0x51fd10['showAlert'](_0x4a3073[_0x5e422c(0x242)],_0x5e422c(0x2a7));}}),document[_0xef710e(0x2d2)]('generateTokenBtn')['addEventListener'](_0xef710e(0x2fc),async()=>{const _0x50b52d=_0xef710e,_0x3734dd=document[_0x50b52d(0x2d2)](_0x50b52d(0x1f8)),_0x2ff7ad=_0x3734dd[_0x50b52d(0x252)];try{_0x3734dd[_0x50b52d(0x2f9)]=!![],_0x3734dd[_0x50b52d(0x252)]=_0x50b52d(0x26b),_0x3734dd['style']['background']=_0x50b52d(0x17f),_0x51fd10[_0x50b52d(0x14c)](_0x50b52d(0x321),'info');const _0x77e733=await _0xf634e1(!![]);if(_0x77e733)_0x51fd10[_0x50b52d(0x14c)]('Token\x20generation\x20succeeded!',_0x50b52d(0x260)),_0x51fd10[_0x50b52d(0x254)](_0x50b52d(0x1b8),_0x50b52d(0x260)),_0x21981a();else throw new Error(_0x50b52d(0x206));}catch(_0x47f468){_0x51fd10[_0x50b52d(0x14c)](_0x50b52d(0x32a)+_0x47f468['message'],_0x50b52d(0x2a7)),_0x51fd10[_0x50b52d(0x254)](_0x50b52d(0x206),_0x50b52d(0x2a7)),_0x5c5ae2();}finally{_0x3734dd[_0x50b52d(0x2f9)]=![],_0x3734dd['textContent']=_0x2ff7ad,_0x3734dd['style'][_0x50b52d(0x1c7)]=_0x50b52d(0x26e);}});let _0x3fd7e5=![];document['getElementById'](_0xef710e(0x313))[_0xef710e(0x24e)](_0xef710e(0x2fc),async()=>{const _0x3e75ee=_0xef710e;if(!_0x5757f9[_0x3e75ee(0x346)]){_0x51fd10[_0x3e75ee(0x254)](_0x3e75ee(0x1ee),_0x3e75ee(0x19b));return;}if(_0x3fd7e5){_0x5757f9[_0x3e75ee(0x1bd)]=!![],_0x51fd10['addDebugLog'](_0x3e75ee(0x1a7),_0x3e75ee(0x19b));return;}_0x3fd7e5=!![],_0x5757f9[_0x3e75ee(0x31d)]=!![],_0x5757f9[_0x3e75ee(0x1bd)]=![];const _0x1cb254=document['getElementById'](_0x3e75ee(0x313));_0x1cb254['textContent']=_0x3e75ee(0x24d),_0x1cb254[_0x3e75ee(0x2a5)][_0x3e75ee(0x1c7)]='linear-gradient(135deg,\x20#ff6b35\x200%,\x20#f7931e\x20100%)';try{_0x51fd10[_0x3e75ee(0x14c)](_0x3e75ee(0x190),_0x3e75ee(0x303));!_0x327512()&&(_0x51fd10['addDebugLog'](_0x3e75ee(0x2ec),_0x3e75ee(0x303)),await _0xf634e1(!![]));const _0x1ab4c9=await _0x30412e();if(_0x1ab4c9['length']>0x0){_0x11fef9(_0x51fd10['t'](_0x3e75ee(0x224),{'count':_0x1ab4c9[_0x3e75ee(0x37a)]})),_0x54f85b(_0x3e75ee(0x239),_0x1ab4c9['length']);const _0x343d2e=await _0x1274b6(_0x1ab4c9);_0x343d2e===_0x1ab4c9[_0x3e75ee(0x37a)]&&_0x54f85b(_0x3e75ee(0x2d7));}else _0x11fef9(_0x51fd10['t'](_0x3e75ee(0x29b))),_0x9d4780();}catch(_0x1b398e){_0x51fd10[_0x3e75ee(0x14c)]('Repair\x20error:\x20'+_0x1b398e[_0x3e75ee(0x242)],_0x3e75ee(0x2a7)),_0x51fd10[_0x3e75ee(0x254)](_0x3e75ee(0x358),_0x3e75ee(0x2a7));}finally{_0x3fd7e5=![],_0x5757f9[_0x3e75ee(0x31d)]=![],_0x5757f9[_0x3e75ee(0x1bd)]=![],_0x1cb254[_0x3e75ee(0x252)]=_0x3e75ee(0x2bd)+_0x51fd10['t'](_0x3e75ee(0x1d9)),_0x1cb254[_0x3e75ee(0x2a5)]['background']=_0x3e75ee(0x136);}}),document['getElementById'](_0xef710e(0x301))[_0xef710e(0x24e)](_0xef710e(0x2cd),_0x2dbff9=>{const _0x4cb810=_0xef710e;_0x5757f9['autoRepairEnabled']=_0x2dbff9[_0x4cb810(0x29c)][_0x4cb810(0x368)];if(_0x5757f9[_0x4cb810(0x301)]){if(!_0x5757f9[_0x4cb810(0x346)]){_0x51fd10['showAlert']('Please\x20load\x20a\x20progress\x20file\x20first',_0x4cb810(0x19b)),_0x2dbff9[_0x4cb810(0x29c)][_0x4cb810(0x368)]=![],_0x5757f9['autoRepairEnabled']=![];return;}_0x4af947();}else _0x476431();}),document[_0xef710e(0x2d2)]('repairInterval')['addEventListener']('change',_0x286156=>{const _0x731493=_0xef710e,_0x28320d=parseInt(_0x286156[_0x731493(0x29c)][_0x731493(0x31a)])||0x1e;_0x5757f9[_0x731493(0x212)]=Math[_0x731493(0x13b)](0xa,Math[_0x731493(0x319)](0xe10,_0x28320d)),_0x286156['target'][_0x731493(0x31a)]=_0x5757f9['autoRepairInterval'],_0x51fd10['addDebugLog']('Repair\x20interval\x20changed\x20to\x20'+_0x5757f9[_0x731493(0x212)]+_0x731493(0x293),'info'),_0x5757f9['autoRepairEnabled']&&_0x5757f9[_0x731493(0x346)]&&(_0x51fd10['addDebugLog'](_0x731493(0x352),_0x731493(0x303)),_0x4af947());}),document[_0xef710e(0x2d2)](_0xef710e(0x360))[_0xef710e(0x24e)]('change',_0x11e7cf=>{const _0x4d5b5e=_0xef710e;_0x5757f9[_0x4d5b5e(0x360)]=_0x11e7cf[_0x4d5b5e(0x29c)][_0x4d5b5e(0x368)],_0x51fd10[_0x4d5b5e(0x14c)](_0x4d5b5e(0x1d4)+(_0x5757f9[_0x4d5b5e(0x360)]?_0x4d5b5e(0x1a1):_0x4d5b5e(0x2f9)),_0x4d5b5e(0x303)),_0x509839(),_0x5757f9['autoTokenRefresh']&&_0x5757f9[_0x4d5b5e(0x1e4)]&&!_0x327512()&&_0xf634e1();}),document[_0xef710e(0x2d2)](_0xef710e(0x339))[_0xef710e(0x24e)](_0xef710e(0x2cd),_0x23983f=>{const _0x522475=_0xef710e;_0x5757f9[_0x522475(0x2af)]=_0x23983f[_0x522475(0x29c)][_0x522475(0x31a)],_0x51fd10[_0x522475(0x14c)]('Token\x20source\x20changed\x20to:\x20'+_0x5757f9[_0x522475(0x2af)],_0x522475(0x303)),_0x509839(),_0x327512()&&(_0x51fd10[_0x522475(0x14c)](_0x522475(0x25b),'info'),_0xe98abc());}),document[_0xef710e(0x2d2)]('clearDebugBtn')[_0xef710e(0x24e)]('click',()=>{const _0x64e72c=_0xef710e;_0x5757f9[_0x64e72c(0x1ff)]=[],_0xdd5175(),_0x51fd10[_0x64e72c(0x14c)](_0x64e72c(0x2eb),_0x64e72c(0x303)),_0x51fd10[_0x64e72c(0x14c)]('Enhanced\x20WPlace\x20Autonomous\x20Repair\x20Tool\x20ready',_0x64e72c(0x303));});}function _0x3c8453(_0x2dc7b7){const _0x302da0=_0x40b50f;if(!_0x2dc7b7[_0x302da0(0x12e)]||_0x2dc7b7[_0x302da0(0x12e)]<_0x302da0(0x2fe)){_0x51fd10[_0x302da0(0x14c)](_0x302da0(0x2ce),_0x302da0(0x303));if(!_0x2dc7b7['state'])_0x2dc7b7[_0x302da0(0x145)]={};if(!_0x2dc7b7[_0x302da0(0x268)])_0x2dc7b7[_0x302da0(0x268)]={};_0x2dc7b7[_0x302da0(0x145)][_0x302da0(0x28b)]=_0x2dc7b7[_0x302da0(0x145)][_0x302da0(0x28b)]??!![],_0x2dc7b7[_0x302da0(0x145)][_0x302da0(0x2bb)]=_0x2dc7b7[_0x302da0(0x145)][_0x302da0(0x2bb)]??![],_0x2dc7b7[_0x302da0(0x12e)]='2.0';}return _0x2dc7b7[_0x302da0(0x12e)]===_0x302da0(0x2fe)&&(_0x2dc7b7[_0x302da0(0x145)][_0x302da0(0x1e4)]=_0x2dc7b7[_0x302da0(0x145)][_0x302da0(0x1e4)]??_0x25ad89[_0x302da0(0x311)],_0x2dc7b7[_0x302da0(0x145)]['autoTokenRefresh']=_0x2dc7b7['state'][_0x302da0(0x360)]??_0x25ad89[_0x302da0(0x204)],_0x2dc7b7[_0x302da0(0x145)]['tokenSource']=_0x2dc7b7[_0x302da0(0x145)][_0x302da0(0x2af)]??_0x25ad89['TOKEN_SOURCE'],_0x2dc7b7[_0x302da0(0x12e)]=_0x302da0(0x30d),_0x51fd10[_0x302da0(0x14c)](_0x302da0(0x1e7),_0x302da0(0x303))),_0x2dc7b7;}async function _0x221ce8(){const _0x3b770e=_0x40b50f;try{_0x51fd10['addDebugLog'](_0x3b770e(0x18c),_0x3b770e(0x303)),await _0x51fd10[_0x3b770e(0x1cd)](),_0x5757f9['autoTokenRefresh']&&(_0x51fd10['addDebugLog']('Pre-generating\x20token\x20for\x20autonomous\x20operation...',_0x3b770e(0x303)),await _0xf634e1(),_0x327512()?_0x51fd10[_0x3b770e(0x14c)](_0x3b770e(0x34c),'success'):_0x51fd10[_0x3b770e(0x14c)](_0x3b770e(0x1ef),_0x3b770e(0x19b))),_0x5757f9[_0x3b770e(0x1e4)]&&_0x5757f9['autoTokenRefresh']&&setInterval(async()=>{const _0x81d6a2=_0x3b770e;if(_0x35c4c5()&&!_0x26fce8){_0x51fd10['addDebugLog']('Autonomous\x20token\x20refresh\x20triggered',_0x81d6a2(0x303));try{await _0xf634e1(!![]);}catch(_0x29ac0f){_0x51fd10['addDebugLog'](_0x81d6a2(0x21e)+_0x29ac0f[_0x81d6a2(0x242)],_0x81d6a2(0x19b));}}},0x7530),_0x51fd10['addDebugLog'](_0x3b770e(0x1b0),_0x3b770e(0x260));}catch(_0x5af6c6){_0x51fd10['addDebugLog']('Autonomous\x20initialization\x20error:\x20'+_0x5af6c6[_0x3b770e(0x242)],'error');}}async function _0x5d2d5d(){const _0x3939eb=_0x40b50f;_0x51fd10[_0x3939eb(0x14c)]('Starting\x20WPlace\x20Autonomous\x20Repair\x20Tool\x20v3.0...','info'),_0x537ce4(),await _0x221ce8(),_0x51fd10[_0x3939eb(0x14c)]('Enhanced\x20Features\x20Initialized:','info'),_0x51fd10[_0x3939eb(0x14c)](_0x3939eb(0x269),_0x3939eb(0x303)),_0x51fd10[_0x3939eb(0x14c)](_0x3939eb(0x131),'info'),_0x51fd10[_0x3939eb(0x14c)](_0x3939eb(0x1a2),_0x3939eb(0x303)),_0x51fd10['addDebugLog'](_0x3939eb(0x228),_0x3939eb(0x303)),_0x51fd10[_0x3939eb(0x14c)](_0x3939eb(0x1f6),_0x3939eb(0x303)),_0x51fd10['addDebugLog'](_0x3939eb(0x2d4),'info'),_0x51fd10[_0x3939eb(0x14c)](_0x3939eb(0x20e),'info'),_0x5757f9['autonomousMode']?(_0x51fd10[_0x3939eb(0x14c)](_0x3939eb(0x17c),_0x3939eb(0x260)),_0x51fd10[_0x3939eb(0x14c)](_0x3939eb(0x2f3),_0x3939eb(0x303)),_0x51fd10[_0x3939eb(0x14c)](_0x3939eb(0x2f0),_0x3939eb(0x303)),_0x51fd10['addDebugLog'](_0x3939eb(0x197),_0x3939eb(0x303)),_0x51fd10[_0x3939eb(0x14c)](_0x3939eb(0x355),_0x3939eb(0x303)),_0x51fd10['addDebugLog'](_0x3939eb(0x361),_0x3939eb(0x303)),_0x51fd10[_0x3939eb(0x14c)](_0x3939eb(0x304),_0x3939eb(0x303))):_0x51fd10[_0x3939eb(0x14c)](_0x3939eb(0x19f),_0x3939eb(0x303)),_0x11fef9(_0x5757f9[_0x3939eb(0x1e4)]?_0x51fd10['t'](_0x3939eb(0x2e6)):_0x3939eb(0x362)),_0x51fd10['addDebugLog'](_0x3939eb(0x12f),_0x3939eb(0x260));}function _0x2cdd78(){const _0x2bd482=_0x40b50f;_0x51fd10[_0x2bd482(0x14c)](_0x2bd482(0x18a),_0x2bd482(0x303)),_0x5757f9['autoRepairTimer']&&(clearInterval(_0x5757f9[_0x2bd482(0x331)]),_0x5757f9[_0x2bd482(0x331)]=null),_0x5757f9[_0x2bd482(0x300)]&&(clearTimeout(_0x5757f9['tokenRetryTimer']),_0x5757f9[_0x2bd482(0x300)]=null),_0x5757f9['tokenPreloadTimer']&&(clearTimeout(_0x5757f9['tokenPreloadTimer']),_0x5757f9[_0x2bd482(0x1c1)]=null),_0x51fd10[_0x2bd482(0x340)](),_0x5757f9[_0x2bd482(0x1bd)]=!![],_0x51fd10[_0x2bd482(0x14c)](_0x2bd482(0x2b0),_0x2bd482(0x303));}window[_0x40b50f(0x24e)]('beforeunload',_0x2cdd78),document[_0x40b50f(0x24e)]('visibilitychange',()=>{const _0x4837a7=_0x40b50f;_0x5757f9[_0x4837a7(0x1e4)]&&(document[_0x4837a7(0x1e8)]?_0x51fd10[_0x4837a7(0x14c)](_0x4837a7(0x15a),_0x4837a7(0x303)):(_0x51fd10['addDebugLog'](_0x4837a7(0x216),_0x4837a7(0x303)),_0x20b600(),_0x21981a()));}),window[_0x40b50f(0x24e)](_0x40b50f(0x2a7),_0x37258a=>{const _0x322e5e=_0x40b50f;_0x5757f9['autonomousMode']&&_0x51fd10[_0x322e5e(0x14c)](_0x322e5e(0x266)+(_0x37258a['error']?.['message']||_0x322e5e(0x265)),'error');}),window['addEventListener'](_0x40b50f(0x150),_0x32a511=>{const _0xb35a15=_0x40b50f;_0x5757f9['autonomousMode']&&_0x51fd10['addDebugLog'](_0xb35a15(0x22a)+_0x32a511[_0xb35a15(0x337)],'error');}),_0x5d2d5d()[_0x40b50f(0x1c9)](_0xee1742=>{const _0x1ff177=_0x40b50f;console['error']('Failed\x20to\x20initialize\x20autonomous\x20repair\x20tool:',_0xee1742),_0x51fd10[_0x1ff177(0x14c)]('Initialization\x20failed:\x20'+_0xee1742[_0x1ff177(0x242)],_0x1ff177(0x2a7));});})());
+// eslint-disable-next-line prettier/prettier
+; (async () => {
+  // CONFIGURATION CONSTANTS
+  const CONFIG = {
+    COOLDOWN_DEFAULT: 31000,
+    TRANSPARENCY_THRESHOLD: 100,
+    WHITE_THRESHOLD: 250,
+    LOG_INTERVAL: 10,
+    PAINTING_SPEED: {
+      MIN: 1,
+      MAX: 1000,
+      DEFAULT: 5,
+    },
+    TOKEN_SOURCE: 'generator', // "generator", "manual", or "hybrid"
+    AUTONOMOUS_MODE: false, // Enable autonomous operation
+    AUTO_TOKEN_REFRESH: true, // Automatically refresh tokens
+    TOKEN_PRELOAD_BUFFER: 60000, // Preload tokens 1 minute before expiry
+    MAX_RETRIES: 10,
+    RETRY_DELAY_BASE: 1000,
+    COLOR_MAP: {
+      0: { id: 1, name: 'Black', rgb: { r: 0, g: 0, b: 0 } },
+      1: { id: 2, name: 'Dark Gray', rgb: { r: 60, g: 60, b: 60 } },
+      2: { id: 3, name: 'Gray', rgb: { r: 120, g: 120, b: 120 } },
+      3: { id: 4, name: 'Light Gray', rgb: { r: 210, g: 210, b: 210 } },
+      4: { id: 5, name: 'White', rgb: { r: 255, g: 255, b: 255 } },
+      5: { id: 6, name: 'Deep Red', rgb: { r: 96, g: 0, b: 24 } },
+      6: { id: 7, name: 'Red', rgb: { r: 237, g: 28, b: 36 } },
+      7: { id: 8, name: 'Orange', rgb: { r: 255, g: 127, b: 39 } },
+      8: { id: 9, name: 'Gold', rgb: { r: 246, g: 170, b: 9 } },
+      9: { id: 10, name: 'Yellow', rgb: { r: 249, g: 221, b: 59 } },
+      10: { id: 11, name: 'Light Yellow', rgb: { r: 255, g: 250, b: 188 } },
+      11: { id: 12, name: 'Dark Green', rgb: { r: 14, g: 185, b: 104 } },
+      12: { id: 13, name: 'Green', rgb: { r: 19, g: 230, b: 123 } },
+      13: { id: 14, name: 'Light Green', rgb: { r: 135, g: 255, b: 94 } },
+      14: { id: 15, name: 'Dark Teal', rgb: { r: 12, g: 129, b: 110 } },
+      15: { id: 16, name: 'Teal', rgb: { r: 16, g: 174, b: 166 } },
+      16: { id: 17, name: 'Light Teal', rgb: { r: 19, g: 225, b: 190 } },
+      17: { id: 20, name: 'Cyan', rgb: { r: 96, g: 247, b: 242 } },
+      18: { id: 44, name: 'Light Cyan', rgb: { r: 187, g: 250, b: 242 } },
+      19: { id: 18, name: 'Dark Blue', rgb: { r: 40, g: 80, b: 158 } },
+      20: { id: 19, name: 'Blue', rgb: { r: 64, g: 147, b: 228 } },
+      21: { id: 21, name: 'Indigo', rgb: { r: 107, g: 80, b: 246 } },
+      22: { id: 22, name: 'Light Indigo', rgb: { r: 153, g: 177, b: 251 } },
+      23: { id: 23, name: 'Dark Purple', rgb: { r: 120, g: 12, b: 153 } },
+      24: { id: 24, name: 'Purple', rgb: { r: 170, g: 56, b: 185 } },
+      25: { id: 25, name: 'Light Purple', rgb: { r: 224, g: 159, b: 249 } },
+      26: { id: 26, name: 'Dark Pink', rgb: { r: 203, g: 0, b: 122 } },
+      27: { id: 27, name: 'Pink', rgb: { r: 236, g: 31, b: 128 } },
+      28: { id: 28, name: 'Light Pink', rgb: { r: 243, g: 141, b: 169 } },
+      29: { id: 29, name: 'Dark Brown', rgb: { r: 104, g: 70, b: 52 } },
+      30: { id: 30, name: 'Brown', rgb: { r: 149, g: 104, b: 42 } },
+      31: { id: 31, name: 'Beige', rgb: { r: 248, g: 178, b: 119 } },
+      32: { id: 52, name: 'Light Beige', rgb: { r: 255, g: 197, b: 165 } },
+      63: { id: 0, name: 'Transparent', rgb: null },
+    },
+  };
+
+  // GLOBAL STATE
+  const state = {
+    running: false,
+    imageLoaded: false,
+    totalPixels: 0,
+    paintedPixels: 0,
+    availableColors: [],
+    displayCharges: 0,
+    maxCharges: 1,
+    cooldown: CONFIG.COOLDOWN_DEFAULT,
+    imageData: null,
+    stopFlag: false,
+    startPosition: null,
+    region: null,
+    paintWhitePixels: true,
+    paintTransparentPixels: false,
+    autoRepairEnabled: false,
+    autoRepairInterval: 30,
+    autoRepairTimer: null,
+    debugLogs: [],
+    customTransparencyThreshold: CONFIG.TRANSPARENCY_THRESHOLD,
+    customWhiteThreshold: CONFIG.WHITE_THRESHOLD,
+    tokenSource: CONFIG.TOKEN_SOURCE,
+    autonomousMode: CONFIG.AUTONOMOUS_MODE,
+    autoTokenRefresh: CONFIG.AUTO_TOKEN_REFRESH,
+    tokenPreloadBuffer: CONFIG.TOKEN_PRELOAD_BUFFER,
+    retryCount: 0,
+    tokenRetryTimer: null,
+    tokenPreloadTimer: null,
+    windowMinimized: false,
+    lastAttackState: null,
+  };
+
+  // Random string generator
+  const randStr = (len, chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789') =>
+    [...Array(len)].map(() => chars[(crypto?.getRandomValues?.(new Uint32Array(1))[0] % chars.length) || Math.floor(Math.random() * chars.length)]).join('');
+
+  // Advanced Turnstile token handling with sophisticated management
+  let turnstileToken = null;
+  let tokenExpiryTime = 0;
+  let tokenGenerationInProgress = false;
+  let _resolveToken = null;
+  let tokenPromise = new Promise((resolve) => {
+    _resolveToken = resolve;
+  });
+  const TOKEN_LIFETIME = 240000; // 4 minutes
+  const MAX_BATCH_RETRIES = 10;
+
+  // Audio notification system
+  function playNotificationSound() {
+    try {
+      const audio = new Audio('https://cdn.pixabay.com/download/audio/2025/03/21/audio_9bec51b17f.mp3?filename=glass-break-316720.mp3');
+      audio.volume = 0.5;
+      audio.play().catch(() => {
+        console.warn('Could not play notification sound');
+      });
+    } catch (error) {
+      console.warn('Audio notification failed:', error);
+    }
+  }
+
+  // Notification system for attacks and repairs
+  function showAttackNotification(type, count = 0) {
+    const existing = document.getElementById('attack-notification');
+    if (existing) existing.remove();
+
+    const notification = document.createElement('div');
+    notification.id = 'attack-notification';
+    notification.style.cssText = `
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      z-index: 15000; background: rgba(0,0,0,0.9); color: white;
+      border-radius: 15px; padding: 20px; text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      border: 2px solid ${type === 'attack' ? '#ff4444' : '#44ff44'};
+      min-width: 350px; max-width: 450px;
+    `;
+
+    if (type === 'attack') {
+      notification.innerHTML = `
+        <div style="margin-bottom: 15px;">
+          <img src="https://i.imgur.com/uJ2FRUM.png" 
+               alt="Attack" 
+               style="width: 80px; height: 80px; border-radius: 10px; object-fit: cover;">
+        </div>
+        <h2 style="color: #ff4444; margin: 10px 0; font-size: 18px; font-weight: bold;">
+          PIXEL ART ATTACKED!
+        </h2>
+        <p style="margin: 5px 0; font-size: 14px;">
+          Detected ${count} damaged pixels!
+        </p>
+      `;
+    } else if (type === 'repaired') {
+      notification.innerHTML = `
+        <div style="margin-bottom: 15px;">
+          <img src="https://i.imgur.com/WXVkpjo.png" 
+               alt="Repaired" 
+               style="width: 80px; height: 80px; border-radius: 10px; object-fit: cover;">
+        </div>
+        <h2 style="color: #44ff44; margin: 10px 0; font-size: 18px; font-weight: bold;">
+          COMPLETELY REPAIRED!
+        </h2>
+        <p style="margin: 5px 0; font-size: 14px;">
+          All pixels have been restored!
+        </p>
+      `;
+    }
+
+    document.body.appendChild(notification);
+
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.style.transition = 'opacity 0.5s ease';
+        notification.style.opacity = '0';
+        setTimeout(() => {
+          if (notification.parentNode) notification.remove();
+        }, 500);
+      }
+    }, 3000);
+  }
+
+  // Peaceful state display in main window
+  function showPeacefulState() {
+    const statusDiv = document.getElementById('status');
+    if (statusDiv && !state.running) {
+      statusDiv.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <img src="https://c.tenor.com/Bo5TLHiee7QAAAAd/tenor.gif" 
+               alt="Peaceful" 
+               style="width: 32px; height: 32px; border-radius: 6px;">
+          <span style="color: #81c784; font-weight: 500;">No attacks detected - All secure</span>
+        </div>
+      `;
+    }
+  }
+
+  // Typewriter effect for title
+  function createTypewriterTitle() {
+    const titleText = "WPlace Autonomous Repair Tool";
+    let currentIndex = 0;
+    const titleElement = document.getElementById('main-title');
+    
+    if (!titleElement) return;
+    
+    function typeNext() {
+      if (currentIndex < titleText.length) {
+        titleElement.textContent = titleText.substring(0, currentIndex + 1);
+        currentIndex++;
+        setTimeout(typeNext, 100);
+      } else {
+        setTimeout(() => {
+          currentIndex = 0;
+          titleElement.textContent = '';
+          setTimeout(typeNext, 1000);
+        }, 3000);
+      }
+    }
+    
+    typeNext();
+  }
+
+  function setTurnstileToken(token) {
+    if (_resolveToken) {
+      _resolveToken(token);
+      _resolveToken = null;
+    }
+    turnstileToken = token;
+    tokenExpiryTime = Date.now() + TOKEN_LIFETIME;
+    Utils.addDebugLog('Token captured and cached successfully', 'success');
+    
+    // Schedule preload of next token if autonomous mode is enabled
+    if (state.autoTokenRefresh && state.autonomousMode) {
+      scheduleTokenPreload();
+    }
+  }
+
+  function isTokenValid() {
+    return turnstileToken && Date.now() < tokenExpiryTime;
+  }
+
+  function willTokenExpireSoon() {
+    return turnstileToken && (tokenExpiryTime - Date.now()) < state.tokenPreloadBuffer;
+  }
+
+  function invalidateToken() {
+    turnstileToken = null;
+    tokenExpiryTime = 0;
+    if (state.tokenPreloadTimer) {
+      clearTimeout(state.tokenPreloadTimer);
+      state.tokenPreloadTimer = null;
+    }
+    Utils.addDebugLog('Token invalidated, will force fresh generation', 'warning');
+  }
+
+  function scheduleTokenPreload() {
+    if (state.tokenPreloadTimer) {
+      clearTimeout(state.tokenPreloadTimer);
+    }
+    
+    const timeUntilPreload = Math.max(1000, tokenExpiryTime - Date.now() - state.tokenPreloadBuffer);
+    
+    state.tokenPreloadTimer = setTimeout(async () => {
+      if (state.autonomousMode && state.autoTokenRefresh) {
+        Utils.addDebugLog('Preloading next token before expiry...', 'info');
+        try {
+          await ensureToken(true);
+        } catch (error) {
+          Utils.addDebugLog(`Token preload failed: ${error.message}`, 'warning');
+        }
+      }
+    }, timeUntilPreload);
+    
+    Utils.addDebugLog(`Token preload scheduled in ${Math.round(timeUntilPreload / 1000)}s`, 'info');
+  }
+
+  async function ensureToken(forceRefresh = false) {
+    if (isTokenValid() && !forceRefresh && !willTokenExpireSoon()) {
+      return turnstileToken;
+    }
+
+    if (forceRefresh || willTokenExpireSoon()) {
+      Utils.addDebugLog(forceRefresh ? 'Force refreshing token...' : 'Token expiring soon, refreshing...', 'info');
+      invalidateToken();
+    }
+
+    if (tokenGenerationInProgress) {
+      Utils.addDebugLog('Token generation already in progress, waiting...', 'info');
+      await Utils.sleep(2000);
+      return isTokenValid() ? turnstileToken : null;
+    }
+
+    tokenGenerationInProgress = true;
+
+    try {
+      Utils.addDebugLog('Generating new token with enhanced system...', 'info');
+      
+      // Try multiple methods based on token source configuration
+      let token = null;
+      
+      if (state.tokenSource === 'generator' || state.tokenSource === 'hybrid') {
+        token = await handleCaptchaWithRetry();
+      }
+      
+      if (!token && (state.tokenSource === 'manual' || state.tokenSource === 'hybrid')) {
+        Utils.addDebugLog('Generator failed, trying fallback automation...', 'warning');
+        token = await handleCaptchaFallback();
+      }
+
+      if (token && token.length > 20) {
+        setTurnstileToken(token);
+        state.retryCount = 0; // Reset retry counter on success
+        return token;
+      }
+
+      // Play notification sound if token generation failed and user action needed
+      playNotificationSound();
+      throw new Error('All token generation methods failed');
+    } catch (error) {
+      Utils.addDebugLog(`Token generation failed: ${error.message}`, 'error');
+      
+      // Implement retry logic for autonomous mode
+      if (state.autonomousMode && state.retryCount < CONFIG.MAX_RETRIES) {
+        state.retryCount++;
+        const delay = CONFIG.RETRY_DELAY_BASE * Math.pow(2, state.retryCount - 1);
+        Utils.addDebugLog(`Retrying token generation in ${delay}ms (attempt ${state.retryCount}/${CONFIG.MAX_RETRIES})`, 'warning');
+        
+        state.tokenRetryTimer = setTimeout(async () => {
+          try {
+            await ensureToken(true);
+          } catch (retryError) {
+            Utils.addDebugLog(`Retry ${state.retryCount} failed: ${retryError.message}`, 'error');
+          }
+        }, delay);
+      }
+      
+      return null;
+    } finally {
+      tokenGenerationInProgress = false;
+    }
+  }
+
+  async function handleCaptchaWithRetry() {
+    const startTime = performance.now();
+
+    try {
+      const { sitekey, token: preGeneratedToken } = await Utils.obtainSitekeyAndToken();
+
+      if (!sitekey) {
+        throw new Error('No valid sitekey found');
+      }
+
+      Utils.addDebugLog(`Using sitekey: ${sitekey}`, 'info');
+
+      let token = null;
+
+      if (preGeneratedToken && typeof preGeneratedToken === 'string' && preGeneratedToken.length > 20) {
+        Utils.addDebugLog('Reusing pre-generated Turnstile token', 'info');
+        token = preGeneratedToken;
+      } else {
+        if (isTokenValid() && !willTokenExpireSoon()) {
+          Utils.addDebugLog('Using existing cached token', 'info');
+          token = turnstileToken;
+        } else {
+          Utils.addDebugLog('Generating new token with executeTurnstile...', 'info');
+          token = await Utils.executeTurnstile(sitekey, 'paint');
+        }
+      }
+
+      if (token && typeof token === 'string' && token.length > 20) {
+        const elapsed = Math.round(performance.now() - startTime);
+        Utils.addDebugLog(`Turnstile token generated successfully in ${elapsed}ms`, 'success');
+        return token;
+      } else {
+        throw new Error(`Invalid or empty token received - Length: ${token?.length || 0}`);
+      }
+    } catch (error) {
+      const elapsed = Math.round(performance.now() - startTime);
+      Utils.addDebugLog(`Turnstile token generation failed after ${elapsed}ms: ${error.message}`, 'error');
+      throw error;
+    }
+  }
+
+  async function handleCaptchaFallback() {
+    return new Promise(async (resolve, reject) => {
+      try {
+        if (!_resolveToken) {
+          tokenPromise = new Promise((res) => {
+            _resolveToken = res;
+          });
+        }
+        
+        const timeoutPromise = Utils.sleep(30000).then(() =>
+          reject(new Error('Auto-CAPTCHA timed out.'))
+        );
+
+        const solvePromise = (async () => {
+          Utils.addDebugLog('Starting automated CAPTCHA solving...', 'info');
+          
+          const mainPaintBtn = await Utils.waitForSelector(
+            'button.btn.btn-primary.btn-lg, button.btn-primary.sm\\:btn-xl',
+            200,
+            10000
+          );
+          if (!mainPaintBtn) throw new Error('Could not find the main paint button.');
+          
+          Utils.addDebugLog('Found paint button, clicking...', 'info');
+          mainPaintBtn.click();
+          await Utils.sleep(500);
+
+          const transBtn = await Utils.waitForSelector('button#color-0', 200, 5000);
+          if (!transBtn) throw new Error('Could not find the transparent color button.');
+          
+          Utils.addDebugLog('Found transparent color button, clicking...', 'info');
+          transBtn.click();
+          await Utils.sleep(500);
+
+          const canvas = await Utils.waitForSelector('canvas', 200, 5000);
+          if (!canvas) throw new Error('Could not find the canvas element.');
+
+          Utils.addDebugLog('Found canvas, simulating interaction...', 'info');
+          canvas.setAttribute('tabindex', '0');
+          canvas.focus();
+          const rect = canvas.getBoundingClientRect();
+          const centerX = Math.round(rect.left + rect.width / 2);
+          const centerY = Math.round(rect.top + rect.height / 2);
+
+          canvas.dispatchEvent(
+            new MouseEvent('mousemove', {
+              clientX: centerX,
+              clientY: centerY,
+              bubbles: true,
+            })
+          );
+          
+          canvas.dispatchEvent(
+            new KeyboardEvent('keydown', {
+              key: ' ',
+              code: 'Space',
+              bubbles: true,
+            })
+          );
+          await Utils.sleep(50);
+          canvas.dispatchEvent(
+            new KeyboardEvent('keyup', {
+              key: ' ',
+              code: 'Space',
+              bubbles: true,
+            })
+          );
+          await Utils.sleep(800);
+
+          Utils.addDebugLog('Starting confirmation loop...', 'info');
+          const confirmLoop = async () => {
+            let attempts = 0;
+            while (!turnstileToken && attempts < 20) {
+              attempts++;
+              let confirmBtn = await Utils.waitForSelector(
+                'button.btn.btn-primary.btn-lg, button.btn.btn-primary.sm\\:btn-xl',
+                100,
+                1000
+              );
+              if (!confirmBtn) {
+                const allPrimary = Array.from(document.querySelectorAll('button.btn-primary'));
+                confirmBtn = allPrimary.length ? allPrimary[allPrimary.length - 1] : null;
+              }
+              if (confirmBtn) {
+                Utils.addDebugLog(`Confirmation attempt ${attempts}...`, 'info');
+                confirmBtn.click();
+              }
+              await Utils.sleep(500);
+            }
+          };
+
+          confirmLoop();
+          const token = await tokenPromise;
+          await Utils.sleep(300);
+          Utils.addDebugLog('Fallback token generation completed', 'success');
+          resolve(token);
+        })();
+
+        await Promise.race([solvePromise, timeoutPromise]);
+      } catch (error) {
+        Utils.addDebugLog(`Auto-CAPTCHA process failed: ${error.message}`, 'error');
+        reject(error);
+      }
+    });
+  }
+
+  // Enhanced WASM token creation with better error handling
+  async function createWasmToken(regionX, regionY, payload) {
+    try {
+      const mod = await import('/_app/immutable/chunks/BBb1ALhY.js');
+      let wasm;
+      try {
+        wasm = await mod._();
+        Utils.addDebugLog('WASM initialized successfully', 'success');
+      } catch (wasmError) {
+        Utils.addDebugLog(`WASM initialization failed: ${wasmError.message}`, 'error');
+        return null;
+      }
+
+      try {
+        const me = await fetch(`https://backend.wplace.live/me`, { credentials: 'include' }).then(r => r.ok ? r.json() : null);
+        if (me?.id) {
+          mod.i(me.id);
+          Utils.addDebugLog(`User ID set: ${me.id}`, 'info');
+        }
+      } catch (userIdError) {
+        Utils.addDebugLog(`Error setting user ID: ${userIdError.message}`, 'warning');
+      }
+
+      try {
+        const testUrl = `https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`;
+        if (mod.r) {
+          mod.r(testUrl);
+          Utils.addDebugLog(`Request URL set: ${testUrl}`, 'info');
+        }
+      } catch (urlError) {
+        Utils.addDebugLog(`Error setting request URL: ${urlError.message}`, 'warning');
+      }
+
+      const enc = new TextEncoder();
+      const dec = new TextDecoder();
+      const bodyStr = JSON.stringify(payload);
+      const bytes = enc.encode(bodyStr);
+
+      let inPtr;
+      try {
+        if (!wasm.__wbindgen_malloc) {
+          Utils.addDebugLog('__wbindgen_malloc function not found', 'error');
+          return null;
+        }
+
+        inPtr = wasm.__wbindgen_malloc(bytes.length, 1);
+        const wasmBuffer = new Uint8Array(wasm.memory.buffer, inPtr, bytes.length);
+        wasmBuffer.set(bytes);
+      } catch (memError) {
+        Utils.addDebugLog(`Memory allocation error: ${memError.message}`, 'error');
+        return null;
+      }
+
+      let outPtr, outLen, token;
+      try {
+        const result = wasm.get_pawtected_endpoint_payload(inPtr, bytes.length);
+
+        if (Array.isArray(result) && result.length === 2) {
+          [outPtr, outLen] = result;
+          const outputBuffer = new Uint8Array(wasm.memory.buffer, outPtr, outLen);
+          token = dec.decode(outputBuffer);
+        } else {
+          Utils.addDebugLog(`Unexpected function result format`, 'error');
+          return null;
+        }
+      } catch (funcError) {
+        Utils.addDebugLog(`Function call error: ${funcError.message}`, 'error');
+        return null;
+      }
+
+      try {
+        if (wasm.__wbindgen_free && outPtr && outLen) {
+          wasm.__wbindgen_free(outPtr, outLen, 1);
+        }
+        if (wasm.__wbindgen_free && inPtr) {
+          wasm.__wbindgen_free(inPtr, bytes.length, 1);
+        }
+      } catch (cleanupError) {
+        Utils.addDebugLog(`Cleanup warning: ${cleanupError.message}`, 'warning');
+      }
+
+      return token;
+    } catch (error) {
+      Utils.addDebugLog(`Failed to generate WASM token: ${error.message}`, 'error');
+      return null;
+    }
+  }
+
+  // Advanced injection system with enhanced token capture
+  function inject(callback) {
+    const script = document.createElement('script');
+    script.textContent = `(${callback})();`;
+    document.documentElement?.appendChild(script);
+    script.remove();
+  }
+
+  inject(() => {
+    const fetchedBlobQueue = new Map();
+    const tokenCaptureQueue = new Set();
+
+    window.addEventListener('message', (event) => {
+      const { source, blobID, blobData } = event.data;
+      if (source === 'auto-image-overlay' && blobID && blobData) {
+        const callback = fetchedBlobQueue.get(blobID);
+        if (typeof callback === 'function') {
+          callback(blobData);
+        }
+        fetchedBlobQueue.delete(blobID);
+      }
+    });
+
+    const originalFetch = window.fetch;
+    window.fetch = async function (...args) {
+      const response = await originalFetch.apply(this, args);
+      const url = args[0] instanceof Request ? args[0].url : args[0];
+
+      if (typeof url === 'string') {
+        // Enhanced token capture from paint requests
+        if (url.includes('https://backend.wplace.live/s0/pixel/')) {
+          try {
+            const requestBody = args[1]?.body;
+            if (requestBody) {
+              const payload = JSON.parse(requestBody);
+              if (payload.t && typeof payload.t === 'string' && payload.t.length > 20) {
+                // Prevent duplicate captures
+                if (!tokenCaptureQueue.has(payload.t)) {
+                  tokenCaptureQueue.add(payload.t);
+                  console.log(`🔍✅ Enhanced Token Captured - Length: ${payload.t.length}, Preview: ${payload.t.substring(0, 50)}...`);
+                  window.postMessage({ 
+                    source: 'turnstile-capture', 
+                    token: payload.t,
+                    timestamp: Date.now(),
+                    source_type: 'paint_request'
+                  }, '*');
+                  
+                  // Clean up old tokens from queue
+                  setTimeout(() => {
+                    tokenCaptureQueue.delete(payload.t);
+                  }, 300000); // 5 minutes
+                }
+              }
+            }
+          } catch (parseError) {
+            console.warn('Failed to parse paint request payload:', parseError);
+          }
+        }
+
+        // Enhanced tile interception for overlay system
+        const contentType = response.headers.get('content-type') || '';
+        if (contentType.includes('image/png') && url.includes('.png')) {
+          const cloned = response.clone();
+          return new Promise(async (resolve) => {
+            const blobUUID = crypto.randomUUID();
+            const originalBlob = await cloned.blob();
+
+            fetchedBlobQueue.set(blobUUID, (processedBlob) => {
+              resolve(
+                new Response(processedBlob, {
+                  headers: cloned.headers,
+                  status: cloned.status,
+                  statusText: cloned.statusText,
+                })
+              );
+            });
+
+            window.postMessage(
+              {
+                source: 'auto-image-tile',
+                endpoint: url,
+                blobID: blobUUID,
+                blobData: originalBlob,
+                timestamp: Date.now(),
+              },
+              '*'
+            );
+          });
+        }
+
+        // Monitor for authentication endpoints
+        if (url.includes('backend.wplace.live/me') || url.includes('auth')) {
+          const clonedForMonitoring = response.clone();
+          clonedForMonitoring.json().then(data => {
+            if (data && typeof data === 'object') {
+              window.postMessage({
+                source: 'auth-monitor',
+                data: data,
+                timestamp: Date.now(),
+              }, '*');
+            }
+          }).catch(() => {
+            // Ignore JSON parsing errors for non-JSON responses
+          });
+        }
+      }
+
+      return response;
+    };
+
+    // Enhanced XMLHttpRequest interception
+    const originalXHROpen = XMLHttpRequest.prototype.open;
+    const originalXHRSend = XMLHttpRequest.prototype.send;
+
+    XMLHttpRequest.prototype.open = function(method, url, ...args) {
+      this._interceptedUrl = url;
+      this._interceptedMethod = method;
+      return originalXHROpen.call(this, method, url, ...args);
+    };
+
+    XMLHttpRequest.prototype.send = function(data) {
+      if (this._interceptedUrl && this._interceptedUrl.includes('backend.wplace.live')) {
+        const originalOnReadyStateChange = this.onreadystatechange;
+        this.onreadystatechange = function() {
+          if (this.readyState === 4 && this.status === 200) {
+            try {
+              if (this._interceptedUrl.includes('s0/pixel/') && data) {
+                const payload = JSON.parse(data);
+                if (payload.t && typeof payload.t === 'string' && payload.t.length > 20) {
+                  console.log(`🔍✅ XHR Token Captured - Length: ${payload.t.length}`);
+                  window.postMessage({ 
+                    source: 'turnstile-capture', 
+                    token: payload.t,
+                    timestamp: Date.now(),
+                    source_type: 'xhr_request'
+                  }, '*');
+                }
+              }
+            } catch (e) {
+              // Ignore parsing errors
+            }
+          }
+          if (originalOnReadyStateChange) {
+            originalOnReadyStateChange.call(this);
+          }
+        };
+      }
+      return originalXHRSend.call(this, data);
+    };
+
+    // Monitor for dynamic script injection (additional token sources)
+    const originalAppendChild = Node.prototype.appendChild;
+    Node.prototype.appendChild = function(child) {
+      if (child.tagName === 'SCRIPT' && child.src && child.src.includes('turnstile')) {
+        console.log('🔍 Turnstile script detected:', child.src);
+        window.postMessage({
+          source: 'script-monitor',
+          scriptSrc: child.src,
+          timestamp: Date.now(),
+        }, '*');
+      }
+      return originalAppendChild.call(this, child);
+    };
+  });
+
+  // Enhanced message handler for all interception types
+  window.addEventListener('message', (event) => {
+    const { source, endpoint, blobID, blobData, token, timestamp, source_type, data } = event.data;
+
+    if (source === 'auto-image-tile' && endpoint && blobID && blobData) {
+      overlayManager.processAndRespondToTileRequest(event.data);
+    }
+
+    if (source === 'turnstile-capture' && token) {
+      Utils.addDebugLog(`Token captured from ${source_type || 'unknown'} - Length: ${token.length}`, 'success');
+      setTurnstileToken(token);
+      
+      // Update UI immediately
+      updateTokenStatus();
+    }
+
+    if (source === 'auth-monitor' && data) {
+      Utils.addDebugLog(`Auth data captured: User ID ${data.id || 'unknown'}`, 'info');
+      if (data.charges) {
+        state.displayCharges = Math.floor(data.charges.count || 0);
+        state.maxCharges = Math.max(1, Math.floor(data.charges.max || 1));
+        state.cooldown = data.charges.cooldownMs || CONFIG.COOLDOWN_DEFAULT;
+        updateChargesDisplay();
+      }
+    }
+
+    if (source === 'script-monitor') {
+      Utils.addDebugLog(`External script detected: ${event.data.scriptSrc}`, 'info');
+    }
+  });
+
+  // Fallback translations
+  const TEXTS = {
+    title: 'WPlace Autonomous Repair Tool',
+    loadFromFile: 'Load Progress File',
+    repairPixels: 'Repair Pixels',
+    enableAutoRepair: 'Enable Auto Repair',
+    repairInterval: 'Check Interval (seconds)',
+    debug: 'Debug Console',
+    clearDebug: 'Clear Debug',
+    scanningForDamage: 'Scanning for damaged pixels...',
+    damageDetected: 'Damage detected: {count} pixels',
+    noDamageDetected: 'No damage found',
+    repairingPixels: 'Repairing {count} damaged pixels...',
+    repairComplete: 'Repair completed: {repaired} pixels fixed',
+    autoRepairStarted: 'Auto repair started (every {interval}s)',
+    autoRepairStopped: 'Auto repair stopped',
+    fileLoaded: 'Progress file loaded successfully',
+    invalidFile: 'Invalid file format',
+    noImageData: 'No image data found in file',
+    turnstileInstructions: 'Complete the verification',
+    hideTurnstileBtn: 'Hide',
+    tokenCapturedSuccess: 'Token captured successfully',
+    autonomousModeActive: 'Autonomous mode active',
+    tokenSystemReady: 'Advanced token system ready',
+  };
+
+  // Enhanced utility functions
+  const Utils = {
+    sleep: (ms) => new Promise((r) => setTimeout(r, ms)),
+
+    t: (key, params = {}) => {
+      let text = TEXTS[key] || key;
+      Object.keys(params).forEach((param) => {
+        text = text.replace(`{${param}}`, params[param]);
+      });
+      return text;
+    },
+
+    showAlert: (message, type = 'info') => {
+      const alertDiv = document.createElement('div');
+      alertDiv.style.cssText = `
+        position: fixed; top: 20px; right: 20px; z-index: 10000;
+        padding: 12px 16px; border-radius: 8px; color: white; font-weight: 500;
+        background: ${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : type === 'warning' ? '#ffc107' : '#17a2b8'};
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        max-width: 300px; word-wrap: break-word;
+      `;
+      alertDiv.textContent = message;
+      document.body.appendChild(alertDiv);
+
+      setTimeout(() => {
+        alertDiv.style.transition = 'opacity 0.3s ease';
+        alertDiv.style.opacity = '0';
+        setTimeout(() => {
+          if (alertDiv.parentNode) alertDiv.remove();
+        }, 300);
+      }, 4000);
+    },
+
+    addDebugLog: (message, type = 'info') => {
+      const timestamp = new Date().toLocaleTimeString();
+      state.debugLogs.push({ timestamp, message, type });
+
+      if (state.debugLogs.length > 150) {
+        state.debugLogs = state.debugLogs.slice(-150);
+      }
+
+      updateDebugConsole();
+      console.log(`[${timestamp}] ${message}`);
+    },
+
+    waitForSelector: async (selector, interval = 200, timeout = 5000) => {
+      const start = Date.now();
+      while (Date.now() - start < timeout) {
+        const el = document.querySelector(selector);
+        if (el) return el;
+        await Utils.sleep(interval);
+      }
+      return null;
+    },
+
+    createFileUploader: () =>
+      new Promise((resolve, reject) => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        input.onchange = (e) => {
+          const file = e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = () => {
+              try {
+                const data = JSON.parse(reader.result);
+                resolve(data);
+              } catch (error) {
+                reject(new Error('Invalid JSON file'));
+              }
+            };
+            reader.onerror = () => reject(new Error('File reading error'));
+            reader.readAsText(file);
+          } else {
+            reject(new Error('No file selected'));
+          }
+        };
+        input.click();
+      }),
+
+    isWhitePixel: (r, g, b) => {
+      const wt = state.customWhiteThreshold || CONFIG.WHITE_THRESHOLD;
+      return r >= wt && g >= wt && b >= wt;
+    },
+
+    resolveColor(targetRgb, availableColors) {
+      if (!availableColors || availableColors.length === 0) {
+        return { id: null, rgb: targetRgb };
+      }
+
+      let bestId = availableColors[0].id;
+      let bestRgb = [...availableColors[0].rgb];
+      let bestScore = Infinity;
+
+      for (let i = 0; i < availableColors.length; i++) {
+        const c = availableColors[i];
+        const [r, g, b] = c.rgb;
+        const rmean = (r + targetRgb[0]) / 2;
+        const rdiff = r - targetRgb[0];
+        const gdiff = g - targetRgb[1];
+        const bdiff = b - targetRgb[2];
+        const dist = Math.sqrt(
+          (((512 + rmean) * rdiff * rdiff) >> 8) +
+          4 * gdiff * gdiff +
+          (((767 - rmean) * bdiff * bdiff) >> 8)
+        );
+        if (dist < bestScore) {
+          bestScore = dist;
+          bestId = c.id;
+          bestRgb = [...c.rgb];
+          if (dist === 0) break;
+        }
+      }
+
+      return { id: bestId, rgb: bestRgb };
+    },
+
+    calculateTileRange(
+      startRegionX,
+      startRegionY,
+      startPixelX,
+      startPixelY,
+      width,
+      height,
+      tileSize = 1000
+    ) {
+      const endPixelX = startPixelX + width;
+      const endPixelY = startPixelY + height;
+
+      return {
+        startTileX: startRegionX + Math.floor(startPixelX / tileSize),
+        startTileY: startRegionY + Math.floor(startPixelY / tileSize),
+        endTileX: startRegionX + Math.floor((endPixelX - 1) / tileSize),
+        endTileY: startRegionY + Math.floor((endPixelY - 1) / tileSize),
+      };
+    },
+
+    dynamicSleep: async function (tickAndGetRemainingMs) {
+      let remaining = Math.max(0, await tickAndGetRemainingMs());
+      while (remaining > 0) {
+        const interval = remaining > 5000 ? 2000 : remaining > 1000 ? 500 : 100;
+        await this.sleep(Math.min(interval, remaining));
+        remaining = Math.max(0, await tickAndGetRemainingMs());
+      }
+    },
+
+    // Enhanced Turnstile integration with sophisticated management
+    turnstileLoaded: false,
+    _turnstileContainer: null,
+    _turnstileOverlay: null,
+    _turnstileWidgetId: null,
+    _lastSitekey: null,
+    _cachedSitekey: null,
+    _sitekeyAttempts: 0,
+
+    async loadTurnstile() {
+      if (window.turnstile) {
+        this.turnstileLoaded = true;
+        return Promise.resolve();
+      }
+
+      return new Promise((resolve, reject) => {
+        if (
+          document.querySelector(
+            'script[src^="https://challenges.cloudflare.com/turnstile/v0/api.js"]'
+          )
+        ) {
+          const checkReady = () => {
+            if (window.turnstile) {
+              this.turnstileLoaded = true;
+              resolve();
+            } else {
+              setTimeout(checkReady, 100);
+            }
+          };
+          return checkReady();
+        }
+
+        const script = document.createElement('script');
+        script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+        script.async = true;
+        script.defer = true;
+        script.onload = () => {
+          this.turnstileLoaded = true;
+          Utils.addDebugLog('Turnstile script loaded successfully', 'success');
+          resolve();
+        };
+        script.onerror = () => {
+          Utils.addDebugLog('Failed to load Turnstile script', 'error');
+          reject(new Error('Failed to load Turnstile'));
+        };
+        document.head.appendChild(script);
+      });
+    },
+
+    ensureTurnstileContainer() {
+      if (!this._turnstileContainer || !document.body.contains(this._turnstileContainer)) {
+        if (this._turnstileContainer) {
+          this._turnstileContainer.remove();
+        }
+
+        this._turnstileContainer = document.createElement('div');
+        this._turnstileContainer.style.cssText = `
+          position: absolute; left: -9999px; top: -9999px; width: 1px; height: 1px;
+          overflow: hidden; visibility: hidden; opacity: 0; pointer-events: none;
+        `;
+        this._turnstileContainer.setAttribute('aria-hidden', 'true');
+        this._turnstileContainer.id = 'turnstile-widget-container';
+        document.body.appendChild(this._turnstileContainer);
+      }
+      return this._turnstileContainer;
+    },
+
+    ensureTurnstileOverlayContainer() {
+      if (this._turnstileOverlay && document.body.contains(this._turnstileOverlay)) {
+        return this._turnstileOverlay;
+      }
+
+      const overlay = document.createElement('div');
+      overlay.id = 'turnstile-overlay-container';
+      overlay.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.8); z-index: 10001; display: none;
+        justify-content: center; align-items: center; flex-direction: column;
+        color: white; font-family: 'Segoe UI', Arial, sans-serif;
+      `;
+
+      const title = document.createElement('div');
+      title.textContent = Utils.t('turnstileInstructions');
+      title.style.cssText = 'font-size: 18px; margin-bottom: 20px; text-align: center;';
+
+      const host = document.createElement('div');
+      host.id = 'turnstile-overlay-host';
+      host.style.cssText = 'margin-bottom: 20px;';
+
+      const hideBtn = document.createElement('button');
+      hideBtn.textContent = Utils.t('hideTurnstileBtn');
+      hideBtn.style.cssText = `
+        background: #dc3545; color: white; border: none; padding: 10px 20px;
+        border-radius: 5px; cursor: pointer; font-size: 14px;
+      `;
+      hideBtn.addEventListener('click', () => {
+        overlay.style.display = 'none';
+      });
+
+      overlay.appendChild(title);
+      overlay.appendChild(host);
+      overlay.appendChild(hideBtn);
+      document.body.appendChild(overlay);
+
+      this._turnstileOverlay = overlay;
+      return overlay;
+    },
+
+    async executeTurnstile(sitekey, action = 'paint') {
+      await this.loadTurnstile();
+
+      if (this._turnstileWidgetId && this._lastSitekey === sitekey && window.turnstile?.execute) {
+        try {
+          Utils.addDebugLog('Reusing existing Turnstile widget...', 'info');
+          const token = await Promise.race([
+            window.turnstile.execute(this._turnstileWidgetId, { action }),
+            new Promise((_, reject) =>
+              setTimeout(() => reject(new Error('Execute timeout')), 15000)
+            ),
+          ]);
+          if (token && token.length > 20) {
+            Utils.addDebugLog('Token generated via widget reuse', 'success');
+            return token;
+          }
+        } catch (error) {
+          Utils.addDebugLog(`Widget reuse failed: ${error.message}`, 'warning');
+        }
+      }
+
+      const invisibleToken = await this.createTurnstileWidget(sitekey, action);
+      if (invisibleToken && invisibleToken.length > 20) {
+        return invisibleToken;
+      }
+
+      if (state.autonomousMode) {
+        Utils.addDebugLog('Autonomous mode: skipping interactive widget to avoid user interaction', 'info');
+        return null;
+      }
+
+      Utils.addDebugLog('Falling back to interactive Turnstile (visible)', 'warning');
+      return await this.createTurnstileWidgetInteractive(sitekey, action);
+    },
+
+    async createTurnstileWidget(sitekey, action) {
+      return new Promise((resolve) => {
+        try {
+          if (this._turnstileWidgetId && window.turnstile?.remove) {
+            try {
+              window.turnstile.remove(this._turnstileWidgetId);
+              Utils.addDebugLog('Cleaned up existing Turnstile widget', 'info');
+            } catch (e) {
+              Utils.addDebugLog(`Widget cleanup warning: ${e.message}`, 'warning');
+            }
+          }
+
+          const container = this.ensureTurnstileContainer();
+          container.innerHTML = '';
+
+          if (!window.turnstile?.render) {
+            Utils.addDebugLog('Turnstile not available for rendering', 'error');
+            resolve(null);
+            return;
+          }
+
+          Utils.addDebugLog('Creating invisible Turnstile widget...', 'info');
+          const widgetId = window.turnstile.render(container, {
+            sitekey,
+            action,
+            size: 'invisible',
+            retry: 'auto',
+            'retry-interval': 8000,
+            callback: (token) => {
+              Utils.addDebugLog('Invisible Turnstile callback received', 'success');
+              resolve(token);
+            },
+            'error-callback': (error) => {
+              Utils.addDebugLog(`Turnstile error: ${error}`, 'error');
+              resolve(null);
+            },
+            'timeout-callback': () => {
+              Utils.addDebugLog('Turnstile timeout', 'warning');
+              resolve(null);
+            },
+          });
+
+          this._turnstileWidgetId = widgetId;
+          this._lastSitekey = sitekey;
+
+          if (!widgetId) {
+            Utils.addDebugLog('Failed to create Turnstile widget', 'error');
+            return resolve(null);
+          }
+
+          Promise.race([
+            window.turnstile.execute(widgetId, { action }),
+            new Promise((_, reject) =>
+              setTimeout(() => reject(new Error('Invisible execute timeout')), 12000)
+            ),
+          ])
+            .then(resolve)
+            .catch((error) => {
+              Utils.addDebugLog(`Turnstile execution failed: ${error.message}`, 'error');
+              resolve(null);
+            });
+        } catch (e) {
+          Utils.addDebugLog(`Invisible Turnstile creation failed: ${e.message}`, 'error');
+          resolve(null);
+        }
+      });
+    },
+
+    async createTurnstileWidgetInteractive(sitekey, action) {
+      Utils.addDebugLog('Creating interactive Turnstile widget (visible)', 'info');
+
+      return new Promise((resolve) => {
+        try {
+          if (this._turnstileWidgetId && window.turnstile?.remove) {
+            try {
+              window.turnstile.remove(this._turnstileWidgetId);
+            } catch (e) {
+              Utils.addDebugLog(`Widget cleanup warning: ${e.message}`, 'warning');
+            }
+          }
+
+          const overlay = this.ensureTurnstileOverlayContainer();
+          overlay.style.display = 'flex';
+
+          const host = overlay.querySelector('#turnstile-overlay-host');
+          host.innerHTML = '';
+
+          const timeout = setTimeout(() => {
+            Utils.addDebugLog('Interactive Turnstile widget timeout', 'warning');
+            overlay.style.display = 'none';
+            resolve(null);
+          }, 60000);
+
+          const widgetId = window.turnstile.render(host, {
+            sitekey,
+            action,
+            size: 'normal',
+            theme: 'auto',
+            callback: (token) => {
+              clearTimeout(timeout);
+              overlay.style.display = 'none';
+              Utils.addDebugLog('Interactive Turnstile completed successfully', 'success');
+
+              if (typeof token === 'string' && token.length > 20) {
+                resolve(token);
+              } else {
+                Utils.addDebugLog('Invalid token from interactive widget', 'warning');
+                resolve(null);
+              }
+            },
+            'error-callback': (error) => {
+              clearTimeout(timeout);
+              overlay.style.display = 'none';
+              Utils.addDebugLog(`Interactive Turnstile error: ${error}`, 'error');
+              resolve(null);
+            },
+          });
+
+          this._turnstileWidgetId = widgetId;
+          this._lastSitekey = sitekey;
+
+          if (!widgetId) {
+            clearTimeout(timeout);
+            overlay.style.display = 'none';
+            Utils.addDebugLog('Failed to create interactive Turnstile widget', 'error');
+            resolve(null);
+          } else {
+            Utils.addDebugLog('Interactive Turnstile widget created, waiting for user interaction...', 'info');
+          }
+        } catch (e) {
+          Utils.addDebugLog(`Interactive Turnstile creation failed: ${e.message}`, 'error');
+          resolve(null);
+        }
+      });
+    },
+
+    cleanupTurnstile() {
+      if (this._turnstileWidgetId && window.turnstile?.remove) {
+        try {
+          window.turnstile.remove(this._turnstileWidgetId);
+        } catch (e) {
+          Utils.addDebugLog(`Failed to cleanup Turnstile widget: ${e.message}`, 'warning');
+        }
+      }
+
+      if (this._turnstileContainer && document.body.contains(this._turnstileContainer)) {
+        this._turnstileContainer.remove();
+      }
+
+      if (this._turnstileOverlay && document.body.contains(this._turnstileOverlay)) {
+        this._turnstileOverlay.remove();
+      }
+
+      this._turnstileWidgetId = null;
+      this._turnstileContainer = null;
+      this._turnstileOverlay = null;
+      this._lastSitekey = null;
+    },
+
+    async obtainSitekeyAndToken(fallback = '0x4AAAAAABpqJe8FO0N84q0F') {
+      if (this._cachedSitekey && this._sitekeyAttempts < 3) {
+        Utils.addDebugLog(`Using cached sitekey: ${this._cachedSitekey}`, 'info');
+
+        return isTokenValid()
+          ? {
+            sitekey: this._cachedSitekey,
+            token: turnstileToken,
+          }
+          : { sitekey: this._cachedSitekey, token: null };
+      }
+
+      const potentialSitekeys = [
+        '0x4AAAAAABpqJe8FO0N84q0F',
+        '0x4AAAAAAAJ7xjKAp6Mt_7zw',
+        '0x4AAAAAADm5QWx6Ov2LNF2g',
+      ];
+
+      const trySitekey = async (sitekey, source) => {
+        if (!sitekey || sitekey.length < 10) return null;
+
+        Utils.addDebugLog(`Testing sitekey from ${source}: ${sitekey}`, 'info');
+        const token = await this.executeTurnstile(sitekey);
+
+        if (token && token.length >= 20) {
+          Utils.addDebugLog(`Valid token generated from ${source} sitekey`, 'success');
+          setTurnstileToken(token);
+          this._cachedSitekey = sitekey;
+          this._sitekeyAttempts = 0;
+          return { sitekey, token };
+        } else {
+          Utils.addDebugLog(`Failed to get token from ${source} sitekey`, 'warning');
+          return null;
+        }
+      };
+
+      try {
+        this._sitekeyAttempts++;
+
+        // Enhanced sitekey detection methods
+        const detectionMethods = [
+          () => {
+            const sitekeySel = document.querySelector('[data-sitekey]');
+            return sitekeySel ? sitekeySel.getAttribute('data-sitekey') : null;
+          },
+          () => {
+            const turnstileEl = document.querySelector('.cf-turnstile');
+            return turnstileEl?.dataset?.sitekey || null;
+          },
+          () => {
+            const metaTags = document.querySelectorAll('meta[name*="turnstile"], meta[property*="turnstile"]');
+            for (const meta of metaTags) {
+              const content = meta.getAttribute('content');
+              if (content && content.length > 10) return content;
+            }
+            return null;
+          },
+          () => window.__TURNSTILE_SITEKEY || null,
+          () => {
+            const scripts = document.querySelectorAll('script');
+            for (const script of scripts) {
+              const content = script.textContent || script.innerHTML;
+              const match = content.match(/(?:sitekey|data-sitekey)['"\s\[\]:\=\(]*['"]?([0-9a-zA-Z_-]{20,})['"]?/i);
+              if (match && match[1]) {
+                return match[1].replace(/['"]/g, '');
+              }
+            }
+            return null;
+          }
+        ];
+
+        for (const method of detectionMethods) {
+          try {
+            const sitekey = method();
+            if (sitekey) {
+              const result = await trySitekey(sitekey, 'detection method');
+              if (result) return result;
+            }
+          } catch (error) {
+            Utils.addDebugLog(`Detection method failed: ${error.message}`, 'warning');
+          }
+        }
+
+        Utils.addDebugLog('Testing known potential sitekeys...', 'info');
+        for (const testSitekey of potentialSitekeys) {
+          const result = await trySitekey(testSitekey, 'known list');
+          if (result) return result;
+        }
+      } catch (error) {
+        Utils.addDebugLog(`Error during sitekey detection: ${error.message}`, 'warning');
+      }
+
+      Utils.addDebugLog(`Trying fallback sitekey: ${fallback}`, 'info');
+      const fallbackResult = await trySitekey(fallback, 'fallback');
+      if (fallbackResult) {
+        return fallbackResult;
+      }
+
+      Utils.addDebugLog('No working sitekey or token found after all attempts.', 'error');
+      return { sitekey: null, token: null };
+    },
+  };
+
+  // Enhanced Overlay Manager for pixel detection with autonomous capabilities
+  class OverlayManager {
+    constructor() {
+      this.originalTiles = new Map();
+      this.originalTilesData = new Map();
+      this.tileSize = 1000;
+      this.loadingPromises = new Map();
+      this.autonomousMode = state.autonomousMode;
+    }
+
+    async processAndRespondToTileRequest(eventData) {
+      const { endpoint, blobID, blobData } = eventData;
+
+      const tileMatch = endpoint.match(/(\d+)\/(\d+)\.png/);
+      if (tileMatch) {
+        const tileX = parseInt(tileMatch[1], 10);
+        const tileY = parseInt(tileMatch[2], 10);
+        const tileKey = `${tileX},${tileY}`;
+
+        try {
+          const originalBitmap = await createImageBitmap(blobData);
+          this.originalTiles.set(tileKey, originalBitmap);
+
+          try {
+            let canvas, ctx;
+            if (typeof OffscreenCanvas !== 'undefined') {
+              canvas = new OffscreenCanvas(originalBitmap.width, originalBitmap.height);
+              ctx = canvas.getContext('2d');
+            } else {
+              canvas = document.createElement('canvas');
+              canvas.width = originalBitmap.width;
+              canvas.height = originalBitmap.height;
+              ctx = canvas.getContext('2d');
+            }
+            ctx.imageSmoothingEnabled = false;
+            ctx.drawImage(originalBitmap, 0, 0);
+            const imgData = ctx.getImageData(0, 0, originalBitmap.width, originalBitmap.height);
+
+            this.originalTilesData.set(tileKey, {
+              w: originalBitmap.width,
+              h: originalBitmap.height,
+              data: new Uint8ClampedArray(imgData.data),
+            });
+
+            if (this.autonomousMode) {
+              Utils.addDebugLog(`Auto-cached tile: ${tileKey} (${originalBitmap.width}x${originalBitmap.height})`, 'info');
+            }
+          } catch (e) {
+            Utils.addDebugLog(`Failed to cache tile ImageData: ${tileKey} - ${e.message}`, 'warning');
+          }
+        } catch (e) {
+          Utils.addDebugLog(`Failed to create tile bitmap: ${tileKey} - ${e.message}`, 'error');
+        }
+      }
+
+      window.postMessage(
+        {
+          source: 'auto-image-overlay',
+          blobID: blobID,
+          blobData: blobData,
+        },
+        '*'
+      );
+    }
+
+    async getTilePixelColor(tileX, tileY, pixelX, pixelY) {
+      const tileKey = `${tileX},${tileY}`;
+      const alphaThresh = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
+
+      const cached = this.originalTilesData.get(tileKey);
+      if (cached && cached.data && cached.w > 0 && cached.h > 0) {
+        const x = Math.max(0, Math.min(cached.w - 1, pixelX));
+        const y = Math.max(0, Math.min(cached.h - 1, pixelY));
+        const idx = (y * cached.w + x) * 4;
+        const d = cached.data;
+        const a = d[idx + 3];
+
+        if (!state.paintTransparentPixels && a < alphaThresh) {
+          return null;
+        }
+        return [d[idx], d[idx + 1], d[idx + 2], a];
+      }
+
+      const bitmap = this.originalTiles.get(tileKey);
+      if (!bitmap) {
+        if (this.autonomousMode) {
+          Utils.addDebugLog(`Tile ${tileKey} not available, requesting load...`, 'warning');
+        }
+        return null;
+      }
+
+      try {
+        let canvas, ctx;
+        if (typeof OffscreenCanvas !== 'undefined') {
+          canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+          ctx = canvas.getContext('2d');
+        } else {
+          canvas = document.createElement('canvas');
+          canvas.width = bitmap.width;
+          canvas.height = bitmap.height;
+          ctx = canvas.getContext('2d');
+        }
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(bitmap, 0, 0);
+
+        const x = Math.max(0, Math.min(bitmap.width - 1, pixelX));
+        const y = Math.max(0, Math.min(bitmap.height - 1, pixelY));
+        const data = ctx.getImageData(x, y, 1, 1).data;
+        const a = data[3];
+
+        if (!state.paintTransparentPixels && a < alphaThresh) {
+          return null;
+        }
+
+        return [data[0], data[1], data[2], a];
+      } catch (e) {
+        Utils.addDebugLog(`Error reading pixel from tile ${tileKey}: ${e.message}`, 'error');
+        return null;
+      }
+    }
+
+    async waitForTiles(startRegionX, startRegionY, pixelWidth, pixelHeight, startPixelX = 0, startPixelY = 0, timeoutMs = 15000) {
+      const { startTileX, startTileY, endTileX, endTileY } = Utils.calculateTileRange(
+        startRegionX,
+        startRegionY,
+        startPixelX,
+        startPixelY,
+        pixelWidth,
+        pixelHeight,
+        this.tileSize
+		);
+
+      const requiredTiles = [];
+      for (let ty = startTileY; ty <= endTileY; ty++) {
+        for (let tx = startTileX; tx <= endTileX; tx++) {
+          requiredTiles.push(`${tx},${ty}`);
+        }
+      }
+
+      if (requiredTiles.length === 0) return true;
+
+      Utils.addDebugLog(`Waiting for ${requiredTiles.length} tiles (autonomous: ${this.autonomousMode})...`, 'info');
+
+      const startTime = Date.now();
+      let lastProgress = 0;
+
+      while (Date.now() - startTime < timeoutMs) {
+        if (state.stopFlag) {
+          Utils.addDebugLog('waitForTiles: stopped by user', 'warning');
+          return false;
+        }
+
+        const loaded = requiredTiles.filter((k) => this.originalTiles.has(k)).length;
+        const progress = Math.round((loaded / requiredTiles.length) * 100);
+
+        if (progress !== lastProgress && progress % 20 === 0) {
+          Utils.addDebugLog(`Tile loading progress: ${loaded}/${requiredTiles.length} (${progress}%)`, 'info');
+          lastProgress = progress;
+        }
+
+        if (loaded === requiredTiles.length) {
+          Utils.addDebugLog(`All ${requiredTiles.length} required tiles are loaded`, 'success');
+          return true;
+        }
+
+        await Utils.sleep(this.autonomousMode ? 500 : 1000);
+      }
+
+      const loaded = requiredTiles.filter((k) => this.originalTiles.has(k)).length;
+      Utils.addDebugLog(`Timeout waiting for tiles: ${loaded}/${requiredTiles.length} loaded`, 'warning');
+      
+      if (this.autonomousMode && loaded > requiredTiles.length * 0.8) {
+        Utils.addDebugLog(`Autonomous mode: proceeding with ${loaded}/${requiredTiles.length} tiles (80%+ loaded)`, 'warning');
+        return true;
+      }
+
+      return loaded > 0;
+    }
+  }
+
+  const overlayManager = new OverlayManager();
+
+  // Enhanced WPlace API Service with autonomous capabilities
+  const WPlaceService = {
+    async paintPixelInRegion(regionX, regionY, pixelX, pixelY, color, retryCount = 0) {
+      try {
+        await ensureToken();
+        if (!turnstileToken) {
+          Utils.addDebugLog('No valid token available for paint request', 'error');
+          return 'token_error';
+        }
+
+        const payload = {
+          coords: [pixelX, pixelY],
+          colors: [color],
+          t: turnstileToken,
+          fp: randStr(10),
+        };
+
+        const wasmToken = await createWasmToken(regionX, regionY, payload);
+        if (!wasmToken) {
+          Utils.addDebugLog('Failed to generate WASM token', 'error');
+          return false;
+        }
+
+        const res = await fetch(`https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'text/plain;charset=UTF-8',
+            'x-pawtect-token': wasmToken 
+          },
+          credentials: 'include',
+          body: JSON.stringify(payload),
+        });
+
+        if (res.status === 403) {
+          Utils.addDebugLog(`403 Forbidden for pixel (${pixelX},${pixelY}). Token invalid/expired.`, 'error');
+          invalidateToken();
+          
+          if (retryCount < 2 && state.autonomousMode) {
+            Utils.addDebugLog(`Autonomous retry ${retryCount + 1}/2 for pixel (${pixelX},${pixelY})`, 'warning');
+            await Utils.sleep(1000);
+            return await this.paintPixelInRegion(regionX, regionY, pixelX, pixelY, color, retryCount + 1);
+          }
+          
+          return 'token_error';
+        }
+
+        if (!res.ok) {
+          Utils.addDebugLog(`Paint request failed with status ${res.status}`, 'error');
+          return false;
+        }
+
+        const data = await res.json();
+        const success = data?.painted === 1;
+        
+        if (success) {
+          Utils.addDebugLog(`Paint SUCCESS for (${pixelX},${pixelY}) with color ${color}`, 'success');
+        } else {
+          Utils.addDebugLog(`Paint FAILED for (${pixelX},${pixelY}) - server response: ${JSON.stringify(data)}`, 'error');
+        }
+        
+        return success;
+      } catch (e) {
+        Utils.addDebugLog(`Paint request error for (${pixelX},${pixelY}): ${e.message}`, 'error');
+        return false;
+      }
+    },
+
+    async getCharges() {
+      try {
+        const res = await fetch('https://backend.wplace.live/me', {
+          credentials: 'include',
+        });
+        if (!res.ok) return { charges: 0, max: 1, cooldown: CONFIG.COOLDOWN_DEFAULT };
+        const data = await res.json();
+        return {
+          charges: data.charges?.count ?? 0,
+          max: data.charges?.max ?? 1,
+          cooldown: data.charges?.cooldownMs ?? CONFIG.COOLDOWN_DEFAULT,
+        };
+      } catch (e) {
+        Utils.addDebugLog(`Error fetching charges: ${e.message}`, 'warning');
+        return { charges: 0, max: 1, cooldown: CONFIG.COOLDOWN_DEFAULT };
+      }
+    },
+  };
+
+  // Anti-grief repair system with autonomous capabilities
+  async function scanForDamage() {
+    if (!state.imageData || !state.startPosition || !state.region) {
+      Utils.addDebugLog('No image data or position for scanning', 'warning');
+      return [];
+    }
+
+    Utils.addDebugLog('Starting autonomous damage scan...', 'info');
+    updateStatus(Utils.t('scanningForDamage'));
+
+    const damagedPixels = [];
+    const { width, height, pixels } = state.imageData;
+
+    const ready = await overlayManager.waitForTiles(
+      state.region.x,
+      state.region.y,
+      width,
+      height,
+      state.startPosition.x,
+      state.startPosition.y,
+      state.autonomousMode ? 20000 : 15000
+    );
+
+    if (!ready) {
+      Utils.addDebugLog('Failed to load required tiles for scanning', 'error');
+      if (state.autonomousMode) {
+        Utils.addDebugLog('Autonomous mode: will retry scan in 30 seconds', 'warning');
+        setTimeout(() => {
+          if (state.autoRepairEnabled && !state.stopFlag) {
+            scanForDamage();
+          }
+        }, 30000);
+      }
+      return [];
+    }
+
+    Utils.addDebugLog(`Scanning ${width}x${height} image for damage (autonomous: ${state.autonomousMode})...`, 'info');
+
+    let scannedPixels = 0;
+    let lastProgressUpdate = Date.now();
+    
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        if (state.stopFlag) break;
+
+        const idx = (y * width + x) * 4;
+        const originalR = pixels[idx];
+        const originalG = pixels[idx + 1];
+        const originalB = pixels[idx + 2];
+        const originalA = pixels[idx + 3];
+
+        if (!state.paintTransparentPixels && originalA < CONFIG.TRANSPARENCY_THRESHOLD) {
+          continue;
+        }
+
+        if (!state.paintWhitePixels && Utils.isWhitePixel(originalR, originalG, originalB)) {
+          continue;
+        }
+
+        scannedPixels++;
+
+        const absX = state.startPosition.x + x;
+        const absY = state.startPosition.y + y;
+        const tileX = state.region.x + Math.floor(absX / 1000);
+        const tileY = state.region.y + Math.floor(absY / 1000);
+        const pixelX = absX % 1000;
+        const pixelY = absY % 1000;
+
+        try {
+          const currentPixel = await overlayManager.getTilePixelColor(tileX, tileY, pixelX, pixelY);
+
+          if (!currentPixel) {
+            if (!state.autonomousMode) {
+              Utils.addDebugLog(`No current pixel data for (${x},${y}) - tile ${tileX},${tileY}`, 'warning');
+            }
+            continue;
+          }
+
+          const targetColor = Utils.resolveColor([originalR, originalG, originalB], state.availableColors);
+          const currentColor = Utils.resolveColor(currentPixel.slice(0, 3), state.availableColors);
+
+          if (targetColor.id !== currentColor.id) {
+            damagedPixels.push({
+              x,
+              y,
+              originalColor: targetColor,
+              currentColor: currentColor,
+              originalRgb: [originalR, originalG, originalB],
+              currentRgb: currentPixel.slice(0, 3)
+            });
+
+            if (!state.autonomousMode || damagedPixels.length <= 10) {
+              Utils.addDebugLog(`Damage at (${x},${y}): expected color ${targetColor.id}, found color ${currentColor.id}`, 'warning');
+            }
+          }
+        } catch (e) {
+          if (!state.autonomousMode) {
+            Utils.addDebugLog(`Error checking pixel (${x},${y}): ${e.message}`, 'error');
+          }
+        }
+      }
+
+      if (state.autonomousMode && Date.now() - lastProgressUpdate > 5000) {
+        Utils.addDebugLog(`Scan progress: ${y}/${height} rows (${Math.round((y / height) * 100)}%), found ${damagedPixels.length} damaged`, 'info');
+        lastProgressUpdate = Date.now();
+      } else if (!state.autonomousMode && y % 10 === 0) {
+        Utils.addDebugLog(`Scan progress: ${y}/${height} rows (${Math.round((y / height) * 100)}%)`, 'info');
+      }
+    }
+
+    const logLevel = damagedPixels.length > 0 ? 'warning' : 'success';
+    Utils.addDebugLog(`Scan complete. Checked ${scannedPixels} pixels, found ${damagedPixels.length} damaged`, logLevel);
+
+    return damagedPixels;
+  }
+
+  async function repairDamagedPixels(damagedPixels) {
+    if (damagedPixels.length === 0) {
+      updateStatus(Utils.t('noDamageDetected'));
+      return 0;
+    }
+
+    Utils.addDebugLog(`Starting autonomous repair of ${damagedPixels.length} pixels`, 'info');
+    updateStatus(Utils.t('repairingPixels', { count: damagedPixels.length }));
+
+    let repairedCount = 0;
+    let consecutiveFailures = 0;
+    const maxConsecutiveFailures = state.autonomousMode ? 5 : 3;
+
+    for (let i = 0; i < damagedPixels.length; i++) {
+      const pixel = damagedPixels[i];
+      
+      if (state.stopFlag) {
+        Utils.addDebugLog('Repair stopped by user request', 'warning');
+        break;
+      }
+
+      // Enhanced charge management for autonomous mode
+      await updateCharges();
+      let chargeWaitAttempts = 0;
+      const maxChargeWaitAttempts = state.autonomousMode ? 20 : 10;
+      
+      while (state.displayCharges < 1 && !state.stopFlag && chargeWaitAttempts < maxChargeWaitAttempts) {
+        chargeWaitAttempts++;
+        const waitTime = state.autonomousMode ? Math.min(state.cooldown, 10000) : state.cooldown;
+        
+        if (chargeWaitAttempts === 1) {
+          Utils.addDebugLog(`Waiting for charges... (${state.displayCharges}/${state.maxCharges})`, 'info');
+        }
+        
+        await Utils.dynamicSleep(() => {
+          if (state.displayCharges >= 1) return 0;
+          if (state.stopFlag) return 0;
+          return waitTime;
+        });
+        await updateCharges();
+      }
+
+      if (state.stopFlag) break;
+      
+      if (state.displayCharges < 1) {
+        Utils.addDebugLog(`No charges available after waiting, skipping pixel (${pixel.x},${pixel.y})`, 'warning');
+        continue;
+      }
+
+      const success = await repairSinglePixel(pixel);
+      if (success) {
+        repairedCount++;
+        consecutiveFailures = 0;
+        if (!state.autonomousMode || repairedCount <= 10 || repairedCount % 10 === 0) {
+          Utils.addDebugLog(`Repaired pixel (${pixel.x},${pixel.y}) with color ${pixel.originalColor.id} [${repairedCount}/${damagedPixels.length}]`, 'success');
+        }
+      } else {
+        consecutiveFailures++;
+        Utils.addDebugLog(`Failed to repair pixel (${pixel.x},${pixel.y}) [${consecutiveFailures}/${maxConsecutiveFailures} consecutive failures]`, 'error');
+        
+        if (consecutiveFailures >= maxConsecutiveFailures) {
+          Utils.addDebugLog(`Too many consecutive failures (${consecutiveFailures}), pausing repair`, 'error');
+          if (state.autonomousMode) {
+            Utils.addDebugLog('Autonomous mode: will retry repair in 60 seconds', 'warning');
+            setTimeout(() => {
+              if (state.autoRepairEnabled && !state.stopFlag) {
+                performRepairCheck();
+              }
+            }, 60000);
+          }
+          break;
+        }
+      }
+
+      await updateCharges();
+      
+      // Dynamic delay based on mode and success rate
+      const baseDelay = state.autonomousMode ? 100 : 200;
+      const adaptiveDelay = consecutiveFailures > 0 ? baseDelay * (consecutiveFailures + 1) : baseDelay;
+      await Utils.sleep(adaptiveDelay);
+    }
+
+    const message = Utils.t('repairComplete', { repaired: repairedCount });
+    updateStatus(message);
+    Utils.addDebugLog(`${message} (${damagedPixels.length - repairedCount} remaining)`, 'success');
+
+    return repairedCount;
+  }
+
+  async function repairSinglePixel(pixel) {
+    const { x, y, originalColor } = pixel;
+
+    const absX = state.startPosition.x + x;
+    const absY = state.startPosition.y + y;
+    const regionX = state.region.x + Math.floor(absX / 1000);
+    const regionY = state.region.y + Math.floor(absY / 1000);
+    const pixelX = absX % 1000;
+    const pixelY = absY % 1000;
+
+    try {
+      const result = await WPlaceService.paintPixelInRegion(
+        regionX,
+        regionY,
+        pixelX,
+        pixelY,
+        originalColor.id
+      );
+
+      if (result === 'token_error') {
+        Utils.addDebugLog('Token error during repair, refreshing token...', 'warning');
+        await ensureToken(true);
+        await Utils.sleep(state.autonomousMode ? 500 : 1000);
+        
+        // Retry once with new token
+        const retryResult = await WPlaceService.paintPixelInRegion(regionX, regionY, pixelX, pixelY, originalColor.id);
+        return retryResult === true;
+      }
+
+      return result === true;
+    } catch (e) {
+      Utils.addDebugLog(`Error repairing pixel (${x},${y}): ${e.message}`, 'error');
+      return false;
+    }
+  }
+
+  async function performRepairCheck() {
+    if (state.running) {
+      Utils.addDebugLog('Repair check skipped - manual repair in progress', 'info');
+      return;
+    }
+
+    try {
+      Utils.addDebugLog('Autonomous repair check triggered', 'info');
+      
+      // Ensure we have a valid token before starting
+      if (!isTokenValid()) {
+        Utils.addDebugLog('No valid token for autonomous repair, generating...', 'warning');
+        await ensureToken(true);
+        if (!isTokenValid()) {
+          Utils.addDebugLog('Failed to generate token for autonomous repair, will retry next cycle', 'error');
+          return;
+        }
+      }
+      
+      const damagedPixels = await scanForDamage();
+
+      if (damagedPixels.length > 0) {
+        Utils.addDebugLog(`Autonomous repair: Found ${damagedPixels.length} damaged pixels, starting repair`, 'warning');
+        updateStatus(Utils.t('damageDetected', { count: damagedPixels.length }));
+        
+        // Show attack notification
+        showAttackNotification('attack', damagedPixels.length);
+        state.lastAttackState = 'attacked';
+        
+        const repairedCount = await repairDamagedPixels(damagedPixels);
+        
+        // Show repair complete notification if all pixels were repaired
+        if (repairedCount === damagedPixels.length) {
+          showAttackNotification('repaired');
+          state.lastAttackState = 'repaired';
+        }
+      } else {
+        updateStatus(Utils.t('noDamageDetected'));
+        
+        // Show peaceful state if we're not under attack
+        if (state.lastAttackState !== 'peaceful') {
+          showPeacefulState();
+          state.lastAttackState = 'peaceful';
+        }
+        
+        if (!state.autonomousMode) {
+          Utils.addDebugLog('Autonomous repair: No damage detected', 'success');
+        }
+      }
+    } catch (error) {
+      Utils.addDebugLog(`Autonomous repair error: ${error.message}`, 'error');
+      
+      if (state.autonomousMode) {
+        Utils.addDebugLog('Autonomous mode: will retry repair check in 120 seconds due to error', 'warning');
+        setTimeout(() => {
+          if (state.autoRepairEnabled && !state.stopFlag) {
+            performRepairCheck();
+          }
+        }, 120000);
+      }
+    }
+  }
+
+  function startAutoRepair() {
+    if (state.autoRepairTimer) {
+      clearInterval(state.autoRepairTimer);
+    }
+
+    const intervalMs = state.autoRepairInterval * 1000;
+    state.autoRepairTimer = setInterval(performRepairCheck, intervalMs);
+
+    const message = Utils.t('autoRepairStarted', { interval: state.autoRepairInterval });
+    Utils.addDebugLog(`${message} (autonomous: ${state.autonomousMode})`, 'info');
+    Utils.showAlert(message, 'success');
+    
+    // Perform first check immediately
+    setTimeout(performRepairCheck, 2000);
+  }
+
+  function stopAutoRepair() {
+    if (state.autoRepairTimer) {
+      clearInterval(state.autoRepairTimer);
+      state.autoRepairTimer = null;
+    }
+
+    const message = Utils.t('autoRepairStopped');
+    Utils.addDebugLog(`${message}`, 'info');
+    Utils.showAlert(message, 'info');
+  }
+
+  // Enhanced UI Functions
+  function updateStatus(message) {
+    const statusEl = document.getElementById('status');
+    if (statusEl) {
+      if (typeof message === 'string') {
+        statusEl.innerHTML = message;
+      } else {
+        statusEl.textContent = message;
+      }
+    }
+  }
+
+  function updateDebugConsole() {
+    const debugConsole = document.getElementById('debugConsole');
+    if (!debugConsole) return;
+
+    const logsHtml = state.debugLogs.map(log => {
+      const color = log.type === 'error' ? '#ff6b6b' :
+        log.type === 'warning' ? '#ffa726' :
+          log.type === 'success' ? '#66bb6a' : '#64b5f6';
+
+      return `<div style="color: ${color}; margin: 2px 0; font-size: 11px;">
+        <span style="opacity: 0.7;">[${log.timestamp}]</span> ${log.message}
+      </div>`;
+    }).join('');
+
+    debugConsole.innerHTML = logsHtml;
+    debugConsole.scrollTop = debugConsole.scrollHeight;
+  }
+
+  async function updateCharges() {
+    try {
+      const { charges, max, cooldown } = await WPlaceService.getCharges();
+      state.displayCharges = Math.floor(charges);
+      state.maxCharges = Math.max(1, Math.floor(max));
+      state.cooldown = cooldown;
+
+      updateChargesDisplay();
+    } catch (error) {
+      if (!state.autonomousMode) {
+        Utils.addDebugLog(`Error updating charges: ${error.message}`, 'error');
+      }
+    }
+  }
+
+  function updateChargesDisplay() {
+    const chargesEl = document.getElementById('chargesInfo');
+    if (chargesEl) {
+      chargesEl.textContent = `Charges: ${state.displayCharges}/${state.maxCharges} (cooldown: ${Math.round(state.cooldown / 1000)}s)`;
+    }
+  }
+
+  function updateTokenStatus() {
+    const tokenEl = document.getElementById('tokenInfo');
+    if (tokenEl) {
+      if (isTokenValid()) {
+        const remaining = Math.round((tokenExpiryTime - Date.now()) / 1000);
+        tokenEl.textContent = `Token: Valid (expires in ${remaining}s)`;
+        tokenEl.style.color = '#81c784';
+      } else {
+        tokenEl.textContent = 'Token: Not generated or expired';
+        tokenEl.style.color = '#ffab91';
+      }
+    }
+  }
+
+  function updateSystemStatus() {
+    const systemEl = document.getElementById('systemInfo');
+    if (systemEl) {
+      const autonomousStatus = state.autonomousMode ? 'AUTONOMOUS' : 'MANUAL';
+      const tokenMode = state.tokenSource.toUpperCase();
+      systemEl.textContent = `System: ${autonomousStatus} | Token: ${tokenMode} | Auto-refresh: ${state.autoTokenRefresh ? 'ON' : 'OFF'}`;
+    }
+  }
+
+  // Window dragging functionality
+  function makeWindowDraggable() {
+    const container = document.getElementById('wplace-repair-tool');
+    const header = document.getElementById('window-header');
+    
+    let isDragging = false;
+    let currentX;
+    let currentY;
+    let initialX;
+    let initialY;
+    let xOffset = 0;
+    let yOffset = 0;
+
+    function dragStart(e) {
+      if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') {
+        return;
+      }
+      
+      initialX = e.clientX - xOffset;
+      initialY = e.clientY - yOffset;
+
+      if (e.target === header || header.contains(e.target)) {
+        isDragging = true;
+        container.style.cursor = 'grabbing';
+      }
+    }
+
+    function dragEnd() {
+      initialX = currentX;
+      initialY = currentY;
+      isDragging = false;
+      container.style.cursor = 'default';
+    }
+
+    function drag(e) {
+      if (isDragging) {
+        e.preventDefault();
+        currentX = e.clientX - initialX;
+        currentY = e.clientY - initialY;
+        xOffset = currentX;
+        yOffset = currentY;
+
+        container.style.transform = `translate(${currentX}px, ${currentY}px)`;
+      }
+    }
+
+    header.addEventListener('mousedown', dragStart);
+    document.addEventListener('mouseup', dragEnd);
+    document.addEventListener('mousemove', drag);
+  }
+
+  // Enhanced UI Creation with autonomous controls
+  function createUI() {
+    const existing = document.getElementById('wplace-repair-tool');
+    if (existing) existing.remove();
+
+    const container = document.createElement('div');
+    container.id = 'wplace-repair-tool';
+    container.style.cssText = `
+      position: fixed; top: 20px; left: 20px; z-index: 10000;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px; min-width: 520px; max-width: 600px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+      color: white; font-family: 'Segoe UI', Arial, sans-serif;
+      backdrop-filter: blur(10px);
+      resize: both; overflow: hidden;
+    `;
+
+    container.innerHTML = `
+      <div id="window-header" style="
+        background: rgba(255,255,255,0.1); padding: 12px 20px; 
+        border-radius: 12px 12px 0 0; cursor: grab; user-select: none;
+        display: flex; justify-content: space-between; align-items: center;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+      ">
+        <h3 id="main-title" style="margin: 0; color: #fff; font-size: 18px; min-height: 22px;">
+          WPlace Autonomous Repair Tool
+        </h3>
+        <div style="display: flex; gap: 8px;">
+          <button id="minimizeBtn" style="
+            background: #ffc107; border: none; width: 20px; height: 20px;
+            border-radius: 50%; cursor: pointer; font-size: 12px; color: #000;
+          ">−</button>
+          <button id="closeBtn" style="
+            background: #dc3545; border: none; width: 20px; height: 20px;
+            border-radius: 50%; cursor: pointer; font-size: 12px; color: white;
+          ">×</button>
+        </div>
+      </div>
+      
+      <div id="window-content" style="padding: 20px;">
+        <div style="margin-bottom: 20px;">
+          <div id="status" style="font-size: 14px; color: #b3d9ff; margin-bottom: 10px; min-height: 20px;">
+            ${Utils.t('autonomousModeActive')}
+          </div>
+          <div id="chargesInfo" style="font-size: 12px; color: #90caf9;">
+            Charges: 0/1 (cooldown: 31s)
+          </div>
+          <div id="tokenInfo" style="font-size: 11px; color: #81c784; margin-top: 5px;">
+            Token: Initializing...
+          </div>
+          <div id="systemInfo" style="font-size: 10px; color: #ffcc80; margin-top: 3px;">
+            System: AUTONOMOUS | Token: GENERATOR | Auto-refresh: ON
+          </div>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+          <button id="loadFileBtn" style="
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white; border: none; border-radius: 8px; padding: 10px 16px;
+            cursor: pointer; font-weight: 500; margin-right: 8px; margin-bottom: 8px; font-size: 12px;
+          ">
+            📁 ${Utils.t('loadFromFile')}
+          </button>
+          
+          <button id="repairBtn" style="
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white; border: none; border-radius: 8px; padding: 10px 16px;
+            cursor: pointer; font-weight: 500; margin-right: 8px; margin-bottom: 8px; font-size: 12px;
+          " disabled>
+            🔧 ${Utils.t('repairPixels')}
+          </button>
+          
+          <button id="generateTokenBtn" style="
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white; border: none; border-radius: 8px; padding: 10px 16px;
+            cursor: pointer; font-weight: 500; font-size: 12px; margin-bottom: 8px;
+          ">
+            🎯 Force Token
+          </button>
+        </div>
+
+        <div style="margin-bottom: 15px; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 8px;">
+          <div style="margin-bottom: 10px;">
+            <label style="display: flex; align-items: center; cursor: pointer;">
+              <input type="checkbox" id="autoRepairEnabled" style="margin-right: 8px;">
+              <span>${Utils.t('enableAutoRepair')} (Enhanced)</span>
+            </label>
+          </div>
+          
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+            <label style="font-size: 14px;">${Utils.t('repairInterval')}:</label>
+            <input type="number" id="repairInterval" value="30" min="10" max="3600" 
+                   style="width: 80px; padding: 5px; border-radius: 4px; border: 1px solid #ccc; color: #333;">
+            <span style="font-size: 12px; color: #b3d9ff;">seconds</span>
+          </div>
+          
+          <div style="display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;">
+            <label style="display: flex; align-items: center; cursor: pointer; font-size: 12px;">
+              <input type="checkbox" id="autoTokenRefresh" ${state.autoTokenRefresh ? 'checked' : ''} style="margin-right: 6px;">
+              <span>Auto Token Refresh</span>
+            </label>
+            <select id="tokenSourceSelect" style="
+              padding: 4px 8px; border-radius: 4px; font-size: 11px; 
+              background: white; color: #333; border: 1px solid #ccc;
+            ">
+              <option value="generator" ${state.tokenSource === 'generator' ? 'selected' : ''}>Generator</option>
+              <option value="hybrid" ${state.tokenSource === 'hybrid' ? 'selected' : ''}>Hybrid</option>
+              <option value="manual" ${state.tokenSource === 'manual' ? 'selected' : ''}>Manual</option>
+            </select>
+          </div>
+          
+          <div style="margin-top: 10px; font-size: 12px; color: #e1f5fe;">
+            <div>Image: <span id="imageInfo">Not loaded</span></div>
+            <div>Position: <span id="positionInfo">Not set</span></div>
+            <div>Colors: <span id="colorsInfo">0 available</span></div>
+          </div>
+        </div>
+
+        <div style="margin-top: 15px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <h4 style="margin: 0; font-size: 14px; color: #fff;">📋 ${Utils.t('debug')} (Enhanced System)</h4>
+            <button id="clearDebugBtn" style="
+              background: rgba(255,255,255,0.2); color: white; border: none;
+              border-radius: 4px; padding: 4px 8px; font-size: 12px; cursor: pointer;
+            ">
+              ${Utils.t('clearDebug')}
+            </button>
+          </div>
+          
+          <div id="debugConsole" style="
+            background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px; padding: 10px; height: 300px; overflow-y: auto;
+            font-family: 'Courier New', monospace; font-size: 11px;
+            color: #e3f2fd; line-height: 1.3;
+          ">
+            <div style="color: #90caf9;">[Ready] WPlace Autonomous Repair Tool v3.0</div>
+            <div style="color: #81c784;">[Info] Advanced injection + Enhanced token management</div>
+            <div style="color: #ffcc80;">[Info] Autonomous mode with smart retry and preloading</div>
+            <div style="color: #c5e1a5;">[Info] ${Utils.t('tokenSystemReady')}</div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(container);
+    makeWindowDraggable();
+    setupEventListeners();
+    
+    // Start typewriter effect
+    setTimeout(() => {
+      createTypewriterTitle();
+    }, 1000);
+    
+    // Start autonomous systems
+    initializeAutonomousSystems();
+  }
+
+  function initializeAutonomousSystems() {
+    // Update charges periodically
+    updateCharges();
+    setInterval(updateCharges, 10000);
+    
+    // Update token status
+    updateTokenStatus();
+    setInterval(updateTokenStatus, 5000);
+    
+    // Update system status
+    updateSystemStatus();
+    setInterval(updateSystemStatus, 15000);
+    
+    // Start autonomous token preloading if enabled
+    if (state.autoTokenRefresh && state.autonomousMode) {
+      Utils.addDebugLog('Autonomous token management started', 'success');
+      ensureToken();
+    }
+  }
+
+  function setupEventListeners() {
+    // Window controls
+    document.getElementById('minimizeBtn').addEventListener('click', () => {
+      const content = document.getElementById('window-content');
+      state.windowMinimized = !state.windowMinimized;
+      
+      if (state.windowMinimized) {
+        content.style.display = 'none';
+        document.getElementById('minimizeBtn').textContent = '+';
+      } else {
+        content.style.display = 'block';
+        document.getElementById('minimizeBtn').textContent = '−';
+      }
+    });
+
+    document.getElementById('closeBtn').addEventListener('click', () => {
+      const container = document.getElementById('wplace-repair-tool');
+      if (container) {
+        container.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+        container.style.opacity = '0';
+        container.style.transform = 'scale(0.8)';
+        setTimeout(() => {
+          container.remove();
+          cleanup();
+        }, 300);
+      }
+    });
+
+    // Load file
+    document.getElementById('loadFileBtn').addEventListener('click', async () => {
+      try {
+        Utils.addDebugLog('Loading progress file...', 'info');
+        const data = await Utils.createFileUploader();
+
+        if (!data || !data.state || !data.imageData) {
+          throw new Error(Utils.t('invalidFile'));
+        }
+
+        const migratedData = migrateProgressData(data);
+
+        Object.assign(state, migratedData.state);
+        state.imageData = {
+          ...migratedData.imageData,
+          pixels: new Uint8ClampedArray(migratedData.imageData.pixels),
+        };
+
+        state.imageLoaded = true;
+        document.getElementById('repairBtn').disabled = false;
+
+        // Update info displays
+        document.getElementById('imageInfo').textContent = `${state.imageData.width}x${state.imageData.height}`;
+        document.getElementById('positionInfo').textContent = state.startPosition ?
+          `(${state.startPosition.x}, ${state.startPosition.y}) in region (${state.region.x}, ${state.region.y})` : 'Not set';
+        document.getElementById('colorsInfo').textContent = `${state.availableColors?.length || 0} available`;
+
+        updateStatus(Utils.t('fileLoaded'));
+        Utils.addDebugLog(`Loaded image: ${state.imageData.width}x${state.imageData.height}`, 'success');
+        Utils.addDebugLog(`Position: (${state.startPosition?.x}, ${state.startPosition?.y})`, 'info');
+        Utils.addDebugLog(`Region: (${state.region?.x}, ${state.region?.y})`, 'info');
+        Utils.addDebugLog(`Available colors: ${state.availableColors?.length || 0}`, 'info');
+
+        if (migratedData.state.paintWhitePixels !== undefined) {
+          state.paintWhitePixels = migratedData.state.paintWhitePixels;
+          Utils.addDebugLog(`Paint white pixels: ${state.paintWhitePixels}`, 'info');
+        }
+        if (migratedData.state.paintTransparentPixels !== undefined) {
+          state.paintTransparentPixels = migratedData.state.paintTransparentPixels;
+          Utils.addDebugLog(`Paint transparent pixels: ${state.paintTransparentPixels}`, 'info');
+        }
+
+        Utils.showAlert(Utils.t('fileLoaded'), 'success');
+        
+        // If autonomous mode and auto repair is enabled, start it
+        if (state.autonomousMode && document.getElementById('autoRepairEnabled').checked) {
+          Utils.addDebugLog('Autonomous mode: starting auto repair after file load', 'info');
+          setTimeout(() => {
+            state.autoRepairEnabled = true;
+            startAutoRepair();
+          }, 5000);
+        }
+        
+      } catch (error) {
+        Utils.addDebugLog(`Load error: ${error.message}`, 'error');
+        Utils.showAlert(error.message, 'error');
+      }
+    });
+
+    // Generate Token button
+    document.getElementById('generateTokenBtn').addEventListener('click', async () => {
+      const btn = document.getElementById('generateTokenBtn');
+      const originalText = btn.textContent;
+
+      try {
+        btn.disabled = true;
+        btn.textContent = '🔄 Generating...';
+        btn.style.background = 'linear-gradient(135deg, #ffa726 0%, #ff9800 100%)';
+
+        Utils.addDebugLog('Manual token generation requested', 'info');
+
+        const token = await ensureToken(true);
+
+        if (token) {
+          Utils.addDebugLog('Token generation succeeded!', 'success');
+          Utils.showAlert('Token generated successfully!', 'success');
+          updateTokenStatus();
+        } else {
+          throw new Error('Token generation failed');
+        }
+      } catch (error) {
+        Utils.addDebugLog(`Token generation failed: ${error.message}`, 'error');
+        Utils.showAlert('Token generation failed', 'error');
+        playNotificationSound();
+      } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
+        btn.style.background = 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)';
+      }
+    });
+
+    // Manual repair
+    let repairRunning = false;
+    document.getElementById('repairBtn').addEventListener('click', async () => {
+      if (!state.imageLoaded) {
+        Utils.showAlert('Please load a progress file first', 'warning');
+        return;
+      }
+
+      if (repairRunning) {
+        state.stopFlag = true;
+        Utils.addDebugLog('Manual repair stop requested', 'warning');
+        return;
+      }
+
+      repairRunning = true;
+      state.running = true;
+      state.stopFlag = false;
+      const repairBtn = document.getElementById('repairBtn');
+      repairBtn.textContent = '⏸️ Stop Repair';
+      repairBtn.style.background = 'linear-gradient(135deg, #ff6b35 0%, #f7931e 100%)';
+
+      try {
+        Utils.addDebugLog('Starting manual repair with enhanced autonomous system...', 'info');
+
+        if (!isTokenValid()) {
+          Utils.addDebugLog('No valid token, generating...', 'info');
+          await ensureToken(true);
+        }
+
+        const damagedPixels = await scanForDamage();
+
+        if (damagedPixels.length > 0) {
+          updateStatus(Utils.t('damageDetected', { count: damagedPixels.length }));
+          showAttackNotification('attack', damagedPixels.length);
+          
+          const repairedCount = await repairDamagedPixels(damagedPixels);
+          
+          if (repairedCount === damagedPixels.length) {
+            showAttackNotification('repaired');
+          }
+        } else {
+          updateStatus(Utils.t('noDamageDetected'));
+          showPeacefulState();
+        }
+      } catch (error) {
+        Utils.addDebugLog(`Repair error: ${error.message}`, 'error');
+        Utils.showAlert('Repair failed', 'error');
+      } finally {
+        repairRunning = false;
+        state.running = false;
+        state.stopFlag = false;
+        repairBtn.textContent = '🔧 ' + Utils.t('repairPixels');
+        repairBtn.style.background = 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)';
+      }
+    });
+
+    // Auto repair toggle
+    document.getElementById('autoRepairEnabled').addEventListener('change', (e) => {
+      state.autoRepairEnabled = e.target.checked;
+
+      if (state.autoRepairEnabled) {
+        if (!state.imageLoaded) {
+          Utils.showAlert('Please load a progress file first', 'warning');
+          e.target.checked = false;
+          state.autoRepairEnabled = false;
+          return;
+        }
+        startAutoRepair();
+      } else {
+        stopAutoRepair();
+      }
+    });
+
+    // Repair interval change
+    document.getElementById('repairInterval').addEventListener('change', (e) => {
+      const value = parseInt(e.target.value) || 30;
+      state.autoRepairInterval = Math.max(10, Math.min(3600, value));
+      e.target.value = state.autoRepairInterval;
+
+      Utils.addDebugLog(`Repair interval changed to ${state.autoRepairInterval} seconds`, 'info');
+
+      if (state.autoRepairEnabled && state.imageLoaded) {
+        Utils.addDebugLog('Restarting auto repair with new interval', 'info');
+        startAutoRepair();
+      }
+    });
+
+    // Auto token refresh toggle
+    document.getElementById('autoTokenRefresh').addEventListener('change', (e) => {
+      state.autoTokenRefresh = e.target.checked;
+      Utils.addDebugLog(`Auto token refresh ${state.autoTokenRefresh ? 'enabled' : 'disabled'}`, 'info');
+      updateSystemStatus();
+      
+      if (state.autoTokenRefresh && state.autonomousMode && !isTokenValid()) {
+        ensureToken();
+      }
+    });
+
+    // Token source selection
+    document.getElementById('tokenSourceSelect').addEventListener('change', (e) => {
+      state.tokenSource = e.target.value;
+      Utils.addDebugLog(`Token source changed to: ${state.tokenSource}`, 'info');
+      updateSystemStatus();
+      
+      // Invalidate current token to force new generation with new method
+      if (isTokenValid()) {
+        Utils.addDebugLog('Invalidating current token due to source change', 'info');
+        invalidateToken();
+      }
+    });
+
+    // Clear debug
+    document.getElementById('clearDebugBtn').addEventListener('click', () => {
+      state.debugLogs = [];
+      updateDebugConsole();
+      Utils.addDebugLog('Debug console cleared', 'info');
+      Utils.addDebugLog('Enhanced WPlace Autonomous Repair Tool ready', 'info');
+    });
+  }
+
+  // Enhanced data migration helper
+  function migrateProgressData(data) {
+    if (!data.version || data.version < '2.0') {
+      Utils.addDebugLog('Migrating old progress data format...', 'info');
+      
+      if (!data.state) data.state = {};
+      if (!data.imageData) data.imageData = {};
+      
+      data.state.paintWhitePixels = data.state.paintWhitePixels ?? true;
+      data.state.paintTransparentPixels = data.state.paintTransparentPixels ?? false;
+      
+      data.version = '2.0';
+    }
+
+    // Additional migrations for autonomous features
+    if (data.version === '2.0') {
+      data.state.autonomousMode = data.state.autonomousMode ?? CONFIG.AUTONOMOUS_MODE;
+      data.state.autoTokenRefresh = data.state.autoTokenRefresh ?? CONFIG.AUTO_TOKEN_REFRESH;
+      data.state.tokenSource = data.state.tokenSource ?? CONFIG.TOKEN_SOURCE;
+      data.version = '3.0';
+      Utils.addDebugLog('Migrated to autonomous features v3.0', 'info');
+    }
+    
+    return data;
+  }
+
+  // Autonomous initialization and management
+  async function initializeAutonomousMode() {
+    try {
+      Utils.addDebugLog('Initializing autonomous systems...', 'info');
+      
+      // Load enhanced Turnstile
+      await Utils.loadTurnstile();
+      
+      // Pre-generate token for autonomous operation
+      if (state.autoTokenRefresh) {
+        Utils.addDebugLog('Pre-generating token for autonomous operation...', 'info');
+        await ensureToken();
+        
+        if (isTokenValid()) {
+          Utils.addDebugLog('Initial autonomous token ready', 'success');
+        } else {
+          Utils.addDebugLog('Initial token generation failed, will retry automatically', 'warning');
+        }
+      }
+      
+      // Setup autonomous token management
+      if (state.autonomousMode && state.autoTokenRefresh) {
+        setInterval(async () => {
+          if (willTokenExpireSoon() && !tokenGenerationInProgress) {
+            Utils.addDebugLog('Autonomous token refresh triggered', 'info');
+            try {
+              await ensureToken(true);
+            } catch (error) {
+              Utils.addDebugLog(`Autonomous token refresh failed: ${error.message}`, 'warning');
+            }
+          }
+        }, 30000); // Check every 30 seconds
+      }
+      
+      Utils.addDebugLog('Autonomous systems initialized successfully', 'success');
+      
+    } catch (error) {
+      Utils.addDebugLog(`Autonomous initialization error: ${error.message}`, 'error');
+    }
+  }
+
+  // Main initialization function
+  async function initialize() {
+    Utils.addDebugLog('Starting WPlace Autonomous Repair Tool v3.0...', 'info');
+    
+    // Create UI first
+    createUI();
+    
+    // Initialize autonomous systems
+    await initializeAutonomousMode();
+    
+    Utils.addDebugLog('Enhanced Features Initialized:', 'info');
+    Utils.addDebugLog('• Advanced injection with multi-source token capture', 'info');
+    Utils.addDebugLog('• Sophisticated token management with preloading', 'info');
+    Utils.addDebugLog('• Autonomous operation with smart retry logic', 'info');
+    Utils.addDebugLog('• Enhanced tile interception and caching', 'info');
+    Utils.addDebugLog('• Adaptive repair algorithms with failure handling', 'info');
+    Utils.addDebugLog('• Visual notifications and audio alerts', 'info');
+    Utils.addDebugLog('• Draggable window with minimize/close controls', 'info');
+    
+    if (state.autonomousMode) {
+      Utils.addDebugLog('AUTONOMOUS MODE ACTIVE - Tool will operate independently', 'success');
+      Utils.addDebugLog('Instructions for autonomous operation:', 'info');
+      Utils.addDebugLog('1. Load a progress file using "Load Progress File"', 'info');
+      Utils.addDebugLog('2. Enable "Auto Repair" to start autonomous monitoring', 'info');
+      Utils.addDebugLog('3. Tool will automatically scan and repair damage', 'info');
+      Utils.addDebugLog('4. Tokens will be generated and refreshed automatically', 'info');
+      Utils.addDebugLog('5. Monitor debug console for autonomous operation logs', 'info');
+    } else {
+      Utils.addDebugLog('Manual mode active - use controls for manual operation', 'info');
+    }
+    
+    // Show autonomous mode status
+    updateStatus(state.autonomousMode ? Utils.t('autonomousModeActive') : 'Manual mode ready - Load file and enable auto repair to start');
+    
+    Utils.addDebugLog('WPlace Autonomous Repair Tool ready for operation', 'success');
+  }
+
+  // Enhanced cleanup function
+  function cleanup() {
+    Utils.addDebugLog('Cleaning up autonomous systems...', 'info');
+    
+    // Clear all timers
+    if (state.autoRepairTimer) {
+      clearInterval(state.autoRepairTimer);
+      state.autoRepairTimer = null;
+    }
+    
+    if (state.tokenRetryTimer) {
+      clearTimeout(state.tokenRetryTimer);
+      state.tokenRetryTimer = null;
+    }
+    
+    if (state.tokenPreloadTimer) {
+      clearTimeout(state.tokenPreloadTimer);
+      state.tokenPreloadTimer = null;
+    }
+    
+    // Cleanup Turnstile
+    Utils.cleanupTurnstile();
+    
+    // Set stop flag
+    state.stopFlag = true;
+    
+    Utils.addDebugLog('Cleanup completed', 'info');
+  }
+
+  // Add cleanup on page unload
+  window.addEventListener('beforeunload', cleanup);
+  
+  // Handle page visibility changes for autonomous mode
+  document.addEventListener('visibilitychange', () => {
+    if (state.autonomousMode) {
+      if (document.hidden) {
+        Utils.addDebugLog('Page hidden - autonomous systems continue running', 'info');
+      } else {
+        Utils.addDebugLog('Page visible - autonomous systems active', 'info');
+        // Refresh status when page becomes visible
+        updateCharges();
+        updateTokenStatus();
+      }
+    }
+  });
+
+  // Enhanced error handling for autonomous mode
+  window.addEventListener('error', (event) => {
+    if (state.autonomousMode) {
+      Utils.addDebugLog(`Global error in autonomous mode: ${event.error?.message || 'Unknown error'}`, 'error');
+    }
+  });
+
+  window.addEventListener('unhandledrejection', (event) => {
+    if (state.autonomousMode) {
+      Utils.addDebugLog(`Unhandled promise rejection in autonomous mode: ${event.reason}`, 'error');
+    }
+  });
+
+  // Start the enhanced autonomous application
+  initialize().catch(error => {
+    console.error('Failed to initialize autonomous repair tool:', error);
+    Utils.addDebugLog(`Initialization failed: ${error.message}`, 'error');
+  });
+
+})();
