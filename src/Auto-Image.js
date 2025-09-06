@@ -1041,28 +1041,19 @@ import { TurnstileManager, TurnstileError } from './auth/index.js';
                 }
 
                 console.log('🔐 Generating new token with TurnstileManager...');
+                console.log('🔍 Using sitekey:', sitekey);
 
-                // Create or find container for Turnstile
-                let container = document.getElementById('turnstile-container');
-                if (!container) {
-                    container = document.createElement('div');
-                    container.id = 'turnstile-container';
-                    container.style.cssText = `
-                        position: fixed;
-                        top: -1000px;
-                        left: -1000px;
-                        width: 1px;
-                        height: 1px;
-                        opacity: 0;
-                        pointer-events: none;
-                        z-index: -1;
-                    `;
-                    document.body.appendChild(container);
-                }
+                // Initialize TurnstileManager (it handles its own UI)
+                console.log('⚡ Initializing TurnstileManager...');
+                await this.turnstileManager.initialize(sitekey);
+                console.log('✅ TurnstileManager initialized successfully');
 
-                // Initialize TurnstileManager with sitekey and container
-                await this.turnstileManager.initialize(sitekey, container);
+                console.log('🎲 Solving Turnstile challenge...');
                 const token = await this.turnstileManager.solve();
+                console.log(
+                    '🎯 Turnstile solve completed, token length:',
+                    token ? token.length : 'null'
+                );
 
                 if (token && token.length >= 20) {
                     console.log('✅ Valid token generated');
