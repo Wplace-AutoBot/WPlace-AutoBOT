@@ -104,6 +104,10 @@ javascript:(async()=>{ const u='https://raw.githubusercontent.com/Wplace-AutoBot
 </p>
 
 ---
+<p align="center">
+  <img src="[https://i.imgur.com/5QYvb4w.png](https://i.imgur.com/LPAzNue.png)" alt="Script Demonstration"/>
+</p>
+---
 
 ### 📋┃To-do
 
