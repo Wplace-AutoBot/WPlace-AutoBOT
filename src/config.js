@@ -229,9 +229,3 @@ export const CONFIG = {
     COORDINATE_BLOCK_WIDTH: 6,
     COORDINATE_BLOCK_HEIGHT: 2,
 };
-
-/**
- * Get the current active theme name.
- * @returns {string} Current theme name
- */
-export const getCurrentTheme = () => CONFIG.THEMES[CONFIG.currentTheme];

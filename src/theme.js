@@ -2,7 +2,7 @@
 // Extracted from Auto-Image.js as part of Phase 2 code restructuring
 
 import { EMBEDDED_THEMES } from 'embedded-assets';
-import { CONFIG, getCurrentTheme } from './config.js';
+import { CONFIG } from './config.js';
 
 /**
  * Get list of available theme names.
@@ -11,10 +11,10 @@ import { CONFIG, getCurrentTheme } from './config.js';
 export const getAvailableThemes = () => Object.keys(EMBEDDED_THEMES);
 
 /**
- * Get the current active theme object.
- * @returns {Object} Current theme object
+ * Get the current active theme name.
+ * @returns {string} Current theme name
  */
-export { getCurrentTheme };
+export const getCurrentTheme = () => CONFIG.THEMES[CONFIG.currentTheme];
 
 /**
  * Get the current active theme name.
@@ -112,10 +112,7 @@ export function applyTheme() {
     setVar('--wplace-radius', '' + (theme.borderRadius || '12px'));
     setVar('--wplace-border-style', '' + (theme.borderStyle || 'solid'));
     setVar('--wplace-border-width', '' + (theme.borderWidth || '1px'));
-    setVar(
-        '--wplace-backdrop',
-        '' + (theme.backdropFilter || 'blur(10px)')
-    );
+    setVar('--wplace-backdrop', '' + (theme.backdropFilter || 'blur(10px)'));
     setVar('--wplace-border-color', 'rgba(255,255,255,0.1)');
 }
 

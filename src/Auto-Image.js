@@ -1,34 +1,14 @@
-import {
-    EMBEDDED_CSS,
-    EMBEDDED_THEMES,
-    EMBEDDED_LANGUAGES,
-} from 'embedded-assets';
+import { EMBEDDED_CSS } from 'embedded-assets';
 import { CONFIG } from './config.js';
-import { 
+import {
     getCurrentTheme,
-    switchTheme, 
+    switchTheme,
     applyTheme,
-    loadThemePreference
+    loadThemePreference,
 } from './theme.js';
-import { 
-    initializeTranslations, 
-    getText, 
-    t,
-    getCurrentLanguage,
-    setLanguage,
-    loadTranslations,
-    AVAILABLE_LANGUAGES
-} from './translations.js';
+import { initializeTranslations, t, setLanguage } from './translations.js';
 
 (async () => {
-
-    // Theme functions are now imported from ./theme.js
-
-    // Translation system now imported from separate module
-
-
-
-
     // GLOBAL STATE
     const state = {
         running: false,
@@ -1595,7 +1575,7 @@ import {
             button.addEventListener('contextmenu', e => e.preventDefault());
         },
 
-        // Translation function wrapper - delegates to imported translation system
+        // Translation function wrapper
         t: (key, params = {}) => {
             return t(key, params, state);
         },
@@ -4565,8 +4545,7 @@ import {
             if (languageSelect) {
                 languageSelect.addEventListener('change', async e => {
                     const newLanguage = e.target.value;
-                    
-                    // Use the imported setLanguage function which handles everything
+
                     await setLanguage(newLanguage, state);
 
                     setTimeout(() => {

@@ -96,9 +96,7 @@ export const loadTranslations = async (language, retryCount = 0) => {
             console.warn(`❌ Invalid translation format for ${language}`);
         }
     } else {
-        console.warn(
-            `❌ Language ${language} not found in embedded assets`
-        );
+        console.warn(`❌ Language ${language} not found in embedded assets`);
     }
 
     return null;
@@ -110,7 +108,7 @@ export const loadTranslations = async (language, retryCount = 0) => {
  * @param {Object} state - The global state object containing language property
  * @returns {Promise<string>} The selected language code
  */
-export const loadLanguagePreference = async (state) => {
+export const loadLanguagePreference = async state => {
     const savedLanguage = localStorage.getItem('wplace_language');
     const browserLocale = navigator.language;
     const browserLanguage = browserLocale.split('-')[0];
@@ -177,7 +175,7 @@ export const loadLanguagePreference = async (state) => {
  * @param {Object} state - The global state object containing language property
  * @returns {Promise<void>}
  */
-export const initializeTranslations = async (state) => {
+export const initializeTranslations = async state => {
     try {
         console.log('🌐 Initializing translation system...');
 
@@ -226,7 +224,7 @@ export const initializeTranslations = async (state) => {
  */
 export const getText = (key, replacements = {}, state) => {
     const currentLang = state?.language || currentLanguage;
-    
+
     // Try current language first
     let text = loadedTranslations[currentLang]?.[key];
 
@@ -267,7 +265,7 @@ export const getText = (key, replacements = {}, state) => {
  */
 export const t = (key, params = {}, state) => {
     const currentLang = state?.language || currentLanguage;
-    
+
     // Try to get from cache first
     const cacheKey = `${currentLang}_${key}`;
     if (translationCache.has(cacheKey)) {
@@ -300,14 +298,9 @@ export const t = (key, params = {}, state) => {
 
     // Final fallback to emergency fallback or key
     let text =
-        FALLBACK_TEXT[currentLang]?.[key] ||
-        FALLBACK_TEXT.en?.[key] ||
-        key;
+        FALLBACK_TEXT[currentLang]?.[key] || FALLBACK_TEXT.en?.[key] || key;
     Object.keys(params).forEach(param => {
-        text = text.replace(
-            new RegExp(`\\{${param}\\}`, 'g'),
-            params[param]
-        );
+        text = text.replace(new RegExp(`\\{${param}\\}`, 'g'), params[param]);
     });
 
     // Log missing translations for debugging
