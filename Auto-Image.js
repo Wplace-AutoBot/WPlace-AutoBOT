@@ -5718,18 +5718,19 @@
       const isTimeToUpdate = timeSinceLastUpdate >= randomUpdateThreshold;
 
       const shouldCallApi = isForcedRefresh || isFirstCheck || isTimeToUpdate;
+      let chargesData = {};
 
       if (shouldCallApi) {
-        const { charges, max, cooldown } = await WPlaceService.getCharges();
-        state.displayCharges = Math.floor(charges);
-        state.preciseCurrentCharges = charges;
-        state.cooldown = cooldown;
-        state.maxCharges = Math.floor(max) > 1 ? Math.floor(max) : state.maxCharges;
+        chargesData = await WPlaceService.getCharges();
+        state.displayCharges = Math.floor(chargesData.charges);
+        state.preciseCurrentCharges = chargesData.charges;
+        state.cooldown = chargesData.cooldown;
+        state.maxCharges = Math.floor(chargesData.max) > 1 ? Math.floor(chargesData.max) : state.maxCharges;
 
         state.fullChargeData = {
-          current: charges,
-          max: max,
-          cooldownMs: cooldown,
+          current: chargesData.charges,
+          max: chargesData.max,
+          cooldownMs: chargesData.cooldown,
           startTime: Date.now(),
           spentSinceShot: 0,
         };
@@ -5821,8 +5822,21 @@
           .join('');
       }
 
+      let totalChargesHTML = '';
+      if (state.allAccountsInfo && state.allAccountsInfo.length > 0) {
+          const totalCharges = state.allAccountsInfo.reduce((sum, acc) => sum + Math.floor(acc.Charges || 0), 0);
+          const totalMaxCharges = state.allAccountsInfo.reduce((sum, acc) => sum + Math.floor(acc.Max || 0), 0);
+          totalChargesHTML = `
+              <div class="wplace-stat-item">
+                  <div class="wplace-stat-label"><i class="fas fa-layer-group"></i> Total Charges</div>
+                  <div class="wplace-stat-value">${totalCharges}/${totalMaxCharges}</div>
+              </div>
+          `;
+      }
+
       statsArea.innerHTML = `
             ${imageStatsHTML}
+            ${totalChargesHTML}
             <div class="wplace-stat-item">
               <div class="wplace-stat-label">
                 <i class="fas fa-bolt"></i> ${Utils.t('charges')}
@@ -5854,7 +5868,18 @@
             }
         `;
 
-      // should be after statsArea.innerHTML = '...'. todo make full stats ui update partial
+      // Sync with the accounts list
+      if (state.allAccountsInfo && state.allAccountsInfo.length > 0 && chargesData.id) {
+          const currentAccountInList = state.allAccountsInfo.find(acc => acc.ID === chargesData.id);
+          if (currentAccountInList) {
+              currentAccountInList.Charges = state.displayCharges;
+              currentAccountInList.Max = state.maxCharges;
+              currentAccountInList.Droplets = chargesData.droplets;
+              // Re-render the list to show the updated charge count
+              renderAccountsList && renderAccountsList();
+          }
+      }
+
       updateChargeStatsDisplay(intervalMs);
     };
 
@@ -8069,6 +8094,7 @@
         randomBatchMin: state.randomBatchMin,
         randomBatchMax: state.randomBatchMax,
         cooldownChargeThreshold: state.cooldownChargeThreshold,
+        autoSwap: CONFIG.autoSwap,
         tokenSource: state.tokenSource, // "generator", "hybrid", or "manual"
         minimized: state.minimized,
         overlayOpacity: state.overlayOpacity,
@@ -8125,6 +8151,7 @@
       state.randomBatchMax = settings.randomBatchMax || CONFIG.RANDOM_BATCH_RANGE.MAX;
       state.cooldownChargeThreshold =
         settings.cooldownChargeThreshold || CONFIG.COOLDOWN_CHARGE_THRESHOLD;
+      CONFIG.autoSwap = settings.autoSwap ?? true;
       state.tokenSource = settings.tokenSource || CONFIG.TOKEN_SOURCE; // Default to "generator"
       state.minimized = settings.minimized ?? false;
       CONFIG.PAINTING_SPEED_ENABLED = settings.paintingSpeedEnabled ?? false;
@@ -8255,6 +8282,9 @@
       if (cooldownSlider) cooldownSlider.value = state.cooldownChargeThreshold;
       if (cooldownInput) cooldownInput.value = state.cooldownChargeThreshold;
       if (cooldownValue) cooldownValue.textContent = `${Utils.t('charges')}`;
+
+      const autoSwapToggle = document.getElementById('autoSwapToggle');
+      if (autoSwapToggle) autoSwapToggle.checked = CONFIG.autoSwap;
 
       const overlayOpacitySlider = document.getElementById('overlayOpacitySlider');
       if (overlayOpacitySlider) overlayOpacitySlider.value = state.overlayOpacity;
