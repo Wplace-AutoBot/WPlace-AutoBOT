@@ -147,6 +147,8 @@ const buildInfoPlugin = buildTarget => ({
                 lastCommitMessage = execSync('git log -1 --pretty=%s', {
                     encoding: 'utf8',
                 }).trim();
+                // Escape backticks for template literal safety
+                lastCommitMessage = lastCommitMessage.replace(/`/g, '\\`');
                 // Truncate long commit messages
                 if (lastCommitMessage.length > 50) {
                     lastCommitMessage =
