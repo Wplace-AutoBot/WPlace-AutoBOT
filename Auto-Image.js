@@ -198,6 +198,7 @@
     COORDINATE_SNAKE: true,
     COORDINATE_BLOCK_WIDTH: 6,
     COORDINATE_BLOCK_HEIGHT: 2,
+    autoSwap: true,
   };
 
   const getCurrentTheme = () => CONFIG.THEMES[CONFIG.currentTheme];
@@ -595,6 +596,9 @@
     _lastSaveTime: 0,
     _saveInProgress: false,
     paintedMap: null,
+    allAccountsInfo: [],
+    isFetchingAllAccounts: false,
+    accountIndex: 0,
   };
 
   let _updateResizePreview = () => {};
@@ -2747,6 +2751,134 @@
     },
   };
 
+    const randStr = (len, chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789') =>
+    [...Array(len)].map(() => chars[(crypto?.getRandomValues?.(new Uint32Array(1))[0] % chars.length) || Math.floor(Math.random() * chars.length)]).join('')
+
+    async function createWasmToken(regionX,regionY, payload) {
+    try {
+      // Load the Pawtect module and WASM
+      const mod = await import('/_app/immutable/chunks/BBb1ALhY.js');
+      let wasm;
+      try {
+        wasm = await mod._();
+        console.log('✅ WASM initialized successfully');
+      } catch (wasmError) {
+        console.error('❌ WASM initialization failed:', wasmError);
+        return null;
+      }
+      try {
+        try {
+          const me = await fetch(`https://backend.wplace.live/me`, { credentials: 'include' }).then(r => r.ok ? r.json() : null);
+          if (me?.id)
+          {
+            mod.i(me.id);
+            console.log('✅ user ID set:', me.id);
+          }
+        } catch { }
+      } catch (userIdError) {
+        console.log('⚠️ Error setting user ID:', userIdError.message);
+      }
+      try {
+        const testUrl = `https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`;
+        if (mod.r) {
+          mod.r(testUrl);
+          console.log('✅ Request URL set:', testUrl);
+        } else {
+          console.log('⚠️ request_url function (mod.r) not available');
+        }
+      } catch (urlError) {
+        console.log('⚠️ Error setting request URL:', urlError.message);
+      }
+
+      // Create test payload
+
+      console.log('📝 payload:', payload);
+
+      // Encode payload
+      const enc = new TextEncoder();
+      const dec = new TextDecoder();
+      const bodyStr = JSON.stringify(payload);
+      const bytes = enc.encode(bodyStr);
+      console.log('📏 Payload size:', bytes.length, 'bytes');
+      console.log('📄 Payload string:', bodyStr);
+
+      // Allocate WASM memory with validation
+      let inPtr;
+      try {
+        if (!wasm.__wbindgen_malloc) {
+          console.error('❌ __wbindgen_malloc function not found');
+          return null;
+        }
+
+        inPtr = wasm.__wbindgen_malloc(bytes.length, 1);
+        console.log('✅ WASM memory allocated, pointer:', inPtr);
+
+        // Copy data to WASM memory
+        const wasmBuffer = new Uint8Array(wasm.memory.buffer, inPtr, bytes.length);
+        wasmBuffer.set(bytes);
+        console.log('✅ Data copied to WASM memory');
+      } catch (memError) {
+        console.error('❌ Memory allocation error:', memError);
+        return null;
+      }
+
+      // Call the WASM function
+      console.log('🚀 Calling get_pawtected_endpoint_payload...');
+      let outPtr, outLen, token;
+      try {
+        const result = wasm.get_pawtected_endpoint_payload(inPtr, bytes.length);
+        console.log('✅ Function called, result type:', typeof result, result);
+
+        if (Array.isArray(result) && result.length === 2) {
+          [outPtr, outLen] = result;
+          console.log('✅ Got output pointer:', outPtr, 'length:', outLen);
+
+          // Decode the result
+          const outputBuffer = new Uint8Array(wasm.memory.buffer, outPtr, outLen);
+          token = dec.decode(outputBuffer);
+          console.log('✅ Token decoded successfully');
+        } else {
+          console.error('❌ Unexpected function result format:', result);
+          return null;
+        }
+      } catch (funcError) {
+        console.error('❌ Function call error:', funcError);
+        console.error('Stack trace:', funcError.stack);
+        return null;
+      }
+
+      // Cleanup memory
+      try {
+        if (wasm.__wbindgen_free && outPtr && outLen) {
+          wasm.__wbindgen_free(outPtr, outLen, 1);
+          console.log('✅ Output memory freed');
+        }
+        if (wasm.__wbindgen_free && inPtr) {
+          wasm.__wbindgen_free(inPtr, bytes.length, 1);
+          console.log('✅ Input memory freed');
+        }
+      } catch (cleanupError) {
+        console.log('⚠️ Cleanup warning:', cleanupError.message);
+      }
+
+      // Display results
+      console.log('');
+      console.log('🎉 SUCCESS!');
+      console.log('📊 Results:');
+      console.log('   Input coords: [1245984, 1088]');
+      console.log('   Token length:', token?.length || 0);
+      console.log('   Token preview:', token?.substring(0, 50) + '...');
+      console.log('');
+      console.log('🔑 Full token:');
+      console.log(token);
+      return token;
+    } catch (error) {
+      console.error('❌ Failed to generate fp parameter:', error);
+      return null;
+    }
+    return null;
+  }
+
   // IMAGE PROCESSOR CLASS
   class ImageProcessor {
     constructor(imageSrc) {
@@ -2826,10 +2958,12 @@
           coords: [pixelX, pixelY],
           colors: [color],
           t: turnstileToken,
+          fp: randStr(10),
         };
+        var token = await createWasmToken(regionX, regionY, payload);
         const res = await fetch(`https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`, {
           method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+          headers: { 'Content-Type': 'text/plain;charset=UTF-8', 'x-pawtect-token': token },
           credentials: 'include',
           body: JSON.stringify(payload),
         });
@@ -2854,6 +2988,7 @@
         charges: 0,
         max: 1,
         cooldown: CONFIG.COOLDOWN_DEFAULT,
+        droplets: 0,
       };
 
       try {
@@ -2869,16 +3004,341 @@
         const data = await res.json();
 
         return {
+          id: data.id,
           charges: data.charges?.count ?? 0,
           max: data.charges?.max ?? 1,
           cooldown: data.charges?.cooldownMs ?? CONFIG.COOLDOWN_DEFAULT,
+          droplets: data.droplets || 0,
         };
       } catch (e) {
         console.error('Failed to get charges:', e);
         return defaultResult;
       }
     },
+
+    async fetchCheck() {
+      try {
+        const res = await fetch("https://backend.wplace.live/me", {
+          credentials: "include",
+        })
+        const data = await res.json()
+        return {
+          ID: data.id,
+          Charges: data.charges.count,
+          Max: data.charges.max,
+          Droplets: data.droplets
+        }
+      } catch (e) {
+        console.error("Failed to get ID:", e)
+        return {}
+      }
+    }
   };
+
+  async function purchase(type) {
+    // loadThemePreference()
+    let id;
+    let chargeMultiplier;
+    if (type === "max_charges") {
+        id = 70;
+        chargeMultiplier = 5;
+    } else if (type === "paint_charges") {
+        id = 80;
+        chargeMultiplier = 30;
+    } else {
+        console.error("Error: Invalid purchase type provided.");
+        return;
+    }
+    const { droplets } = await WPlaceService.getCharges();
+    console.log("There are currently : ", droplets, "droplets.");
+    try {
+        const amounts = Math.floor(droplets / 500);
+        if (amounts < 1) {
+            console.log("Not enough droplets to purchase.");
+            return;
+        }
+        const payload = {
+            "product": {
+                "id": id,
+                "amount": amounts
+            }
+        };
+        const res = fetch("https://backend.wplace.live/purchase", {
+            method: "POST",
+            headers: {
+                "Content-Type": "text/plain;charset=UTF-8"
+            },
+            body: JSON.stringify(payload),
+            credentials: "include"
+        });
+        console.log("Fetch POST return :", res);
+        const { droplets: newDroplets } = await WPlaceService.getCharges();
+        if (droplets != newDroplets) {
+            console.log("Successfully bought", amounts * chargeMultiplier, type.replace('_', ' '), ".");
+        }
+        else {
+            console.log("Failed to buy charges");
+        }
+    } catch (e) {
+        console.error("An error occurred during the purchase:", e);
+    }
+  }
+
+  function swapAccountTrigger(token) {
+      localStorage.removeItem("lp");
+      if (!token) return;
+      console.log("Sending token to extension...");
+      window.postMessage({
+          source: 'my-userscript',
+          type: 'setCookie',
+          value: token
+      }, '*');
+  }
+
+  async function getAccounts() {
+      return new Promise((resolve, reject) => {
+          console.log("Requesting accounts from extension...");
+          // Ask extension for accounts
+          window.postMessage({
+              source: "my-userscript",
+              type: "getAccounts"
+          }, "*");
+          function handler(event) {
+              if (event.source !== window) return;
+              if (event.data.source !== "extension") return;
+              if (event.data.type === "accountsData") {
+                  window.removeEventListener("message", handler);
+                  // Save to localStorage
+                  try {
+                      localStorage.setItem("accounts", JSON.stringify(event.data.accounts));
+                      console.log("✅ Accounts saved to localStorage:", event.data.accounts);
+                  } catch (e) {
+                      console.error("❌ Failed to save accounts:", e);
+                  }
+                  resolve(event.data.accounts);
+              }
+          }
+          window.addEventListener("message", handler);
+      });
+  }
+
+  async function fetchAccount() {
+      const { ID, Charges, Max, Droplets } = await WPlaceService.fetchCheck();
+      console.log("User's ID :", ID);
+      console.log("User's Charges :", Charges, "/", Max);
+      console.log("User's Droplets :", Droplets);
+  }
+
+  const loadAccountNames = () => {
+    try {
+        return JSON.parse(localStorage.getItem("wplace-account-names")) || {};
+    } catch (e) {
+        return {};
+    }
+  };
+
+  const saveAccountNames = (names) => {
+      try {
+          localStorage.setItem("wplace-account-names", JSON.stringify(names));
+      } catch (e) {
+          console.warn("Could not save account names:", e);
+      }
+  };
+
+  async function editAccountName(token, currentName) {
+      const newName = prompt("Enter a new name for this account:", currentName);
+      if (newName === null) return; // User cancelled
+
+      if (newName.trim() === "") {
+          Utils.showAlert("Account name cannot be empty.", "warning");
+          return;
+      }
+
+      const names = loadAccountNames();
+      names[token] = newName.trim();
+      saveAccountNames(names);
+
+      const accountInfo = state.allAccountsInfo.find(acc => acc.token === token);
+      if (accountInfo) {
+          accountInfo.displayName = newName.trim();
+      }
+
+      renderAccountsList();
+      Utils.showAlert("Account name updated.", "success");
+  }
+
+  async function deleteAccount(token, name) {
+      if (!confirm(`Are you sure you want to delete the account \"${name}\"?\nThis action cannot be undone.`)) {
+          return;
+      }
+
+      let accounts = JSON.parse(localStorage.getItem("accounts")) || [];
+      const initialCount = accounts.length;
+      accounts = accounts.filter(t => t !== token);
+      if (accounts.length < initialCount) {
+          localStorage.setItem("accounts", JSON.stringify(accounts));
+      }
+
+      const names = loadAccountNames();
+      delete names[token];
+      saveAccountNames(names);
+
+      state.allAccountsInfo = state.allAccountsInfo.filter(acc => acc.token !== token);
+      renderAccountsList();
+      Utils.showAlert(`Account \"${name}\" has been deleted.`, "success");
+  }
+
+  function renderAccountsList() {
+      const accountsListArea = document.getElementById('accountsListArea');
+      if (!accountsListArea) return;
+
+      accountsListArea.innerHTML = '';
+      if (state.allAccountsInfo.length === 0) {
+          accountsListArea.innerHTML = `<div class=\"wplace-stat-item\" style=\"opacity: 0.5;\">No account data. Click <i class=\"fas fa-users-cog\"></i> to refresh.</div>`;
+          return;
+      }
+
+      const theme = getCurrentTheme();
+      state.allAccountsInfo.forEach((info, index) => {
+          const item = Utils.createElement('div', {
+              className: `wplace-account-item ${info.isCurrent ? 'is-current' : ''}`
+          });
+
+          const displayName = info.displayName || `Account ${index + 1}`;
+
+          const details = Utils.createElement('div', { className: 'wplace-account-details' });
+          details.appendChild(Utils.createElement('div', { className: 'wplace-account-name', title: displayName }, displayName));
+
+          let stats;
+          if (info.error) {
+              stats = Utils.createElement('div', { className: 'wplace-account-stats', style: { color: theme.error } }, 'Error');
+          } else {
+              stats = Utils.createElement('div', {
+                  className: 'wplace-account-stats',
+                  innerHTML: `
+                      <span><i class=\"fas fa-bolt\"></i> ${Math.floor(info.Charges || 0)}/${Math.floor(info.Max || 0)}</span>
+                      <span><i class=\"fas fa-tint\"></i> ${Math.floor(info.Droplets || 0)}</span>
+                  `
+              });
+          }
+
+          const controls = Utils.createElement('div', { className: 'wplace-account-controls' });
+          const editBtn = Utils.createElement('button', {
+              className: 'wplace-account-btn edit-btn',
+              title: 'Edit Name',
+              innerHTML: '<i class=\"fas fa-edit\"></i>'
+          });
+          editBtn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              editAccountName(info.token, displayName);
+          });
+
+          const deleteBtn = Utils.createElement('button', {
+              className: 'wplace-account-btn delete-btn',
+              title: 'Delete Account',
+              innerHTML: '<i class=\"fas fa-trash-alt\"></i>'
+          });
+          deleteBtn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              deleteAccount(info.token, displayName);
+          });
+
+          controls.appendChild(editBtn);
+          controls.appendChild(deleteBtn);
+
+          item.appendChild(details);
+          item.appendChild(stats);
+          item.appendChild(controls);
+
+          accountsListArea.appendChild(item);
+      });
+  }
+
+  async function fetchAllAccountDetails() {
+      if (state.isFetchingAllAccounts) {
+          Utils.showAlert("Already fetching account details.", "warning");
+          return;
+      }
+      state.isFetchingAllAccounts = true;
+
+      const refreshBtn = document.getElementById('refreshAllAccountsBtn');
+      if (refreshBtn) {
+          refreshBtn.innerHTML = '<i class=\"fas fa-spinner fa-spin\"></i>';
+          refreshBtn.disabled = true;
+      }
+
+      const accountsListArea = document.getElementById('accountsListArea');
+      if (accountsListArea) {
+          accountsListArea.innerHTML = `<div class=\"wplace-stat-item\" style=\"opacity: 0.5;\">Initializing...</div>`;
+      }
+
+      let originalToken = null;
+
+      try {
+          await getAccounts();
+          const accountsTokens = JSON.parse(localStorage.getItem("accounts")) || [];
+          if (accountsTokens.length === 0) {
+              if (accountsListArea) accountsListArea.innerHTML = `<div class=\"wplace-stat-item\" style=\"opacity: 0.5;\">No accounts found.</div>`;
+              return;
+          }
+
+          const { id: originalId } = await WPlaceService.getCharges();
+          state.allAccountsInfo = [];
+          renderAccountsList();
+
+          const accountNames = loadAccountNames();
+          for (let i = 0; i < accountsTokens.length; i++) {
+              const token = accountsTokens[i];
+              swapAccountTrigger(token);
+
+              let retries = 0;
+              let swapped = false;
+              let fetchedInfo = null;
+              while (retries < 5 && !swapped) {
+                  await Utils.sleep(1000);
+                  try {
+                      fetchedInfo = await WPlaceService.fetchCheck();
+                      if (fetchedInfo.ID) swapped = true;
+                  } catch (e) { retries++; }
+              }
+
+              if (swapped) {
+                  await fetchAccount();
+                  // await purchase("max_charges");
+                  const displayName = accountNames[token] || `Account ${i + 1}`;
+                  if (fetchedInfo.ID === originalId) originalToken = token;
+                  state.allAccountsInfo.push({ ...fetchedInfo, token, displayName, isCurrent: fetchedInfo.ID === originalId });
+              } else {
+                  const displayName = accountNames[token] || `Account ${i + 1}`;
+                  state.allAccountsInfo.push({ token, ID: `...${token.slice(-4)}`, displayName, error: 'Failed to fetch' });
+              }
+              renderAccountsList();
+          }
+      } catch (error) {
+          console.error("Error fetching all account details:", error);
+          if (accountsListArea) accountsListArea.innerHTML = `<div class=\"wplace-stat-item\" style=\"color: ${getCurrentTheme().error};\">Error loading accounts.</div>`;
+      } finally {
+          if (originalToken) swapAccountTrigger(originalToken);
+          await Utils.sleep(1000);
+
+          // After switching back, update stats and sync the list
+          const meData = await WPlaceService.getCharges();
+          const currentAccountInList = state.allAccountsInfo.find(acc => acc.ID === meData.id);
+          if (currentAccountInList) {
+              currentAccountInList.Charges = meData.charges;
+              currentAccountInList.Max = meData.max;
+              currentAccountInList.Droplets = meData.droplets;
+          }
+          await updateStats(); // This will re-render the main stats
+          renderAccountsList(); // This will re-render the list with synced data
+
+          state.isFetchingAllAccounts = false;
+          if (refreshBtn) {
+              refreshBtn.innerHTML = '<i class=\"fas fa-users-cog\"></i>';
+              refreshBtn.disabled = false;
+          }
+      }
+  }
 
   // Desktop Notification Manager
   const NotificationManager = {
@@ -3538,6 +3998,9 @@
           <span>${Utils.t('paintingStats')}</span>
         </div>
         <div class="wplace-header-controls">
+          <button id="refreshAllAccountsBtn" class="wplace-header-btn" title="Refresh All Accounts">
+            <i class="fas fa-users-cog"></i>
+          </button>
           <button id="refreshChargesBtn" class="wplace-header-btn" title="${Utils.t(
             'refreshCharges'
           )}">
@@ -3549,6 +4012,18 @@
         </div>
       </div>
       <div class="wplace-content">
+        <div class="wplace-section" id="account-swapper-section">
+            <div class="wplace-section-title" style="justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <i class="fas fa-sync-alt"></i>
+                    <span>Account Swapper</span>
+                </div>
+                <label class="wplace-switch">
+                    <input type="checkbox" id="autoSwapToggle">
+                    <span class="wplace-slider-round"></span>
+                </label>
+            </div>
+        </div>
         <div class="wplace-stats">
           <div id="statsArea">
             <div class="wplace-stat-item">
@@ -3557,6 +4032,15 @@
               )}</div>
             </div>
           </div>
+        </div>
+        <div class="wplace-section" id="all-accounts-section">
+            <div class="wplace-section-title">
+                <i class="fas fa-users"></i>
+                <span>All Accounts</span>
+            </div>
+            <div id="accountsListArea" class="accounts-list-container">
+                <div class="wplace-stat-item" style="opacity: 0.5;">Click the <i class="fas fa-users-cog"></i> icon to load accounts.</div>
+            </div>
         </div>
       </div>
     `;
@@ -4121,6 +4605,31 @@
         .wplace-content::-webkit-scrollbar-thumb:hover {
           background: rgba(255,255,255,0.5);
         }
+      /* Switch toggle for auto-swap */
+      .wplace-switch { position: relative; display: inline-block; width: 34px; height: 20px; }
+      .wplace-switch input { opacity: 0; width: 0; height: 0; }
+      .wplace-slider-round { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--wplace-secondary); border: 1px solid var(--wplace-accent); transition: .4s; border-radius: 20px; }
+      .wplace-slider-round:before { position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px; background-color: var(--wplace-text); transition: .4s; border-radius: 50%; }
+      input:checked + .wplace-slider-round { background-color: var(--wplace-success); }
+      input:checked + .wplace-slider-round:before { transform: translateX(14px); }
+
+      /* Accounts list */
+      .accounts-list-container { max-height: 280px; overflow-y: auto; padding-right: 5px; display: flex; flex-direction: column; gap: 8px; }
+      .wplace-account-item { padding: 8px; background: rgba(255,255,255,0.03); border: 1px solid var(--wplace-accent); border-radius: var(--wplace-radius); display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; font-size: 11px; transition: all 0.2s ease; }
+      .wplace-account-item.is-current { border-left: 3px solid var(--wplace-highlight); background: rgba(119, 92, 227, 0.2); }
+
+      .wplace-account-details { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .wplace-account-name { font-weight: 600; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex-grow: 1; display: flex; align-items: center; }
+      .wplace-account-id { opacity: 0.7; font-family: monospace; font-size: 10px; }
+
+      .wplace-account-stats { display: flex; gap: 8px; align-items: center; white-space: nowrap; }
+      .wplace-account-stats span { display: flex; align-items: center; gap: 5px; }
+      .wplace-account-stats i { color: var(--wplace-highlight); }
+
+      .wplace-account-controls { display: flex; gap: 6px; }
+      .wplace-account-btn { background: transparent; border: none; color: var(--wplace-text); opacity: 0.6; cursor: pointer; padding: 4px; font-size: 11px; border-radius: 4px; transition: all 0.2s ease; line-height: 1; }
+      .wplace-account-btn:hover { opacity: 1; background: rgba(255,255,255,0.1); }
+      .wplace-account-btn.delete-btn:hover { color: var(--wplace-error); }
       </style>
     `;
 
@@ -4487,6 +4996,18 @@
       });
 
       if (refreshChargesBtn) {
+        const refreshAllAccountsBtn = statsContainer.querySelector("#refreshAllAccountsBtn");
+        if (refreshAllAccountsBtn) {
+            refreshAllAccountsBtn.addEventListener('click', fetchAllAccountDetails);
+        }
+
+        const autoSwapToggle = statsContainer.querySelector("#autoSwapToggle");
+        if (autoSwapToggle) {
+            autoSwapToggle.checked = CONFIG.autoSwap;
+            autoSwapToggle.addEventListener('change', (e) => {
+                CONFIG.autoSwap = e.target.checked;
+            });
+        }
         refreshChargesBtn.addEventListener('click', async () => {
           refreshChargesBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
           refreshChargesBtn.disabled = true;
@@ -6975,6 +7496,7 @@
   }
 
   async function processImage() {
+    await getAccounts();
     const { width, height, pixels } = state.imageData;
     const { x: startX, y: startY } = state.startPosition;
     const { x: regionX, y: regionY } = state.region;
@@ -7251,18 +7773,73 @@
         }
 
         if (state.displayCharges < state.cooldownChargeThreshold && !state.stopFlag) {
-          await Utils.dynamicSleep(() => {
-            if (state.displayCharges >= state.cooldownChargeThreshold) {
-              NotificationManager.maybeNotifyChargesReached(true);
-              return 0;
+          if (!CONFIG.autoSwap) {
+            await Utils.dynamicSleep(() => {
+              if (state.displayCharges >= state.cooldownChargeThreshold) {
+                NotificationManager.maybeNotifyChargesReached(true);
+                return 0;
+              }
+              if (state.stopFlag) return 0;
+              return getMsToTargetCharges(
+                state.preciseCurrentCharges,
+                state.cooldownChargeThreshold,
+                state.cooldown
+              );
+            });
+          } else {
+            console.log("⚠️ Charges too low, swapping to next account...");
+
+            const accounts = JSON.parse(localStorage.getItem("accounts")) || [];
+            if (accounts.length === 0) {
+                console.warn("❌ No accounts available, stopping painting.");
+                state.stopFlag = true;
+                break outerLoop;
             }
-            if (state.stopFlag) return 0;
-            return getMsToTargetCharges(
-              state.preciseCurrentCharges,
-              state.cooldownChargeThreshold,
-              state.cooldown
-            );
-          });
+
+            state.accountIndex = (state.accountIndex + 1) % accounts.length;
+            console.log("🔄 Switching to account index:", state.accountIndex);
+
+            const nextToken = accounts[state.accountIndex];
+            console.log("🔑 Next token:", nextToken);
+
+            if (!nextToken) {
+                console.warn("⚠️ Invalid token, skipping...");
+                continue;
+            }
+
+            swapAccountTrigger(nextToken);
+
+            let maxRetries = 20;
+            let retryCount = 0;
+            let swapSuccess = false;
+
+            while (!swapSuccess && retryCount < maxRetries) {
+                console.log(`⏳ Waiting for account swap... (Attempt ${retryCount + 1}/${maxRetries})`);
+
+                await Utils.sleep(1000);
+
+                try {
+                    await fetchAccount();
+                    console.log("✅ Account swap confirmed.");
+                    swapSuccess = true;
+                } catch (error) {
+                    console.warn("❌ Account swap not yet successful. Retrying...", error);
+                    retryCount++;
+                }
+            }
+
+            if (swapSuccess) {
+                const { charges, cooldown } = await WPlaceService.getCharges();
+                state.displayCharges = Math.floor(charges);
+                state.preciseCurrentCharges = charges;
+                state.cooldown = cooldown;
+                Utils.performSmartSave();
+                updateStats();
+            } else {
+                console.error("❌ Failed to swap account after multiple retries. Stopping loop.");
+                state.stopFlag = true;
+            }
+          }
         }
 
         if (state.stopFlag) {
@@ -7420,11 +7997,11 @@
     }
 
     try {
-      const payload = { coords, colors, t: token };
-
+      const payload = { coords, colors, t: token, fp: randStr(10) };
+      var wasmtoken = await createWasmToken(regionX, regionY, payload);
       const res = await fetch(`https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+        headers: { 'Content-Type': 'text/plain;charset=UTF-8', 'x-pawtect-token': wasmtoken },
         credentials: 'include',
         body: JSON.stringify(payload),
       });
@@ -7443,12 +8020,13 @@
           turnstileToken = token;
 
           // Retry the request with new token
-          const retryPayload = { coords, colors, t: token };
+          const retryPayload = { coords, colors, t: token, fp: randStr(10) };
+          var wasmtoken = await createWasmToken(regionX, regionY, retryPayload);
           const retryRes = await fetch(
             `https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`,
             {
               method: 'POST',
-              headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+              headers: { 'Content-Type': 'text/plain;charset=UTF-8', 'x-pawtect-token': wasmtoken },
               credentials: 'include',
               body: JSON.stringify(retryPayload),
             }
