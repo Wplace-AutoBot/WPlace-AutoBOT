@@ -2200,34 +2200,6 @@
     transition: all 0.2s ease;
 }
 
-/* Theme and language selects */
-#themeSelect:hover,
-#languageSelect:hover {
-    border-color: rgba(255, 255, 255, 0.4);
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateY(-1px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
-}
-
-#themeSelect:focus,
-#languageSelect:focus {
-    border-color: #4facfe;
-    box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.3);
-}
-
-#themeSelect option,
-#languageSelect option {
-    background: #2d3748;
-    color: white;
-    padding: 10px;
-    border-radius: 6px;
-}
-
-#themeSelect option:hover,
-#languageSelect option:hover {
-    background: #4a5568;
-}
-
 /* Dragging state */
 .wplace-dragging {
     opacity: 0.9;

@@ -227,6 +227,27 @@ import {
                     'pixel-blink': true,
                 },
             },
+            'Acrylic': {
+                primary: '#00000080',
+                secondary: '#00000040',
+                accent: 'rgba(0,0,0,0.75)',
+                text: '#ffffff',
+                highlight: '#ffffff',
+                success: '#00e500',
+                error: '#e50000',
+                warning: '#e5e500',
+                fontFamily: "'Inter', 'Apple Color Emoji'",
+                borderRadius: '10px',
+                borderStyle: 'solid',
+                borderWidth: '0px',
+                boxShadow: 'none',
+                backdropFilter: 'blur(20px)',
+                animations: {
+                    glow: false,
+                    scanline: false,
+                    'pixel-blink': false,
+                },
+            }
         },
         currentTheme: 'Classic Autobot',
         PAINT_UNAVAILABLE: true,
@@ -279,19 +300,16 @@ import {
      */
     function applyTheme() {
         const theme = getCurrentTheme();
-        // Toggle theme class on documentElement so CSS vars cascade to our UI
-        document.documentElement.classList.remove(
-            'wplace-theme-classic',
-            'wplace-theme-classic-light',
-            'wplace-theme-neon'
-        );
-
         // Map CONFIG theme names to CSS class names
         const themeClassMapping = {
             'Classic Autobot': 'wplace-theme-classic',
             'Classic Light': 'wplace-theme-classic-light',
             'Neon Retro': 'wplace-theme-neon',
+            'Acrylic': 'wplace-theme-acrylic',
         };
+
+        // Toggle theme class on documentElement so CSS vars cascade to our UI
+        document.documentElement.classList.remove(...Object.values(themeClassMapping));
 
         const themeClass =
             themeClassMapping[CONFIG.currentTheme] || 'wplace-theme-classic';
@@ -311,6 +329,7 @@ import {
             'Classic Autobot': 'classic',
             'Classic Light': 'classic-light',
             'Neon Retro': 'neon',
+            'Acrylic': 'acrylic',
         };
 
         const themeFileName = themeFileMapping[themeName] || 'classic';
@@ -4231,15 +4250,6 @@ import {
           </div>
         </div>
 
-        <!-- Automation Section -->
-        <div class="wplace-settings-section">
-          <label class="wplace-settings-section-label">
-            <i class="fas fa-robot wplace-icon-robot"></i>
-            ${Utils.t('automation')}
-          </label>
-          <!-- Token generator is always enabled - settings moved to Token Source above -->
-        </div>
-
         <!-- Overlay Settings Section -->
         <div class="wplace-settings-section">
           <label class="wplace-settings-section-label">
@@ -4423,12 +4433,13 @@ import {
           </div>
           
           <!-- Speed Control Toggle -->
-          <label class="wplace-speed-control-toggle">
-            <input type="checkbox" id="enableSpeedToggle" ${
-                CONFIG.PAINTING_SPEED_ENABLED ? 'checked' : ''
-            } class="wplace-speed-checkbox"/>
-            <span>${Utils.t('enablePaintingSpeedLimit')}</span>
-          </label>
+            <label class="wplace-settings-toggle">
+              <div>
+                <span class="wplace-settings-toggle-title">${Utils.t('enablePaintingSpeedLimit')}</span>
+                <p class="wplace-settings-toggle-description">Limits concurrent paint operations to prevent performance issues and ensure smoother rendering</p>
+              </div>
+              <input type="checkbox" id="enableSpeedToggle" ${CONFIG.PAINTING_SPEED_ENABLED ? 'checked' : ''} class="wplace-speed-checkbox"/>
+            </label>
         </div>
         
         <!-- Coordinate Generation Section -->
@@ -4518,23 +4529,28 @@ import {
             Desktop Notifications
           </label>
           <div class="wplace-settings-section-wrapper wplace-notifications-wrapper">
-            <label class="wplace-notification-toggle">
-              <span>${Utils.t('enableNotifications')}</span>
-              <input type="checkbox" id="notifEnabledToggle" ${
-                  state.notificationsEnabled ? 'checked' : ''
-              } class="wplace-notification-checkbox" />
+            <label class="wplace-settings-toggle">
+              <div>
+                <span class="wplace-settings-toggle-title">${Utils.t('enableNotifications')}</span>
+                <p class="wplace-settings-toggle-description">Receive browser notifications for important events and updates</p>
+              </div>
+              <input type="checkbox" id="notifEnabledToggle" ${state.notificationsEnabled ? 'checked' : ''} class="wplace-notification-checkbox" />
             </label>
-            <label class="wplace-notification-toggle">
-              <span>${Utils.t('notifyOnChargesThreshold')}</span>
-              <input type="checkbox" id="notifOnChargesToggle" ${
-                  state.notifyOnChargesReached ? 'checked' : ''
-              } class="wplace-notification-checkbox" />
+            
+            <label class="wplace-settings-toggle">
+              <div>
+                <span class="wplace-settings-toggle-title">${Utils.t('notifyOnChargesThreshold')}</span>
+                <p class="wplace-settings-toggle-description">Get notified when your charges reach threshold limits</p>
+              </div>
+              <input type="checkbox" id="notifOnChargesToggle" ${state.notifyOnChargesReached ? 'checked' : ''} class="wplace-notification-checkbox" />
             </label>
-            <label class="wplace-notification-toggle">
-              <span>${Utils.t('onlyWhenNotFocused')}</span>
-              <input type="checkbox" id="notifOnlyUnfocusedToggle" ${
-                  state.notifyOnlyWhenUnfocused ? 'checked' : ''
-              } class="wplace-notification-checkbox" />
+            
+            <label class="wplace-settings-toggle">
+              <div>
+                <span class="wplace-settings-toggle-title">${Utils.t('onlyWhenNotFocused')}</span>
+                <p class="wplace-settings-toggle-description">Only show notifications when the browser tab is not in focus</p>
+              </div>
+              <input type="checkbox" id="notifOnlyUnfocusedToggle" ${state.notifyOnlyWhenUnfocused ? 'checked' : ''} class="wplace-notification-checkbox" />
             </label>
             <div class="wplace-notification-interval">
               <span>${Utils.t('repeatEvery')}</span>
@@ -4545,7 +4561,7 @@ import {
               <button id="notifRequestPermBtn" class="wplace-btn wplace-btn-secondary wplace-notification-perm-btn"><i class="fas fa-unlock"></i><span>${Utils.t(
                   'grantPermission'
               )}</span></button>
-              <button id="notifTestBtn" class="wplace-btn wplace-notification-test-btn"><i class="fas fa-bell"></i><span>${Utils.t(
+              <button id="notifTestBtn" class="wplace-btn wplace-btn-secondary wplace-notification-test-btn"><i class="fas fa-bell"></i><span>${Utils.t(
                   'test'
               )}</span></button>
             </div>
