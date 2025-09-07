@@ -7783,10 +7783,12 @@
   applyTheme();
 
   var pawtect_chunk = null;
+
+  //find module if pawtect_chunk is null
+  pawtect_chunk ??= await findTokenModule("pawtect_wasm_bg.wasm");
+  
   async function createWasmToken(regionX, regionY, payload) {
     try {
-      //find module if pawtect_chunk is null
-      pawtect_chunk ??= await findTokenModule("pawtect_wasm_bg.wasm");
       // Load the Pawtect module and WASM
       const mod = await import(pawtect_chunk);
       let wasm;
@@ -7902,7 +7904,7 @@
       return null;
     }
   }
-  
+
   async function findTokenModule(str) {
     const links = Array.from(document.querySelectorAll('link[rel="modulepreload"][href$=".js"]'));
 
