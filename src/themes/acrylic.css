@@ -72,6 +72,7 @@
 
 .wplace-theme-acrylic .wplace-settings-header {
     background: transparent;
+    border: none;
     padding: 0;
 }
 
@@ -118,6 +119,8 @@
     font-weight: 600;
     background: var(--wplace-accent);
     color: var(--wplace-highlight);
+    text-shadow: none;
+    border: none;
 }
 
 .wplace-theme-acrylic .wplace-header-title {
@@ -278,7 +281,14 @@
 .wplace-theme-acrylic .wplace-btn-secondary,
 .wplace-theme-acrylic .wplace-btn-select,
 .wplace-theme-acrylic .wplace-btn-file,
-.wplace-theme-acrylic .wplace-btn-overlay {
+.wplace-theme-acrylic .wplace-btn-overlay,
+.wplace-theme-acrylic .resize-zoom-btn,
+.wplace-theme-acrylic #unselectPaidBtn,
+.wplace-theme-acrylic #unselectAllBtn,
+.wplace-theme-acrylic #selectAllBtn,
+.wplace-theme-acrylic .resize-mode-btn,
+.wplace-theme-acrylic .resize-clear-btn,
+.wplace-theme-acrylic .resize-invert-btn {
     background: var(--wplace-secondary);
 }
 
@@ -287,7 +297,8 @@
     color: white;
 }
 
-.wplace-theme-acrylic .wplace-btn-stop {
+.wplace-theme-acrylic .wplace-btn-stop,
+.wplace-theme-acrylic .resize-reset-advanced-btn {
     background: var(--wplace-error);
     color: white;
 }
@@ -306,6 +317,11 @@
     background: white;
     color: black;
     border-radius: 8px;
+}
+
+.wplace-theme-acrylic .resize-zoom-btn {
+    height: 35px;
+    justify-content: center;
 }
 
 /* Compact Input Buttons */
@@ -366,7 +382,10 @@
 /* Form Controls */
 .wplace-theme-acrylic .wplace-settings-checkbox,
 .wplace-theme-acrylic .wplace-notification-checkbox,
-.wplace-theme-acrylic .wplace-speed-checkbox {
+.wplace-theme-acrylic .wplace-speed-checkbox,
+.wplace-theme-acrylic .resize-checkbox-label input[type="checkbox"],
+.wplace-theme-acrylic .resize-color-checkbox,
+.wplace-theme-acrylic .resize-advanced-checkbox {
     cursor: pointer;
     width: 20px;
     height: 20px;
@@ -378,7 +397,10 @@
 .wplace-theme-acrylic .wplace-settings-number-input,
 .wplace-theme-acrylic .wplace-cooldown-input,
 .wplace-theme-acrylic .wplace-speed-input,
-.wplace-theme-acrylic .wplace-notification-interval-input {
+.wplace-theme-acrylic .wplace-notification-interval-input,
+.wplace-theme-acrylic .resize-advanced-select,
+.wplace-theme-acrylic .resize-threshold-input {
+    min-height: 45px;
     background: rgb(255 255 255 / 10%);
     color: white;
     border: 1px solid rgb(255 255 255 / 25%);
@@ -391,7 +413,9 @@
 .wplace-theme-acrylic .wplace-settings-number-input:hover,
 .wplace-theme-acrylic .wplace-cooldown-input:hover,
 .wplace-theme-acrylic .wplace-speed-input:hover,
-.wplace-theme-acrylic .wplace-notification-interval-input:hover {
+.wplace-theme-acrylic .wplace-notification-interval-input:hover,
+.wplace-theme-acrylic .resize-advanced-select:hover,
+.wplace-theme-acrylic .resize-threshold-input:hover {
     border-color: rgb(255 255 255 / 50%);
 }
 
@@ -399,24 +423,28 @@
 .wplace-theme-acrylic .wplace-settings-number-input:focus,
 .wplace-theme-acrylic .wplace-cooldown-input:focus,
 .wplace-theme-acrylic .wplace-speed-input:focus,
-.wplace-theme-acrylic .wplace-notification-interval-input:focus {
+.wplace-theme-acrylic .wplace-notification-interval-input:focus,
+.wplace-theme-acrylic .resize-advanced-select:focus,
+.wplace-theme-acrylic .resize-threshold-input:focus {
+    outline: none;
     border-color: white;
 }
 
-.wplace-theme-acrylic .wplace-settings-option {
-    background: #2d3748;
-    color: white;
-}
-
+.wplace-theme-acrylic .wplace-settings-option,
 .wplace-theme-acrylic .wplace-settings-select option {
-    background: #2d3748;
+    background: #202020;
     color: white;
 }
 
 .wplace-theme-acrylic .wplace-cooldown-input,
 .wplace-theme-acrylic .wplace-speed-input {
     border-radius: 4px !important;
+    min-height: unset !important;
     height: 25px !important;
+}
+
+.wplace-theme-acrylic .wplace-notification-interval-input {
+    min-height: unset;
 }
 
 .wplace-theme-acrylic .wplace-cooldown-input:focus,
@@ -433,7 +461,11 @@
 /* Sliders */
 .wplace-theme-acrylic .wplace-slider,
 .wplace-theme-acrylic .wplace-speed-slider,
-.wplace-theme-acrylic .wplace-overlay-opacity-slider {
+.wplace-theme-acrylic .wplace-overlay-opacity-slider,
+.wplace-theme-acrylic .resize-slider,
+.wplace-theme-acrylic .resize-tool-slider,
+.wplace-theme-acrylic .resize-chroma-weight-slider {
+    appearance: none;
     flex: none;
     background: var(--wplace-secondary) !important;
     border-radius: 3px !important;
@@ -442,7 +474,11 @@
 
 .wplace-theme-acrylic .wplace-slider::-webkit-slider-thumb,
 .wplace-theme-acrylic .wplace-speed-slider::-webkit-slider-thumb,
-.wplace-theme-acrylic .wplace-overlay-opacity-slider::-webkit-slider-thumb {
+.wplace-theme-acrylic .wplace-overlay-opacity-slider::-webkit-slider-thumb,
+.wplace-theme-acrylic .resize-slider::-webkit-slider-thumb,
+.wplace-theme-acrylic .resize-tool-slider::-webkit-slider-thumb,
+.wplace-theme-acrylic .resize-chroma-weight-slider::-webkit-slider-thumb {
+    appearance: none !important;
     width: 16px !important;
     height: 16px !important;
     border-radius: 4px !important;
@@ -461,10 +497,6 @@
     color: white;
     box-shadow: 0 3px 10px rgb(79 172 254 / 30%);
     border: 1px solid rgb(255 255 255 / 20%);
-}
-
-.wplace-theme-acrylic .resize-slider {
-    -webkit-appearance: revert;
 }
 
 /* Layout Controls */
@@ -616,22 +648,72 @@
 }
 
 /* Resize Tools */
-.wplace-theme-acrylic .resize-tools button {
-    border-radius: 6px;
-    border: 1px solid rgb(255 255 255 / 20%);
-    background: rgb(255 255 255 / 6%);
-    color: #fff;
-}
-
 .wplace-theme-acrylic .resize-overlay {
     background: rgb(0 0 0 / 50%);
 }
 
-/* TODO: More resize menu styles */
 .wplace-theme-acrylic .resize-container {
     background: var(--wplace-secondary);
     backdrop-filter: var(--wplace-backdrop);
     border: none;
     border-radius: var(--wplace-radius);
     color: var(--wplace-text);
+    max-width: 600px;
 }
+
+.wplace-theme-acrylic .resize-container * {
+    font-size: 15px !important;
+}
+
+.wplace-theme-acrylic .resize-dialog-title {
+    font-weight: 600;
+    font-size: larger !important;
+}
+
+.wplace-theme-acrylic .resize-zoom-controls {
+    justify-content: center;
+}
+
+.wplace-theme-acrylic .resize-camera-help {
+    margin: auto;
+}
+
+.wplace-theme-acrylic .resize-tools-container {
+    justify-content: center;
+}
+
+.wplace-theme-acrylic .resize-tools {
+    margin-bottom: 15px;
+}
+
+.wplace-theme-acrylic .resize-mode-controls,
+.wplace-theme-acrylic .resize-mode-group {
+    gap: 10px;
+}
+
+.wplace-theme-acrylic .resize-brush-controls {
+    align-items: center;
+    width: 100%;
+}
+
+.wplace-theme-acrylic .resize-brush-controls .resize-tool-label {
+    width: 6em;
+}
+
+.wplace-theme-acrylic .resize-color-palette-section {
+    margin-bottom: 15px;
+}
+
+.wplace-theme-acrylic .resize-color-palette-section .wplace-section-title i,
+.wplace-theme-acrylic .resize-advanced-color-section .wplace-section-title i {
+    display: flex;
+}
+
+.wplace-theme-acrylic .wplace-color-grid {
+    font-family: Inter, sans-serif;
+}
+
+.wplace-theme-acrylic .resize-chroma-weight-value {
+    background: var(--wplace-secondary);
+}
+
