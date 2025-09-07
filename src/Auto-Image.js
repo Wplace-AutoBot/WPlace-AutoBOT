@@ -14,7 +14,7 @@ import { createState } from './core/state.js';
     // Initialize centralized state manager for Auto-Image
     const stateManager = createState();
     const { state, update, get } = stateManager;
-    
+
     // Set initial config values
     state.cooldown = CONFIG.COOLDOWN_DEFAULT;
     state.paintingSpeed = CONFIG.PAINTING_SPEED.DEFAULT;
