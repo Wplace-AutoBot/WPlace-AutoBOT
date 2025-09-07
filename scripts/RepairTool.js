@@ -12,7 +12,7 @@
       DEFAULT: 5,
     },
     TOKEN_SOURCE: 'generator', // "generator", "manual", or "hybrid"
-    AUTONOMOUS_MODE: false, // Enable autonomous operation
+    AUTONOMOUS_MODE: true, // Enable autonomous operation
     AUTO_TOKEN_REFRESH: true, // Automatically refresh tokens
     TOKEN_PRELOAD_BUFFER: 60000, // Preload tokens 1 minute before expiry
     MAX_RETRIES: 10,
@@ -51,6 +51,36 @@
       30: { id: 30, name: 'Brown', rgb: { r: 149, g: 104, b: 42 } },
       31: { id: 31, name: 'Beige', rgb: { r: 248, g: 178, b: 119 } },
       32: { id: 52, name: 'Light Beige', rgb: { r: 255, g: 197, b: 165 } },
+      33: { id: 32, name: 'Medium Gray', rgb: { r: 170, g: 170, b: 170 } },
+      34: { id: 33, name: 'Dark Red', rgb: { r: 165, g: 14, b: 30 } },
+      35: { id: 34, name: 'Light Red', rgb: { r: 250, g: 128, b: 114 } },
+      36: { id: 35, name: 'Dark Orange', rgb: { r: 228, g: 92, b: 26 } },
+      37: { id: 37, name: 'Dark Goldenrod', rgb: { r: 156, g: 132, b: 49 } },
+      38: { id: 38, name: 'Goldenrod', rgb: { r: 197, g: 173, b: 49 } },
+      39: { id: 39, name: 'Light Goldenrod', rgb: { r: 232, g: 212, b: 95 } },
+      40: { id: 40, name: 'Dark Olive', rgb: { r: 74, g: 107, b: 58 } },
+      41: { id: 41, name: 'Olive', rgb: { r: 90, g: 148, b: 74 } },
+      42: { id: 42, name: 'Light Olive', rgb: { r: 132, g: 197, b: 115 } },
+      43: { id: 43, name: 'Dark Cyan', rgb: { r: 15, g: 121, b: 159 } },
+      44: { id: 45, name: 'Light Blue', rgb: { r: 125, g: 199, b: 255 } },
+      45: { id: 46, name: 'Dark Indigo', rgb: { r: 77, g: 49, b: 184 } },
+      46: { id: 47, name: 'Dark Slate Blue', rgb: { r: 74, g: 66, b: 132 } },
+      47: { id: 48, name: 'Slate Blue', rgb: { r: 122, g: 113, b: 196 } },
+      48: { id: 49, name: 'Light Slate Blue', rgb: { r: 181, g: 174, b: 241 } },
+      49: { id: 53, name: 'Dark Peach', rgb: { r: 155, g: 82, b: 73 } },
+      50: { id: 54, name: 'Peach', rgb: { r: 209, g: 128, b: 120 } },
+      51: { id: 55, name: 'Light Peach', rgb: { r: 250, g: 182, b: 164 } },
+      52: { id: 50, name: 'Light Brown', rgb: { r: 219, g: 164, b: 99 } },
+      53: { id: 56, name: 'Dark Tan', rgb: { r: 123, g: 99, b: 82 } },
+      54: { id: 57, name: 'Tan', rgb: { r: 156, g: 132, b: 107 } },
+      55: { id: 36, name: 'Light Tan', rgb: { r: 214, g: 181, b: 148 } },
+      56: { id: 51, name: 'Dark Beige', rgb: { r: 209, g: 128, b: 81 } },
+      57: { id: 61, name: 'Dark Stone', rgb: { r: 109, g: 100, b: 63 } },
+      58: { id: 62, name: 'Stone', rgb: { r: 148, g: 140, b: 107 } },
+      59: { id: 63, name: 'Light Stone', rgb: { r: 205, g: 197, b: 158 } },
+      60: { id: 58, name: 'Dark Slate', rgb: { r: 51, g: 57, b: 65 } },
+      61: { id: 59, name: 'Slate', rgb: { r: 109, g: 117, b: 141 } },
+      62: { id: 60, name: 'Light Slate', rgb: { r: 179, g: 185, b: 209 } },
       63: { id: 0, name: 'Transparent', rgb: null },
     },
   };
@@ -86,13 +116,16 @@
     tokenPreloadTimer: null,
     windowMinimized: false,
     lastAttackState: null,
+    initialSetupComplete: false,
   };
 
   // Random string generator
-  const randStr = (len, chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789') =>
+  const randStr = (len, chars = 'abcdefghijklmnopqrstuvwxyz0123456789') =>
     [...Array(len)].map(() => chars[(crypto?.getRandomValues?.(new Uint32Array(1))[0] % chars.length) || Math.floor(Math.random() * chars.length)]).join('');
 
-  // Advanced Turnstile token handling with sophisticated management
+  const fpStr32 = randStr(32);
+
+  // Enhanced Turnstile token handling - Actualizado con la lógica de new.txt
   let turnstileToken = null;
   let tokenExpiryTime = 0;
   let tokenGenerationInProgress = false;
@@ -100,8 +133,459 @@
   let tokenPromise = new Promise((resolve) => {
     _resolveToken = resolve;
   });
-  const TOKEN_LIFETIME = 240000; // 4 minutes
+  let retryCount = 0;
+  const MAX_RETRIES = 10;
   const MAX_BATCH_RETRIES = 10;
+  const TOKEN_LIFETIME = 240000; // 4 minutes (tokens typically last 5 min, use 4 for safety)
+
+  function setTurnstileToken(token) {
+    if (_resolveToken) {
+      _resolveToken(token);
+      _resolveToken = null;
+    }
+    turnstileToken = token;
+    tokenExpiryTime = Date.now() + TOKEN_LIFETIME;
+    console.log('✅ Turnstile token set successfully');
+    Utils.addDebugLog('Token cached successfully', 'success');
+  }
+
+  function isTokenValid() {
+    return turnstileToken && Date.now() < tokenExpiryTime;
+  }
+
+  function invalidateToken() {
+    turnstileToken = null;
+    tokenExpiryTime = 0;
+    console.log('🗑️ Token invalidated, will force fresh generation');
+    Utils.addDebugLog('Token invalidated, will force fresh generation', 'warning');
+  }
+
+  async function ensureToken(forceRefresh = false) {
+    // Return cached token if still valid and not forcing refresh
+    if (isTokenValid() && !forceRefresh) {
+      return turnstileToken;
+    }
+
+    // Invalidate token if forcing refresh
+    if (forceRefresh) invalidateToken();
+
+    // Avoid multiple simultaneous token generations
+    if (tokenGenerationInProgress) {
+      console.log('🔄 Token generation already in progress, waiting...');
+      await Utils.sleep(2000);
+      return isTokenValid() ? turnstileToken : null;
+    }
+
+    tokenGenerationInProgress = true;
+
+    try {
+      console.log('🔄 Token expired or missing, generating new one...');
+      const token = await handleCaptchaWithRetry();
+      if (token && token.length > 20) {
+        setTurnstileToken(token);
+        console.log('✅ Token captured and cached successfully');
+        return token;
+      }
+
+      console.log('⚠️ Invisible Turnstile failed, forcing browser automation...');
+      const fallbackToken = await handleCaptchaFallback();
+      if (fallbackToken && fallbackToken.length > 20) {
+        setTurnstileToken(fallbackToken);
+        console.log('✅ Fallback token captured successfully');
+        return fallbackToken;
+      }
+
+      console.log('❌ All token generation methods failed');
+      return null;
+    } finally {
+      tokenGenerationInProgress = false;
+    }
+  }
+
+  async function handleCaptchaWithRetry() {
+    const startTime = performance.now();
+
+    try {
+      const { sitekey, token: preGeneratedToken } = await Utils.obtainSitekeyAndToken();
+
+      if (!sitekey) {
+        throw new Error('No valid sitekey found');
+      }
+
+      console.log('🔑 Using sitekey:', sitekey);
+
+      if (typeof window !== 'undefined' && window.navigator) {
+        console.log(
+          '🧭 UA:',
+          window.navigator.userAgent.substring(0, 50) + '...',
+          'Platform:',
+          window.navigator.platform
+        );
+      }
+
+      let token = null;
+
+      if (
+        preGeneratedToken &&
+        typeof preGeneratedToken === 'string' &&
+        preGeneratedToken.length > 20
+      ) {
+        console.log('♻️ Reusing pre-generated Turnstile token');
+        token = preGeneratedToken;
+      } else {
+        if (isTokenValid()) {
+          console.log('♻️ Using existing cached token (from previous session)');
+          token = turnstileToken;
+        } else {
+          console.log('🔍 Generating new token with executeTurnstile...');
+          token = await Utils.executeTurnstile(sitekey, 'paint');
+          if (token) setTurnstileToken(token);
+        }
+      }
+
+      if (token && typeof token === 'string' && token.length > 20) {
+        const elapsed = Math.round(performance.now() - startTime);
+        console.log(`✅ Turnstile token generated successfully in ${elapsed}ms`);
+        return token;
+      } else {
+        throw new Error(`Invalid or empty token received - Length: ${token?.length || 0}`);
+      }
+    } catch (error) {
+      const elapsed = Math.round(performance.now() - startTime);
+      console.error(`❌ Turnstile token generation failed after ${elapsed}ms:`, error);
+      throw error;
+    }
+  }
+
+  async function handleCaptchaFallback() {
+    return new Promise(async (resolve, reject) => {
+      try {
+        // Ensure we have a fresh promise to await for a new token capture
+        if (!_resolveToken) {
+          tokenPromise = new Promise((res) => {
+            _resolveToken = res;
+          });
+        }
+        const timeoutPromise = Utils.sleep(20000).then(() =>
+          reject(new Error('Auto-CAPTCHA timed out.'))
+        );
+
+        const solvePromise = (async () => {
+          const mainPaintBtn = await Utils.waitForSelector(
+            'button.btn.btn-primary.btn-lg, button.btn-primary.sm\\:btn-xl',
+            200,
+            10000
+          );
+          if (!mainPaintBtn) throw new Error('Could not find the main paint button.');
+          mainPaintBtn.click();
+          await Utils.sleep(500);
+
+          const transBtn = await Utils.waitForSelector('button#color-0', 200, 5000);
+          if (!transBtn) throw new Error('Could not find the transparent color button.');
+          transBtn.click();
+          await Utils.sleep(500);
+
+          const canvas = await Utils.waitForSelector('canvas', 200, 5000);
+          if (!canvas) throw new Error('Could not find the canvas element.');
+
+          canvas.setAttribute('tabindex', '0');
+          canvas.focus();
+          const rect = canvas.getBoundingClientRect();
+          const centerX = Math.round(rect.left + rect.width / 2);
+          const centerY = Math.round(rect.top + rect.height / 2);
+
+          canvas.dispatchEvent(
+            new MouseEvent('mousemove', {
+              clientX: centerX,
+              clientY: centerY,
+              bubbles: true,
+            })
+          );
+          canvas.dispatchEvent(
+            new KeyboardEvent('keydown', {
+              key: ' ',
+              code: 'Space',
+              bubbles: true,
+            })
+          );
+          await Utils.sleep(50);
+          canvas.dispatchEvent(
+            new KeyboardEvent('keyup', {
+              key: ' ',
+              code: 'Space',
+              bubbles: true,
+            })
+          );
+          await Utils.sleep(500);
+
+          // 800ms delay before sending confirmation
+          await Utils.sleep(800);
+
+          // Keep confirming until token is captured
+          const confirmLoop = async () => {
+            while (!turnstileToken) {
+              let confirmBtn = await Utils.waitForSelector(
+                'button.btn.btn-primary.btn-lg, button.btn.btn-primary.sm\\:btn-xl'
+              );
+              if (!confirmBtn) {
+                const allPrimary = Array.from(document.querySelectorAll('button.btn-primary'));
+                confirmBtn = allPrimary.length ? allPrimary[allPrimary.length - 1] : null;
+              }
+              if (confirmBtn) {
+                confirmBtn.click();
+              }
+              await Utils.sleep(500); // 500ms delay between confirmation attempts
+            }
+          };
+
+          // Start confirmation loop and wait for token
+          confirmLoop();
+          const token = await tokenPromise;
+          await Utils.sleep(300); // small delay after token is captured
+          resolve(token);
+        })();
+
+        await Promise.race([solvePromise, timeoutPromise]);
+      } catch (error) {
+        console.error('Auto-CAPTCHA process failed:', error);
+        reject(error);
+      }
+    });
+  }
+
+  // NUEVA LÓGICA DE INYECCIÓN - ACTUALIZADA DESDE new.txt
+  function inject(callback) {
+    const script = document.createElement('script');
+    script.textContent = `(${callback})();`;
+    document.documentElement?.appendChild(script);
+    script.remove();
+  }
+
+  inject(() => {
+    const fetchedBlobQueue = new Map();
+
+    window.addEventListener('message', (event) => {
+      const { source, blobID, blobData } = event.data;
+      if (source === 'auto-image-overlay' && blobID && blobData) {
+        const callback = fetchedBlobQueue.get(blobID);
+        if (typeof callback === 'function') {
+          callback(blobData);
+        }
+        fetchedBlobQueue.delete(blobID);
+      }
+    });
+
+    const originalFetch = window.fetch;
+    window.fetch = async function (...args) {
+      const response = await originalFetch.apply(this, args);
+      const url = args[0] instanceof Request ? args[0].url : args[0];
+
+      if (typeof url === 'string') {
+        if (url.includes('https://backend.wplace.live/s0/pixel/')) {
+          try {
+            const payload = JSON.parse(args[1].body);
+            if (payload.t) {
+              // 📊 Debug log
+              console.log(
+                `🔍✅ Turnstile Token Captured - Type: ${typeof payload.t}, Value: ${payload.t
+                  ? typeof payload.t === 'string'
+                    ? payload.t.length > 50
+                      ? payload.t.substring(0, 50) + '...'
+                      : payload.t
+                    : JSON.stringify(payload.t)
+                  : 'null/undefined'
+                }, Length: ${payload.t?.length || 0}`
+              );
+              window.postMessage({ source: 'turnstile-capture', token: payload.t }, '*');
+            }
+          } catch (_) {
+            /* ignore */
+          }
+        }
+
+        const contentType = response.headers.get('content-type') || '';
+        if (contentType.includes('image/png') && url.includes('.png')) {
+          const cloned = response.clone();
+          return new Promise(async (resolve) => {
+            const blobUUID = crypto.randomUUID();
+            const originalBlob = await cloned.blob();
+
+            fetchedBlobQueue.set(blobUUID, (processedBlob) => {
+              resolve(
+                new Response(processedBlob, {
+                  headers: cloned.headers,
+                  status: cloned.status,
+                  statusText: cloned.statusText,
+                })
+              );
+            });
+
+            window.postMessage(
+              {
+                source: 'auto-image-tile',
+                endpoint: url,
+                blobID: blobUUID,
+                blobData: originalBlob,
+              },
+              '*'
+            );
+          });
+        }
+      }
+
+      return response;
+    };
+  });
+
+  window.addEventListener('message', (event) => {
+    const { source, endpoint, blobID, blobData, token } = event.data;
+
+    if (source === 'auto-image-tile' && endpoint && blobID && blobData) {
+      overlayManager.processAndRespondToTileRequest(event.data);
+    }
+
+    if (source === 'turnstile-capture' && token) {
+      setTurnstileToken(token);
+      Utils.addDebugLog('Token captured from injection system', 'success');
+      updateTokenStatus();
+    }
+  });
+
+  // NUEVO SISTEMA WASM - ACTUALIZADO DESDE new.txt
+  var pawtect_chunk = null;
+
+  // Find module if pawtect_chunk is null
+  pawtect_chunk ??= await findTokenModule("pawtect_wasm_bg.wasm");
+
+  async function createWasmToken(regionX, regionY, payload) {
+    try {
+      // Load the Pawtect module and WASM
+      const mod = await import(new URL('/_app/immutable/chunks/'+pawtect_chunk, location.origin).href);
+      let wasm;
+      try {
+        wasm = await mod._();
+        console.log('✅ WASM initialized successfully');
+      } catch (wasmError) {
+        console.error('❌ WASM initialization failed:', wasmError);
+        return null;
+      }
+      try {
+        try {
+          const me = await fetch(`https://backend.wplace.live/me`, { credentials: 'include' }).then(r => r.ok ? r.json() : null);
+          if (me?.id) {
+            mod.i(me.id);
+            console.log('✅ user ID set:', me.id);
+          }
+        } catch { }
+      } catch (userIdError) {
+        console.log('⚠️ Error setting user ID:', userIdError.message);
+      }
+      try {
+        const testUrl = `https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`;
+        if (mod.r) {
+          mod.r(testUrl);
+          console.log('✅ Request URL set:', testUrl);
+        } else {
+          console.log('⚠️ request_url function (mod.r) not available');
+        }
+      } catch (urlError) {
+        console.log('⚠️ Error setting request URL:', urlError.message);
+      }
+
+      console.log('🔍 payload:', payload);
+
+      // Encode payload
+      const enc = new TextEncoder();
+      const dec = new TextDecoder();
+      const bodyStr = JSON.stringify(payload);
+      const bytes = enc.encode(bodyStr);
+      console.log('🔍 Payload size:', bytes.length, 'bytes');
+      console.log('🔄 Payload string:', bodyStr);
+
+      // Allocate WASM memory with validation
+      let inPtr;
+      try {
+        if (!wasm.__wbindgen_malloc) {
+          console.error('❌ __wbindgen_malloc function not found');
+          return null;
+        }
+
+        inPtr = wasm.__wbindgen_malloc(bytes.length, 1);
+        console.log('✅ WASM memory allocated, pointer:', inPtr);
+
+        // Copy data to WASM memory
+        const wasmBuffer = new Uint8Array(wasm.memory.buffer, inPtr, bytes.length);
+        wasmBuffer.set(bytes);
+        console.log('✅ Data copied to WASM memory');
+      } catch (memError) {
+        console.error('❌ Memory allocation error:', memError);
+        return null;
+      }
+
+      // Call the WASM function
+      console.log('🚀 Calling get_pawtected_endpoint_payload...');
+      let outPtr, outLen, token;
+      try {
+        const result = wasm.get_pawtected_endpoint_payload(inPtr, bytes.length);
+        console.log('✅ Function called, result type:', typeof result, result);
+
+        if (Array.isArray(result) && result.length === 2) {
+          [outPtr, outLen] = result;
+          console.log('✅ Got output pointer:', outPtr, 'length:', outLen);
+
+          // Decode the result
+          const outputBuffer = new Uint8Array(wasm.memory.buffer, outPtr, outLen);
+          token = dec.decode(outputBuffer);
+          console.log('✅ Token decoded successfully');
+        } else {
+          console.error('❌ Unexpected function result format:', result);
+          return null;
+        }
+      } catch (funcError) {
+        console.error('❌ Function call error:', funcError);
+        console.error('Stack trace:', funcError.stack);
+        return null;
+      }
+
+      // Cleanup memory
+      try {
+        if (wasm.__wbindgen_free && outPtr && outLen) {
+          wasm.__wbindgen_free(outPtr, outLen, 1);
+          console.log('✅ Output memory freed');
+        }
+        if (wasm.__wbindgen_free && inPtr) {
+          wasm.__wbindgen_free(inPtr, bytes.length, 1);
+          console.log('✅ Input memory freed');
+        }
+      } catch (cleanupError) {
+        console.log('⚠️ Cleanup warning:', cleanupError.message);
+      }
+
+      console.log('🎉 SUCCESS!');
+      console.log('🔑 Full token:', token);
+      return token;
+    } catch (error) {
+      console.error('❌ Failed to generate fp parameter:', error);
+      return null;
+    }
+  }
+
+  async function findTokenModule(str) {
+    console.log('🔎 Searching for wasm Module...');
+    const links = Array.from(document.querySelectorAll('link[rel="modulepreload"][href$=".js"]'));
+
+    for (const link of links) {
+      try {
+        const url = new URL(link.getAttribute("href"), location.origin).href;
+        const code = await fetch(url).then(r => r.text());
+        if (code.includes(str)) {
+          console.log('✅ Found wasm Module...');
+          return url.split('/').pop();
+        }
+      } catch { }
+    }
+    console.error(`❌ Could not find Pawtect chunk: `, error);
+  }
 
   // Audio notification system
   function playNotificationSound() {
@@ -149,8 +633,8 @@
     } else if (type === 'repaired') {
       notification.innerHTML = `
         <div style="margin-bottom: 15px;">
-          <img src="https://i.imgur.com/WXVkpjo.png" 
-               alt="Repaired" 
+          <img src="https://i.imgur.com/WXVkpjo.png"
+		  alt="Repaired" 
                style="width: 80px; height: 80px; border-radius: 10px; object-fit: cover;">
         </div>
         <h2 style="color: #44ff44; margin: 10px 0; font-size: 18px; font-weight: bold;">
@@ -164,7 +648,6 @@
 
     document.body.appendChild(notification);
 
-    // Auto remove after 3 seconds
     setTimeout(() => {
       if (notification.parentNode) {
         notification.style.transition = 'opacity 0.5s ease';
@@ -216,557 +699,6 @@
     typeNext();
   }
 
-  function setTurnstileToken(token) {
-    if (_resolveToken) {
-      _resolveToken(token);
-      _resolveToken = null;
-    }
-    turnstileToken = token;
-    tokenExpiryTime = Date.now() + TOKEN_LIFETIME;
-    Utils.addDebugLog('Token captured and cached successfully', 'success');
-    
-    // Schedule preload of next token if autonomous mode is enabled
-    if (state.autoTokenRefresh && state.autonomousMode) {
-      scheduleTokenPreload();
-    }
-  }
-
-  function isTokenValid() {
-    return turnstileToken && Date.now() < tokenExpiryTime;
-  }
-
-  function willTokenExpireSoon() {
-    return turnstileToken && (tokenExpiryTime - Date.now()) < state.tokenPreloadBuffer;
-  }
-
-  function invalidateToken() {
-    turnstileToken = null;
-    tokenExpiryTime = 0;
-    if (state.tokenPreloadTimer) {
-      clearTimeout(state.tokenPreloadTimer);
-      state.tokenPreloadTimer = null;
-    }
-    Utils.addDebugLog('Token invalidated, will force fresh generation', 'warning');
-  }
-
-  function scheduleTokenPreload() {
-    if (state.tokenPreloadTimer) {
-      clearTimeout(state.tokenPreloadTimer);
-    }
-    
-    const timeUntilPreload = Math.max(1000, tokenExpiryTime - Date.now() - state.tokenPreloadBuffer);
-    
-    state.tokenPreloadTimer = setTimeout(async () => {
-      if (state.autonomousMode && state.autoTokenRefresh) {
-        Utils.addDebugLog('Preloading next token before expiry...', 'info');
-        try {
-          await ensureToken(true);
-        } catch (error) {
-          Utils.addDebugLog(`Token preload failed: ${error.message}`, 'warning');
-        }
-      }
-    }, timeUntilPreload);
-    
-    Utils.addDebugLog(`Token preload scheduled in ${Math.round(timeUntilPreload / 1000)}s`, 'info');
-  }
-
-  async function ensureToken(forceRefresh = false) {
-    if (isTokenValid() && !forceRefresh && !willTokenExpireSoon()) {
-      return turnstileToken;
-    }
-
-    if (forceRefresh || willTokenExpireSoon()) {
-      Utils.addDebugLog(forceRefresh ? 'Force refreshing token...' : 'Token expiring soon, refreshing...', 'info');
-      invalidateToken();
-    }
-
-    if (tokenGenerationInProgress) {
-      Utils.addDebugLog('Token generation already in progress, waiting...', 'info');
-      await Utils.sleep(2000);
-      return isTokenValid() ? turnstileToken : null;
-    }
-
-    tokenGenerationInProgress = true;
-
-    try {
-      Utils.addDebugLog('Generating new token with enhanced system...', 'info');
-      
-      // Try multiple methods based on token source configuration
-      let token = null;
-      
-      if (state.tokenSource === 'generator' || state.tokenSource === 'hybrid') {
-        token = await handleCaptchaWithRetry();
-      }
-      
-      if (!token && (state.tokenSource === 'manual' || state.tokenSource === 'hybrid')) {
-        Utils.addDebugLog('Generator failed, trying fallback automation...', 'warning');
-        token = await handleCaptchaFallback();
-      }
-
-      if (token && token.length > 20) {
-        setTurnstileToken(token);
-        state.retryCount = 0; // Reset retry counter on success
-        return token;
-      }
-
-      // Play notification sound if token generation failed and user action needed
-      playNotificationSound();
-      throw new Error('All token generation methods failed');
-    } catch (error) {
-      Utils.addDebugLog(`Token generation failed: ${error.message}`, 'error');
-      
-      // Implement retry logic for autonomous mode
-      if (state.autonomousMode && state.retryCount < CONFIG.MAX_RETRIES) {
-        state.retryCount++;
-        const delay = CONFIG.RETRY_DELAY_BASE * Math.pow(2, state.retryCount - 1);
-        Utils.addDebugLog(`Retrying token generation in ${delay}ms (attempt ${state.retryCount}/${CONFIG.MAX_RETRIES})`, 'warning');
-        
-        state.tokenRetryTimer = setTimeout(async () => {
-          try {
-            await ensureToken(true);
-          } catch (retryError) {
-            Utils.addDebugLog(`Retry ${state.retryCount} failed: ${retryError.message}`, 'error');
-          }
-        }, delay);
-      }
-      
-      return null;
-    } finally {
-      tokenGenerationInProgress = false;
-    }
-  }
-
-  async function handleCaptchaWithRetry() {
-    const startTime = performance.now();
-
-    try {
-      const { sitekey, token: preGeneratedToken } = await Utils.obtainSitekeyAndToken();
-
-      if (!sitekey) {
-        throw new Error('No valid sitekey found');
-      }
-
-      Utils.addDebugLog(`Using sitekey: ${sitekey}`, 'info');
-
-      let token = null;
-
-      if (preGeneratedToken && typeof preGeneratedToken === 'string' && preGeneratedToken.length > 20) {
-        Utils.addDebugLog('Reusing pre-generated Turnstile token', 'info');
-        token = preGeneratedToken;
-      } else {
-        if (isTokenValid() && !willTokenExpireSoon()) {
-          Utils.addDebugLog('Using existing cached token', 'info');
-          token = turnstileToken;
-        } else {
-          Utils.addDebugLog('Generating new token with executeTurnstile...', 'info');
-          token = await Utils.executeTurnstile(sitekey, 'paint');
-        }
-      }
-
-      if (token && typeof token === 'string' && token.length > 20) {
-        const elapsed = Math.round(performance.now() - startTime);
-        Utils.addDebugLog(`Turnstile token generated successfully in ${elapsed}ms`, 'success');
-        return token;
-      } else {
-        throw new Error(`Invalid or empty token received - Length: ${token?.length || 0}`);
-      }
-    } catch (error) {
-      const elapsed = Math.round(performance.now() - startTime);
-      Utils.addDebugLog(`Turnstile token generation failed after ${elapsed}ms: ${error.message}`, 'error');
-      throw error;
-    }
-  }
-
-  async function handleCaptchaFallback() {
-    return new Promise(async (resolve, reject) => {
-      try {
-        if (!_resolveToken) {
-          tokenPromise = new Promise((res) => {
-            _resolveToken = res;
-          });
-        }
-        
-        const timeoutPromise = Utils.sleep(30000).then(() =>
-          reject(new Error('Auto-CAPTCHA timed out.'))
-        );
-
-        const solvePromise = (async () => {
-          Utils.addDebugLog('Starting automated CAPTCHA solving...', 'info');
-          
-          const mainPaintBtn = await Utils.waitForSelector(
-            'button.btn.btn-primary.btn-lg, button.btn-primary.sm\\:btn-xl',
-            200,
-            10000
-          );
-          if (!mainPaintBtn) throw new Error('Could not find the main paint button.');
-          
-          Utils.addDebugLog('Found paint button, clicking...', 'info');
-          mainPaintBtn.click();
-          await Utils.sleep(500);
-
-          const transBtn = await Utils.waitForSelector('button#color-0', 200, 5000);
-          if (!transBtn) throw new Error('Could not find the transparent color button.');
-          
-          Utils.addDebugLog('Found transparent color button, clicking...', 'info');
-          transBtn.click();
-          await Utils.sleep(500);
-
-          const canvas = await Utils.waitForSelector('canvas', 200, 5000);
-          if (!canvas) throw new Error('Could not find the canvas element.');
-
-          Utils.addDebugLog('Found canvas, simulating interaction...', 'info');
-          canvas.setAttribute('tabindex', '0');
-          canvas.focus();
-          const rect = canvas.getBoundingClientRect();
-          const centerX = Math.round(rect.left + rect.width / 2);
-          const centerY = Math.round(rect.top + rect.height / 2);
-
-          canvas.dispatchEvent(
-            new MouseEvent('mousemove', {
-              clientX: centerX,
-              clientY: centerY,
-              bubbles: true,
-            })
-          );
-          
-          canvas.dispatchEvent(
-            new KeyboardEvent('keydown', {
-              key: ' ',
-              code: 'Space',
-              bubbles: true,
-            })
-          );
-          await Utils.sleep(50);
-          canvas.dispatchEvent(
-            new KeyboardEvent('keyup', {
-              key: ' ',
-              code: 'Space',
-              bubbles: true,
-            })
-          );
-          await Utils.sleep(800);
-
-          Utils.addDebugLog('Starting confirmation loop...', 'info');
-          const confirmLoop = async () => {
-            let attempts = 0;
-            while (!turnstileToken && attempts < 20) {
-              attempts++;
-              let confirmBtn = await Utils.waitForSelector(
-                'button.btn.btn-primary.btn-lg, button.btn.btn-primary.sm\\:btn-xl',
-                100,
-                1000
-              );
-              if (!confirmBtn) {
-                const allPrimary = Array.from(document.querySelectorAll('button.btn-primary'));
-                confirmBtn = allPrimary.length ? allPrimary[allPrimary.length - 1] : null;
-              }
-              if (confirmBtn) {
-                Utils.addDebugLog(`Confirmation attempt ${attempts}...`, 'info');
-                confirmBtn.click();
-              }
-              await Utils.sleep(500);
-            }
-          };
-
-          confirmLoop();
-          const token = await tokenPromise;
-          await Utils.sleep(300);
-          Utils.addDebugLog('Fallback token generation completed', 'success');
-          resolve(token);
-        })();
-
-        await Promise.race([solvePromise, timeoutPromise]);
-      } catch (error) {
-        Utils.addDebugLog(`Auto-CAPTCHA process failed: ${error.message}`, 'error');
-        reject(error);
-      }
-    });
-  }
-
-  // Enhanced WASM token creation with better error handling
-  async function createWasmToken(regionX, regionY, payload) {
-    try {
-      const mod = await import('/_app/immutable/chunks/BBb1ALhY.js');
-      let wasm;
-      try {
-        wasm = await mod._();
-        Utils.addDebugLog('WASM initialized successfully', 'success');
-      } catch (wasmError) {
-        Utils.addDebugLog(`WASM initialization failed: ${wasmError.message}`, 'error');
-        return null;
-      }
-
-      try {
-        const me = await fetch(`https://backend.wplace.live/me`, { credentials: 'include' }).then(r => r.ok ? r.json() : null);
-        if (me?.id) {
-          mod.i(me.id);
-          Utils.addDebugLog(`User ID set: ${me.id}`, 'info');
-        }
-      } catch (userIdError) {
-        Utils.addDebugLog(`Error setting user ID: ${userIdError.message}`, 'warning');
-      }
-
-      try {
-        const testUrl = `https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`;
-        if (mod.r) {
-          mod.r(testUrl);
-          Utils.addDebugLog(`Request URL set: ${testUrl}`, 'info');
-        }
-      } catch (urlError) {
-        Utils.addDebugLog(`Error setting request URL: ${urlError.message}`, 'warning');
-      }
-
-      const enc = new TextEncoder();
-      const dec = new TextDecoder();
-      const bodyStr = JSON.stringify(payload);
-      const bytes = enc.encode(bodyStr);
-
-      let inPtr;
-      try {
-        if (!wasm.__wbindgen_malloc) {
-          Utils.addDebugLog('__wbindgen_malloc function not found', 'error');
-          return null;
-        }
-
-        inPtr = wasm.__wbindgen_malloc(bytes.length, 1);
-        const wasmBuffer = new Uint8Array(wasm.memory.buffer, inPtr, bytes.length);
-        wasmBuffer.set(bytes);
-      } catch (memError) {
-        Utils.addDebugLog(`Memory allocation error: ${memError.message}`, 'error');
-        return null;
-      }
-
-      let outPtr, outLen, token;
-      try {
-        const result = wasm.get_pawtected_endpoint_payload(inPtr, bytes.length);
-
-        if (Array.isArray(result) && result.length === 2) {
-          [outPtr, outLen] = result;
-          const outputBuffer = new Uint8Array(wasm.memory.buffer, outPtr, outLen);
-          token = dec.decode(outputBuffer);
-        } else {
-          Utils.addDebugLog(`Unexpected function result format`, 'error');
-          return null;
-        }
-      } catch (funcError) {
-        Utils.addDebugLog(`Function call error: ${funcError.message}`, 'error');
-        return null;
-      }
-
-      try {
-        if (wasm.__wbindgen_free && outPtr && outLen) {
-          wasm.__wbindgen_free(outPtr, outLen, 1);
-        }
-        if (wasm.__wbindgen_free && inPtr) {
-          wasm.__wbindgen_free(inPtr, bytes.length, 1);
-        }
-      } catch (cleanupError) {
-        Utils.addDebugLog(`Cleanup warning: ${cleanupError.message}`, 'warning');
-      }
-
-      return token;
-    } catch (error) {
-      Utils.addDebugLog(`Failed to generate WASM token: ${error.message}`, 'error');
-      return null;
-    }
-  }
-
-  // Advanced injection system with enhanced token capture
-  function inject(callback) {
-    const script = document.createElement('script');
-    script.textContent = `(${callback})();`;
-    document.documentElement?.appendChild(script);
-    script.remove();
-  }
-
-  inject(() => {
-    const fetchedBlobQueue = new Map();
-    const tokenCaptureQueue = new Set();
-
-    window.addEventListener('message', (event) => {
-      const { source, blobID, blobData } = event.data;
-      if (source === 'auto-image-overlay' && blobID && blobData) {
-        const callback = fetchedBlobQueue.get(blobID);
-        if (typeof callback === 'function') {
-          callback(blobData);
-        }
-        fetchedBlobQueue.delete(blobID);
-      }
-    });
-
-    const originalFetch = window.fetch;
-    window.fetch = async function (...args) {
-      const response = await originalFetch.apply(this, args);
-      const url = args[0] instanceof Request ? args[0].url : args[0];
-
-      if (typeof url === 'string') {
-        // Enhanced token capture from paint requests
-        if (url.includes('https://backend.wplace.live/s0/pixel/')) {
-          try {
-            const requestBody = args[1]?.body;
-            if (requestBody) {
-              const payload = JSON.parse(requestBody);
-              if (payload.t && typeof payload.t === 'string' && payload.t.length > 20) {
-                // Prevent duplicate captures
-                if (!tokenCaptureQueue.has(payload.t)) {
-                  tokenCaptureQueue.add(payload.t);
-                  console.log(`🔍✅ Enhanced Token Captured - Length: ${payload.t.length}, Preview: ${payload.t.substring(0, 50)}...`);
-                  window.postMessage({ 
-                    source: 'turnstile-capture', 
-                    token: payload.t,
-                    timestamp: Date.now(),
-                    source_type: 'paint_request'
-                  }, '*');
-                  
-                  // Clean up old tokens from queue
-                  setTimeout(() => {
-                    tokenCaptureQueue.delete(payload.t);
-                  }, 300000); // 5 minutes
-                }
-              }
-            }
-          } catch (parseError) {
-            console.warn('Failed to parse paint request payload:', parseError);
-          }
-        }
-
-        // Enhanced tile interception for overlay system
-        const contentType = response.headers.get('content-type') || '';
-        if (contentType.includes('image/png') && url.includes('.png')) {
-          const cloned = response.clone();
-          return new Promise(async (resolve) => {
-            const blobUUID = crypto.randomUUID();
-            const originalBlob = await cloned.blob();
-
-            fetchedBlobQueue.set(blobUUID, (processedBlob) => {
-              resolve(
-                new Response(processedBlob, {
-                  headers: cloned.headers,
-                  status: cloned.status,
-                  statusText: cloned.statusText,
-                })
-              );
-            });
-
-            window.postMessage(
-              {
-                source: 'auto-image-tile',
-                endpoint: url,
-                blobID: blobUUID,
-                blobData: originalBlob,
-                timestamp: Date.now(),
-              },
-              '*'
-            );
-          });
-        }
-
-        // Monitor for authentication endpoints
-        if (url.includes('backend.wplace.live/me') || url.includes('auth')) {
-          const clonedForMonitoring = response.clone();
-          clonedForMonitoring.json().then(data => {
-            if (data && typeof data === 'object') {
-              window.postMessage({
-                source: 'auth-monitor',
-                data: data,
-                timestamp: Date.now(),
-              }, '*');
-            }
-          }).catch(() => {
-            // Ignore JSON parsing errors for non-JSON responses
-          });
-        }
-      }
-
-      return response;
-    };
-
-    // Enhanced XMLHttpRequest interception
-    const originalXHROpen = XMLHttpRequest.prototype.open;
-    const originalXHRSend = XMLHttpRequest.prototype.send;
-
-    XMLHttpRequest.prototype.open = function(method, url, ...args) {
-      this._interceptedUrl = url;
-      this._interceptedMethod = method;
-      return originalXHROpen.call(this, method, url, ...args);
-    };
-
-    XMLHttpRequest.prototype.send = function(data) {
-      if (this._interceptedUrl && this._interceptedUrl.includes('backend.wplace.live')) {
-        const originalOnReadyStateChange = this.onreadystatechange;
-        this.onreadystatechange = function() {
-          if (this.readyState === 4 && this.status === 200) {
-            try {
-              if (this._interceptedUrl.includes('s0/pixel/') && data) {
-                const payload = JSON.parse(data);
-                if (payload.t && typeof payload.t === 'string' && payload.t.length > 20) {
-                  console.log(`🔍✅ XHR Token Captured - Length: ${payload.t.length}`);
-                  window.postMessage({ 
-                    source: 'turnstile-capture', 
-                    token: payload.t,
-                    timestamp: Date.now(),
-                    source_type: 'xhr_request'
-                  }, '*');
-                }
-              }
-            } catch (e) {
-              // Ignore parsing errors
-            }
-          }
-          if (originalOnReadyStateChange) {
-            originalOnReadyStateChange.call(this);
-          }
-        };
-      }
-      return originalXHRSend.call(this, data);
-    };
-
-    // Monitor for dynamic script injection (additional token sources)
-    const originalAppendChild = Node.prototype.appendChild;
-    Node.prototype.appendChild = function(child) {
-      if (child.tagName === 'SCRIPT' && child.src && child.src.includes('turnstile')) {
-        console.log('🔍 Turnstile script detected:', child.src);
-        window.postMessage({
-          source: 'script-monitor',
-          scriptSrc: child.src,
-          timestamp: Date.now(),
-        }, '*');
-      }
-      return originalAppendChild.call(this, child);
-    };
-  });
-
-  // Enhanced message handler for all interception types
-  window.addEventListener('message', (event) => {
-    const { source, endpoint, blobID, blobData, token, timestamp, source_type, data } = event.data;
-
-    if (source === 'auto-image-tile' && endpoint && blobID && blobData) {
-      overlayManager.processAndRespondToTileRequest(event.data);
-    }
-
-    if (source === 'turnstile-capture' && token) {
-      Utils.addDebugLog(`Token captured from ${source_type || 'unknown'} - Length: ${token.length}`, 'success');
-      setTurnstileToken(token);
-      
-      // Update UI immediately
-      updateTokenStatus();
-    }
-
-    if (source === 'auth-monitor' && data) {
-      Utils.addDebugLog(`Auth data captured: User ID ${data.id || 'unknown'}`, 'info');
-      if (data.charges) {
-        state.displayCharges = Math.floor(data.charges.count || 0);
-        state.maxCharges = Math.max(1, Math.floor(data.charges.max || 1));
-        state.cooldown = data.charges.cooldownMs || CONFIG.COOLDOWN_DEFAULT;
-        updateChargesDisplay();
-      }
-    }
-
-    if (source === 'script-monitor') {
-      Utils.addDebugLog(`External script detected: ${event.data.scriptSrc}`, 'info');
-    }
-  });
-
   // Fallback translations
   const TEXTS = {
     title: 'WPlace Autonomous Repair Tool',
@@ -791,9 +723,12 @@
     tokenCapturedSuccess: 'Token captured successfully',
     autonomousModeActive: 'Autonomous mode active',
     tokenSystemReady: 'Advanced token system ready',
+    fileOperationsAvailable: 'File operations available',
+    initializingToken: 'Initializing token system...',
+    tokenReady: 'Token system ready',
   };
 
-  // Enhanced utility functions
+  // UTILIDADES ACTUALIZADAS CON NUEVA IMPLEMENTACIÓN TURNSTILE
   const Utils = {
     sleep: (ms) => new Promise((r) => setTimeout(r, ms)),
 
@@ -940,14 +875,13 @@
       }
     },
 
-    // Enhanced Turnstile integration with sophisticated management
+    // NUEVA IMPLEMENTACIÓN TURNSTILE COMPLETA - ACTUALIZADA DESDE new.txt
     turnstileLoaded: false,
     _turnstileContainer: null,
     _turnstileOverlay: null,
     _turnstileWidgetId: null,
     _lastSitekey: null,
     _cachedSitekey: null,
-    _sitekeyAttempts: 0,
 
     async loadTurnstile() {
       if (window.turnstile) {
@@ -956,11 +890,7 @@
       }
 
       return new Promise((resolve, reject) => {
-        if (
-          document.querySelector(
-            'script[src^="https://challenges.cloudflare.com/turnstile/v0/api.js"]'
-          )
-        ) {
+        if (document.querySelector('script[src^="https://challenges.cloudflare.com/turnstile/v0/api.js"]')) {
           const checkReady = () => {
             if (window.turnstile) {
               this.turnstileLoaded = true;
@@ -996,10 +926,7 @@
         }
 
         this._turnstileContainer = document.createElement('div');
-        this._turnstileContainer.style.cssText = `
-          position: absolute; left: -9999px; top: -9999px; width: 1px; height: 1px;
-          overflow: hidden; visibility: hidden; opacity: 0; pointer-events: none;
-        `;
+        this._turnstileContainer.className = 'wplace-turnstile-hidden';
         this._turnstileContainer.setAttribute('aria-hidden', 'true');
         this._turnstileContainer.id = 'turnstile-widget-container';
         document.body.appendChild(this._turnstileContainer);
@@ -1014,30 +941,20 @@
 
       const overlay = document.createElement('div');
       overlay.id = 'turnstile-overlay-container';
-      overlay.style.cssText = `
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.8); z-index: 10001; display: none;
-        justify-content: center; align-items: center; flex-direction: column;
-        color: white; font-family: 'Segoe UI', Arial, sans-serif;
-      `;
+      overlay.className = 'wplace-turnstile-overlay wplace-overlay-hidden';
 
       const title = document.createElement('div');
       title.textContent = Utils.t('turnstileInstructions');
-      title.style.cssText = 'font-size: 18px; margin-bottom: 20px; text-align: center;';
+      title.className = 'wplace-turnstile-title';
 
       const host = document.createElement('div');
       host.id = 'turnstile-overlay-host';
-      host.style.cssText = 'margin-bottom: 20px;';
+      host.className = 'wplace-turnstile-host';
 
       const hideBtn = document.createElement('button');
       hideBtn.textContent = Utils.t('hideTurnstileBtn');
-      hideBtn.style.cssText = `
-        background: #dc3545; color: white; border: none; padding: 10px 20px;
-        border-radius: 5px; cursor: pointer; font-size: 14px;
-      `;
-      hideBtn.addEventListener('click', () => {
-        overlay.style.display = 'none';
-      });
+      hideBtn.className = 'wplace-turnstile-hide-btn';
+      hideBtn.addEventListener('click', () => overlay.remove());
 
       overlay.appendChild(title);
       overlay.appendChild(host);
@@ -1051,9 +968,10 @@
     async executeTurnstile(sitekey, action = 'paint') {
       await this.loadTurnstile();
 
+      // Try reusing existing widget first if sitekey matches
       if (this._turnstileWidgetId && this._lastSitekey === sitekey && window.turnstile?.execute) {
         try {
-          Utils.addDebugLog('Reusing existing Turnstile widget...', 'info');
+          console.log('🔄 Reusing existing Turnstile widget...');
           const token = await Promise.race([
             window.turnstile.execute(this._turnstileWidgetId, { action }),
             new Promise((_, reject) =>
@@ -1061,50 +979,48 @@
             ),
           ]);
           if (token && token.length > 20) {
-            Utils.addDebugLog('Token generated via widget reuse', 'success');
+            console.log('✅ Token generated via widget reuse');
             return token;
           }
         } catch (error) {
-          Utils.addDebugLog(`Widget reuse failed: ${error.message}`, 'warning');
+          console.log('  Widget reuse failed, will create a fresh widget:', error.message);
         }
       }
 
+      // Try invisible widget first
       const invisibleToken = await this.createTurnstileWidget(sitekey, action);
       if (invisibleToken && invisibleToken.length > 20) {
         return invisibleToken;
       }
 
-      if (state.autonomousMode) {
-        Utils.addDebugLog('Autonomous mode: skipping interactive widget to avoid user interaction', 'info');
-        return null;
-      }
-
-      Utils.addDebugLog('Falling back to interactive Turnstile (visible)', 'warning');
+      console.log('  Falling back to interactive Turnstile (visible).');
       return await this.createTurnstileWidgetInteractive(sitekey, action);
     },
 
     async createTurnstileWidget(sitekey, action) {
       return new Promise((resolve) => {
         try {
+          // Force cleanup of any existing widget
           if (this._turnstileWidgetId && window.turnstile?.remove) {
             try {
               window.turnstile.remove(this._turnstileWidgetId);
-              Utils.addDebugLog('Cleaned up existing Turnstile widget', 'info');
+              console.log('🧹 Cleaned up existing Turnstile widget');
             } catch (e) {
-              Utils.addDebugLog(`Widget cleanup warning: ${e.message}`, 'warning');
+              console.warn('⚠️ Widget cleanup warning:', e.message);
             }
           }
 
           const container = this.ensureTurnstileContainer();
           container.innerHTML = '';
 
+          // Verify Turnstile is available
           if (!window.turnstile?.render) {
-            Utils.addDebugLog('Turnstile not available for rendering', 'error');
+            console.error('❌ Turnstile not available for rendering');
             resolve(null);
             return;
           }
 
-          Utils.addDebugLog('Creating invisible Turnstile widget...', 'info');
+          console.log('🔧 Creating invisible Turnstile widget...');
           const widgetId = window.turnstile.render(container, {
             sitekey,
             action,
@@ -1112,27 +1028,21 @@
             retry: 'auto',
             'retry-interval': 8000,
             callback: (token) => {
-              Utils.addDebugLog('Invisible Turnstile callback received', 'success');
+              console.log('✅ Invisible Turnstile callback');
               resolve(token);
             },
-            'error-callback': (error) => {
-              Utils.addDebugLog(`Turnstile error: ${error}`, 'error');
-              resolve(null);
-            },
-            'timeout-callback': () => {
-              Utils.addDebugLog('Turnstile timeout', 'warning');
-              resolve(null);
-            },
+            'error-callback': () => resolve(null),
+            'timeout-callback': () => resolve(null),
           });
 
           this._turnstileWidgetId = widgetId;
           this._lastSitekey = sitekey;
 
           if (!widgetId) {
-            Utils.addDebugLog('Failed to create Turnstile widget', 'error');
             return resolve(null);
           }
 
+          // Execute the widget and race with timeout
           Promise.race([
             window.turnstile.execute(widgetId, { action }),
             new Promise((_, reject) =>
@@ -1140,63 +1050,67 @@
             ),
           ])
             .then(resolve)
-            .catch((error) => {
-              Utils.addDebugLog(`Turnstile execution failed: ${error.message}`, 'error');
-              resolve(null);
-            });
+            .catch(() => resolve(null));
         } catch (e) {
-          Utils.addDebugLog(`Invisible Turnstile creation failed: ${e.message}`, 'error');
+          console.error('❌ Invisible Turnstile creation failed:', e);
           resolve(null);
         }
       });
     },
 
     async createTurnstileWidgetInteractive(sitekey, action) {
-      Utils.addDebugLog('Creating interactive Turnstile widget (visible)', 'info');
+      // Create a visible widget that users can interact with if needed
+      console.log('🔄 Creating interactive Turnstile widget (visible)');
 
       return new Promise((resolve) => {
         try {
+          // Force cleanup of any existing widget
           if (this._turnstileWidgetId && window.turnstile?.remove) {
             try {
               window.turnstile.remove(this._turnstileWidgetId);
             } catch (e) {
-              Utils.addDebugLog(`Widget cleanup warning: ${e.message}`, 'warning');
+              console.warn('⚠️ Widget cleanup warning:', e.message);
             }
           }
 
           const overlay = this.ensureTurnstileOverlayContainer();
-          overlay.style.display = 'flex';
+          overlay.classList.remove('wplace-overlay-hidden');
+          overlay.style.display = 'block';
 
           const host = overlay.querySelector('#turnstile-overlay-host');
           host.innerHTML = '';
 
+          // Set a timeout for interactive mode
           const timeout = setTimeout(() => {
-            Utils.addDebugLog('Interactive Turnstile widget timeout', 'warning');
+            console.warn('⏰ Interactive Turnstile widget timeout');
+            overlay.classList.add('wplace-overlay-hidden');
             overlay.style.display = 'none';
             resolve(null);
-          }, 60000);
+          }, 60000); // 60 seconds for user interaction
 
           const widgetId = window.turnstile.render(host, {
             sitekey,
             action,
             size: 'normal',
-            theme: 'auto',
+            theme: 'light',
             callback: (token) => {
               clearTimeout(timeout);
+              overlay.classList.add('wplace-overlay-hidden');
               overlay.style.display = 'none';
-              Utils.addDebugLog('Interactive Turnstile completed successfully', 'success');
+              console.log('✅ Interactive Turnstile completed successfully');
 
               if (typeof token === 'string' && token.length > 20) {
                 resolve(token);
               } else {
-                Utils.addDebugLog('Invalid token from interactive widget', 'warning');
+                console.warn('❌ Invalid token from interactive widget');
                 resolve(null);
               }
             },
             'error-callback': (error) => {
               clearTimeout(timeout);
+              overlay.classList.add('wplace-overlay-hidden');
               overlay.style.display = 'none';
-              Utils.addDebugLog(`Interactive Turnstile error: ${error}`, 'error');
+              console.warn('❌ Interactive Turnstile error:', error);
               resolve(null);
             },
           });
@@ -1206,14 +1120,15 @@
 
           if (!widgetId) {
             clearTimeout(timeout);
+            overlay.classList.add('wplace-overlay-hidden');
             overlay.style.display = 'none';
-            Utils.addDebugLog('Failed to create interactive Turnstile widget', 'error');
+            console.warn('❌ Failed to create interactive Turnstile widget');
             resolve(null);
           } else {
-            Utils.addDebugLog('Interactive Turnstile widget created, waiting for user interaction...', 'info');
+            console.log('✅ Interactive Turnstile widget created, waiting for user interaction...');
           }
         } catch (e) {
-          Utils.addDebugLog(`Interactive Turnstile creation failed: ${e.message}`, 'error');
+          console.error('❌ Interactive Turnstile creation failed:', e);
           resolve(null);
         }
       });
@@ -1224,7 +1139,7 @@
         try {
           window.turnstile.remove(this._turnstileWidgetId);
         } catch (e) {
-          Utils.addDebugLog(`Failed to cleanup Turnstile widget: ${e.message}`, 'warning');
+          console.warn('Failed to cleanup Turnstile widget:', e);
         }
       }
 
@@ -1242,9 +1157,11 @@
       this._lastSitekey = null;
     },
 
+    // DETECCIÓN DE SITEKEY MEJORADA - ACTUALIZADA DESDE new.txt
     async obtainSitekeyAndToken(fallback = '0x4AAAAAABpqJe8FO0N84q0F') {
-      if (this._cachedSitekey && this._sitekeyAttempts < 3) {
-        Utils.addDebugLog(`Using cached sitekey: ${this._cachedSitekey}`, 'info');
+      // Cache sitekey to avoid repeated DOM queries
+      if (this._cachedSitekey) {
+        console.log('🔍 Using cached sitekey:', this._cachedSitekey);
 
         return isTokenValid()
           ? {
@@ -1254,93 +1171,106 @@
           : { sitekey: this._cachedSitekey, token: null };
       }
 
+      // List of potential sitekeys to try
       const potentialSitekeys = [
-        '0x4AAAAAABpqJe8FO0N84q0F',
-        '0x4AAAAAAAJ7xjKAp6Mt_7zw',
-        '0x4AAAAAADm5QWx6Ov2LNF2g',
+        '0x4AAAAAABpqJe8FO0N84q0F', // WPlace common sitekey
+        '0x4AAAAAAAJ7xjKAp6Mt_7zw', // Alternative WPlace sitekey
+        '0x4AAAAAADm5QWx6Ov2LNF2g', // Another common sitekey
       ];
-
       const trySitekey = async (sitekey, source) => {
         if (!sitekey || sitekey.length < 10) return null;
 
-        Utils.addDebugLog(`Testing sitekey from ${source}: ${sitekey}`, 'info');
+        console.log(`🔍 Testing sitekey from ${source}:`, sitekey);
         const token = await this.executeTurnstile(sitekey);
 
         if (token && token.length >= 20) {
-          Utils.addDebugLog(`Valid token generated from ${source} sitekey`, 'success');
+          console.log(`✅ Valid token generated from ${source} sitekey`);
           setTurnstileToken(token);
           this._cachedSitekey = sitekey;
-          this._sitekeyAttempts = 0;
           return { sitekey, token };
         } else {
-          Utils.addDebugLog(`Failed to get token from ${source} sitekey`, 'warning');
+          console.log(`❌ Failed to get token from ${source} sitekey`);
           return null;
         }
       };
 
       try {
-        this._sitekeyAttempts++;
-
-        // Enhanced sitekey detection methods
-        const detectionMethods = [
-          () => {
-            const sitekeySel = document.querySelector('[data-sitekey]');
-            return sitekeySel ? sitekeySel.getAttribute('data-sitekey') : null;
-          },
-          () => {
-            const turnstileEl = document.querySelector('.cf-turnstile');
-            return turnstileEl?.dataset?.sitekey || null;
-          },
-          () => {
-            const metaTags = document.querySelectorAll('meta[name*="turnstile"], meta[property*="turnstile"]');
-            for (const meta of metaTags) {
-              const content = meta.getAttribute('content');
-              if (content && content.length > 10) return content;
-            }
-            return null;
-          },
-          () => window.__TURNSTILE_SITEKEY || null,
-          () => {
-            const scripts = document.querySelectorAll('script');
-            for (const script of scripts) {
-              const content = script.textContent || script.innerHTML;
-              const match = content.match(/(?:sitekey|data-sitekey)['"\s\[\]:\=\(]*['"]?([0-9a-zA-Z_-]{20,})['"]?/i);
-              if (match && match[1]) {
-                return match[1].replace(/['"]/g, '');
-              }
-            }
-            return null;
-          }
-        ];
-
-        for (const method of detectionMethods) {
-          try {
-            const sitekey = method();
-            if (sitekey) {
-              const result = await trySitekey(sitekey, 'detection method');
-              if (result) return result;
-            }
-          } catch (error) {
-            Utils.addDebugLog(`Detection method failed: ${error.message}`, 'warning');
+        // 1️⃣ data-sitekey attribute
+        const sitekeySel = document.querySelector('[data-sitekey]');
+        if (sitekeySel) {
+          const sitekey = sitekeySel.getAttribute('data-sitekey');
+          const result = await trySitekey(sitekey, 'data attribute');
+          if (result) {
+            return result;
           }
         }
 
-        Utils.addDebugLog('Testing known potential sitekeys...', 'info');
+        // 2️⃣ Turnstile element
+        const turnstileEl = document.querySelector('.cf-turnstile');
+        if (turnstileEl?.dataset?.sitekey) {
+          const sitekey = turnstileEl.dataset.sitekey;
+          const result = await trySitekey(sitekey, 'turnstile element');
+          if (result) {
+            return result;
+          }
+        }
+
+        // 3️⃣ Meta tags
+        const metaTags = document.querySelectorAll(
+          'meta[name*="turnstile"], meta[property*="turnstile"]'
+        );
+        for (const meta of metaTags) {
+          const content = meta.getAttribute('content');
+          const result = await trySitekey(content, 'meta tag');
+          if (result) {
+            return result;
+          }
+        }
+
+        // 4️⃣ Global variable
+        if (window.__TURNSTILE_SITEKEY) {
+          const result = await trySitekey(window.__TURNSTILE_SITEKEY, 'global variable');
+          if (result) {
+            return result;
+          }
+        }
+
+        // 5️⃣ Script tags
+        const scripts = document.querySelectorAll('script');
+        for (const script of scripts) {
+          const content = script.textContent || script.innerHTML;
+          const match = content.match(
+            /(?:sitekey|data-sitekey)['"\s\[\]:\=\(]*['"]?([0-9a-zA-Z_-]{20,})['"]?/i
+          );
+          if (match && match[1]) {
+            const extracted = match[1].replace(/['"]/g, '');
+            const result = await trySitekey(extracted, 'script content');
+            if (result) {
+              return result;
+            }
+          }
+        }
+
+        // 6️⃣ Known potential sitekeys
+        console.log('🔍 Testing known potential sitekeys...');
         for (const testSitekey of potentialSitekeys) {
           const result = await trySitekey(testSitekey, 'known list');
-          if (result) return result;
+          if (result) {
+            return result;
+          }
         }
       } catch (error) {
-        Utils.addDebugLog(`Error during sitekey detection: ${error.message}`, 'warning');
+        console.warn('⚠️ Error during sitekey detection:', error);
       }
 
-      Utils.addDebugLog(`Trying fallback sitekey: ${fallback}`, 'info');
+      // 7️⃣ Fallback
+      console.log('🔧 Trying fallback sitekey:', fallback);
       const fallbackResult = await trySitekey(fallback, 'fallback');
       if (fallbackResult) {
         return fallbackResult;
       }
 
-      Utils.addDebugLog('No working sitekey or token found after all attempts.', 'error');
+      console.error('❌ No working sitekey or token found.');
       return { sitekey: null, token: null };
     },
   };
@@ -1475,7 +1405,7 @@
         pixelWidth,
         pixelHeight,
         this.tileSize
-		);
+      );
 
       const requiredTiles = [];
       for (let ty = startTileY; ty <= endTileY; ty++) {
@@ -1527,7 +1457,7 @@
 
   const overlayManager = new OverlayManager();
 
-  // Enhanced WPlace API Service with autonomous capabilities
+  // Enhanced WPlace API Service with autonomous capabilities - ACTUALIZADO CON NUEVA LÓGICA
   const WPlaceService = {
     async paintPixelInRegion(regionX, regionY, pixelX, pixelY, color, retryCount = 0) {
       try {
@@ -1541,7 +1471,7 @@
           coords: [pixelX, pixelY],
           colors: [color],
           t: turnstileToken,
-          fp: randStr(10),
+          fp: fpStr32,
         };
 
         const wasmToken = await createWasmToken(regionX, regionY, payload);
@@ -1944,7 +1874,56 @@
     Utils.showAlert(message, 'info');
   }
 
-  // Enhanced UI Functions
+  // FUNCIONES DE UI MEJORADAS CON GESTIÓN DE CONFIGURACIÓN INICIAL
+  function enableFileOperations() {
+    state.initialSetupComplete = true;
+
+    const loadBtn = document.querySelector('#loadFileBtn');
+    if (loadBtn) {
+      loadBtn.disabled = false;
+      loadBtn.title = '';
+      loadBtn.style.animation = 'pulse 0.6s ease-in-out';
+      setTimeout(() => {
+        if (loadBtn) loadBtn.style.animation = '';
+      }, 600);
+      Utils.addDebugLog('Load Progress button enabled after initial setup', 'success');
+    }
+
+    Utils.showAlert(Utils.t('fileOperationsAvailable'), 'success');
+  }
+
+  async function initializeTokenGenerator() {
+    if (isTokenValid()) {
+      Utils.addDebugLog('Valid token already available, skipping initialization', 'success');
+      updateTokenStatus();
+      enableFileOperations();
+      return;
+    }
+
+    try {
+      Utils.addDebugLog('Initializing Turnstile token generator...', 'info');
+      updateStatus(Utils.t('initializingToken'));
+
+      await Utils.loadTurnstile();
+      Utils.addDebugLog('Turnstile script loaded successfully', 'success');
+
+      if (state.autoTokenRefresh) {
+        Utils.addDebugLog('Pre-generating token for autonomous operations...', 'info');
+        await ensureToken();
+      }
+
+      state.initialSetupComplete = true;
+      Utils.addDebugLog('Enhanced token generator initialization complete', 'success');
+      updateStatus(Utils.t('tokenReady'));
+      enableFileOperations();
+
+    } catch (error) {
+      Utils.addDebugLog('Token system initialization failed: ' + error.message, 'warning');
+      Utils.addDebugLog('Manual token generation will be required', 'info');
+      enableFileOperations();
+    }
+  }
+
   function updateStatus(message) {
     const statusEl = document.getElementById('status');
     if (statusEl) {
@@ -2070,7 +2049,7 @@
     document.addEventListener('mousemove', drag);
   }
 
-  // Enhanced UI Creation with autonomous controls
+  // Enhanced UI Creation with NEW IMPLEMENTATION
   function createUI() {
     const existing = document.getElementById('wplace-repair-tool');
     if (existing) existing.remove();
@@ -2131,7 +2110,7 @@
             background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
             color: white; border: none; border-radius: 8px; padding: 10px 16px;
             cursor: pointer; font-weight: 500; margin-right: 8px; margin-bottom: 8px; font-size: 12px;
-          ">
+          " disabled title="Waiting for initial setup to complete...">
             📁 ${Utils.t('loadFromFile')}
           </button>
           
@@ -2207,8 +2186,8 @@
             color: #e3f2fd; line-height: 1.3;
           ">
             <div style="color: #90caf9;">[Ready] WPlace Autonomous Repair Tool v3.0</div>
-            <div style="color: #81c784;">[Info] Advanced injection + Enhanced token management</div>
-            <div style="color: #ffcc80;">[Info] Autonomous mode with smart retry and preloading</div>
+            <div style="color: #81c784;">[Info] NEW Turnstile implementation active</div>
+            <div style="color: #ffcc80;">[Info] Enhanced token management with preloading</div>
             <div style="color: #c5e1a5;">[Info] ${Utils.t('tokenSystemReady')}</div>
           </div>
         </div>
@@ -2241,11 +2220,8 @@
     updateSystemStatus();
     setInterval(updateSystemStatus, 15000);
     
-    // Start autonomous token preloading if enabled
-    if (state.autoTokenRefresh && state.autonomousMode) {
-      Utils.addDebugLog('Autonomous token management started', 'success');
-      ensureToken();
-    }
+    // Initialize token generator
+    initializeTokenGenerator();
   }
 
   function setupEventListeners() {
@@ -2513,47 +2489,6 @@
     return data;
   }
 
-  // Autonomous initialization and management
-  async function initializeAutonomousMode() {
-    try {
-      Utils.addDebugLog('Initializing autonomous systems...', 'info');
-      
-      // Load enhanced Turnstile
-      await Utils.loadTurnstile();
-      
-      // Pre-generate token for autonomous operation
-      if (state.autoTokenRefresh) {
-        Utils.addDebugLog('Pre-generating token for autonomous operation...', 'info');
-        await ensureToken();
-        
-        if (isTokenValid()) {
-          Utils.addDebugLog('Initial autonomous token ready', 'success');
-        } else {
-          Utils.addDebugLog('Initial token generation failed, will retry automatically', 'warning');
-        }
-      }
-      
-      // Setup autonomous token management
-      if (state.autonomousMode && state.autoTokenRefresh) {
-        setInterval(async () => {
-          if (willTokenExpireSoon() && !tokenGenerationInProgress) {
-            Utils.addDebugLog('Autonomous token refresh triggered', 'info');
-            try {
-              await ensureToken(true);
-            } catch (error) {
-              Utils.addDebugLog(`Autonomous token refresh failed: ${error.message}`, 'warning');
-            }
-          }
-        }, 30000); // Check every 30 seconds
-      }
-      
-      Utils.addDebugLog('Autonomous systems initialized successfully', 'success');
-      
-    } catch (error) {
-      Utils.addDebugLog(`Autonomous initialization error: ${error.message}`, 'error');
-    }
-  }
-
   // Main initialization function
   async function initialize() {
     Utils.addDebugLog('Starting WPlace Autonomous Repair Tool v3.0...', 'info');
@@ -2561,11 +2496,9 @@
     // Create UI first
     createUI();
     
-    // Initialize autonomous systems
-    await initializeAutonomousMode();
-    
-    Utils.addDebugLog('Enhanced Features Initialized:', 'info');
-    Utils.addDebugLog('• Advanced injection with multi-source token capture', 'info');
+    Utils.addDebugLog('NEW Enhanced Features Initialized:', 'info');
+    Utils.addDebugLog('• NEW Turnstile implementation with widget reuse', 'info');
+    Utils.addDebugLog('• Enhanced sitekey detection from multiple sources', 'info');
     Utils.addDebugLog('• Sophisticated token management with preloading', 'info');
     Utils.addDebugLog('• Autonomous operation with smart retry logic', 'info');
     Utils.addDebugLog('• Enhanced tile interception and caching', 'info');
@@ -2576,11 +2509,12 @@
     if (state.autonomousMode) {
       Utils.addDebugLog('AUTONOMOUS MODE ACTIVE - Tool will operate independently', 'success');
       Utils.addDebugLog('Instructions for autonomous operation:', 'info');
-      Utils.addDebugLog('1. Load a progress file using "Load Progress File"', 'info');
-      Utils.addDebugLog('2. Enable "Auto Repair" to start autonomous monitoring', 'info');
-      Utils.addDebugLog('3. Tool will automatically scan and repair damage', 'info');
-      Utils.addDebugLog('4. Tokens will be generated and refreshed automatically', 'info');
-      Utils.addDebugLog('5. Monitor debug console for autonomous operation logs', 'info');
+      Utils.addDebugLog('1. Wait for initial setup to complete', 'info');
+      Utils.addDebugLog('2. Load a progress file using "Load Progress File"', 'info');
+      Utils.addDebugLog('3. Enable "Auto Repair" to start autonomous monitoring', 'info');
+      Utils.addDebugLog('4. Tool will automatically scan and repair damage', 'info');
+      Utils.addDebugLog('5. Tokens will be generated and refreshed automatically', 'info');
+      Utils.addDebugLog('6. Monitor debug console for autonomous operation logs', 'info');
     } else {
       Utils.addDebugLog('Manual mode active - use controls for manual operation', 'info');
     }
