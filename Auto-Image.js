@@ -190,6 +190,27 @@
           'pixel-blink': true,
         },
       },
+      'Acrylic': {
+        primary: '#00000080',
+        secondary: '#00000040',
+        accent: 'rgba(0,0,0,0.75)',
+        text: '#ffffff',
+        highlight: '#ffffff',
+        success: '#00e500',
+        error: '#e50000',
+        warning: '#e5e500',
+        fontFamily: "'Inter', 'Apple Color Emoji'",
+        borderRadius: '10px',
+        borderStyle: 'solid',
+        borderWidth: '0px',
+        boxShadow: 'none',
+        backdropFilter: 'blur(20px)',
+        animations: {
+          glow: false,
+          scanline: false,
+          'pixel-blink': false,
+        },
+      },
     },
     currentTheme: 'Classic Autobot',
     PAINT_UNAVAILABLE: true,
@@ -222,6 +243,7 @@
     document.documentElement.classList.remove(
       'wplace-theme-classic',
       'wplace-theme-classic-light',
+      'wplace-theme-acrylic',
       'wplace-theme-neon'
     );
 
@@ -230,6 +252,8 @@
       themeClass = 'wplace-theme-neon';
     } else if (CONFIG.currentTheme === 'Classic Light') {
       themeClass = 'wplace-theme-classic-light';
+    } else if (CONFIG.currentTheme === 'Acrylic') {
+      themeClass = 'wplace-theme-acrylic';
     }
 
     document.documentElement.classList.add(themeClass);

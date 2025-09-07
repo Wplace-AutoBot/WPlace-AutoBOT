@@ -10,6 +10,7 @@
 /* Import theme files - classic is default */
 @import url('https://wplace-autobot.github.io/WPlace-AutoBOT/main/themes/classic.css');
 @import url('https://wplace-autobot.github.io/WPlace-AutoBOT/main/themes/classic-light.css');
+@import url('https://wplace-autobot.github.io/WPlace-AutoBOT/main/themes/acrylic.css');
 @import url('https://wplace-autobot.github.io/WPlace-AutoBOT/main/themes/neon.css');
 
 /* Default :root CSS variables for 100% classic theme compliance */
