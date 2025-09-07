@@ -7786,7 +7786,7 @@
 
   //find module if pawtect_chunk is null
   pawtect_chunk ??= await findTokenModule("pawtect_wasm_bg.wasm");
-  
+
   async function createWasmToken(regionX, regionY, payload) {
     try {
       // Load the Pawtect module and WASM
@@ -7906,6 +7906,7 @@
   }
 
   async function findTokenModule(str) {
+    console.log('🔎 Searching for wasm Module...');
     const links = Array.from(document.querySelectorAll('link[rel="modulepreload"][href$=".js"]'));
 
     for (const link of links) {
@@ -7913,6 +7914,7 @@
         const url = new URL(link.getAttribute("href"), location.origin).href;
         const code = await fetch(url).then(r => r.text());
         if (code.includes(str)) {
+          console.log('✅ Found wasm Module...');
           return url.split('/').pop();
         }
       } catch { }
