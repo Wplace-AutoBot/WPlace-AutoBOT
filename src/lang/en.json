@@ -150,5 +150,13 @@
     "paintTransparentPixels": "Paint Transparent",
     "paintTransparentPixelsDescription": "If enabled, template transparent pixels will be painted",
     "paintUnavailablePixels": "Paint Unavailable",
-    "paintUnavailablePixelsDescription": "If enabled, template colors that are unavailable will be painted using the closest available color"
+    "paintUnavailablePixelsDescription": "If enabled, template colors that are unavailable will be painted using the closest available color",
+    "protectionStatus": "Protection Status",
+    "protectionEnhanced": "Enhanced (Pawtect + WASM)",
+    "protectionBasic": "Basic (Turnstile + FP)",
+    "protectionMinimal": "Minimal (Turnstile only)",
+    "protectionUnknown": "Unknown",
+    "protectionEnhancedDesc": "Advanced protection with Pawtect WASM tokens and fingerprinting",
+    "protectionBasicDesc": "Basic protection with Turnstile tokens and fingerprinting (WASM unavailable)",
+    "protectionMinimalDesc": "Minimal protection with Turnstile tokens only"
 }
