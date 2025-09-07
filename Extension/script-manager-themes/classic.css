@@ -45,7 +45,8 @@
 .wplace-theme-classic .script-manager-close-btn:hover { background: #333 !important; }
 
 .wplace-theme-classic .theme-select-wrapper { background: rgba(255,255,255,0.04) !important; border:1px solid rgba(255,255,255,0.1) !important; }
-.wplace-theme-classic select.theme-select { background: #222 !important; color: var(--sm-text) !important; border:1px solid rgba(255,255,255,0.15) !important; }
+.wplace-theme-classic select.theme-select { background: #111 !important; color: #fafafa !important; border:1px solid rgba(255,255,255,0.28) !important; text-shadow: 0 0 4px rgba(255,255,255,0.35); }
+.wplace-theme-classic select.theme-select option { background:#111 !important; color:#fafafa !important; }
 
 .wplace-theme-classic .script-grid { scrollbar-color: var(--sm-scrollbar-thumb) var(--sm-scrollbar-track); }
 .wplace-theme-classic .script-card {

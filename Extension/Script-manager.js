@@ -808,6 +808,9 @@
         applyAutobotTheme(v);
       });
     }
+
+  // Re-apply current theme so manager theme layer is injected AFTER neon fallback styles
+  try { applyAutobotTheme(currentTheme); } catch(e){ console.warn('Post-open theme reapply failed', e);}  
   }
 
   // Make functions globally available
