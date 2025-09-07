@@ -357,13 +357,21 @@ import { createAutoImageUtils } from './core/utils.js';
 
     // Initialize color cache
     const colorCache = new Map();
-    
+
     // Create Utils object with all dependencies
-    const Utils = createAutoImageUtils(state, CONFIG, colorCache, isTokenValid, turnstileToken, setTurnstileToken, null);
+    const Utils = createAutoImageUtils(
+        state,
+        CONFIG,
+        colorCache,
+        isTokenValid,
+        turnstileToken,
+        setTurnstileToken,
+        null
+    );
 
     // Initialize OverlayManager after Utils is defined
     const overlayManager = new OverlayManager(state, CONFIG, Utils);
-    
+
     // Set overlayManager reference in Utils
     Utils.overlayManager = overlayManager;
 

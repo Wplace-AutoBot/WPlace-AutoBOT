@@ -1,7 +1,15 @@
 import { TurnstileManager } from '../auth/index.js';
 import { t } from './translations.js';
 
-export function createAutoImageUtils(state, CONFIG, colorCache, isTokenValid, turnstileToken, setTurnstileToken, overlayManager) {
+export function createAutoImageUtils(
+    state,
+    CONFIG,
+    colorCache,
+    isTokenValid,
+    turnstileToken,
+    setTurnstileToken,
+    overlayManager
+) {
     const Utils = {
         overlayManager: overlayManager, // Will be set after creation
         sleep: ms => new Promise(r => setTimeout(r, ms)),
@@ -286,7 +294,7 @@ export function createAutoImageUtils(state, CONFIG, colorCache, isTokenValid, tu
             const b2 = 200 * (fY - fZ);
             return [L, a, b2];
         },
-        _lab: function(r, g, b) {
+        _lab: function (r, g, b) {
             const key = (r << 16) | (g << 8) | b;
             let v = this._labCache.get(key);
             if (!v) {
@@ -295,7 +303,7 @@ export function createAutoImageUtils(state, CONFIG, colorCache, isTokenValid, tu
             }
             return v;
         },
-        findClosestPaletteColor: function(r, g, b, palette) {
+        findClosestPaletteColor: function (r, g, b, palette) {
             // Use provided palette or derive from COLOR_MAP
             if (!palette || palette.length === 0) {
                 palette = Object.values(CONFIG.COLOR_MAP)
@@ -357,7 +365,11 @@ export function createAutoImageUtils(state, CONFIG, colorCache, isTokenValid, tu
             return r >= wt && g >= wt && b >= wt;
         },
 
-        resolveColor: function(targetRgb, availableColors, exactMatch = false) {
+        resolveColor: function (
+            targetRgb,
+            availableColors,
+            exactMatch = false
+        ) {
             if (!availableColors || availableColors.length === 0) {
                 return {
                     id: null,
@@ -539,7 +551,7 @@ export function createAutoImageUtils(state, CONFIG, colorCache, isTokenValid, tu
                 input.click();
             }),
 
-        extractAvailableColors: function() {
+        extractAvailableColors: function () {
             const colorElements = document.querySelectorAll(
                 '.tooltip button[id^="color-"]'
             );
@@ -687,7 +699,7 @@ export function createAutoImageUtils(state, CONFIG, colorCache, isTokenValid, tu
         },
 
         // Smart save - only save if significant changes
-        shouldAutoSave: function() {
+        shouldAutoSave: function () {
             const now = Date.now();
             const pixelsSinceLastSave =
                 state.paintedPixels - state._lastSavePixelCount;
@@ -704,7 +716,7 @@ export function createAutoImageUtils(state, CONFIG, colorCache, isTokenValid, tu
             );
         },
 
-        performSmartSave: function() {
+        performSmartSave: function () {
             if (!this.shouldAutoSave()) return false;
 
             state._saveInProgress = true;
@@ -723,7 +735,7 @@ export function createAutoImageUtils(state, CONFIG, colorCache, isTokenValid, tu
         // --- Data management helpers ---
 
         // Base64 compression helpers for efficient storage
-        packPaintedMapToBase64: function(paintedMap, width, height) {
+        packPaintedMapToBase64: function (paintedMap, width, height) {
             if (!paintedMap || !width || !height) return null;
             const totalBits = width * height;
             const byteLen = Math.ceil(totalBits / 8);
@@ -750,7 +762,7 @@ export function createAutoImageUtils(state, CONFIG, colorCache, isTokenValid, tu
             return btoa(binary);
         },
 
-        unpackPaintedMapFromBase64: function(base64, width, height) {
+        unpackPaintedMapFromBase64: function (base64, width, height) {
             if (!base64 || !width || !height) return null;
             const binary = atob(base64);
             const bytes = new Uint8Array(binary.length);
@@ -772,7 +784,7 @@ export function createAutoImageUtils(state, CONFIG, colorCache, isTokenValid, tu
         },
 
         // Migration helpers for backward compatibility
-        migrateProgressToV2: function(saved) {
+        migrateProgressToV2: function (saved) {
             if (!saved) return saved;
             const isV1 =
                 !saved.version ||
@@ -802,7 +814,7 @@ export function createAutoImageUtils(state, CONFIG, colorCache, isTokenValid, tu
             }
         },
 
-        migrateProgressToV21: function(saved) {
+        migrateProgressToV21: function (saved) {
             if (!saved) return saved;
             if (saved.version === '2.1') return saved;
             const isV2 = saved.version === '2' || saved.version === '2.0';
@@ -872,7 +884,7 @@ export function createAutoImageUtils(state, CONFIG, colorCache, isTokenValid, tu
             }
         },
 
-        buildPaintedMapPacked: function() {
+        buildPaintedMapPacked: function () {
             if (state.paintedMap && state.imageData) {
                 const data = this.packPaintedMapToBase64(
                     state.paintedMap,
@@ -890,7 +902,7 @@ export function createAutoImageUtils(state, CONFIG, colorCache, isTokenValid, tu
             return null;
         },
 
-        buildProgressData: function() {
+        buildProgressData: function () {
             return {
                 timestamp: Date.now(),
                 version: '2.2',
@@ -921,7 +933,7 @@ export function createAutoImageUtils(state, CONFIG, colorCache, isTokenValid, tu
             };
         },
 
-        migrateProgress: function(saved) {
+        migrateProgress: function (saved) {
             if (!saved) return null;
 
             let data = saved;
@@ -946,7 +958,7 @@ export function createAutoImageUtils(state, CONFIG, colorCache, isTokenValid, tu
             return data;
         },
 
-        saveProgress: function() {
+        saveProgress: function () {
             try {
                 const progressData = this.buildProgressData(state);
 
@@ -961,7 +973,7 @@ export function createAutoImageUtils(state, CONFIG, colorCache, isTokenValid, tu
             }
         },
 
-        loadProgress: function() {
+        loadProgress: function () {
             try {
                 const saved = localStorage.getItem('wplace-bot-progress');
                 if (!saved) return null;
@@ -983,7 +995,7 @@ export function createAutoImageUtils(state, CONFIG, colorCache, isTokenValid, tu
             }
         },
 
-        clearProgress: function() {
+        clearProgress: function () {
             try {
                 localStorage.removeItem('wplace-bot-progress');
                 // Also clear painted map from memory
@@ -1004,7 +1016,7 @@ export function createAutoImageUtils(state, CONFIG, colorCache, isTokenValid, tu
             }
         },
 
-        restoreProgress: function(savedData) {
+        restoreProgress: function (savedData) {
             try {
                 Object.assign(state, savedData.state);
 
@@ -1082,7 +1094,7 @@ export function createAutoImageUtils(state, CONFIG, colorCache, isTokenValid, tu
             }
         },
 
-        saveProgressToFile: function() {
+        saveProgressToFile: function () {
             try {
                 const progressData = this.buildProgressData();
                 const filename = `wplace-bot-progress-${new Date()
@@ -1100,7 +1112,7 @@ export function createAutoImageUtils(state, CONFIG, colorCache, isTokenValid, tu
             }
         },
 
-        loadProgressFromFile: async function() {
+        loadProgressFromFile: async function () {
             try {
                 const data = await this.createFileUploader();
                 if (!data || !data.state) {
@@ -1117,7 +1129,7 @@ export function createAutoImageUtils(state, CONFIG, colorCache, isTokenValid, tu
         },
 
         // Helper function to restore overlay from loaded data
-        restoreOverlayFromData: async function() {
+        restoreOverlayFromData: async function () {
             if (
                 !state.imageLoaded ||
                 !state.imageData ||
@@ -1167,7 +1179,7 @@ export function createAutoImageUtils(state, CONFIG, colorCache, isTokenValid, tu
             }
         },
 
-        updateCoordinateUI: function({
+        updateCoordinateUI: function ({
             mode,
             directionControls,
             snakeControls,
@@ -1184,6 +1196,6 @@ export function createAutoImageUtils(state, CONFIG, colorCache, isTokenValid, tu
                 blockControls.style.display = isBlock ? 'block' : 'none';
         },
     };
-    
+
     return Utils;
 }

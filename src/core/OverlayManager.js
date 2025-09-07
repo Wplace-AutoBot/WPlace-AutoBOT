@@ -11,7 +11,7 @@ class OverlayManager {
         this.processPromise = null; // Track ongoing processing
         this.lastProcessedHash = null; // Cache invalidation
         this.workerPool = null; // Web worker pool for heavy processing
-        
+
         // Inject dependencies
         this.state = state;
         this.CONFIG = CONFIG;
@@ -193,14 +193,8 @@ class OverlayManager {
         // Crop coordinates within the source image
         const sX = Math.max(0, imgStartX);
         const sY = Math.max(0, imgStartY);
-        const sW = Math.min(
-            imageWidth - sX,
-            this.tileSize - (sX - imgStartX)
-        );
-        const sH = Math.min(
-            imageHeight - sY,
-            this.tileSize - (sY - imgStartY)
-        );
+        const sW = Math.min(imageWidth - sX, this.tileSize - (sX - imgStartX));
+        const sH = Math.min(imageHeight - sY, this.tileSize - (sY - imgStartY));
 
         if (sW <= 0 || sH <= 0) return null;
 
@@ -208,24 +202,11 @@ class OverlayManager {
         const dX = Math.max(0, -imgStartX);
         const dY = Math.max(0, -imgStartY);
 
-        const chunkCanvas = new OffscreenCanvas(
-            this.tileSize,
-            this.tileSize
-        );
+        const chunkCanvas = new OffscreenCanvas(this.tileSize, this.tileSize);
         const chunkCtx = chunkCanvas.getContext('2d');
         chunkCtx.imageSmoothingEnabled = false;
 
-        chunkCtx.drawImage(
-            this.imageBitmap,
-            sX,
-            sY,
-            sW,
-            sH,
-            dX,
-            dY,
-            sW,
-            sH
-        );
+        chunkCtx.drawImage(this.imageBitmap, sX, sY, sW, sH, dX, dY, sW, sH);
 
         // OPTIMIZED: Blue marble effect with faster pixel manipulation
         if (this.state.blueMarbleEnabled) {
@@ -392,10 +373,7 @@ class OverlayManager {
             try {
                 let canvas, ctx;
                 if (typeof OffscreenCanvas !== 'undefined') {
-                    canvas = new OffscreenCanvas(
-                        bitmap.width,
-                        bitmap.height
-                    );
+                    canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
                     ctx = canvas.getContext('2d');
                 } else {
                     canvas = document.createElement('canvas');
