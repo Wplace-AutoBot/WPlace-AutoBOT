@@ -383,7 +383,7 @@
 .wplace-theme-acrylic .wplace-settings-checkbox,
 .wplace-theme-acrylic .wplace-notification-checkbox,
 .wplace-theme-acrylic .wplace-speed-checkbox,
-.wplace-theme-acrylic .resize-checkbox-label input[type="checkbox"],
+.wplace-theme-acrylic .resize-checkbox-label input[type='checkbox'],
 .wplace-theme-acrylic .resize-color-checkbox,
 .wplace-theme-acrylic .resize-advanced-checkbox {
     cursor: pointer;
@@ -716,4 +716,3 @@
 .wplace-theme-acrylic .resize-chroma-weight-value {
     background: var(--wplace-secondary);
 }
-
