@@ -1,4 +1,14 @@
-// eslint-disable-next-line prettier/prettier
+// ==UserScript==
+// @name         WPlaceBot
+// @namespace    http://tampermonkey.net/
+// @version      2025-08-08.3
+// @description  Bot
+// @author       TH3C0D3R
+// @match        https://wplace.live/*
+// @grant        none
+// @icon
+// ==/UserScript==
+localStorage.removeItem("lp");
 ; (async () => {
   // CONFIGURATION CONSTANTS
   const CONFIG = {
@@ -7814,7 +7824,7 @@
   async function createWasmToken(regionX, regionY, payload) {
     try {
       // Load the Pawtect module and WASM
-      const mod = await import(pawtect_chunk);
+      const mod = await import("/_app/immutable/chunks/"+pawtect_chunk);
       let wasm;
       try {
         wasm = await mod._();
