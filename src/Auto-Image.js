@@ -196,7 +196,7 @@ import { TokenManager } from './auth/TokenManager.js';
         colorCache,
         () => tokenManager?.isTokenValid() || false,
         () => tokenManager?.getToken() || null,
-        (token) => tokenManager?.setTurnstileToken(token),
+        token => tokenManager?.setTurnstileToken(token),
         null
     );
 

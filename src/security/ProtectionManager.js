@@ -18,10 +18,10 @@ export class ProtectionManager {
      */
     initialize() {
         if (this.initialized) return;
-        
+
         console.log('🛡️ Protection Manager initialized');
         this.initialized = true;
-        
+
         // Clear old timings periodically to prevent memory leaks
         setInterval(() => this.cleanupTimings(), 60000); // Every minute
     }
@@ -55,16 +55,16 @@ export class ProtectionManager {
     trackRequest(requestType = 'generic') {
         const now = Date.now();
         const timeSinceLastRequest = now - this.lastRequestTime;
-        
+
         this.requestTimings.push({
             timestamp: now,
             type: requestType,
             interval: timeSinceLastRequest,
-            counter: ++this.requestCounter
+            counter: ++this.requestCounter,
         });
 
         this.lastRequestTime = now;
-        
+
         // Keep only last 100 requests to prevent memory bloat
         if (this.requestTimings.length > 100) {
             this.requestTimings.shift();
@@ -80,20 +80,24 @@ export class ProtectionManager {
 
         const recent = this.requestTimings.slice(-5);
         const intervals = recent.map(r => r.interval).filter(i => i > 0);
-        
+
         if (intervals.length < 2) return false;
 
         // Check for too-regular patterns (same intervals)
-        const avgInterval = intervals.reduce((a, b) => a + b) / intervals.length;
-        const variance = intervals.reduce((sum, interval) => 
-            sum + Math.pow(interval - avgInterval, 2), 0) / intervals.length;
-        
+        const avgInterval =
+            intervals.reduce((a, b) => a + b) / intervals.length;
+        const variance =
+            intervals.reduce(
+                (sum, interval) => sum + Math.pow(interval - avgInterval, 2),
+                0
+            ) / intervals.length;
+
         // If variance is very low, requests are too regular
-        const suspiciouslyRegular = variance < (avgInterval * 0.1);
-        
+        const suspiciouslyRegular = variance < avgInterval * 0.1;
+
         // Check for requests that are too frequent
         const tooFrequent = avgInterval < 100; // Less than 100ms between requests
-        
+
         return suspiciouslyRegular || tooFrequent;
     }
 
@@ -104,8 +108,10 @@ export class ProtectionManager {
     getStats() {
         const recent = this.requestTimings.slice(-10);
         const intervals = recent.map(r => r.interval).filter(i => i > 0);
-        const avgInterval = intervals.length > 0 ? 
-            intervals.reduce((a, b) => a + b) / intervals.length : 0;
+        const avgInterval =
+            intervals.length > 0
+                ? intervals.reduce((a, b) => a + b) / intervals.length
+                : 0;
 
         return {
             totalRequests: this.requestCounter,
@@ -113,7 +119,7 @@ export class ProtectionManager {
             averageInterval: Math.round(avgInterval),
             suspicious: this.isPatternSuspicious(),
             initialized: this.initialized,
-            lastRequestAge: Date.now() - this.lastRequestTime
+            lastRequestAge: Date.now() - this.lastRequestTime,
         };
     }
 
@@ -121,8 +127,10 @@ export class ProtectionManager {
      * Clean up old timing data to prevent memory leaks
      */
     cleanupTimings() {
-        const cutoff = Date.now() - (5 * 60 * 1000); // 5 minutes ago
-        this.requestTimings = this.requestTimings.filter(timing => timing.timestamp > cutoff);
+        const cutoff = Date.now() - 5 * 60 * 1000; // 5 minutes ago
+        this.requestTimings = this.requestTimings.filter(
+            timing => timing.timestamp > cutoff
+        );
     }
 
     /**
@@ -138,15 +146,15 @@ export class ProtectionManager {
 
         for (let i = 0; i <= steps; i++) {
             const progress = i / steps;
-            
+
             // Add some curve and randomness to make it look natural
             const curve = Math.sin(progress * Math.PI) * 0.1;
             const randomX = (Math.random() - 0.5) * 2;
             const randomY = (Math.random() - 0.5) * 2;
-            
-            const x = startX + (dx * progress) + (dy * curve) + randomX;
-            const y = startY + (dy * progress) - (dx * curve) + randomY;
-            
+
+            const x = startX + dx * progress + dy * curve + randomX;
+            const y = startY + dy * progress - dx * curve + randomY;
+
             path.push({ x: Math.round(x), y: Math.round(y) });
         }
 
@@ -161,18 +169,18 @@ export class ProtectionManager {
     generateTypingPattern(text) {
         const pattern = [];
         const baseDelay = 150; // Base typing speed
-        
+
         for (let i = 0; i < text.length; i++) {
             const char = text[i];
             let delay = this.generateRandomDelay(baseDelay, 0.4);
-            
+
             // Longer delays for punctuation and spaces
             if (/[.,!?;:]/.test(char)) delay *= 1.5;
             if (char === ' ') delay *= 0.7;
-            
+
             pattern.push({ char, delay: Math.round(delay) });
         }
-        
+
         return pattern;
     }
 }

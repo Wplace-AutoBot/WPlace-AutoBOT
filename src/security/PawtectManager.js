@@ -22,7 +22,9 @@ export class PawtectManager {
         try {
             // Find the pawtect WASM module if not already found
             if (!this.pawtectChunk) {
-                this.pawtectChunk = await this.findTokenModule("pawtect_wasm_bg.wasm");
+                this.pawtectChunk = await this.findTokenModule(
+                    'pawtect_wasm_bg.wasm'
+                );
                 if (!this.pawtectChunk) {
                     console.error('❌ Could not find Pawtect WASM chunk');
                     return false;
@@ -46,11 +48,14 @@ export class PawtectManager {
      */
     async findTokenModule(wasmFileName) {
         console.log('🔎 Searching for WASM Module...');
-        const links = Array.from(document.querySelectorAll('link[rel="modulepreload"][href$=".js"]'));
+        const links = Array.from(
+            document.querySelectorAll('link[rel="modulepreload"][href$=".js"]')
+        );
 
         for (const link of links) {
             try {
-                const url = new URL(link.getAttribute("href"), location.origin).href;
+                const url = new URL(link.getAttribute('href'), location.origin)
+                    .href;
                 const code = await fetch(url).then(r => r.text());
                 if (code.includes(wasmFileName)) {
                     console.log('✅ Found WASM Module...');
@@ -60,7 +65,7 @@ export class PawtectManager {
                 // Silently continue searching
             }
         }
-        
+
         console.error(`❌ Could not find Pawtect chunk for: ${wasmFileName}`);
         return null;
     }
@@ -68,7 +73,7 @@ export class PawtectManager {
     /**
      * Create a WASM token for the x-pawtect-token header
      * This is the main function ported from the remote script
-     * 
+     *
      * @param {number} regionX - X coordinate of the region
      * @param {number} regionY - Y coordinate of the region
      * @param {Object} payload - The payload object containing coords, colors, token, and fp
@@ -82,9 +87,14 @@ export class PawtectManager {
             }
 
             // Load the Pawtect module and WASM
-            const mod = await import(new URL('/_app/immutable/chunks/' + this.pawtectChunk, location.origin).href);
+            const mod = await import(
+                new URL(
+                    '/_app/immutable/chunks/' + this.pawtectChunk,
+                    location.origin
+                ).href
+            );
             let wasm;
-            
+
             try {
                 wasm = await mod._();
                 console.log('✅ WASM initialized successfully');
@@ -96,10 +106,10 @@ export class PawtectManager {
             // Set user ID if available and not already set
             try {
                 if (!this.userIdSet) {
-                    const me = await fetch(`https://backend.wplace.live/me`, { 
-                        credentials: 'include' 
-                    }).then(r => r.ok ? r.json() : null);
-                    
+                    const me = await fetch(`https://backend.wplace.live/me`, {
+                        credentials: 'include',
+                    }).then(r => (r.ok ? r.json() : null));
+
                     if (me?.id && mod.i) {
                         mod.i(me.id);
                         console.log('✅ User ID set:', me.id);
@@ -117,7 +127,9 @@ export class PawtectManager {
                     mod.r(testUrl);
                     console.log('✅ Request URL set:', testUrl);
                 } else {
-                    console.log('⚠️ request_url function (mod.r) not available');
+                    console.log(
+                        '⚠️ request_url function (mod.r) not available'
+                    );
                 }
             } catch (urlError) {
                 console.log('⚠️ Error setting request URL:', urlError.message);
@@ -145,7 +157,11 @@ export class PawtectManager {
                 console.log('✅ WASM memory allocated, pointer:', inPtr);
 
                 // Copy data to WASM memory
-                const wasmBuffer = new Uint8Array(wasm.memory.buffer, inPtr, bytes.length);
+                const wasmBuffer = new Uint8Array(
+                    wasm.memory.buffer,
+                    inPtr,
+                    bytes.length
+                );
                 wasmBuffer.set(bytes);
                 console.log('✅ Data copied to WASM memory');
             } catch (memError) {
@@ -157,19 +173,38 @@ export class PawtectManager {
             console.log('🚀 Calling get_pawtected_endpoint_payload...');
             let outPtr, outLen, token;
             try {
-                const result = wasm.get_pawtected_endpoint_payload(inPtr, bytes.length);
-                console.log('✅ Function called, result type:', typeof result, result);
+                const result = wasm.get_pawtected_endpoint_payload(
+                    inPtr,
+                    bytes.length
+                );
+                console.log(
+                    '✅ Function called, result type:',
+                    typeof result,
+                    result
+                );
 
                 if (Array.isArray(result) && result.length === 2) {
                     [outPtr, outLen] = result;
-                    console.log('✅ Got output pointer:', outPtr, 'length:', outLen);
+                    console.log(
+                        '✅ Got output pointer:',
+                        outPtr,
+                        'length:',
+                        outLen
+                    );
 
                     // Decode the result
-                    const outputBuffer = new Uint8Array(wasm.memory.buffer, outPtr, outLen);
+                    const outputBuffer = new Uint8Array(
+                        wasm.memory.buffer,
+                        outPtr,
+                        outLen
+                    );
                     token = dec.decode(outputBuffer);
                     console.log('✅ Token decoded successfully');
                 } else {
-                    console.error('❌ Unexpected function result format:', result);
+                    console.error(
+                        '❌ Unexpected function result format:',
+                        result
+                    );
                     return null;
                 }
             } catch (funcError) {
@@ -197,7 +232,6 @@ export class PawtectManager {
             console.log('🎉 WASM TOKEN SUCCESS!');
             console.log('🔑 Full token:', token);
             return token;
-
         } catch (error) {
             console.error('❌ Failed to generate pawtect parameter:', error);
             return null;
@@ -241,7 +275,7 @@ export class PawtectManager {
             hasPawtectChunk: !!this.pawtectChunk,
             pawtectChunk: this.pawtectChunk,
             userIdSet: this.userIdSet,
-            hasWasmModule: !!this.wasmModule
+            hasWasmModule: !!this.wasmModule,
         };
     }
 }
@@ -254,7 +288,7 @@ export const pawtectManager = new PawtectManager();
 /**
  * Utility function to create a WASM token
  * @param {number} regionX - X coordinate of the region
- * @param {number} regionY - Y coordinate of the region  
+ * @param {number} regionY - Y coordinate of the region
  * @param {Object} payload - The payload object
  * @returns {Promise<string|null>} The generated WASM token
  */
