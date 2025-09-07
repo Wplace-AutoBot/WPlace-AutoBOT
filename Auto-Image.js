@@ -2828,7 +2828,7 @@
         var token = await createWasmToken(regionX, regionY, payload);
         const res = await fetch(`https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`, {
           method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=UTF-8', "x-pawtect-token":token },
+          headers: { 'Content-Type': 'text/plain;charset=UTF-8', "x-pawtect-token": token },
           credentials: 'include',
           body: JSON.stringify(payload),
         });
@@ -7388,7 +7388,7 @@
       var wasmtoken = await createWasmToken(regionX, regionY, payload);
       const res = await fetch(`https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=UTF-8', "x-pawtect-token":wasmtoken },
+        headers: { 'Content-Type': 'text/plain;charset=UTF-8', "x-pawtect-token": wasmtoken },
         credentials: 'include',
         body: JSON.stringify(payload),
       });
@@ -7413,7 +7413,7 @@
             `https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`,
             {
               method: 'POST',
-              headers: { 'Content-Type': 'text/plain;charset=UTF-8', "x-pawtect-token":wasmtoken },
+              headers: { 'Content-Type': 'text/plain;charset=UTF-8', "x-pawtect-token": wasmtoken },
               credentials: 'include',
               body: JSON.stringify(retryPayload),
             }
@@ -7782,10 +7782,13 @@
   loadThemePreference();
   applyTheme();
 
-  async function createWasmToken(regionX,regionY, payload) {
+  var pawtect_chunk = null;
+  async function createWasmToken(regionX, regionY, payload) {
     try {
+      //find module if pawtect_chunk is null
+      pawtect_chunk ??= await findTokenModule("pawtect_wasm_bg.wasm");
       // Load the Pawtect module and WASM
-      const mod = await import('/_app/immutable/chunks/BBb1ALhY.js');
+      const mod = await import(pawtect_chunk);
       let wasm;
       try {
         wasm = await mod._();
@@ -7797,8 +7800,7 @@
       try {
         try {
           const me = await fetch(`https://backend.wplace.live/me`, { credentials: 'include' }).then(r => r.ok ? r.json() : null);
-          if (me?.id) 
-          {
+          if (me?.id) {
             mod.i(me.id);
             console.log('✅ user ID set:', me.id);
           }
@@ -7892,11 +7894,6 @@
       // Display results
       console.log('');
       console.log('🎉 SUCCESS!');
-      console.log('📊 Results:');
-      console.log('   Input coords: [1245984, 1088]');
-      console.log('   Token length:', token?.length || 0);
-      console.log('   Token preview:', token?.substring(0, 50) + '...');
-      console.log('');
       console.log('🔑 Full token:');
       console.log(token);
       return token;
@@ -7904,7 +7901,21 @@
       console.error('❌ Failed to generate fp parameter:', error);
       return null;
     }
-    return null;
+  }
+  
+  async function findTokenModule(str) {
+    const links = Array.from(document.querySelectorAll('link[rel="modulepreload"][href$=".js"]'));
+
+    for (const link of links) {
+      try {
+        const url = new URL(link.getAttribute("href"), location.origin).href;
+        const code = await fetch(url).then(r => r.text());
+        if (code.includes(str)) {
+          return url.split('/').pop();
+        }
+      } catch { }
+    }
+    console.error(`❌ Could not find Pawtect chunk: `, error);
   }
 
   createUI().then(() => {
