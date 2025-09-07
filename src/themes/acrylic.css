@@ -377,6 +377,7 @@
 .wplace-theme-acrylic .wplace-settings-select,
 .wplace-theme-acrylic .wplace-settings-number-input,
 .wplace-theme-acrylic .wplace-cooldown-input,
+.wplace-theme-acrylic .wplace-speed-input,
 .wplace-theme-acrylic .wplace-notification-interval-input {
     background: rgb(255 255 255 / 10%);
     color: white;
@@ -389,6 +390,7 @@
 .wplace-theme-acrylic .wplace-settings-select:hover,
 .wplace-theme-acrylic .wplace-settings-number-input:hover,
 .wplace-theme-acrylic .wplace-cooldown-input:hover,
+.wplace-theme-acrylic .wplace-speed-input:hover,
 .wplace-theme-acrylic .wplace-notification-interval-input:hover {
     border-color: rgb(255 255 255 / 50%);
 }
@@ -396,6 +398,7 @@
 .wplace-theme-acrylic .wplace-settings-select:focus,
 .wplace-theme-acrylic .wplace-settings-number-input:focus,
 .wplace-theme-acrylic .wplace-cooldown-input:focus,
+.wplace-theme-acrylic .wplace-speed-input:focus,
 .wplace-theme-acrylic .wplace-notification-interval-input:focus {
     border-color: white;
 }
@@ -410,11 +413,14 @@
     color: white;
 }
 
-.wplace-theme-acrylic .wplace-cooldown-input {
+.wplace-theme-acrylic .wplace-cooldown-input,
+.wplace-theme-acrylic .wplace-speed-input {
     border-radius: 4px !important;
+    height: 25px !important;
 }
 
-.wplace-theme-acrylic .wplace-cooldown-input:focus {
+.wplace-theme-acrylic .wplace-cooldown-input:focus,
+.wplace-theme-acrylic .wplace-speed-input:focus {
     background: rgb(255 255 255 / 10%);
     box-shadow: none;
 }
@@ -428,13 +434,13 @@
 .wplace-theme-acrylic .wplace-slider,
 .wplace-theme-acrylic .wplace-speed-slider,
 .wplace-theme-acrylic .wplace-overlay-opacity-slider {
+    flex: none;
     background: var(--wplace-secondary) !important;
     border-radius: 3px !important;
     height: 6px !important;
 }
 
 .wplace-theme-acrylic .wplace-slider::-webkit-slider-thumb,
-.wplace-theme-acrylic .resize-slider::-webkit-slider-thumb,
 .wplace-theme-acrylic .wplace-speed-slider::-webkit-slider-thumb,
 .wplace-theme-acrylic .wplace-overlay-opacity-slider::-webkit-slider-thumb {
     width: 16px !important;
@@ -443,6 +449,10 @@
     background: white !important;
     box-shadow: none !important;
     transform: none !important;
+}
+
+.wplace-theme-acrylic #cooldownSlider {
+    flex: 1;
 }
 
 .wplace-theme-acrylic .wplace-speed-value {
@@ -466,6 +476,12 @@
     margin: 0;
 }
 
+.wplace-theme-acrylic .wplace-speed-labels,
+.wplace-theme-acrylic .wplace-speed-unit {
+    font-size: 12px !important;
+    margin: 0;
+}
+
 .wplace-theme-acrylic .wplace-input-label-compact {
     color: rgba(255, 255, 255, 0.75);
     margin-left: 4px;
@@ -486,7 +502,8 @@
     display: block;
 }
 
-.wplace-theme-acrylic .wplace-cooldown-input-group {
+.wplace-theme-acrylic .wplace-cooldown-input-group,
+.wplace-theme-acrylic .wplace-speed-input-group {
     margin: 0;
     background: transparent;
 }
