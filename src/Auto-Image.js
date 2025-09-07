@@ -4,6 +4,13 @@ import {
     EMBEDDED_LANGUAGES,
 } from 'embedded-assets';
 
+import { 
+    enhancedAPI, 
+    PawtectWASM, 
+    FingerprintGenerator,
+    utils 
+} from './pawtect-wasm.js';
+
 (async () => {
     // CONFIGURATION CONSTANTS
     const CONFIG = {
@@ -3264,74 +3271,97 @@ import {
         }
     }
 
-    // WPLACE API SERVICE
+    // ENHANCED WPLACE API SERVICE WITH PAWTECT PROTECTION
     const WPlaceService = {
+        // Initialize enhanced API on first use
+        async _ensureInitialized() {
+            if (!enhancedAPI.isInitialized) {
+                console.log('🚀 Initializing Enhanced WPlace API with Pawtect protection...');
+                await enhancedAPI.initialize();
+            }
+        },
+
         async paintPixelInRegion(regionX, regionY, pixelX, pixelY, color) {
             try {
+                // Ensure enhanced API is initialized
+                await this._ensureInitialized();
+
+                // Ensure Turnstile token is available
                 await ensureToken();
-                if (!turnstileToken) return 'token_error';
-                const payload = {
-                    coords: [pixelX, pixelY],
-                    colors: [color],
-                    t: turnstileToken,
-                };
-                const res = await fetch(
-                    `https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`,
-                    {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
-                        credentials: 'include',
-                        body: JSON.stringify(payload),
-                    }
+                if (!turnstileToken) {
+                    console.error('❌ No Turnstile token available');
+                    return 'token_error';
+                }
+
+                console.log('🎯 Painting pixel with enhanced protection system');
+                console.log(`📍 Region: ${regionX}, ${regionY}`);
+                console.log(`🔲 Pixel: ${pixelX}, ${pixelY}`);
+                console.log(`🎨 Color: ${color}`);
+
+                // Use enhanced API with Pawtect protection
+                const result = await enhancedAPI.paintPixelInRegion(
+                    regionX, regionY, pixelX, pixelY, color, turnstileToken
                 );
-                if (res.status === 403) {
-                    console.error(
-                        '❌ 403 Forbidden. Turnstile token might be invalid or expired.'
-                    );
+
+                if (result === 'token_error') {
+                    console.warn('⚠️ Token error - invalidating current token');
                     turnstileToken = null;
                     tokenPromise = new Promise(resolve => {
                         _resolveToken = resolve;
                     });
                     return 'token_error';
                 }
-                const data = await res.json();
-                return data?.painted === 1;
-            } catch (e) {
-                console.error('Paint request failed:', e);
+
+                if (result === true) {
+                    console.log('✅ Pixel painted successfully with enhanced protection');
+                } else {
+                    console.warn('⚠️ Pixel painting failed');
+                }
+
+                return result;
+            } catch (error) {
+                console.error('❌ Enhanced paint request failed:', error);
                 return false;
             }
         },
 
         async getCharges() {
-            const defaultResult = {
-                charges: 0,
-                max: 1,
-                cooldown: CONFIG.COOLDOWN_DEFAULT,
-            };
-
             try {
-                const res = await fetch('https://backend.wplace.live/me', {
-                    credentials: 'include',
-                });
+                // Ensure enhanced API is initialized
+                await this._ensureInitialized();
 
-                if (!res.ok) {
-                    console.error(`Failed to get charges: HTTP ${res.status}`);
-                    return defaultResult;
-                }
+                // Use enhanced API for charges
+                const result = await enhancedAPI.getCharges();
 
-                const data = await res.json();
-
+                // Add backward compatibility fields
                 return {
-                    charges: data.charges?.count ?? 0,
-                    max: data.charges?.max ?? 1,
-                    cooldown:
-                        data.charges?.cooldownMs ?? CONFIG.COOLDOWN_DEFAULT,
+                    charges: result.charges,
+                    max: result.max,
+                    cooldown: result.cooldown,
+                    // Additional fields from enhanced API
+                    id: result.id,
+                    droplets: result.droplets
                 };
-            } catch (e) {
-                console.error('Failed to get charges:', e);
+            } catch (error) {
+                console.error('❌ Failed to get charges with enhanced API:', error);
+                
+                // Fallback to basic implementation
+                const defaultResult = {
+                    charges: 0,
+                    max: 1,
+                    cooldown: CONFIG.COOLDOWN_DEFAULT,
+                    id: null,
+                    droplets: 0
+                };
+
                 return defaultResult;
             }
         },
+
+        // Get status of enhanced protection systems
+        getProtectionStatus() {
+            return enhancedAPI.getStatus();
+        }
     };
 
     // Desktop Notification Manager
@@ -4982,6 +5012,8 @@ import {
 
                     try {
                         await updateStats(true);
+                        // Also update protection status when refreshing
+                        setTimeout(updateProtectionStatus, 100);
                     } catch (error) {
                         console.error('Error refreshing charges:', error);
                     } finally {
@@ -5955,6 +5987,14 @@ import {
               </div>
               <div class="wplace-stat-value" id="wplace-stat-fullcharge-value">--:--:--</div>
             </div>
+            <div class="wplace-stat-item">
+              <div class="wplace-stat-label">
+                <i class="fas fa-shield-alt"></i> ${Utils.t('protectionStatus')}
+              </div>
+              <div class="wplace-stat-value" id="wplace-stat-protection-value">
+                <span id="pawtect-status">🔐 Checking...</span>
+              </div>
+            </div>
             ${
                 state.colorsChecked
                     ? `
@@ -5974,12 +6014,48 @@ import {
 
             // should be after statsArea.innerHTML = '...'. todo make full stats ui update partial
             updateChargeStatsDisplay(intervalMs);
+            
+            // Update protection status after stats are rendered
+            setTimeout(updateProtectionStatus, 100);
         };
 
         updateDataButtons = () => {
             const hasImageData = state.imageLoaded && state.imageData;
             saveBtn.disabled = !hasImageData;
             saveToFileBtn.disabled = !hasImageData;
+        };
+
+        // Update protection status display
+        updateProtectionStatus = () => {
+            const protectionElement = document.getElementById('pawtect-status');
+            if (!protectionElement) return;
+
+            try {
+                const protectionStatus = WPlaceService.getProtectionStatus();
+                
+                if (protectionStatus.initialized && protectionStatus.pawtectStatus.initialized) {
+                    protectionElement.innerHTML = `
+                        <span style="color: #28a745;">🔐 ${Utils.t('protectionEnhanced')}</span>
+                    `;
+                    protectionElement.title = Utils.t('protectionEnhancedDesc');
+                } else if (protectionStatus.initialized) {
+                    protectionElement.innerHTML = `
+                        <span style="color: #ffc107;">⚡ ${Utils.t('protectionBasic')}</span>
+                    `;
+                    protectionElement.title = Utils.t('protectionBasicDesc');
+                } else {
+                    protectionElement.innerHTML = `
+                        <span style="color: #dc3545;">⚠️ ${Utils.t('protectionMinimal')}</span>
+                    `;
+                    protectionElement.title = Utils.t('protectionMinimalDesc');
+                }
+            } catch (error) {
+                console.warn('Failed to update protection status:', error);
+                protectionElement.innerHTML = `
+                    <span style="color: #6c757d;">❓ ${Utils.t('protectionUnknown')}</span>
+                `;
+                protectionElement.title = 'Protection status unknown';
+            }
         };
 
         updateDataButtons();
