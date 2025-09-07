@@ -59,13 +59,13 @@ async function executeLocalScript(scriptName, tabId) {
         console.log(`Script loaded: ${scriptCode.length} characters`);
 
         // Load theme and language resources
-        const resources = await loadExtensionResources();
+    const resources = await loadExtensionResources();
 
         // Execute in MAIN world context (bypasses CSP)
         await chrome.scripting.executeScript({
             target: { tabId: tabId },
             world: "MAIN", // Key: executes in page context, not extension context
-            func: (code, name, themeCSS, languages) => {
+            func: (code, name, themeCSS, managerThemeCSS, languages) => {
                 console.log(`%c🚀 Executing ${name}...`, 'color: #4ade80; font-weight: bold; font-size: 14px;');
                 
                 // Create detailed resource report
@@ -74,8 +74,10 @@ async function executeLocalScript(scriptName, tabId) {
                 // Debug: Log what resources we received
                 console.log(`%c📦 Raw Resources Received:`, 'color: #8b5cf6; font-weight: bold;');
                 console.log(`  - Themes object:`, themeCSS);
+                console.log(`  - Manager Themes object:`, managerThemeCSS);
                 console.log(`  - Languages object:`, languages);
                 console.log(`  - Theme count: ${Object.keys(themeCSS || {}).length}`);
+                console.log(`  - Manager Theme count: ${Object.keys(managerThemeCSS || {}).length}`);
                 console.log(`  - Language count: ${Object.keys(languages || {}).length}`);
                 
                 // Inject CSS themes if available
@@ -121,6 +123,24 @@ async function executeLocalScript(scriptName, tabId) {
                     console.log(`  📁 Expected source: Extension local files`);
                     console.log(`  📋 Expected files: auto-image-styles.css, acrylic.css, classic.css, etc.`);
                     window.AUTOBOT_THEMES = {};
+                }
+
+                // Inject manager-specific theme variants (not auto-applied, just stored)
+                if (managerThemeCSS && Object.keys(managerThemeCSS).length > 0) {
+                    console.group(`%c🗂️ Script Manager Theme Variants`, 'color: #6366f1; font-weight: bold;');
+                    window.AUTOBOT_MANAGER_THEMES = managerThemeCSS;
+                    Object.entries(managerThemeCSS).forEach(([filename, content]) => {
+                        console.log(`%c📄 Manager Theme File: ${filename}`, 'color: #6366f1; font-weight: bold;');
+                        console.log(`  📏 Size: ${content.length.toLocaleString()} characters`);
+                        console.log(`  📍 Source: Extension local file (chrome-extension://)`);
+                        const preview = content.substring(0, 160).split('\n').slice(0, 2).join('\n');
+                        console.log(`  👀 Preview: ${preview}${content.length > 160 ? '...' : ''}`);
+                    });
+                    console.log(`%c✅ Stored ${Object.keys(managerThemeCSS).length} manager theme variants for deferred application`, 'color: #10b981;');
+                    console.groupEnd();
+                } else {
+                    console.log('%cℹ️ No manager-specific theme variants provided', 'color: #6366f1;');
+                    window.AUTOBOT_MANAGER_THEMES = {};
                 }
                 
                 // Inject language data if available
@@ -231,6 +251,7 @@ async function executeLocalScript(scriptName, tabId) {
                 // Final resource summary
                 console.group(`%c📋 Resource Summary`, 'color: #10b981; font-weight: bold;');
                 console.log(`%c🎨 Themes loaded: ${Object.keys(window.AUTOBOT_THEMES || {}).length}`, 'color: #8b5cf6;');
+                console.log(`%c🗂️ Manager Themes loaded: ${Object.keys(window.AUTOBOT_MANAGER_THEMES || {}).length}`, 'color: #6366f1;');
                 console.log(`%c🌍 Languages loaded: ${Object.keys(window.AUTOBOT_LANGUAGES || {}).length}`, 'color: #06b6d4;');
                 console.log(`%c🛠️ Helper functions available:`, 'color: #10b981;');
                 console.log(`  - applyTheme(themeName) - Apply CSS theme`);
@@ -248,7 +269,7 @@ async function executeLocalScript(scriptName, tabId) {
                 
                 console.log(`%c✅ ${name} executed successfully with full resource access`, 'color: #4ade80; font-weight: bold;');
             },
-            args: [scriptCode, scriptName, resources.themes, resources.languages]
+            args: [scriptCode, scriptName, resources.themes, resources.managerThemes, resources.languages]
         });
 
         console.log('Script executed successfully in MAIN context');
@@ -265,20 +286,22 @@ async function loadExtensionResources() {
     
     const resources = {
         themes: {},
+        managerThemes: {},
         languages: {}
     };
 
     try {
         console.log('%c� Starting resource loading from extension directory...', 'color: #3b82f6; font-weight: bold;');
         
-        // Load theme files
+    // Load theme files
         console.group('%c🎨 Theme Files Loading', 'color: #8b5cf6; font-weight: bold;');
         const themeFiles = [
             'auto-image-styles.css',
             'themes/acrylic.css',
             'themes/classic-light.css', 
             'themes/classic.css',
-            'themes/neon.css'
+            'themes/neon.css',
+            'themes/ph.css'
         ];
 
         for (const themeFile of themeFiles) {
@@ -324,6 +347,35 @@ async function loadExtensionResources() {
                 console.error(`  🔍 Error type: ${error.constructor.name}`);
                 console.error(`  📝 Error message: ${error.message}`);
                 console.error(`  📍 Error stack: ${error.stack}`);
+            }
+        }
+        console.groupEnd();
+
+        // Load Script Manager specific themes (manager variants)
+        console.group('%c🗂️ Script Manager Theme Variant Loading', 'color: #6366f1; font-weight: bold;');
+        const managerThemeFiles = [
+            'script-manager-themes/acrylic.css',
+            'script-manager-themes/classic-light.css',
+            'script-manager-themes/classic.css',
+            'script-manager-themes/neon.css',
+            'script-manager-themes/ph.css'
+        ];
+
+        for (const mThemeFile of managerThemeFiles) {
+            try {
+                console.log(`%c📥 Loading manager theme: ${mThemeFile}`, 'color: #6366f1;');
+                const mUrl = chrome.runtime.getURL(mThemeFile);
+                const response = await fetch(mUrl);
+                if (response.ok) {
+                    const content = await response.text();
+                    const fileName = mThemeFile.split('/').pop();
+                    resources.managerThemes[fileName] = content;
+                    console.log(`%c✅ Manager theme loaded: ${fileName} (${content.length.toLocaleString()} chars)`, 'color: #10b981;');
+                } else {
+                    console.warn(`%c⚠️ Failed to load manager theme ${mThemeFile}: ${response.status}`, 'color: #f59e0b;');
+                }
+            } catch (err) {
+                console.error(`%c❌ Error loading manager theme ${mThemeFile}:`, 'color: #ef4444; font-weight: bold;', err);
             }
         }
         console.groupEnd();
@@ -417,16 +469,19 @@ async function loadExtensionResources() {
         // Final summary with detailed statistics
         console.group('%c� Resource Loading Summary', 'color: #10b981; font-weight: bold;');
         console.log(`%c⏱️ Total loading time: ${loadTime.toFixed(2)}ms`, 'color: #10b981; font-weight: bold;');
-        console.log(`%c🎨 Themes loaded: ${Object.keys(resources.themes).length}/${themeFiles.length}`, 'color: #8b5cf6; font-weight: bold;');
+    console.log(`%c🎨 Themes loaded: ${Object.keys(resources.themes).length}/${themeFiles.length}`, 'color: #8b5cf6; font-weight: bold;');
+    console.log(`%c🗂️ Manager Themes loaded: ${Object.keys(resources.managerThemes).length}/${managerThemeFiles.length}`, 'color: #6366f1; font-weight: bold;');
         console.log(`%c🌍 Languages loaded: ${Object.keys(resources.languages).length}/${languageFiles.length}`, 'color: #06b6d4; font-weight: bold;');
         
         // Calculate total size
-        const themeSize = Object.values(resources.themes).reduce((sum, content) => sum + content.length, 0);
+    const themeSize = Object.values(resources.themes).reduce((sum, content) => sum + content.length, 0);
+    const managerThemeSize = Object.values(resources.managerThemes).reduce((sum, content) => sum + content.length, 0);
         const langSize = Object.values(resources.languages).reduce((sum, content) => sum + JSON.stringify(content).length, 0);
-        const totalSize = themeSize + langSize;
+    const totalSize = themeSize + managerThemeSize + langSize;
         
         console.log(`%c📊 Total data loaded: ${(totalSize / 1024).toFixed(2)} KB`, 'color: #10b981; font-weight: bold;');
-        console.log(`  🎨 Themes: ${(themeSize / 1024).toFixed(2)} KB`);
+    console.log(`  🎨 Themes: ${(themeSize / 1024).toFixed(2)} KB`);
+    console.log(`  🗂️ Manager Themes: ${(managerThemeSize / 1024).toFixed(2)} KB`);
         console.log(`  🌍 Languages: ${(langSize / 1024).toFixed(2)} KB`);
         
         console.log(`%c📁 Resource sources:`, 'color: #10b981; font-weight: bold;');
@@ -438,6 +493,9 @@ async function loadExtensionResources() {
         // List successful loads
         if (Object.keys(resources.themes).length > 0) {
             console.log(`%c✅ Loaded themes: ${Object.keys(resources.themes).join(', ')}`, 'color: #8b5cf6;');
+        }
+        if (Object.keys(resources.managerThemes).length > 0) {
+            console.log(`%c✅ Loaded manager themes: ${Object.keys(resources.managerThemes).join(', ')}`, 'color: #6366f1;');
         }
         if (Object.keys(resources.languages).length > 0) {
             const langs = Object.keys(resources.languages).map(f => f.replace('.json', '')).join(', ');

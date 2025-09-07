@@ -1,0 +1,64 @@
+/* Script Manager Theme: Classic Light (Full Implementation) */
+.sm-theme-classic-light {
+  --sm-primary: #ffffff;
+  --sm-secondary: #f8f9fa;
+  --sm-accent: #e9ecef;
+  --sm-text: #212529;
+  --sm-highlight: #6f42c1;
+  --sm-success: #28a745;
+  --sm-error: #dc3545;
+  --sm-warning: #ffc107;
+  --sm-font: 'Segoe UI', Roboto, sans-serif;
+  --sm-border-color: #6f42c1;
+  --sm-border-width: 2px;
+  --sm-shadow-glow-a: 0 8px 32px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.05);
+  --sm-shadow-glow-b: inset 0 0 18px rgba(111,66,193,0.08);
+  --sm-shadow-outline: 0 0 0 1px rgba(111,66,193,0.25);
+  --sm-card-bg: linear-gradient(135deg,#fff,#f8f9fa);
+  --sm-card-bg-hover: linear-gradient(135deg,#f8f9fa,#e9ecef);
+  --sm-card-border: rgba(0,0,0,0.12);
+  --sm-scrollbar-track: rgba(0,0,0,0.06);
+  --sm-scrollbar-thumb: rgba(0,0,0,0.28);
+  --sm-scrollbar-thumb-hover: rgba(0,0,0,0.42);
+}
+
+.wplace-theme-classic-light .script-manager-container {
+  background: linear-gradient(135deg,#fff,#f8f9fa) !important;
+  border: var(--sm-border-width) solid var(--sm-border-color) !important;
+  box-shadow: var(--sm-shadow-glow-a), var(--sm-shadow-glow-b) !important;
+  color: var(--sm-text) !important;
+  font-family: var(--sm-font) !important;
+  border-radius: 16px !important;
+}
+
+.wplace-theme-classic-light .script-manager-header { background: linear-gradient(135deg,#f8f9fa,#e9ecef) !important; border-bottom: 1px solid rgba(0,0,0,0.15) !important; }
+.wplace-theme-classic-light .script-manager-title { color: var(--sm-highlight) !important; font-weight:600; }
+.wplace-theme-classic-light .script-manager-close-btn { background: #e9ecef !important; border:1px solid rgba(0,0,0,0.2) !important; color: var(--sm-highlight) !important; border-radius: 10px !important; }
+.wplace-theme-classic-light .script-manager-close-btn:hover { background: #dee2e6 !important; }
+
+.wplace-theme-classic-light .theme-select-wrapper { background: #f8f9fa !important; border:1px solid rgba(0,0,0,0.15) !important; }
+.wplace-theme-classic-light select.theme-select { background: #fff !important; color: var(--sm-text) !important; border:1px solid rgba(0,0,0,0.2) !important; }
+
+.wplace-theme-classic-light .script-grid { scrollbar-color: var(--sm-scrollbar-thumb) var(--sm-scrollbar-track); }
+.wplace-theme-classic-light .script-card {
+  background: var(--sm-card-bg) !important;
+  border: 1px solid var(--sm-card-border) !important;
+  border-radius: 14px !important;
+  color: var(--sm-text) !important;
+  transition: background .25s, transform .25s, box-shadow .25s;
+  position: relative;
+  overflow: hidden;
+}
+.wplace-theme-classic-light .script-card:hover { background: var(--sm-card-bg-hover) !important; transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.18); }
+.wplace-theme-classic-light .script-card:active { transform: translateY(-1px); }
+.wplace-theme-classic-light .script-title { color: var(--sm-highlight) !important; font-weight:600; }
+.wplace-theme-classic-light .script-description { color: rgba(33,37,41,0.75) !important; font-size:12px; }
+.wplace-theme-classic-light .script-category { background: rgba(111,66,193,0.12) !important; border:1px solid rgba(111,66,193,0.35) !important; color: var(--sm-highlight) !important; border-radius: 8px !important; font-size:11px; }
+
+.wplace-theme-classic-light .status-text { color: var(--sm-highlight) !important; font-size: 11px; }
+
+/* Scrollbars */
+.wplace-theme-classic-light .script-grid::-webkit-scrollbar { width: 10px; }
+.wplace-theme-classic-light .script-grid::-webkit-scrollbar-track { background: var(--sm-scrollbar-track); }
+.wplace-theme-classic-light .script-grid::-webkit-scrollbar-thumb { background: var(--sm-scrollbar-thumb); border-radius: 6px; }
+.wplace-theme-classic-light .script-grid::-webkit-scrollbar-thumb:hover { background: var(--sm-scrollbar-thumb-hover); }

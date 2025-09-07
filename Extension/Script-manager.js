@@ -10,9 +10,9 @@
 // ==/UserScript==
 
 ; (async () => {
-  console.log('%c🚀 WPlace AutoBOT Script Manager Loading...', 'color: #00ff41; font-weight: bold; font-size: 16px;');
+  console.log('%c🚀 WPlace AutoBOT Script Manager Loading...', 'color: var(--wplace-text, #4facfe); font-weight: bold; font-size: 16px;');
 
-  // Available scripts configuration
+  
   const AVAILABLE_SCRIPTS = [
     { 
       name: 'Auto-Farm.js', 
@@ -37,29 +37,46 @@
     }
   ];
 
-  // Neon theme styling
+  
   const NEON_STYLES = `
     @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+    
+    :root, .wplace-theme-neon, .wplace-theme-classic, .wplace-theme-classic-light, .wplace-theme-acrylic {
+      --sm-primary: var(--wplace-primary, #1a1a2e);
+      --sm-secondary: var(--wplace-secondary, #16213e);
+      --sm-accent: var(--wplace-accent, #0f3460);
+      --sm-text: var(--wplace-text, #00ff41);
+      --sm-highlight: var(--wplace-highlight, #ff6b35);
+      --sm-success: var(--wplace-success, #39ff14);
+      --sm-error: var(--wplace-error, #ff073a);
+      --sm-warning: var(--wplace-warning, #ff0);
+      --sm-font: var(--wplace-font, 'Press Start 2P', monospace, 'Courier New');
+      --sm-border-color: var(--wplace-text, #00ff41);
+      --sm-border-width: 3px;
+      --sm-shadow-glow-a: 0 0 30px rgb(0 255 65 / 50%);
+      --sm-shadow-glow-b: inset 0 0 30px rgb(0 255 65 / 10%);
+      --sm-shadow-outline: 0 0 0 1px var(--sm-border-color);
+    }
     
     .script-manager-container {
       position: fixed !important;
       top: 50% !important;
       left: 50% !important;
       transform: translate(-50%, -50%) !important;
-      background: #1a1a2e;
-      border: 3px solid #00ff41;
+      background: var(--sm-primary);
+      border: var(--sm-border-width) solid var(--sm-border-color);
       border-radius: 0;
       box-shadow: 
-        0 0 30px rgb(0 255 65 / 50%), 
-        inset 0 0 30px rgb(0 255 65 / 10%),
-        0 0 0 1px #00ff41;
-      font-family: 'Press Start 2P', monospace, 'Courier New';
+        var(--sm-shadow-glow-a), 
+        var(--sm-shadow-glow-b),
+        var(--sm-shadow-outline);
+      font-family: var(--sm-font);
       z-index: 10001 !important;
       min-width: 600px;
       max-width: 800px;
       max-height: 80vh;
       overflow: hidden;
-      color: #00ff41;
+      color: var(--sm-text);
       animation: neon-pulse 2s ease-in-out infinite alternate;
     }
     
@@ -70,7 +87,7 @@
       left: 0;
       right: 0;
       height: 2px;
-      background: linear-gradient(90deg, transparent, #00ff41, transparent);
+  background: linear-gradient(90deg, transparent, var(--sm-text), transparent);
       z-index: 1;
       pointer-events: none;
       animation: scanline 3s linear infinite;
@@ -78,8 +95,8 @@
     }
     
     .script-manager-header {
-      background: #16213e;
-      border-bottom: 2px solid #00ff41;
+      background: var(--sm-secondary);
+      border-bottom: 2px solid var(--sm-border-color);
       padding: 15px 20px;
       position: relative;
       display: flex;
@@ -108,9 +125,9 @@
     }
     
     .script-manager-title {
-      color: #00ff41;
+      color: var(--sm-text);
       font-size: 14px;
-      text-shadow: 0 0 15px #00ff41;
+      text-shadow: 0 0 15px var(--sm-text);
       margin: 0;
       text-transform: uppercase;
       letter-spacing: 2px;
@@ -118,10 +135,10 @@
     }
     
     .script-manager-close {
-      background: #16213e;
-      border: 2px solid #ff073a;
+      background: var(--sm-secondary);
+      border: 2px solid var(--sm-error);
       border-radius: 0;
-      color: #ff073a;
+      color: var(--sm-error);
       width: 30px;
       height: 30px;
       cursor: pointer;
@@ -131,13 +148,13 @@
       align-items: center;
       justify-content: center;
       transition: all 0.3s ease;
-      text-shadow: 0 0 10px #ff073a;
+  text-shadow: 0 0 10px var(--sm-error);
     }
     
     .script-manager-close:hover {
-      background: #ff073a;
-      color: #1a1a2e;
-      box-shadow: 0 0 20px #ff073a;
+      background: var(--sm-error);
+      color: var(--sm-primary);
+      box-shadow: 0 0 20px var(--sm-error);
       animation: pixel-blink 0.5s infinite;
     }
     
@@ -145,7 +162,7 @@
       padding: 20px;
       max-height: 60vh;
       overflow-y: auto;
-      background: linear-gradient(45deg, rgba(0,255,65,0.03) 0%, rgba(22,33,62,0.05) 100%);
+      background: linear-gradient(45deg, rgba(255,255,255,0.04) 0%, rgba(0,0,0,0.15) 100%);
     }
     
     .script-grid {
@@ -156,8 +173,8 @@
     }
     
     .script-card {
-      background: #16213e;
-      border: 2px solid #00ff41;
+      background: var(--sm-secondary);
+      border: 2px solid var(--sm-border-color);
       border-radius: 0;
       padding: 15px;
       cursor: pointer;
@@ -184,10 +201,10 @@
     }
     
     .script-card:hover {
-      background: rgba(0,255,65,0.1);
+      background: rgba(255,255,255,0.08);
       box-shadow: 
-        0 0 25px rgb(0 255 65 / 60%),
-        inset 0 0 25px rgb(0 255 65 / 15%);
+        0 0 25px var(--sm-text),
+        inset 0 0 25px rgb(255 255 255 / 10%);
       transform: translateY(-3px);
       animation: card-glow 0.5s ease-in-out infinite alternate;
     }
@@ -201,41 +218,41 @@
     .script-icon {
       font-size: 24px;
       margin-right: 10px;
-      filter: drop-shadow(0 0 10px #00ff41);
+      filter: drop-shadow(0 0 10px var(--sm-text));
     }
     
     .script-title {
-      color: #00ff41;
+      color: var(--sm-text);
       font-size: 11px;
-      text-shadow: 0 0 10px #00ff41;
+      text-shadow: 0 0 10px var(--sm-text);
       text-transform: uppercase;
       letter-spacing: 1px;
       margin: 0;
     }
     
     .script-description {
-      color: #00ff41dd;
+      color: var(--sm-text);
       font-size: 8px;
       line-height: 1.4;
-      text-shadow: 0 0 5px #00ff41;
+      text-shadow: 0 0 5px var(--sm-text);
       margin-bottom: 15px;
     }
     
     .script-category {
       background: rgba(255, 107, 53, 0.2);
-      border: 1px solid #ff6b35;
-      color: #ff6b35;
+      border: 1px solid var(--sm-highlight);
+      color: var(--sm-highlight);
       padding: 3px 8px;
       font-size: 7px;
       text-transform: uppercase;
       letter-spacing: 1px;
-      text-shadow: 0 0 5px #ff6b35;
+      text-shadow: 0 0 5px var(--sm-highlight);
       display: inline-block;
     }
     
     .script-manager-footer {
-      background: #16213e;
-      border-top: 2px solid #00ff41;
+      background: var(--sm-secondary);
+      border-top: 2px solid var(--sm-border-color);
       padding: 15px 20px;
       display: flex;
       justify-content: space-between;
@@ -243,9 +260,9 @@
     }
     
     .status-text {
-      color: #00ff41dd;
+      color: var(--sm-text);
       font-size: 8px;
-      text-shadow: 0 0 5px #00ff41;
+      text-shadow: 0 0 5px var(--sm-text);
     }
     
     .action-buttons {
@@ -254,35 +271,70 @@
     }
     
     .neon-btn {
-      background: #16213e;
-      border: 2px solid #00ff41;
+      background: var(--sm-secondary);
+      border: 2px solid var(--sm-border-color);
       border-radius: 0;
-      color: #00ff41;
+      color: var(--sm-text);
       padding: 8px 15px;
       font-family: 'Press Start 2P', monospace;
       font-size: 8px;
       text-transform: uppercase;
       cursor: pointer;
       transition: all 0.3s ease;
-      text-shadow: 0 0 8px #00ff41;
+      text-shadow: 0 0 8px var(--sm-text);
       letter-spacing: 1px;
     }
     
     .neon-btn:hover {
-      background: rgba(0,255,65,0.1);
-      box-shadow: 0 0 20px rgb(0 255 65 / 60%);
+      background: rgba(255,255,255,0.1);
+      box-shadow: 0 0 20px var(--sm-text);
       animation: pixel-blink 0.5s infinite;
     }
     
     .neon-btn.secondary {
-      border-color: #ff6b35;
-      color: #ff6b35;
-      text-shadow: 0 0 8px #ff6b35;
+      border-color: var(--sm-highlight);
+      color: var(--sm-highlight);
+      text-shadow: 0 0 8px var(--sm-highlight);
     }
     
     .neon-btn.secondary:hover {
       background: rgba(255, 107, 53, 0.1);
-      box-shadow: 0 0 20px rgb(255 107 53 / 60%);
+      box-shadow: 0 0 20px var(--sm-highlight);
+    }
+
+    /* Theme select styling */
+    #autobot-theme-select.neon-select {
+      appearance: none;
+      -webkit-appearance: none;
+      background: var(--sm-secondary);
+      color: var(--sm-text);
+      border: 2px solid var(--sm-border-color);
+      text-shadow: 0 0 6px color-mix(in srgb, var(--sm-text) 40%, transparent);
+      padding: 6px 28px 6px 10px !important;
+      position: relative;
+      cursor: pointer;
+      line-height: 1.2;
+      letter-spacing: 0.5px;
+      font-size: 10px;
+      background-image: linear-gradient(45deg, transparent 50%, var(--sm-text) 50%), linear-gradient(135deg, var(--sm-text) 50%, transparent 50%);
+      background-position: right 10px top 55%, right 4px top 55%;
+      background-size: 8px 8px, 8px 8px;
+      background-repeat: no-repeat;
+    }
+
+    #autobot-theme-select.neon-select:hover {
+      box-shadow: 0 0 14px color-mix(in srgb, var(--sm-text) 55%, transparent);
+    }
+
+    #autobot-theme-select.neon-select:focus {
+      outline: 2px solid var(--sm-highlight);
+      outline-offset: 1px;
+      box-shadow: 0 0 0 2px var(--sm-highlight), 0 0 18px color-mix(in srgb, var(--sm-highlight) 60%, transparent);
+    }
+
+    #autobot-theme-select.neon-select option {
+      background: var(--sm-primary);
+      color: var(--sm-text);
     }
     
     .script-manager-backdrop {
@@ -297,7 +349,7 @@
       animation: backdrop-fade-in 0.3s ease-out;
     }
     
-    /* Loading animation */
+    
     .loading-container {
       display: flex;
       flex-direction: column;
@@ -310,7 +362,7 @@
       width: 40px;
       height: 40px;
       border: 3px solid #16213e;
-      border-top: 3px solid #00ff41;
+  border-top: 3px solid var(--sm-border-color);
       border-radius: 0;
       animation: neon-spin 1s linear infinite;
       margin-bottom: 15px;
@@ -318,44 +370,44 @@
     }
     
     .loading-text {
-      color: #00ff41;
+  color: var(--sm-text);
       font-size: 8px;
-      text-shadow: 0 0 10px #00ff41;
+  text-shadow: 0 0 10px var(--sm-text);
       text-transform: uppercase;
       letter-spacing: 2px;
       animation: text-pulse 1.5s ease-in-out infinite;
     }
     
-    /* Custom scrollbar */
+    
     .script-manager-content::-webkit-scrollbar {
       width: 12px;
     }
     
     .script-manager-content::-webkit-scrollbar-track {
       background: #16213e;
-      border: 1px solid #00ff41;
+  border: 1px solid var(--sm-border-color);
     }
     
     .script-manager-content::-webkit-scrollbar-thumb {
-      background: #00ff41;
+  background: var(--sm-text);
       border-radius: 0;
-      box-shadow: 0 0 10px #00ff41;
+  box-shadow: 0 0 10px var(--sm-text);
     }
     
     .script-manager-content::-webkit-scrollbar-thumb:hover {
-      background: #39ff14;
-      box-shadow: 0 0 15px #39ff14;
+  background: var(--sm-success);
+  box-shadow: 0 0 15px var(--sm-success);
     }
     
-    /* Animations */
+    
     @keyframes neon-pulse {
-      0% { box-shadow: 0 0 30px rgb(0 255 65 / 50%), inset 0 0 30px rgb(0 255 65 / 10%), 0 0 0 1px #00ff41; }
-      100% { box-shadow: 0 0 40px rgb(0 255 65 / 70%), inset 0 0 40px rgb(0 255 65 / 15%), 0 0 0 1px #00ff41; }
+  0% { box-shadow: var(--sm-shadow-glow-a), var(--sm-shadow-glow-b), var(--sm-shadow-outline); }
+  100% { box-shadow: 0 0 40px color-mix(in srgb, var(--sm-text) 70%, transparent), inset 0 0 40px color-mix(in srgb, var(--sm-text) 15%, transparent), var(--sm-shadow-outline); }
     }
     
     @keyframes text-glow {
-      0% { text-shadow: 0 0 15px #00ff41; }
-      100% { text-shadow: 0 0 25px #00ff41, 0 0 35px #00ff41; }
+  0% { text-shadow: 0 0 15px var(--sm-text); }
+  100% { text-shadow: 0 0 25px var(--sm-text), 0 0 35px var(--sm-text); }
     }
     
     @keyframes pixel-blink {
@@ -394,7 +446,7 @@
       100% { opacity: 1; }
     }
     
-    /* Responsive design */
+    
     @media (max-width: 768px) {
       .script-manager-container {
         min-width: 90vw;
@@ -410,6 +462,124 @@
       }
     }
   `;
+
+  
+  function toTitleLabel(base) {
+    // Special cases
+    if (base === 'ph') return 'PH';
+    if (base === 'classic-light') return 'Classic Light';
+    // Convert kebab / snake to Title Case
+    return base.replace(/[-_]+/g, ' ') 
+               .replace(/\b\w/g, c => c.toUpperCase());
+  }
+
+  function discoverThemes() {
+    // Prefer manager-specific themes if provided
+    const managerObj = (window.AUTOBOT_MANAGER_THEMES || {});
+    const baseObj = (window.AUTOBOT_THEMES || {});
+
+    // Build a unified map giving precedence to manager variants
+    const combined = { ...baseObj };
+    // Manager themes override (or add new) by filename
+    Object.keys(managerObj).forEach(fn => { combined[fn] = managerObj[fn]; });
+
+    const files = Object.keys(combined)
+      .filter(f => f.endsWith('.css'))
+      .filter(f => f !== 'auto-image-styles.css');
+
+    const list = files.map(f => {
+      const base = f.replace(/\.css$/, '');
+      return {
+        value: base,
+        label: toTitleLabel(base),
+        className: 'wplace-theme-' + base
+      };
+    }).sort((a,b)=> a.label.localeCompare(b.label));
+
+    if (list.length === 0) {
+      return [ { value: 'neon', label: 'Neon Retro', className: 'wplace-theme-neon' } ];
+    }
+    return list;
+  }
+
+  let AVAILABLE_THEMES = discoverThemes();
+
+  
+  if (!AVAILABLE_THEMES || AVAILABLE_THEMES.length <= 1) {
+    setTimeout(() => { AVAILABLE_THEMES = discoverThemes(); }, 500);
+  }
+
+  const THEME_STORAGE_KEY = 'autobot-selected-theme';
+  let currentTheme = localStorage.getItem(THEME_STORAGE_KEY) || 'neon';
+
+  function logTheme(msg, color = '#8b5cf6') {
+    console.log(`%c🎨 ThemeSwitcher: ${msg}`,'color:'+color+';font-weight:bold;');
+  }
+
+  // Inject (or update) the manager-specific theme CSS layer so it overrides the base theme
+  function applyManagerThemeLayer(themeValue) {
+    try {
+      const mgr = (window.AUTOBOT_MANAGER_THEMES || {});
+      const fileName = themeValue + '.css';
+      const css = mgr[fileName];
+      const STYLE_ID = 'autobot-manager-theme';
+      // Always remove previous layer first so we don't accumulate
+      const prev = document.getElementById(STYLE_ID);
+      if (prev) prev.remove();
+      if (!css) {
+        logTheme(`No manager theme layer for '${themeValue}' (file ${fileName})`, '#ef4444');
+        return false;
+      }
+      const el = document.createElement('style');
+      el.id = STYLE_ID;
+      el.textContent = css;
+      document.head.appendChild(el);
+      logTheme(`Manager layer injected: ${fileName}`, '#10b981');
+      return true;
+    } catch (e) {
+      console.warn('Manager theme layer injection failed', e);
+      return false;
+    }
+  }
+
+  function applyAutobotTheme(themeValue) {
+    const found = AVAILABLE_THEMES.find(t => t.value === themeValue) || AVAILABLE_THEMES[0];
+    currentTheme = found.value;
+    localStorage.setItem(THEME_STORAGE_KEY, currentTheme);
+
+    
+    document.documentElement.classList.forEach(cls => {
+      if (cls.startsWith('wplace-theme-')) {
+        document.documentElement.classList.remove(cls);
+      }
+    });
+
+    
+    if (typeof window.applyTheme === 'function') {
+      const success = window.applyTheme(found.value);
+      if (!success) {
+        document.documentElement.classList.add(found.className);
+        logTheme(`Fallback class applied: ${found.className}`, '#f59e0b');
+      } else {
+        // Ensure matching class for variable-based selectors (some themes depend on it)
+        document.documentElement.classList.add(found.className);
+        logTheme(`Applied via window.applyTheme('${found.value}')`, '#10b981');
+      }
+    } else {
+      document.documentElement.classList.add(found.className);
+      logTheme(`applyTheme helper missing; class applied: ${found.className}`, '#f59e0b');
+    }
+
+    
+    const layered = applyManagerThemeLayer(found.value);
+    if (!layered) {
+      // If no manager CSS, we still rely on base theme + class selectors
+      logTheme(`Using base theme only for '${found.value}'`, '#3b82f6');
+    }
+  }
+
+  // Pre-apply the stored theme early
+  try { applyAutobotTheme(currentTheme); } catch(e){ console.warn('Theme pre-apply failed', e);}  
 
   // Execute script function - Fixed to work like extension popup
   async function executeScript(scriptName) {
@@ -591,10 +761,17 @@
         <!-- Scripts will be rendered here -->
       </div>
       <div class="script-manager-footer">
-        <div class="status-text">Ready to launch scripts</div>
-        <div class="action-buttons">
-          <button class="neon-btn secondary" onclick="closeScriptManager()">Cancel</button>
-          <button class="neon-btn" onclick="window.location.reload()">Refresh Page</button>
+        <div style="display:flex;align-items:center;gap:12px;width:100%;justify-content:space-between;">
+          <div class="status-text">Ready • Theme:</div>
+          <div class="theme-select-wrapper" style="display:flex;align-items:center;gap:6px;">
+            <select id="autobot-theme-select" class="neon-btn neon-select" style="padding:4px 8px;min-width:160px;">
+              ${AVAILABLE_THEMES.map(t => `<option value="${t.value}" ${t.value===currentTheme?'selected':''}>${t.label}</option>`).join('')}
+            </select>
+          </div>
+          <div class="action-buttons">
+            <button class="neon-btn secondary" onclick="closeScriptManager()">Cancel</button>
+            <button class="neon-btn" onclick="window.location.reload()">Refresh</button>
+          </div>
         </div>
       </div>
     `;
@@ -622,6 +799,15 @@
     container.focus();
     
     console.log('%c✅ Script Manager opened successfully', 'color: #39ff14; font-weight: bold;');
+
+    // Theme select listener (after render)
+    const themeSelect = container.querySelector('#autobot-theme-select');
+    if (themeSelect) {
+      themeSelect.addEventListener('change', (e) => {
+        const v = e.target.value;
+        applyAutobotTheme(v);
+      });
+    }
   }
 
   // Make functions globally available
