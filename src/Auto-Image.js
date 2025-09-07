@@ -4727,7 +4727,7 @@ import {
               <div class="wplace-row" style="display: flex;">
                   <button id="selectAllBtn" class="wplace-btn" style="flex: 1;">Select All</button>
                   <button id="unselectAllBtn" class="wplace-btn" style="flex: 1;">Unselect All</button>
-                  <button id="unselectPaidBtn" class="wplace-btn">Unselect Paid</button>
+                  <button id="unselectPaidBtn" class="wplace-btn" style="flex: 1;">Unselect Paid</button>
               </div>
               <div id="colors-container" class="wplace-color-grid"></div>
           </div>
