@@ -1,0 +1,603 @@
+/* WPlace Auto-Image Bot - Acrylic Theme */
+/* Beautiful theme with translucent blurred panels */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+@font-face {
+    font-family: 'Apple Color Emoji';
+    src: url('https://raw.githubusercontent.com/GORAlexComp/AppleColorEmojiFont/refs/heads/main/fonts/AppleColorEmoji.ttf');
+}
+
+/* Main Container */
+.wplace-theme-acrylic #wplace-image-bot-container {
+    background: var(--wplace-primary);
+    color: var(--wplace-text);
+    border-radius: var(--wplace-radius);
+    box-shadow: none;
+    backdrop-filter: var(--wplace-backdrop);
+    border: var(--wplace-border-width) var(--wplace-border-style)
+        var(--wplace-border-color);
+    min-width: 300px;
+}
+
+.wplace-theme-acrylic #wplace-image-bot-container * {
+    font-size: 15px;
+    line-height: normal;
+}
+
+.wplace-theme-acrylic .wplace-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+}
+
+#wplace-image-bot-container.wplace-dragging {
+    transition: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+/* Stats */
+.wplace-theme-acrylic #wplace-stats-container {
+    background: var(--wplace-primary);
+    color: var(--wplace-text);
+    border-radius: var(--wplace-radius);
+    box-shadow: none;
+    backdrop-filter: var(--wplace-backdrop);
+    border: var(--wplace-border-width) var(--wplace-border-style)
+        var(--wplace-border-color);
+}
+
+.wplace-theme-acrylic .wplace-stats {
+    margin-bottom: 0;
+}
+
+.wplace-theme-acrylic .wplace-colors-section {
+    border-top: none;
+    margin: 0;
+}
+
+/* Settings Container */
+.wplace-theme-acrylic #wplace-settings-container {
+    background: var(--wplace-primary) !important;
+    color: var(--wplace-text) !important;
+    border-radius: var(--wplace-radius) !important;
+    box-shadow: none !important;
+    backdrop-filter: var(--wplace-backdrop) !important;
+    border: var(--wplace-border-width) var(--wplace-border-style)
+        var(--wplace-border-color) !important;
+    max-width: 400px !important;
+}
+
+.wplace-theme-acrylic .wplace-settings-header {
+    background: transparent;
+    padding: 0;
+}
+
+.wplace-theme-acrylic .wplace-settings-header:hover {
+    background: transparent !important;
+}
+
+.wplace-theme-acrylic .wplace-settings-icon {
+    animation: none;
+    font-size: 15px;
+}
+
+.wplace-theme-acrylic .wplace-settings-content {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.wplace-theme-acrylic .wplace-settings-footer {
+    border-top: none;
+    padding: 10px;
+}
+
+.wplace-theme-acrylic .wplace-settings-section {
+    margin: 0;
+}
+
+.wplace-theme-acrylic .wplace-settings-section-wrapper,
+.wplace-theme-acrylic .wplace-overlay-wrapper,
+.wplace-theme-acrylic .wplace-batch-controls {
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+}
+
+/* Headers */
+.wplace-theme-acrylic .wplace-header,
+.wplace-theme-acrylic .wplace-settings-title-wrapper {
+    height: 40px;
+    padding: 7px 7px 7px 10px;
+    font-weight: 600;
+    background: var(--wplace-accent);
+    color: var(--wplace-highlight);
+}
+
+.wplace-theme-acrylic .wplace-header span,
+.wplace-theme-acrylic .wplace-settings-title {
+    max-width: 150px;
+    font-size: 15px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.wplace-theme-acrylic .wplace-header-controls #compactBtn {
+    display: none;
+}
+
+.wplace-theme-acrylic .wplace-header-btn,
+.wplace-theme-acrylic .wplace-settings-close-btn {
+    background: #2e2e2e;
+    color: var(--wplace-highlight);
+    border: none;
+    font-size: 12px;
+    border-radius: 4px;
+    width: 24px;
+    height: 24px;
+}
+
+.wplace-theme-acrylic .wplace-header-btn i {
+    font-size: 12px !important;
+}
+
+.wplace-theme-acrylic .wplace-header-btn:hover,
+.wplace-theme-acrylic .wplace-settings-close-btn:hover {
+    background: transparent;
+    transform: none;
+}
+
+/* Sections */
+.wplace-theme-acrylic .wplace-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: transparent;
+    padding: 0;
+    border: none;
+    margin: 0;
+}
+
+.wplace-theme-acrylic .wplace-section-title {
+    color: var(--wplace-highlight);
+    text-transform: capitalize;
+    font-size: 13px;
+    font-weight: 600;
+    pointer-events: none;
+    letter-spacing: unset;
+}
+
+.wplace-theme-acrylic .wplace-section-title i {
+    display: none;
+}
+
+.wplace-theme-acrylic .wplace-status-section {
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Status Styling */
+.wplace-theme-acrylic .wplace-stats {
+    background: transparent;
+    padding: 0;
+    border: none;
+}
+
+.wplace-theme-acrylic .wplace-stat-value {
+    color: var(--wplace-highlight);
+}
+
+.wplace-theme-acrylic .wplace-status {
+    border-radius: var(--wplace-radius);
+    border: none;
+    box-shadow: none;
+    padding: 10px;
+    font-weight: 500;
+}
+
+.wplace-theme-acrylic .status-default {
+    background: color-mix(in srgb, white 15%, transparent) !important;
+}
+
+.wplace-theme-acrylic .status-success {
+    background: color-mix(in srgb, var(--wplace-success) 15%, transparent);
+    color: var(--wplace-success);
+}
+
+.wplace-theme-acrylic .status-error {
+    background: color-mix(in srgb, var(--wplace-error) 15%, transparent);
+    color: var(--wplace-error);
+}
+
+.wplace-theme-acrylic .status-warning {
+    background: color-mix(in srgb, var(--wplace-warning) 15%, transparent);
+    color: var(--wplace-warning);
+}
+
+/* Buttons */
+.wplace-theme-acrylic .wplace-btn {
+    border-radius: 8px;
+    border: none;
+    height: max-content;
+    padding: 10px;
+    gap: 5px;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: normal;
+    text-align: left;
+    font-size: 15px !important;
+    box-shadow: none;
+}
+
+.wplace-theme-acrylic .wplace-btn::before {
+    display: none;
+}
+
+.wplace-theme-acrylic .wplace-btn:disabled {
+    box-shadow: none !important;
+}
+
+.wplace-theme-acrylic .wplace-btn:hover:not(:disabled) {
+    transform: none;
+    animation: none;
+    box-shadow: none !important;
+    filter: brightness(0.9);
+}
+
+.wplace-theme-acrylic .wplace-btn-primary,
+.wplace-theme-acrylic .wplace-btn-upload {
+    background: white !important;
+    color: black !important;
+    border: none !important;
+}
+
+.wplace-theme-acrylic .wplace-btn-upload:hover:not(:disabled) {
+    background: revert !important;
+}
+
+.wplace-theme-acrylic .wplace-btn-secondary,
+.wplace-theme-acrylic .wplace-btn-select,
+.wplace-theme-acrylic .wplace-btn-file,
+.wplace-theme-acrylic .wplace-btn-overlay {
+    background: var(--wplace-secondary);
+}
+
+.wplace-theme-acrylic .wplace-btn-start {
+    background: var(--wplace-success);
+    color: white;
+}
+
+.wplace-theme-acrylic .wplace-btn-stop {
+    background: var(--wplace-error);
+    color: white;
+}
+
+.wplace-theme-acrylic .wplace-btn.active {
+    background: white;
+    color: black;
+    box-shadow: none !important;
+}
+
+.wplace-theme-acrylic .wplace-btn.active i {
+    filter: none;
+}
+
+.wplace-theme-acrylic .wplace-settings-apply-btn {
+    background: white;
+    color: black;
+    border-radius: 8px;
+}
+
+/* Compact Input Buttons */
+.wplace-theme-acrylic .wplace-input-btn-small,
+.wplace-theme-acrylic .wplace-input-btn-small:hover,
+.wplace-theme-acrylic .wplace-input-btn-small:active {
+    background: white;
+    color: black;
+    border: none;
+    transform: none;
+    border-radius: 4px;
+    box-shadow: none;
+    font-weight: 500;
+    width: 25px;
+    height: 25px;
+}
+
+/* Alerts */
+.wplace-theme-acrylic .wplace-alert-base {
+    border-radius: var(--wplace-radius);
+    backdrop-filter: var(--wplace-backdrop);
+    border: none;
+    box-shadow: none;
+}
+
+.wplace-theme-acrylic .wplace-alert-info {
+    background: color-mix(in srgb, #0000e5 50%, transparent);
+}
+
+.wplace-theme-acrylic .wplace-alert-success {
+    background: color-mix(in srgb, var(--wplace-success) 50%, transparent);
+}
+
+.wplace-theme-acrylic .wplace-alert-error {
+    background: color-mix(in srgb, var(--wplace-error) 50%, transparent);
+}
+
+.wplace-theme-acrylic .wplace-alert-warning {
+    background: color-mix(in srgb, var(--wplace-warning) 50%, transparent);
+}
+
+/* Progress Bar */
+.wplace-theme-acrylic .wplace-progress {
+    background: var(--wplace-secondary);
+    border-radius: 4px;
+    margin: 0;
+    border: none;
+}
+
+.wplace-theme-acrylic .wplace-progress-bar {
+    background: white;
+}
+
+.wplace-theme-acrylic .wplace-progress-bar::after {
+    display: none;
+}
+
+/* Form Controls */
+.wplace-theme-acrylic .wplace-settings-checkbox,
+.wplace-theme-acrylic .wplace-notification-checkbox,
+.wplace-theme-acrylic .wplace-speed-checkbox {
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    accent-color: var(--wplace-highlight);
+}
+
+.wplace-theme-acrylic .wplace-settings-select,
+.wplace-theme-acrylic .wplace-settings-number-input,
+.wplace-theme-acrylic .wplace-cooldown-input,
+.wplace-theme-acrylic .wplace-notification-interval-input {
+    background: rgb(255 255 255 / 10%);
+    color: white;
+    border: 1px solid rgb(255 255 255 / 25%);
+    border-radius: 8px;
+    box-shadow: none;
+    transition-duration: 0.3s;
+}
+
+.wplace-theme-acrylic .wplace-settings-select:hover,
+.wplace-theme-acrylic .wplace-settings-number-input:hover,
+.wplace-theme-acrylic .wplace-cooldown-input:hover,
+.wplace-theme-acrylic .wplace-notification-interval-input:hover {
+    border-color: rgb(255 255 255 / 50%);
+}
+
+.wplace-theme-acrylic .wplace-settings-select:focus,
+.wplace-theme-acrylic .wplace-settings-number-input:focus,
+.wplace-theme-acrylic .wplace-cooldown-input:focus,
+.wplace-theme-acrylic .wplace-notification-interval-input:focus {
+    border-color: white;
+}
+
+.wplace-theme-acrylic .wplace-settings-option {
+    background: #2d3748;
+    color: white;
+}
+
+.wplace-theme-acrylic .wplace-settings-select option {
+    background: #2d3748;
+    color: white;
+}
+
+.wplace-theme-acrylic .wplace-cooldown-input {
+    border-radius: 4px !important;
+}
+
+.wplace-theme-acrylic .wplace-cooldown-input:focus {
+    background: rgb(255 255 255 / 10%);
+    box-shadow: none;
+}
+
+.wplace-theme-acrylic .wplace-overlay-opacity-value {
+    background-color: var(--wplace-secondary) !important;
+    border: none !important;
+}
+
+/* Sliders */
+.wplace-theme-acrylic .wplace-slider,
+.wplace-theme-acrylic .wplace-speed-slider,
+.wplace-theme-acrylic .wplace-overlay-opacity-slider {
+    background: var(--wplace-secondary) !important;
+    border-radius: 3px !important;
+    height: 6px !important;
+}
+
+.wplace-theme-acrylic .wplace-slider::-webkit-slider-thumb,
+.wplace-theme-acrylic .resize-slider::-webkit-slider-thumb,
+.wplace-theme-acrylic .wplace-speed-slider::-webkit-slider-thumb,
+.wplace-theme-acrylic .wplace-overlay-opacity-slider::-webkit-slider-thumb {
+    width: 16px !important;
+    height: 16px !important;
+    border-radius: 4px !important;
+    background: white !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+.wplace-theme-acrylic .wplace-speed-value {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    border-radius: 8px;
+    color: white;
+    box-shadow: 0 3px 10px rgb(79 172 254 / 30%);
+    border: 1px solid rgb(255 255 255 / 20%);
+}
+
+.wplace-theme-acrylic .resize-slider {
+    -webkit-appearance: revert;
+}
+
+/* Layout Controls */
+.wplace-theme-acrylic .wplace-slider-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
+
+.wplace-theme-acrylic .wplace-input-label-compact {
+    color: rgba(255, 255, 255, 0.75);
+    margin-left: 4px;
+    text-transform: lowercase;
+    white-space: nowrap;
+}
+
+.wplace-theme-acrylic .wplace-cooldown-control {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.wplace-theme-acrylic .wplace-cooldown-control label {
+    font-weight: 400;
+    margin-bottom: 0;
+    display: block;
+}
+
+.wplace-theme-acrylic .wplace-cooldown-input-group {
+    margin: 0;
+    background: transparent;
+}
+
+/* Color Elements */
+.wplace-theme-acrylic .wplace-color-item-name {
+    color: #ccc;
+}
+
+.wplace-theme-acrylic .wplace-color-swatch {
+    border: 1px solid rgb(255 255 255 / 20%);
+    border-radius: 4px;
+}
+
+.wplace-theme-acrylic .wplace-color-swatch:not(.active) {
+    filter: grayscale(80%);
+}
+
+.wplace-theme-acrylic .wplace-color-swatch.unavailable {
+    border-color: #666;
+}
+
+.wplace-theme-acrylic .wplace-color-swatch.unavailable:not(.active) {
+    filter: grayscale(90%);
+}
+
+.wplace-theme-acrylic .wplace-color-swatch.active::after {
+    text-shadow: 0 0 3px black;
+}
+
+.wplace-theme-acrylic .wplace-stat-color-swatch {
+    border-radius: 3px;
+    border: 1px solid rgb(255 255 255 / 10%);
+    box-shadow: inset 0 0 2px rgb(0 0 0 / 50%);
+}
+
+.wplace-theme-acrylic .wplace-stat-colors-grid {
+    background: var(--wplace-secondary);
+    border-radius: 8px;
+}
+
+.wplace-theme-acrylic .wplace-color-divider {
+    background: rgb(255 255 255 / 10%);
+}
+
+/* Icons */
+.wplace-theme-acrylic .wplace-icon-key,
+.wplace-theme-acrylic .wplace-icon-robot,
+.wplace-theme-acrylic .wplace-icon-speed,
+.wplace-theme-acrylic .wplace-icon-bell,
+.wplace-theme-acrylic .wplace-icon-palette,
+.wplace-theme-acrylic .wplace-icon-globe,
+.wplace-theme-acrylic .wplace-icon-paint,
+.wplace-theme-acrylic .wplace-icon-eye,
+.wplace-theme-acrylic .wplace-icon-compass,
+.wplace-theme-acrylic .wplace-icon-route,
+.wplace-theme-acrylic .wplace-icon-table,
+.wplace-theme-acrylic .wplace-icon-dice {
+    color: white;
+}
+
+/* Typography */
+.wplace-theme-acrylic .wplace-cooldown-unit {
+    display: none;
+}
+
+.wplace-theme-acrylic .wplace-settings-toggle-title,
+.wplace-theme-acrylic .wplace-overlay-opacity-label {
+    font-size: 15px !important;
+}
+
+.wplace-theme-acrylic .wplace-settings-description,
+.wplace-theme-acrylic .wplace-random-batch-description,
+.wplace-theme-acrylic .wplace-settings-toggle-description {
+    font-size: 12px;
+    color: rgb(255 255 255 / 75%) !important;
+}
+
+/* Turnstile Overlay */
+.wplace-theme-acrylic .wplace-turnstile-overlay {
+    background: var(--wplace-primary);
+    border-radius: var(--wplace-radius);
+    box-shadow: none;
+    backdrop-filter: var(--wplace-backdrop);
+    border: none;
+    padding: 16px !important;
+    color: var(--wplace-text) !important;
+}
+
+.wplace-theme-acrylic .wplace-turnstile-hide-btn {
+    border-radius: 8px !important;
+    backdrop-filter: var(--wplace-backdrop) !important;
+    background: var(--wplace-primary) !important;
+    top: -25px !important;
+    right: 0 !important;
+    transition: all 0.3s ease !important;
+}
+
+.wplace-theme-acrylic .wplace-turnstile-hide-btn:hover {
+    background: white !important;
+    color: black !important;
+}
+
+/* Resize Tools */
+.wplace-theme-acrylic .resize-tools button {
+    border-radius: 6px;
+    border: 1px solid rgb(255 255 255 / 20%);
+    background: rgb(255 255 255 / 6%);
+    color: #fff;
+}
+
+.wplace-theme-acrylic .resize-overlay {
+    background: rgb(0 0 0 / 50%);
+}
+
+/* TODO: More resize menu styles */
+.wplace-theme-acrylic .resize-container {
+    background: var(--wplace-secondary);
+    backdrop-filter: var(--wplace-backdrop);
+    border: none;
+    border-radius: var(--wplace-radius);
+    color: var(--wplace-text);
+}
