@@ -111,6 +111,8 @@
 /* Headers */
 .wplace-theme-acrylic .wplace-header,
 .wplace-theme-acrylic .wplace-settings-title-wrapper {
+    display: flex;
+    gap: 6px;
     height: 40px;
     padding: 7px 7px 7px 10px;
     font-weight: 600;
@@ -118,9 +120,13 @@
     color: var(--wplace-highlight);
 }
 
+.wplace-theme-acrylic .wplace-header-title {
+    flex: 1;
+    min-width: 0;
+}
+
 .wplace-theme-acrylic .wplace-header span,
 .wplace-theme-acrylic .wplace-settings-title {
-    max-width: 150px;
     font-size: 15px;
     font-weight: 600;
     white-space: nowrap;
@@ -229,7 +235,6 @@
 .wplace-theme-acrylic .wplace-btn {
     border-radius: 8px;
     border: none;
-    height: max-content;
     padding: 10px;
     gap: 5px;
     flex-direction: column;
@@ -238,6 +243,8 @@
     text-align: left;
     font-size: 15px !important;
     box-shadow: none;
+    height: 100%;
+    justify-content: space-between;
 }
 
 .wplace-theme-acrylic .wplace-btn::before {
@@ -248,7 +255,9 @@
     box-shadow: none !important;
 }
 
-.wplace-theme-acrylic .wplace-btn:hover:not(:disabled) {
+.wplace-theme-acrylic .wplace-btn:hover:not(:disabled),
+.wplace-theme-acrylic .wplace-settings-apply-btn:hover:not(:disabled),
+.wplace-theme-acrylic .wplace-input-btn-small:hover:not(:disabled) {
     transform: none;
     animation: none;
     box-shadow: none !important;
@@ -559,12 +568,20 @@
 /* Turnstile Overlay */
 .wplace-theme-acrylic .wplace-turnstile-overlay {
     background: var(--wplace-primary);
+    backdrop-filter: var(--wplace-backdrop);
     border-radius: var(--wplace-radius);
     box-shadow: none;
-    backdrop-filter: var(--wplace-backdrop);
     border: none;
     padding: 16px !important;
     color: var(--wplace-text) !important;
+    max-width: 332px !important;
+}
+
+.wplace-theme-acrylic .wplace-turnstile-title {
+    font: inherit !important;
+    font-size: 12px !important;
+    opacity: 1 !important;
+    line-height: normal !important;
 }
 
 .wplace-theme-acrylic .wplace-turnstile-hide-btn {
