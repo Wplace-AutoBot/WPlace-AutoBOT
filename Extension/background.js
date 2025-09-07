@@ -293,16 +293,51 @@ async function loadExtensionResources() {
     try {
         console.log('%c� Starting resource loading from extension directory...', 'color: #3b82f6; font-weight: bold;');
         
-    // Load theme files
+    // Load theme files (dynamic discovery, exclude removed ph.css)
         console.group('%c🎨 Theme Files Loading', 'color: #8b5cf6; font-weight: bold;');
-        const themeFiles = [
-            'auto-image-styles.css',
-            'themes/acrylic.css',
-            'themes/classic-light.css', 
-            'themes/classic.css',
-            'themes/neon.css',
-            'themes/ph.css'
-        ];
+        async function discoverBaseThemeFiles() {
+            const discovered = new Set();
+            const EXCLUDE = new Set(['ph.css']);
+            // Always include auto-image-styles.css if present (root-level)
+            discovered.add('auto-image-styles.css');
+            if (chrome.runtime.getPackageDirectoryEntry) {
+                try {
+                    const entries = await new Promise((resolve, reject) => {
+                        chrome.runtime.getPackageDirectoryEntry(root => {
+                            try {
+                                root.getDirectory('themes', {}, dir => {
+                                    const reader = dir.createReader();
+                                    const acc = [];
+                                    function readBatch() {
+                                        reader.readEntries(batch => {
+                                            if (!batch.length) return resolve(acc);
+                                            acc.push(...batch);
+                                            readBatch();
+                                        }, reject);
+                                    }
+                                    readBatch();
+                                }, reject);
+                            } catch (e) { reject(e); }
+                        });
+                    });
+                    entries.forEach(ent => {
+                        if (ent.isFile && ent.name.endsWith('.css') && !EXCLUDE.has(ent.name)) {
+                            discovered.add('themes/' + ent.name);
+                        }
+                    });
+                    console.log(`%c🔍 Discovered base themes: ${[...discovered].filter(f=>f.startsWith('themes/')).map(f=>f.split('/').pop()).join(', ')}`, 'color: #8b5cf6;');
+                } catch (e) {
+                    console.warn('%c⚠️ Base theme enumeration failed; using static fallback list', 'color: #f59e0b;', e);
+                }
+            } else {
+                console.log('%cℹ️ getPackageDirectoryEntry unavailable; using static theme list fallback', 'color: #8b5cf6;');
+            }
+            if (![...discovered].some(p => p.startsWith('themes/'))) {
+                ['themes/acrylic.css','themes/classic-light.css','themes/classic.css','themes/neon.css'].forEach(f=>discovered.add(f));
+            }
+            return [...discovered];
+        }
+        const themeFiles = await discoverBaseThemeFiles();
 
         for (const themeFile of themeFiles) {
             try {
@@ -351,16 +386,52 @@ async function loadExtensionResources() {
         }
         console.groupEnd();
 
-        // Load Script Manager specific themes (manager variants)
+        // Load Script Manager specific themes (manager variants) dynamically
         console.group('%c🗂️ Script Manager Theme Variant Loading', 'color: #6366f1; font-weight: bold;');
-        const managerThemeFiles = [
-            'script-manager-themes/acrylic.css',
-            'script-manager-themes/classic-light.css',
-            'script-manager-themes/classic.css',
-            'script-manager-themes/neon.css',
-            'script-manager-themes/ph.css'
-        ];
 
+        async function discoverManagerThemeFiles() {
+            const discovered = new Set();
+            const EXCLUDE = new Set(['theme-template.css']);
+            if (chrome.runtime.getPackageDirectoryEntry) {
+                try {
+                    const dirEntries = await new Promise((resolve, reject) => {
+                        chrome.runtime.getPackageDirectoryEntry(root => {
+                            try {
+                                root.getDirectory('script-manager-themes', {}, dir => {
+                                    const reader = dir.createReader();
+                                    const entries = [];
+                                    function readBatch() {
+                                        reader.readEntries(batch => {
+                                            if (!batch.length) return resolve(entries);
+                                            entries.push(...batch);
+                                            readBatch();
+                                        }, reject);
+                                    }
+                                    readBatch();
+                                }, reject);
+                            } catch (e) { reject(e); }
+                        });
+                    });
+                    dirEntries.forEach(ent => {
+                        if (ent.isFile && ent.name.endsWith('.css') && !EXCLUDE.has(ent.name)) {
+                            discovered.add('script-manager-themes/' + ent.name);
+                        }
+                    });
+                    console.log(`%c🔍 Discovered manager themes: ${[...discovered].map(f=>f.split('/').pop()).join(', ')}`, 'color: #6366f1;');
+                } catch (e) {
+                    console.warn('%c⚠️ Manager theme directory enumeration failed; falling back to static list', 'color: #f59e0b;', e);
+                }
+            } else {
+                console.log('%cℹ️ getPackageDirectoryEntry not available; using static manager theme list fallback', 'color: #6366f1;');
+            }
+            if (discovered.size === 0) {
+                ['script-manager-themes/acrylic.css', 'script-manager-themes/classic-light.css', 'script-manager-themes/classic.css', 'script-manager-themes/neon.css']
+                  .forEach(f => discovered.add(f));
+            }
+            return [...discovered];
+        }
+
+        const managerThemeFiles = await discoverManagerThemeFiles();
         for (const mThemeFile of managerThemeFiles) {
             try {
                 console.log(`%c📥 Loading manager theme: ${mThemeFile}`, 'color: #6366f1;');
@@ -470,7 +541,7 @@ async function loadExtensionResources() {
         console.group('%c� Resource Loading Summary', 'color: #10b981; font-weight: bold;');
         console.log(`%c⏱️ Total loading time: ${loadTime.toFixed(2)}ms`, 'color: #10b981; font-weight: bold;');
     console.log(`%c🎨 Themes loaded: ${Object.keys(resources.themes).length}/${themeFiles.length}`, 'color: #8b5cf6; font-weight: bold;');
-    console.log(`%c🗂️ Manager Themes loaded: ${Object.keys(resources.managerThemes).length}/${managerThemeFiles.length}`, 'color: #6366f1; font-weight: bold;');
+    console.log(`%c🗂️ Manager Themes loaded: ${Object.keys(resources.managerThemes).length}`, 'color: #6366f1; font-weight: bold;');
         console.log(`%c🌍 Languages loaded: ${Object.keys(resources.languages).length}/${languageFiles.length}`, 'color: #06b6d4; font-weight: bold;');
         
         // Calculate total size
