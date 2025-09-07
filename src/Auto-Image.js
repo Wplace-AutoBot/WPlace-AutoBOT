@@ -12,6 +12,7 @@ import { createState } from './core/state.js';
 import { OverlayManager } from './core/OverlayManager.js';
 import { createAutoImageUtils } from './core/utils.js';
 import { ImageProcessor } from './core/ImageProcessor.js';
+import { TokenManager } from './auth/TokenManager.js';
 
 (async () => {
     // Initialize centralized state manager for Auto-Image
@@ -46,182 +47,11 @@ import { ImageProcessor } from './core/ImageProcessor.js';
 
     // OverlayManager will be instantiated after Utils is defined
 
-    // Optimized Turnstile token handling with improved caching and retry logic
-    let turnstileToken = null;
-    let tokenExpiryTime = 0;
-    let tokenGenerationInProgress = false;
-    let _resolveToken = null;
-    let tokenPromise = new Promise(resolve => {
-        _resolveToken = resolve;
-    });
-    let retryCount = 0;
-    const MAX_RETRIES = 10;
+    // Initialize Token Manager
+    let tokenManager; // Will be initialized after Utils is created
+
+    // Batch processing constants
     const MAX_BATCH_RETRIES = 10; // Maximum attempts for batch sending
-    const TOKEN_LIFETIME = 240000; // 4 minutes (tokens typically last 5 min, use 4 for safety)
-
-    /**
-     * Set a new Turnstile token and update expiry time.
-     * @param {string} token - The Turnstile token to set
-     */
-    function setTurnstileToken(token) {
-        if (_resolveToken) {
-            _resolveToken(token);
-            _resolveToken = null;
-        }
-        turnstileToken = token;
-        tokenExpiryTime = Date.now() + TOKEN_LIFETIME;
-        console.log('✅ Turnstile token set successfully');
-    }
-
-    /**
-     * Check if the current Turnstile token is valid and not expired.
-     * @returns {boolean} True if token exists and hasn't expired
-     */
-    function isTokenValid() {
-        return turnstileToken && Date.now() < tokenExpiryTime;
-    }
-
-    /**
-     * Invalidate the current Turnstile token by clearing it and expiry time.
-     */
-    function invalidateToken() {
-        turnstileToken = null;
-        tokenExpiryTime = 0;
-        console.log('🗑️ Token invalidated, will force fresh generation');
-    }
-
-    /**
-     * Ensure a valid Turnstile token is available, generating one if needed.
-     * @param {boolean} [forceRefresh=false] - Force generation of a new token even if current is valid
-     * @returns {Promise<string|null>} The valid token or null if generation failed
-     */
-    async function ensureToken(forceRefresh = false) {
-        // Return cached token if still valid and not forcing refresh
-        if (isTokenValid() && !forceRefresh) {
-            return turnstileToken;
-        }
-
-        // Invalidate token if forcing refresh
-        if (forceRefresh) invalidateToken();
-
-        // Avoid multiple simultaneous token generations
-        if (tokenGenerationInProgress) {
-            console.log('🔄 Token generation already in progress, waiting...');
-            await Utils.sleep(2000);
-            return isTokenValid() ? turnstileToken : null;
-        }
-
-        tokenGenerationInProgress = true;
-
-        try {
-            console.log('🔄 Token expired or missing, generating new one...');
-            const token = await handleCaptchaWithRetry();
-            if (token && token.length > 20) {
-                setTurnstileToken(token);
-                console.log('✅ Token captured and cached successfully');
-                return token;
-            }
-
-            console.log(
-                '⚠️ Invisible Turnstile failed, forcing browser automation...'
-            );
-            const fallbackToken = await handleCaptchaFallback();
-            if (fallbackToken && fallbackToken.length > 20) {
-                setTurnstileToken(fallbackToken);
-                console.log('✅ Fallback token captured successfully');
-                return fallbackToken;
-            }
-
-            console.log('❌ All token generation methods failed');
-            return null;
-        } finally {
-            tokenGenerationInProgress = false;
-        }
-    }
-
-    /**
-     * Handle Turnstile CAPTCHA generation with retry logic.
-     * Attempts to obtain sitekey and generate token using invisible method.
-     * @returns {Promise<string|null>} The generated token or null if failed
-     */
-    async function handleCaptchaWithRetry() {
-        const startTime = performance.now();
-
-        try {
-            const { sitekey, token: preGeneratedToken } =
-                await Utils.obtainSitekeyAndToken();
-
-            if (!sitekey) {
-                throw new Error('No valid sitekey found');
-            }
-
-            console.log('🔑 Using sitekey:', sitekey);
-
-            if (typeof window !== 'undefined' && window.navigator) {
-                console.log(
-                    '🧭 UA:',
-                    window.navigator.userAgent.substring(0, 50) + '...',
-                    'Platform:',
-                    window.navigator.platform
-                );
-            }
-
-            let token = null;
-
-            if (
-                preGeneratedToken &&
-                typeof preGeneratedToken === 'string' &&
-                preGeneratedToken.length > 20
-            ) {
-                console.log('♻️ Reusing pre-generated Turnstile token');
-                token = preGeneratedToken;
-            } else {
-                if (isTokenValid()) {
-                    console.log(
-                        '♻️ Using existing cached token (from previous session)'
-                    );
-                    token = turnstileToken;
-                } else {
-                    console.log(
-                        '🔐 Generating new token with executeTurnstile...'
-                    );
-                    const result = await Utils.obtainSitekeyAndToken();
-                    token = result.token;
-                    if (token) setTurnstileToken(token);
-                }
-            }
-
-            if (token && typeof token === 'string' && token.length > 20) {
-                const elapsed = Math.round(performance.now() - startTime);
-                console.log(
-                    `✅ Turnstile token generated successfully in ${elapsed}ms`
-                );
-                return token;
-            } else {
-                throw new Error(
-                    `Invalid or empty token received - Length: ${token?.length || 0}`
-                );
-            }
-        } catch (error) {
-            const elapsed = Math.round(performance.now() - startTime);
-            console.error(
-                `❌ Turnstile token generation failed after ${elapsed}ms:`,
-                error
-            );
-            throw error;
-        }
-    }
-
-    /**
-     * Fallback method for CAPTCHA token generation when primary method fails.
-     * @returns {Promise<string|null>} The fallback token or null if not implemented
-     */
-    async function handleCaptchaFallback() {
-        // Implementation for fallback token generation would go here
-        // This is a placeholder for browser automation fallback
-        console.log('🔄 Attempting fallback token generation...');
-        return null;
-    }
 
     /**
      * Inject and execute a JavaScript function in the page context.
@@ -364,11 +194,14 @@ import { ImageProcessor } from './core/ImageProcessor.js';
         state,
         CONFIG,
         colorCache,
-        isTokenValid,
-        turnstileToken,
-        setTurnstileToken,
+        () => tokenManager?.isTokenValid() || false,
+        () => tokenManager?.getToken() || null,
+        (token) => tokenManager?.setTurnstileToken(token),
         null
     );
+
+    // Initialize TokenManager after Utils is defined
+    tokenManager = new TokenManager(Utils);
 
     // Initialize OverlayManager after Utils is defined
     const overlayManager = new OverlayManager(state, CONFIG, Utils);
@@ -382,12 +215,13 @@ import { ImageProcessor } from './core/ImageProcessor.js';
     const WPlaceService = {
         async paintPixelInRegion(regionX, regionY, pixelX, pixelY, color) {
             try {
-                await ensureToken();
-                if (!turnstileToken) return 'token_error';
+                await tokenManager.ensureToken();
+                const token = tokenManager.getToken();
+                if (!token) return 'token_error';
                 const payload = {
                     coords: [pixelX, pixelY],
                     colors: [color],
-                    t: turnstileToken,
+                    t: token,
                 };
                 const res = await fetch(
                     `https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`,
@@ -402,10 +236,7 @@ import { ImageProcessor } from './core/ImageProcessor.js';
                     console.error(
                         '❌ 403 Forbidden. Turnstile token might be invalid or expired.'
                     );
-                    turnstileToken = null;
-                    tokenPromise = new Promise(resolve => {
-                        _resolveToken = resolve;
-                    });
+                    tokenManager.invalidateToken();
                     return 'token_error';
                 }
                 const data = await res.json();
@@ -769,236 +600,7 @@ import { ImageProcessor } from './core/ImageProcessor.js';
      * Handle CAPTCHA generation and validation process.
      * @returns {Promise<void>}
      */
-    async function handleCaptcha() {
-        const startTime = performance.now();
-
-        // Check user's token source preference
-        if (state.tokenSource === 'manual') {
-            console.log(
-                '🎯 Manual token source selected - using pixel placement automation'
-            );
-            return await handleCaptchaFallback();
-        }
-
-        // Generator mode (pure) or Hybrid mode - try generator first
-        try {
-            // Use optimized token generation with automatic sitekey detection
-            const { sitekey, token: preGeneratedToken } =
-                await Utils.obtainSitekeyAndToken();
-
-            if (!sitekey) {
-                throw new Error('No valid sitekey found');
-            }
-
-            console.log('🔑 Generating Turnstile token for sitekey:', sitekey);
-            console.log(
-                '🧭 UA:',
-                navigator.userAgent.substring(0, 50) + '...',
-                'Platform:',
-                navigator.platform
-            );
-
-            // Add additional checks before token generation
-            if (!window.turnstile) {
-                // TurnstileManager will be initialized when needed
-            }
-
-            let token = null;
-
-            // ✅ Reuse pre-generated token if available and valid
-            if (
-                preGeneratedToken &&
-                typeof preGeneratedToken === 'string' &&
-                preGeneratedToken.length > 20
-            ) {
-                console.log(
-                    '♻️ Reusing pre-generated token from sitekey detection phase'
-                );
-                token = preGeneratedToken;
-            }
-            // ✅ Or use globally cached token if still valid
-            else if (isTokenValid()) {
-                console.log(
-                    '♻️ Using existing cached token (from previous operation)'
-                );
-                token = turnstileToken;
-            }
-            // ✅ Otherwise generate a new one
-            else {
-                console.log(
-                    '🔐 No valid pre-generated or cached token, creating new one...'
-                );
-                token = await Utils.executeTurnstile(sitekey, 'paint');
-                if (token) {
-                    setTurnstileToken(token);
-                }
-            }
-
-            // 📊 Debug log
-            console.log(
-                `🔍 Token received - Type: ${typeof token}, Value: ${
-                    token
-                        ? typeof token === 'string'
-                            ? token.length > 50
-                                ? token.substring(0, 50) + '...'
-                                : token
-                            : JSON.stringify(token)
-                        : 'null/undefined'
-                }, Length: ${token?.length || 0}`
-            );
-
-            // ✅ Final validation
-            if (typeof token === 'string' && token.length > 20) {
-                const duration = Math.round(performance.now() - startTime);
-                console.log(
-                    `✅ Turnstile token generated successfully in ${duration}ms`
-                );
-                return token;
-            } else {
-                throw new Error(
-                    `Invalid or empty token received - Type: ${typeof token}, Value: ${JSON.stringify(
-                        token
-                    )}, Length: ${token?.length || 0}`
-                );
-            }
-        } catch (error) {
-            const duration = Math.round(performance.now() - startTime);
-            console.error(
-                `❌ Turnstile token generation failed after ${duration}ms:`,
-                error
-            );
-
-            // Fallback to manual pixel placement for hybrid mode
-            if (state.tokenSource === 'hybrid') {
-                console.log(
-                    '🔄 Hybrid mode: Generator failed, automatically switching to manual pixel placement...'
-                );
-                const fbToken = await handleCaptchaFallback();
-                return fbToken;
-            } else {
-                // Pure generator mode - don't fallback, just fail
-                throw error;
-            }
-        }
-    }
-
-    // Keep original method as fallback
-    async function handleCaptchaFallback() {
-        return new Promise(async (resolve, reject) => {
-            try {
-                // Ensure we have a fresh promise to await for a new token capture
-                if (!_resolveToken) {
-                    tokenPromise = new Promise(res => {
-                        _resolveToken = res;
-                    });
-                }
-                const timeoutPromise = Utils.sleep(20000).then(() =>
-                    reject(new Error('Auto-CAPTCHA timed out.'))
-                );
-
-                const solvePromise = (async () => {
-                    const mainPaintBtn = await Utils.waitForSelector(
-                        'button.btn.btn-primary.btn-lg, button.btn-primary.sm\\:btn-xl',
-                        200,
-                        10000
-                    );
-                    if (!mainPaintBtn)
-                        throw new Error(
-                            'Could not find the main paint button.'
-                        );
-                    mainPaintBtn.click();
-                    await Utils.sleep(500);
-
-                    const transBtn = await Utils.waitForSelector(
-                        'button#color-0',
-                        200,
-                        5000
-                    );
-                    if (!transBtn)
-                        throw new Error(
-                            'Could not find the transparent color button.'
-                        );
-                    transBtn.click();
-                    await Utils.sleep(500);
-
-                    const canvas = await Utils.waitForSelector(
-                        'canvas',
-                        200,
-                        5000
-                    );
-                    if (!canvas)
-                        throw new Error('Could not find the canvas element.');
-
-                    canvas.setAttribute('tabindex', '0');
-                    canvas.focus();
-                    const rect = canvas.getBoundingClientRect();
-                    const centerX = Math.round(rect.left + rect.width / 2);
-                    const centerY = Math.round(rect.top + rect.height / 2);
-
-                    canvas.dispatchEvent(
-                        new MouseEvent('mousemove', {
-                            clientX: centerX,
-                            clientY: centerY,
-                            bubbles: true,
-                        })
-                    );
-                    canvas.dispatchEvent(
-                        new KeyboardEvent('keydown', {
-                            key: ' ',
-                            code: 'Space',
-                            bubbles: true,
-                        })
-                    );
-                    await Utils.sleep(50);
-                    canvas.dispatchEvent(
-                        new KeyboardEvent('keyup', {
-                            key: ' ',
-                            code: 'Space',
-                            bubbles: true,
-                        })
-                    );
-                    await Utils.sleep(500);
-
-                    // 800ms delay before sending confirmation
-                    await Utils.sleep(800);
-
-                    // Keep confirming until token is captured
-                    const confirmLoop = async () => {
-                        while (!turnstileToken) {
-                            let confirmBtn = await Utils.waitForSelector(
-                                'button.btn.btn-primary.btn-lg, button.btn.btn-primary.sm\\:btn-xl'
-                            );
-                            if (!confirmBtn) {
-                                const allPrimary = Array.from(
-                                    document.querySelectorAll(
-                                        'button.btn-primary'
-                                    )
-                                );
-                                confirmBtn = allPrimary.length
-                                    ? allPrimary[allPrimary.length - 1]
-                                    : null;
-                            }
-                            if (confirmBtn) {
-                                confirmBtn.click();
-                            }
-                            await Utils.sleep(500); // 500ms delay between confirmation attempts
-                        }
-                    };
-
-                    // Start confirmation loop and wait for token
-                    confirmLoop();
-                    const token = await tokenPromise;
-                    await Utils.sleep(300); // small delay after token is captured
-                    resolve(token);
-                })();
-
-                await Promise.race([solvePromise, timeoutPromise]);
-            } catch (error) {
-                console.error('Auto-CAPTCHA process failed:', error);
-                reject(error);
-            }
-        });
-    }
+    // Token management functions moved to TokenManager class
 
     /**
      * Create and initialize the main user interface.
@@ -4565,8 +4167,8 @@ import { ImageProcessor } from './core/ImageProcessor.js';
                 updateUI('missingRequirements', 'error');
                 return;
             }
-            await ensureToken();
-            if (!turnstileToken) return;
+            await tokenManager.ensureToken();
+            if (!tokenManager.getToken()) return;
 
             state.running = true;
             state.stopFlag = false;
@@ -5442,7 +5044,7 @@ import { ImageProcessor } from './core/ImageProcessor.js';
                 );
                 updateUI('captchaSolving', 'warning');
                 try {
-                    await handleCaptcha();
+                    await tokenManager.handleCaptcha(state);
                     // Don't count token regeneration as a failed attempt
                     attempt--;
                     continue;
@@ -5488,19 +5090,15 @@ import { ImageProcessor } from './core/ImageProcessor.js';
      * @returns {Promise<boolean>} True if request was successful
      */
     async function sendPixelBatch(pixelBatch, regionX, regionY) {
-        let token = turnstileToken;
+        let token = tokenManager.getToken();
 
         // Generate new token if we don't have one
         if (!token) {
             try {
                 console.log('🔑 Generating Turnstile token for pixel batch...');
-                token = await handleCaptcha();
-                turnstileToken = token; // Store for potential reuse
+                token = await tokenManager.handleCaptcha(state);
             } catch (error) {
                 console.error('❌ Failed to generate Turnstile token:', error);
-                tokenPromise = new Promise(resolve => {
-                    _resolveToken = resolve;
-                });
                 return 'token_error';
             }
         }
@@ -5539,8 +5137,7 @@ import { ImageProcessor } from './core/ImageProcessor.js';
                 // Try to generate a new token and retry once
                 try {
                     console.log('🔄 Regenerating Turnstile token after 403...');
-                    token = await handleCaptcha();
-                    turnstileToken = token;
+                    token = await tokenManager.handleCaptcha(state);
 
                     // Retry the request with new token
                     const retryPayload = { coords, colors, t: token };
@@ -5557,10 +5154,7 @@ import { ImageProcessor } from './core/ImageProcessor.js';
                     );
 
                     if (retryRes.status === 403) {
-                        turnstileToken = null;
-                        tokenPromise = new Promise(resolve => {
-                            _resolveToken = resolve;
-                        });
+                        tokenManager.invalidateToken();
                         return 'token_error';
                     }
 
@@ -5568,10 +5162,7 @@ import { ImageProcessor } from './core/ImageProcessor.js';
                     return retryData?.painted === pixelBatch.length;
                 } catch (retryError) {
                     console.error('❌ Token regeneration failed:', retryError);
-                    turnstileToken = null;
-                    tokenPromise = new Promise(resolve => {
-                        _resolveToken = resolve;
-                    });
+                    tokenManager.invalidateToken();
                     return 'token_error';
                 }
             }
@@ -5979,7 +5570,7 @@ import { ImageProcessor } from './core/ImageProcessor.js';
     // Optimized token initialization with better timing and error handling
     async function initializeTokenGenerator() {
         // Skip if already have valid token
-        if (isTokenValid()) {
+        if (tokenManager.isTokenValid()) {
             console.log(
                 '✅ Valid token already available, skipping initialization'
             );
@@ -5998,9 +5589,9 @@ import { ImageProcessor } from './core/ImageProcessor.js';
                 'Turnstile script loaded. Attempting to generate token...'
             );
 
-            const token = await handleCaptchaWithRetry();
+            const token = await tokenManager.handleCaptchaWithRetry();
             if (token) {
-                setTurnstileToken(token);
+                tokenManager.setTurnstileToken(token);
                 console.log('✅ Startup token generated successfully');
                 updateUI('tokenReady', 'success');
                 Utils.showAlert(Utils.t('tokenGeneratorReady'), 'success');
