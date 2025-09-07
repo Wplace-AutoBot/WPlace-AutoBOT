@@ -7824,7 +7824,7 @@ localStorage.removeItem("lp");
   async function createWasmToken(regionX, regionY, payload) {
     try {
       // Load the Pawtect module and WASM
-      const mod = await import(new URL('/_app/immutable/chunks/"+pawtect_chunk', location.origin).href);
+      const mod = await import(new URL('/_app/immutable/chunks/'+pawtect_chunk, location.origin).href);
       let wasm;
       try {
         wasm = await mod._();
