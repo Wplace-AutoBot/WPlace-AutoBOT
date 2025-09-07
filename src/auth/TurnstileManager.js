@@ -1,5 +1,5 @@
 import { TurnstileError } from './errors.js';
-import { getCurrentTheme, getCurrentThemeName } from '../theme.js';
+import { getCurrentTheme, getCurrentThemeName } from '../core/theme.js';
 
 export class TurnstileManager {
     constructor(config = {}) {

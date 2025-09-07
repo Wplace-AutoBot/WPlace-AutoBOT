@@ -1,81 +1,42 @@
 import { EMBEDDED_CSS } from 'embedded-assets';
-import { CONFIG } from './config.js';
+import { CONFIG } from './core/config.js';
 import {
     getCurrentTheme,
     switchTheme,
     applyTheme,
     loadThemePreference,
-} from './theme.js';
-import { initializeTranslations, t, setLanguage } from './translations.js';
+} from './core/theme.js';
+import { initializeTranslations, t, setLanguage } from './core/translations.js';
 import { TurnstileManager, TurnstileError } from './auth/index.js';
+import { createState } from './core/state.js';
 
 (async () => {
-    // GLOBAL STATE
-    const state = {
-        running: false,
-        imageLoaded: false,
-        processing: false,
-        totalPixels: 0,
-        paintedPixels: 0,
-        availableColors: [],
-        activeColorPalette: [], // User-selected colors for conversion
-        paintWhitePixels: true, // Default to ON
-        fullChargeData: null,
-        fullChargeInterval: null,
-        paintTransparentPixels: false, // Default to OFF
-        displayCharges: 0,
-        preciseCurrentCharges: 0,
-        maxCharges: 1, // Default max charges
-        cooldown: CONFIG.COOLDOWN_DEFAULT,
-        imageData: null,
-        stopFlag: false,
-        colorsChecked: false,
-        startPosition: null,
-        selectingPosition: false,
-        region: null,
-        minimized: false,
-        lastPosition: { x: 0, y: 0 },
-        estimatedTime: 0,
-        language: 'en',
-        paintingSpeed: CONFIG.PAINTING_SPEED.DEFAULT, // pixels batch size
-        batchMode: CONFIG.BATCH_MODE, // "normal" or "random"
-        randomBatchMin: CONFIG.RANDOM_BATCH_RANGE.MIN, // Random range minimum
-        randomBatchMax: CONFIG.RANDOM_BATCH_RANGE.MAX, // Random range maximum
-        cooldownChargeThreshold: CONFIG.COOLDOWN_CHARGE_THRESHOLD,
-        chargesThresholdInterval: null,
-        tokenSource: CONFIG.TOKEN_SOURCE, // "generator" or "manual"
-        initialSetupComplete: false, // Track if initial startup setup is complete (only happens once)
-        overlayOpacity: CONFIG.OVERLAY.OPACITY_DEFAULT,
-        blueMarbleEnabled: CONFIG.OVERLAY.BLUE_MARBLE_DEFAULT,
-        ditheringEnabled: true,
-        // Advanced color matching settings
-        colorMatchingAlgorithm: 'lab',
-        enableChromaPenalty: true,
-        chromaPenaltyWeight: 0.15,
-        customTransparencyThreshold: CONFIG.TRANSPARENCY_THRESHOLD,
-        customWhiteThreshold: CONFIG.WHITE_THRESHOLD,
-        resizeSettings: null,
-        originalImage: null,
-        resizeIgnoreMask: null,
-        paintUnavailablePixels: CONFIG.PAINT_UNAVAILABLE,
-        // Coordinate generation settings
-        coordinateMode: CONFIG.COORDINATE_MODE,
-        coordinateDirection: CONFIG.COORDINATE_DIRECTION,
-        coordinateSnake: CONFIG.COORDINATE_SNAKE,
-        blockWidth: CONFIG.COORDINATE_BLOCK_WIDTH,
-        blockHeight: CONFIG.COORDINATE_BLOCK_HEIGHT,
-        notificationsEnabled: CONFIG.NOTIFICATIONS.ENABLED,
-        notifyOnChargesReached: CONFIG.NOTIFICATIONS.ON_CHARGES_REACHED,
-        notifyOnlyWhenUnfocused: CONFIG.NOTIFICATIONS.ONLY_WHEN_UNFOCUSED,
-        notificationIntervalMinutes: CONFIG.NOTIFICATIONS.REPEAT_MINUTES,
-        _lastChargesNotifyAt: 0,
-        _lastChargesBelow: true,
-        // Smart save tracking
-        _lastSavePixelCount: 0,
-        _lastSaveTime: 0,
-        _saveInProgress: false,
-        paintedMap: null,
-    };
+    // Initialize centralized state manager for Auto-Image
+    const stateManager = createState();
+    const { state, update, get } = stateManager;
+    
+    // Set initial config values
+    state.cooldown = CONFIG.COOLDOWN_DEFAULT;
+    state.paintingSpeed = CONFIG.PAINTING_SPEED.DEFAULT;
+    state.batchMode = CONFIG.BATCH_MODE;
+    state.randomBatchMin = CONFIG.RANDOM_BATCH_RANGE.MIN;
+    state.randomBatchMax = CONFIG.RANDOM_BATCH_RANGE.MAX;
+    state.cooldownChargeThreshold = CONFIG.COOLDOWN_CHARGE_THRESHOLD;
+    state.tokenSource = CONFIG.TOKEN_SOURCE;
+    state.overlayOpacity = CONFIG.OVERLAY.OPACITY_DEFAULT;
+    state.blueMarbleEnabled = CONFIG.OVERLAY.BLUE_MARBLE_DEFAULT;
+    state.customTransparencyThreshold = CONFIG.TRANSPARENCY_THRESHOLD;
+    state.customWhiteThreshold = CONFIG.WHITE_THRESHOLD;
+    state.paintUnavailablePixels = CONFIG.PAINT_UNAVAILABLE;
+    state.coordinateMode = CONFIG.COORDINATE_MODE;
+    state.coordinateDirection = CONFIG.COORDINATE_DIRECTION;
+    state.coordinateSnake = CONFIG.COORDINATE_SNAKE;
+    state.blockWidth = CONFIG.COORDINATE_BLOCK_WIDTH;
+    state.blockHeight = CONFIG.COORDINATE_BLOCK_HEIGHT;
+    state.notificationsEnabled = CONFIG.NOTIFICATIONS.ENABLED;
+    state.notifyOnChargesReached = CONFIG.NOTIFICATIONS.ON_CHARGES_REACHED;
+    state.notifyOnlyWhenUnfocused = CONFIG.NOTIFICATIONS.ONLY_WHEN_UNFOCUSED;
+    state.notificationIntervalMinutes = CONFIG.NOTIFICATIONS.REPEAT_MINUTES;
 
     let _updateResizePreview = () => {};
     let _resizeDialogCleanup = null;
