@@ -14,7 +14,9 @@
     "scripting"
   ],
   "host_permissions": [
-    "https://wplace.live/*"
+    "https://backend.wplace.live/*",
+    "https://wplace.live/*",
+    "https://*.wplace.live/*"
   ],
   "action": {
     "default_popup": "popup/popup.html",
