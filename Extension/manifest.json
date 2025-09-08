@@ -10,8 +10,13 @@
     "128": "icons/icon128.png"
   },
   "permissions": [
-    "activeTab",
-    "scripting"
+    "cookies",
+    "webRequest",
+    "scripting",
+    "tabs",
+    "storage",
+    "browsingData",
+    "webNavigation"
   ],
   "host_permissions": [
     "https://backend.wplace.live/*",
