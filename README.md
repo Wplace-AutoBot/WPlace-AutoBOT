@@ -19,13 +19,15 @@ This project was fork from https://github.com/DarkModde/WPlace-AutoBOT
 <br>
 
 <p align="center">
-  If you're wondering—yes! These scripts were Developed by a team consisting of Brazilians, Vietnamese, and Indonesians. HUEHUE!</strong></sub>
+  If you're wondering—yes! These scripts were Developed by a team consisting of Brazilians, Vietnamese, Dutch and Indonesians. HUEHUE!</strong></sub>
   <p align="center">
   <img src="https://cdn.jsdelivr.net/gh/hjnilsson/country-flags/svg/br.svg" alt="Brazil" width="32"/>
   &nbsp;
   <img src="https://cdn.jsdelivr.net/gh/hjnilsson/country-flags/svg/vn.svg" alt="Vietnam" width="32"/>
   &nbsp;
   <img src="https://cdn.jsdelivr.net/gh/hjnilsson/country-flags/svg/id.svg" alt="Indonesia" width="32"/>
+  &nbsp;
+  <img src="https://cdn.jsdelivr.net/gh/hjnilsson/country-flags/svg/nl.svg" alt=Netherlands width="32"/>
 </p>
 </p>
 
@@ -86,6 +88,7 @@ javascript:(async()=>{ const u='https://raw.githubusercontent.com/Wplace-AutoBot
 - [x] Overlay(you dont need bluemarble anymore)
 - [x] Paint over multiple tiles
 - [x] Multi Account Auto Switcher Via Other Branch ; https://github.com/Wplace-AutoBot/WPlace-AutoBOT/tree/Acc-switch (Ram Efficient LOL)
+- [x] WPlace Autoplace extension Branch(included Auto-Farm, Auto-Image, Repair tools, ...)
 - [x] AutoCaptcha Solver With Turnstile Token Generator
 - [x] Wider Paint Control Options
 - [x] Advance Color Processing
