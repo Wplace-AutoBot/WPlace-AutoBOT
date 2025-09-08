@@ -13,6 +13,7 @@ import { OverlayManager } from './core/OverlayManager.js';
 import { createAutoImageUtils } from './core/utils.js';
 import { ImageProcessor } from './core/ImageProcessor.js';
 import { TokenManager } from './auth/TokenManager.js';
+import { initializeSecurity, getSecurity } from './security/index.js';
 
 (async () => {
     // Initialize centralized state manager for Auto-Image
@@ -203,6 +204,11 @@ import { TokenManager } from './auth/TokenManager.js';
     // Initialize TokenManager after Utils is defined
     tokenManager = new TokenManager(Utils);
 
+    // Initialize Security Systems (fingerprint & pawtect protection)
+    console.log('🛡️ Initializing security systems...');
+    const security = await initializeSecurity();
+    console.log('✅ Security systems ready');
+
     // Initialize OverlayManager after Utils is defined
     const overlayManager = new OverlayManager(state, CONFIG, Utils);
 
@@ -218,16 +224,32 @@ import { TokenManager } from './auth/TokenManager.js';
                 await tokenManager.ensureToken();
                 const token = tokenManager.getToken();
                 if (!token) return 'token_error';
+                
+                // Get fingerprint from security system
+                const fingerprint = security.fingerprint.getFingerprint();
+                
                 const payload = {
                     coords: [pixelX, pixelY],
                     colors: [color],
                     t: token,
+                    fp: fingerprint,
                 };
+                
+                // Generate WASM token for pawtect protection
+                const wasmToken = await security.pawtect.createWasmToken(regionX, regionY, payload);
+                if (!wasmToken) {
+                    console.error('❌ Failed to generate WASM token');
+                    return 'token_error';
+                }
+                
                 const res = await fetch(
                     `https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`,
                     {
                         method: 'POST',
-                        headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+                        headers: { 
+                            'Content-Type': 'text/plain;charset=UTF-8',
+                            'x-pawtect-token': wasmToken
+                        },
                         credentials: 'include',
                         body: JSON.stringify(payload),
                     }
@@ -5113,13 +5135,26 @@ import { TokenManager } from './auth/TokenManager.js';
         }
 
         try {
-            const payload = { coords, colors, t: token };
+            // Get fingerprint from security system
+            const fingerprint = security.fingerprint.getFingerprint();
+            
+            const payload = { coords, colors, t: token, fp: fingerprint };
+            
+            // Generate WASM token for pawtect protection
+            const wasmToken = await security.pawtect.createWasmToken(regionX, regionY, payload);
+            if (!wasmToken) {
+                console.error('❌ Failed to generate WASM token for batch');
+                return 'token_error';
+            }
 
             const res = await fetch(
                 `https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`,
                 {
                     method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+                    headers: { 
+                        'Content-Type': 'text/plain;charset=UTF-8',
+                        'x-pawtect-token': wasmToken
+                    },
                     credentials: 'include',
                     body: JSON.stringify(payload),
                 }
@@ -5140,13 +5175,22 @@ import { TokenManager } from './auth/TokenManager.js';
                     token = await tokenManager.handleCaptcha(state);
 
                     // Retry the request with new token
-                    const retryPayload = { coords, colors, t: token };
+                    const retryPayload = { coords, colors, t: token, fp: fingerprint };
+                    
+                    // Generate new WASM token for retry
+                    const retryWasmToken = await security.pawtect.createWasmToken(regionX, regionY, retryPayload);
+                    if (!retryWasmToken) {
+                        console.error('❌ Failed to generate WASM token for retry');
+                        return 'token_error';
+                    }
+                    
                     const retryRes = await fetch(
                         `https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`,
                         {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'text/plain;charset=UTF-8',
+                                'x-pawtect-token': retryWasmToken
                             },
                             credentials: 'include',
                             body: JSON.stringify(retryPayload),
