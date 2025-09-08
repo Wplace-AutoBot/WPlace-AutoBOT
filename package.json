@@ -23,7 +23,8 @@
         "format:check": "prettier --ignore-path .gitignore --ignore-path .prettierignore --ignore-unknown --check .",
         "clean": "rm -rf dist/*",
         "docs:generate": "node scripts/generate-docs.js",
-        "docs:watch": "node scripts/watch-docs.js"
+        "docs:watch": "node scripts/watch-docs.js",
+        "ci": "npm run format:check && npm run build:all"
     },
     "devDependencies": {
         "@eslint/js": "^9.34.0",

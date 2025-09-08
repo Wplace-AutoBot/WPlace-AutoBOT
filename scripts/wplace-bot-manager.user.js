@@ -7,8 +7,8 @@
 // @match        https://wplace.live/*
 // @grant        none
 // @run-at       document-end
-// @updateURL    https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/wplace-bot-manager.user.js
-// @downloadURL  https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/wplace-bot-manager.user.js
+// @updateURL    https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/scripts/wplace-bot-manager.user.js
+// @downloadURL  https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/scripts/wplace-bot-manager.user.js
 // ==/UserScript==
 
 (function () {
@@ -20,6 +20,22 @@
     const BASE_URL_KEY = 'wplace-bot-base-url';
     const HOST_ID = 'wplace-bot-launcher-host';
     const TARGET_NAME_KEY = 'wplace-target-name';
+
+    // Loader types
+    const LOADER_DEFAULT = 'inline';
+    const LOADERS = ['blob', 'inline', 'eval'];
+    const loaderLabels = {
+        blob: 'Blob URL',
+        inline: 'Inline textContent',
+        eval: 'Global eval()',
+    };
+    function sanitizeLoader(v) {
+        v = String(v || '').toLowerCase();
+        return LOADERS.includes(v) ? v : LOADER_DEFAULT;
+    }
+    function labelForLoader(v) {
+        return loaderLabels[sanitizeLoader(v)];
+    }
 
     // Add hotkey to open manager (Ctrl+Shift+M)
     document.addEventListener('keydown', function (e) {
@@ -87,6 +103,7 @@
                     url: String(x.url),
                     title: String(x.title || 'Untitled'),
                     note: String(x.note || ''),
+                    loader: sanitizeLoader(x.loader),
                     createdAt: Number(x.createdAt || Date.now()),
                     lastUsedAt: Number(x.lastUsedAt || 0),
                 }));
@@ -170,6 +187,7 @@
                 url: DEFAULT_URL,
                 title: 'WPlace Auto-Image',
                 note: 'Fetches and runs Auto-Image.js from GitHub (trusted only).',
+                loader: LOADER_DEFAULT,
                 createdAt: Date.now(),
                 lastUsedAt: 0,
             });
@@ -329,6 +347,19 @@
                     placeholder="https://example.com/script.js" />
                 </div>
                 <div class="formRow">
+                  <label>Load method</label>
+                  <select class="input" id="fLoader">
+                    <option value="inline">Inline textContent (default)</option>
+                    <option value="blob">Blob URL</option>
+                    <option value="eval">Global eval()</option>
+                  </select>
+                  <div class="small">
+                    Tip: Try "Blob" if inline scripts are blocked by CSP,
+                    "Inline" if blob: URLs are blocked, and "eval" if you
+                    explicitly allow unsafe-eval.
+                  </div>
+                </div>
+                <div class="formRow">
                   <label>Note (optional)</label>
                   <textarea class="textarea" id="fNote"
                     placeholder="What does this script do?"></textarea>
@@ -357,6 +388,7 @@
         const addSummary = shadow.getElementById('addSummary');
         const fTitle = shadow.getElementById('fTitle');
         const fUrl = shadow.getElementById('fUrl');
+        const fLoader = shadow.getElementById('fLoader');
         const fNote = shadow.getElementById('fNote');
         const editingIdInput = shadow.getElementById('editingId');
         const closeBtn = shadow.getElementById('closeBtn');
@@ -417,6 +449,7 @@
             editingIdInput.value = '';
             fTitle.value = '';
             fUrl.value = '';
+            fLoader.value = LOADER_DEFAULT;
             fNote.value = '';
             addSummary.textContent = 'Add / Edit script';
         }
@@ -426,6 +459,7 @@
                 editingIdInput.value = prefill.id || '';
                 fTitle.value = prefill.title || '';
                 fUrl.value = prefill.url || '';
+                fLoader.value = sanitizeLoader(prefill.loader);
                 fNote.value = prefill.note || '';
                 addSummary.textContent = prefill.id
                     ? 'Edit script'
@@ -434,6 +468,7 @@
                 resetForm();
                 fUrl.value = DEFAULT_URL;
                 fTitle.value = 'WPlace Auto-Image';
+                fLoader.value = LOADER_DEFAULT;
             }
             addDetails.open = true;
             setTimeout(() => fTitle.focus(), 0);
@@ -465,7 +500,7 @@
 
                 const titleBtn = document.createElement('button');
                 titleBtn.className = 'titleBtn';
-                titleBtn.title = s.url;
+                titleBtn.title = `[${labelForLoader(s.loader)}] ${s.url}`;
                 titleBtn.textContent = s.title || '(Untitled)';
                 titleBtn.addEventListener('click', () => runScriptInline(s.id));
 
@@ -531,62 +566,94 @@
                 localStorage.setItem(BASE_URL_KEY, baseUrl);
             } catch {}
 
+            const postRunSuccess = () => {
+                s.lastUsedAt = Date.now();
+                saveScripts(scripts);
+                render();
+                toast(`Ran: ${s.title}`);
+                hasRunScript = true;
+                updateUIState();
+                if (!devMode) {
+                    setTimeout(() => {
+                        toast('Reload page to run another script', {
+                            ms: 5000,
+                            danger: false,
+                        });
+                    }, 1500);
+                } else {
+                    toast('Dev mode: Reload not required', { ms: 3000 });
+                }
+            };
+
+            let code = '';
             try {
                 const res = await fetch(s.url, { cache: 'no-store' });
-                if (!res.ok)
+                if (!res.ok) {
                     throw new Error(`HTTP ${res.status} ${res.statusText}`);
-                const code = await res.text();
-
-                const blob = new Blob([code], {
-                    type: 'application/javascript',
-                });
-                const blobUrl = URL.createObjectURL(blob);
-                const scriptEl = document.createElement('script');
-                scriptEl.src = blobUrl;
-                scriptEl.async = true;
-
-                scriptEl.addEventListener('load', () => {
-                    URL.revokeObjectURL(blobUrl);
-                    setTimeout(() => scriptEl.remove(), 0);
-                    s.lastUsedAt = Date.now();
-                    saveScripts(scripts);
-                    render();
-                    toast(`Ran: ${s.title}`);
-
-                    // Mark that a script has been executed and update UI
-                    hasRunScript = true;
-                    updateUIState();
-
-                    // Check if dev-mode is enabled to bypass reload requirement
-                    const devMode = localStorage.getItem('dev-mode') === 'true';
-                    if (!devMode) {
-                        // Inform user that reload is needed for next script
-                        setTimeout(() => {
-                            toast('Reload page to run another script', {
-                                ms: 5000,
-                                danger: false,
-                            });
-                        }, 1500); // Show after initial success message
-                    } else {
-                        toast('Dev mode: Reload not required', { ms: 3000 });
-                    }
-                });
-
-                scriptEl.addEventListener('error', ev => {
-                    URL.revokeObjectURL(blobUrl);
-                    const msg =
-                        (ev && ev.message) ||
-                        'Script failed to load or was blocked (CSP?).';
-                    alert(`Failed to execute script via blob URL: ${msg}`);
-                });
-
-                (
-                    document.body ||
-                    document.head ||
-                    document.documentElement
-                ).appendChild(scriptEl);
+                }
+                code = await res.text();
             } catch (err) {
                 alert(`Failed to load script: ${err.message || err}`);
+                return;
+            }
+
+            const loader = sanitizeLoader(s.loader);
+            if (loader === 'blob') {
+                try {
+                    const blob = new Blob([code], {
+                        type: 'application/javascript',
+                    });
+                    const blobUrl = URL.createObjectURL(blob);
+                    const scriptEl = document.createElement('script');
+                    scriptEl.src = blobUrl;
+                    scriptEl.async = true;
+                    scriptEl.addEventListener('load', () => {
+                        URL.revokeObjectURL(blobUrl);
+                        setTimeout(() => scriptEl.remove(), 0);
+                        postRunSuccess();
+                    });
+                    scriptEl.addEventListener('error', ev => {
+                        URL.revokeObjectURL(blobUrl);
+                        const msg =
+                            (ev && ev.message) ||
+                            'Script failed to load or was blocked (CSP?).';
+                        alert(`Failed to execute script via blob URL: ${msg}`);
+                    });
+                    (
+                        document.body ||
+                        document.head ||
+                        document.documentElement
+                    ).appendChild(scriptEl);
+                } catch (err) {
+                    alert(`Blob loader failed: ${err.message || err}`);
+                }
+            } else if (loader === 'inline') {
+                try {
+                    const scriptEl = document.createElement('script');
+                    scriptEl.textContent = code;
+                    (
+                        document.body ||
+                        document.head ||
+                        document.documentElement
+                    ).appendChild(scriptEl);
+                    setTimeout(() => scriptEl.remove(), 0);
+                    postRunSuccess();
+                } catch (err) {
+                    alert(
+                        `Inline loader failed (CSP inline blocked?): ` +
+                            (err.message || err)
+                    );
+                }
+            } else if (loader === 'eval') {
+                try {
+                    (0, eval)(code); // global eval
+                    postRunSuccess();
+                } catch (err) {
+                    alert(
+                        `Eval failed (unsafe-eval blocked?): ` +
+                            (err.message || err)
+                    );
+                }
             }
         }
 
@@ -665,6 +732,7 @@
             const id = editingIdInput.value.trim();
             const title = fTitle.value.trim();
             const url = fUrl.value.trim();
+            const loader = sanitizeLoader(fLoader.value);
             const note = fNote.value.trim();
 
             if (!title || !url) {
@@ -681,13 +749,20 @@
             if (id) {
                 const idx = scripts.findIndex(x => x.id === id);
                 if (idx >= 0) {
-                    scripts[idx] = { ...scripts[idx], title, url, note };
+                    scripts[idx] = {
+                        ...scripts[idx],
+                        title,
+                        url,
+                        note,
+                        loader,
+                    };
                 }
             } else {
                 scripts.push({
                     id: uid(),
                     title,
                     url,
+                    loader,
                     note,
                     createdAt: Date.now(),
                     lastUsedAt: 0,
@@ -731,6 +806,7 @@
                     url: String(x.url),
                     title: String(x.title || 'Untitled'),
                     note: String(x.note || ''),
+                    loader: sanitizeLoader(x.loader),
                     createdAt: Number(x.createdAt || Date.now()),
                     lastUsedAt: Number(x.lastUsedAt || 0),
                 }));

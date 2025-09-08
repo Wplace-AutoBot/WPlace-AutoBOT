@@ -2,7 +2,7 @@ name: Pages – aggregate all branches
 
 on:
     push:
-        branches: ['**']
+        branches: ['main', 'dev']
     workflow_dispatch:
 
 permissions:
@@ -32,6 +32,17 @@ jobs:
               with:
                   node-version: '18'
                   cache: 'npm'
+
+            - uses: actions/cache@v4
+              with:
+                  path: |
+                      node_modules
+                      public/production
+                  key: ${{ runner.os }}-cd-${{ hashFiles('**/package-lock.json') }}-${{ github.ref_name }}-${{ github.sha }}
+                  restore-keys: |
+                      ${{ runner.os }}-cd-${{ hashFiles('**/package-lock.json') }}-${{ github.ref_name }}-
+                      ${{ runner.os }}-cd-${{ hashFiles('**/package-lock.json') }}-
+                      ${{ runner.os }}-cd-
 
             - name: Install dependencies
               run: npm ci
@@ -88,17 +99,142 @@ jobs:
                   <meta charset="utf-8" />
                   <meta name="viewport" content="width=device-width,initial-scale=1" />
                   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ctext y='14' font-size='14'%3E🚀%3C/text%3E%3C/svg%3E" />
-                  <title>Branches</title>
+                  <title>WPlace AutoBOT - Branches</title>
                   <style>
-                    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;
-                         margin:24px;background:#0d1117;color:#e6edf3}
-                    a{color:#58a6ff;text-decoration:none}
-                    .card{background:#161b22;padding:16px;border-radius:8px;margin:12px 0}
-                    input{background:#0b0f14;border:1px solid #30363d;color:#e6edf3;
-                          padding:8px 10px;border-radius:6px;width:100%;max-width:420px}
+                    :root {
+                      --wplace-primary: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
+                      --wplace-secondary: linear-gradient(135deg, #111 0%, #2a2a2a 100%);
+                      --wplace-accent: #222;
+                      --wplace-text: #fff;
+                      --wplace-highlight: #775ce3;
+                      --wplace-highlight-secondary: #d3a4ff;
+                      --wplace-icon-primary: #4facfe;
+                      --wplace-icon-secondary: #00f2fe;
+                      --wplace-radius: 12px;
+                      --wplace-shadow: 0 8px 32px rgb(0 0 0 / 60%), 0 0 0 1px rgb(255 255 255 / 10%);
+                      --wplace-backdrop: blur(10px);
+                      --wplace-font: 'Segoe UI', roboto, sans-serif;
+                    }
+                    
+                    body {
+                      font-family: var(--wplace-font);
+                      margin: 24px;
+                      background: #0d1117;
+                      color: var(--wplace-text);
+                      line-height: 1.6;
+                    }
+                    
+                    h1 {
+                      background: linear-gradient(135deg, var(--wplace-icon-primary) 0%, var(--wplace-icon-secondary) 100%);
+                      -webkit-background-clip: text;
+                      -webkit-text-fill-color: transparent;
+                      background-clip: text;
+                      font-weight: 700;
+                      font-size: 2.5rem;
+                      margin-bottom: 8px;
+                      text-align: center;
+                    }
+                    
+                    .subtitle {
+                      text-align: center;
+                      color: var(--wplace-highlight-secondary);
+                      margin-bottom: 32px;
+                      font-size: 1.1rem;
+                      opacity: 0.9;
+                    }
+                    
+                    a {
+                      color: var(--wplace-icon-primary);
+                      text-decoration: none;
+                      transition: color 0.2s ease;
+                    }
+                    
+                    a:hover {
+                      color: var(--wplace-icon-secondary);
+                    }
+                    
+                    .card {
+                      background: var(--wplace-secondary);
+                      padding: 20px;
+                      border-radius: var(--wplace-radius);
+                      margin: 16px 0;
+                      border: 1px solid rgb(255 255 255 / 10%);
+                      box-shadow: var(--wplace-shadow);
+                      backdrop-filter: var(--wplace-backdrop);
+                      transition: all 0.3s ease;
+                    }
+                    
+                    .card:hover {
+                      transform: translateY(-2px);
+                      box-shadow: 0 12px 40px rgb(0 0 0 / 70%), 0 0 0 1px rgb(255 255 255 / 15%);
+                      border-color: var(--wplace-highlight);
+                    }
+                    
+                    .card strong {
+                      color: var(--wplace-highlight);
+                      font-size: 1.2rem;
+                      display: block;
+                      margin-bottom: 8px;
+                    }
+                    
+                    .card a {
+                      background: linear-gradient(135deg, var(--wplace-highlight) 0%, var(--wplace-highlight-secondary) 100%);
+                      color: white;
+                      padding: 8px 16px;
+                      border-radius: 8px;
+                      display: inline-block;
+                      font-weight: 500;
+                      transition: all 0.2s ease;
+                    }
+                    
+                    .card a:hover {
+                      transform: translateY(-1px);
+                      box-shadow: 0 4px 12px rgb(0 0 0 / 30%);
+                      color: white;
+                    }
+                    
+                    input {
+                      background: rgb(255 255 255 / 8%);
+                      border: 1px solid rgb(255 255 255 / 20%);
+                      color: var(--wplace-text);
+                      padding: 12px 16px;
+                      border-radius: var(--wplace-radius);
+                      width: 100%;
+                      max-width: 420px;
+                      font-size: 16px;
+                      margin: 0 auto 32px;
+                      display: block;
+                      transition: all 0.2s ease;
+                    }
+                    
+                    input:focus {
+                      outline: none;
+                      border-color: var(--wplace-highlight);
+                      box-shadow: 0 0 0 3px rgb(119 92 227 / 20%);
+                      background: rgb(255 255 255 / 12%);
+                    }
+                    
+                    input::placeholder {
+                      color: rgb(255 255 255 / 50%);
+                    }
+                    
+                    .header-info {
+                      text-align: center;
+                      margin-bottom: 24px;
+                      padding: 16px;
+                      background: rgb(255 255 255 / 5%);
+                      border-radius: var(--wplace-radius);
+                      border: 1px solid rgb(255 255 255 / 10%);
+                    }
+                    
+                    .emoji {
+                      font-size: 1.5rem;
+                      margin-right: 8px;
+                    }
                   </style>
-                  <h1>Branches</h1>
-                  <input id="q" placeholder="Filter branches..." />
+                  <h1><span class="emoji">🚀</span>WPlace AutoBOT</h1>
+                  <div class="subtitle">Branch File Browser</div>
+                  <input id="q" placeholder="🔍 Filter branches..." />
                   <div id="list"></div>
                   <script>window.__branches=window.__branches||[];</script>
                   HTML
@@ -113,13 +249,13 @@ jobs:
                       echo "<!doctype html><meta charset='utf-8'/>"
                       echo "<meta name='viewport' content='width=device-width,initial-scale=1'/>"
                       echo "<link rel='icon' href=\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ctext y='14' font-size='14'%3E🚀%3C/text%3E%3C/svg%3E\" />"
-                      echo "<title>${title}</title>"
-                      echo "<style>body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;margin:24px;background:#0d1117;color:#e6edf3}a{color:#58a6ff;text-decoration:none}table{width:100%;border-collapse:collapse}th,td{padding:8px;border-bottom:1px solid #30363d}tr:hover{background:#161b22}</style>"
-                      echo "<h1>${title}</h1>"
+                      echo "<title>WPlace AutoBOT - ${title}</title>"
+                      echo "<style>:root{--wplace-primary:linear-gradient(135deg,#000 0%,#1a1a1a 100%);--wplace-secondary:linear-gradient(135deg,#111 0%,#2a2a2a 100%);--wplace-text:#fff;--wplace-highlight:#775ce3;--wplace-icon-primary:#4facfe;--wplace-icon-secondary:#00f2fe;--wplace-radius:12px;--wplace-shadow:0 8px 32px rgb(0 0 0 / 60%), 0 0 0 1px rgb(255 255 255 / 10%);--wplace-font:'Segoe UI',roboto,sans-serif}body{font-family:var(--wplace-font);margin:24px;background:#0d1117;color:var(--wplace-text);line-height:1.6}h1{background:linear-gradient(135deg,var(--wplace-icon-primary) 0%,var(--wplace-icon-secondary) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:600;margin-bottom:16px}a{color:var(--wplace-icon-primary);text-decoration:none;transition:color 0.2s ease}a:hover{color:var(--wplace-icon-secondary)}table{width:100%;border-collapse:collapse;background:rgb(255 255 255 / 3%);border-radius:var(--wplace-radius);overflow:hidden;border:1px solid rgb(255 255 255 / 10%)}th{background:var(--wplace-secondary);color:var(--wplace-highlight);padding:12px;border-bottom:1px solid rgb(255 255 255 / 20%);font-weight:500}td{padding:10px 12px;border-bottom:1px solid rgb(255 255 255 / 8%)}tr:hover{background:rgb(255 255 255 / 5%)}tr:last-child td{border-bottom:none}.nav{margin-bottom:20px;padding:12px;background:rgb(255 255 255 / 5%);border-radius:var(--wplace-radius);border:1px solid rgb(255 255 255 / 10%)}.nav a{margin-right:16px;padding:6px 12px;background:rgb(255 255 255 / 8%);border-radius:6px;transition:all 0.2s ease}.nav a:hover{background:rgb(255 255 255 / 15%);transform:translateY(-1px)}</style>"
+                      echo "<h1>🚀 ${title}</h1>"
                       if [[ "$DIR" != "$ROOT" ]]; then
-                        echo "<p><a href='../'>⬆ Up</a> • <a href='${SITE_ROOT}'>All branches</a></p>"
+                        echo "<div class='nav'><a href='../'>⬆ Up</a><a href='${SITE_ROOT}'>🏠 All branches</a></div>"
                       else
-                        echo "<p><a href='${SITE_ROOT}'>All branches</a></p>"
+                        echo "<div class='nav'><a href='${SITE_ROOT}'>🏠 All branches</a></div>"
                       fi
                       echo "<table><thead><tr><th>Name</th><th style='width:120px'>Size</th><th style='width:180px'>Modified</th></tr></thead><tbody>"
 

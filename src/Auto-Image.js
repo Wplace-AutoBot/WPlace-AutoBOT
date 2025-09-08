@@ -1,1417 +1,58 @@
+import { EMBEDDED_CSS } from 'embedded-assets';
+import { CONFIG } from './core/config.js';
 import {
-    EMBEDDED_CSS,
-    EMBEDDED_THEMES,
-    EMBEDDED_LANGUAGES,
-} from 'embedded-assets';
+    getCurrentTheme,
+    switchTheme,
+    applyTheme,
+    loadThemePreference,
+} from './core/theme.js';
+import { initializeTranslations, t, setLanguage } from './core/translations.js';
+import { TurnstileManager, TurnstileError } from './auth/index.js';
+import { createState } from './core/state.js';
+import { OverlayManager } from './core/OverlayManager.js';
+import { createAutoImageUtils } from './core/utils.js';
+import { ImageProcessor } from './core/ImageProcessor.js';
+import { TokenManager } from './auth/TokenManager.js';
+import { initializeSecurity, getSecurity } from './security/index.js';
 
 (async () => {
-    // CONFIGURATION CONSTANTS
-    const CONFIG = {
-        COOLDOWN_DEFAULT: 31000,
-        TRANSPARENCY_THRESHOLD: 100,
-        WHITE_THRESHOLD: 250,
-        LOG_INTERVAL: 10,
-        PAINTING_SPEED: {
-            MIN: 1, // Minimum 1 pixel batch size
-            MAX: 1000, // Maximum 1000 pixels batch size
-            DEFAULT: 5, // Default 5 pixels batch size
-        },
-        BATCH_MODE: 'normal', // "normal" or "random" - default to normal
-        RANDOM_BATCH_RANGE: {
-            MIN: 3, // Random range minimum
-            MAX: 20, // Random range maximum
-        },
-        PAINTING_SPEED_ENABLED: false, // On by default
-        AUTO_CAPTCHA_ENABLED: true, // Turnstile generator enabled by default
-        TOKEN_SOURCE: 'generator', // "generator", "manual", or "hybrid" - default to generator
-        COOLDOWN_CHARGE_THRESHOLD: 1, // Default wait threshold
-        // Desktop Notifications (defaults)
-        NOTIFICATIONS: {
-            ENABLED: false,
-            ON_CHARGES_REACHED: true,
-            ONLY_WHEN_UNFOCUSED: true,
-            REPEAT_MINUTES: 5, // repeat reminder while threshold condition holds
-        },
-        OVERLAY: {
-            OPACITY_DEFAULT: 0.2,
-            BLUE_MARBLE_DEFAULT: false,
-            ditheringEnabled: false,
-        }, // --- START: Color data from colour-converter.js ---
-        // New color structure with proper ID mapping
-        COLOR_MAP: {
-            0: { id: 1, name: 'Black', rgb: { r: 0, g: 0, b: 0 } },
-            1: { id: 2, name: 'Dark Gray', rgb: { r: 60, g: 60, b: 60 } },
-            2: { id: 3, name: 'Gray', rgb: { r: 120, g: 120, b: 120 } },
-            3: { id: 4, name: 'Light Gray', rgb: { r: 210, g: 210, b: 210 } },
-            4: { id: 5, name: 'White', rgb: { r: 255, g: 255, b: 255 } },
-            5: { id: 6, name: 'Deep Red', rgb: { r: 96, g: 0, b: 24 } },
-            6: { id: 7, name: 'Red', rgb: { r: 237, g: 28, b: 36 } },
-            7: { id: 8, name: 'Orange', rgb: { r: 255, g: 127, b: 39 } },
-            8: { id: 9, name: 'Gold', rgb: { r: 246, g: 170, b: 9 } },
-            9: { id: 10, name: 'Yellow', rgb: { r: 249, g: 221, b: 59 } },
-            10: {
-                id: 11,
-                name: 'Light Yellow',
-                rgb: { r: 255, g: 250, b: 188 },
-            },
-            11: { id: 12, name: 'Dark Green', rgb: { r: 14, g: 185, b: 104 } },
-            12: { id: 13, name: 'Green', rgb: { r: 19, g: 230, b: 123 } },
-            13: { id: 14, name: 'Light Green', rgb: { r: 135, g: 255, b: 94 } },
-            14: { id: 15, name: 'Dark Teal', rgb: { r: 12, g: 129, b: 110 } },
-            15: { id: 16, name: 'Teal', rgb: { r: 16, g: 174, b: 166 } },
-            16: { id: 17, name: 'Light Teal', rgb: { r: 19, g: 225, b: 190 } },
-            17: { id: 20, name: 'Cyan', rgb: { r: 96, g: 247, b: 242 } },
-            18: { id: 44, name: 'Light Cyan', rgb: { r: 187, g: 250, b: 242 } },
-            19: { id: 18, name: 'Dark Blue', rgb: { r: 40, g: 80, b: 158 } },
-            20: { id: 19, name: 'Blue', rgb: { r: 64, g: 147, b: 228 } },
-            21: { id: 21, name: 'Indigo', rgb: { r: 107, g: 80, b: 246 } },
-            22: {
-                id: 22,
-                name: 'Light Indigo',
-                rgb: { r: 153, g: 177, b: 251 },
-            },
-            23: { id: 23, name: 'Dark Purple', rgb: { r: 120, g: 12, b: 153 } },
-            24: { id: 24, name: 'Purple', rgb: { r: 170, g: 56, b: 185 } },
-            25: {
-                id: 25,
-                name: 'Light Purple',
-                rgb: { r: 224, g: 159, b: 249 },
-            },
-            26: { id: 26, name: 'Dark Pink', rgb: { r: 203, g: 0, b: 122 } },
-            27: { id: 27, name: 'Pink', rgb: { r: 236, g: 31, b: 128 } },
-            28: { id: 28, name: 'Light Pink', rgb: { r: 243, g: 141, b: 169 } },
-            29: { id: 29, name: 'Dark Brown', rgb: { r: 104, g: 70, b: 52 } },
-            30: { id: 30, name: 'Brown', rgb: { r: 149, g: 104, b: 42 } },
-            31: { id: 31, name: 'Beige', rgb: { r: 248, g: 178, b: 119 } },
-            32: {
-                id: 52,
-                name: 'Light Beige',
-                rgb: { r: 255, g: 197, b: 165 },
-            },
-            33: {
-                id: 32,
-                name: 'Medium Gray',
-                rgb: { r: 170, g: 170, b: 170 },
-            },
-            34: { id: 33, name: 'Dark Red', rgb: { r: 165, g: 14, b: 30 } },
-            35: { id: 34, name: 'Light Red', rgb: { r: 250, g: 128, b: 114 } },
-            36: { id: 35, name: 'Dark Orange', rgb: { r: 228, g: 92, b: 26 } },
-            37: {
-                id: 37,
-                name: 'Dark Goldenrod',
-                rgb: { r: 156, g: 132, b: 49 },
-            },
-            38: { id: 38, name: 'Goldenrod', rgb: { r: 197, g: 173, b: 49 } },
-            39: {
-                id: 39,
-                name: 'Light Goldenrod',
-                rgb: { r: 232, g: 212, b: 95 },
-            },
-            40: { id: 40, name: 'Dark Olive', rgb: { r: 74, g: 107, b: 58 } },
-            41: { id: 41, name: 'Olive', rgb: { r: 90, g: 148, b: 74 } },
-            42: {
-                id: 42,
-                name: 'Light Olive',
-                rgb: { r: 132, g: 197, b: 115 },
-            },
-            43: { id: 43, name: 'Dark Cyan', rgb: { r: 15, g: 121, b: 159 } },
-            44: { id: 45, name: 'Light Blue', rgb: { r: 125, g: 199, b: 255 } },
-            45: { id: 46, name: 'Dark Indigo', rgb: { r: 77, g: 49, b: 184 } },
-            46: {
-                id: 47,
-                name: 'Dark Slate Blue',
-                rgb: { r: 74, g: 66, b: 132 },
-            },
-            47: { id: 48, name: 'Slate Blue', rgb: { r: 122, g: 113, b: 196 } },
-            48: {
-                id: 49,
-                name: 'Light Slate Blue',
-                rgb: { r: 181, g: 174, b: 241 },
-            },
-            49: { id: 53, name: 'Dark Peach', rgb: { r: 155, g: 82, b: 73 } },
-            50: { id: 54, name: 'Peach', rgb: { r: 209, g: 128, b: 120 } },
-            51: {
-                id: 55,
-                name: 'Light Peach',
-                rgb: { r: 250, g: 182, b: 164 },
-            },
-            52: { id: 50, name: 'Light Brown', rgb: { r: 219, g: 164, b: 99 } },
-            53: { id: 56, name: 'Dark Tan', rgb: { r: 123, g: 99, b: 82 } },
-            54: { id: 57, name: 'Tan', rgb: { r: 156, g: 132, b: 107 } },
-            55: { id: 36, name: 'Light Tan', rgb: { r: 214, g: 181, b: 148 } },
-            56: { id: 51, name: 'Dark Beige', rgb: { r: 209, g: 128, b: 81 } },
-            57: { id: 61, name: 'Dark Stone', rgb: { r: 109, g: 100, b: 63 } },
-            58: { id: 62, name: 'Stone', rgb: { r: 148, g: 140, b: 107 } },
-            59: {
-                id: 63,
-                name: 'Light Stone',
-                rgb: { r: 205, g: 197, b: 158 },
-            },
-            60: { id: 58, name: 'Dark Slate', rgb: { r: 51, g: 57, b: 65 } },
-            61: { id: 59, name: 'Slate', rgb: { r: 109, g: 117, b: 141 } },
-            62: {
-                id: 60,
-                name: 'Light Slate',
-                rgb: { r: 179, g: 185, b: 209 },
-            },
-            63: { id: 0, name: 'Transparent', rgb: null },
-        }, // --- END: Color data ---
-        // CSS Classes moved to src/auto-image-styles.css
-        THEMES: {
-            'Classic Autobot': {
-                primary: '#000000',
-                secondary: '#111111',
-                accent: '#222222',
-                text: '#ffffff',
-                highlight: '#775ce3',
-                success: '#00ff00',
-                error: '#ff0000',
-                warning: '#ffaa00',
-                fontFamily: "'Segoe UI', Roboto, sans-serif",
-                borderRadius: '12px',
-                borderStyle: 'solid',
-                borderWidth: '1px',
-                boxShadow:
-                    '0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.1)',
-                backdropFilter: 'blur(10px)',
-                animations: {
-                    glow: false,
-                    scanline: false,
-                    'pixel-blink': false,
-                },
-            },
-            'Classic Light': {
-                primary: '#ffffff',
-                secondary: '#f8f9fa',
-                accent: '#e9ecef',
-                text: '#212529',
-                highlight: '#6f42c1',
-                success: '#28a745',
-                error: '#dc3545',
-                warning: '#ffc107',
-                fontFamily: "'Segoe UI', Roboto, sans-serif",
-                borderRadius: '12px',
-                borderStyle: 'solid',
-                borderWidth: '1px',
-                boxShadow:
-                    '0 8px 32px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.08)',
-                backdropFilter: 'blur(10px)',
-                animations: {
-                    glow: false,
-                    scanline: false,
-                    'pixel-blink': false,
-                },
-            },
-            'Neon Retro': {
-                primary: '#1a1a2e',
-                secondary: '#16213e',
-                accent: '#0f3460',
-                text: '#00ff41',
-                highlight: '#ff6b35',
-                success: '#39ff14',
-                error: '#ff073a',
-                warning: '#ffff00',
-                neon: '#00ffff',
-                purple: '#bf00ff',
-                pink: '#ff1493',
-                fontFamily: "'Press Start 2P', monospace",
-                borderRadius: '0',
-                borderStyle: 'solid',
-                borderWidth: '3px',
-                boxShadow:
-                    '0 0 20px rgba(0, 255, 65, 0.3), inset 0 0 20px rgba(0, 255, 65, 0.1)',
-                backdropFilter: 'none',
-                animations: {
-                    glow: true,
-                    scanline: true,
-                    'pixel-blink': true,
-                },
-            },
-        },
-        currentTheme: 'Classic Autobot',
-        PAINT_UNAVAILABLE: true,
-        COORDINATE_MODE: 'rows',
-        COORDINATE_DIRECTION: 'bottom-left',
-        COORDINATE_SNAKE: true,
-        COORDINATE_BLOCK_WIDTH: 6,
-        COORDINATE_BLOCK_HEIGHT: 2,
-    };
+    // Initialize centralized state manager for Auto-Image
+    const stateManager = createState();
+    const { state, update, get } = stateManager;
 
-    /**
-     * Get the current active theme name.
-     * @returns {string} Current theme name
-     */
-    const getCurrentTheme = () => CONFIG.THEMES[CONFIG.currentTheme];
-
-    // Helper functions for embedded themes
-    /**
-     * Get list of available theme names.
-     * @returns {Array<string>} Array of theme names
-     */
-    const getAvailableThemes = () => Object.keys(EMBEDDED_THEMES);
-
-    /**
-     * Get the current active theme name.
-     * @returns {string} Current theme name
-     */
-    const getCurrentThemeName = () => CONFIG.currentTheme;
-
-    /**
-     * Switch to a different theme by name.
-     * @param {string} themeName - The name of the theme to switch to
-     */
-    const switchTheme = themeName => {
-        if (CONFIG.THEMES[themeName]) {
-            CONFIG.currentTheme = themeName;
-            saveThemePreference();
-
-            // APPLY THEME VARS/CLASS (new)
-            applyTheme();
-
-            // Recreate UI (kept for now)
-            createUI();
-        }
-    };
-
-    /**
-     * Apply the current theme to the document by setting CSS classes and variables.
-     * Updates the document element classes and injects theme-specific CSS.
-     */
-    function applyTheme() {
-        const theme = getCurrentTheme();
-        // Toggle theme class on documentElement so CSS vars cascade to our UI
-        document.documentElement.classList.remove(
-            'wplace-theme-classic',
-            'wplace-theme-classic-light',
-            'wplace-theme-neon'
-        );
-
-        // Map CONFIG theme names to CSS class names
-        const themeClassMapping = {
-            'Classic Autobot': 'wplace-theme-classic',
-            'Classic Light': 'wplace-theme-classic-light',
-            'Neon Retro': 'wplace-theme-neon',
-        };
-
-        const themeClass =
-            themeClassMapping[CONFIG.currentTheme] || 'wplace-theme-classic';
-
-        document.documentElement.classList.add(themeClass);
-
-        // Inject embedded theme CSS
-        const existingThemeStyle = document.getElementById('wplace-theme-css');
-        if (existingThemeStyle) {
-            existingThemeStyle.remove();
-        }
-
-        // Inject new theme CSS from embedded themes
-        const themeName = getCurrentThemeName();
-        // Map CONFIG theme names to embedded theme file names
-        const themeFileMapping = {
-            'Classic Autobot': 'classic',
-            'Classic Light': 'classic-light',
-            'Neon Retro': 'neon',
-        };
-
-        const themeFileName = themeFileMapping[themeName] || 'classic';
-        if (EMBEDDED_THEMES[themeFileName]) {
-            const style = document.createElement('style');
-            style.id = 'wplace-theme-css';
-            style.textContent = EMBEDDED_THEMES[themeFileName];
-            document.head.appendChild(style);
-        }
-
-        // Also set CSS variables explicitly in case you want runtime overrides
-        const root = document.documentElement;
-        const setVar = (k, v) => {
-            try {
-                root.style.setProperty(k, v);
-            } catch {}
-        };
-
-        setVar('--wplace-primary', theme.primary);
-        setVar('--wplace-secondary', theme.secondary);
-        setVar('--wplace-accent', theme.accent);
-        setVar('--wplace-text', theme.text);
-        setVar('--wplace-highlight', theme.highlight);
-        setVar('--wplace-success', theme.success);
-        setVar('--wplace-error', theme.error);
-        setVar('--wplace-warning', theme.warning);
-
-        // Typography + look
-        setVar(
-            '--wplace-font',
-            theme.fontFamily || "'Segoe UI', Roboto, sans-serif"
-        );
-        setVar('--wplace-radius', '' + (theme.borderRadius || '12px'));
-        setVar('--wplace-border-style', '' + (theme.borderStyle || 'solid'));
-        setVar('--wplace-border-width', '' + (theme.borderWidth || '1px'));
-        setVar(
-            '--wplace-backdrop',
-            '' + (theme.backdropFilter || 'blur(10px)')
-        );
-        setVar('--wplace-border-color', 'rgba(255,255,255,0.1)');
-    }
-
-    /**
-     * Save the current theme preference to localStorage.
-     */
-    const saveThemePreference = () => {
-        try {
-            localStorage.setItem('wplace-theme', CONFIG.currentTheme);
-        } catch (e) {
-            console.warn('Could not save theme preference:', e);
-        }
-    };
-
-    /**
-     * Load the saved theme preference from localStorage.
-     */
-    const loadThemePreference = () => {
-        try {
-            const saved = localStorage.getItem('wplace-theme');
-            if (saved && CONFIG.THEMES[saved]) {
-                CONFIG.currentTheme = saved;
-            }
-        } catch (e) {
-            console.warn('Could not load theme preference:', e);
-        }
-    };
-
-    // Simple translation cache
-    const translationCache = new Map();
-
-    // Dynamically loaded translations
-    let loadedTranslations = {};
-
-    // Available languages
-    const AVAILABLE_LANGUAGES = [
-        'en',
-        'ru',
-        'pt',
-        'vi',
-        'fr',
-        'id',
-        'tr',
-        'zh-CN',
-        'zh-TW',
-        'ja',
-        'ko',
-        'uk',
-    ];
-
-    /**
-     * Load translations for a specific language from embedded assets.
-     * @param {string} language - The language code to load (e.g., 'en', 'ru', 'pt')
-     * @param {number} [retryCount=0] - Current retry attempt count
-     * @returns {Promise<Object|null>} The loaded translations object or null if failed
-     */
-    const loadTranslations = async (language, retryCount = 0) => {
-        if (loadedTranslations[language]) {
-            return loadedTranslations[language];
-        }
-
-        // Load translations from embedded assets
-        if (EMBEDDED_LANGUAGES[language]) {
-            const translations = EMBEDDED_LANGUAGES[language];
-
-            // Validate that translations is an object with keys
-            if (
-                typeof translations === 'object' &&
-                translations !== null &&
-                Object.keys(translations).length > 0
-            ) {
-                loadedTranslations[language] = translations;
-                console.log(
-                    `📚 Loaded ${language} translations successfully from embedded assets (${
-                        Object.keys(translations).length
-                    } keys)`
-                );
-                return translations;
-            } else {
-                console.warn(`❌ Invalid translation format for ${language}`);
-            }
-        } else {
-            console.warn(
-                `❌ Language ${language} not found in embedded assets`
-            );
-        }
-
-        return null;
-    };
-
-    /**
-     * Load and set the user's language preference.
-     * Checks saved preference, browser locale, and falls back to English.
-     * @returns {Promise<void>}
-     */
-    const loadLanguagePreference = async () => {
-        const savedLanguage = localStorage.getItem('wplace_language');
-        const browserLocale = navigator.language;
-        const browserLanguage = browserLocale.split('-')[0];
-
-        let selectedLanguage = 'en'; // Default fallback
-
-        try {
-            // Check if we have the saved language available
-            if (savedLanguage && AVAILABLE_LANGUAGES.includes(savedLanguage)) {
-                selectedLanguage = savedLanguage;
-                console.log(
-                    `🔄 Using saved language preference: ${selectedLanguage}`
-                );
-            }
-            // Try full locale match (e.g. "zh-CN", "zh-TW" etc)
-            else if (AVAILABLE_LANGUAGES.includes(browserLocale)) {
-                selectedLanguage = browserLocale;
-                localStorage.setItem('wplace_language', browserLocale);
-                console.log(`🔄 Using browser locale: ${selectedLanguage}`);
-            }
-            // Try base language match (e.g. "en" for "en-US" or "en-GB" etc)
-            else if (AVAILABLE_LANGUAGES.includes(browserLanguage)) {
-                selectedLanguage = browserLanguage;
-                localStorage.setItem('wplace_language', browserLanguage);
-                console.log(`🔄 Using browser language: ${selectedLanguage}`);
-            }
-            // Use English as fallback
-            else {
-                console.log(
-                    `🔄 No matching language found, using English fallback`
-                );
-            }
-
-            // Set the language in state first
-            state.language = selectedLanguage;
-
-            // Only load translations if not already loaded and not English (which should already be loaded)
-            if (
-                selectedLanguage !== 'en' &&
-                !loadedTranslations[selectedLanguage]
-            ) {
-                const loaded = await loadTranslations(selectedLanguage);
-                if (!loaded) {
-                    console.warn(
-                        `⚠️ Failed to load ${selectedLanguage} translations, falling back to English`
-                    );
-                    state.language = 'en';
-                    localStorage.setItem('wplace_language', 'en');
-                }
-            }
-        } catch (error) {
-            console.error(`❌ Error in loadLanguagePreference:`, error);
-            state.language = 'en'; // Always ensure we have a valid language
-        }
-    };
-
-    // Simple user notification function for critical issues
-    const showTranslationWarning = message => {
-        try {
-            // Create a simple temporary notification banner
-            const warning = document.createElement('div');
-            warning.className = 'wplace-warning-banner';
-            warning.textContent = message;
-            document.body.appendChild(warning);
-
-            // Auto-remove after 8 seconds
-            setTimeout(() => {
-                if (warning.parentNode) {
-                    warning.remove();
-                }
-            }, 8000);
-        } catch (e) {
-            // If DOM manipulation fails, just log
-            console.warn('Failed to show translation warning UI:', e);
-        }
-    };
-
-    /**
-     * Initialize the translation system by loading English fallback and user preference.
-     * @returns {Promise<void>}
-     */
-    const initializeTranslations = async () => {
-        try {
-            console.log('🌐 Initializing translation system...');
-
-            // Always ensure English is loaded as fallback first
-            if (!loadedTranslations['en']) {
-                const englishLoaded = await loadTranslations('en');
-                if (!englishLoaded) {
-                    console.warn(
-                        '⚠️ Failed to load English translations from CDN, using fallback'
-                    );
-                    showTranslationWarning(
-                        '⚠️ Translation loading failed, using basic fallbacks'
-                    );
-                }
-            }
-
-            // Then load user's language preference
-            await loadLanguagePreference();
-
-            console.log(
-                `✅ Translation system initialized. Active language: ${state.language}`
-            );
-        } catch (error) {
-            console.error('❌ Translation initialization failed:', error);
-            // Ensure state has a valid language even if loading fails
-            if (!state.language) {
-                state.language = 'en';
-            }
-            console.warn(
-                '⚠️ Using fallback translations due to initialization failure'
-            );
-            showTranslationWarning(
-                '⚠️ Translation system error, using basic English'
-            );
-        }
-    };
-
-    // Emergency fallback TEXT (minimal)
-    const FALLBACK_TEXT = {
-        en: {
-            title: 'WPlace Auto-Image',
-            toggleOverlay: 'Toggle Overlay',
-            scanColors: 'Scan Colors',
-            uploadImage: 'Upload Image',
-            resizeImage: 'Resize Image',
-            selectPosition: 'Select Position',
-            startPainting: 'Start Painting',
-            stopPainting: 'Stop Painting',
-            progress: 'Progress',
-            pixels: 'Pixels',
-            charges: 'Charges',
-            batchSize: 'Batch Size',
-            initMessage: "Click 'Upload Image' to begin",
-        },
-    };
-
-    /**
-     * Get translated text for a given key with fallback support.
-     * Falls back through: current language → English → hardcoded fallback → key itself.
-     * @param {string} key - The translation key to look up
-     * @param {Object} [replacements={}] - Object with placeholder replacements like {count: 5}
-     * @returns {string} The translated text or the key if no translation found
-     */
-    const getText = (key, replacements = {}) => {
-        // Try current language first
-        let text = loadedTranslations[state.language]?.[key];
-
-        // Fallback to English translations
-        if (!text && state.language !== 'en') {
-            text = loadedTranslations['en']?.[key];
-        }
-
-        // Fallback to hardcoded English
-        if (!text) {
-            text = FALLBACK_TEXT['en']?.[key];
-        }
-
-        // Last resort - return the key itself
-        if (!text) {
-            console.warn(`⚠️ Missing translation for key: ${key}`);
-            return key;
-        }
-
-        // Handle string replacements like {count}, {time}, etc.
-        return Object.entries(replacements).reduce(
-            (result, [placeholder, value]) => {
-                return result.replace(
-                    new RegExp(`\\{${placeholder}\\}`, 'g'),
-                    value
-                );
-            },
-            text
-        );
-    };
-
-    // GLOBAL STATE
-    const state = {
-        running: false,
-        imageLoaded: false,
-        processing: false,
-        totalPixels: 0,
-        paintedPixels: 0,
-        availableColors: [],
-        activeColorPalette: [], // User-selected colors for conversion
-        paintWhitePixels: true, // Default to ON
-        fullChargeData: null,
-        fullChargeInterval: null,
-        paintTransparentPixels: false, // Default to OFF
-        displayCharges: 0,
-        preciseCurrentCharges: 0,
-        maxCharges: 1, // Default max charges
-        cooldown: CONFIG.COOLDOWN_DEFAULT,
-        imageData: null,
-        stopFlag: false,
-        colorsChecked: false,
-        startPosition: null,
-        selectingPosition: false,
-        region: null,
-        minimized: false,
-        lastPosition: { x: 0, y: 0 },
-        estimatedTime: 0,
-        language: 'en',
-        paintingSpeed: CONFIG.PAINTING_SPEED.DEFAULT, // pixels batch size
-        batchMode: CONFIG.BATCH_MODE, // "normal" or "random"
-        randomBatchMin: CONFIG.RANDOM_BATCH_RANGE.MIN, // Random range minimum
-        randomBatchMax: CONFIG.RANDOM_BATCH_RANGE.MAX, // Random range maximum
-        cooldownChargeThreshold: CONFIG.COOLDOWN_CHARGE_THRESHOLD,
-        chargesThresholdInterval: null,
-        tokenSource: CONFIG.TOKEN_SOURCE, // "generator" or "manual"
-        initialSetupComplete: false, // Track if initial startup setup is complete (only happens once)
-        overlayOpacity: CONFIG.OVERLAY.OPACITY_DEFAULT,
-        blueMarbleEnabled: CONFIG.OVERLAY.BLUE_MARBLE_DEFAULT,
-        ditheringEnabled: true,
-        // Advanced color matching settings
-        colorMatchingAlgorithm: 'lab',
-        enableChromaPenalty: true,
-        chromaPenaltyWeight: 0.15,
-        customTransparencyThreshold: CONFIG.TRANSPARENCY_THRESHOLD,
-        customWhiteThreshold: CONFIG.WHITE_THRESHOLD,
-        resizeSettings: null,
-        originalImage: null,
-        resizeIgnoreMask: null,
-        paintUnavailablePixels: CONFIG.PAINT_UNAVAILABLE,
-        // Coordinate generation settings
-        coordinateMode: CONFIG.COORDINATE_MODE,
-        coordinateDirection: CONFIG.COORDINATE_DIRECTION,
-        coordinateSnake: CONFIG.COORDINATE_SNAKE,
-        blockWidth: CONFIG.COORDINATE_BLOCK_WIDTH,
-        blockHeight: CONFIG.COORDINATE_BLOCK_HEIGHT,
-        notificationsEnabled: CONFIG.NOTIFICATIONS.ENABLED,
-        notifyOnChargesReached: CONFIG.NOTIFICATIONS.ON_CHARGES_REACHED,
-        notifyOnlyWhenUnfocused: CONFIG.NOTIFICATIONS.ONLY_WHEN_UNFOCUSED,
-        notificationIntervalMinutes: CONFIG.NOTIFICATIONS.REPEAT_MINUTES,
-        _lastChargesNotifyAt: 0,
-        _lastChargesBelow: true,
-        // Smart save tracking
-        _lastSavePixelCount: 0,
-        _lastSaveTime: 0,
-        _saveInProgress: false,
-        paintedMap: null,
-    };
+    // Set initial config values
+    state.cooldown = CONFIG.COOLDOWN_DEFAULT;
+    state.paintingSpeed = CONFIG.PAINTING_SPEED.DEFAULT;
+    state.batchMode = CONFIG.BATCH_MODE;
+    state.randomBatchMin = CONFIG.RANDOM_BATCH_RANGE.MIN;
+    state.randomBatchMax = CONFIG.RANDOM_BATCH_RANGE.MAX;
+    state.cooldownChargeThreshold = CONFIG.COOLDOWN_CHARGE_THRESHOLD;
+    state.tokenSource = CONFIG.TOKEN_SOURCE;
+    state.overlayOpacity = CONFIG.OVERLAY.OPACITY_DEFAULT;
+    state.blueMarbleEnabled = CONFIG.OVERLAY.BLUE_MARBLE_DEFAULT;
+    state.customTransparencyThreshold = CONFIG.TRANSPARENCY_THRESHOLD;
+    state.customWhiteThreshold = CONFIG.WHITE_THRESHOLD;
+    state.paintUnavailablePixels = CONFIG.PAINT_UNAVAILABLE;
+    state.coordinateMode = CONFIG.COORDINATE_MODE;
+    state.coordinateDirection = CONFIG.COORDINATE_DIRECTION;
+    state.coordinateSnake = CONFIG.COORDINATE_SNAKE;
+    state.blockWidth = CONFIG.COORDINATE_BLOCK_WIDTH;
+    state.blockHeight = CONFIG.COORDINATE_BLOCK_HEIGHT;
+    state.notificationsEnabled = CONFIG.NOTIFICATIONS.ENABLED;
+    state.notifyOnChargesReached = CONFIG.NOTIFICATIONS.ON_CHARGES_REACHED;
+    state.notifyOnlyWhenUnfocused = CONFIG.NOTIFICATIONS.ONLY_WHEN_UNFOCUSED;
+    state.notificationIntervalMinutes = CONFIG.NOTIFICATIONS.REPEAT_MINUTES;
 
     let _updateResizePreview = () => {};
     let _resizeDialogCleanup = null;
 
-    // --- OVERLAY UPDATE: Optimized OverlayManager class with performance improvements ---
-    class OverlayManager {
-        constructor() {
-            this.isEnabled = false;
-            this.startCoords = null; // { region: {x, y}, pixel: {x, y} }
-            this.imageBitmap = null;
-            this.chunkedTiles = new Map(); // Map<"tileX,tileY", ImageBitmap>
-            this.originalTiles = new Map(); // Map<"tileX,tileY", ImageBitmap> store latest original tile bitmaps
-            this.originalTilesData = new Map(); // Map<"tileX,tileY", {w,h,data:Uint8ClampedArray}> cache full ImageData for fast pixel reads
-            this.tileSize = 1000;
-            this.processPromise = null; // Track ongoing processing
-            this.lastProcessedHash = null; // Cache invalidation
-            this.workerPool = null; // Web worker pool for heavy processing
-        }
+    // OverlayManager will be instantiated after Utils is defined
 
-        toggle() {
-            this.isEnabled = !this.isEnabled;
-            console.log(`Overlay ${this.isEnabled ? 'enabled' : 'disabled'}.`);
-            return this.isEnabled;
-        }
+    // Initialize Token Manager
+    let tokenManager; // Will be initialized after Utils is created
 
-        enable() {
-            this.isEnabled = true;
-        }
-
-        disable() {
-            this.isEnabled = false;
-        }
-
-        clear() {
-            this.disable();
-            this.imageBitmap = null;
-            this.chunkedTiles.clear();
-            this.originalTiles.clear();
-            this.originalTilesData.clear();
-            this.lastProcessedHash = null;
-            if (this.processPromise) {
-                this.processPromise = null;
-            }
-        }
-
-        async setImage(imageBitmap) {
-            this.imageBitmap = imageBitmap;
-            this.lastProcessedHash = null; // Invalidate cache
-            if (this.imageBitmap && this.startCoords) {
-                await this.processImageIntoChunks();
-            }
-        }
-
-        async setPosition(startPosition, region) {
-            if (!startPosition || !region) {
-                this.startCoords = null;
-                this.chunkedTiles.clear();
-                this.lastProcessedHash = null;
-                return;
-            }
-            this.startCoords = { region, pixel: startPosition };
-            this.lastProcessedHash = null; // Invalidate cache
-            if (this.imageBitmap) {
-                await this.processImageIntoChunks();
-            }
-        }
-
-        // Generate hash for cache invalidation
-        _generateProcessHash() {
-            if (!this.imageBitmap || !this.startCoords) return null;
-            const { width, height } = this.imageBitmap;
-            const { x: px, y: py } = this.startCoords.pixel;
-            const { x: rx, y: ry } = this.startCoords.region;
-            return `${width}x${height}_${px},${py}_${rx},${ry}_${state.blueMarbleEnabled}_${state.overlayOpacity}`;
-        }
-
-        // --- OVERLAY UPDATE: Optimized chunking with caching and batch processing ---
-        async processImageIntoChunks() {
-            if (!this.imageBitmap || !this.startCoords) return;
-
-            // Check if we're already processing to avoid duplicate work
-            if (this.processPromise) {
-                return this.processPromise;
-            }
-
-            // Check cache validity
-            const currentHash = this._generateProcessHash();
-            if (
-                this.lastProcessedHash === currentHash &&
-                this.chunkedTiles.size > 0
-            ) {
-                console.log(
-                    `📦 Using cached overlay chunks (${this.chunkedTiles.size} tiles)`
-                );
-                return;
-            }
-
-            // Start processing
-            this.processPromise = this._doProcessImageIntoChunks();
-            try {
-                await this.processPromise;
-                this.lastProcessedHash = currentHash;
-            } finally {
-                this.processPromise = null;
-            }
-        }
-
-        async _doProcessImageIntoChunks() {
-            const startTime = performance.now();
-            this.chunkedTiles.clear();
-
-            const { width: imageWidth, height: imageHeight } = this.imageBitmap;
-            const { x: startPixelX, y: startPixelY } = this.startCoords.pixel;
-            const { x: startRegionX, y: startRegionY } =
-                this.startCoords.region;
-
-            const { startTileX, startTileY, endTileX, endTileY } =
-                Utils.calculateTileRange(
-                    startRegionX,
-                    startRegionY,
-                    startPixelX,
-                    startPixelY,
-                    imageWidth,
-                    imageHeight,
-                    this.tileSize
-                );
-
-            const totalTiles =
-                (endTileX - startTileX + 1) * (endTileY - startTileY + 1);
-            console.log(`🔄 Processing ${totalTiles} overlay tiles...`);
-
-            // Process tiles in batches to avoid blocking the main thread
-            const batchSize = 4; // Process 4 tiles at a time
-            const tilesToProcess = [];
-
-            for (let ty = startTileY; ty <= endTileY; ty++) {
-                for (let tx = startTileX; tx <= endTileX; tx++) {
-                    tilesToProcess.push({ tx, ty });
-                }
-            }
-
-            // Process tiles in batches with yielding
-            for (let i = 0; i < tilesToProcess.length; i += batchSize) {
-                const batch = tilesToProcess.slice(i, i + batchSize);
-
-                await Promise.all(
-                    batch.map(async ({ tx, ty }) => {
-                        const tileKey = `${tx},${ty}`;
-                        const chunkBitmap = await this._processTile(
-                            tx,
-                            ty,
-                            imageWidth,
-                            imageHeight,
-                            startPixelX,
-                            startPixelY,
-                            startRegionX,
-                            startRegionY
-                        );
-                        if (chunkBitmap) {
-                            this.chunkedTiles.set(tileKey, chunkBitmap);
-                        }
-                    })
-                );
-
-                // Yield control to prevent blocking
-                if (i + batchSize < tilesToProcess.length) {
-                    await new Promise(resolve => setTimeout(resolve, 0));
-                }
-            }
-
-            const processingTime = performance.now() - startTime;
-            console.log(
-                `✅ Overlay processed ${this.chunkedTiles.size} tiles in ${Math.round(processingTime)}ms`
-            );
-        }
-
-        async _processTile(
-            tx,
-            ty,
-            imageWidth,
-            imageHeight,
-            startPixelX,
-            startPixelY,
-            startRegionX,
-            startRegionY
-        ) {
-            const tileKey = `${tx},${ty}`;
-
-            // Calculate the portion of the image that overlaps with this tile
-            const imgStartX = (tx - startRegionX) * this.tileSize - startPixelX;
-            const imgStartY = (ty - startRegionY) * this.tileSize - startPixelY;
-
-            // Crop coordinates within the source image
-            const sX = Math.max(0, imgStartX);
-            const sY = Math.max(0, imgStartY);
-            const sW = Math.min(
-                imageWidth - sX,
-                this.tileSize - (sX - imgStartX)
-            );
-            const sH = Math.min(
-                imageHeight - sY,
-                this.tileSize - (sY - imgStartY)
-            );
-
-            if (sW <= 0 || sH <= 0) return null;
-
-            // Destination coordinates on the new chunk canvas
-            const dX = Math.max(0, -imgStartX);
-            const dY = Math.max(0, -imgStartY);
-
-            const chunkCanvas = new OffscreenCanvas(
-                this.tileSize,
-                this.tileSize
-            );
-            const chunkCtx = chunkCanvas.getContext('2d');
-            chunkCtx.imageSmoothingEnabled = false;
-
-            chunkCtx.drawImage(
-                this.imageBitmap,
-                sX,
-                sY,
-                sW,
-                sH,
-                dX,
-                dY,
-                sW,
-                sH
-            );
-
-            // --- OPTIMIZED: Blue marble effect with faster pixel manipulation ---
-            if (state.blueMarbleEnabled) {
-                const imageData = chunkCtx.getImageData(dX, dY, sW, sH);
-                const data = imageData.data;
-
-                // Faster pixel manipulation using typed arrays
-                for (let i = 0; i < data.length; i += 4) {
-                    const pixelIndex = i / 4;
-                    const pixelY = Math.floor(pixelIndex / sW);
-                    const pixelX = pixelIndex % sW;
-
-                    if ((pixelX + pixelY) % 2 === 0 && data[i + 3] > 0) {
-                        data[i + 3] = 0; // Set alpha to 0
-                    }
-                }
-
-                chunkCtx.putImageData(imageData, dX, dY);
-            }
-
-            return await chunkCanvas.transferToImageBitmap();
-        }
-
-        // --- OVERLAY UPDATE: Optimized compositing with caching ---
-        async processAndRespondToTileRequest(eventData) {
-            const { endpoint, blobID, blobData } = eventData;
-
-            let finalBlob = blobData;
-
-            if (this.isEnabled && this.chunkedTiles.size > 0) {
-                const tileMatch = endpoint.match(/(\d+)\/(\d+)\.png/);
-                if (tileMatch) {
-                    const tileX = parseInt(tileMatch[1], 10);
-                    const tileY = parseInt(tileMatch[2], 10);
-                    const tileKey = `${tileX},${tileY}`;
-
-                    const chunkBitmap = this.chunkedTiles.get(tileKey);
-                    // Also store the original tile bitmap for later pixel color checks
-                    try {
-                        const originalBitmap =
-                            await createImageBitmap(blobData);
-                        this.originalTiles.set(tileKey, originalBitmap);
-                        // Cache full ImageData for fast pixel access (avoid repeated drawImage/getImageData)
-                        try {
-                            let canvas, ctx;
-                            if (typeof OffscreenCanvas !== 'undefined') {
-                                canvas = new OffscreenCanvas(
-                                    originalBitmap.width,
-                                    originalBitmap.height
-                                );
-                                ctx = canvas.getContext('2d');
-                            } else {
-                                canvas = document.createElement('canvas');
-                                canvas.width = originalBitmap.width;
-                                canvas.height = originalBitmap.height;
-                                ctx = canvas.getContext('2d');
-                            }
-                            ctx.imageSmoothingEnabled = false;
-                            ctx.drawImage(originalBitmap, 0, 0);
-                            const imgData = ctx.getImageData(
-                                0,
-                                0,
-                                originalBitmap.width,
-                                originalBitmap.height
-                            );
-                            // Store typed array copy to avoid retaining large canvas
-                            this.originalTilesData.set(tileKey, {
-                                w: originalBitmap.width,
-                                h: originalBitmap.height,
-                                data: new Uint8ClampedArray(imgData.data),
-                            });
-                        } catch (e) {
-                            // If ImageData extraction fails, still keep the bitmap as fallback
-                            console.warn(
-                                'OverlayManager: could not cache ImageData for',
-                                tileKey,
-                                e
-                            );
-                        }
-                    } catch (e) {
-                        console.warn(
-                            'OverlayManager: could not create original bitmap for',
-                            tileKey,
-                            e
-                        );
-                    }
-                    if (chunkBitmap) {
-                        try {
-                            // Use faster compositing for better performance
-                            finalBlob = await this._compositeTileOptimized(
-                                blobData,
-                                chunkBitmap
-                            );
-                        } catch (e) {
-                            console.error('Error compositing overlay:', e);
-                            // Fallback to original tile on error
-                            finalBlob = blobData;
-                        }
-                    }
-                }
-            }
-
-            // Send the (possibly modified) blob back to the injected script
-            window.postMessage(
-                {
-                    source: 'auto-image-overlay',
-                    blobID: blobID,
-                    blobData: finalBlob,
-                },
-                '*'
-            );
-        }
-
-        // Returns [r,g,b,a] for a pixel inside a region tile (tileX, tileY are region coords)
-        async getTilePixelColor(tileX, tileY, pixelX, pixelY) {
-            const tileKey = `${tileX},${tileY}`;
-            const alphaThresh =
-                state.customTransparencyThreshold ||
-                CONFIG.TRANSPARENCY_THRESHOLD;
-
-            // 1. Prefer cached ImageData if available
-            const cached = this.originalTilesData.get(tileKey);
-            if (cached && cached.data && cached.w > 0 && cached.h > 0) {
-                const x = Math.max(0, Math.min(cached.w - 1, pixelX));
-                const y = Math.max(0, Math.min(cached.h - 1, pixelY));
-                const idx = (y * cached.w + x) * 4;
-                const d = cached.data;
-                const a = d[idx + 3];
-
-                if (!state.paintTransparentPixels && a < alphaThresh) {
-                    // Treat as transparent / unavailable
-                    // Lightweight debug: show when transparency causes skip (only if verbose enabled)
-                    if (window._overlayDebug)
-                        console.debug(
-                            'OverlayManager: pixel transparent (cached), skipping',
-                            tileKey,
-                            x,
-                            y,
-                            a
-                        );
-                    return null;
-                }
-                return [d[idx], d[idx + 1], d[idx + 2], a];
-            }
-
-            // 2. Fallback: use bitmap, with retry
-            const maxRetries = 3;
-            for (let attempt = 1; attempt <= maxRetries; attempt++) {
-                const bitmap = this.originalTiles.get(tileKey);
-                if (!bitmap) {
-                    if (attempt === maxRetries) {
-                        console.warn(
-                            'OverlayManager: no bitmap for',
-                            tileKey,
-                            'after',
-                            maxRetries,
-                            'attempts'
-                        );
-                    } else {
-                        await Utils.sleep(50 * attempt); // exponential delay
-                    }
-                    continue;
-                }
-
-                try {
-                    let canvas, ctx;
-                    if (typeof OffscreenCanvas !== 'undefined') {
-                        canvas = new OffscreenCanvas(
-                            bitmap.width,
-                            bitmap.height
-                        );
-                        ctx = canvas.getContext('2d');
-                    } else {
-                        canvas = document.createElement('canvas');
-                        canvas.width = bitmap.width;
-                        canvas.height = bitmap.height;
-                        ctx = canvas.getContext('2d');
-                    }
-                    ctx.imageSmoothingEnabled = false;
-                    ctx.drawImage(bitmap, 0, 0);
-
-                    const x = Math.max(0, Math.min(bitmap.width - 1, pixelX));
-                    const y = Math.max(0, Math.min(bitmap.height - 1, pixelY));
-                    const data = ctx.getImageData(x, y, 1, 1).data;
-                    const a = data[3];
-
-                    if (!state.paintTransparentPixels && a < alphaThresh) {
-                        if (window._overlayDebug)
-                            console.debug(
-                                'OverlayManager: pixel transparent (fallback)',
-                                tileKey,
-                                x,
-                                y,
-                                a
-                            );
-                        return null;
-                    }
-
-                    return [data[0], data[1], data[2], a];
-                } catch (e) {
-                    console.warn(
-                        'OverlayManager: failed to read pixel (attempt',
-                        attempt,
-                        ')',
-                        tileKey,
-                        e
-                    );
-                    if (attempt < maxRetries) {
-                        await Utils.sleep(50 * attempt);
-                    } else {
-                        console.error(
-                            'OverlayManager: failed to read pixel after',
-                            maxRetries,
-                            'attempts',
-                            tileKey
-                        );
-                    }
-                }
-            }
-
-            // 3. If everything fails — you can return null or [0,0,0,0]
-            // Prefer null — to avoid misleading
-            return null;
-        }
-
-        async _compositeTileOptimized(originalBlob, overlayBitmap) {
-            const originalBitmap = await createImageBitmap(originalBlob);
-            const canvas = new OffscreenCanvas(
-                originalBitmap.width,
-                originalBitmap.height
-            );
-            const ctx = canvas.getContext('2d');
-
-            // Disable antialiasing for pixel-perfect rendering
-            ctx.imageSmoothingEnabled = false;
-
-            // Draw original tile first
-            ctx.drawImage(originalBitmap, 0, 0);
-
-            // Set opacity and draw overlay with optimized blend mode
-            ctx.globalAlpha = state.overlayOpacity;
-            ctx.globalCompositeOperation = 'source-over';
-            ctx.drawImage(overlayBitmap, 0, 0);
-
-            // Use faster blob conversion with compression settings
-            return await canvas.convertToBlob({
-                type: 'image/png',
-                quality: 0.95, // Slight compression for faster processing
-            });
-        }
-
-        /**
-         * Wait until all required tiles are loaded and cached
-         * @param {number} startRegionX
-         * @param {number} startRegionY
-         * @param {number} pixelWidth
-         * @param {number} pixelHeight
-         * @param {number} startPixelX
-         * @param {number} startPixelY
-         * @param {number} timeoutMs
-         * @returns {Promise<boolean>} true if tiles are ready
-         */
-        async waitForTiles(
-            startRegionX,
-            startRegionY,
-            pixelWidth,
-            pixelHeight,
-            startPixelX = 0,
-            startPixelY = 0,
-            timeoutMs = 10000
-        ) {
-            const { startTileX, startTileY, endTileX, endTileY } =
-                Utils.calculateTileRange(
-                    startRegionX,
-                    startRegionY,
-                    startPixelX,
-                    startPixelY,
-                    pixelWidth,
-                    pixelHeight,
-                    this.tileSize
-                );
-
-            const requiredTiles = [];
-            for (let ty = startTileY; ty <= endTileY; ty++) {
-                for (let tx = startTileX; tx <= endTileX; tx++) {
-                    requiredTiles.push(`${tx},${ty}`);
-                }
-            }
-
-            if (requiredTiles.length === 0) return true;
-
-            const startTime = Date.now();
-
-            while (Date.now() - startTime < timeoutMs) {
-                if (state.stopFlag) {
-                    console.log('waitForTiles: stopped by user');
-                    return false;
-                }
-
-                const missing = requiredTiles.filter(
-                    key => !this.originalTiles.has(key)
-                );
-                if (missing.length === 0) {
-                    console.log(
-                        `✅ All ${requiredTiles.length} required tiles are loaded`
-                    );
-                    return true;
-                }
-
-                await Utils.sleep(100);
-            }
-
-            console.warn(`❌ Timeout waiting for tiles: ${requiredTiles.length} required, 
-        ${requiredTiles.filter(k => this.originalTiles.has(k)).length} loaded`);
-            return false;
-        }
-    }
-
-    const overlayManager = new OverlayManager();
-
-    // Optimized Turnstile token handling with improved caching and retry logic
-    let turnstileToken = null;
-    let tokenExpiryTime = 0;
-    let tokenGenerationInProgress = false;
-    let _resolveToken = null;
-    let tokenPromise = new Promise(resolve => {
-        _resolveToken = resolve;
-    });
-    let retryCount = 0;
-    const MAX_RETRIES = 10;
+    // Batch processing constants
     const MAX_BATCH_RETRIES = 10; // Maximum attempts for batch sending
-    const TOKEN_LIFETIME = 240000; // 4 minutes (tokens typically last 5 min, use 4 for safety)
-
-    /**
-     * Set a new Turnstile token and update expiry time.
-     * @param {string} token - The Turnstile token to set
-     */
-    function setTurnstileToken(token) {
-        if (_resolveToken) {
-            _resolveToken(token);
-            _resolveToken = null;
-        }
-        turnstileToken = token;
-        tokenExpiryTime = Date.now() + TOKEN_LIFETIME;
-        console.log('✅ Turnstile token set successfully');
-    }
-
-    /**
-     * Check if the current Turnstile token is valid and not expired.
-     * @returns {boolean} True if token exists and hasn't expired
-     */
-    function isTokenValid() {
-        return turnstileToken && Date.now() < tokenExpiryTime;
-    }
-
-    /**
-     * Invalidate the current Turnstile token by clearing it and expiry time.
-     */
-    function invalidateToken() {
-        turnstileToken = null;
-        tokenExpiryTime = 0;
-        console.log('🗑️ Token invalidated, will force fresh generation');
-    }
-
-    /**
-     * Ensure a valid Turnstile token is available, generating one if needed.
-     * @param {boolean} [forceRefresh=false] - Force generation of a new token even if current is valid
-     * @returns {Promise<string|null>} The valid token or null if generation failed
-     */
-    async function ensureToken(forceRefresh = false) {
-        // Return cached token if still valid and not forcing refresh
-        if (isTokenValid() && !forceRefresh) {
-            return turnstileToken;
-        }
-
-        // Invalidate token if forcing refresh
-        if (forceRefresh) invalidateToken();
-
-        // Avoid multiple simultaneous token generations
-        if (tokenGenerationInProgress) {
-            console.log('🔄 Token generation already in progress, waiting...');
-            await Utils.sleep(2000);
-            return isTokenValid() ? turnstileToken : null;
-        }
-
-        tokenGenerationInProgress = true;
-
-        try {
-            console.log('🔄 Token expired or missing, generating new one...');
-            const token = await handleCaptchaWithRetry();
-            if (token && token.length > 20) {
-                setTurnstileToken(token);
-                console.log('✅ Token captured and cached successfully');
-                return token;
-            }
-
-            console.log(
-                '⚠️ Invisible Turnstile failed, forcing browser automation...'
-            );
-            const fallbackToken = await handleCaptchaFallback();
-            if (fallbackToken && fallbackToken.length > 20) {
-                setTurnstileToken(fallbackToken);
-                console.log('✅ Fallback token captured successfully');
-                return fallbackToken;
-            }
-
-            console.log('❌ All token generation methods failed');
-            return null;
-        } finally {
-            tokenGenerationInProgress = false;
-        }
-    }
-
-    /**
-     * Handle Turnstile CAPTCHA generation with retry logic.
-     * Attempts to obtain sitekey and generate token using invisible method.
-     * @returns {Promise<string|null>} The generated token or null if failed
-     */
-    async function handleCaptchaWithRetry() {
-        const startTime = performance.now();
-
-        try {
-            const { sitekey, token: preGeneratedToken } =
-                await Utils.obtainSitekeyAndToken();
-
-            if (!sitekey) {
-                throw new Error('No valid sitekey found');
-            }
-
-            console.log('🔑 Using sitekey:', sitekey);
-
-            if (typeof window !== 'undefined' && window.navigator) {
-                console.log(
-                    '🧭 UA:',
-                    window.navigator.userAgent.substring(0, 50) + '...',
-                    'Platform:',
-                    window.navigator.platform
-                );
-            }
-
-            let token = null;
-
-            if (
-                preGeneratedToken &&
-                typeof preGeneratedToken === 'string' &&
-                preGeneratedToken.length > 20
-            ) {
-                console.log('♻️ Reusing pre-generated Turnstile token');
-                token = preGeneratedToken;
-            } else {
-                if (isTokenValid()) {
-                    console.log(
-                        '♻️ Using existing cached token (from previous session)'
-                    );
-                    token = turnstileToken;
-                } else {
-                    console.log(
-                        '🔐 Generating new token with executeTurnstile...'
-                    );
-                    token = await Utils.executeTurnstile(sitekey, 'paint');
-                    if (token) setTurnstileToken(token);
-                }
-            }
-
-            if (token && typeof token === 'string' && token.length > 20) {
-                const elapsed = Math.round(performance.now() - startTime);
-                console.log(
-                    `✅ Turnstile token generated successfully in ${elapsed}ms`
-                );
-                return token;
-            } else {
-                throw new Error(
-                    `Invalid or empty token received - Length: ${token?.length || 0}`
-                );
-            }
-        } catch (error) {
-            const elapsed = Math.round(performance.now() - startTime);
-            console.error(
-                `❌ Turnstile token generation failed after ${elapsed}ms:`,
-                error
-            );
-            throw error;
-        }
-    }
-
-    /**
-     * Fallback method for CAPTCHA token generation when primary method fails.
-     * @returns {Promise<string|null>} The fallback token or null if not implemented
-     */
-    async function handleCaptchaFallback() {
-        // Implementation for fallback token generation would go here
-        // This is a placeholder for browser automation fallback
-        console.log('🔄 Attempting fallback token generation...');
-        return null;
-    }
 
     /**
      * Inject and execute a JavaScript function in the page context.
@@ -1508,28 +149,6 @@ import {
         };
     });
 
-    window.addEventListener('message', event => {
-        const { source, endpoint, blobID, blobData, token } = event.data;
-
-        if (source === 'auto-image-tile' && endpoint && blobID && blobData) {
-            overlayManager.processAndRespondToTileRequest(event.data);
-        }
-
-        if (source === 'turnstile-capture' && token) {
-            setTurnstileToken(token);
-            if (
-                document
-                    .querySelector('#statusText')
-                    ?.textContent.includes('CAPTCHA')
-            ) {
-                Utils.showAlert(Utils.t('tokenCapturedSuccess'), 'success');
-                updateUI('colorsFound', 'success', {
-                    count: state.availableColors.length,
-                });
-            }
-        }
-    });
-
     /**
      * Detect the user's language from the backend API or browser settings.
      * @returns {Promise<void>}
@@ -1546,1740 +165,116 @@ import {
         }
     }
 
-    // UTILITY FUNCTIONS
-    const Utils = {
-        sleep: ms => new Promise(r => setTimeout(r, ms)),
+    // Initialize color cache
+    const colorCache = new Map();
 
-        dynamicSleep: async function (tickAndGetRemainingMs) {
-            let remaining = Math.max(0, await tickAndGetRemainingMs());
-            while (remaining > 0) {
-                const interval =
-                    remaining > 5000 ? 2000 : remaining > 1000 ? 500 : 100;
-                await this.sleep(Math.min(interval, remaining));
-                remaining = Math.max(0, await tickAndGetRemainingMs());
-            }
-        },
+    // Create Utils object with all dependencies
+    const Utils = createAutoImageUtils(
+        state,
+        CONFIG,
+        colorCache,
+        () => tokenManager?.isTokenValid() || false,
+        () => tokenManager?.getToken() || null,
+        token => tokenManager?.setTurnstileToken(token),
+        null
+    );
 
-        waitForSelector: async (selector, interval = 200, timeout = 5000) => {
-            const start = Date.now();
-            while (Date.now() - start < timeout) {
-                const el = document.querySelector(selector);
-                if (el) return el;
-                await Utils.sleep(interval);
-            }
-            return null;
-        },
+    // Initialize TokenManager after Utils is defined
+    tokenManager = new TokenManager(Utils);
 
-        msToTimeText(ms) {
-            const totalSeconds = Math.ceil(ms / 1000);
-            const hours = Math.floor(totalSeconds / 3600);
-            const minutes = Math.floor((totalSeconds % 3600) / 60);
-            const seconds = totalSeconds % 60;
+    // Initialize Security Systems (fingerprint & pawtect protection)
+    console.log('🛡️ Initializing security systems...');
+    const security = await initializeSecurity();
+    console.log('✅ Security systems ready');
 
-            if (hours > 0) return `${hours}h ${minutes}m ${seconds}s`;
-            if (minutes > 0) return `${minutes}m ${seconds}s`;
-            return `${seconds}s`;
-        },
+    // Initialize OverlayManager after Utils is defined
+    const overlayManager = new OverlayManager(state, CONFIG, Utils);
 
-        /**
-         * Calculate the range of tile coordinates (in region space) that cover a given image area.
-         * @param {number} startRegionX - Base region X
-         * @param {number} startRegionY - Base region Y
-         * @param {number} startPixelX - Starting pixel X within the region grid
-         * @param {number} startPixelY - Starting pixel Y within the region grid
-         * @param {number} width - Image width in pixels
-         * @param {number} height - Image height in pixels
-         * @param {number} tileSize - Size of a tile (default 1000)
-         * @returns {{ startTileX: number, startTileY: number, endTileX: number, endTileY: number }}
-         */
-        calculateTileRange(
-            startRegionX,
-            startRegionY,
-            startPixelX,
-            startPixelY,
-            width,
-            height,
-            tileSize = 1000
-        ) {
-            const endPixelX = startPixelX + width;
-            const endPixelY = startPixelY + height;
+    // Set overlayManager reference in Utils
+    Utils.overlayManager = overlayManager;
 
-            return {
-                startTileX: startRegionX + Math.floor(startPixelX / tileSize),
-                startTileY: startRegionY + Math.floor(startPixelY / tileSize),
-                endTileX: startRegionX + Math.floor((endPixelX - 1) / tileSize),
-                endTileY: startRegionY + Math.floor((endPixelY - 1) / tileSize),
-            };
-        }, // Turnstile Generator Integration - Optimized with widget reuse and proper cleanup
-        turnstileLoaded: false,
-        _turnstileContainer: null,
-        _turnstileOverlay: null,
-        _turnstileWidgetId: null,
-        _lastSitekey: null,
+    // Set up message event listener for turnstile token capture (after tokenManager is initialized)
+    window.addEventListener('message', event => {
+        const { source, endpoint, blobID, blobData, token } = event.data;
 
-        async loadTurnstile() {
-            // If Turnstile is already present, just resolve.
-            if (window.turnstile) {
-                this.turnstileLoaded = true;
-                return Promise.resolve();
-            }
+        if (source === 'auto-image-tile' && endpoint && blobID && blobData) {
+            overlayManager.processAndRespondToTileRequest(event.data);
+        }
 
-            return new Promise((resolve, reject) => {
-                // Avoid adding the script twice
-                if (
-                    document.querySelector(
-                        'script[src^="https://challenges.cloudflare.com/turnstile/v0/api.js"]'
-                    )
-                ) {
-                    const checkReady = () => {
-                        if (window.turnstile) {
-                            this.turnstileLoaded = true;
-                            resolve();
-                        } else {
-                            setTimeout(checkReady, 100);
-                        }
-                    };
-                    return checkReady();
-                }
-
-                const script = document.createElement('script');
-                script.src =
-                    'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
-                script.async = true;
-                script.defer = true;
-                script.onload = () => {
-                    this.turnstileLoaded = true;
-                    console.log('✅ Turnstile script loaded successfully');
-                    resolve();
-                };
-                script.onerror = () => {
-                    console.error('❌ Failed to load Turnstile script');
-                    reject(new Error('Failed to load Turnstile'));
-                };
-                document.head.appendChild(script);
-            });
-        },
-
-        // Create or reuse the turnstile container - completely hidden for token generation
-        ensureTurnstileContainer() {
+        if (source === 'turnstile-capture' && token) {
+            tokenManager.setTurnstileToken(token);
             if (
-                !this._turnstileContainer ||
-                !document.body.contains(this._turnstileContainer)
+                document
+                    .querySelector('#statusText')
+                    ?.textContent.includes('CAPTCHA')
             ) {
-                // Clean up old container if it exists
-                if (this._turnstileContainer) {
-                    this._turnstileContainer.remove();
-                }
-
-                this._turnstileContainer = document.createElement('div');
-                this._turnstileContainer.className = 'wplace-turnstile-hidden';
-                this._turnstileContainer.setAttribute('aria-hidden', 'true');
-                this._turnstileContainer.id = 'turnstile-widget-container';
-                document.body.appendChild(this._turnstileContainer);
-            }
-            return this._turnstileContainer;
-        },
-
-        // Interactive overlay container for visible widgets when needed
-        ensureTurnstileOverlayContainer() {
-            if (
-                this._turnstileOverlay &&
-                document.body.contains(this._turnstileOverlay)
-            ) {
-                return this._turnstileOverlay;
-            }
-
-            const overlay = document.createElement('div');
-            overlay.id = 'turnstile-overlay-container';
-            overlay.className =
-                'wplace-turnstile-overlay wplace-overlay-hidden';
-
-            const title = document.createElement('div');
-            title.textContent = Utils.t('turnstileInstructions');
-            title.className = 'wplace-turnstile-title';
-
-            const host = document.createElement('div');
-            host.id = 'turnstile-overlay-host';
-            host.className = 'wplace-turnstile-host';
-
-            const hideBtn = document.createElement('button');
-            hideBtn.textContent = Utils.t('hideTurnstileBtn');
-            hideBtn.className = 'wplace-turnstile-hide-btn';
-            hideBtn.addEventListener('click', () => overlay.remove());
-
-            overlay.appendChild(title);
-            overlay.appendChild(host);
-            overlay.appendChild(hideBtn);
-            document.body.appendChild(overlay);
-
-            this._turnstileOverlay = overlay;
-            return overlay;
-        },
-
-        async executeTurnstile(sitekey, action = 'paint') {
-            await this.loadTurnstile();
-
-            // Try reusing existing widget first if sitekey matches
-            if (
-                this._turnstileWidgetId &&
-                this._lastSitekey === sitekey &&
-                window.turnstile?.execute
-            ) {
-                try {
-                    console.log('🔄 Reusing existing Turnstile widget...');
-                    const token = await Promise.race([
-                        window.turnstile.execute(this._turnstileWidgetId, {
-                            action,
-                        }),
-                        new Promise((_, reject) =>
-                            setTimeout(
-                                () => reject(new Error('Execute timeout')),
-                                15000
-                            )
-                        ),
-                    ]);
-                    if (token && token.length > 20) {
-                        console.log('✅ Token generated via widget reuse');
-                        return token;
-                    }
-                } catch (error) {
-                    console.log(
-                        '� Widget reuse failed, will create a fresh widget:',
-                        error.message
-                    );
-                }
-            }
-
-            // Try invisible widget first
-            const invisibleToken = await this.createTurnstileWidget(
-                sitekey,
-                action
-            );
-            if (invisibleToken && invisibleToken.length > 20) {
-                return invisibleToken;
-            }
-
-            console.log('� Falling back to interactive Turnstile (visible).');
-            return await this.createTurnstileWidgetInteractive(sitekey, action);
-        },
-
-        async createTurnstileWidget(sitekey, action) {
-            return new Promise(resolve => {
-                try {
-                    // Force cleanup of any existing widget
-                    if (this._turnstileWidgetId && window.turnstile?.remove) {
-                        try {
-                            window.turnstile.remove(this._turnstileWidgetId);
-                            console.log(
-                                '🧹 Cleaned up existing Turnstile widget'
-                            );
-                        } catch (e) {
-                            console.warn(
-                                '⚠️ Widget cleanup warning:',
-                                e.message
-                            );
-                        }
-                    }
-
-                    const container = this.ensureTurnstileContainer();
-                    container.innerHTML = '';
-
-                    // Verify Turnstile is available
-                    if (!window.turnstile?.render) {
-                        console.error(
-                            '❌ Turnstile not available for rendering'
-                        );
-                        resolve(null);
-                        return;
-                    }
-
-                    console.log('🔧 Creating invisible Turnstile widget...');
-                    const widgetId = window.turnstile.render(container, {
-                        sitekey,
-                        action,
-                        size: 'invisible',
-                        retry: 'auto',
-                        'retry-interval': 8000,
-                        callback: token => {
-                            console.log('✅ Invisible Turnstile callback');
-                            resolve(token);
-                        },
-                        'error-callback': () => resolve(null),
-                        'timeout-callback': () => resolve(null),
-                    });
-
-                    this._turnstileWidgetId = widgetId;
-                    this._lastSitekey = sitekey;
-
-                    if (!widgetId) {
-                        return resolve(null);
-                    }
-
-                    // Execute the widget and race with timeout
-                    Promise.race([
-                        window.turnstile.execute(widgetId, { action }),
-                        new Promise((_, reject) =>
-                            setTimeout(
-                                () =>
-                                    reject(
-                                        new Error('Invisible execute timeout')
-                                    ),
-                                12000
-                            )
-                        ),
-                    ])
-                        .then(resolve)
-                        .catch(() => resolve(null));
-                } catch (e) {
-                    console.error('❌ Invisible Turnstile creation failed:', e);
-                    resolve(null);
-                }
-            });
-        },
-
-        async createTurnstileWidgetInteractive(sitekey, action) {
-            // Create a visible widget that users can interact with if needed
-            console.log('🔄 Creating interactive Turnstile widget (visible)');
-
-            return new Promise(resolve => {
-                try {
-                    // Force cleanup of any existing widget
-                    if (this._turnstileWidgetId && window.turnstile?.remove) {
-                        try {
-                            window.turnstile.remove(this._turnstileWidgetId);
-                        } catch (e) {
-                            console.warn(
-                                '⚠️ Widget cleanup warning:',
-                                e.message
-                            );
-                        }
-                    }
-
-                    const overlay = this.ensureTurnstileOverlayContainer();
-                    overlay.classList.remove('wplace-overlay-hidden');
-                    overlay.style.display = 'block';
-
-                    const host = overlay.querySelector(
-                        '#turnstile-overlay-host'
-                    );
-                    host.innerHTML = '';
-
-                    // Set a timeout for interactive mode
-                    const timeout = setTimeout(() => {
-                        console.warn('⏰ Interactive Turnstile widget timeout');
-                        overlay.classList.add('wplace-overlay-hidden');
-                        overlay.style.display = 'none';
-                        resolve(null);
-                    }, 60000); // 60 seconds for user interaction
-
-                    const widgetId = window.turnstile.render(host, {
-                        sitekey,
-                        action,
-                        size: 'normal',
-                        theme: 'light',
-                        callback: token => {
-                            clearTimeout(timeout);
-                            overlay.classList.add('wplace-overlay-hidden');
-                            overlay.style.display = 'none';
-                            console.log(
-                                '✅ Interactive Turnstile completed successfully'
-                            );
-
-                            if (
-                                typeof token === 'string' &&
-                                token.length > 20
-                            ) {
-                                resolve(token);
-                            } else {
-                                console.warn(
-                                    '❌ Invalid token from interactive widget'
-                                );
-                                resolve(null);
-                            }
-                        },
-                        'error-callback': error => {
-                            clearTimeout(timeout);
-                            overlay.classList.add('wplace-overlay-hidden');
-                            overlay.style.display = 'none';
-                            console.warn(
-                                '❌ Interactive Turnstile error:',
-                                error
-                            );
-                            resolve(null);
-                        },
-                    });
-
-                    this._turnstileWidgetId = widgetId;
-                    this._lastSitekey = sitekey;
-
-                    if (!widgetId) {
-                        clearTimeout(timeout);
-                        overlay.classList.add('wplace-overlay-hidden');
-                        overlay.style.display = 'none';
-                        console.warn(
-                            '❌ Failed to create interactive Turnstile widget'
-                        );
-                        resolve(null);
-                    } else {
-                        console.log(
-                            '✅ Interactive Turnstile widget created, waiting for user interaction...'
-                        );
-                    }
-                } catch (e) {
-                    console.error(
-                        '❌ Interactive Turnstile creation failed:',
-                        e
-                    );
-                    resolve(null);
-                }
-            });
-        },
-
-        // Cleanup method for when the script is disabled/reloaded
-        cleanupTurnstile() {
-            if (this._turnstileWidgetId && window.turnstile?.remove) {
-                try {
-                    window.turnstile.remove(this._turnstileWidgetId);
-                } catch (e) {
-                    console.warn('Failed to cleanup Turnstile widget:', e);
-                }
-            }
-
-            if (
-                this._turnstileContainer &&
-                document.body.contains(this._turnstileContainer)
-            ) {
-                this._turnstileContainer.remove();
-            }
-
-            if (
-                this._turnstileOverlay &&
-                document.body.contains(this._turnstileOverlay)
-            ) {
-                this._turnstileOverlay.remove();
-            }
-
-            this._turnstileWidgetId = null;
-            this._turnstileContainer = null;
-            this._turnstileOverlay = null;
-            this._lastSitekey = null;
-        },
-
-        async obtainSitekeyAndToken(fallback = '0x4AAAAAABpqJe8FO0N84q0F') {
-            // Cache sitekey to avoid repeated DOM queries
-            if (this._cachedSitekey) {
-                console.log('🔍 Using cached sitekey:', this._cachedSitekey);
-
-                return isTokenValid()
-                    ? {
-                          sitekey: this._cachedSitekey,
-                          token: turnstileToken,
-                      }
-                    : { sitekey: this._cachedSitekey, token: null };
-            }
-
-            // List of potential sitekeys to try
-            const potentialSitekeys = [
-                '0x4AAAAAABpqJe8FO0N84q0F', // WPlace common sitekey
-                '0x4AAAAAAAJ7xjKAp6Mt_7zw', // Alternative WPlace sitekey
-                '0x4AAAAAADm5QWx6Ov2LNF2g', // Another common sitekey
-            ];
-            const trySitekey = async (sitekey, source) => {
-                if (!sitekey || sitekey.length < 10) return null;
-
-                console.log(`🔍 Testing sitekey from ${source}:`, sitekey);
-                const token = await this.executeTurnstile(sitekey);
-
-                if (token && token.length >= 20) {
-                    console.log(
-                        `✅ Valid token generated from ${source} sitekey`
-                    );
-                    setTurnstileToken(token);
-                    this._cachedSitekey = sitekey;
-                    return { sitekey, token };
-                } else {
-                    console.log(
-                        `❌ Failed to get token from ${source} sitekey`
-                    );
-                    return null;
-                }
-            };
-
-            try {
-                // 1️⃣ data-sitekey attribute
-                const sitekeySel = document.querySelector('[data-sitekey]');
-                if (sitekeySel) {
-                    const sitekey = sitekeySel.getAttribute('data-sitekey');
-                    const result = await trySitekey(sitekey, 'data attribute');
-                    if (result) {
-                        return result;
-                    }
-                }
-
-                // 2️⃣ Turnstile element
-                const turnstileEl = document.querySelector('.cf-turnstile');
-                if (turnstileEl?.dataset?.sitekey) {
-                    const sitekey = turnstileEl.dataset.sitekey;
-                    const result = await trySitekey(
-                        sitekey,
-                        'turnstile element'
-                    );
-                    if (result) {
-                        return result;
-                    }
-                }
-
-                // 3️⃣ Meta tags
-                const metaTags = document.querySelectorAll(
-                    'meta[name*="turnstile"], meta[property*="turnstile"]'
-                );
-                for (const meta of metaTags) {
-                    const content = meta.getAttribute('content');
-                    const result = await trySitekey(content, 'meta tag');
-                    if (result) {
-                        return result;
-                    }
-                }
-
-                // 4️⃣ Global variable
-                if (window.__TURNSTILE_SITEKEY) {
-                    const result = await trySitekey(
-                        window.__TURNSTILE_SITEKEY,
-                        'global variable'
-                    );
-                    if (result) {
-                        return result;
-                    }
-                }
-
-                // 5️⃣ Script tags
-                const scripts = document.querySelectorAll('script');
-                for (const script of scripts) {
-                    const content = script.textContent || script.innerHTML;
-                    const match = content.match(
-                        /(?:sitekey|data-sitekey)['"\s\[\]:\=\(]*['"]?([0-9a-zA-Z_-]{20,})['"]?/i
-                    );
-                    if (match && match[1]) {
-                        const extracted = match[1].replace(/['"]/g, '');
-                        const result = await trySitekey(
-                            extracted,
-                            'script content'
-                        );
-                        if (result) {
-                            return result;
-                        }
-                    }
-                }
-
-                // 6️⃣ Known potential sitekeys
-                console.log('🔍 Testing known potential sitekeys...');
-                for (const testSitekey of potentialSitekeys) {
-                    const result = await trySitekey(testSitekey, 'known list');
-                    if (result) {
-                        return result;
-                    }
-                }
-            } catch (error) {
-                console.warn('⚠️ Error during sitekey detection:', error);
-            }
-
-            // 7️⃣ Fallback
-            console.log('🔧 Trying fallback sitekey:', fallback);
-            const fallbackResult = await trySitekey(fallback, 'fallback');
-            if (fallbackResult) {
-                return fallbackResult;
-            }
-
-            console.error('❌ No working sitekey or token found.');
-            return { sitekey: null, token: null };
-        },
-
-        createElement: (tag, props = {}, children = []) => {
-            const element = document.createElement(tag);
-
-            Object.entries(props).forEach(([key, value]) => {
-                if (key === 'style' && typeof value === 'object') {
-                    Object.assign(element.style, value);
-                } else if (key === 'className') {
-                    element.className = value;
-                } else if (key === 'innerHTML') {
-                    element.innerHTML = value;
-                } else {
-                    element.setAttribute(key, value);
-                }
-            });
-
-            if (typeof children === 'string') {
-                element.textContent = children;
-            } else if (Array.isArray(children)) {
-                children.forEach(child => {
-                    if (typeof child === 'string') {
-                        element.appendChild(document.createTextNode(child));
-                    } else {
-                        element.appendChild(child);
-                    }
+                Utils.showAlert(Utils.t('tokenCapturedSuccess'), 'success');
+                updateUI('colorsFound', 'success', {
+                    count: state.availableColors.length,
                 });
             }
-
-            return element;
-        },
-
-        createButton: (
-            id,
-            text,
-            icon,
-            onClick,
-            className = 'wplace-btn-primary'
-        ) => {
-            const button = Utils.createElement('button', {
-                id: id,
-                className: className,
-                innerHTML: `${icon ? `<i class="${icon}"></i>` : ''}<span>${text}</span>`,
-            });
-            if (onClick) button.addEventListener('click', onClick);
-            return button;
-        },
-
-        // Add hold-to-repeat functionality to buttons (for +/- buttons)
-        addHoldToRepeatListener: (
-            button,
-            callback,
-            initialDelay = 500,
-            initialInterval = 150
-        ) => {
-            let timeout, interval;
-            let currentInterval = initialInterval;
-            const minInterval = 25; // Fastest repeat rate
-            const acceleration = 0.9; // Speed multiplier each cycle
-
-            const startRepeating = () => {
-                callback(); // Execute immediately
-                currentInterval = initialInterval; // Reset to initial speed
-
-                timeout = setTimeout(() => {
-                    const acceleratingRepeat = () => {
-                        callback();
-                        currentInterval = Math.max(
-                            minInterval,
-                            currentInterval * acceleration
-                        );
-                        interval = setTimeout(
-                            acceleratingRepeat,
-                            currentInterval
-                        );
-                    };
-                    acceleratingRepeat();
-                }, initialDelay);
-            };
-
-            const stopRepeating = () => {
-                clearTimeout(timeout);
-                clearTimeout(interval);
-                currentInterval = initialInterval; // Reset for next time
-            };
-
-            // Handle both mouse and touch events
-            button.addEventListener('mousedown', startRepeating);
-            button.addEventListener('mouseup', stopRepeating);
-            button.addEventListener('mouseleave', stopRepeating);
-            button.addEventListener('touchstart', startRepeating);
-            button.addEventListener('touchend', stopRepeating);
-
-            // Prevent context menu on long press
-            button.addEventListener('contextmenu', e => e.preventDefault());
-        },
-
-        // Synchronous translation function for UI rendering
-        t: (key, params = {}) => {
-            // Try to get from cache first
-            const cacheKey = `${state.language}_${key}`;
-            if (translationCache.has(cacheKey)) {
-                let text = translationCache.get(cacheKey);
-                Object.keys(params).forEach(param => {
-                    text = text.replace(`{${param}}`, params[param]);
-                });
-                return text;
-            }
-
-            // Try dynamically loaded translations (already loaded)
-            if (loadedTranslations[state.language]?.[key]) {
-                let text = loadedTranslations[state.language][key];
-                // Cache for future use
-                translationCache.set(cacheKey, text);
-                Object.keys(params).forEach(param => {
-                    text = text.replace(`{${param}}`, params[param]);
-                });
-                return text;
-            }
-
-            // Fallback to English if current language failed
-            if (state.language !== 'en' && loadedTranslations['en']?.[key]) {
-                let text = loadedTranslations['en'][key];
-                Object.keys(params).forEach(param => {
-                    text = text.replace(`{${param}}`, params[param]);
-                });
-                return text;
-            }
-
-            // Final fallback to emergency fallback or key
-            let text =
-                FALLBACK_TEXT[state.language]?.[key] ||
-                FALLBACK_TEXT.en?.[key] ||
-                key;
-            Object.keys(params).forEach(param => {
-                text = text.replace(
-                    new RegExp(`\\{${param}\\}`, 'g'),
-                    params[param]
-                );
-            });
-
-            // Log missing translations for debugging
-            if (text === key && key !== 'undefined') {
-                console.warn(
-                    `⚠️ Missing translation for key: ${key} (language: ${state.language})`
-                );
-            }
-
-            return text;
-        },
-
-        showAlert: (message, type = 'info') => {
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `wplace-alert-base wplace-alert-${type}`;
-
-            alertDiv.textContent = message;
-            document.body.appendChild(alertDiv);
-
-            setTimeout(() => {
-                alertDiv.style.animation = 'slide-down 0.3s ease-out reverse';
-                setTimeout(() => {
-                    document.body.removeChild(alertDiv);
-                }, 300);
-            }, 4000);
-        },
-
-        colorDistance: (a, b) =>
-            Math.sqrt(
-                Math.pow(a[0] - b[0], 2) +
-                    Math.pow(a[1] - b[1], 2) +
-                    Math.pow(a[2] - b[2], 2)
-            ),
-        _labCache: new Map(), // key: (r<<16)|(g<<8)|b  value: [L,a,b]
-        _rgbToLab: (r, g, b) => {
-            // sRGB -> linear
-            const srgbToLinear = v => {
-                v /= 255;
-                return v <= 0.04045
-                    ? v / 12.92
-                    : Math.pow((v + 0.055) / 1.055, 2.4);
-            };
-            const rl = srgbToLinear(r);
-            const gl = srgbToLinear(g);
-            const bl = srgbToLinear(b);
-            let X = rl * 0.4124 + gl * 0.3576 + bl * 0.1805;
-            let Y = rl * 0.2126 + gl * 0.7152 + bl * 0.0722;
-            let Z = rl * 0.0193 + gl * 0.1192 + bl * 0.9505;
-            X /= 0.95047;
-            Y /= 1.0;
-            Z /= 1.08883;
-            const f = t => (t > 0.008856 ? Math.cbrt(t) : 7.787 * t + 16 / 116);
-            const fX = f(X),
-                fY = f(Y),
-                fZ = f(Z);
-            const L = 116 * fY - 16;
-            const a = 500 * (fX - fY);
-            const b2 = 200 * (fY - fZ);
-            return [L, a, b2];
-        },
-        _lab: (r, g, b) => {
-            const key = (r << 16) | (g << 8) | b;
-            let v = Utils._labCache.get(key);
-            if (!v) {
-                v = Utils._rgbToLab(r, g, b);
-                Utils._labCache.set(key, v);
-            }
-            return v;
-        },
-        findClosestPaletteColor: (r, g, b, palette) => {
-            // Use provided palette or derive from COLOR_MAP
-            if (!palette || palette.length === 0) {
-                palette = Object.values(CONFIG.COLOR_MAP)
-                    .filter(c => c.rgb)
-                    .map(c => [c.rgb.r, c.rgb.g, c.rgb.b]);
-            }
-            if (state.colorMatchingAlgorithm === 'legacy') {
-                let menorDist = Infinity;
-                let cor = [0, 0, 0];
-                for (let i = 0; i < palette.length; i++) {
-                    const [pr, pg, pb] = palette[i];
-                    const rmean = (pr + r) / 2;
-                    const rdiff = pr - r;
-                    const gdiff = pg - g;
-                    const bdiff = pb - b;
-                    const dist = Math.sqrt(
-                        (((512 + rmean) * rdiff * rdiff) >> 8) +
-                            4 * gdiff * gdiff +
-                            (((767 - rmean) * bdiff * bdiff) >> 8)
-                    );
-                    if (dist < menorDist) {
-                        menorDist = dist;
-                        cor = [pr, pg, pb];
-                    }
-                }
-                return cor;
-            }
-            // LAB algorithm
-            const [Lt, at, bt] = Utils._lab(r, g, b);
-            const targetChroma = Math.sqrt(at * at + bt * bt);
-            let best = null;
-            let bestDist = Infinity;
-            for (let i = 0; i < palette.length; i++) {
-                const [pr, pg, pb] = palette[i];
-                const [Lp, ap, bp] = Utils._lab(pr, pg, pb);
-                const dL = Lt - Lp;
-                const da = at - ap;
-                const db = bt - bp;
-                let dist = dL * dL + da * da + db * db;
-                if (state.enableChromaPenalty && targetChroma > 20) {
-                    const candChroma = Math.sqrt(ap * ap + bp * bp);
-                    if (candChroma < targetChroma) {
-                        const chromaDiff = targetChroma - candChroma;
-                        dist +=
-                            chromaDiff * chromaDiff * state.chromaPenaltyWeight;
-                    }
-                }
-                if (dist < bestDist) {
-                    bestDist = dist;
-                    best = palette[i];
-                    if (bestDist === 0) break;
-                }
-            }
-            return best || [0, 0, 0];
-        },
-
-        isWhitePixel: (r, g, b) => {
-            const wt = state.customWhiteThreshold || CONFIG.WHITE_THRESHOLD;
-            return r >= wt && g >= wt && b >= wt;
-        },
-
-        resolveColor(targetRgb, availableColors, exactMatch = false) {
-            if (!availableColors || availableColors.length === 0) {
-                return {
-                    id: null,
-                    rgb: targetRgb,
-                };
-            }
-
-            const cacheKey = `${targetRgb[0]},${targetRgb[1]},${targetRgb[2]}|${state.colorMatchingAlgorithm}|${
-                state.enableChromaPenalty ? 'c' : 'nc'
-            }|${state.chromaPenaltyWeight}|${exactMatch ? 'exact' : 'closest'}`;
-
-            if (colorCache.has(cacheKey)) return colorCache.get(cacheKey);
-
-            // Check for an exact color match in availableColors.
-            // If found, return the matched color with its ID.
-            // If not found, return the target color with null ID.
-            // Cache the result for future lookups.
-            if (exactMatch) {
-                const match = availableColors.find(
-                    c =>
-                        c.rgb[0] === targetRgb[0] &&
-                        c.rgb[1] === targetRgb[1] &&
-                        c.rgb[2] === targetRgb[2]
-                );
-                const result = match
-                    ? { id: match.id, rgb: [...match.rgb] }
-                    : { id: null, rgb: targetRgb };
-                colorCache.set(cacheKey, result);
-                return result;
-            }
-
-            // check for white using threshold
-            const whiteThreshold =
-                state.customWhiteThreshold || CONFIG.WHITE_THRESHOLD;
-            if (
-                targetRgb[0] >= whiteThreshold &&
-                targetRgb[1] >= whiteThreshold &&
-                targetRgb[2] >= whiteThreshold
-            ) {
-                const whiteEntry = availableColors.find(
-                    c =>
-                        c.rgb[0] >= whiteThreshold &&
-                        c.rgb[1] >= whiteThreshold &&
-                        c.rgb[2] >= whiteThreshold
-                );
-                if (whiteEntry) {
-                    const result = {
-                        id: whiteEntry.id,
-                        rgb: [...whiteEntry.rgb],
-                    };
-                    colorCache.set(cacheKey, result);
-                    return result;
-                }
-            }
-
-            // find nearest color
-            let bestId = availableColors[0].id;
-            let bestRgb = [...availableColors[0].rgb];
-            let bestScore = Infinity;
-
-            if (state.colorMatchingAlgorithm === 'legacy') {
-                for (let i = 0; i < availableColors.length; i++) {
-                    const c = availableColors[i];
-                    const [r, g, b] = c.rgb;
-                    const rmean = (r + targetRgb[0]) / 2;
-                    const rdiff = r - targetRgb[0];
-                    const gdiff = g - targetRgb[1];
-                    const bdiff = b - targetRgb[2];
-                    const dist = Math.sqrt(
-                        (((512 + rmean) * rdiff * rdiff) >> 8) +
-                            4 * gdiff * gdiff +
-                            (((767 - rmean) * bdiff * bdiff) >> 8)
-                    );
-                    if (dist < bestScore) {
-                        bestScore = dist;
-                        bestId = c.id;
-                        bestRgb = [...c.rgb];
-                        if (dist === 0) break;
-                    }
-                }
-            } else {
-                const [Lt, at, bt] = Utils._lab(
-                    targetRgb[0],
-                    targetRgb[1],
-                    targetRgb[2]
-                );
-                const targetChroma = Math.sqrt(at * at + bt * bt);
-                const penaltyWeight = state.enableChromaPenalty
-                    ? state.chromaPenaltyWeight || 0.15
-                    : 0;
-
-                for (let i = 0; i < availableColors.length; i++) {
-                    const c = availableColors[i];
-                    const [r, g, b] = c.rgb;
-                    const [L2, a2, b2] = Utils._lab(r, g, b);
-                    const dL = Lt - L2,
-                        da = at - a2,
-                        db = bt - b2;
-                    let dist = dL * dL + da * da + db * db;
-
-                    if (penaltyWeight > 0 && targetChroma > 20) {
-                        const candChroma = Math.sqrt(a2 * a2 + b2 * b2);
-                        if (candChroma < targetChroma) {
-                            const cd = targetChroma - candChroma;
-                            dist += cd * cd * penaltyWeight;
-                        }
-                    }
-
-                    if (dist < bestScore) {
-                        bestScore = dist;
-                        bestId = c.id;
-                        bestRgb = [...c.rgb];
-                        if (dist === 0) break;
-                    }
-                }
-            }
-
-            const result = { id: bestId, rgb: bestRgb };
-            colorCache.set(cacheKey, result);
-
-            // limit the size of the cache
-            if (colorCache.size > 15000) {
-                const firstKey = colorCache.keys().next().value;
-                colorCache.delete(firstKey);
-            }
-
-            return result;
-        },
-
-        createImageUploader: () =>
-            new Promise(resolve => {
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = 'image/png,image/jpeg';
-                input.onchange = () => {
-                    const fr = new FileReader();
-                    fr.onload = () => resolve(fr.result);
-                    fr.readAsDataURL(input.files[0]);
-                };
-                input.click();
-            }),
-
-        createFileDownloader: (data, filename) => {
-            const blob = new Blob([data], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        },
-
-        createFileUploader: () =>
-            new Promise((resolve, reject) => {
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = '.json';
-                input.onchange = e => {
-                    const file = e.target.files[0];
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = () => {
-                            try {
-                                const data = JSON.parse(reader.result);
-                                resolve(data);
-                            } catch (error) {
-                                reject(new Error('Invalid JSON file'));
-                            }
-                        };
-                        reader.onerror = () =>
-                            reject(new Error('File reading error'));
-                        reader.readAsText(file);
-                    } else {
-                        reject(new Error('No file selected'));
-                    }
-                };
-                input.click();
-            }),
-
-        extractAvailableColors: () => {
-            const colorElements = document.querySelectorAll(
-                '.tooltip button[id^="color-"]'
-            );
-            if (colorElements.length === 0) {
-                console.log('❌ No color elements found on page');
-                return null;
-            }
-            // Separate available and unavailable colors
-            const availableColors = [];
-            const unavailableColors = [];
-
-            Array.from(colorElements).forEach(el => {
-                const id = Number.parseInt(el.id.replace('color-', ''));
-                if (id === 0) return; // Skip transparent color
-
-                const rgbStr = el.style.backgroundColor.match(/\d+/g);
-                if (!rgbStr || rgbStr.length < 3) {
-                    console.warn(
-                        `Skipping color element ${el.id} — cannot parse RGB`
-                    );
-                    return;
-                }
-                const rgb = rgbStr.map(Number);
-
-                // Find color name from COLOR_MAP
-                const colorInfo = Object.values(CONFIG.COLOR_MAP).find(
-                    color => color.id === id
-                );
-                const name = colorInfo ? colorInfo.name : `Unknown Color ${id}`;
-
-                const colorData = { id, name, rgb };
-
-                // Check if color is available (no SVG overlay means available)
-                if (!el.querySelector('svg')) {
-                    availableColors.push(colorData);
-                } else {
-                    unavailableColors.push(colorData);
-                }
-            });
-
-            // Console log detailed color information
-            console.log('=== CAPTURED COLORS STATUS ===');
-            console.log(`Total available colors: ${availableColors.length}`);
-            console.log(
-                `Total unavailable colors: ${unavailableColors.length}`
-            );
-            console.log(
-                `Total colors scanned: ${availableColors.length + unavailableColors.length}`
-            );
-
-            if (availableColors.length > 0) {
-                console.log('\n--- AVAILABLE COLORS ---');
-                availableColors.forEach((color, index) => {
-                    console.log(
-                        `${
-                            index + 1
-                        }. ID: ${color.id}, Name: "${color.name}", RGB: (${color.rgb[0]}, ${color.rgb[1]}, ${color.rgb[2]})`
-                    );
-                });
-            }
-
-            if (unavailableColors.length > 0) {
-                console.log('\n--- UNAVAILABLE COLORS ---');
-                unavailableColors.forEach((color, index) => {
-                    console.log(
-                        `${
-                            index + 1
-                        }. ID: ${color.id}, Name: "${color.name}", RGB: (${color.rgb[0]}, ${color.rgb[1]}, ${color.rgb[2]}) [LOCKED]`
-                    );
-                });
-            }
-
-            console.log('=== END COLOR STATUS ===');
-
-            return availableColors;
-        },
-
-        formatTime: ms => {
-            const seconds = Math.floor((ms / 1000) % 60);
-            const minutes = Math.floor((ms / (1000 * 60)) % 60);
-            const hours = Math.floor((ms / (1000 * 60 * 60)) % 24);
-            const days = Math.floor(ms / (1000 * 60 * 60 * 24));
-
-            let result = '';
-            if (days > 0) result += `${days}d `;
-            if (hours > 0 || days > 0) result += `${hours}h `;
-            if (minutes > 0 || hours > 0 || days > 0) result += `${minutes}m `;
-            result += `${seconds}s`;
-
-            return result;
-        },
-
-        calculateEstimatedTime: (remainingPixels, charges, cooldown) => {
-            if (remainingPixels <= 0) return 0;
-
-            const paintingSpeedDelay =
-                state.paintingSpeed > 0 ? 1000 / state.paintingSpeed : 1000;
-            const timeFromSpeed = remainingPixels * paintingSpeedDelay;
-
-            const cyclesNeeded = Math.ceil(
-                remainingPixels / Math.max(charges, 1)
-            );
-            const timeFromCharges = cyclesNeeded * cooldown;
-
-            return timeFromSpeed + timeFromCharges; // combine instead of taking max
-        },
-
-        // --- Painted pixel tracking helpers ---
-        initializePaintedMap: (width, height) => {
-            if (!state.paintedMap || state.paintedMap.length !== height) {
-                state.paintedMap = Array(height)
-                    .fill()
-                    .map(() => Array(width).fill(false));
-                console.log(`📋 Initialized painted map: ${width}x${height}`);
-            }
-        },
-
-        markPixelPainted: (x, y, regionX = 0, regionY = 0) => {
-            const actualX = x + regionX;
-            const actualY = y + regionY;
-
-            if (
-                state.paintedMap &&
-                state.paintedMap[actualY] &&
-                actualX >= 0 &&
-                actualX < state.paintedMap[actualY].length
-            ) {
-                state.paintedMap[actualY][actualX] = true;
-            }
-        },
-
-        isPixelPainted: (x, y, regionX = 0, regionY = 0) => {
-            const actualX = x + regionX;
-            const actualY = y + regionY;
-
-            if (
-                state.paintedMap &&
-                state.paintedMap[actualY] &&
-                actualX >= 0 &&
-                actualX < state.paintedMap[actualY].length
-            ) {
-                return state.paintedMap[actualY][actualX];
-            }
-            return false;
-        },
-
-        // Smart save - only save if significant changes
-        shouldAutoSave: () => {
-            const now = Date.now();
-            const pixelsSinceLastSave =
-                state.paintedPixels - state._lastSavePixelCount;
-            const timeSinceLastSave = now - state._lastSaveTime;
-
-            // Save conditions:
-            // 1. Every 25 pixels (reduced from 50 for more frequent saves)
-            // 2. At least 30 seconds since last save (prevent spam)
-            // 3. Not already saving
-            return (
-                !state._saveInProgress &&
-                pixelsSinceLastSave >= 25 &&
-                timeSinceLastSave >= 30000
-            );
-        },
-
-        performSmartSave: () => {
-            if (!Utils.shouldAutoSave()) return false;
-
-            state._saveInProgress = true;
-            const success = Utils.saveProgress();
-
-            if (success) {
-                state._lastSavePixelCount = state.paintedPixels;
-                state._lastSaveTime = Date.now();
-                console.log(`💾 Auto-saved at ${state.paintedPixels} pixels`);
-            }
-
-            state._saveInProgress = false;
-            return success;
-        },
-
-        // --- Data management helpers ---
-
-        // Base64 compression helpers for efficient storage
-        packPaintedMapToBase64: (paintedMap, width, height) => {
-            if (!paintedMap || !width || !height) return null;
-            const totalBits = width * height;
-            const byteLen = Math.ceil(totalBits / 8);
-            const bytes = new Uint8Array(byteLen);
-            let bitIndex = 0;
-            for (let y = 0; y < height; y++) {
-                const row = paintedMap[y];
-                for (let x = 0; x < width; x++) {
-                    const bit = row && row[x] ? 1 : 0;
-                    const b = bitIndex >> 3; // byte index
-                    const o = bitIndex & 7; // bit offset
-                    if (bit) bytes[b] |= 1 << o;
-                    bitIndex++;
-                }
-            }
-            let binary = '';
-            const chunk = 0x8000;
-            for (let i = 0; i < bytes.length; i += chunk) {
-                binary += String.fromCharCode.apply(
-                    null,
-                    bytes.subarray(i, Math.min(i + chunk, bytes.length))
-                );
-            }
-            return btoa(binary);
-        },
-
-        unpackPaintedMapFromBase64: (base64, width, height) => {
-            if (!base64 || !width || !height) return null;
-            const binary = atob(base64);
-            const bytes = new Uint8Array(binary.length);
-            for (let i = 0; i < binary.length; i++)
-                bytes[i] = binary.charCodeAt(i);
-            const map = Array(height)
-                .fill()
-                .map(() => Array(width).fill(false));
-            let bitIndex = 0;
-            for (let y = 0; y < height; y++) {
-                for (let x = 0; x < width; x++) {
-                    const b = bitIndex >> 3;
-                    const o = bitIndex & 7;
-                    map[y][x] = ((bytes[b] >> o) & 1) === 1;
-                    bitIndex++;
-                }
-            }
-            return map;
-        },
-
-        // Migration helpers for backward compatibility
-        migrateProgressToV2: saved => {
-            if (!saved) return saved;
-            const isV1 =
-                !saved.version ||
-                saved.version === '1' ||
-                saved.version === '1.0' ||
-                saved.version === '1.1';
-            if (!isV1) return saved;
-
-            try {
-                const migrated = { ...saved };
-                const width = migrated.imageData?.width;
-                const height = migrated.imageData?.height;
-                if (migrated.paintedMap && width && height) {
-                    const data = Utils.packPaintedMapToBase64(
-                        migrated.paintedMap,
-                        width,
-                        height
-                    );
-                    migrated.paintedMapPacked = { width, height, data };
-                }
-                delete migrated.paintedMap;
-                migrated.version = '2';
-                return migrated;
-            } catch (e) {
-                console.warn('Migration to v2 failed, using original data:', e);
-                return saved;
-            }
-        },
-
-        migrateProgressToV21: saved => {
-            if (!saved) return saved;
-            if (saved.version === '2.1') return saved;
-            const isV2 = saved.version === '2' || saved.version === '2.0';
-            const isV1 =
-                !saved.version ||
-                saved.version === '1' ||
-                saved.version === '1.0' ||
-                saved.version === '1.1';
-            if (!isV2 && !isV1) return saved; // save this for future
-            try {
-                const migrated = { ...saved };
-                // First migrate to v2 if needed
-                if (isV1) {
-                    const width = migrated.imageData?.width;
-                    const height = migrated.imageData?.height;
-                    if (migrated.paintedMap && width && height) {
-                        const data = Utils.packPaintedMapToBase64(
-                            migrated.paintedMap,
-                            width,
-                            height
-                        );
-                        migrated.paintedMapPacked = { width, height, data };
-                    }
-                    delete migrated.paintedMap;
-                }
-                migrated.version = '2.1';
-                return migrated;
-            } catch (e) {
-                console.warn(
-                    'Migration to v2.1 failed, using original data:',
-                    e
-                );
-                return saved;
-            }
-        },
-
-        migrateProgressToV22: data => {
-            try {
-                const migrated = { ...data };
-                migrated.version = '2.2';
-
-                // Add new fields with default values
-                if (!migrated.state.coordinateMode) {
-                    migrated.state.coordinateMode = CONFIG.COORDINATE_MODE;
-                }
-                if (!migrated.state.coordinateDirection) {
-                    migrated.state.coordinateDirection =
-                        CONFIG.COORDINATE_DIRECTION;
-                }
-                if (!migrated.state.coordinateSnake) {
-                    migrated.state.coordinateSnake = CONFIG.COORDINATE_SNAKE;
-                }
-                if (!migrated.state.blockWidth) {
-                    migrated.state.blockWidth = CONFIG.COORDINATE_BLOCK_WIDTH;
-                }
-                if (!migrated.state.blockHeight) {
-                    migrated.state.blockHeight = CONFIG.COORDINATE_BLOCK_HEIGHT;
-                }
-
-                return migrated;
-            } catch (e) {
-                console.warn(
-                    'Migration to v2.2 failed, using original data:',
-                    e
-                );
-                return data;
-            }
-        },
-
-        buildPaintedMapPacked() {
-            if (state.paintedMap && state.imageData) {
-                const data = Utils.packPaintedMapToBase64(
-                    state.paintedMap,
-                    state.imageData.width,
-                    state.imageData.height
-                );
-                if (data) {
-                    return {
-                        width: state.imageData.width,
-                        height: state.imageData.height,
-                        data: data,
-                    };
-                }
-            }
-            return null;
-        },
-
-        buildProgressData() {
-            return {
-                timestamp: Date.now(),
-                version: '2.2',
-                state: {
-                    totalPixels: state.totalPixels,
-                    paintedPixels: state.paintedPixels,
-                    lastPosition: state.lastPosition,
-                    startPosition: state.startPosition,
-                    region: state.region,
-                    imageLoaded: state.imageLoaded,
-                    colorsChecked: state.colorsChecked,
-                    coordinateMode: state.coordinateMode,
-                    coordinateDirection: state.coordinateDirection,
-                    coordinateSnake: state.coordinateSnake,
-                    blockWidth: state.blockWidth,
-                    blockHeight: state.blockHeight,
-                    availableColors: state.availableColors,
-                },
-                imageData: state.imageData
-                    ? {
-                          width: state.imageData.width,
-                          height: state.imageData.height,
-                          pixels: Array.from(state.imageData.pixels),
-                          totalPixels: state.imageData.totalPixels,
-                      }
-                    : null,
-                paintedMapPacked: Utils.buildPaintedMapPacked(),
-            };
-        },
-
-        migrateProgress(saved) {
-            if (!saved) return null;
-
-            let data = saved;
-            const ver = data.version;
-
-            // If version is missing or ≤ 1.x → first migrate to v2
-            if (!ver || ver === '1' || ver === '1.0' || ver === '1.1') {
-                data = Utils.migrateProgressToV2(data);
-            }
-
-            // If still older than v2.1 → migrate to 2.1
-            if (data.version === '2' || data.version === '2.0') {
-                data = Utils.migrateProgressToV21(data);
-            }
-
-            // If still older than v2.2 → migrate to 2.2
-            if (data.version === '2.1') {
-                data = Utils.migrateProgressToV22(data);
-            }
-
-            // Now data is guaranteed to be the latest version
-            return data;
-        },
-
-        saveProgress: () => {
-            try {
-                const progressData = Utils.buildProgressData(state);
-
-                localStorage.setItem(
-                    'wplace-bot-progress',
-                    JSON.stringify(progressData)
-                );
-                return true;
-            } catch (error) {
-                console.error('Error saving progress:', error);
-                return false;
-            }
-        },
-
-        loadProgress: () => {
-            try {
-                const saved = localStorage.getItem('wplace-bot-progress');
-                if (!saved) return null;
-                let data = JSON.parse(saved);
-                const migrated = Utils.migrateProgress(data);
-
-                if (migrated && migrated !== data) {
-                    try {
-                        localStorage.setItem(
-                            'wplace-bot-progress',
-                            JSON.stringify(migrated)
-                        );
-                    } catch {}
-                }
-                return migrated;
-            } catch (error) {
-                console.error('Error loading progress:', error);
-                return null;
-            }
-        },
-
-        clearProgress: () => {
-            try {
-                localStorage.removeItem('wplace-bot-progress');
-                // Also clear painted map from memory
-                state.paintedMap = null;
-                state._lastSavePixelCount = 0;
-                state._lastSaveTime = 0;
-                // Reset coordinate generation settings to their default values
-                state.coordinateMode = CONFIG.COORDINATE_MODE;
-                state.coordinateDirection = CONFIG.COORDINATE_DIRECTION;
-                state.coordinateSnake = CONFIG.COORDINATE_SNAKE;
-                state.blockWidth = CONFIG.COORDINATE_BLOCK_WIDTH;
-                state.blockHeight = CONFIG.COORDINATE_BLOCK_HEIGHT;
-                console.log('📋 Progress and painted map cleared');
-                return true;
-            } catch (error) {
-                console.error('Error clearing progress:', error);
-                return false;
-            }
-        },
-
-        restoreProgress: savedData => {
-            try {
-                Object.assign(state, savedData.state);
-
-                // Restore coordinate generation settings
-                if (savedData.state.coordinateMode) {
-                    state.coordinateMode = savedData.state.coordinateMode;
-                }
-                if (savedData.state.coordinateDirection) {
-                    state.coordinateDirection =
-                        savedData.state.coordinateDirection;
-                }
-                if (savedData.state.coordinateSnake !== undefined) {
-                    state.coordinateSnake = savedData.state.coordinateSnake;
-                }
-                if (savedData.state.blockWidth) {
-                    state.blockWidth = savedData.state.blockWidth;
-                }
-                if (savedData.state.blockHeight) {
-                    state.blockHeight = savedData.state.blockHeight;
-                }
-
-                if (savedData.imageData) {
-                    state.imageData = {
-                        ...savedData.imageData,
-                        pixels: new Uint8ClampedArray(
-                            savedData.imageData.pixels
-                        ),
-                    };
-
-                    try {
-                        const canvas = document.createElement('canvas');
-                        canvas.width = state.imageData.width;
-                        canvas.height = state.imageData.height;
-                        const ctx = canvas.getContext('2d');
-                        const imageData = new ImageData(
-                            state.imageData.pixels,
-                            state.imageData.width,
-                            state.imageData.height
-                        );
-                        ctx.putImageData(imageData, 0, 0);
-                        const proc = new ImageProcessor('');
-                        proc.img = canvas;
-                        proc.canvas = canvas;
-                        proc.ctx = ctx;
-                        state.imageData.processor = proc;
-                    } catch (e) {
-                        console.warn(
-                            'Could not rebuild processor from saved image data:',
-                            e
-                        );
-                    }
-                }
-
-                // Prefer packed form if available; fallback to legacy paintedMap array for backward compatibility
-                if (
-                    savedData.paintedMapPacked &&
-                    savedData.paintedMapPacked.data
-                ) {
-                    const { width, height, data } = savedData.paintedMapPacked;
-                    state.paintedMap = Utils.unpackPaintedMapFromBase64(
-                        data,
-                        width,
-                        height
-                    );
-                } else if (savedData.paintedMap) {
-                    state.paintedMap = savedData.paintedMap.map(row =>
-                        Array.from(row)
-                    );
-                }
-
-                return true;
-            } catch (error) {
-                console.error('Error restoring progress:', error);
-                return false;
-            }
-        },
-
-        saveProgressToFile: () => {
-            try {
-                const progressData = Utils.buildProgressData();
-                const filename = `wplace-bot-progress-${new Date()
-                    .toISOString()
-                    .slice(0, 19)
-                    .replace(/:/g, '-')}.json`;
-                Utils.createFileDownloader(
-                    JSON.stringify(progressData, null, 2),
-                    filename
-                );
-                return true;
-            } catch (error) {
-                console.error('Error saving to file:', error);
-                return false;
-            }
-        },
-
-        loadProgressFromFile: async () => {
-            try {
-                const data = await Utils.createFileUploader();
-                if (!data || !data.state) {
-                    throw new Error('Invalid file format');
-                }
-                const migrated = Utils.migrateProgress(data);
-
-                const success = Utils.restoreProgress(migrated);
-                return success;
-            } catch (error) {
-                console.error('Error loading from file:', error);
-                throw error;
-            }
-        },
-
-        // Helper function to restore overlay from loaded data
-        restoreOverlayFromData: async () => {
-            if (
-                !state.imageLoaded ||
-                !state.imageData ||
-                !state.startPosition ||
-                !state.region
-            ) {
-                return false;
-            }
-
-            try {
-                // Recreate ImageBitmap from loaded pixel data
-                const imageData = new ImageData(
-                    state.imageData.pixels,
-                    state.imageData.width,
-                    state.imageData.height
-                );
-
-                const canvas = new OffscreenCanvas(
-                    state.imageData.width,
-                    state.imageData.height
-                );
-                const ctx = canvas.getContext('2d');
-                ctx.putImageData(imageData, 0, 0);
-                const imageBitmap = await canvas.transferToImageBitmap();
-
-                // Set up overlay with restored data
-                await overlayManager.setImage(imageBitmap);
-                await overlayManager.setPosition(
-                    state.startPosition,
-                    state.region
-                );
-                overlayManager.enable();
-
-                // Update overlay button state
-                const toggleOverlayBtn =
-                    document.getElementById('toggleOverlayBtn');
-                if (toggleOverlayBtn) {
-                    toggleOverlayBtn.disabled = false;
-                    toggleOverlayBtn.classList.add('active');
-                }
-
-                console.log('Overlay restored from data');
-                return true;
-            } catch (error) {
-                console.error('Failed to restore overlay from data:', error);
-                return false;
-            }
-        },
-
-        updateCoordinateUI({
-            mode,
-            directionControls,
-            snakeControls,
-            blockControls,
-        }) {
-            const isLinear = mode === 'rows' || mode === 'columns';
-            const isBlock = mode === 'blocks' || mode === 'shuffle-blocks';
-
-            if (directionControls)
-                directionControls.style.display = isLinear ? 'block' : 'none';
-            if (snakeControls)
-                snakeControls.style.display = isLinear ? 'block' : 'none';
-            if (blockControls)
-                blockControls.style.display = isBlock ? 'block' : 'none';
-        },
-    };
+        }
+    });
 
     // IMAGE PROCESSOR CLASS
-    class ImageProcessor {
-        constructor(imageSrc) {
-            this.imageSrc = imageSrc;
-            this.img = null;
-            this.canvas = null;
-            this.ctx = null;
-        }
-
-        async load() {
-            return new Promise((resolve, reject) => {
-                this.img = new Image();
-                this.img.crossOrigin = 'anonymous';
-                this.img.onload = () => {
-                    this.canvas = document.createElement('canvas');
-                    this.ctx = this.canvas.getContext('2d');
-                    this.canvas.width = this.img.width;
-                    this.canvas.height = this.img.height;
-                    this.ctx.drawImage(this.img, 0, 0);
-                    resolve();
-                };
-                this.img.onerror = reject;
-                this.img.src = this.imageSrc;
-            });
-        }
-
-        getDimensions() {
-            return {
-                width: this.canvas.width,
-                height: this.canvas.height,
-            };
-        }
-
-        getPixelData() {
-            return this.ctx.getImageData(
-                0,
-                0,
-                this.canvas.width,
-                this.canvas.height
-            ).data;
-        }
-
-        resize(newWidth, newHeight) {
-            const tempCanvas = document.createElement('canvas');
-            const tempCtx = tempCanvas.getContext('2d');
-
-            tempCanvas.width = newWidth;
-            tempCanvas.height = newHeight;
-
-            tempCtx.imageSmoothingEnabled = false;
-            tempCtx.drawImage(this.canvas, 0, 0, newWidth, newHeight);
-
-            this.canvas.width = newWidth;
-            this.canvas.height = newHeight;
-            this.ctx.imageSmoothingEnabled = false;
-            this.ctx.drawImage(tempCanvas, 0, 0);
-
-            return this.ctx.getImageData(0, 0, newWidth, newHeight).data;
-        }
-
-        generatePreview(width, height) {
-            const previewCanvas = document.createElement('canvas');
-            const previewCtx = previewCanvas.getContext('2d');
-
-            previewCanvas.width = width;
-            previewCanvas.height = height;
-
-            previewCtx.imageSmoothingEnabled = false;
-            previewCtx.drawImage(this.img, 0, 0, width, height);
-
-            return previewCanvas.toDataURL();
-        }
-    }
 
     // WPLACE API SERVICE
     const WPlaceService = {
         async paintPixelInRegion(regionX, regionY, pixelX, pixelY, color) {
             try {
-                await ensureToken();
-                if (!turnstileToken) return 'token_error';
+                await tokenManager.ensureToken();
+                const token = tokenManager.getToken();
+                if (!token) return 'token_error';
+
+                // Get fingerprint from security system
+                const fingerprint = security.fingerprint.getFingerprint();
+
                 const payload = {
                     coords: [pixelX, pixelY],
                     colors: [color],
-                    t: turnstileToken,
+                    t: token,
+                    fp: fingerprint,
                 };
+
+                // Generate WASM token for pawtect protection
+                let wasmToken = null;
+                try {
+                    wasmToken = await security.pawtect.createWasmToken(
+                        regionX,
+                        regionY,
+                        payload
+                    );
+                    if (!wasmToken) {
+                        console.log(
+                            '⚠️ WASM token generation returned null, continuing without pawtect protection'
+                        );
+                    }
+                } catch (wasmError) {
+                    console.log(
+                        '⚠️ WASM token generation failed:',
+                        wasmError.message,
+                        'continuing without pawtect protection'
+                    );
+                }
+
+                // Prepare headers with conditional pawtect token
+                const headers = {
+                    'Content-Type': 'text/plain;charset=UTF-8',
+                };
+                if (wasmToken) {
+                    headers['x-pawtect-token'] = wasmToken;
+                    console.log('🛡️ Including pawtect token in request');
+                } else {
+                    console.log(
+                        '⚠️ No pawtect token available, sending request without protection'
+                    );
+                }
+
                 const res = await fetch(
                     `https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`,
                     {
                         method: 'POST',
-                        headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+                        headers,
                         credentials: 'include',
                         body: JSON.stringify(payload),
                     }
@@ -3288,10 +283,8 @@ import {
                     console.error(
                         '❌ 403 Forbidden. Turnstile token might be invalid or expired.'
                     );
-                    turnstileToken = null;
-                    tokenPromise = new Promise(resolve => {
-                        _resolveToken = resolve;
-                    });
+                    tokenManager.invalidateToken();
+                    security.pawtect.resetUserState(); // Reset pawtect user state when token is invalidated
                     return 'token_error';
                 }
                 const data = await res.json();
@@ -3454,7 +447,7 @@ import {
     };
 
     // COLOR MATCHING FUNCTION - Optimized with caching
-    const colorCache = new Map();
+    // (colorCache already initialized above)
 
     // UI UPDATE FUNCTIONS (declared early to avoid reference errors)
     let updateUI = () => {};
@@ -3655,236 +648,7 @@ import {
      * Handle CAPTCHA generation and validation process.
      * @returns {Promise<void>}
      */
-    async function handleCaptcha() {
-        const startTime = performance.now();
-
-        // Check user's token source preference
-        if (state.tokenSource === 'manual') {
-            console.log(
-                '🎯 Manual token source selected - using pixel placement automation'
-            );
-            return await handleCaptchaFallback();
-        }
-
-        // Generator mode (pure) or Hybrid mode - try generator first
-        try {
-            // Use optimized token generation with automatic sitekey detection
-            const { sitekey, token: preGeneratedToken } =
-                await Utils.obtainSitekeyAndToken();
-
-            if (!sitekey) {
-                throw new Error('No valid sitekey found');
-            }
-
-            console.log('🔑 Generating Turnstile token for sitekey:', sitekey);
-            console.log(
-                '🧭 UA:',
-                navigator.userAgent.substring(0, 50) + '...',
-                'Platform:',
-                navigator.platform
-            );
-
-            // Add additional checks before token generation
-            if (!window.turnstile) {
-                await Utils.loadTurnstile();
-            }
-
-            let token = null;
-
-            // ✅ Reuse pre-generated token if available and valid
-            if (
-                preGeneratedToken &&
-                typeof preGeneratedToken === 'string' &&
-                preGeneratedToken.length > 20
-            ) {
-                console.log(
-                    '♻️ Reusing pre-generated token from sitekey detection phase'
-                );
-                token = preGeneratedToken;
-            }
-            // ✅ Or use globally cached token if still valid
-            else if (isTokenValid()) {
-                console.log(
-                    '♻️ Using existing cached token (from previous operation)'
-                );
-                token = turnstileToken;
-            }
-            // ✅ Otherwise generate a new one
-            else {
-                console.log(
-                    '🔐 No valid pre-generated or cached token, creating new one...'
-                );
-                token = await Utils.executeTurnstile(sitekey, 'paint');
-                if (token) {
-                    setTurnstileToken(token);
-                }
-            }
-
-            // 📊 Debug log
-            console.log(
-                `🔍 Token received - Type: ${typeof token}, Value: ${
-                    token
-                        ? typeof token === 'string'
-                            ? token.length > 50
-                                ? token.substring(0, 50) + '...'
-                                : token
-                            : JSON.stringify(token)
-                        : 'null/undefined'
-                }, Length: ${token?.length || 0}`
-            );
-
-            // ✅ Final validation
-            if (typeof token === 'string' && token.length > 20) {
-                const duration = Math.round(performance.now() - startTime);
-                console.log(
-                    `✅ Turnstile token generated successfully in ${duration}ms`
-                );
-                return token;
-            } else {
-                throw new Error(
-                    `Invalid or empty token received - Type: ${typeof token}, Value: ${JSON.stringify(
-                        token
-                    )}, Length: ${token?.length || 0}`
-                );
-            }
-        } catch (error) {
-            const duration = Math.round(performance.now() - startTime);
-            console.error(
-                `❌ Turnstile token generation failed after ${duration}ms:`,
-                error
-            );
-
-            // Fallback to manual pixel placement for hybrid mode
-            if (state.tokenSource === 'hybrid') {
-                console.log(
-                    '🔄 Hybrid mode: Generator failed, automatically switching to manual pixel placement...'
-                );
-                const fbToken = await handleCaptchaFallback();
-                return fbToken;
-            } else {
-                // Pure generator mode - don't fallback, just fail
-                throw error;
-            }
-        }
-    }
-
-    // Keep original method as fallback
-    async function handleCaptchaFallback() {
-        return new Promise(async (resolve, reject) => {
-            try {
-                // Ensure we have a fresh promise to await for a new token capture
-                if (!_resolveToken) {
-                    tokenPromise = new Promise(res => {
-                        _resolveToken = res;
-                    });
-                }
-                const timeoutPromise = Utils.sleep(20000).then(() =>
-                    reject(new Error('Auto-CAPTCHA timed out.'))
-                );
-
-                const solvePromise = (async () => {
-                    const mainPaintBtn = await Utils.waitForSelector(
-                        'button.btn.btn-primary.btn-lg, button.btn-primary.sm\\:btn-xl',
-                        200,
-                        10000
-                    );
-                    if (!mainPaintBtn)
-                        throw new Error(
-                            'Could not find the main paint button.'
-                        );
-                    mainPaintBtn.click();
-                    await Utils.sleep(500);
-
-                    const transBtn = await Utils.waitForSelector(
-                        'button#color-0',
-                        200,
-                        5000
-                    );
-                    if (!transBtn)
-                        throw new Error(
-                            'Could not find the transparent color button.'
-                        );
-                    transBtn.click();
-                    await Utils.sleep(500);
-
-                    const canvas = await Utils.waitForSelector(
-                        'canvas',
-                        200,
-                        5000
-                    );
-                    if (!canvas)
-                        throw new Error('Could not find the canvas element.');
-
-                    canvas.setAttribute('tabindex', '0');
-                    canvas.focus();
-                    const rect = canvas.getBoundingClientRect();
-                    const centerX = Math.round(rect.left + rect.width / 2);
-                    const centerY = Math.round(rect.top + rect.height / 2);
-
-                    canvas.dispatchEvent(
-                        new MouseEvent('mousemove', {
-                            clientX: centerX,
-                            clientY: centerY,
-                            bubbles: true,
-                        })
-                    );
-                    canvas.dispatchEvent(
-                        new KeyboardEvent('keydown', {
-                            key: ' ',
-                            code: 'Space',
-                            bubbles: true,
-                        })
-                    );
-                    await Utils.sleep(50);
-                    canvas.dispatchEvent(
-                        new KeyboardEvent('keyup', {
-                            key: ' ',
-                            code: 'Space',
-                            bubbles: true,
-                        })
-                    );
-                    await Utils.sleep(500);
-
-                    // 800ms delay before sending confirmation
-                    await Utils.sleep(800);
-
-                    // Keep confirming until token is captured
-                    const confirmLoop = async () => {
-                        while (!turnstileToken) {
-                            let confirmBtn = await Utils.waitForSelector(
-                                'button.btn.btn-primary.btn-lg, button.btn.btn-primary.sm\\:btn-xl'
-                            );
-                            if (!confirmBtn) {
-                                const allPrimary = Array.from(
-                                    document.querySelectorAll(
-                                        'button.btn-primary'
-                                    )
-                                );
-                                confirmBtn = allPrimary.length
-                                    ? allPrimary[allPrimary.length - 1]
-                                    : null;
-                            }
-                            if (confirmBtn) {
-                                confirmBtn.click();
-                            }
-                            await Utils.sleep(500); // 500ms delay between confirmation attempts
-                        }
-                    };
-
-                    // Start confirmation loop and wait for token
-                    confirmLoop();
-                    const token = await tokenPromise;
-                    await Utils.sleep(300); // small delay after token is captured
-                    resolve(token);
-                })();
-
-                await Promise.race([solvePromise, timeoutPromise]);
-            } catch (error) {
-                console.error('Auto-CAPTCHA process failed:', error);
-                reject(error);
-            }
-        });
-    }
+    // Token management functions moved to TokenManager class
 
     /**
      * Create and initialize the main user interface.
@@ -3912,7 +676,7 @@ import {
         if (existingResizeOverlay) existingResizeOverlay.remove();
 
         loadThemePreference();
-        await initializeTranslations();
+        await initializeTranslations(state);
 
         const theme = getCurrentTheme();
         applyTheme(); // <- new: set CSS vars and theme class before building UI
@@ -5208,11 +1972,8 @@ import {
             if (languageSelect) {
                 languageSelect.addEventListener('change', async e => {
                     const newLanguage = e.target.value;
-                    state.language = newLanguage;
-                    localStorage.setItem('wplace_language', newLanguage);
 
-                    // Load the new language translations
-                    await loadTranslations(newLanguage);
+                    await setLanguage(newLanguage, state);
 
                     setTimeout(() => {
                         settingsContainer.style.display = 'none';
@@ -5226,6 +1987,8 @@ import {
                 themeSelect.addEventListener('change', e => {
                     const newTheme = e.target.value;
                     switchTheme(newTheme);
+                    // Recreate UI after theme switch
+                    createUI();
                 });
             }
 
@@ -7452,8 +4215,8 @@ import {
                 updateUI('missingRequirements', 'error');
                 return;
             }
-            await ensureToken();
-            if (!turnstileToken) return;
+            await tokenManager.ensureToken();
+            if (!tokenManager.getToken()) return;
 
             state.running = true;
             state.stopFlag = false;
@@ -7964,9 +4727,9 @@ import {
 
         function skipPixel(reason, id, rgb, x, y) {
             if (reason !== 'transparent') {
-                console.log(
-                    `Skipped pixel for ${reason} (id: ${id}, (${rgb.join(', ')})) at (${x}, ${y})`
-                );
+                // console.log(
+                //     `Skipped pixel for ${reason} (id: ${id}, (${rgb.join(', ')})) at (${x}, ${y})`
+                // );
             }
             skippedPixels[reason]++;
         }
@@ -8329,7 +5092,7 @@ import {
                 );
                 updateUI('captchaSolving', 'warning');
                 try {
-                    await handleCaptcha();
+                    await tokenManager.ensureToken(true);
                     // Don't count token regeneration as a failed attempt
                     attempt--;
                     continue;
@@ -8375,19 +5138,16 @@ import {
      * @returns {Promise<boolean>} True if request was successful
      */
     async function sendPixelBatch(pixelBatch, regionX, regionY) {
-        let token = turnstileToken;
+        // Use existing token directly, similar to remote script approach
+        let token = tokenManager.getToken();
 
-        // Generate new token if we don't have one
+        // Generate new token if we don't have one (but don't force refresh valid tokens)
         if (!token) {
             try {
                 console.log('🔑 Generating Turnstile token for pixel batch...');
-                token = await handleCaptcha();
-                turnstileToken = token; // Store for potential reuse
+                token = await tokenManager.ensureToken();
             } catch (error) {
                 console.error('❌ Failed to generate Turnstile token:', error);
-                tokenPromise = new Promise(resolve => {
-                    _resolveToken = resolve;
-                });
                 return 'token_error';
             }
         }
@@ -8402,13 +5162,30 @@ import {
         }
 
         try {
-            const payload = { coords, colors, t: token };
+            // Get fingerprint from security system
+            const fingerprint = security.fingerprint.getFingerprint();
+
+            const payload = { coords, colors, t: token, fp: fingerprint };
+
+            // Generate WASM token for pawtect protection
+            const wasmToken = await security.pawtect.createWasmToken(
+                regionX,
+                regionY,
+                payload
+            );
+            if (!wasmToken) {
+                console.error('❌ Failed to generate WASM token for batch');
+                return 'token_error';
+            }
 
             const res = await fetch(
                 `https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`,
                 {
                     method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+                    headers: {
+                        'Content-Type': 'text/plain;charset=UTF-8',
+                        'x-pawtect-token': wasmToken,
+                    },
                     credentials: 'include',
                     body: JSON.stringify(payload),
                 }
@@ -8426,17 +5203,37 @@ import {
                 // Try to generate a new token and retry once
                 try {
                     console.log('🔄 Regenerating Turnstile token after 403...');
-                    token = await handleCaptcha();
-                    turnstileToken = token;
+                    token = await tokenManager.ensureToken(true);
 
                     // Retry the request with new token
-                    const retryPayload = { coords, colors, t: token };
+                    const retryPayload = {
+                        coords,
+                        colors,
+                        t: token,
+                        fp: fingerprint,
+                    };
+
+                    // Generate new WASM token for retry
+                    const retryWasmToken =
+                        await security.pawtect.createWasmToken(
+                            regionX,
+                            regionY,
+                            retryPayload
+                        );
+                    if (!retryWasmToken) {
+                        console.error(
+                            '❌ Failed to generate WASM token for retry'
+                        );
+                        return 'token_error';
+                    }
+
                     const retryRes = await fetch(
                         `https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`,
                         {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'text/plain;charset=UTF-8',
+                                'x-pawtect-token': retryWasmToken,
                             },
                             credentials: 'include',
                             body: JSON.stringify(retryPayload),
@@ -8444,10 +5241,8 @@ import {
                     );
 
                     if (retryRes.status === 403) {
-                        turnstileToken = null;
-                        tokenPromise = new Promise(resolve => {
-                            _resolveToken = resolve;
-                        });
+                        tokenManager.invalidateToken();
+                        security.pawtect.resetUserState(); // Reset pawtect user state when token is invalidated
                         return 'token_error';
                     }
 
@@ -8455,10 +5250,8 @@ import {
                     return retryData?.painted === pixelBatch.length;
                 } catch (retryError) {
                     console.error('❌ Token regeneration failed:', retryError);
-                    turnstileToken = null;
-                    tokenPromise = new Promise(resolve => {
-                        _resolveToken = resolve;
-                    });
+                    tokenManager.invalidateToken();
+                    security.pawtect.resetUserState(); // Reset pawtect user state when token is invalidated
                     return 'token_error';
                 }
             }
@@ -8866,7 +5659,7 @@ import {
     // Optimized token initialization with better timing and error handling
     async function initializeTokenGenerator() {
         // Skip if already have valid token
-        if (isTokenValid()) {
+        if (tokenManager.isTokenValid()) {
             console.log(
                 '✅ Valid token already available, skipping initialization'
             );
@@ -8880,14 +5673,14 @@ import {
             updateUI('initializingToken', 'default');
 
             console.log('Attempting to load Turnstile script...');
-            await Utils.loadTurnstile();
+            // TurnstileManager will be initialized when needed
             console.log(
                 'Turnstile script loaded. Attempting to generate token...'
             );
 
-            const token = await handleCaptchaWithRetry();
+            const token = await tokenManager.handleCaptchaWithRetry();
             if (token) {
-                setTurnstileToken(token);
+                tokenManager.setTurnstileToken(token);
                 console.log('✅ Startup token generated successfully');
                 updateUI('tokenReady', 'success');
                 Utils.showAlert(Utils.t('tokenGeneratorReady'), 'success');
@@ -9018,7 +5811,7 @@ import {
 
         // Add cleanup on page unload
         window.addEventListener('beforeunload', () => {
-            Utils.cleanupTurnstile();
+            Utils.turnstileManager.destroy();
         });
     });
 })();
