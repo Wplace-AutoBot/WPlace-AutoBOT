@@ -10,27 +10,23 @@ export class PawtectManager {
         this.pawtectChunk = null;
         this.wasmModule = null;
         this.initialized = false;
-        this.userIdSet = false;
     }
 
     /**
      * Initialize the Pawtect manager by finding and loading the WASM module
      */
     async initialize() {
-        if (this.initialized) return;
+        if (this.initialized) return true;
 
         try {
-            // Find the pawtect WASM module if not already found
+            // Find the pawtect WASM module if not already found (matches remote script pattern)
+            this.pawtectChunk ??= await this.findTokenModule('pawtect_wasm_bg.wasm');
+            
             if (!this.pawtectChunk) {
-                this.pawtectChunk = await this.findTokenModule(
-                    'pawtect_wasm_bg.wasm'
-                );
-                if (!this.pawtectChunk) {
-                    console.error('❌ Could not find Pawtect WASM chunk');
-                    return false;
-                }
-                console.log('✅ Found Pawtect WASM chunk:', this.pawtectChunk);
+                console.error('❌ Could not find Pawtect WASM chunk');
+                return false;
             }
+            console.log('✅ Found Pawtect WASM chunk:', this.pawtectChunk);
 
             this.initialized = true;
             console.log('🛡️ Pawtect Manager initialized successfully');
@@ -81,18 +77,8 @@ export class PawtectManager {
      */
     async createWasmToken(regionX, regionY, payload) {
         try {
-            if (!this.initialized) {
-                const success = await this.initialize();
-                if (!success) return null;
-            }
-
-            // Load the Pawtect module and WASM
-            const mod = await import(
-                new URL(
-                    '/_app/immutable/chunks/' + this.pawtectChunk,
-                    location.origin
-                ).href
-            );
+            // Load the Pawtect module and WASM (matches remote script pattern)
+            const mod = await import(new URL('/_app/immutable/chunks/' + this.pawtectChunk, location.origin).href);
             let wasm;
 
             try {
@@ -103,19 +89,15 @@ export class PawtectManager {
                 return null;
             }
 
-            // Set user ID if available and not already set
+            // Set user ID (exactly matching remote script - simplified)
             try {
-                if (!this.userIdSet) {
-                    const me = await fetch(`https://backend.wplace.live/me`, {
-                        credentials: 'include',
-                    }).then(r => (r.ok ? r.json() : null));
-
-                    if (me?.id && mod.i) {
+                try {
+                    const me = await fetch(`https://backend.wplace.live/me`, { credentials: 'include' }).then(r => r.ok ? r.json() : null);
+                    if (me?.id) {
                         mod.i(me.id);
-                        console.log('✅ User ID set:', me.id);
-                        this.userIdSet = true;
+                        console.log('✅ user ID set:', me.id);
                     }
-                }
+                } catch { }
             } catch (userIdError) {
                 console.log('⚠️ Error setting user ID:', userIdError.message);
             }
@@ -261,8 +243,14 @@ export class PawtectManager {
         this.pawtectChunk = null;
         this.wasmModule = null;
         this.initialized = false;
-        this.userIdSet = false;
         console.log('🔄 Pawtect Manager reset');
+    }
+
+    /**
+     * Reset user ID state when tokens are invalidated (no-op since remote script doesn't track this)
+     */
+    resetUserState() {
+        console.log('🔄 Pawtect user state reset - user ID will be refreshed on next token generation');
     }
 
     /**
@@ -274,7 +262,6 @@ export class PawtectManager {
             initialized: this.initialized,
             hasPawtectChunk: !!this.pawtectChunk,
             pawtectChunk: this.pawtectChunk,
-            userIdSet: this.userIdSet,
             hasWasmModule: !!this.wasmModule,
         };
     }

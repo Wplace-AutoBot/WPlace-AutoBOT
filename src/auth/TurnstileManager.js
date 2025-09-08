@@ -38,6 +38,12 @@ export class TurnstileManager {
             throw new TurnstileError('Turnstile site key is required');
         }
 
+        // Check if already initialized to prevent multiple widgets
+        if (this.isLoaded && this.widget) {
+            console.log('🔄 Turnstile already initialized, reusing existing widget');
+            return Promise.resolve();
+        }
+
         // Create overlay container like main branch does
         this.container = this._ensureOverlayContainer();
 
@@ -62,7 +68,17 @@ export class TurnstileManager {
     }
 
     _ensureOverlayContainer() {
+        // First check if overlay already exists in DOM (prevent duplicates)
+        const existingOverlay = document.getElementById('turnstile-overlay-container');
+        if (existingOverlay) {
+            console.log('🔄 Reusing existing Turnstile overlay container');
+            this.overlay = existingOverlay;
+            return this.overlay.querySelector('#turnstile-overlay-host');
+        }
+
+        // Check if we have a reference to our overlay
         if (this.overlay && document.body.contains(this.overlay)) {
+            console.log('🔄 Reusing existing Turnstile overlay from instance');
             return this.overlay.querySelector('#turnstile-overlay-host');
         }
 
@@ -154,6 +170,13 @@ export class TurnstileManager {
 
     _renderWidget(resolve, reject) {
         try {
+            // Check if widget already exists to prevent duplicates
+            if (this.widget) {
+                console.log('🔄 Turnstile widget already exists, skipping render');
+                resolve();
+                return;
+            }
+
             // Use normal interactive widget like main branch fallback
             const turnstileTheme = this._getTurnstileTheme();
             console.log('🎨 Using Turnstile theme:', turnstileTheme);
@@ -312,8 +335,16 @@ export class TurnstileManager {
 
     reset() {
         if (this.widget && window.turnstile) {
+            console.log('🧹 Resetting existing Turnstile widget');
             window.turnstile.reset(this.widget);
             this.currentToken = null;
+        }
+        
+        // Hide overlay when resetting
+        if (this.overlay) {
+            this.overlay.classList.add('wplace-overlay-hidden');
+            this.overlay.style.display = 'none';
+            console.log('🔒 Turnstile overlay hidden during reset');
         }
     }
 

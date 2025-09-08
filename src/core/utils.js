@@ -82,12 +82,18 @@ export function createAutoImageUtils(
             retryInterval: 5000,
         }),
 
-        async obtainSitekeyAndToken(fallback = '0x4AAAAAABpqJe8FO0N84q0F') {
+        async obtainSitekeyAndToken(fallback = '0x4AAAAAABpqJe8FO0N84q0F', forceRefresh = false) {
             try {
-                // If we have a valid cached token, return it
-                if (isTokenValid() && turnstileToken) {
+                // If we have a valid cached token and not forcing refresh, return it
+                if (!forceRefresh && isTokenValid() && turnstileToken) {
                     console.log('🔍 Using valid cached token');
                     return { sitekey: fallback, token: turnstileToken };
+                }
+
+                // Reset TurnstileManager widget if forcing refresh (matching remote script behavior)
+                if (forceRefresh) {
+                    console.log('🧹 Cleaning up existing Turnstile widget due to force refresh');
+                    this.turnstileManager.reset();
                 }
 
                 // Try to detect sitekey from page or use fallback

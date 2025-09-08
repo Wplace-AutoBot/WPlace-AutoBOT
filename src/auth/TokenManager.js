@@ -53,11 +53,11 @@ export class TokenManager {
     }
 
     /**
-     * Get the current token if valid.
-     * @returns {string|null} The current token or null if invalid
+     * Get the current token (ignoring time-based expiration to match remote script behavior).
+     * @returns {string|null} The current token or null if not set
      */
     getToken() {
-        return this.isTokenValid() ? this.turnstileToken : null;
+        return this.turnstileToken;
     }
 
     /**
@@ -66,26 +66,28 @@ export class TokenManager {
      * @returns {Promise<string|null>} The valid token or null if generation failed
      */
     async ensureToken(forceRefresh = false) {
-        // Return cached token if still valid and not forcing refresh
-        if (this.isTokenValid() && !forceRefresh) {
+        // Always invalidate and generate fresh token if forcing refresh (matching remote script behavior)
+        if (forceRefresh) {
+            console.log('🔄 Force refresh requested - invalidating cached token and generating fresh one');
+            this.invalidateToken();
+        }
+        // Return cached token only if we have one and not forcing refresh
+        else if (this.turnstileToken) {
             return this.turnstileToken;
         }
-
-        // Invalidate token if forcing refresh
-        if (forceRefresh) this.invalidateToken();
 
         // Avoid multiple simultaneous token generations
         if (this.tokenGenerationInProgress) {
             console.log('🔄 Token generation already in progress, waiting...');
             await this.Utils.sleep(2000);
-            return this.isTokenValid() ? this.turnstileToken : null;
+            return this.turnstileToken;
         }
 
         this.tokenGenerationInProgress = true;
 
         try {
             console.log('🔄 Token expired or missing, generating new one...');
-            const token = await this.handleCaptchaWithRetry();
+            const token = await this.handleCaptchaWithRetry(forceRefresh);
             if (token && token.length > 20) {
                 this.setTurnstileToken(token);
                 console.log('✅ Token captured and cached successfully');
@@ -112,14 +114,15 @@ export class TokenManager {
     /**
      * Handle Turnstile CAPTCHA generation with retry logic.
      * Attempts to obtain sitekey and generate token using invisible method.
+     * @param {boolean} [forceRefresh=false] - Force widget reset and fresh token generation
      * @returns {Promise<string|null>} The generated token or null if failed
      */
-    async handleCaptchaWithRetry() {
+    async handleCaptchaWithRetry(forceRefresh = false) {
         const startTime = performance.now();
 
         try {
             const { sitekey, token: preGeneratedToken } =
-                await this.Utils.obtainSitekeyAndToken();
+                await this.Utils.obtainSitekeyAndToken('0x4AAAAAABpqJe8FO0N84q0F', forceRefresh);
 
             if (!sitekey) {
                 throw new Error('No valid sitekey found');
@@ -155,7 +158,7 @@ export class TokenManager {
                     console.log(
                         '🔐 Generating new token with executeTurnstile...'
                     );
-                    const result = await this.Utils.obtainSitekeyAndToken();
+                    const result = await this.Utils.obtainSitekeyAndToken('0x4AAAAAABpqJe8FO0N84q0F', forceRefresh);
                     token = result.token;
                     if (token) this.setTurnstileToken(token);
                 }
@@ -323,8 +326,10 @@ export class TokenManager {
         // Generator mode (pure) or Hybrid mode - try generator first
         try {
             // Use optimized token generation with automatic sitekey detection
+            // Check if we need to force refresh (for 403 errors)
+            const forceRefresh = state.tokenSource === 'manual' ? false : false; // Will be determined by caller
             const { sitekey, token: preGeneratedToken } =
-                await this.Utils.obtainSitekeyAndToken();
+                await this.Utils.obtainSitekeyAndToken('0x4AAAAAABpqJe8FO0N84q0F', false);
 
             if (!sitekey) {
                 throw new Error('No valid sitekey found');

@@ -149,28 +149,6 @@ import { initializeSecurity, getSecurity } from './security/index.js';
         };
     });
 
-    window.addEventListener('message', event => {
-        const { source, endpoint, blobID, blobData, token } = event.data;
-
-        if (source === 'auto-image-tile' && endpoint && blobID && blobData) {
-            overlayManager.processAndRespondToTileRequest(event.data);
-        }
-
-        if (source === 'turnstile-capture' && token) {
-            setTurnstileToken(token);
-            if (
-                document
-                    .querySelector('#statusText')
-                    ?.textContent.includes('CAPTCHA')
-            ) {
-                Utils.showAlert(Utils.t('tokenCapturedSuccess'), 'success');
-                updateUI('colorsFound', 'success', {
-                    count: state.availableColors.length,
-                });
-            }
-        }
-    });
-
     /**
      * Detect the user's language from the backend API or browser settings.
      * @returns {Promise<void>}
@@ -215,6 +193,29 @@ import { initializeSecurity, getSecurity } from './security/index.js';
     // Set overlayManager reference in Utils
     Utils.overlayManager = overlayManager;
 
+    // Set up message event listener for turnstile token capture (after tokenManager is initialized)
+    window.addEventListener('message', event => {
+        const { source, endpoint, blobID, blobData, token } = event.data;
+
+        if (source === 'auto-image-tile' && endpoint && blobID && blobData) {
+            overlayManager.processAndRespondToTileRequest(event.data);
+        }
+
+        if (source === 'turnstile-capture' && token) {
+            tokenManager.setTurnstileToken(token);
+            if (
+                document
+                    .querySelector('#statusText')
+                    ?.textContent.includes('CAPTCHA')
+            ) {
+                Utils.showAlert(Utils.t('tokenCapturedSuccess'), 'success');
+                updateUI('colorsFound', 'success', {
+                    count: state.availableColors.length,
+                });
+            }
+        }
+    });
+
     // IMAGE PROCESSOR CLASS
 
     // WPLACE API SERVICE
@@ -236,20 +237,32 @@ import { initializeSecurity, getSecurity } from './security/index.js';
                 };
                 
                 // Generate WASM token for pawtect protection
-                const wasmToken = await security.pawtect.createWasmToken(regionX, regionY, payload);
-                if (!wasmToken) {
-                    console.error('❌ Failed to generate WASM token');
-                    return 'token_error';
+                let wasmToken = null;
+                try {
+                    wasmToken = await security.pawtect.createWasmToken(regionX, regionY, payload);
+                    if (!wasmToken) {
+                        console.log('⚠️ WASM token generation returned null, continuing without pawtect protection');
+                    }
+                } catch (wasmError) {
+                    console.log('⚠️ WASM token generation failed:', wasmError.message, 'continuing without pawtect protection');
                 }
                 
+                // Prepare headers with conditional pawtect token
+                const headers = {
+                    'Content-Type': 'text/plain;charset=UTF-8',
+                };
+                if (wasmToken) {
+                    headers['x-pawtect-token'] = wasmToken;
+                    console.log('🛡️ Including pawtect token in request');
+                } else {
+                    console.log('⚠️ No pawtect token available, sending request without protection');
+                }
+
                 const res = await fetch(
                     `https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`,
                     {
                         method: 'POST',
-                        headers: { 
-                            'Content-Type': 'text/plain;charset=UTF-8',
-                            'x-pawtect-token': wasmToken
-                        },
+                        headers,
                         credentials: 'include',
                         body: JSON.stringify(payload),
                     }
@@ -259,6 +272,7 @@ import { initializeSecurity, getSecurity } from './security/index.js';
                         '❌ 403 Forbidden. Turnstile token might be invalid or expired.'
                     );
                     tokenManager.invalidateToken();
+                    security.pawtect.resetUserState(); // Reset pawtect user state when token is invalidated
                     return 'token_error';
                 }
                 const data = await res.json();
@@ -4701,9 +4715,9 @@ import { initializeSecurity, getSecurity } from './security/index.js';
 
         function skipPixel(reason, id, rgb, x, y) {
             if (reason !== 'transparent') {
-                console.log(
-                    `Skipped pixel for ${reason} (id: ${id}, (${rgb.join(', ')})) at (${x}, ${y})`
-                );
+                // console.log(
+                //     `Skipped pixel for ${reason} (id: ${id}, (${rgb.join(', ')})) at (${x}, ${y})`
+                // );
             }
             skippedPixels[reason]++;
         }
@@ -5066,7 +5080,7 @@ import { initializeSecurity, getSecurity } from './security/index.js';
                 );
                 updateUI('captchaSolving', 'warning');
                 try {
-                    await tokenManager.handleCaptcha(state);
+                    await tokenManager.ensureToken(true);
                     // Don't count token regeneration as a failed attempt
                     attempt--;
                     continue;
@@ -5112,13 +5126,14 @@ import { initializeSecurity, getSecurity } from './security/index.js';
      * @returns {Promise<boolean>} True if request was successful
      */
     async function sendPixelBatch(pixelBatch, regionX, regionY) {
+        // Use existing token directly, similar to remote script approach
         let token = tokenManager.getToken();
-
-        // Generate new token if we don't have one
+        
+        // Generate new token if we don't have one (but don't force refresh valid tokens)
         if (!token) {
             try {
                 console.log('🔑 Generating Turnstile token for pixel batch...');
-                token = await tokenManager.handleCaptcha(state);
+                token = await tokenManager.ensureToken();
             } catch (error) {
                 console.error('❌ Failed to generate Turnstile token:', error);
                 return 'token_error';
@@ -5172,7 +5187,7 @@ import { initializeSecurity, getSecurity } from './security/index.js';
                 // Try to generate a new token and retry once
                 try {
                     console.log('🔄 Regenerating Turnstile token after 403...');
-                    token = await tokenManager.handleCaptcha(state);
+                    token = await tokenManager.ensureToken(true);
 
                     // Retry the request with new token
                     const retryPayload = { coords, colors, t: token, fp: fingerprint };
@@ -5199,6 +5214,7 @@ import { initializeSecurity, getSecurity } from './security/index.js';
 
                     if (retryRes.status === 403) {
                         tokenManager.invalidateToken();
+                        security.pawtect.resetUserState(); // Reset pawtect user state when token is invalidated
                         return 'token_error';
                     }
 
@@ -5207,6 +5223,7 @@ import { initializeSecurity, getSecurity } from './security/index.js';
                 } catch (retryError) {
                     console.error('❌ Token regeneration failed:', retryError);
                     tokenManager.invalidateToken();
+                    security.pawtect.resetUserState(); // Reset pawtect user state when token is invalidated
                     return 'token_error';
                 }
             }
