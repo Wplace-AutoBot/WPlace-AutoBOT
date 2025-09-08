@@ -68,7 +68,9 @@ export class TokenManager {
     async ensureToken(forceRefresh = false) {
         // Always invalidate and generate fresh token if forcing refresh (matching remote script behavior)
         if (forceRefresh) {
-            console.log('🔄 Force refresh requested - invalidating cached token and generating fresh one');
+            console.log(
+                '🔄 Force refresh requested - invalidating cached token and generating fresh one'
+            );
             this.invalidateToken();
         }
         // Return cached token only if we have one and not forcing refresh
@@ -122,7 +124,10 @@ export class TokenManager {
 
         try {
             const { sitekey, token: preGeneratedToken } =
-                await this.Utils.obtainSitekeyAndToken('0x4AAAAAABpqJe8FO0N84q0F', forceRefresh);
+                await this.Utils.obtainSitekeyAndToken(
+                    '0x4AAAAAABpqJe8FO0N84q0F',
+                    forceRefresh
+                );
 
             if (!sitekey) {
                 throw new Error('No valid sitekey found');
@@ -158,7 +163,10 @@ export class TokenManager {
                     console.log(
                         '🔐 Generating new token with executeTurnstile...'
                     );
-                    const result = await this.Utils.obtainSitekeyAndToken('0x4AAAAAABpqJe8FO0N84q0F', forceRefresh);
+                    const result = await this.Utils.obtainSitekeyAndToken(
+                        '0x4AAAAAABpqJe8FO0N84q0F',
+                        forceRefresh
+                    );
                     token = result.token;
                     if (token) this.setTurnstileToken(token);
                 }
@@ -329,7 +337,10 @@ export class TokenManager {
             // Check if we need to force refresh (for 403 errors)
             const forceRefresh = state.tokenSource === 'manual' ? false : false; // Will be determined by caller
             const { sitekey, token: preGeneratedToken } =
-                await this.Utils.obtainSitekeyAndToken('0x4AAAAAABpqJe8FO0N84q0F', false);
+                await this.Utils.obtainSitekeyAndToken(
+                    '0x4AAAAAABpqJe8FO0N84q0F',
+                    false
+                );
 
             if (!sitekey) {
                 throw new Error('No valid sitekey found');

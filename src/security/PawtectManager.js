@@ -20,8 +20,10 @@ export class PawtectManager {
 
         try {
             // Find the pawtect WASM module if not already found (matches remote script pattern)
-            this.pawtectChunk ??= await this.findTokenModule('pawtect_wasm_bg.wasm');
-            
+            this.pawtectChunk ??= await this.findTokenModule(
+                'pawtect_wasm_bg.wasm'
+            );
+
             if (!this.pawtectChunk) {
                 console.error('❌ Could not find Pawtect WASM chunk');
                 return false;
@@ -78,7 +80,12 @@ export class PawtectManager {
     async createWasmToken(regionX, regionY, payload) {
         try {
             // Load the Pawtect module and WASM (matches remote script pattern)
-            const mod = await import(new URL('/_app/immutable/chunks/' + this.pawtectChunk, location.origin).href);
+            const mod = await import(
+                new URL(
+                    '/_app/immutable/chunks/' + this.pawtectChunk,
+                    location.origin
+                ).href
+            );
             let wasm;
 
             try {
@@ -92,12 +99,14 @@ export class PawtectManager {
             // Set user ID (exactly matching remote script - simplified)
             try {
                 try {
-                    const me = await fetch(`https://backend.wplace.live/me`, { credentials: 'include' }).then(r => r.ok ? r.json() : null);
+                    const me = await fetch(`https://backend.wplace.live/me`, {
+                        credentials: 'include',
+                    }).then(r => (r.ok ? r.json() : null));
                     if (me?.id) {
                         mod.i(me.id);
                         console.log('✅ user ID set:', me.id);
                     }
-                } catch { }
+                } catch {}
             } catch (userIdError) {
                 console.log('⚠️ Error setting user ID:', userIdError.message);
             }
@@ -250,7 +259,9 @@ export class PawtectManager {
      * Reset user ID state when tokens are invalidated (no-op since remote script doesn't track this)
      */
     resetUserState() {
-        console.log('🔄 Pawtect user state reset - user ID will be refreshed on next token generation');
+        console.log(
+            '🔄 Pawtect user state reset - user ID will be refreshed on next token generation'
+        );
     }
 
     /**

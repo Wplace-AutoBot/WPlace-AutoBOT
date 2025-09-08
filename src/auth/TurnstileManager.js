@@ -40,7 +40,9 @@ export class TurnstileManager {
 
         // Check if already initialized to prevent multiple widgets
         if (this.isLoaded && this.widget) {
-            console.log('🔄 Turnstile already initialized, reusing existing widget');
+            console.log(
+                '🔄 Turnstile already initialized, reusing existing widget'
+            );
             return Promise.resolve();
         }
 
@@ -69,7 +71,9 @@ export class TurnstileManager {
 
     _ensureOverlayContainer() {
         // First check if overlay already exists in DOM (prevent duplicates)
-        const existingOverlay = document.getElementById('turnstile-overlay-container');
+        const existingOverlay = document.getElementById(
+            'turnstile-overlay-container'
+        );
         if (existingOverlay) {
             console.log('🔄 Reusing existing Turnstile overlay container');
             this.overlay = existingOverlay;
@@ -172,7 +176,9 @@ export class TurnstileManager {
         try {
             // Check if widget already exists to prevent duplicates
             if (this.widget) {
-                console.log('🔄 Turnstile widget already exists, skipping render');
+                console.log(
+                    '🔄 Turnstile widget already exists, skipping render'
+                );
                 resolve();
                 return;
             }
@@ -339,7 +345,7 @@ export class TurnstileManager {
             window.turnstile.reset(this.widget);
             this.currentToken = null;
         }
-        
+
         // Hide overlay when resetting
         if (this.overlay) {
             this.overlay.classList.add('wplace-overlay-hidden');

@@ -82,7 +82,10 @@ export function createAutoImageUtils(
             retryInterval: 5000,
         }),
 
-        async obtainSitekeyAndToken(fallback = '0x4AAAAAABpqJe8FO0N84q0F', forceRefresh = false) {
+        async obtainSitekeyAndToken(
+            fallback = '0x4AAAAAABpqJe8FO0N84q0F',
+            forceRefresh = false
+        ) {
             try {
                 // If we have a valid cached token and not forcing refresh, return it
                 if (!forceRefresh && isTokenValid() && turnstileToken) {
@@ -92,7 +95,9 @@ export function createAutoImageUtils(
 
                 // Reset TurnstileManager widget if forcing refresh (matching remote script behavior)
                 if (forceRefresh) {
-                    console.log('🧹 Cleaning up existing Turnstile widget due to force refresh');
+                    console.log(
+                        '🧹 Cleaning up existing Turnstile widget due to force refresh'
+                    );
                     this.turnstileManager.reset();
                 }
 

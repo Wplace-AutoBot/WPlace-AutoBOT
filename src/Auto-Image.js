@@ -225,28 +225,38 @@ import { initializeSecurity, getSecurity } from './security/index.js';
                 await tokenManager.ensureToken();
                 const token = tokenManager.getToken();
                 if (!token) return 'token_error';
-                
+
                 // Get fingerprint from security system
                 const fingerprint = security.fingerprint.getFingerprint();
-                
+
                 const payload = {
                     coords: [pixelX, pixelY],
                     colors: [color],
                     t: token,
                     fp: fingerprint,
                 };
-                
+
                 // Generate WASM token for pawtect protection
                 let wasmToken = null;
                 try {
-                    wasmToken = await security.pawtect.createWasmToken(regionX, regionY, payload);
+                    wasmToken = await security.pawtect.createWasmToken(
+                        regionX,
+                        regionY,
+                        payload
+                    );
                     if (!wasmToken) {
-                        console.log('⚠️ WASM token generation returned null, continuing without pawtect protection');
+                        console.log(
+                            '⚠️ WASM token generation returned null, continuing without pawtect protection'
+                        );
                     }
                 } catch (wasmError) {
-                    console.log('⚠️ WASM token generation failed:', wasmError.message, 'continuing without pawtect protection');
+                    console.log(
+                        '⚠️ WASM token generation failed:',
+                        wasmError.message,
+                        'continuing without pawtect protection'
+                    );
                 }
-                
+
                 // Prepare headers with conditional pawtect token
                 const headers = {
                     'Content-Type': 'text/plain;charset=UTF-8',
@@ -255,7 +265,9 @@ import { initializeSecurity, getSecurity } from './security/index.js';
                     headers['x-pawtect-token'] = wasmToken;
                     console.log('🛡️ Including pawtect token in request');
                 } else {
-                    console.log('⚠️ No pawtect token available, sending request without protection');
+                    console.log(
+                        '⚠️ No pawtect token available, sending request without protection'
+                    );
                 }
 
                 const res = await fetch(
@@ -5128,7 +5140,7 @@ import { initializeSecurity, getSecurity } from './security/index.js';
     async function sendPixelBatch(pixelBatch, regionX, regionY) {
         // Use existing token directly, similar to remote script approach
         let token = tokenManager.getToken();
-        
+
         // Generate new token if we don't have one (but don't force refresh valid tokens)
         if (!token) {
             try {
@@ -5152,11 +5164,15 @@ import { initializeSecurity, getSecurity } from './security/index.js';
         try {
             // Get fingerprint from security system
             const fingerprint = security.fingerprint.getFingerprint();
-            
+
             const payload = { coords, colors, t: token, fp: fingerprint };
-            
+
             // Generate WASM token for pawtect protection
-            const wasmToken = await security.pawtect.createWasmToken(regionX, regionY, payload);
+            const wasmToken = await security.pawtect.createWasmToken(
+                regionX,
+                regionY,
+                payload
+            );
             if (!wasmToken) {
                 console.error('❌ Failed to generate WASM token for batch');
                 return 'token_error';
@@ -5166,9 +5182,9 @@ import { initializeSecurity, getSecurity } from './security/index.js';
                 `https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`,
                 {
                     method: 'POST',
-                    headers: { 
+                    headers: {
                         'Content-Type': 'text/plain;charset=UTF-8',
-                        'x-pawtect-token': wasmToken
+                        'x-pawtect-token': wasmToken,
                     },
                     credentials: 'include',
                     body: JSON.stringify(payload),
@@ -5190,22 +5206,34 @@ import { initializeSecurity, getSecurity } from './security/index.js';
                     token = await tokenManager.ensureToken(true);
 
                     // Retry the request with new token
-                    const retryPayload = { coords, colors, t: token, fp: fingerprint };
-                    
+                    const retryPayload = {
+                        coords,
+                        colors,
+                        t: token,
+                        fp: fingerprint,
+                    };
+
                     // Generate new WASM token for retry
-                    const retryWasmToken = await security.pawtect.createWasmToken(regionX, regionY, retryPayload);
+                    const retryWasmToken =
+                        await security.pawtect.createWasmToken(
+                            regionX,
+                            regionY,
+                            retryPayload
+                        );
                     if (!retryWasmToken) {
-                        console.error('❌ Failed to generate WASM token for retry');
+                        console.error(
+                            '❌ Failed to generate WASM token for retry'
+                        );
                         return 'token_error';
                     }
-                    
+
                     const retryRes = await fetch(
                         `https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`,
                         {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'text/plain;charset=UTF-8',
-                                'x-pawtect-token': retryWasmToken
+                                'x-pawtect-token': retryWasmToken,
                             },
                             credentials: 'include',
                             body: JSON.stringify(retryPayload),
