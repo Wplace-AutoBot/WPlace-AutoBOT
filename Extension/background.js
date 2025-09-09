@@ -661,3 +661,25 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         return true;
     }
 });
+
+async function deleteAccountAtIndex(index) {
+    try {
+        const data = await chrome.storage.local.get("accounts");
+        let accounts = data.accounts || [];
+
+        if (index < 0 || index >= accounts.length) {
+            console.warn("[bg] Invalid index:", index);
+            return false;
+        }
+
+        const removed = accounts.splice(index, 1);
+        await chrome.storage.local.set({ accounts });
+
+        console.log(`[bg] Deleted account at index ${index}:`, removed[0]);
+        return true;
+    } catch (err) {
+        console.error("[bg] Error in deleteAccountAtIndex:", err);
+        return false;
+    }
+}
+

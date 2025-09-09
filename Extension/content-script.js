@@ -324,6 +324,15 @@ if (window.location.hostname === 'wplace.live') {
         }
     });
 
+    chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
+        if (msg.type === "deleteAccount" && typeof msg.index === "number") {
+            const ok = await deleteAccountAtIndex(msg.index);
+            sendResponse({ status: ok ? "ok" : "error" });
+            return true;
+        }
+    });
+
+
     // Initialization
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
