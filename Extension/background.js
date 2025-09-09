@@ -547,7 +547,6 @@ async function filterInvalid() {
     console.log(`✅ Filtered and saved ${validAccounts.length} valid accounts.`);
 }
 
-
 async function exportInfoAccount() {
     const store = await chrome.storage.local.get("infoAccounts");
     const infoAccounts = store.infoAccounts || [];
@@ -676,6 +675,7 @@ async function deleteAccountAtIndex(index) {
         await chrome.storage.local.set({ accounts });
 
         console.log(`[bg] Deleted account at index ${index}:`, removed[0]);
+        await exportInfoAccount();
         return true;
     } catch (err) {
         console.error("[bg] Error in deleteAccountAtIndex:", err);
