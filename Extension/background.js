@@ -632,6 +632,29 @@ async function setCookie(value) {
     );
 }
 
+async function deleteAccountAtIndex(index) {
+    try {
+        const data = await chrome.storage.local.get("infoAccounts");
+        let infoAccounts = data.infoAccounts || [];
+
+        if (index < 0 || index >= infoAccounts.length) {
+            console.warn("[bg] Invalid index:", index);
+            return false;
+        }
+
+        const removed = infoAccounts.splice(index, 1);
+        await chrome.storage.local.set({ infoAccounts });
+
+        console.log(`[bg] Deleted account at index ${index}:`, removed[0]);
+        console.log(`[bg] Remaining accounts:`, infoAccounts);
+        await exportInfoAccount();
+        return true;
+    } catch (err) {
+        console.error("[bg] Error in deleteAccountAtIndex:", err);
+        return false;
+    }
+}
+
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     console.log("📩 Background received message:", msg);
 
@@ -659,30 +682,11 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         });
         return true;
     }
-});
 
-async function deleteAccountAtIndex(index) {
-    try {
-        const data = await chrome.storage.local.get("infoAccounts");
-        let infoAccounts = data.infoAccounts || [];
-
-        if (index < 0 || index >= infoAccounts.length) {
-            console.warn("[bg] Invalid index:", index);
-            return false;
-        }
-
-        const removed = infoAccounts.splice(index, 1);
-        await chrome.storage.local.set({ infoAccounts });
-
-        console.log(`[bg] Deleted account at index ${index}:`, removed[0]);
-
-        // Keep `accounts` in sync (export only tokens)
-        await exportInfoAccount();
-
+    if (msg.type === "deleteAccount" && typeof msg.index === "number") {
+        const ok = deleteAccountAtIndex(msg.index);
+        sendResponse({ status: ok ? "ok" : "error" });
         return true;
-    } catch (err) {
-        console.error("[bg] Error in deleteAccountAtIndex:", err);
-        return false;
     }
-}
+});
 
