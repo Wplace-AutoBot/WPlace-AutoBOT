@@ -1,0 +1,189 @@
+/* =============================================================
+   WPlace AutoBOT Script Manager Theme Template
+   -------------------------------------------------------------
+   Copy this file to create a new theme:
+   1. Duplicate and rename: themes/<your-theme>.css
+   2. Replace THEME-NAME with your descriptive theme slug
+   3. Adjust variables ONLY inside the variable block first
+   4. Tweak component overrides below if necessary
+   5. Add script‑manager glow overrides for cohesive UI
+
+   Variable naming conventions:
+     --wplace-*   : Core UI variables consumed by scripts/components
+     --sm-*       : Script Manager specific overrides (glow, borders)
+
+   Keep themes focused: prefer changing variables over deep selectors.
+   ============================================================= */
+
+/* === CORE THEME VARIABLES ==================================== */
+.wplace-theme-THEME-NAME {
+  /* Base palette */
+  --wplace-primary:            #121418;                 /* Main panel background (can be gradient) */
+  --wplace-secondary:          #1c2026;                 /* Headers / secondary panels */
+  --wplace-accent:             #252b33;                 /* Accents / separators */
+  --wplace-text:               #f5f7fa;                 /* Primary text */
+  --wplace-highlight:          #6d8bff;                 /* Accent highlight color */
+  --wplace-success:            #40d673;                 /* Success color */
+  --wplace-error:              #ff4f5e;                 /* Error color */
+  --wplace-warning:            #ffcc47;                 /* Warning color */
+
+  /* Radii / shapes */
+  --wplace-radius:             14px;                    /* General corner radius */
+  --wplace-btn-radius:         18px;                    /* Buttons */
+
+  /* Border styling */
+  --wplace-border-style:       solid; 
+  --wplace-border-width:       1px;                     /* Outer container borders */
+  --wplace-border-color:       rgba(255,255,255,0.12);
+
+  /* Shadow & backdrop */
+  --wplace-shadow:             0 6px 28px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.05);
+  --wplace-backdrop:           blur(14px) saturate(150%);
+
+  /* Typography */
+  --wplace-font:               'Inter', system-ui, sans-serif;
+
+  /* Feature toggles */
+  --wplace-scanline:           0;                        /* 1 enables scanline effect */
+  --wplace-pixel-blink:        0;                        /* 1 enables retro blink */
+
+  /* Extended semantic colors (optional) */
+  --wplace-danger:             var(--wplace-error);
+  --wplace-danger-dark:        #d83c49;
+  --wplace-muted-text:         rgba(245,247,250,0.55);
+  --wplace-highlight-secondary:#9cb6ff;
+
+  /* Text hierarchy */
+  --wplace-text-secondary:     rgba(245,247,250,0.85);
+  --wplace-text-muted:         rgba(245,247,250,0.65);
+  --wplace-text-dim:           rgba(245,247,250,0.5);
+  --wplace-text-faded:         rgba(245,247,250,0.75);
+
+  /* Background nuance */
+  --wplace-bg-input:           rgba(255,255,255,0.06);
+  --wplace-bg-subtle:          rgba(255,255,255,0.04);
+  --wplace-bg-faint:           rgba(255,255,255,0.03);
+  --wplace-bg-ghost:           rgba(255,255,255,0.02);
+  --wplace-bg-whisper:         rgba(255,255,255,0.01);
+
+  /* Border nuance */
+  --wplace-border-subtle:      rgba(255,255,255,0.18);
+  --wplace-border-faint:       rgba(255,255,255,0.12);
+  --wplace-border-ghost:       rgba(255,255,255,0.08);
+  --wplace-border-ultra-faint: rgba(255,255,255,0.05);
+
+  /* Shadows (component specific) */
+  --wplace-shadow-drag:        0 12px 44px rgba(0,0,0,0.55), 0 0 0 1px rgba(109,139,255,0.35);
+  --wplace-shadow-notification:0 4px 14px rgba(0,0,0,0.5);
+  --wplace-shadow-slider-thumb:0 3px 6px rgba(0,0,0,0.6), 0 0 0 2px var(--wplace-highlight);
+  --wplace-shadow-slider-hover:0 4px 10px rgba(0,0,0,0.65), 0 0 0 3px var(--wplace-highlight);
+
+  /* Slider colors */
+  --wplace-slider-thumb-bg:    var(--wplace-highlight);
+  --wplace-slider-track-bg:    linear-gradient(90deg,#6d8bff 0%,#9cb6ff 100%);
+
+  /* Pulse animation colors */
+  --wplace-pulse-start:        rgba(109,139,255,0.75);
+  --wplace-pulse-mid:          rgba(109,139,255,0.0);
+  --wplace-pulse-end:          rgba(109,139,255,0.0);
+
+  /* Script Manager glow overrides */
+  --sm-shadow-glow-a:          0 8px 40px rgba(109,139,255,0.35), 0 0 0 1px rgba(255,255,255,0.06);
+  --sm-shadow-glow-b:          inset 0 0 28px rgba(109,139,255,0.18);
+  --sm-shadow-outline:         0 0 0 1px rgba(109,139,255,0.45);
+  --sm-border-color:           #6d8bff;
+  --sm-border-width:           2px;
+}
+
+/* === CORE CONTAINERS (prefer variables over hard-coded) ====== */
+.wplace-theme-THEME-NAME #wplace-image-bot-container,
+.wplace-theme-THEME-NAME #wplace-settings-container,
+.wplace-theme-THEME-NAME #wplace-stats-container {
+  background: var(--wplace-primary) !important;
+  color: var(--wplace-text) !important;
+  border-radius: var(--wplace-radius) !important;
+  box-shadow: var(--wplace-shadow) !important;
+  backdrop-filter: var(--wplace-backdrop) !important;
+  border: var(--wplace-border-width) var(--wplace-border-style) var(--wplace-border-color) !important;
+  font-family: var(--wplace-font) !important;
+}
+
+/* Headers */
+.wplace-theme-THEME-NAME .wplace-header {
+  background: var(--wplace-secondary) !important;
+  color: var(--wplace-highlight) !important;
+  font-family: var(--wplace-font) !important;
+  border-bottom: 1px solid var(--wplace-border-subtle) !important;
+}
+
+/* Sections */
+.wplace-theme-THEME-NAME .wplace-section,
+.wplace-theme-THEME-NAME .wplace-status-section,
+.wplace-theme-THEME-NAME .wplace-settings-section-wrapper {
+  background: var(--wplace-bg-subtle) !important;
+  border: 1px solid var(--wplace-border-faint) !important;
+  border-radius: var(--wplace-radius) !important;
+}
+
+/* Buttons */
+.wplace-theme-THEME-NAME .wplace-btn {
+  background: linear-gradient(135deg, var(--wplace-accent) 0%, var(--wplace-secondary) 100%) !important;
+  color: var(--wplace-text) !important;
+  border-radius: var(--wplace-btn-radius) !important;
+  border: 1px solid var(--wplace-border-faint) !important;
+  font-family: var(--wplace-font) !important;
+}
+.wplace-theme-THEME-NAME .wplace-btn:hover:not(:disabled) {
+  box-shadow: 0 4px 14px rgba(0,0,0,0.5), 0 0 0 1px var(--wplace-highlight) !important;
+}
+.wplace-theme-THEME-NAME .wplace-btn-start { background: linear-gradient(135deg,var(--wplace-success) 0%,#208a48 100%) !important; }
+.wplace-theme-THEME-NAME .wplace-btn-stop  { background: linear-gradient(135deg,var(--wplace-error) 0%,#b8303c 100%) !important; }
+.wplace-theme-THEME-NAME .wplace-btn-select{ background: linear-gradient(135deg,var(--wplace-highlight) 0%,#445dba 100%) !important; }
+.wplace-theme-THEME-NAME .wplace-btn-file  { background: linear-gradient(135deg,var(--wplace-warning) 0%,#c79600 100%) !important; }
+
+/* Progress */
+.wplace-theme-THEME-NAME .wplace-progress {
+  background: var(--wplace-bg-faint) !important;
+  border: 1px solid var(--wplace-border-faint) !important;
+  border-radius: var(--wplace-radius) !important;
+}
+.wplace-theme-THEME-NAME .wplace-progress-bar {
+  background: linear-gradient(90deg,var(--wplace-success) 0%, var(--wplace-highlight) 100%) !important;
+  box-shadow: 0 0 10px var(--wplace-success) !important;
+}
+
+/* Status badges */
+.wplace-theme-THEME-NAME .status-success { background: rgba(64,214,115,0.12) !important; color: var(--wplace-success) !important; }
+.wplace-theme-THEME-NAME .status-error   { background: rgba(255,79,94,0.15) !important; color: var(--wplace-error) !important; }
+.wplace-theme-THEME-NAME .status-default { background: var(--wplace-bg-input) !important; color: var(--wplace-text) !important; }
+
+/* Sliders */
+.wplace-theme-THEME-NAME .wplace-slider,
+.wplace-theme-THEME-NAME .wplace-speed-slider,
+.wplace-theme-THEME-NAME .wplace-overlay-opacity-slider {
+  background: var(--wplace-bg-input) !important;
+  border: 1px solid var(--wplace-border-faint) !important;
+  border-radius: 6px !important;
+}
+.wplace-theme-THEME-NAME .wplace-slider::-webkit-slider-thumb,
+.wplace-theme-THEME-NAME .wplace-speed-slider::-webkit-slider-thumb,
+.wplace-theme-THEME-NAME .wplace-overlay-opacity-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px; height: 16px;
+  background: var(--wplace-slider-thumb-bg);
+  border: 2px solid var(--wplace-highlight);
+  border-radius: 50%;
+  box-shadow: var(--wplace-shadow-slider-thumb);
+  cursor: pointer;
+}
+
+/* Script Manager OPTIONAL extra accent (only if desired) */
+.wplace-theme-THEME-NAME .script-manager-container { backdrop-filter: var(--wplace-backdrop); }
+
+/* === OPTIONAL ANIMATIONS ===================================== */
+@media (prefers-reduced-motion: no-preference) {
+  .wplace-theme-THEME-NAME .wplace-btn:active { transform: translateY(1px); }
+}
+
+/* === END THEME TEMPLATE ====================================== */

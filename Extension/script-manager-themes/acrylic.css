@@ -1,0 +1,145 @@
+/* Script Manager Theme: Acrylic (Full Implementation) */
+.sm-theme-acrylic {
+  --sm-primary: rgba(20,20,28,0.55);
+  --sm-secondary: rgba(30,30,40,0.45);
+  --sm-accent: rgba(255,255,255,0.08);
+  --sm-text: #ffffff;
+  --sm-highlight: #7dd3fc;
+  --sm-success: #4ade80;
+  --sm-error: #f87171;
+  --sm-warning: #facc15;
+  --sm-font: 'Inter', system-ui, sans-serif;
+  --sm-border-color: rgba(255,255,255,0.22);
+  --sm-border-width: 1px;
+  --sm-shadow-glow-a: 0 12px 42px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.12);
+  --sm-shadow-glow-b: inset 0 0 42px rgba(255,255,255,0.05);
+  --sm-shadow-outline: 0 0 0 1px rgba(255,255,255,0.18);
+  --sm-card-bg: rgba(255,255,255,0.06);
+  --sm-card-bg-hover: rgba(255,255,255,0.12);
+  --sm-card-border: rgba(255,255,255,0.14);
+  --sm-scrollbar-track: rgba(255,255,255,0.05);
+  --sm-scrollbar-thumb: rgba(255,255,255,0.25);
+  --sm-scrollbar-thumb-hover: rgba(255,255,255,0.38);
+  /* Acrylic customization tokens */
+  --sm-acrylic-blur: 22px;
+  --sm-acrylic-saturation: 185%;
+  --sm-acrylic-opacity: 0.85; /* main frosted layer strength */
+  --sm-acrylic-noise-opacity: 0.035; /* noise grain intensity */
+  --sm-acrylic-border-alpha: 0.32;
+  --sm-acrylic-glow-color: rgba(125,211,252,0.55);
+  --sm-acrylic-gradient-angle: 135deg;
+  --sm-acrylic-tint-a: rgba(255,255,255,0.55);
+  --sm-acrylic-tint-b: rgba(255,255,255,0.07);
+}
+
+.wplace-theme-acrylic .script-manager-container {
+  background: linear-gradient(var(--sm-acrylic-gradient-angle), rgba(255,255,255,0.16), rgba(255,255,255,0.04)) border-box !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(255,255,255,var(--sm-acrylic-border-alpha)) !important;
+  box-shadow: 0 4px 18px -4px rgba(0,0,0,0.45), 0 10px 40px -8px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.12), 0 0 0 1px var(--sm-accent) inset !important;
+  color: var(--sm-text) !important;
+  font-family: var(--sm-font) !important;
+  border-radius: 18px !important;
+}
+
+/* Acrylic layered effects */
+.wplace-theme-acrylic .script-manager-container::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(var(--sm-acrylic-gradient-angle), var(--sm-acrylic-tint-a), var(--sm-acrylic-tint-b))
+    , radial-gradient(circle at 20% 15%, rgba(255,255,255,0.35), transparent 65%)
+    , radial-gradient(circle at 80% 80%, rgba(125,211,252,0.35), transparent 70%);
+  mix-blend-mode: normal;
+  pointer-events: none;
+  backdrop-filter: blur(var(--sm-acrylic-blur)) saturate(var(--sm-acrylic-saturation));
+  -webkit-backdrop-filter: blur(var(--sm-acrylic-blur)) saturate(var(--sm-acrylic-saturation));
+  opacity: var(--sm-acrylic-opacity);
+  transition: opacity .4s ease;
+}
+
+.wplace-theme-acrylic .script-manager-container::after {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    repeating-linear-gradient(0deg, rgba(255,255,255,var(--sm-acrylic-noise-opacity)) 0 1px, transparent 1px 2px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,var(--sm-acrylic-noise-opacity)) 0 1px, transparent 1px 2px);
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  opacity: 1;
+  animation: sm-acrylic-noise 6s steps(3,end) infinite;
+}
+
+@keyframes sm-acrylic-noise {
+  0%,100% { transform: translate3d(0,0,0); }
+  33% { transform: translate3d(2px,-1px,0); }
+  66% { transform: translate3d(-1px,1px,0); }
+}
+
+.wplace-theme-acrylic .script-manager-container:hover::before { opacity: calc(var(--sm-acrylic-opacity) + 0.05); }
+.wplace-theme-acrylic .script-manager-container:focus-within::before { opacity: calc(var(--sm-acrylic-opacity) + 0.1); }
+
+.wplace-theme-acrylic .script-manager-header {
+  background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.12) !important;
+  backdrop-filter: blur(18px) !important;
+}
+.wplace-theme-acrylic .script-manager-title { color: var(--sm-text) !important; font-weight:600; }
+.wplace-theme-acrylic .script-manager-close-btn {
+  background: rgba(255,255,255,0.07) !important;
+  border: 1px solid rgba(255,255,255,0.15) !important;
+  color: var(--sm-highlight) !important;
+  border-radius: 10px !important;
+}
+.wplace-theme-acrylic .script-manager-close-btn:hover { background: rgba(255,255,255,0.15) !important; }
+
+.wplace-theme-acrylic .theme-select-wrapper { background: rgba(255,255,255,0.08) !important; border:1px solid rgba(255,255,255,0.15) !important; }
+.wplace-theme-acrylic select.theme-select { background: rgba(20,20,28,0.45) !important; backdrop-filter: blur(10px) saturate(160%) !important; color: #eaf6ff !important; border:1px solid rgba(255,255,255,0.35) !important; text-shadow: 0 1px 2px rgba(0,0,0,0.6); }
+.wplace-theme-acrylic select.theme-select option { background: rgba(15,15,22,0.85) !important; color:#eaf6ff !important; }
+
+.wplace-theme-acrylic .script-grid { scrollbar-color: var(--sm-scrollbar-thumb) var(--sm-scrollbar-track); }
+.wplace-theme-acrylic .script-card {
+  background: var(--sm-card-bg) !important;
+  border: 1px solid var(--sm-card-border) !important;
+  border-radius: 14px !important;
+  color: var(--sm-text) !important;
+  transition: background .25s, transform .25s, box-shadow .25s;
+  position: relative;
+  overflow: hidden;
+}
+.wplace-theme-acrylic .script-card::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(140deg, rgba(255,255,255,0.18), rgba(255,255,255,0) 45%);
+  opacity: 0; pointer-events: none;
+  mix-blend-mode: overlay;
+  transition: opacity .35s ease;
+}
+.wplace-theme-acrylic .script-card::before {
+  content: '';
+  position: absolute; inset:0;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15), transparent 60%);
+  opacity: 0; pointer-events:none; transition: opacity .4s;
+}
+.wplace-theme-acrylic .script-card:hover { background: var(--sm-card-bg-hover) !important; transform: translateY(-4px); box-shadow: 0 12px 36px -6px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.18); }
+.wplace-theme-acrylic .script-card:hover::before { opacity: 1; }
+.wplace-theme-acrylic .script-card:hover::after { opacity: 1; }
+.wplace-theme-acrylic .script-card:active { transform: translateY(-1px); }
+
+.wplace-theme-acrylic .script-title { color: var(--sm-text) !important; font-weight:600; }
+.wplace-theme-acrylic .script-description { color: rgba(255,255,255,0.75) !important; font-size:12px; }
+.wplace-theme-acrylic .script-category {
+  background: rgba(255,255,255,0.08) !important;
+  border: 1px solid rgba(255,255,255,0.15) !important;
+  color: var(--sm-highlight) !important;
+  border-radius: 8px !important;
+  font-size: 11px;
+}
+
+.wplace-theme-acrylic .status-text { color: var(--sm-highlight) !important; font-size: 11px; }
+
+/* Scrollbars */
+.wplace-theme-acrylic .script-grid::-webkit-scrollbar { width: 10px; }
+.wplace-theme-acrylic .script-grid::-webkit-scrollbar-track { background: var(--sm-scrollbar-track); }
+.wplace-theme-acrylic .script-grid::-webkit-scrollbar-thumb { background: var(--sm-scrollbar-thumb); border-radius: 6px; }
+.wplace-theme-acrylic .script-grid::-webkit-scrollbar-thumb:hover { background: var(--sm-scrollbar-thumb-hover); }

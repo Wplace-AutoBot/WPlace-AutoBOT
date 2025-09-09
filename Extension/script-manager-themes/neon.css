@@ -1,0 +1,124 @@
+/* Script Manager Theme: Neon (Full Implementation) */
+:root, .sm-theme-neon {
+  --sm-primary: #1a1a2e;
+  --sm-secondary: #16213e;
+  --sm-accent: #0f3460;
+  --sm-text: #00ff41;
+  --sm-highlight: #ff6b35;
+  --sm-success: #39ff14;
+  --sm-error: #ff073a;
+  --sm-warning: #ff0;
+  --sm-font: 'Press Start 2P', monospace, 'Courier New';
+  --sm-border-color: #00ff41;
+  --sm-border-width: 3px;
+  --sm-shadow-glow-a: 0 0 30px rgb(0 255 65 / 50%);
+  --sm-shadow-glow-b: inset 0 0 30px rgb(0 255 65 / 10%);
+  --sm-shadow-outline: 0 0 0 1px #00ff41;
+  --sm-card-bg: rgb(0 255 65 / 8%);
+  --sm-card-border: rgb(0 255 65 / 40%);
+  --sm-card-hover: rgb(0 255 65 / 18%);
+  --sm-scrollbar-track: rgb(0 255 65 / 10%);
+  --sm-scrollbar-thumb: #00ff41;
+  --sm-scrollbar-thumb-hover: #39ff14;
+}
+
+/* Container */
+.wplace-theme-neon .script-manager-container {
+  background: var(--sm-primary) !important;
+  border: var(--sm-border-width) solid var(--sm-border-color) !important;
+  box-shadow: var(--sm-shadow-glow-a), var(--sm-shadow-glow-b) !important;
+  color: var(--sm-text) !important;
+  font-family: var(--sm-font) !important;
+  text-shadow: 0 0 6px var(--sm-text) !important;
+  border-radius: 0 !important;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Header */
+.wplace-theme-neon .script-manager-header {
+  background: var(--sm-secondary) !important;
+  border-bottom: 1px solid var(--sm-border-color) !important;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 11px;
+}
+.wplace-theme-neon .script-manager-title { color: var(--sm-text) !important; text-shadow: 0 0 10px var(--sm-text) !important; }
+.wplace-theme-neon .script-manager-close-btn {
+  background: var(--sm-secondary) !important;
+  color: var(--sm-text) !important;
+  border: 1px solid var(--sm-border-color) !important;
+  font-family: var(--sm-font) !important;
+  border-radius: 0 !important;
+}
+.wplace-theme-neon .script-manager-close-btn:hover { background: var(--sm-error) !important; text-shadow: 0 0 8px var(--sm-error); }
+
+/* Theme selector */
+.wplace-theme-neon .theme-select-wrapper { background: var(--sm-secondary) !important; border:1px solid var(--sm-border-color) !important; }
+.wplace-theme-neon select.theme-select {
+  background: var(--sm-secondary) !important;
+  color: var(--sm-text) !important;
+  border: 1px solid var(--sm-border-color) !important;
+  text-shadow: 0 0 5px var(--sm-text) !important;
+  font-family: var(--sm-font) !important;
+  font-size: 10px !important;
+  border-radius: 0 !important;
+}
+
+/* Script grid / cards */
+.wplace-theme-neon .script-grid { scrollbar-color: var(--sm-scrollbar-thumb) var(--sm-scrollbar-track); }
+.wplace-theme-neon .script-card {
+  background: var(--sm-card-bg) !important;
+  border: 1px solid var(--sm-card-border) !important;
+  border-radius: 0 !important;
+  color: var(--sm-text) !important;
+  font-family: var(--sm-font) !important;
+  transition: background .2s, box-shadow .2s, transform .2s;
+  position: relative;
+}
+.wplace-theme-neon .script-card:hover {
+  background: var(--sm-card-hover) !important;
+  box-shadow: 0 0 18px var(--sm-text), inset 0 0 20px rgb(0 255 65 / 15%) !important;
+  transform: translateY(-2px);
+}
+.wplace-theme-neon .script-card:active { transform: translateY(0); }
+
+.wplace-theme-neon .script-card-header .script-icon { text-shadow: 0 0 12px var(--sm-text); }
+.wplace-theme-neon .script-title { color: var(--sm-text) !important; text-shadow: 0 0 6px var(--sm-text) !important; font-size: 11px; }
+.wplace-theme-neon .script-description { color: var(--sm-text); opacity: .85; font-size: 9px; text-shadow: 0 0 4px var(--sm-text); }
+.wplace-theme-neon .script-category {
+  background: var(--sm-secondary) !important;
+  border: 1px solid var(--sm-border-color) !important;
+  color: var(--sm-highlight) !important;
+  text-shadow: 0 0 6px var(--sm-highlight) !important;
+  font-family: var(--sm-font) !important;
+  border-radius: 0 !important;
+}
+
+/* Status text */
+.wplace-theme-neon .status-text { color: var(--sm-text) !important; text-shadow: 0 0 10px var(--sm-text) !important; font-family: var(--sm-font) !important; font-size:10px; }
+
+/* Scrollbars (WebKit) */
+.wplace-theme-neon .script-grid::-webkit-scrollbar { width: 10px; }
+.wplace-theme-neon .script-grid::-webkit-scrollbar-track { background: var(--sm-scrollbar-track); }
+.wplace-theme-neon .script-grid::-webkit-scrollbar-thumb { background: var(--sm-scrollbar-thumb); box-shadow: 0 0 10px var(--sm-text); }
+.wplace-theme-neon .script-grid::-webkit-scrollbar-thumb:hover { background: var(--sm-scrollbar-thumb-hover); }
+
+/* Scanline overlay (optional) */
+.wplace-theme-neon .script-manager-container::before {
+  content: '';
+  position: absolute; inset:0;
+  background: repeating-linear-gradient(180deg, rgba(0,255,65,0.08) 0 1px, transparent 1px 3px);
+  mix-blend-mode: lighten;
+  pointer-events: none;
+  animation: sm-neon-scan 6s linear infinite;
+  opacity: .4;
+}
+
+@keyframes sm-neon-scan { 0% { transform: translateY(-50%);} 100% { transform: translateY(50%);} }
+
+/* Glow pulse */
+@media (prefers-reduced-motion: no-preference) {
+  .wplace-theme-neon .script-manager-container { animation: sm-neon-pulse 3s ease-in-out infinite alternate; }
+  @keyframes sm-neon-pulse { 0% { box-shadow: var(--sm-shadow-glow-a), var(--sm-shadow-glow-b);} 100% { box-shadow: 0 0 40px rgb(0 255 65 / 70%), inset 0 0 35px rgb(0 255 65 / 18%);} }
+}
