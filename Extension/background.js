@@ -663,19 +663,22 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
 async function deleteAccountAtIndex(index) {
     try {
-        const data = await chrome.storage.local.get("accounts");
-        let accounts = data.accounts || [];
+        const data = await chrome.storage.local.get("infoAccounts");
+        let infoAccounts = data.infoAccounts || [];
 
-        if (index < 0 || index >= accounts.length) {
+        if (index < 0 || index >= infoAccounts.length) {
             console.warn("[bg] Invalid index:", index);
             return false;
         }
 
-        const removed = accounts.splice(index, 1);
-        await chrome.storage.local.set({ accounts });
+        const removed = infoAccounts.splice(index, 1);
+        await chrome.storage.local.set({ infoAccounts });
 
         console.log(`[bg] Deleted account at index ${index}:`, removed[0]);
+
+        // Keep `accounts` in sync (export only tokens)
         await exportInfoAccount();
+
         return true;
     } catch (err) {
         console.error("[bg] Error in deleteAccountAtIndex:", err);
