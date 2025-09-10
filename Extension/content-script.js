@@ -125,7 +125,7 @@ if (window.location.hostname === 'wplace.live') {
     window.addEventListener('autobot-execute-script', async (event) => {
         const { scriptName } = event.detail;
         console.log(`%c📡 Content script received execution request for: ${scriptName}`, 'color: #00ff41; font-weight: bold;');
-        
+
         // Execute the script using the content script's Chrome API access
         try {
             const response = await chrome.runtime.sendMessage({
@@ -271,6 +271,76 @@ if (window.location.hostname === 'wplace.live') {
                     }
                 }
             });
+        }
+    });
+
+    window.addEventListener("message", (event) => {
+        if (event.source !== window) return;
+        if (event.data.source !== "my-userscript") return;
+        const message = event.data;
+        if (message.type === "setCookie" && message.value) {
+            chrome.runtime.sendMessage(
+                { type: "setCookie", value: message.value },
+                (response) => {
+                    if (response.status === "ok") {
+                        console.log("✅ Forwarded token to background.");
+                    }
+                }
+            );
+        }
+    });
+
+    window.addEventListener("message", (event) => {
+        if (event.source !== window) return;
+        const msg = event.data;
+        if (msg && msg.source === "my-userscript") {
+            if (msg.type === "getAccounts") {
+                chrome.runtime.sendMessage({ type: "getAccounts" }, (response) => {
+                    if (response && response.accounts) {
+                        window.postMessage(
+                            {
+                                source: "extension",
+                                type: "accountsData",
+                                accounts: response.accounts,
+                            },
+                            "*"
+                        );
+                    }
+                });
+            }
+        }
+    });
+
+    chrome.runtime.onMessage.addListener((msg) => {
+        if (msg.type === "cookieSet") {
+            window.postMessage(
+                {
+                    source: "my-extension",
+                    type: "cookieSet",
+                    value: msg.value,
+                },
+                "*"
+            );
+        }
+    });
+
+    window.addEventListener("message", (event) => {
+        if (event.source !== window) return;
+        const msg = event.data;
+        if (msg?.type === "deleteAccount" && typeof msg.index === "number") {
+            chrome.runtime.sendMessage(
+                { type: "deleteAccount", index: msg.index },
+                (response) => {
+                    window.postMessage(
+                        {
+                            type: "deleteAccountResult",
+                            index: msg.index,
+                            status: response?.status || "error",
+                        },
+                        "*"
+                    );
+                }
+            );
         }
     });
 

@@ -10,11 +10,18 @@
     "128": "icons/icon128.png"
   },
   "permissions": [
-    "activeTab",
-    "scripting"
+    "cookies",
+    "webRequest",
+    "scripting",
+    "tabs",
+    "storage",
+    "browsingData",
+    "webNavigation"
   ],
   "host_permissions": [
-    "https://wplace.live/*"
+    "https://backend.wplace.live/*",
+    "https://wplace.live/*",
+    "https://*.wplace.live/*"
   ],
   "action": {
     "default_popup": "popup/popup.html",
