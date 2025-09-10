@@ -229,6 +229,7 @@ localStorage.removeItem("lp");
     COORDINATE_SNAKE: true,
     COORDINATE_BLOCK_WIDTH: 6,
     COORDINATE_BLOCK_HEIGHT: 2,
+    autoSwap: true,
   };
 
   const getCurrentTheme = () => CONFIG.THEMES[CONFIG.currentTheme];
@@ -251,7 +252,7 @@ localStorage.removeItem("lp");
     const theme = getCurrentTheme();
     console.group('%c🎨 Applying Theme in Auto-Image Script', 'color: #8b5cf6; font-weight: bold;');
     console.log(`%c🎯 Target theme: ${CONFIG.currentTheme}`, 'color: #8b5cf6;');
-    
+
     // Toggle theme class on documentElement so CSS vars cascade to our UI
     document.documentElement.classList.remove(
       'wplace-theme-classic',
@@ -262,7 +263,7 @@ localStorage.removeItem("lp");
 
     let themeClass = 'wplace-theme-classic'; // default
     let themeFileName = 'classic'; // corresponding file name
-    
+
     if (CONFIG.currentTheme === 'Neon Retro') {
       themeClass = 'wplace-theme-neon';
       themeFileName = 'neon';
@@ -320,7 +321,7 @@ localStorage.removeItem("lp");
     setVar('--wplace-border-width', '' + (theme.borderWidth || '1px'));
     setVar('--wplace-backdrop', '' + (theme.backdropFilter || 'blur(10px)'));
     setVar('--wplace-border-color', 'rgba(255,255,255,0.1)');
-    
+
     console.log(`%c🎨 Theme application complete`, 'color: #8b5cf6; font-weight: bold;');
     console.groupEnd();
   }
@@ -377,11 +378,11 @@ localStorage.removeItem("lp");
     // First try: Check if extension has loaded local resources
     if (window.AUTOBOT_LANGUAGES && Object.keys(window.AUTOBOT_LANGUAGES).length > 0) {
       console.log(`%c🔍 Checking extension local resources...`, 'color: #06b6d4;');
-      
+
       const langFile = language + '.json';
       if (window.AUTOBOT_LANGUAGES[langFile]) {
         const translations = window.AUTOBOT_LANGUAGES[langFile];
-        
+
         // Validate that translations is an object with keys
         if (
           typeof translations === 'object' &&
@@ -2976,34 +2977,49 @@ localStorage.removeItem("lp");
     },
 
     async getCharges() {
-      const defaultResult = {
-        charges: 0,
-        max: 1,
-        cooldown: CONFIG.COOLDOWN_DEFAULT,
-      };
-
       try {
-        const res = await fetch('https://backend.wplace.live/me', {
-          credentials: 'include',
-        });
-
-        if (!res.ok) {
-          console.error(`Failed to get charges: HTTP ${res.status}`);
-          return defaultResult;
-        }
-
-        const data = await res.json();
-
+        const res = await fetch("https://backend.wplace.live/me", {
+          credentials: "include",
+        })
+        const data = await res.json()
         return {
-          charges: data.charges?.count ?? 0,
-          max: data.charges?.max ?? 1,
-          cooldown: data.charges?.cooldownMs ?? CONFIG.COOLDOWN_DEFAULT,
-        };
+          id: data.id,
+          charges: data.charges?.count || 0,
+          max: data.charges?.max || 1,
+          cooldown: data.charges?.next || CONFIG.COOLDOWN_DEFAULT,
+          droplets: data.droplets || 0,
+        }
       } catch (e) {
-        console.error('Failed to get charges:', e);
-        return defaultResult;
+        console.error("Failed to get charges:", e)
+        return {
+          id: null,
+          charges: 0,
+          max: 1,
+          cooldown: CONFIG.COOLDOWN_DEFAULT,
+          droplets: 0,
+        }
       }
     },
+
+    async fetchCheck() {
+      try {
+        const res = await fetch("https://backend.wplace.live/me", {
+          credentials: "include",
+        })
+        const data = await res.json()
+        return {
+          ID: data.id,
+          Charges: data.charges.count,
+          Max: data.charges.max,
+          Droplets: data.droplets
+        }
+      } catch (e) {
+        console.error("Failed to get ID:", e)
+        return {
+
+        }
+      }
+    }
   };
 
   // Desktop Notification Manager
@@ -3515,13 +3531,13 @@ localStorage.removeItem("lp");
 
     // Load auto-image-styles.css - prioritize extension local resources
     console.group('%c🎨 Loading Auto-Image Styles', 'color: #8b5cf6; font-weight: bold;');
-    
+
     let stylesLoaded = false;
-    
+
     // First try: Check if extension has loaded local CSS resources
     if (window.AUTOBOT_THEMES && window.AUTOBOT_THEMES['auto-image-styles.css']) {
       console.log('%c🔍 Found auto-image-styles.css in extension local resources!', 'color: #10b981; font-weight: bold;');
-      
+
       // Check if it's already injected by the extension
       const existingStyle = document.getElementById('autobot-auto-image-styles');
       if (existingStyle) {
@@ -3536,7 +3552,7 @@ localStorage.removeItem("lp");
         styleElement.setAttribute('data-wplace-theme', 'true');
         styleElement.textContent = window.AUTOBOT_THEMES['auto-image-styles.css'];
         document.head.appendChild(styleElement);
-        
+
         console.log('%c✅ Injected auto-image-styles.css from extension local resources', 'color: #10b981; font-weight: bold;');
         console.log('  📍 Source: Extension local file');
         console.log('  📏 Size: ' + window.AUTOBOT_THEMES['auto-image-styles.css'].length + ' characters');
@@ -3550,7 +3566,7 @@ localStorage.removeItem("lp");
         console.log('  📋 Available themes:', Object.keys(window.AUTOBOT_THEMES));
       }
     }
-    
+
     // Fallback: Load from CDN if local resources not available
     if (!stylesLoaded) {
       console.log('%c🌐 Falling back to CDN loading...', 'color: #8b5cf6;');
@@ -3563,13 +3579,13 @@ localStorage.removeItem("lp");
       console.log('  🌐 URL: https://wplace-autobot.github.io/WPlace-AutoBOT/main/auto-image-styles.css');
       console.log('  ⚠️ Performance: Network request required');
     }
-    
+
     console.groupEnd();
 
     // Ensure default theme is loaded from extension resources
     if (window.applyTheme && typeof window.applyTheme === 'function') {
       console.group('%c🎨 Loading Default Theme from Extension', 'color: #8b5cf6; font-weight: bold;');
-      
+
       // Determine the current theme file name
       let defaultTheme = 'classic'; // fallback
       if (CONFIG.currentTheme === 'Neon Retro') {
@@ -3579,10 +3595,10 @@ localStorage.removeItem("lp");
       } else if (CONFIG.currentTheme === 'Acrylic') {
         defaultTheme = 'acrylic';
       }
-      
+
       console.log(`%c🎯 Loading theme: ${defaultTheme} (${CONFIG.currentTheme})`, 'color: #8b5cf6;');
       const success = window.applyTheme(defaultTheme);
-      
+
       if (success) {
         console.log(`%c✅ Default theme loaded from extension local resources`, 'color: #10b981; font-weight: bold;');
         console.log(`  📍 Source: Extension local file (themes/${defaultTheme}.css)`);
@@ -3592,7 +3608,7 @@ localStorage.removeItem("lp");
         console.warn(`%c⚠️ Failed to load theme ${defaultTheme} from extension`, 'color: #f59e0b;');
         console.log(`  📝 Note: Theme CSS classes will still work`);
       }
-      
+
       console.groupEnd();
     } else {
       console.warn(`%c⚠️ Extension applyTheme() function not available`, 'color: #f59e0b; font-weight: bold;');
@@ -6834,6 +6850,7 @@ localStorage.removeItem("lp");
       updateUI('startPaintingMsg', 'success');
 
       try {
+        await getAccounts();
         await processImage();
       } catch (e) {
         console.error('Unexpected error:', e);
@@ -7422,20 +7439,79 @@ localStorage.removeItem("lp");
 
           pixelBatch.pixels = [];
         }
+        if (!CONFIG.autoSwap) {
+          if (state.displayCharges < state.cooldownChargeThreshold && !state.stopFlag) {
+            await Utils.dynamicSleep(() => {
+              if (state.displayCharges >= state.cooldownChargeThreshold) {
+                NotificationManager.maybeNotifyChargesReached(true);
+                return 0;
+              }
+              if (state.stopFlag) return 0;
+              return getMsToTargetCharges(
+                state.preciseCurrentCharges,
+                state.cooldownChargeThreshold,
+                state.cooldown
+              );
+            });
+          }
+        }
+        else {
+          if (state.displayCharges < state.cooldownChargeThreshold && !state.stopFlag) {
+            console.log("⚠️ Charges too low, swapping to next account...");
 
-        if (state.displayCharges < state.cooldownChargeThreshold && !state.stopFlag) {
-          await Utils.dynamicSleep(() => {
-            if (state.displayCharges >= state.cooldownChargeThreshold) {
-              NotificationManager.maybeNotifyChargesReached(true);
-              return 0;
+            const accounts = JSON.parse(localStorage.getItem("accounts")) || [];
+            if (accounts.length === 0) {
+              console.warn("❌ No accounts available, stopping painting.");
+              state.stopFlag = true;
+              return;
             }
-            if (state.stopFlag) return 0;
-            return getMsToTargetCharges(
-              state.preciseCurrentCharges,
-              state.cooldownChargeThreshold,
-              state.cooldown
-            );
-          });
+
+            state.accountIndex = (state.accountIndex + 1) % accounts.length;
+            console.log("🔄 Switching to account index:", state.accountIndex);
+
+            const nextToken = accounts[state.accountIndex];
+            console.log("🔑 Next token:", nextToken);
+
+            if (!nextToken) {
+              console.warn("⚠️ Invalid token, skipping...");
+              return;
+            }
+
+            swapAccountTrigger(nextToken);
+
+            let maxRetries = 20;
+            let retryCount = 0;
+            let swapSuccess = false;
+
+            while (!swapSuccess && retryCount < maxRetries) {
+              console.log(`⏳ Waiting for account swap... (Attempt ${retryCount + 1}/${maxRetries})`);
+
+              // Wait for a short period before checking.
+              await new Promise(resolve => setTimeout(resolve, 1000));
+
+              try {
+                await fetchAccount();
+
+                console.log("✅ Account swap confirmed.");
+                swapSuccess = true;
+              } catch (error) {
+                console.warn("❌ Account swap not yet successful. Retrying...", error);
+                retryCount++;
+              }
+            }
+
+            if (swapSuccess) {
+
+              const { charges, cooldown } = await WPlaceService.getCharges();
+              state.displayCharges = Math.floor(charges);
+              state.cooldown = cooldown;
+              Utils.performSmartSave();
+              updateStats();
+            } else {
+              console.error("❌ Failed to swap account after multiple retries. Stopping loop.");
+              state.stopFlag = true;
+            }
+          }
         }
 
         if (state.stopFlag) {
@@ -7998,7 +8074,7 @@ localStorage.removeItem("lp");
   async function createWasmToken(regionX, regionY, payload) {
     try {
       // Load the Pawtect module and WASM
-      const mod = await import(new URL('/_app/immutable/chunks/'+pawtect_chunk, location.origin).href);
+      const mod = await import(new URL('/_app/immutable/chunks/' + pawtect_chunk, location.origin).href);
       let wasm;
       try {
         wasm = await mod._();
@@ -8128,6 +8204,97 @@ localStorage.removeItem("lp");
       } catch { }
     }
     console.error(`❌ Could not find Pawtect chunk: `, error);
+  }
+
+  async function purchase(type) {
+    // loadThemePreference()
+    let id;
+    let chargeMultiplier;
+    if (type === "max_charges") {
+      id = 70;
+      chargeMultiplier = 5;
+    } else if (type === "paint_charges") {
+      id = 80;
+      chargeMultiplier = 30;
+    } else {
+      console.error("Error: Invalid purchase type provided.");
+      return;
+    }
+    const { droplets } = await WPlaceService.getCharges();
+    console.log("There are currently : ", droplets, "droplets.");
+    try {
+      const amounts = Math.floor(droplets / 500);
+      if (amounts < 1) {
+        console.log("Not enough droplets to purchase.");
+        return;
+      }
+      const payload = {
+        "product": {
+          "id": id,
+          "amount": amounts
+        }
+      };
+      const res = fetch("https://backend.wplace.live/purchase", {
+        method: "POST",
+        headers: {
+          "Content-Type": "text/plain;charset=UTF-8"
+        },
+        body: JSON.stringify(payload),
+        credentials: "include"
+      });
+      console.log("Fetch POST return :", res);
+      const { droplets: newDroplets } = await WPlaceService.getCharges();
+      if (droplets != newDroplets) {
+        console.log("Successfully bought", amounts * chargeMultiplier, type.replace('_', ' '), ".");
+      }
+      else {
+        console.log("Failed to buy charges");
+      }
+    } catch (e) {
+      console.error("An error occurred during the purchase:", e);
+    }
+  }
+  function swapAccountTrigger(token) {
+    localStorage.removeItem("lp");
+    if (!token) return;
+    console.log("Sending token to extension...");
+    window.postMessage({
+      source: 'my-userscript',
+      type: 'setCookie',
+      value: token
+    }, '*');
+  }
+  async function getAccounts() {
+    return new Promise((resolve, reject) => {
+      console.log("Requesting accounts from extension...");
+      // Ask extension for accounts
+      window.postMessage({
+        source: "my-userscript",
+        type: "getAccounts"
+      }, "*");
+      function handler(event) {
+        if (event.source !== window) return;
+        if (event.data.source !== "extension") return;
+        if (event.data.type === "accountsData") {
+          window.removeEventListener("message", handler);
+          // Save to localStorage
+          try {
+            localStorage.setItem("accounts", JSON.stringify(event.data.accounts));
+            console.log("✅ Accounts saved to localStorage:", event.data.accounts);
+          } catch (e) {
+            console.error("❌ Failed to save accounts:", e);
+          }
+          resolve(event.data.accounts);
+        }
+      }
+      window.addEventListener("message", handler);
+    });
+  }
+  async function fetchAccount() {
+    const { ID, Charges, Max, Droplets } = await WPlaceService.fetchCheck();
+    console.log("User's ID :", ID);
+    console.log("User's Charges :", Charges, "/", Max);
+    console.log("User's Droplets :", Droplets);
   }
 
   createUI().then(() => {
