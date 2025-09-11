@@ -43,13 +43,13 @@ This project was fork from https://github.com/DarkModde/WPlace-AutoBOT
 ### 🎯┃Auto-Farm
 #### AUTOFARM USES CHARGES TO GET LEVELS, IT DOES NOT DRAW AN IMAGE FOR YOU. PLEASE USE AUTO-IMAGE FOR THAT
 ```js
-javascript:fetch("https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/Auto-Farm.js").then(t=>t.text()).then(eval);
+javascript:(async()=>{ const u='https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/Auto-Farm.js'; const c=await (await fetch(u,{cache:'no-store'})).text(); const blob=new Blob([c],{type:'application/javascript'}); const url=URL.createObjectURL(blob); const s=document.createElement('script'); s.src=url; document.body.appendChild(s); })();
 ```
 
 ### 🖼️┃Auto-Image
 
 ```js
-javascript:fetch("https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/Auto-Image.js").then(t=>t.text()).then(eval);
+javascript:(async()=>{ const u='https://raw.githubusercontent.com/Wplace-AutoBot/WPlace-AutoBOT/refs/heads/main/Auto-Image.js'; const c=await (await fetch(u,{cache:'no-store'})).text(); const blob=new Blob([c],{type:'application/javascript'}); const url=URL.createObjectURL(blob); const s=document.createElement('script'); s.src=url; document.body.appendChild(s); })();;
 ```
 
 <details>
