@@ -16,6 +16,8 @@
    - https://wplace-autobot.github.io/WPlace-AutoBOT/main/themes/classic-light.css  
    - https://wplace-autobot.github.io/WPlace-AutoBOT/main/themes/acrylic.css
    - https://wplace-autobot.github.io/WPlace-AutoBOT/main/themes/neon.css
+   - https://wplace-autobot.github.io/WPlace-AutoBOT/main/themes/neon-cyan.css
+   - https://wplace-autobot.github.io/WPlace-AutoBOT/main/themes/neon-light.css
    
    These are now loaded from local extension files for better performance
    and offline functionality. */
@@ -1920,3 +1922,4 @@
   color: var(--wplace-icon-palette);
   margin-right: 6px;
 }
+

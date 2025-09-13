@@ -156,11 +156,11 @@ localStorage.removeItem("lp");
         },
       },
       'Classic Light': {
-        primary: '#ffffff',
-        secondary: '#f8f9fa',
-        accent: '#e9ecef',
-        text: '#212529',
-        highlight: '#6f42c1',
+        primary: '#E0E0E1',
+        secondary: '#FBFBFB',
+        accent: '#F3F3F3',
+        text: '#203C5D',
+        highlight: '#203C5D',
         success: '#28a745',
         error: '#dc3545',
         warning: '#ffc107',
@@ -193,6 +193,54 @@ localStorage.removeItem("lp");
         borderStyle: 'solid',
         borderWidth: '3px',
         boxShadow: '0 0 20px rgba(0, 255, 65, 0.3), inset 0 0 20px rgba(0, 255, 65, 0.1)',
+        backdropFilter: 'none',
+        animations: {
+          glow: true,
+          scanline: true,
+          'pixel-blink': true,
+        },
+      },
+      'Neon Retro Cyan': {
+        primary: '#1959A1',
+        secondary: '#3C74AF',
+        accent: '#538CC0',
+        text: '#81DCF7',
+        highlight: '#EA9C00',
+        success: '#39ff14',
+        error: '#ff073a',
+        warning: '#ffff00',
+        neon: '00ffff',
+        purple: '#bf00ff',
+        pink: '#ff1493',
+        fontFamily: "'Press Start 2P', monospace",
+        borderRadius: '0',
+        borderStyle: 'solid',
+        borderWidth: '3px',
+        boxShadow: '0 0 20px rgba(234 156 0, 0.3), inset 0 0 20px rgba(234 156 0, 0.1)',
+        backdropFilter: 'none',
+        animations: {
+          glow: true,
+          scanline: true,
+          'pixel-blink': true,
+        },
+      },
+      'Neon Retro Light': {
+        primary: '#E0E0E1',
+        secondary: '#FBFBFB',
+        accent: '#F3F3F3',
+        text: '#203C5D',
+        highlight: '#203C5D',
+        success: '#39ff14',
+        error: '#ff073a',
+        warning: '#ffff00',
+        neon: '#203C5D',
+        purple: '#bf00ff',
+        pink: '#ff1493',
+        fontFamily: "'Press Start 2P', monospace",
+        borderRadius: '0',
+        borderStyle: 'solid',
+        borderWidth: '3px',
+        boxShadow: '0 0 20px rgba(234 156 0, 0.3), inset 0 0 20px rgba(234 156 0, 0.1)',
         backdropFilter: 'none',
         animations: {
           glow: true,
@@ -257,7 +305,9 @@ localStorage.removeItem("lp");
       'wplace-theme-classic',
       'wplace-theme-classic-light',
       'wplace-theme-acrylic',
-      'wplace-theme-neon'
+      'wplace-theme-neon',
+      'wplace-theme-neon-cyan',
+      'wplace-theme-neon-light'
     );
 
     let themeClass = 'wplace-theme-classic'; // default
@@ -269,6 +319,12 @@ localStorage.removeItem("lp");
     } else if (CONFIG.currentTheme === 'Classic Light') {
       themeClass = 'wplace-theme-classic-light';
       themeFileName = 'classic-light';
+    } else if (CONFIG.currentTheme === 'Neon Retro Cyan') {
+      themeClass = 'wplace-theme-neon-cyan';
+      themeFileName = 'neon-cyan';
+    } else if (CONFIG.currentTheme === 'Neon Retro Light') {
+      themeClass = 'wplace-theme-neon-light';
+      themeFileName = 'neon-light';
     } else if (CONFIG.currentTheme === 'Acrylic') {
       themeClass = 'wplace-theme-acrylic';
       themeFileName = 'acrylic';
@@ -3574,6 +3630,10 @@ localStorage.removeItem("lp");
       let defaultTheme = 'classic'; // fallback
       if (CONFIG.currentTheme === 'Neon Retro') {
         defaultTheme = 'neon';
+      } else if (CONFIG.currentTheme === 'Neon Retro Cyan') {
+        defaultTheme = 'neon-cyan';
+      } else if (CONFIG.currentTheme === 'Neon Retro Light') {
+        defaultTheme = 'neon-light';
       } else if (CONFIG.currentTheme === 'Classic Light') {
         defaultTheme = 'classic-light';
       } else if (CONFIG.currentTheme === 'Acrylic') {
@@ -8218,3 +8278,4 @@ localStorage.removeItem("lp");
     });
   });
 })();
+
