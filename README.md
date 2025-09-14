@@ -42,7 +42,7 @@ If you find any, make sure to **disable them**.  [Image](https://i.imgur.com/UtZ
 ### Installation Steps
 
 1. Download the ZIP/RAR archive from: [Download Link](https://github.com/Wplace-AutoBot/WPlace-AutoBOT/releases/tag/Extension)  
-2. Extract the downloaded archive. [Image]
+2. Extract the downloaded archive. 
 > <img src="https://i.imgur.com/AbJderX.png" alt="Script Demonstration"/>
 3. Open your Chromium-based browser and go to **Manage Extensions**. 
 > <img src="https://i.imgur.com/yv1Vk7q.png" alt="Script Demonstration"/>
