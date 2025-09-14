@@ -42,7 +42,7 @@ Dacă găsești vreunul, asigură-te că îl **dezactivezi**.  [Imagine](https:/
 ### Pași de Instalare
 
 1. Descarcă arhiva ZIP/RAR de la: [Link Descărcare](https://github.com/Wplace-AutoBot/WPlace-AutoBOT/releases/tag/Extension)  
-2. Extrage arhiva descărcată. [Imagine]
+2. Extrage arhiva descărcată.
 > <img src="https://i.imgur.com/AbJderX.png" alt="Demonstrație Script"/>
 3. Deschide browserul tău bazat pe Chromium și mergi la **Gestionare extensii**. 
 > <img src="https://i.imgur.com/yv1Vk7q.png" alt="Demonstrație Script"/>
@@ -92,7 +92,7 @@ Urmează exact aceiași pași ca pentru Chrome, folosind Kiwi Browser. Interfaț
 </p>
 
 📋┃De făcut:
-- [x] Să funcționeze AutoFarm
+- [x] Să funcționeze scriptul AutoFarm
 
 - [ ] Să unească ambele scripturi într-unul singur
 
