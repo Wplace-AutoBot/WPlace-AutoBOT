@@ -7845,7 +7845,7 @@ localStorage.removeItem("lp");
           }
           if (me?.experiments) {
             if (state.experiments == null) {
-              var item = Object.keys(me.experiments).find((v, _, _) => v.contains("pawtect")) ?? null;
+              var item = Object.keys(me.experiments).find((v, _, __) => v.contains("pawtect")) ?? null;
               if (item) {
                 if (me.experiments[item]?.variant && typeof (me.experiments[item]?.variant) === "string") {
                   localStorage.setItem("exp_wbot", me.experiments);
@@ -7853,7 +7853,7 @@ localStorage.removeItem("lp");
               }
             }
             else {
-              var item = Object.keys(me.experiments).find((v, _, _) => v.contains("pawtect")) ?? null;
+              var item = Object.keys(me.experiments).find((v, _, __) => v.contains("pawtect")) ?? null;
               if (item) {
                 if (!isExactlyEqual(state.experiments, me.experiments)) {
                   alert("WPlace updated their PAWTECT Variant! REPORT TO WPLACE BOT DEVELOPERS")
