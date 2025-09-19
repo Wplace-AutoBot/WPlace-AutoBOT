@@ -586,6 +586,7 @@ localStorage.removeItem("lp");
     startPosition: null,
     selectingPosition: false,
     region: null,
+    experiments: null,
     minimized: false,
     lastPosition: { x: 0, y: 0 },
     estimatedTime: 0,
@@ -629,6 +630,8 @@ localStorage.removeItem("lp");
     _saveInProgress: false,
     paintedMap: null,
   };
+
+  state.experiments = localStorage.getItem("exp_wbot");
 
   let _updateResizePreview = () => { };
   let _resizeDialogCleanup = null;
@@ -7815,7 +7818,7 @@ localStorage.removeItem("lp");
   // Load theme preference immediately on startup before creating UI
   loadThemePreference();
   applyTheme();
-
+  const isExactlyEqual = (a, b) => a?.[Object.keys(a)[0]]?.variant === b?.[Object.keys(b)[0]]?.variant;
   var pawtect_chunk = null;
 
   //find module if pawtect_chunk is null
@@ -7824,7 +7827,7 @@ localStorage.removeItem("lp");
   async function createWasmToken(regionX, regionY, payload) {
     try {
       // Load the Pawtect module and WASM
-      const mod = await import(new URL('/_app/immutable/chunks/'+pawtect_chunk, location.origin).href);
+      const mod = await import(new URL('/_app/immutable/chunks/' + pawtect_chunk, location.origin).href);
       let wasm;
       try {
         wasm = await mod._();
@@ -7839,6 +7842,24 @@ localStorage.removeItem("lp");
           if (me?.id) {
             mod.i(me.id);
             console.log('✅ user ID set:', me.id);
+          }
+          if (me?.experiments) {
+            if (state.experiments == null) {
+              var item = Object.keys(me.experiments).find((v, _, _) => v.contains("pawtect")) ?? null;
+              if (item) {
+                if (me.experiments[item]?.variant && typeof (me.experiments[item]?.variant) === "string") {
+                  localStorage.setItem("exp_wbot", me.experiments);
+                }
+              }
+            }
+            else {
+              var item = Object.keys(me.experiments).find((v, _, _) => v.contains("pawtect")) ?? null;
+              if (item) {
+                if (!isExactlyEqual(state.experiments, me.experiments)) {
+                  alert("WPlace updated their PAWTECT Variant! REPORT TO WPLACE BOT DEVELOPERS")
+                }
+              }
+            }
           }
         } catch { }
       } catch (userIdError) {
