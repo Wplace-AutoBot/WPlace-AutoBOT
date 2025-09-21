@@ -3385,6 +3385,7 @@ localStorage.removeItem("lp");
     const existingResizeOverlay = document.querySelector('.resize-overlay');
 
     document.addEventListener("keydown", async function (event) {
+      return;
       if(state.running) return;
       event.stopPropagation();
       var tmpStart = {};
