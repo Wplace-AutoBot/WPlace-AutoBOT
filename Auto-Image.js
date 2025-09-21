@@ -3384,6 +3384,54 @@ localStorage.removeItem("lp");
     const existingResizeContainer = document.querySelector('.resize-container');
     const existingResizeOverlay = document.querySelector('.resize-overlay');
 
+    document.addEventListener("keydown", async function (event) {
+      if(state.running) return;
+      event.stopPropagation();
+      var tmpStart = {};
+      switch (event.key) {
+        case "ArrowUp":
+          if (state?.startPosition?.y && state?.region?.y) {
+            tmpStart = structuredClone(state.startPosition);
+
+            state.startPosition.y = state.startPosition.y == 0 ? state.startPosition.y = 3999 : state.startPosition.y - 1;
+            state.region = getRegion(tmpStart,state.region,state.startPosition);
+
+            await overlayManager.setPosition(state.startPosition, state.region);
+          }
+          break;
+        case "ArrowDown":
+          if (state?.startPosition?.y && state?.region?.y) {
+            tmpStart = structuredClone(state.startPosition);
+
+            state.startPosition.y = state.startPosition.y == 3999 ? state.startPosition.y = 0 : state.startPosition.y + 1;
+            state.region = getRegion(tmpStart,state.region,state.startPosition);
+
+            await overlayManager.setPosition(state.startPosition, state.region);
+          }
+          break;
+        case "ArrowLeft":
+          if (state?.startPosition?.x && state?.region?.x) {
+            tmpStart = structuredClone(state.startPosition);
+
+            state.startPosition.x = state.startPosition.x == 0 ? state.startPosition.x = 3999 : state.startPosition.x - 1;
+            state.region = getRegion(tmpStart,state.region,state.startPosition);
+
+            await overlayManager.setPosition(state.startPosition, state.region);
+          }
+          break;
+        case "ArrowRight":
+          if (state?.startPosition?.x && state?.region?.x) {
+            tmpStart = structuredClone(state.startPosition);
+
+            state.startPosition.x = state.startPosition.x == 3999 ? state.startPosition.x = 0 : state.startPosition.x + 1;
+            state.region = getRegion(tmpStart,state.region,state.startPosition);
+
+            await overlayManager.setPosition(state.startPosition, state.region);
+          }
+          break;
+      }
+    });
+
     if (existingContainer) existingContainer.remove();
     if (existingStats) existingStats.remove();
     if (existingSettings) existingSettings.remove();
@@ -7976,6 +8024,34 @@ localStorage.removeItem("lp");
     }
     console.error(`❌ Could not find Pawtect chunk: `, error);
   }
+
+  function getRegion(prevStart, prevRegion, currentStart) {
+    const { X: prevX, Y: prevY } = prevStart;
+    const { X: prevRegionX, Y: prevRegionY } = prevRegion;
+    const { X: startX, Y: startY } = currentStart;
+
+    // Detect wrapping at cell edges (because local coords reset at 0/3999)
+    let dx = startX - prevX;
+    if (dx > 2000) dx -= 4000;
+    if (dx < -2000) dx += 4000;
+
+    let dy = startY - prevY;
+    if (dy > 2000) dy -= 4000;
+    if (dy < -2000) dy += 4000;
+
+    // Estimate new absolute pixel position in global region coordinates
+    let globalX = prevRegionX * 1000 + (prevX % 1000) + dx;
+    let globalY = prevRegionY * 1000 + (prevY % 1000) + dy;
+
+    // Compute new region
+    let regionX = Math.floor(globalX / 1000);
+    let regionY = Math.floor(globalY / 1000);
+
+    return {
+      X: regionX, Y: regionY
+    };
+  }
+
 
   createUI().then(() => {
     // Generate token automatically after UI is ready
