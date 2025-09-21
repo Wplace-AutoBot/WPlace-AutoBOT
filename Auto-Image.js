@@ -8026,9 +8026,9 @@ localStorage.removeItem("lp");
   }
 
   function getRegion(prevStart, prevRegion, currentStart) {
-    const { X: prevX, Y: prevY } = prevStart;
-    const { X: prevRegionX, Y: prevRegionY } = prevRegion;
-    const { X: startX, Y: startY } = currentStart;
+    const { x: prevX, y: prevY } = prevStart;
+    const { x: prevRegionX, y: prevRegionY } = prevRegion;
+    const { x: startX, y: startY } = currentStart;
 
     // Detect wrapping at cell edges (because local coords reset at 0/3999)
     let dx = startX - prevX;
