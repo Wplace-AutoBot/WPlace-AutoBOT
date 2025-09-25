@@ -8392,13 +8392,13 @@ function getText(key, params) {
 
         if (paintingResult === 'charges_depleted') {
           if (CONFIG.autoBuyToggle && CONFIG.autoBuy != buyTypes[0]) {
-            console.log('Trying to buy more charges before stopping');
+            console.log('Trying to buy more charges before swapping account...');
             const purchaseResult = await purchase(CONFIG.autoBuy);
             if (purchaseResult == 2) {
               console.log('✅ Purchase successful, continuing painting');
               await updateStats();
               await updateCurrentAccountInList();
-              continue;
+              if (CONFIG.autoBuy == buyTypes[2]) continue;
             }
             else if (purchaseResult == 1) {
               console.log('😭 Not enough droplets to buy more charges, swapping account.');
@@ -9710,7 +9710,7 @@ function getText(key, params) {
           "amount": amounts
         }
       };
-      const res = fetch("https://backend.wplace.live/purchase", {
+      const res = await fetch("https://backend.wplace.live/purchase", {
         method: "POST",
         headers: {
           "Content-Type": "text/plain;charset=UTF-8"
@@ -9871,7 +9871,7 @@ function getText(key, params) {
             // Switch to this account temporarily to fetch its data
             console.log(`🔄 [FETCH] Switching to ${account.displayName} to fetch fresh data...`);
             await switchToSpecificAccount(account.token, account.displayName);
-            await Utils.sleep(500); // Small delay to ensure switch takes effect
+            // await Utils.sleep(500); // Small delay to ensure switch takes effect
 
             // Fetch fresh account details
             const accountData = await WPlaceService.getCharges();
@@ -9898,7 +9898,7 @@ function getText(key, params) {
           console.log(`🔙 [FETCH] Switching back to original current account: ${originalCurrentAccount.displayName}`);
           try {
             await switchToSpecificAccount(originalCurrentAccount.token, originalCurrentAccount.displayName);
-            await Utils.sleep(300);
+            //await Utils.sleep(300);
 
             // Mark it as current again
             accountManager.updateAccountData(originalCurrentAccount.token, {
@@ -9956,7 +9956,7 @@ function getText(key, params) {
   // Function to update current account spotlight when switching during painting
   async function updateCurrentAccountSpotlight() {
     if (accountManager.getAccountCount() === 0) return;
-    await Utils.sleep(500); // Wait a bit for the switch to take effect
+    // await Utils.sleep(500); // Wait a bit for the switch to take effect
     try {
       const currentAccountData = await WPlaceService.getCharges();
       console.log("Current account after switch:", currentAccountData);
@@ -10172,10 +10172,10 @@ function getText(key, params) {
       console.log(`✅ [SWITCH] Successfully switched to ${nextAccount.displayName}`);
 
       // Wait a moment for the switch to fully complete
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // await new Promise(resolve => setTimeout(resolve, 1000));
 
       // Update the account status and UI after successful switch
-      await updateCurrentAccountSpotlight();
+      await updateCurrentAccountInList();
 
       return true;
     } catch (error) {
@@ -10200,7 +10200,7 @@ function getText(key, params) {
       //await new Promise(resolve => setTimeout(resolve, 1000));
 
       try {
-        await fetchAccount();
+        // await fetchAccount();
         console.log('✅ [SPECIFIC SWITCH] Account swap confirmed.');
         swapSuccess = true;
       } catch (error) {
