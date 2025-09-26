@@ -6705,7 +6705,7 @@ function getText(key, params) {
       // Draw thumbnail
       const minimapCtx = minimapCanvas.getContext('2d');
       minimapCtx.imageSmoothingEnabled = false;
-      drawCheckerboardBackground(ctx, editCanvas.width, editCanvas.height);
+      drawCheckerboardBackground(minimapCtx, editCanvas.width, editCanvas.height);
       minimapCtx.drawImage(editCanvas, 0, 0, minimapCanvas.width, minimapCanvas.height);
 
       // Update viewport indicator
