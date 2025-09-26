@@ -325,7 +325,7 @@ function getText(key, params) {
     COORDINATE_BLOCK_WIDTH: 6,
     COORDINATE_BLOCK_HEIGHT: 2,
     autoSwap: true,
-    autoBuy: buyTypes[2],
+    autoBuy: 'none', // "none", "max_charges", or "paint_charges"
     autoBuyToggle: false,
     maxChargesStopEnable: false,
     maxChargesBeforeStop: 1500,
@@ -2391,78 +2391,102 @@ function getText(key, params) {
       </div>
     `;
 
-    // Stats Window - Separate UI
     const statsContainer = document.createElement('div');
     statsContainer.id = 'wplace-stats-container';
     statsContainer.style.display = 'none';
     statsContainer.innerHTML = `
-      <div class="wplace-header">
-        <div class="wplace-header-title">
-          <i class="fas fa-chart-bar"></i>
-          <span>${Utils.t('paintingStats')}</span>
-        </div>
-        <div class="wplace-header-controls">
-          <button id="refreshChargesBtn" class="wplace-header-btn" title="${Utils.t(
-      'refreshCharges'
-    )}">
-            <i class="fas fa-sync"></i>
-          </button>
-          <button id="closeStatsBtn" class="wplace-header-btn" title="${Utils.t('closeStats')}">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
+    <div class="wplace-header">
+      <div class="wplace-header-title">
+        <i class="fas fa-chart-bar"></i>
+        <span>${Utils.t('paintingStats')}</span>
       </div>
-      <div class="wplace-content">
-        <div class="wplace-stats">
-          <div id="statsArea">
-            <div class="wplace-stat-item">
-              <div class="wplace-stat-label"><i class="fas fa-info-circle"></i> ${Utils.t(
-      'initMessage'
-    )}</div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="wplace-section" id="account-swapper-section">
-          <div class="wplace-section-title" style="justify-content: space-between; align-items: center;">
-            <div style="display: flex; align-items: center; gap: 6px;">
-              <i class="fas fa-sync-alt"></i>
-              <span>Account Swapper</span>
-            </div>
-            <label class="wplace-switch">
-              <input type="checkbox" id="autoSwapToggle">
-              <span class="wplace-slider-round"></span>
-            </label>
-          </div>
-        </div>
-
-        <div class="wplace-section" id="autobuy-section">
-          <div class="wplace-section-title" style="justify-content: space-between; align-items: center;">
-            <div style="display: flex; align-items: center; gap: 6px;">
-              <i class="fas fa-shopping-cart"></i>
-              <span>Auto Buy Charges</span>
-            </div>
-            <label class="wplace-switch">
-              <input type="checkbox" id="autoBuyToggle" disabled>
-              <span class="wplace-slider-round"></span>
-            </label>
-          </div>
-        </div>
-
-        <div class="wplace-section" id="all-accounts-section">
-          <div class="wplace-section-title">
-            <i class="fas fa-users"></i>
-            <span>All Accounts</span>
-            <button id="refreshAllAccountsBtn" class="wplace-header-btn" title="Refresh all accounts">
-              <i class="fas fa-users-cog"></i>
-            </button>
-          </div>
-          <div id="accountsListArea" class="accounts-list-container">
-            <div class="wplace-stat-item" style="opacity: 0.5;">Click the <i class="fas fa-users-cog"></i> icon to load accounts.</div>
+      <div class="wplace-header-controls">
+        <button id="refreshChargesBtn" class="wplace-header-btn" title="${Utils.t('refreshCharges')}">
+          <i class="fas fa-sync"></i>
+        </button>
+        <button id="closeStatsBtn" class="wplace-header-btn" title="${Utils.t('closeStats')}">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+    <div class="wplace-content">
+      <div class="wplace-stats">
+        <div id="statsArea">
+          <div class="wplace-stat-item">
+            <div class="wplace-stat-label"><i class="fas fa-info-circle"></i> ${Utils.t('initMessage')}</div>
           </div>
         </div>
       </div>
+      
+      <div class="wplace-section" id="account-swapper-section">
+        <div class="wplace-section-title" style="justify-content: space-between; align-items: center;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <i class="fas fa-sync-alt"></i>
+            <span>Account Swapper</span>
+          </div>
+          <label class="wplace-switch">
+            <input type="checkbox" id="autoSwapToggle">
+            <span class="wplace-slider-round"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="wplace-section" id="autobuy-section">
+        <div class="wplace-section-title" style="flex-direction: column; align-items: flex-start; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 6px; width: 100%;">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Auto Buy Charges</span>
+          </div>
+          <div class="pill-container">
+            <div class="pill-highlight"></div>
+            <button class="pill-btn active" data-mode="none">Off</button>
+            <button class="pill-btn" data-mode="max_charges">Max</button>
+            <button class="pill-btn" data-mode="paint_charges">Paint</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="wplace-section" id="all-accounts-section">
+        <div class="wplace-section-title">
+          <i class="fas fa-users"></i>
+          <span>All Accounts</span>
+          <button id="refreshAllAccountsBtn" class="wplace-header-btn" title="Refresh all accounts">
+            <i class="fas fa-users-cog"></i>
+          </button>
+        </div>
+        <div id="accountsListArea" class="accounts-list-container">
+          <div class="wplace-stat-item" style="opacity: 0.5;">Click the <i class="fas fa-users-cog"></i> icon to load accounts.</div>
+        </div>
+      </div>
+    </div>
     `;
+
+    function initPillSelector() {
+      const buttons = statsContainer.querySelectorAll(".pill-btn");
+      const highlight = statsContainer.querySelector(".pill-highlight");
+
+      buttons.forEach((btn, index) => {
+        btn.addEventListener("click", () => {
+          highlight.style.transform = `translateX(${index * 100}%)`;
+
+          buttons.forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+
+          CONFIG.autoBuy = btn.dataset.mode;
+          if (CONFIG.autoBuy === 'none') {
+            console.log("AutoBuy disabled");
+            CONFIG.autoBuyToggle = false;
+          }
+          else {
+            CONFIG.autoBuyToggle = true;
+            console.log("AutoBuy enabled");
+          }
+          console.log("AutoBuy mode set to:", CONFIG.autoBuy);
+        });
+      });
+    }
+
+    initPillSelector();
 
     // Modern Settings Container with Theme Support
     // Use the theme variable already declared at the top of createUI function
@@ -8391,14 +8415,14 @@ function getText(key, params) {
         }
 
         if (paintingResult === 'charges_depleted') {
-          if (CONFIG.autoBuyToggle && CONFIG.autoBuy != buyTypes[0]) {
+          if (CONFIG.autoBuyToggle && CONFIG.autoBuy != 'none') {
             console.log('Trying to buy more charges before swapping account...');
             const purchaseResult = await purchase(CONFIG.autoBuy);
             if (purchaseResult == 2) {
               console.log('✅ Purchase successful, continuing painting');
               await updateStats();
               await updateCurrentAccountInList();
-              if (CONFIG.autoBuy == buyTypes[2]) continue;
+              if (CONFIG.autoBuy == 'paint_charges') continue;
             }
             else if (purchaseResult == 1) {
               console.log('😭 Not enough droplets to buy more charges, swapping account.');
