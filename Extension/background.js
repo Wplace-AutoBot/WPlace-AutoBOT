@@ -857,7 +857,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         (async () => {
             try {
                 console.log("📂 Fetching accounts...");
-                await exportInfoAccount();
+                await filterInvalid();
                 const result = await chrome.storage.local.get("accounts");
                 console.log("📤 Returning accounts:", result.accounts);
                 sendResponse({ accounts: result.accounts || [] });
