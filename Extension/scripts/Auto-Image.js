@@ -9085,10 +9085,13 @@ function getText(key, params) {
         console.log(`🔑 Token error on attempt ${attempt} - no token available during processing`);
         console.log(`❌ Stopping batch processing - tokens must be generated at startup/start button only`);
         updateUI('captchaFailed', 'error');
-        return false; // Stop processing entirely - don't regenerate during processing
+        await Utils.sleep(2000); // Wait longer before retrying after token failure
+        continue; // Continue to retry until maxRetries reached
       } else if (result === 'token_regenerated') {
         console.log(`🔄 Token regenerated on attempt ${attempt} after 403 error - retrying batch`);
-        updateUI('paintingPaused', 'warning', { message: 'Token refreshed, resuming...' });
+        const pausedX = state.lastPaintedPosition.x;
+        const pausedY = state.lastPaintedPosition.y;
+        updateUI('paintingPaused', 'warning', { x: pausedX, y: pausedY });
         // Don't count token regeneration as a failed attempt, retry immediately
         attempt--;
         await Utils.sleep(500); // Brief pause before retry
