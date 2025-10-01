@@ -54,6 +54,7 @@
   "paintingSpeed": "Boyama Hızı",
   "pixelsPerSecond": "piksel/saniye",
   "speedSetting": "Hız: {speed} piksel/sn",
+  "keepAspectRatio": "En-boy oranını koru",
   "settings": "Ayarlar",
   "botSettings": "Bot Ayarları",
   "close": "Kapat",
@@ -140,5 +141,18 @@
   "hideStats": "İstatistikleri Gizle",
   "paintOptions": "Boya Seçenekleri",
   "paintWhitePixels": "Beyaz pikselleri boya",
-  "paintTransparentPixels": "Şeffaf pikselleri boya"
+  "paintWhitePixelsDescription": "Etkinleştirilirse, şablon beyaz pikselleri boyanacaktır.",
+  "paintTransparentPixels": "Şeffaf pikselleri boya",
+  "paintTransparentPixelsDescription": "Etkinleştirilirse, şablon şeffaf pikselleri boyanacaktır",
+  "paintUnavailablePixels": "Kullanılamayan pikselleri boya",
+  "paintUnavailablePixelsDescription": "Etkinleştirilirse, kullanılamayan şablon renkleri en yakın uygun renkle boyanacaktır",
+  "colorsUpdated": "✅ Uygun renkler arttı {oldCount} -> {newCount}, {diffCount} yeni renk bulundu",
+  "overlayTilesNotLoaded": "❌ Gerekli harita karoları yüklenmedi. Bağlantıyı kontrol edin veya yeniden deneyin.",
+  "paintingBatchFailed": "❌ Toplu gönderim birkaç denemeden sonra başarısız oldu. Boyama durduruldu.",
+  "paintingPixelCheckFailed": "❌ ({x}, {y}) konumundaki piksel okunamadı. Boyama durduruldu.",
+  "paintingFinalBatchFailed": "⚠️ {count} pikselden oluşan son topluluk birkaç denemeden sonra başarısız oldu.",
+  "paintingStoppedByUser": "⏹️ Boyama kullanıcı tarafından durduruldu",
+  "fullChargeIn": "Tam dolum süresi",
+  "batchSize": "Topluluk boyutu"
 }
+

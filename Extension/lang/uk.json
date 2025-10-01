@@ -54,6 +54,7 @@
   "paintingSpeed": "Швидкість малювання",
   "pixelsPerSecond": "пікселів/секунда",
   "speedSetting": "Швидкість: {speed} пікселів/сек",
+  "keepAspectRatio": "Зберігати співвідношення сторін",
   "settings": "Налаштування",
   "botSettings": "Налаштування бота",
   "close": "Закрити",
@@ -140,5 +141,18 @@
   "hideStats": "Приховати статистику",
   "paintOptions": "Параметри малювання",
   "paintWhitePixels": "Малювати білі пікселі",
-  "paintTransparentPixels": "Малювати прозорі пікселі"
+  "paintWhitePixelsDescription": "Якщо ввімкнено, білі пікселі шаблону будуть намальовані.",
+  "paintTransparentPixels": "Малювати прозорі пікселі",
+  "paintTransparentPixelsDescription": "Якщо ввімкнено, прозорі пікселі шаблону будуть намальовані",
+  "paintUnavailablePixels": "Малювати недоступні пікселі",
+  "paintUnavailablePixelsDescription": "Якщо ввімкнено, недоступні кольори шаблону будуть намальовані найближчим доступним кольором",
+  "colorsUpdated": "✅ Доступні кольори збільшено {oldCount} -> {newCount}, знайдено {diffCount} нових кольорів",
+  "overlayTilesNotLoaded": "❌ Необхідні тайли карти не завантажені. Перевір з'єднання або спробуй знову.",
+  "paintingBatchFailed": "❌ Не вдалося відправити пакет після кількох спроб. Малювання зупинено.",
+  "paintingPixelCheckFailed": "❌ Не вдалося прочитати піксель у ({x}, {y}). Малювання зупинено.",
+  "paintingFinalBatchFailed": "⚠️ Фінальний пакет з {count} пікселів не вдалося відправити після кількох спроб.",
+  "paintingStoppedByUser": "⏹️ Малювання зупинено користувачем",
+  "fullChargeIn": "Повний заряд через",
+  "batchSize": "Розмір пакета"
 }
+

@@ -60,6 +60,8 @@
   "paintingSpeed": "Painting Speed",
   "pixelsPerSecond": "pixels/second",
   "speedSetting": "Speed: {speed} pixels/sec",
+  "batchSize": "Batch Size",
+  "keepAspectRatio": "Keep Aspect Ratio",
   "settings": "Settings",
   "botSettings": "Bot Settings",
   "close": "Close",

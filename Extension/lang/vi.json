@@ -54,6 +54,7 @@
   "paintingSpeed": "Tốc độ vẽ",
   "pixelsPerSecond": "pixel/giây",
   "speedSetting": "Tốc độ: {speed} pixel/giây",
+  "keepAspectRatio": "Giữ tỷ lệ khung hình",
   "settings": "Cài đặt",
   "botSettings": "Cài đặt Bot",
   "close": "Đóng",
@@ -140,5 +141,18 @@
   "hideStats": "Ẩn thống kê",
   "paintOptions": "Tùy chọn vẽ",
   "paintWhitePixels": "Vẽ điểm ảnh trắng",
-  "paintTransparentPixels": "Vẽ điểm ảnh trong suốt"
+  "paintWhitePixelsDescription": "Nếu được bật, các pixel trắng của mẫu sẽ được vẽ.",
+  "paintTransparentPixels": "Vẽ điểm ảnh trong suốt",
+  "paintTransparentPixelsDescription": "Nếu được bật, các pixel trong suốt của mẫu sẽ được vẽ",
+  "paintUnavailablePixels": "Vẽ pixel không khả dụng",
+  "paintUnavailablePixelsDescription": "Nếu được bật, màu mẫu không khả dụng sẽ được vẽ bằng màu khả dụng gần nhất",
+  "colorsUpdated": "✅ Màu khả dụng tăng {oldCount} -> {newCount}, tìm thấy {diffCount} màu mới",
+  "overlayTilesNotLoaded": "❌ Ô bản đồ cần thiết chưa được tải. Kiểm tra kết nối hoặc thử lại.",
+  "paintingBatchFailed": "❌ Gửi lô thất bại sau nhiều lần thử. Dừng vẽ.",
+  "paintingPixelCheckFailed": "❌ Không thể đọc pixel tại ({x}, {y}). Dừng vẽ.",
+  "paintingFinalBatchFailed": "⚠️ Lô cuối cùng gồm {count} pixel thất bại sau nhiều lần thử.",
+  "paintingStoppedByUser": "⏹️ Người dùng đã dừng vẽ",
+  "fullChargeIn": "Sạc đầy trong",
+  "batchSize": "Kích thước lô"
 }
+

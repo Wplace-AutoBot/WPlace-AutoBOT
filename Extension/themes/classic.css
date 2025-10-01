@@ -22,13 +22,13 @@
   --wplace-icon-primary: #4facfe;
   --wplace-icon-secondary: #00f2fe;
   --wplace-icon-palette: #f093fb;
-  
+
   /* Additional UI colors */
   --wplace-danger: #ff6a6a;
   --wplace-danger-dark: #ff4757;
   --wplace-muted-text: #fffB;
   --wplace-highlight-secondary: #203C5D;
-  
+
   /* Slider colors */
   --wplace-slider-track-bg: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
 }
@@ -231,7 +231,7 @@
 :root .wplace-btn[aria-pressed="true"] i,
 .wplace-theme-classic .wplace-btn.active i,
 .wplace-theme-classic .wplace-btn[aria-pressed="true"] i {
-  filter: drop-shadow(0 0 3px #000); 
+  filter: drop-shadow(0 0 3px #000);
 }
 
 :root .mask-mode-group .wplace-btn.active,
@@ -355,6 +355,7 @@
 
 /* Auto light/dark support for classic theme */
 @media (prefers-color-scheme: light) {
+
   :root .theme-auto,
   .wplace-theme-classic .theme-auto {
     --wplace-primary: #fff;
@@ -365,6 +366,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
+
   :root .theme-auto,
   .wplace-theme-classic .theme-auto {
     --wplace-primary: #1e1e1e;
@@ -431,27 +433,27 @@
 /* Icon colors for classic theme */
 :root .wplace-icon-key,
 .wplace-theme-classic .wplace-icon-key {
-  color: #4facfe; 
+  color: #4facfe;
 }
 
 :root .wplace-icon-robot,
 .wplace-theme-classic .wplace-icon-robot {
-  color: #4facfe; 
+  color: #4facfe;
 }
 
 :root .wplace-icon-speed,
 .wplace-theme-classic .wplace-icon-speed {
-  color: #4facfe; 
+  color: #4facfe;
 }
 
 :root .wplace-icon-bell,
 .wplace-theme-classic .wplace-icon-bell {
-  color: #ffd166; 
+  color: #ffd166;
 }
 
 :root .wplace-icon-palette,
 .wplace-theme-classic .wplace-icon-palette {
-  color: #f093fb; 
+  color: #f093fb;
 }
 
 :root .wplace-icon-globe,
@@ -666,26 +668,26 @@
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 :root .wplace-input-btn-compact:hover,
 .wplace-theme-classic .wplace-input-btn-compact:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
 }
 
 :root .wplace-input-btn-compact:active,
 .wplace-theme-classic .wplace-input-btn-compact:active {
   transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 :root .wplace-number-input-compact,
 .wplace-theme-classic .wplace-number-input-compact {
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 4px;
   color: white;
   padding: 4px 8px;
@@ -701,12 +703,12 @@
   outline: none;
   border-color: #4facfe;
   box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.3);
-  background: rgba(255,255,255,0.15);
+  background: rgba(255, 255, 255, 0.15);
 }
 
 :root .wplace-input-label-compact,
 .wplace-theme-classic .wplace-input-label-compact {
-  color: rgba(255,255,255,0.8);
+  color: rgba(255, 255, 255, 0.8);
   font-size: 11px;
   margin-left: 4px;
   white-space: nowrap;
@@ -811,13 +813,13 @@
   border-radius: 50%;
 }
 
-:root .wplace-switch input:checked + .wplace-slider-round,
-.wplace-theme-classic .wplace-switch input:checked + .wplace-slider-round {
+:root .wplace-switch input:checked+.wplace-slider-round,
+.wplace-theme-classic .wplace-switch input:checked+.wplace-slider-round {
   background: var(--wplace-slider-track-bg);
 }
 
-:root .wplace-switch input:checked + .wplace-slider-round:before,
-.wplace-theme-classic .wplace-switch input:checked + .wplace-slider-round:before {
+:root .wplace-switch input:checked+.wplace-slider-round:before,
+.wplace-theme-classic .wplace-switch input:checked+.wplace-slider-round:before {
   transform: translateX(26px);
 }
 
@@ -1388,6 +1390,14 @@
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.25) inset, 0 0 6px rgba(79, 172, 254, 0.5);
 }
 
+/* Specific tool styling to ensure proper click handling */
+:root #fillTool,
+.wplace-theme-classic #fillTool {
+  position: relative;
+  z-index: 10;
+  pointer-events: auto;
+}
+
 :root .edit-toggle,
 .wplace-theme-classic .edit-toggle {
   background: linear-gradient(135deg, #333 0%, #555 100%);
@@ -1622,10 +1632,10 @@
   justify-content: center;
   width: 100%;
   height: 100%;
-  background: 
-    linear-gradient(45deg, #f0f0f0 25%, transparent 25%), 
-    linear-gradient(-45deg, #f0f0f0 25%, transparent 25%), 
-    linear-gradient(45deg, transparent 75%, #f0f0f0 75%), 
+  background:
+    linear-gradient(45deg, #f0f0f0 25%, transparent 25%),
+    linear-gradient(-45deg, #f0f0f0 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #f0f0f0 75%),
     linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
   background-size: 20px 20px;
   background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
@@ -1637,7 +1647,7 @@
   position: relative;
   transform-origin: center center;
   display: inline-block;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   border: 2px solid #333;
   background: white;
   transition: transform 0.1s ease-out;
@@ -1648,12 +1658,12 @@
 .wplace-theme-classic .brush-preview {
   position: absolute;
   pointer-events: none;
-  border: 2px solid rgba(255,255,255,0.8);
-  background: rgba(0,0,0,0.1);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  background: rgba(0, 0, 0, 0.1);
   z-index: 1000;
   transform-origin: top left;
   display: none;
-  box-shadow: 0 0 4px rgba(0,0,0,0.5);
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
 }
 
 :root .minimap-container,
@@ -1667,7 +1677,7 @@
   padding: 8px;
   z-index: 100;
   backdrop-filter: blur(4px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 :root .minimap-header,
@@ -1862,6 +1872,7 @@
 
 /* Mobile Responsive Adjustments */
 @media (max-width: 1024px) {
+
   :root .edit-container,
   .wplace-theme-classic .edit-container {
     width: 100vw;
@@ -1872,31 +1883,31 @@
     left: 0;
     border-radius: 0;
   }
-  
+
   :root .edit-nav-controls,
   .wplace-theme-classic .edit-nav-controls {
     flex-direction: column;
     gap: 8px;
   }
-  
+
   :root .edit-main-area,
   .wplace-theme-classic .edit-main-area {
     flex-direction: row;
   }
-  
+
   :root .edit-toolbar,
   .wplace-theme-classic .edit-toolbar {
     width: 60px;
     min-width: 60px;
   }
-  
+
   :root .minimap-container,
   .wplace-theme-classic .minimap-container {
     top: 80px;
     right: 8px;
     transform: scale(0.8);
   }
-  
+
   :root .zoom-controls,
   .wplace-theme-classic .zoom-controls {
     flex-wrap: wrap;
@@ -1905,6 +1916,7 @@
 }
 
 @media (max-width: 768px) {
+
   :root .edit-header,
   .wplace-theme-classic .edit-header {
     padding: 8px 12px;
@@ -1912,28 +1924,28 @@
     gap: 8px;
     min-height: 60px;
   }
-  
+
   :root .edit-main-area,
   .wplace-theme-classic .edit-main-area {
     flex-direction: row;
   }
-  
+
   :root .edit-toolbar,
   .wplace-theme-classic .edit-toolbar {
     width: 50px;
     min-width: 50px;
   }
-  
+
   :root .zoom-controls,
   .wplace-theme-classic .zoom-controls {
     scale: 0.9;
   }
-  
+
   :root .minimap-container,
   .wplace-theme-classic .minimap-container {
     display: none;
   }
-  
+
   :root .edit-color-grid .color-btn,
   .wplace-theme-classic .edit-color-grid .color-btn {
     width: 16px;
@@ -1943,19 +1955,20 @@
 
 /* Touch Device Optimizations */
 @media (hover: none) and (pointer: coarse) {
+
   :root .zoom-btn,
   .wplace-theme-classic .zoom-btn {
     min-width: 44px;
     min-height: 44px;
   }
-  
+
   :root .edit-tool,
   .wplace-theme-classic .edit-tool {
     min-width: 44px;
     min-height: 44px;
     padding: 12px;
   }
-  
+
   :root .edit-color-btn,
   .wplace-theme-classic .edit-color-btn {
     width: 32px;
@@ -1965,13 +1978,14 @@
 
 /* High DPI Display Support */
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+
   :root .edit-canvas,
   .wplace-theme-classic .edit-canvas {
     image-rendering: pixelated;
     image-rendering: -moz-crisp-edges;
     image-rendering: crisp-edges;
   }
-  
+
   :root .minimap-canvas,
   .wplace-theme-classic .minimap-canvas {
     image-rendering: pixelated;
@@ -2000,4 +2014,3 @@
 .wplace-theme-classic .zoom-btn:active {
   transform: translateY(1px) scale(0.95);
 }
-

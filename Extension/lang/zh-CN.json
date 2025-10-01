@@ -54,6 +54,7 @@
   "paintingSpeed": "绘制速度",
   "pixelsPerSecond": "像素/秒",
   "speedSetting": "速度: {speed} 像素/秒",
+  "keepAspectRatio": "保持纵横比",
   "settings": "设置",
   "botSettings": "机器人设置",
   "close": "关闭",
@@ -140,5 +141,18 @@
   "hideStats": "隐藏统计",
   "paintOptions": "绘图选项",
   "paintWhitePixels": "绘制白色像素",
-  "paintTransparentPixels": "绘制透明像素"
+  "paintWhitePixelsDescription": "如果启用，将绘制模板白色像素。",
+  "paintTransparentPixels": "绘制透明像素",
+  "paintTransparentPixelsDescription": "如果启用，将绘制模板透明像素",
+  "paintUnavailablePixels": "绘制不可用像素",
+  "paintUnavailablePixelsDescription": "如果启用，不可用的模板颜色将使用最接近的可用颜色绘制",
+  "colorsUpdated": "✅ 可用颜色增加 {oldCount} -> {newCount}，找到 {diffCount} 个新颜色",
+  "overlayTilesNotLoaded": "❌ 所需的地图图块未加载。检查连接或重试。",
+  "paintingBatchFailed": "❌ 多次尝试后批量发送失败。绘制已停止。",
+  "paintingPixelCheckFailed": "❌ 无法读取 ({x}, {y}) 处的像素。绘制已停止。",
+  "paintingFinalBatchFailed": "⚠️ {count} 个像素的最终批次在多次尝试后失败。",
+  "paintingStoppedByUser": "⏹️ 已被用户停止",
+  "fullChargeIn": "完全充电时间",
+  "batchSize": "批次大小"
 }
+

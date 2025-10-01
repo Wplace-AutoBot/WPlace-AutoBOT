@@ -54,6 +54,7 @@
   "paintingSpeed": "Velocidade de Pintura",
   "pixelsPerSecond": "pixels/segundo",
   "speedSetting": "Velocidade: {speed} pixels/seg",
+  "keepAspectRatio": "Manter proporção",
   "settings": "Configurações",
   "botSettings": "Configurações do Bot",
   "close": "Fechar",
@@ -139,5 +140,17 @@
   "hideStats": "Ocultar Estatísticas",
   "paintOptions": "Opções de pintura",
   "paintWhitePixels": "Pintar pixels brancos",
-  "paintTransparentPixels": "Pintar pixels transparentes"
+  "paintWhitePixelsDescription": "Se ativado, pixels brancos do modelo serão pintados.",
+  "paintTransparentPixels": "Pintar pixels transparentes",
+  "paintTransparentPixelsDescription": "Se ativado, pixels transparentes do modelo serão pintados",
+  "paintUnavailablePixels": "Pintar pixels indisponíveis",
+  "paintUnavailablePixelsDescription": "Se ativado, cores de modelo indisponíveis serão pintadas usando a cor disponível mais próxima",
+  "colorsUpdated": "✅ Cores disponíveis aumentadas {oldCount} -> {newCount}, {diffCount} novas cores encontradas",
+  "overlayTilesNotLoaded": "❌ Blocos de mapa necessários não carregados. Verifique a conexão ou tente novamente.",
+  "paintingBatchFailed": "❌ Falha ao enviar lote após várias tentativas. Pintura interrompida.",
+  "paintingPixelCheckFailed": "❌ Falha ao ler pixel em ({x}, {y}). Pintura interrompida.",
+  "paintingFinalBatchFailed": "⚠️ Lote final de {count} pixels falhou após várias tentativas.",
+  "paintingStoppedByUser": "⏹️ Pintura interrompida pelo usuário",
+  "fullChargeIn": "Carga completa em",
+  "batchSize": "Tamanho do lote"
 }

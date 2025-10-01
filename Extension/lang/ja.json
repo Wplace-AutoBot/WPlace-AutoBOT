@@ -54,6 +54,7 @@
   "paintingSpeed": "描画速度",
   "pixelsPerSecond": "ピクセル/秒",
   "speedSetting": "速度: {speed} ピクセル/秒",
+  "keepAspectRatio": "アスペクト比を維持",
   "settings": "設定",
   "botSettings": "ボット設定",
   "close": "閉じる",
@@ -140,5 +141,18 @@
   "hideStats": "統計を非表示",
   "paintOptions": "描画オプション",
   "paintWhitePixels": "白いピクセルを描画",
-  "paintTransparentPixels": "透明ピクセルを描画"
+  "paintWhitePixelsDescription": "有効にすると、テンプレートの白いピクセルが描画されます。",
+  "paintTransparentPixels": "透明ピクセルを描画",
+  "paintTransparentPixelsDescription": "有効にすると、テンプレートの透明ピクセルが描画されます",
+  "paintUnavailablePixels": "利用不可のピクセルを描画",
+  "paintUnavailablePixelsDescription": "有効にすると、利用できないテンプレートの色は最も近い利用可能な色で描画されます",
+  "colorsUpdated": "✅ 利用可能な色が増加 {oldCount} -> {newCount}、{diffCount} 個の新しい色が見つかりました",
+  "overlayTilesNotLoaded": "❌ 必要なマップタイルがロードされていません。接続を確認するか、再試行してください。",
+  "paintingBatchFailed": "❌ 複数回の試行後、バッチ送信に失敗しました。描画を停止しました。",
+  "paintingPixelCheckFailed": "❌ ({x}, {y}) のピクセルを読み取れませんでした。描画を停止しました。",
+  "paintingFinalBatchFailed": "⚠️ {count} ピクセルの最終バッチが複数回の試行後に失敗しました。",
+  "paintingStoppedByUser": "⏹️ ユーザーにより停止されました",
+  "fullChargeIn": "フル充電まで",
+  "batchSize": "バッチサイズ"
 }
+

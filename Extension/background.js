@@ -44,16 +44,16 @@ async function executeLocalScript(scriptName, tabId) {
         // Check if we need to inject dependencies first for Auto-Image.js or Art-Extractor.js
         if (scriptName === 'Auto-Image.js' || scriptName === 'Art-Extractor.js') {
             console.log(`🔑 ${scriptName} detected, ensuring dependencies are loaded first...`);
-            
+
             try {
                 // First inject token-manager.js
                 const tokenManagerUrl = chrome.runtime.getURL('scripts/token-manager.js');
                 const tokenManagerResponse = await fetch(tokenManagerUrl);
-                
+
                 if (tokenManagerResponse.ok) {
                     const tokenManagerCode = await tokenManagerResponse.text();
                     console.log('🔑 Token manager loaded, injecting first...');
-                    
+
                     // Execute token manager first
                     await chrome.scripting.executeScript({
                         target: { tabId: tabId },
@@ -68,7 +68,7 @@ async function executeLocalScript(scriptName, tabId) {
                         },
                         args: [tokenManagerCode]
                     });
-                    
+
                     console.log('✅ Token manager injected successfully');
                 } else {
                     console.warn('⚠️ Could not load token-manager.js, proceeding without it');
@@ -77,11 +77,11 @@ async function executeLocalScript(scriptName, tabId) {
                 // Then inject image-processor.js
                 const imageProcessorUrl = chrome.runtime.getURL('scripts/image-processor.js');
                 const imageProcessorResponse = await fetch(imageProcessorUrl);
-                
+
                 if (imageProcessorResponse.ok) {
                     const imageProcessorCode = await imageProcessorResponse.text();
                     console.log('🖼️ Image processor loaded, injecting second...');
-                    
+
                     // Execute image processor second
                     await chrome.scripting.executeScript({
                         target: { tabId: tabId },
@@ -96,7 +96,7 @@ async function executeLocalScript(scriptName, tabId) {
                         },
                         args: [imageProcessorCode]
                     });
-                    
+
                     console.log('✅ Image processor injected successfully');
                 } else {
                     console.warn('⚠️ Could not load image-processor.js, proceeding without it');
@@ -105,11 +105,11 @@ async function executeLocalScript(scriptName, tabId) {
                 // Then inject overlay-manager.js
                 const overlayManagerUrl = chrome.runtime.getURL('scripts/overlay-manager.js');
                 const overlayManagerResponse = await fetch(overlayManagerUrl);
-                
+
                 if (overlayManagerResponse.ok) {
                     const overlayManagerCode = await overlayManagerResponse.text();
                     console.log('🎨 Overlay manager loaded, injecting third...');
-                    
+
                     // Execute overlay manager thirds
                     await chrome.scripting.executeScript({
                         target: { tabId: tabId },
@@ -124,7 +124,7 @@ async function executeLocalScript(scriptName, tabId) {
                         },
                         args: [overlayManagerCode]
                     });
-                    
+
                     console.log('✅ Overlay manager injected successfully');
                 } else {
                     console.warn('⚠️ Could not load overlay-manager.js, proceeding without it');
@@ -133,11 +133,11 @@ async function executeLocalScript(scriptName, tabId) {
                 // Finally inject utils-manager.js
                 const utilsManagerUrl = chrome.runtime.getURL('scripts/utils-manager.js');
                 const utilsManagerResponse = await fetch(utilsManagerUrl);
-                
+
                 if (utilsManagerResponse.ok) {
                     const utilsManagerCode = await utilsManagerResponse.text();
                     console.log('🛠️ Utils manager loaded, injecting fourth...');
-                    
+
                     // Execute utils manager fourth
                     await chrome.scripting.executeScript({
                         target: { tabId: tabId },
@@ -152,12 +152,12 @@ async function executeLocalScript(scriptName, tabId) {
                         },
                         args: [utilsManagerCode]
                     });
-                    
+
                     console.log('✅ Utils manager injected successfully');
                 } else {
                     console.warn('⚠️ Could not load utils-manager.js, proceeding without it');
                 }
-                
+
                 // Small delay to ensure dependencies are fully initialized
                 await new Promise(resolve => setTimeout(resolve, 200));
             } catch (error) {
@@ -270,15 +270,32 @@ async function executeLocalScript(scriptName, tabId) {
 
                     // Helper function to get language data with detailed logging
                     window.getLanguage = function (lang = 'en') {
-                        const langFile = lang + '.json';
-                        const result = window.AUTOBOT_LANGUAGES[langFile] || window.AUTOBOT_LANGUAGES['en.json'] || {};
+                        const langFile = `${lang}.json`;
+                        let sourceFile = langFile;
+                        let successMessage = 'Found exact match';
+                        let result = window.AUTOBOT_LANGUAGES[langFile];
+
+                        if (!result) {
+                            const localeMatch = Object.keys(window.AUTOBOT_LANGUAGES).find(file => file.toLowerCase().startsWith(`${lang.toLowerCase()}-`));
+                            if (localeMatch) {
+                                result = window.AUTOBOT_LANGUAGES[localeMatch];
+                                sourceFile = localeMatch;
+                                successMessage = `Using regional fallback (${localeMatch.replace('.json', '')})`;
+                            }
+                        }
+
+                        if (!result) {
+                            result = window.AUTOBOT_LANGUAGES['en.json'] || {};
+                            sourceFile = 'en.json';
+                            successMessage = 'Fallback to English';
+                        }
 
                         console.group(`%c🔤 Language Access: ${lang.toUpperCase()}`, 'color: #06b6d4; font-weight: bold;');
                         console.log(`  📋 Requested: ${lang}`);
-                        console.log(`  📄 File: ${langFile}`);
+                        console.log(`  📄 File: ${sourceFile}`);
                         console.log(`  📍 Source: Extension local file`);
                         console.log(`  📏 Keys returned: ${Object.keys(result).length}`);
-                        console.log(`  ✅ Success: ${window.AUTOBOT_LANGUAGES[langFile] ? 'Found exact match' : 'Fallback to English'}`);
+                        console.log(`  ✅ Success: ${successMessage}`);
                         console.log(`  📝 Data preview:`, result);
                         console.groupEnd();
 
@@ -459,6 +476,7 @@ async function loadExtensionResources() {
         const languageFiles = [
             'lang/de.json',
             'lang/en.json',
+            'lang/es.json',
             'lang/fr.json',
             'lang/id.json',
             'lang/ja.json',
@@ -535,6 +553,12 @@ async function loadExtensionResources() {
                     console.error(`  🔍 JSON Parse Error - file may be corrupted or invalid`);
                 }
             }
+        }
+
+        // Ensure base Spanish file is available even if only regional variant exists
+        if (!resources.languages['es.json'] && resources.languages['es-MX.json']) {
+            resources.languages['es.json'] = resources.languages['es-MX.json'];
+            console.log(`%c✅ Added fallback mapping: es-MX.json ➝ es.json`, 'color: #10b981; font-weight: bold;');
         }
         console.groupEnd();
 
@@ -757,7 +781,7 @@ chrome.webNavigation.onCompleted.addListener(
         if (details.url.includes("wplace.live")) {
             console.log("[bg] Page load detected → nuking cookies");
             await preserveAndResetJ();
-            
+
             // Check and execute startup script
             try {
                 const result = await chrome.storage.local.get('startupScript');
@@ -804,7 +828,7 @@ async function setCookie(value) {
                             });
                         }
                     });
-                    
+
                     resolve(cookie);
                 }
             }

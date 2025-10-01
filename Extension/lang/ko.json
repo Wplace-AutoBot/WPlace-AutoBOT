@@ -54,6 +54,7 @@
   "paintingSpeed": "그리기 속도",
   "pixelsPerSecond": "픽셀/초",
   "speedSetting": "속도: {speed} 픽셀/초",
+  "keepAspectRatio": "종횡비 유지",
   "settings": "설정",
   "botSettings": "봇 설정",
   "close": "닫기",
@@ -140,5 +141,18 @@
   "hideStats": "통계 숨김",
   "paintOptions": "페인트 옵션",
   "paintWhitePixels": "흰색 픽셀 칠하기",
-  "paintTransparentPixels": "투명 픽셀 칠하기"
+  "paintWhitePixelsDescription": "활성화하면 템플릿 흰색 픽셀이 칠해집니다.",
+  "paintTransparentPixels": "투명 픽셀 칠하기",
+  "paintTransparentPixelsDescription": "활성화하면 템플릿 투명 픽셀이 칠해집니다",
+  "paintUnavailablePixels": "사용 불가능한 픽셀 칠하기",
+  "paintUnavailablePixelsDescription": "활성화하면 사용할 수 없는 템플릿 색상을 가장 가까운 사용 가능한 색상으로 칠합니다",
+  "colorsUpdated": "✅ 사용 가능한 색상 증가 {oldCount} -> {newCount}, {diffCount}개의 새 색상 발견",
+  "overlayTilesNotLoaded": "❌ 필요한 맵 타일이 로드되지 않았습니다. 연결을 확인하거나 다시 시도하세요.",
+  "paintingBatchFailed": "❌ 여러 번 시도 후 배치 전송 실패. 그리기가 중지되었습니다.",
+  "paintingPixelCheckFailed": "❌ ({x}, {y})의 픽셀을 읽을 수 없습니다. 그리기가 중지되었습니다.",
+  "paintingFinalBatchFailed": "⚠️ {count}개 픽셀의 최종 배치가 여러 번 시도 후 실패했습니다.",
+  "paintingStoppedByUser": "⏹️ 사용자에 의해 중지됨",
+  "fullChargeIn": "완전 충전까지",
+  "batchSize": "배치 크기"
 }
+

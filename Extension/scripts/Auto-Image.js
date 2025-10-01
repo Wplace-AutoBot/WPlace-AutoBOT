@@ -87,7 +87,7 @@ function getText(key, params) {
     OVERLAY: {
       OPACITY_DEFAULT: 0.6,
       BLUE_MARBLE_DEFAULT: false,
-      ditheringEnabled: false,
+      ditheringEnabled: true,
     }, // --- START: Color data from colour-converter.js ---
     // New color structure with proper ID mapping
     COLOR_MAP: {
@@ -325,7 +325,7 @@ function getText(key, params) {
     COORDINATE_BLOCK_WIDTH: 6,
     COORDINATE_BLOCK_HEIGHT: 2,
     autoSwap: true,
-    autoBuy: buyTypes[2],
+    autoBuy: 'none', // "none", "max_charges", or "paint_charges"
     autoBuyToggle: false,
     maxChargesStopEnable: false,
     maxChargesBeforeStop: 1500,
@@ -461,6 +461,7 @@ function getText(key, params) {
   // Available languages
   const AVAILABLE_LANGUAGES = [
     'en',
+    'es',
     'ru',
     'pt',
     'vi',
@@ -486,9 +487,13 @@ function getText(key, params) {
     if (window.AUTOBOT_LANGUAGES && Object.keys(window.AUTOBOT_LANGUAGES).length > 0) {
       console.log(`%c🔍 Checking extension local resources...`, 'color: #06b6d4;');
 
-      const langFile = language + '.json';
-      if (window.AUTOBOT_LANGUAGES[langFile]) {
-        const translations = window.AUTOBOT_LANGUAGES[langFile];
+      const langFile = `${language}.json`;
+      const availableFiles = Object.keys(window.AUTOBOT_LANGUAGES || {});
+      const regionalMatch = availableFiles.find(file => file.toLowerCase().startsWith(`${language.toLowerCase()}-`));
+      const resolvedFile = window.AUTOBOT_LANGUAGES[langFile] ? langFile : regionalMatch;
+
+      if (resolvedFile && window.AUTOBOT_LANGUAGES[resolvedFile]) {
+        const translations = window.AUTOBOT_LANGUAGES[resolvedFile];
 
         // Validate that translations is an object with keys
         if (
@@ -499,6 +504,9 @@ function getText(key, params) {
           window.loadedTranslations[language] = translations;
           console.log(`%c✅ Loaded ${language} translations from EXTENSION LOCAL FILES`, 'color: #10b981; font-weight: bold;');
           console.log(`  📍 Source: Extension local storage (chrome-extension://)`);
+          if (resolvedFile !== langFile) {
+            console.log(`  🔄 Resolved locale: ${resolvedFile.replace('.json', '')}`);
+          }
           console.log(`  📏 Keys count: ${Object.keys(translations).length}`);
           console.log(`  🚀 Performance: Instant load (no network request)`);
           console.groupEnd();
@@ -2391,78 +2399,102 @@ function getText(key, params) {
       </div>
     `;
 
-    // Stats Window - Separate UI
     const statsContainer = document.createElement('div');
     statsContainer.id = 'wplace-stats-container';
     statsContainer.style.display = 'none';
     statsContainer.innerHTML = `
-      <div class="wplace-header">
-        <div class="wplace-header-title">
-          <i class="fas fa-chart-bar"></i>
-          <span>${Utils.t('paintingStats')}</span>
-        </div>
-        <div class="wplace-header-controls">
-          <button id="refreshChargesBtn" class="wplace-header-btn" title="${Utils.t(
-      'refreshCharges'
-    )}">
-            <i class="fas fa-sync"></i>
-          </button>
-          <button id="closeStatsBtn" class="wplace-header-btn" title="${Utils.t('closeStats')}">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
+    <div class="wplace-header">
+      <div class="wplace-header-title">
+        <i class="fas fa-chart-bar"></i>
+        <span>${Utils.t('paintingStats')}</span>
       </div>
-      <div class="wplace-content">
-        <div class="wplace-stats">
-          <div id="statsArea">
-            <div class="wplace-stat-item">
-              <div class="wplace-stat-label"><i class="fas fa-info-circle"></i> ${Utils.t(
-      'initMessage'
-    )}</div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="wplace-section" id="account-swapper-section">
-          <div class="wplace-section-title" style="justify-content: space-between; align-items: center;">
-            <div style="display: flex; align-items: center; gap: 6px;">
-              <i class="fas fa-sync-alt"></i>
-              <span>Account Swapper</span>
-            </div>
-            <label class="wplace-switch">
-              <input type="checkbox" id="autoSwapToggle">
-              <span class="wplace-slider-round"></span>
-            </label>
-          </div>
-        </div>
-
-        <div class="wplace-section" id="autobuy-section">
-          <div class="wplace-section-title" style="justify-content: space-between; align-items: center;">
-            <div style="display: flex; align-items: center; gap: 6px;">
-              <i class="fas fa-shopping-cart"></i>
-              <span>Auto Buy Charges</span>
-            </div>
-            <label class="wplace-switch">
-              <input type="checkbox" id="autoBuyToggle" disabled>
-              <span class="wplace-slider-round"></span>
-            </label>
-          </div>
-        </div>
-
-        <div class="wplace-section" id="all-accounts-section">
-          <div class="wplace-section-title">
-            <i class="fas fa-users"></i>
-            <span>All Accounts</span>
-            <button id="refreshAllAccountsBtn" class="wplace-header-btn" title="Refresh all accounts">
-              <i class="fas fa-users-cog"></i>
-            </button>
-          </div>
-          <div id="accountsListArea" class="accounts-list-container">
-            <div class="wplace-stat-item" style="opacity: 0.5;">Click the <i class="fas fa-users-cog"></i> icon to load accounts.</div>
+      <div class="wplace-header-controls">
+        <button id="refreshChargesBtn" class="wplace-header-btn" title="${Utils.t('refreshCharges')}">
+          <i class="fas fa-sync"></i>
+        </button>
+        <button id="closeStatsBtn" class="wplace-header-btn" title="${Utils.t('closeStats')}">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+    <div class="wplace-content">
+      <div class="wplace-stats">
+        <div id="statsArea">
+          <div class="wplace-stat-item">
+            <div class="wplace-stat-label"><i class="fas fa-info-circle"></i> ${Utils.t('initMessage')}</div>
           </div>
         </div>
       </div>
+      
+      <div class="wplace-section" id="account-swapper-section">
+        <div class="wplace-section-title" style="justify-content: space-between; align-items: center;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <i class="fas fa-sync-alt"></i>
+            <span>Account Swapper</span>
+          </div>
+          <label class="wplace-switch">
+            <input type="checkbox" id="autoSwapToggle">
+            <span class="wplace-slider-round"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="wplace-section" id="autobuy-section">
+        <div class="wplace-section-title" style="flex-direction: column; align-items: flex-start; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 6px; width: 100%;">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Auto Buy Charges</span>
+          </div>
+          <div class="pill-container">
+            <div class="pill-highlight"></div>
+            <button class="pill-btn active" data-mode="none">Off</button>
+            <button class="pill-btn" data-mode="max_charges">Max</button>
+            <button class="pill-btn" data-mode="paint_charges">Paint</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="wplace-section" id="all-accounts-section">
+        <div class="wplace-section-title">
+          <i class="fas fa-users"></i>
+          <span>All Accounts</span>
+          <button id="refreshAllAccountsBtn" class="wplace-header-btn" title="Refresh all accounts">
+            <i class="fas fa-users-cog"></i>
+          </button>
+        </div>
+        <div id="accountsListArea" class="accounts-list-container">
+          <div class="wplace-stat-item" style="opacity: 0.5;">Click the <i class="fas fa-users-cog"></i> icon to load accounts.</div>
+        </div>
+      </div>
+    </div>
     `;
+
+    function initPillSelector() {
+      const buttons = statsContainer.querySelectorAll(".pill-btn");
+      const highlight = statsContainer.querySelector(".pill-highlight");
+
+      buttons.forEach((btn, index) => {
+        btn.addEventListener("click", () => {
+          highlight.style.transform = `translateX(${index * 100}%)`;
+
+          buttons.forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+
+          CONFIG.autoBuy = btn.dataset.mode;
+          if (CONFIG.autoBuy === 'none') {
+            console.log("AutoBuy disabled");
+            CONFIG.autoBuyToggle = false;
+          }
+          else {
+            CONFIG.autoBuyToggle = true;
+            console.log("AutoBuy enabled");
+          }
+          console.log("AutoBuy mode set to:", CONFIG.autoBuy);
+        });
+      });
+    }
+
+    initPillSelector();
 
     // Modern Settings Container with Theme Support
     // Use the theme variable already declared at the top of createUI function
@@ -2872,6 +2904,7 @@ function getText(key, params) {
               <option value="ru" ${state.language === 'ru' ? 'selected' : ''} class="wplace-settings-option">🇷🇺 Русский</option>
               <option value="uk" ${state.language === 'uk' ? 'selected' : ''} class="wplace-settings-option">🇺🇦 Українська</option>
               <option value="en" ${state.language === 'en' ? 'selected' : ''} class="wplace-settings-option">🇺🇸 English</option>
+              <option value="es" ${state.language === 'es' ? 'selected' : ''} class="wplace-settings-option">🇪🇸 Español</option>
               <option value="pt" ${state.language === 'pt' ? 'selected' : ''} class="wplace-settings-option">🇧🇷 Português</option>
               <option value="fr" ${state.language === 'fr' ? 'selected' : ''} class="wplace-settings-option">🇫🇷 Français</option>
               <option value="tr" ${state.language === 'tr' ? 'selected' : ''} class="wplace-settings-option">🇹🇷 Türkçe</option>
@@ -3410,7 +3443,7 @@ function getText(key, params) {
         autoSwapToggle.addEventListener('change', (e) => {
           CONFIG.autoSwap = e.target.checked;
           console.log(`🔄 Auto-swap ${CONFIG.autoSwap ? 'enabled' : 'disabled'}`);
-          
+
           // Handle autoBuy toggle dependency
           const autoBuyToggle = statsContainer.querySelector('#autoBuyToggle');
           if (autoBuyToggle) {
@@ -3433,7 +3466,7 @@ function getText(key, params) {
       if (autoBuyToggle) {
         autoBuyToggle.checked = CONFIG.autoBuyToggle;
         autoBuyToggle.disabled = !CONFIG.autoSwap; // Disable if autoSwap is off
-        
+
         autoBuyToggle.addEventListener('change', (e) => {
           CONFIG.autoBuyToggle = e.target.checked;
           console.log(`💰 Auto-buy ${CONFIG.autoBuyToggle ? 'enabled' : 'disabled'}`);
@@ -4701,7 +4734,7 @@ function getText(key, params) {
         canvasStack.style.width = newWidth + 'px';
         canvasStack.style.height = newHeight + 'px';
         baseCtx.imageSmoothingEnabled = false;
-        
+
         if (!state.availableColors || state.availableColors.length === 0) {
           if (baseProcessor !== processor && (!baseProcessor.img || !baseProcessor.canvas)) {
             await baseProcessor.load();
@@ -4714,7 +4747,7 @@ function getText(key, params) {
           updateZoomLayout();
           return;
         }
-        
+
         if (baseProcessor !== processor && (!baseProcessor.img || !baseProcessor.canvas)) {
           await baseProcessor.load();
         }
@@ -5690,26 +5723,26 @@ function getText(key, params) {
           Utils.showAlert('No image available for editing. Please upload an image first.', 'error');
           return;
         }
-        
+
         // Hide resize panel
         resizeContainer.style.display = 'none';
-        
+
         // Create edit panel if it doesn't exist
         let editOverlay = document.getElementById('editOverlay');
         if (!editOverlay) {
           createEditPanel();
           editOverlay = document.getElementById('editOverlay');
         }
-        
+
         // Get current image data from baseCanvas
         const imageData = baseCanvas.toDataURL();
-        
+
         // Initialize edit panel with current image
         initializeEditPanel(imageData);
-        
+
         // Show edit panel
         editOverlay.style.display = 'block';
-        
+
         console.log('✨ Pixel Art Editor opened successfully');
       } catch (error) {
         console.error('Error opening pixel art editor:', error);
@@ -5721,7 +5754,7 @@ function getText(key, params) {
       const editOverlay = document.createElement('div');
       editOverlay.id = 'editOverlay';
       editOverlay.className = 'edit-overlay';
-      
+
       editOverlay.innerHTML = `
         <div class="edit-container">
           <div class="edit-header">
@@ -5830,9 +5863,9 @@ function getText(key, params) {
           </div>
         </div>
       `;
-      
+
       document.body.appendChild(editOverlay);
-      
+
       // Set up event handlers
       setupEditPanelEvents();
     }
@@ -5856,69 +5889,69 @@ function getText(key, params) {
       const zoomFit = document.getElementById('zoomFit');
       const zoom100 = document.getElementById('zoom100');
       const minimapCanvas = document.getElementById('minimapCanvas');
-      
+
       // Back to resize panel
       editBackBtn.onclick = () => {
         document.getElementById('editOverlay').style.display = 'none';
         resizeContainer.style.display = 'block';
       };
-      
+
       // Apply changes
       editApplyBtn.onclick = () => {
         applyEditChanges();
         document.getElementById('editOverlay').style.display = 'none';
         resizeContainer.style.display = 'block';
       };
-      
+
       // Tool selection
       paintBrush.onclick = () => {
         selectTool('paint');
       };
-      
+
       eraseTool.onclick = () => {
         selectTool('erase');
       };
-      
+
       eyedropperTool.onclick = () => {
         selectTool('eyedropper');
       };
-      
+
       fillTool.onclick = () => {
         selectTool('fill');
       };
-      
+
       // Grid toggle
       showGrid.onclick = () => {
         editState.showGrid = !editState.showGrid;
         showGrid.classList.toggle('active', editState.showGrid);
         redrawCanvas();
       };
-      
+
       // Brush size
       brushSize.oninput = () => {
         brushSizeValue.textContent = brushSize.value;
         updateBrushSize(parseInt(brushSize.value));
       };
-      
+
       // Undo/Redo
       undoBtn.onclick = () => undoEdit();
       redoBtn.onclick = () => redoEdit();
-      
+
       // Reset view
       resetViewBtn.onclick = () => resetEditView();
-      
+
       // Enhanced zoom controls
       editZoomIn.onclick = () => zoomIn();
       editZoomOut.onclick = () => zoomOut();
-      
+
       zoomSelect.onchange = () => {
         const newZoom = parseFloat(zoomSelect.value);
         setZoom(newZoom);
       };
-      
+
       zoomFit.onclick = () => fitToWindow();
       zoom100.onclick = () => setZoom(1);
-      
+
       // Minimap navigation
       if (minimapCanvas) {
         minimapCanvas.onclick = (e) => navigateToMinimapPosition(e);
@@ -5955,23 +5988,23 @@ function getText(key, params) {
     function calculateOptimalPanelSize(imageWidth, imageHeight) {
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
-      
+
       // Reserve minimal space for UI elements for almost fullscreen experience
       const uiReserved = {
         header: 80,
-        toolbar: 60, 
+        toolbar: 60,
         bottomBar: 120,
         padding: 40
       };
-      
+
       const maxCanvasWidth = viewportWidth - uiReserved.padding;
       const maxCanvasHeight = viewportHeight - uiReserved.header - uiReserved.toolbar - uiReserved.bottomBar - uiReserved.padding;
-      
+
       // Calculate optimal initial zoom to fit image
       const scaleX = maxCanvasWidth / imageWidth;
       const scaleY = maxCanvasHeight / imageHeight;
       const initialZoom = Math.min(scaleX, scaleY, 1); // Don't zoom in initially
-      
+
       return {
         panelWidth: Math.min(viewportWidth * 0.95, imageWidth * initialZoom + uiReserved.colorPanel + uiReserved.padding),
         panelHeight: Math.min(viewportHeight * 0.95, imageHeight * initialZoom + uiReserved.toolbar + uiReserved.statusBar + uiReserved.canvasToolbar + uiReserved.padding),
@@ -5984,7 +6017,7 @@ function getText(key, params) {
     function initializeEditPanel(imageData) {
       const editCanvas = document.getElementById('editCanvas');
       const ctx = editCanvas.getContext('2d');
-      
+
       // Reset edit state
       editState.zoom = 1;
       editState.panX = 0;
@@ -5997,19 +6030,19 @@ function getText(key, params) {
       editState.isPanning = false;
       editState.isDrawing = false;
       editState.lastPaintPos = null;
-      
+
       // Set canvas size to match baseCanvas
       editCanvas.width = baseCanvas.width;
       editCanvas.height = baseCanvas.height;
       editState.canvasWidth = editCanvas.width;
       editState.canvasHeight = editCanvas.height;
-      
+
       // Configure canvas context for pixel art
       ctx.imageSmoothingEnabled = false;
       ctx.webkitImageSmoothingEnabled = false;
       ctx.mozImageSmoothingEnabled = false;
       ctx.msImageSmoothingEnabled = false;
-      
+
       // Calculate optimal panel size
       const panelSize = calculateOptimalPanelSize(editCanvas.width, editCanvas.height);
       const editContainer = document.querySelector('.edit-container');
@@ -6017,44 +6050,55 @@ function getText(key, params) {
         editContainer.style.width = panelSize.panelWidth + 'px';
         editContainer.style.height = panelSize.panelHeight + 'px';
       }
-      
+
       // Setup canvas container
       setupCanvasContainer();
       
+      // Add CSS checkerboard background to the wrapper element (not the canvas)
+      // This allows users to see transparency without saving it to the template
+      const canvasWrapper = document.getElementById('editCanvasWrapper');
+      if (canvasWrapper) {
+        canvasWrapper.style.background = `
+          repeating-conic-gradient(#f0f0f0 0% 25%, #e0e0e0 0% 50%) 
+          50% / 16px 16px
+        `;
+      }
+
       // Load image onto canvas
       const img = new Image();
       img.onload = () => {
         ctx.clearRect(0, 0, editCanvas.width, editCanvas.height);
+        // REMOVED: drawCheckerboardBackground - prevents checkerboard from being saved with template
         ctx.drawImage(img, 0, 0);
-        
-  // Always fit artwork to the visible area on start and center
-  fitToWindow();
-  centerCanvas();
-        
+
+        // Always fit artwork to the visible area on start and center
+        fitToWindow();
+        centerCanvas();
+
         // Setup minimap
         setupMinimap();
-        
+
         // Save initial state for undo
         saveEditState();
-        
+
         // Set up canvas drawing events
         setupCanvasDrawing();
-        
+
         // Initialize color palette
         initializeEditColorPalette();
-        
+
         // Setup keyboard shortcuts
         setupKeyboardShortcuts();
-        
+
         // Setup touch support
         setupTouchSupport();
-        
+
         // Set initial tool
         selectTool('paint');
-        
+
         // Update status bar
         updateStatusBar(0, 0);
-        
+
         // Center canvas initially
         centerCanvas();
       };
@@ -6066,43 +6110,43 @@ function getText(key, params) {
       const canvas = document.getElementById('editCanvas');
       const wrapper = document.getElementById('editCanvasWrapper');
       const container = document.getElementById('editCanvasContainer');
-      
+
       if (!canvas || !wrapper || !container) return null;
-      
+
       // Get the actual canvas element bounds (after CSS transform)
       const canvasRect = canvas.getBoundingClientRect();
-      
+
       // Calculate relative position within the actual canvas bounds
       const relativeX = (clientX - canvasRect.left) / canvasRect.width * canvas.width;
       const relativeY = (clientY - canvasRect.top) / canvasRect.height * canvas.height;
-      
+
       // Convert to canvas coordinates
       const canvasX = Math.floor(relativeX);
       const canvasY = Math.floor(relativeY);
-      
+
       // Bounds checking
       if (canvasX < 0 || canvasX >= canvas.width || canvasY < 0 || canvasY >= canvas.height) {
         return null;
       }
-      
+
       return { x: canvasX, y: canvasY };
     }
 
     function setupCanvasDrawing() {
       const editCanvas = document.getElementById('editCanvas');
       const ctx = editCanvas.getContext('2d');
-      
+
       let isDrawing = false;
       let isPanning = false;
       let lastX = 0;
       let lastY = 0;
       let panStartX = 0;
       let panStartY = 0;
-      
+
       const getMousePos = (e) => {
         return mapClientToCanvas(e.clientX, e.clientY);
       };
-      
+
       editCanvas.onmousedown = (e) => {
         if (e.button === 2 || e.ctrlKey) { // Right click or Ctrl+click for panning
           editState.isPanning = true;
@@ -6112,38 +6156,38 @@ function getText(key, params) {
           e.preventDefault();
           return;
         }
-        
+
         const pos = getMousePos(e);
         if (!pos) return;
-        
+
         if (editState.currentTool === 'eyedropper') {
           handleEyedropper(pos.x, pos.y);
           return;
         }
-        
+
         if (editState.currentTool === 'fill') {
           floodFill(pos.x, pos.y, editState.currentColor);
           saveEditState();
           return;
         }
-        
+
         editState.isDrawing = true;
         editState.lastPaintPos = { x: pos.x, y: pos.y };
         lastX = pos.x;
         lastY = pos.y;
-        
+
         paintAtPosition(pos.x, pos.y, true);
       };
-      
+
       editCanvas.onmousemove = (e) => {
         const pos = getMousePos(e);
-        
+
         if (pos) {
           editState.mouseX = pos.x;
           editState.mouseY = pos.y;
           updateStatusBar(pos.x, pos.y);
         }
-        
+
         if (editState.isPanning) {
           editState.panX = e.clientX - panStartX;
           editState.panY = e.clientY - panStartY;
@@ -6152,64 +6196,64 @@ function getText(key, params) {
           updateMinimap();
           return;
         }
-        
+
         if (!editState.isDrawing) {
           return;
         }
-        
+
         if (pos && editState.lastPaintPos) {
           paintAtPosition(pos.x, pos.y, true);
           editState.lastPaintPos = { x: pos.x, y: pos.y };
         }
       };
-      
+
       editCanvas.onmouseup = (e) => {
         if (editState.isPanning) {
           editState.isPanning = false;
           selectTool(editState.currentTool); // Restore cursor
           return;
         }
-        
+
         if (editState.isDrawing) {
           editState.isDrawing = false;
           editState.lastPaintPos = null;
           saveEditState();
         }
       };
-      
+
       editCanvas.onmouseleave = () => {
         if (editState.isPanning) {
           editState.isPanning = false;
           selectTool(editState.currentTool); // Restore cursor
         }
-        
+
         if (editState.isDrawing) {
           editState.isDrawing = false;
           editState.lastPaintPos = null;
           saveEditState();
         }
       };
-      
+
       // Prevent context menu on right click
       editCanvas.oncontextmenu = (e) => {
         e.preventDefault();
         return false;
       };
-      
+
       // Enhanced zoom with mouse wheel (zoom to cursor)
       editCanvas.onwheel = (e) => {
         e.preventDefault();
-        const zoomFactor = e.deltaY < 0 ? 1.2 : 1/1.2;
+        const zoomFactor = e.deltaY < 0 ? 1.2 : 1 / 1.2;
         zoomToPoint(editState.zoom * zoomFactor, e.clientX, e.clientY);
       };
     }
 
     function paintAtPosition(x, y, isMouseDown = true) {
       if (!isMouseDown || !editState.currentColor) return;
-      
+
       const canvas = document.getElementById('editCanvas');
       const ctx = canvas.getContext('2d');
-      
+
       if (editState.lastPaintPos && editState.currentTool === 'paint') {
         // Draw line from last position to current position
         drawLine(ctx, editState.lastPaintPos.x, editState.lastPaintPos.y, x, y, editState.currentTool);
@@ -6217,9 +6261,9 @@ function getText(key, params) {
         // Single brush stroke
         drawBrush(ctx, x, y, editState.currentTool);
       }
-      
+
       editState.lastPaintPos = { x, y };
-      
+
       // Update minimap thumbnail
       if (!editState.updatePending) {
         editState.updatePending = true;
@@ -6233,7 +6277,7 @@ function getText(key, params) {
     function drawBrush(ctx, x, y, tool) {
       const size = editState.brushSize;
       const halfSize = Math.floor(size / 2);
-      
+
       if (tool === 'paint') {
         ctx.fillStyle = editState.currentColor;
         for (let dx = 0; dx < size; dx++) {
@@ -6241,7 +6285,7 @@ function getText(key, params) {
             // Center the brush at the cursor position
             const px = x - halfSize + dx;
             const py = y - halfSize + dy;
-            
+
             if (px >= 0 && px < ctx.canvas.width && py >= 0 && py < ctx.canvas.height) {
               ctx.fillRect(px, py, 1, 1);
             }
@@ -6253,7 +6297,7 @@ function getText(key, params) {
             // Center the brush at the cursor position
             const px = x - halfSize + dx;
             const py = y - halfSize + dy;
-            
+
             if (px >= 0 && px < ctx.canvas.width && py >= 0 && py < ctx.canvas.height) {
               ctx.clearRect(px, py, 1, 1);
             }
@@ -6269,16 +6313,16 @@ function getText(key, params) {
     function erasePixel(x, y) {
       const editCanvas = document.getElementById('editCanvas');
       const ctx = editCanvas.getContext('2d');
-      
+
       const size = editState.brushSize;
       const halfSize = Math.floor(size / 2);
-      
+
       for (let dx = 0; dx < size; dx++) {
         for (let dy = 0; dy < size; dy++) {
           // Center the brush at the cursor position (consistent with drawBrush)
           const px = x - halfSize + dx;
           const py = y - halfSize + dy;
-          
+
           if (px >= 0 && px < editCanvas.width && py >= 0 && py < editCanvas.height) {
             ctx.clearRect(px, py, 1, 1);
           }
@@ -6293,15 +6337,15 @@ function getText(key, params) {
       const sx = x1 < x2 ? 1 : -1;
       const sy = y1 < y2 ? 1 : -1;
       let err = dx - dy;
-      
+
       let x = x1;
       let y = y1;
-      
+
       while (true) {
         drawBrush(ctx, x, y, tool);
-        
+
         if (x === x2 && y === y2) break;
-        
+
         const e2 = 2 * err;
         if (e2 > -dy) {
           err -= dy;
@@ -6321,15 +6365,15 @@ function getText(key, params) {
       const sx = x1 < x2 ? 1 : -1;
       const sy = y1 < y2 ? 1 : -1;
       let err = dx - dy;
-      
+
       let x = x1;
       let y = y1;
-      
+
       while (true) {
         erasePixel(x, y);
-        
+
         if (x === x2 && y === y2) break;
-        
+
         const e2 = 2 * err;
         if (e2 > -dy) {
           err -= dy;
@@ -6344,14 +6388,14 @@ function getText(key, params) {
 
     function selectTool(tool) {
       editState.currentTool = tool;
-      
+
       document.querySelectorAll('.edit-tool').forEach(btn => {
         btn.classList.remove('active');
       });
-      
+
       const editCanvas = document.getElementById('editCanvas');
-      
-      switch(tool) {
+
+      switch (tool) {
         case 'paint':
           document.getElementById('paintBrush').classList.add('active');
           editCanvas.style.cursor = 'crosshair';
@@ -6378,18 +6422,18 @@ function getText(key, params) {
     function initializeEditColorPalette() {
       const colorGrid = document.getElementById('editColorGrid');
       const currentColorDisplay = document.getElementById('currentColorDisplay');
-      
+
       colorGrid.innerHTML = '';
-      
+
       let availableColors = [];
-      
+
       // Try to get colors from state first
       if (state && state.availableColors && state.availableColors.length > 0) {
         availableColors = state.availableColors.map(color => ({
           id: color.id,
           name: color.name,
           rgb: color.rgb,
-          hex: `#${color.rgb[0].toString(16).padStart(2,'0')}${color.rgb[1].toString(16).padStart(2,'0')}${color.rgb[2].toString(16).padStart(2,'0')}`
+          hex: `#${color.rgb[0].toString(16).padStart(2, '0')}${color.rgb[1].toString(16).padStart(2, '0')}${color.rgb[2].toString(16).padStart(2, '0')}`
         }));
       } else {
         // Fallback to CONFIG.COLOR_MAP
@@ -6399,27 +6443,27 @@ function getText(key, params) {
             id: color.id,
             name: color.name,
             rgb: [color.rgb.r, color.rgb.g, color.rgb.b],
-            hex: `#${color.rgb.r.toString(16).padStart(2,'0')}${color.rgb.g.toString(16).padStart(2,'0')}${color.rgb.b.toString(16).padStart(2,'0')}`
+            hex: `#${color.rgb.r.toString(16).padStart(2, '0')}${color.rgb.g.toString(16).padStart(2, '0')}${color.rgb.b.toString(16).padStart(2, '0')}`
           }));
       }
-      
+
       // Fallback to basic colors if nothing available
       if (availableColors.length === 0) {
         availableColors = [
-          {id: 0, name: 'Black', rgb: [0,0,0], hex: '#000000'},
-          {id: 1, name: 'White', rgb: [255,255,255], hex: '#ffffff'},
-          {id: 2, name: 'Red', rgb: [255,0,0], hex: '#ff0000'},
-          {id: 3, name: 'Green', rgb: [0,255,0], hex: '#00ff00'},
-          {id: 4, name: 'Blue', rgb: [0,0,255], hex: '#0000ff'}
+          { id: 0, name: 'Black', rgb: [0, 0, 0], hex: '#000000' },
+          { id: 1, name: 'White', rgb: [255, 255, 255], hex: '#ffffff' },
+          { id: 2, name: 'Red', rgb: [255, 0, 0], hex: '#ff0000' },
+          { id: 3, name: 'Green', rgb: [0, 255, 0], hex: '#00ff00' },
+          { id: 4, name: 'Blue', rgb: [0, 0, 255], hex: '#0000ff' }
         ];
       }
-      
+
       // Update color count
       const colorCount = document.getElementById('editColorCount');
       if (colorCount) {
         colorCount.textContent = availableColors.length;
       }
-      
+
       availableColors.forEach(color => {
         const colorBtn = document.createElement('button');
         colorBtn.className = 'color-btn';
@@ -6427,24 +6471,24 @@ function getText(key, params) {
         colorBtn.title = `${color.name} (${color.hex})`;
         colorBtn.dataset.colorId = color.id;
         colorBtn.dataset.colorHex = color.hex;
-        
+
         colorBtn.onclick = () => {
           editState.currentColor = color.hex;
           editState.currentColorId = color.id;
           currentColorDisplay.style.backgroundColor = color.hex;
-          
+
           // Update active color
           document.querySelectorAll('.color-btn').forEach(btn => {
             btn.classList.remove('selected');
           });
           colorBtn.classList.add('selected');
-          
+
           updateStatusBar(editState.mouseX, editState.mouseY);
         };
-        
+
         colorGrid.appendChild(colorBtn);
       });
-      
+
       // Set first color as default
       if (availableColors.length > 0) {
         editState.currentColor = availableColors[0].hex;
@@ -6457,50 +6501,51 @@ function getText(key, params) {
     function saveEditState() {
       const editCanvas = document.getElementById('editCanvas');
       const imageData = editCanvas.toDataURL();
-      
+
       editState.undoStack.push(imageData);
-      
+
       // Limit undo stack size
       if (editState.undoStack.length > 50) {
         editState.undoStack.shift();
       }
-      
+
       // Clear redo stack when new action is performed
       editState.redoStack = [];
-      
+
       updateUndoRedoButtons();
     }
 
     function undoEdit() {
       if (editState.undoStack.length <= 1) return;
-      
+
       const currentState = editState.undoStack.pop();
       editState.redoStack.push(currentState);
-      
+
       const previousState = editState.undoStack[editState.undoStack.length - 1];
       loadEditState(previousState);
-      
+
       updateUndoRedoButtons();
     }
 
     function redoEdit() {
       if (editState.redoStack.length === 0) return;
-      
+
       const nextState = editState.redoStack.pop();
       editState.undoStack.push(nextState);
-      
+
       loadEditState(nextState);
-      
+
       updateUndoRedoButtons();
     }
 
     function loadEditState(imageData) {
       const editCanvas = document.getElementById('editCanvas');
       const ctx = editCanvas.getContext('2d');
-      
+
       const img = new Image();
       img.onload = () => {
         ctx.clearRect(0, 0, editCanvas.width, editCanvas.height);
+        // REMOVED: drawCheckerboardBackground - prevents checkerboard from being saved with template
         ctx.drawImage(img, 0, 0);
       };
       img.src = imageData;
@@ -6509,11 +6554,11 @@ function getText(key, params) {
     function updateUndoRedoButtons() {
       const undoBtn = document.getElementById('undoBtn');
       const redoBtn = document.getElementById('redoBtn');
-      
+
       if (undoBtn) {
         undoBtn.disabled = editState.undoStack.length <= 1;
       }
-      
+
       if (redoBtn) {
         redoBtn.disabled = editState.redoStack.length === 0;
       }
@@ -6524,7 +6569,7 @@ function getText(key, params) {
       if (wrapper) {
         wrapper.style.transform = `translate(${editState.panX}px, ${editState.panY}px) scale(${editState.zoom})`;
       }
-      
+
       // Update zoom select
       const zoomSelect = document.getElementById('zoomSelect');
       if (zoomSelect) {
@@ -6540,9 +6585,9 @@ function getText(key, params) {
       const canvasContainer = document.getElementById('editCanvasContainer');
       const editCanvas = document.getElementById('editCanvas');
       const wrapper = document.getElementById('editCanvasWrapper');
-      
+
       if (!canvasContainer || !wrapper) return;
-      
+
       // Setup container styles
       canvasContainer.style.cssText = `
         position: relative;
@@ -6561,7 +6606,7 @@ function getText(key, params) {
         background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
         background-color: #ddd;
       `;
-      
+
       // Setup wrapper styles
       wrapper.style.cssText = `
         position: relative;
@@ -6576,28 +6621,28 @@ function getText(key, params) {
     function zoomToPoint(newZoom, clientX, clientY) {
       const container = document.getElementById('editCanvasContainer');
       const wrapper = document.getElementById('editCanvasWrapper');
-      
+
       if (!container || !wrapper) return;
-      
+
       newZoom = Math.max(0.1, Math.min(32, newZoom));
-      
+
       if (clientX !== undefined && clientY !== undefined) {
         // Get current transform values
         const oldZoom = editState.zoom;
         const rect = container.getBoundingClientRect();
-        
+
         // Calculate zoom center point relative to container
         const containerCenterX = rect.left + rect.width / 2;
         const containerCenterY = rect.top + rect.height / 2;
-        
+
         // Calculate offset to keep zoom point centered
         const offsetX = (clientX - containerCenterX) * (1 - newZoom / oldZoom);
         const offsetY = (clientY - containerCenterY) * (1 - newZoom / oldZoom);
-        
+
         editState.panX += offsetX;
         editState.panY += offsetY;
       }
-      
+
       editState.zoom = newZoom;
       constrainPan();
       updateCanvasTransform();
@@ -6608,20 +6653,20 @@ function getText(key, params) {
     function constrainPan() {
       const container = document.getElementById('editCanvasContainer');
       const canvas = document.getElementById('editCanvas');
-      
+
       if (!container || !canvas) return;
-      
+
       const containerRect = container.getBoundingClientRect();
       const scaledWidth = canvas.width * editState.zoom;
       const scaledHeight = canvas.height * editState.zoom;
-      
-  // Small padding around edges to avoid snapping against borders
-  const padding = 10;
-      
+
+      // Small padding around edges to avoid snapping against borders
+      const padding = 10;
+
       // Calculate limits to keep canvas somewhat visible
       const maxPanX = Math.max(0, (scaledWidth - containerRect.width) / 2 + padding);
       const maxPanY = Math.max(0, (scaledHeight - containerRect.height) / 2 + padding);
-      
+
       editState.panX = Math.max(-maxPanX, Math.min(maxPanX, editState.panX));
       editState.panY = Math.max(-maxPanY, Math.min(maxPanY, editState.panY));
     }
@@ -6645,16 +6690,16 @@ function getText(key, params) {
     function fitToWindow() {
       const container = document.getElementById('editCanvasContainer');
       const canvas = document.getElementById('editCanvas');
-      
+
       if (!container || !canvas) return;
-      
+
       const containerRect = container.getBoundingClientRect();
       const padding = 40;
-      
+
       const scaleX = (containerRect.width - padding) / canvas.width;
       const scaleY = (containerRect.height - padding) / canvas.height;
       const fitZoom = Math.max(0.1, Math.min(scaleX, scaleY));
-      
+
       // Center the canvas
       editState.zoom = fitZoom;
       editState.panX = 0;
@@ -6675,7 +6720,7 @@ function getText(key, params) {
       editState.zoom = 1;
       editState.panX = 0;
       editState.panY = 0;
-      
+
       updateCanvasTransform();
       updateMinimap();
     }
@@ -6684,27 +6729,28 @@ function getText(key, params) {
       const minimapCanvas = document.getElementById('minimapCanvas');
       const editCanvas = document.getElementById('editCanvas');
       const minimapContainer = document.getElementById('minimapContainer');
-      
+
       if (!minimapCanvas || !editCanvas) return;
-      
+
       // Show minimap only for larger images
       if (editCanvas.width < 100 || editCanvas.height < 100) {
         if (minimapContainer) minimapContainer.style.display = 'none';
         return;
       }
-      
+
       // Calculate minimap size
       const maxSize = 150;
       const scale = Math.min(maxSize / editCanvas.width, maxSize / editCanvas.height);
-      
+
       minimapCanvas.width = editCanvas.width * scale;
       minimapCanvas.height = editCanvas.height * scale;
-      
+
       // Draw thumbnail
       const minimapCtx = minimapCanvas.getContext('2d');
       minimapCtx.imageSmoothingEnabled = false;
+      // REMOVED: drawCheckerboardBackground - prevents checkerboard from being saved with template
       minimapCtx.drawImage(editCanvas, 0, 0, minimapCanvas.width, minimapCanvas.height);
-      
+
       // Update viewport indicator
       updateMinimap();
     }
@@ -6714,19 +6760,19 @@ function getText(key, params) {
       const minimapCanvas = document.getElementById('minimapCanvas');
       const container = document.getElementById('editCanvasContainer');
       const editCanvas = document.getElementById('editCanvas');
-      
+
       if (!viewport || !minimapCanvas || !container || !editCanvas) return;
-      
+
       const containerRect = container.getBoundingClientRect();
       const scale = minimapCanvas.width / editCanvas.width;
-      
+
       // Calculate visible area in minimap coordinates
       const visibleWidth = Math.min(containerRect.width / editState.zoom * scale, minimapCanvas.width);
       const visibleHeight = Math.min(containerRect.height / editState.zoom * scale, minimapCanvas.height);
-      
+
       const viewportX = (minimapCanvas.width / 2) - (editState.panX / editState.zoom * scale) - (visibleWidth / 2);
       const viewportY = (minimapCanvas.height / 2) - (editState.panY / editState.zoom * scale) - (visibleHeight / 2);
-      
+
       viewport.style.width = `${visibleWidth}px`;
       viewport.style.height = `${visibleHeight}px`;
       viewport.style.left = `${Math.max(0, Math.min(minimapCanvas.width - visibleWidth, viewportX))}px`;
@@ -6736,20 +6782,20 @@ function getText(key, params) {
     function navigateToMinimapPosition(e) {
       const minimapCanvas = document.getElementById('minimapCanvas');
       const editCanvas = document.getElementById('editCanvas');
-      
+
       if (!minimapCanvas || !editCanvas) return;
-      
+
       const rect = minimapCanvas.getBoundingClientRect();
       const x = (e.clientX - rect.left) / minimapCanvas.width;
       const y = (e.clientY - rect.top) / minimapCanvas.height;
-      
+
       // Convert to canvas coordinates and center
       const targetX = (x - 0.5) * editCanvas.width * editState.zoom;
       const targetY = (y - 0.5) * editCanvas.height * editState.zoom;
-      
+
       editState.panX = -targetX;
       editState.panY = -targetY;
-      
+
       constrainPan();
       updateCanvasTransform();
       updateMinimap();
@@ -6766,18 +6812,18 @@ function getText(key, params) {
     function handleEyedropper(x, y) {
       const editCanvas = document.getElementById('editCanvas');
       const ctx = editCanvas.getContext('2d');
-      
+
       if (x >= 0 && x < editCanvas.width && y >= 0 && y < editCanvas.height) {
         const imageData = ctx.getImageData(x, y, 1, 1);
         const [r, g, b] = imageData.data;
-        const pickedColor = `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
-        
+        const pickedColor = `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+
         editState.currentColor = pickedColor;
         const currentColorDisplay = document.getElementById('currentColorDisplay');
         if (currentColorDisplay) {
           currentColorDisplay.style.backgroundColor = pickedColor;
         }
-        
+
         // Try to find matching color in palette
         document.querySelectorAll('.edit-color-btn').forEach(btn => {
           btn.classList.remove('active');
@@ -6786,7 +6832,7 @@ function getText(key, params) {
             editState.currentColorId = parseInt(btn.dataset.colorId);
           }
         });
-        
+
         updateStatusBar(x, y);
       }
     }
@@ -6796,54 +6842,54 @@ function getText(key, params) {
       const ctx = editCanvas.getContext('2d');
       const imageData = ctx.getImageData(0, 0, editCanvas.width, editCanvas.height);
       const data = imageData.data;
-      
+
       if (startX < 0 || startX >= editCanvas.width || startY < 0 || startY >= editCanvas.height) return;
-      
+
       const startIndex = (startY * editCanvas.width + startX) * 4;
       const startR = data[startIndex];
       const startG = data[startIndex + 1];
       const startB = data[startIndex + 2];
       const startA = data[startIndex + 3];
-      
+
       // Convert fill color to RGB
       const fillR = parseInt(fillColor.slice(1, 3), 16);
       const fillG = parseInt(fillColor.slice(3, 5), 16);
       const fillB = parseInt(fillColor.slice(5, 7), 16);
-      
+
       // Don't fill if the color is already the same
       if (startR === fillR && startG === fillG && startB === fillB) return;
-      
-      const pixelsToCheck = [{x: startX, y: startY}];
+
+      const pixelsToCheck = [{ x: startX, y: startY }];
       const checkedPixels = new Set();
-      
+
       while (pixelsToCheck.length > 0) {
-        const {x, y} = pixelsToCheck.pop();
+        const { x, y } = pixelsToCheck.pop();
         const key = `${x},${y}`;
-        
+
         if (checkedPixels.has(key)) continue;
         checkedPixels.add(key);
-        
+
         if (x < 0 || x >= editCanvas.width || y < 0 || y >= editCanvas.height) continue;
-        
+
         const index = (y * editCanvas.width + x) * 4;
         const r = data[index];
         const g = data[index + 1];
         const b = data[index + 2];
         const a = data[index + 3];
-        
+
         if (r === startR && g === startG && b === startB && a === startA) {
           data[index] = fillR;
           data[index + 1] = fillG;
           data[index + 2] = fillB;
           data[index + 3] = 255;
-          
-          pixelsToCheck.push({x: x + 1, y});
-          pixelsToCheck.push({x: x - 1, y});
-          pixelsToCheck.push({x, y: y + 1});
-          pixelsToCheck.push({x, y: y - 1});
+
+          pixelsToCheck.push({ x: x + 1, y });
+          pixelsToCheck.push({ x: x - 1, y });
+          pixelsToCheck.push({ x, y: y + 1 });
+          pixelsToCheck.push({ x, y: y - 1 });
         }
       }
-      
+
       ctx.putImageData(imageData, 0, 0);
     }
 
@@ -6854,38 +6900,54 @@ function getText(key, params) {
 
     function drawGrid(ctx, width, height) {
       if (!editState.showGrid || editState.zoom < 4) return;
-      
+
       ctx.save();
       ctx.strokeStyle = 'rgba(128, 128, 128, 0.3)';
       ctx.lineWidth = 1 / editState.zoom;
-      
+
       for (let x = 0; x <= width; x++) {
         ctx.beginPath();
         ctx.moveTo(x, 0);
         ctx.lineTo(x, height);
         ctx.stroke();
       }
-      
+
       for (let y = 0; y <= height; y++) {
         ctx.beginPath();
         ctx.moveTo(0, y);
         ctx.lineTo(width, y);
         ctx.stroke();
       }
-      
+
       ctx.restore();
+    }
+
+    function drawCheckerboardBackground(ctx, width, height) {
+      const checkerSize = 8; // Size of each checker square
+      ctx.fillStyle = '#f0f0f0'; // Light gray
+      ctx.fillRect(0, 0, width, height);
+
+      ctx.fillStyle = '#e0e0e0'; // Slightly darker gray
+      for (let x = 0; x < width; x += checkerSize) {
+        for (let y = 0; y < height; y += checkerSize) {
+          if ((Math.floor(x / checkerSize) + Math.floor(y / checkerSize)) % 2 === 1) {
+            ctx.fillRect(x, y, checkerSize, checkerSize);
+          }
+        }
+      }
     }
 
     function redrawCanvas() {
       if (editState.undoStack.length === 0) return;
-      
+
       const currentState = editState.undoStack[editState.undoStack.length - 1];
       const editCanvas = document.getElementById('editCanvas');
       const ctx = editCanvas.getContext('2d');
-      
+
       const img = new Image();
       img.onload = () => {
         ctx.clearRect(0, 0, editCanvas.width, editCanvas.height);
+        // REMOVED: drawCheckerboardBackground - prevents checkerboard from being saved with template
         ctx.drawImage(img, 0, 0);
         drawGrid(ctx, editCanvas.width, editCanvas.height);
       };
@@ -6895,17 +6957,17 @@ function getText(key, params) {
     function setupTouchSupport() {
       const canvas = document.getElementById('editCanvas');
       if (!canvas) return;
-      
+
       let touchStartTime = 0;
-      
+
       canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
       canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
       canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
-      
+
       function handleTouchStart(e) {
         e.preventDefault();
         touchStartTime = Date.now();
-        
+
         if (e.touches.length === 1) {
           // Single touch - start painting
           const touch = e.touches[0];
@@ -6919,22 +6981,22 @@ function getText(key, params) {
           // Two finger - prepare for zoom/pan
           const touch1 = e.touches[0];
           const touch2 = e.touches[1];
-          
+
           editState.lastTouchDistance = Math.hypot(
             touch2.clientX - touch1.clientX,
             touch2.clientY - touch1.clientY
           );
-          
+
           editState.lastTouchCenter = {
             x: (touch1.clientX + touch2.clientX) / 2,
             y: (touch1.clientY + touch2.clientY) / 2
           };
         }
       }
-      
+
       function handleTouchMove(e) {
         e.preventDefault();
-        
+
         if (e.touches.length === 1 && editState.isDrawing) {
           // Continue painting
           const touch = e.touches[0];
@@ -6946,46 +7008,46 @@ function getText(key, params) {
           // Pinch zoom and pan
           const touch1 = e.touches[0];
           const touch2 = e.touches[1];
-          
+
           const currentDistance = Math.hypot(
             touch2.clientX - touch1.clientX,
             touch2.clientY - touch1.clientY
           );
-          
+
           const currentCenter = {
             x: (touch1.clientX + touch2.clientX) / 2,
             y: (touch1.clientY + touch2.clientY) / 2
           };
-          
+
           // Zoom based on distance change
           if (editState.lastTouchDistance > 0) {
             const zoomFactor = currentDistance / editState.lastTouchDistance;
             const newZoom = Math.max(0.1, Math.min(32, editState.zoom * zoomFactor));
             zoomToPoint(newZoom, currentCenter.x, currentCenter.y);
           }
-          
+
           // Pan based on center movement
           editState.panX += currentCenter.x - editState.lastTouchCenter.x;
           editState.panY += currentCenter.y - editState.lastTouchCenter.y;
-          
+
           editState.lastTouchDistance = currentDistance;
           editState.lastTouchCenter = currentCenter;
-          
+
           constrainPan();
           updateCanvasTransform();
           updateMinimap();
         }
       }
-      
+
       function handleTouchEnd(e) {
         e.preventDefault();
-        
+
         if (editState.isDrawing) {
           editState.isDrawing = false;
           editState.lastPaintPos = null;
           saveEditState();
         }
-        
+
         if (e.touches.length === 0) {
           editState.lastTouchDistance = 0;
         }
@@ -6997,14 +7059,14 @@ function getText(key, params) {
         // Only handle shortcuts when edit panel is visible
         const editOverlay = document.getElementById('editOverlay');
         if (!editOverlay || editOverlay.style.display === 'none') return;
-        
+
         // Prevent default for handled keys
         const handledKeys = ['b', 'e', 'i', 'f', 'g', 'z', '[', ']'];
         if (handledKeys.includes(e.key.toLowerCase()) || (e.ctrlKey && e.key.toLowerCase() === 'z')) {
           e.preventDefault();
         }
-        
-        switch(e.key.toLowerCase()) {
+
+        switch (e.key.toLowerCase()) {
           case 'b': // Brush
             selectTool('paint');
             break;
@@ -7079,34 +7141,34 @@ function getText(key, params) {
         if (!editCanvas) {
           throw new Error('Edit canvas not found');
         }
-        
+
         // Find the resize canvas in the resize panel
         const resizeCanvas = document.getElementById('resizeCanvas');
         if (!resizeCanvas) {
           throw new Error('Resize canvas not found');
         }
-        
+
         const baseCtx = resizeCanvas.getContext('2d');
         if (!baseCtx) {
           throw new Error('Resize canvas context not available');
         }
-        
+
         // Make sure the resize canvas has the same dimensions as the edit canvas
         if (resizeCanvas.width !== editCanvas.width || resizeCanvas.height !== editCanvas.height) {
           resizeCanvas.width = editCanvas.width;
           resizeCanvas.height = editCanvas.height;
         }
-        
+
         // Clear resize canvas
         baseCtx.clearRect(0, 0, resizeCanvas.width, resizeCanvas.height);
-        
-        // Copy edited image to resize canvas
+
+        // Copy edited image to resize canvas (no checkerboard since we removed it entirely)
         baseCtx.imageSmoothingEnabled = false;
         baseCtx.drawImage(editCanvas, 0, 0);
-        
+
         // CRITICAL: Completely replace the template system with edited artwork
         const editedImageData = editCanvas.toDataURL();
-        
+
         // Create new processor with edited image as the template
         if (window.WPlaceImageProcessor) {
           const newProcessor = new window.WPlaceImageProcessor(editedImageData);
@@ -7115,7 +7177,7 @@ function getText(key, params) {
             const editCtx = editCanvas.getContext('2d');
             const editImageData = editCtx.getImageData(0, 0, editCanvas.width, editCanvas.height);
             const pixels = editImageData.data;
-            
+
             // Count valid pixels in the edited image
             let totalValidPixels = 0;
             for (let i = 0; i < pixels.length; i += 4) {
@@ -7123,36 +7185,36 @@ function getText(key, params) {
               const r = pixels[i];
               const g = pixels[i + 1];
               const b = pixels[i + 2];
-              
+
               const isTransparent = !state.paintTransparentPixels && a < state.customTransparencyThreshold;
               const isWhiteAndSkipped = !state.paintWhitePixels && Utils.isWhitePixel(r, g, b);
-              
+
               if (!isTransparent && !isWhiteAndSkipped) {
                 totalValidPixels++;
               }
             }
-            
+
             // COMPLETELY REBUILD state.imageData with the edited artwork
             state.imageData = {
               width: editCanvas.width,
-              height: editCanvas.height, 
+              height: editCanvas.height,
               pixels: pixels,
               totalPixels: totalValidPixels,
               processor: newProcessor,
             };
-            
+
             // CRITICAL: Update state.originalImage so resize panel uses edited artwork as base template
             state.originalImage = {
               dataUrl: editedImageData,
               width: editCanvas.width,
               height: editCanvas.height
             };
-            
+
             // Update state with new totals
             state.totalPixels = totalValidPixels;
             state.paintedPixels = 0; // Reset progress since this is a new template
             state.imageLoaded = true;
-            
+
             // Update local processors
             if (typeof processor !== 'undefined') {
               processor = newProcessor;
@@ -7160,38 +7222,38 @@ function getText(key, params) {
             }
             if (typeof baseProcessor !== 'undefined') {
               baseProcessor = newProcessor;
-              console.log('🔄 Updated baseProcessor with edited artwork');  
+              console.log('🔄 Updated baseProcessor with edited artwork');
             }
-            
+
             // Force regeneration of overlays by clearing cached mask data
             if (typeof window._maskImageData !== 'undefined') {
               delete window._maskImageData;
             }
-            
+
             // Update UI to reflect the new template
             if (typeof updateUI === 'function') {
               updateUI();
             }
-            
+
             // Show loading and properly reload resize panel with new template
             Utils.showAlert('Updating template... Please wait.', 'info');
-            
+
             // Give more time for template to fully update and force resize panel reload
             setTimeout(() => {
               // Hide edit overlay first
               document.getElementById('editOverlay').style.display = 'none';
-              
+
               // Completely reload resize dialog with updated processor
               setTimeout(() => {
                 // Clean up existing dialog
                 if (typeof _resizeDialogCleanup === 'function') {
                   _resizeDialogCleanup();
                 }
-                
+
                 // Force complete reload of resize dialog with new processor
                 setTimeout(() => {
                   showResizeDialog(newProcessor);
-                  
+
                   console.log('✅ Template COMPLETELY replaced with edited artwork');
                   console.log(`📊 New template stats: ${editCanvas.width}x${editCanvas.height}, ${totalValidPixels} pixels`);
                   Utils.showAlert('Template successfully replaced with your edited artwork!', 'success');
@@ -7206,7 +7268,7 @@ function getText(key, params) {
           console.error('WPlaceImageProcessor not available');
           Utils.showAlert('Image processor not available. Please reload the page.', 'error');
         }
-        
+
         console.log('✅ Edit changes applied - template replacement in progress');
       } catch (error) {
         console.error('Error applying edit changes:', error);
@@ -7372,6 +7434,11 @@ function getText(key, params) {
             console.warn('⚠️ No availableColors in file, using defaults');
             fileData.state.availableColors = [];
           }
+
+          // Reset session-specific flags when loading extracted file data
+          state.preFilteringDone = false;
+          state.progressResetDone = false;
+          console.log('🔄 Reset session flags for extracted file load');
 
           // Use the existing restoreProgress function but with special handling
           const restoreSuccess = await Utils.restoreProgress(fileData);
@@ -7702,6 +7769,10 @@ function getText(key, params) {
         // Perform progressive pixel detection from top-left to bottom-right
         console.log('🔍 Starting progressive pixel detection from top-left to bottom-right...');
         await performProgressivePixelDetection();
+        
+        // Mark pre-filtering as done to prevent duplicate scanning
+        state.preFilteringDone = true;
+        console.log('✅ Pre-filtering marked as complete - will not scan again this session');
       } else {
         console.log('🔄 Continuing session - pre-filtering already done, but progress reset');
       }
@@ -8185,8 +8256,9 @@ function getText(key, params) {
 
     // --------- Traversal modes ----------
     if (mode === 'rows') {
+      let rowIndex = 0;
       for (let y = yStart; y !== yEnd; y += yStep) {
-        if (snake && (y - yStart) % 2 !== 0) {
+        if (snake && rowIndex % 2 !== 0) {
           for (let x = xEnd - xStep; x !== xStart - xStep; x -= xStep) {
             coords.push([x, y]);
           }
@@ -8195,10 +8267,12 @@ function getText(key, params) {
             coords.push([x, y]);
           }
         }
+        rowIndex++;
       }
     } else if (mode === 'columns') {
+      let colIndex = 0;
       for (let x = xStart; x !== xEnd; x += xStep) {
-        if (snake && (x - xStart) % 2 !== 0) {
+        if (snake && colIndex % 2 !== 0) {
           for (let y = yEnd - yStep; y !== yStart - yStep; y -= yStep) {
             coords.push([x, y]);
           }
@@ -8207,6 +8281,7 @@ function getText(key, params) {
             coords.push([x, y]);
           }
         }
+        colIndex++;
       }
     } else if (mode === 'circle-out') {
       const cx = Math.floor(width / 2);
@@ -8320,7 +8395,8 @@ function getText(key, params) {
       // Update last painted position to the last pixel in the successful batch
       if (pixelBatch.pixels.length > 0) {
         const lastPixel = pixelBatch.pixels[pixelBatch.pixels.length - 1];
-        state.lastPaintedPosition = { x: lastPixel.x, y: lastPixel.y };
+        // FIXED: Use localX/localY (image-relative coordinates) instead of x/y (absolute canvas coordinates)
+        state.lastPaintedPosition = { x: lastPixel.localX, y: lastPixel.localY };
       }
 
       // IMPORTANT: Decrement charges locally to match Acc-Switch.js behavior
@@ -8372,14 +8448,14 @@ function getText(key, params) {
         }
 
         if (paintingResult === 'charges_depleted') {
-          if (CONFIG.autoBuyToggle && CONFIG.autoBuy != buyTypes[0]) {
-            console.log('Trying to buy more charges before stopping');
+          if (CONFIG.autoBuyToggle && CONFIG.autoBuy != 'none') {
+            console.log('Trying to buy more charges before swapping account...');
             const purchaseResult = await purchase(CONFIG.autoBuy);
             if (purchaseResult == 2) {
               console.log('✅ Purchase successful, continuing painting');
               await updateStats();
               await updateCurrentAccountInList();
-              continue;
+              if (CONFIG.autoBuy == 'paint_charges') continue;
             }
             else if (purchaseResult == 1) {
               console.log('😭 Not enough droplets to buy more charges, swapping account.');
@@ -8439,7 +8515,7 @@ function getText(key, params) {
                 // Update current account status before switching
                 console.log('📊 Updating current account status before switch...');
                 await updateCurrentAccountInList();
-                
+
                 // Switch to next account immediately (no cooldown) - only if we have multiple accounts
                 const nextAccount = accountManager.getNextAccount();
                 console.log(`🔄 Switching to next account: ${nextAccount?.displayName} (${accountManager.currentIndex + 2}/${totalAccounts})`);
@@ -9030,6 +9106,11 @@ function getText(key, params) {
       return Math.max(1, targetBatchSize);
     }
 
+    // CRITICAL FIX: When speed control is ENABLED, use actual available charges as the batch size
+    // This ensures bot sends exactly the number of pixels matching available charges
+    // Example: 75 charges → send 75 pixels, 14 charges → send 14 pixels
+    const availableCharges = state.displayCharges;
+    
     if (state.batchMode === 'random') {
       // Generate random batch size within the specified range
       const min = Math.max(1, state.randomBatchMin);
@@ -9041,11 +9122,13 @@ function getText(key, params) {
       targetBatchSize = state.paintingSpeed;
     }
 
-    // Always limit by available charges
-    const maxAllowed = state.displayCharges;
-    const finalBatchSize = Math.min(targetBatchSize, maxAllowed);
+    // FIXED: Use actual available charges as the maximum batch size
+    // This matches the available pixels exactly (e.g., 75 charges = 75 pixel batch)
+    const finalBatchSize = Math.min(targetBatchSize, availableCharges);
+    
+    console.log(`📊 Batch size: ${finalBatchSize} (target: ${targetBatchSize}, available: ${availableCharges})`);
 
-    return finalBatchSize;
+    return Math.max(1, finalBatchSize);
   }
 
   // Helper function to retry batch until success with exponential backoff
@@ -9066,10 +9149,13 @@ function getText(key, params) {
         console.log(`🔑 Token error on attempt ${attempt} - no token available during processing`);
         console.log(`❌ Stopping batch processing - tokens must be generated at startup/start button only`);
         updateUI('captchaFailed', 'error');
-        return false; // Stop processing entirely - don't regenerate during processing
+        await Utils.sleep(2000); // Wait longer before retrying after token failure
+        continue; // Continue to retry until maxRetries reached
       } else if (result === 'token_regenerated') {
         console.log(`🔄 Token regenerated on attempt ${attempt} after 403 error - retrying batch`);
-        updateUI('paintingPaused', 'warning', { message: 'Token refreshed, resuming...' });
+        const pausedX = state.lastPaintedPosition.x;
+        const pausedY = state.lastPaintedPosition.y;
+        updateUI('paintingPaused', 'warning', { x: pausedX, y: pausedY });
         // Don't count token regeneration as a failed attempt, retry immediately
         attempt--;
         await Utils.sleep(500); // Brief pause before retry
@@ -9691,7 +9777,7 @@ function getText(key, params) {
           "amount": amounts
         }
       };
-      const res = fetch("https://backend.wplace.live/purchase", {
+      const res = await fetch("https://backend.wplace.live/purchase", {
         method: "POST",
         headers: {
           "Content-Type": "text/plain;charset=UTF-8"
@@ -9748,12 +9834,6 @@ function getText(key, params) {
     return new Promise((resolve, reject) => {
       console.log("Requesting accounts from extension...");
 
-      // Set timeout for extension response
-      const timeout = setTimeout(() => {
-        window.removeEventListener("message", handler);
-        reject(new Error("Extension response timeout"));
-      }, 15000); // 15 second timeout (increased from 5 seconds)
-
       // Ask extension for accounts
       window.postMessage({
         source: "my-userscript",
@@ -9764,10 +9844,9 @@ function getText(key, params) {
         if (event.source !== window) return;
         if (event.data.source !== "extension") return;
         if (event.data.type === "accountsData") {
-          // Clear timeout and remove listener when we get the response
-          clearTimeout(timeout);
+          // Remove listener when we get the response
           window.removeEventListener("message", handler);
-          
+
           try {
             localStorage.setItem("accounts", JSON.stringify(event.data.accounts));
             console.log("✅ Accounts saved to localStorage:", event.data.accounts);
@@ -9852,7 +9931,7 @@ function getText(key, params) {
             // Switch to this account temporarily to fetch its data
             console.log(`🔄 [FETCH] Switching to ${account.displayName} to fetch fresh data...`);
             await switchToSpecificAccount(account.token, account.displayName);
-            await Utils.sleep(500); // Small delay to ensure switch takes effect
+            // await Utils.sleep(500); // Small delay to ensure switch takes effect
 
             // Fetch fresh account details
             const accountData = await WPlaceService.getCharges();
@@ -9879,7 +9958,7 @@ function getText(key, params) {
           console.log(`🔙 [FETCH] Switching back to original current account: ${originalCurrentAccount.displayName}`);
           try {
             await switchToSpecificAccount(originalCurrentAccount.token, originalCurrentAccount.displayName);
-            await Utils.sleep(300);
+            //await Utils.sleep(300);
 
             // Mark it as current again
             accountManager.updateAccountData(originalCurrentAccount.token, {
@@ -9937,7 +10016,7 @@ function getText(key, params) {
   // Function to update current account spotlight when switching during painting
   async function updateCurrentAccountSpotlight() {
     if (accountManager.getAccountCount() === 0) return;
-    await Utils.sleep(500); // Wait a bit for the switch to take effect
+    // await Utils.sleep(500); // Wait a bit for the switch to take effect
     try {
       const currentAccountData = await WPlaceService.getCharges();
       console.log("Current account after switch:", currentAccountData);
@@ -10153,10 +10232,10 @@ function getText(key, params) {
       console.log(`✅ [SWITCH] Successfully switched to ${nextAccount.displayName}`);
 
       // Wait a moment for the switch to fully complete
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      // await new Promise(resolve => setTimeout(resolve, 1000));
+
       // Update the account status and UI after successful switch
-      await updateCurrentAccountSpotlight();
+      await updateCurrentAccountInList();
 
       return true;
     } catch (error) {
@@ -10181,7 +10260,7 @@ function getText(key, params) {
       //await new Promise(resolve => setTimeout(resolve, 1000));
 
       try {
-        await fetchAccount();
+        // await fetchAccount();
         console.log('✅ [SPECIFIC SWITCH] Account swap confirmed.');
         swapSuccess = true;
       } catch (error) {

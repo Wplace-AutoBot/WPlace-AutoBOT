@@ -54,6 +54,7 @@
   "paintingSpeed": "Скорость рисования",
   "pixelsPerSecond": "пикселей/сек",
   "speedSetting": "Скорость: {speed} пикс./сек",
+  "keepAspectRatio": "Сохранять пропорции",
   "settings": "Настройки",
   "botSettings": "Настройки бота",
   "close": "Закрыть",
@@ -139,5 +140,17 @@
   "hideStats": "Скрыть статистику",
   "paintOptions": "Параметры рисования",
   "paintWhitePixels": "Рисовать белые пиксели",
-  "paintTransparentPixels": "Рисовать прозрачные пиксели"
+  "paintWhitePixelsDescription": "Если включено, белые пиксели шаблона будут рисоваться.",
+  "paintTransparentPixels": "Рисовать прозрачные пиксели",
+  "paintTransparentPixelsDescription": "Если включено, прозрачные пиксели шаблона будут рисоваться",
+  "paintUnavailablePixels": "Рисовать недоступные пиксели",
+  "paintUnavailablePixelsDescription": "Если включено, недоступные цвета шаблона будут рисоваться ближайшим доступным цветом",
+  "colorsUpdated": "✅ Доступные цвета увеличены {oldCount} -> {newCount}, найдено {diffCount} новых цветов",
+  "overlayTilesNotLoaded": "❌ Необходимые тайлы карты не загружены. Проверьте соединение или попробуйте снова.",
+  "paintingBatchFailed": "❌ Не удалось отправить пакет после нескольких попыток. Рисование остановлено.",
+  "paintingPixelCheckFailed": "❌ Не удалось прочитать пиксель в ({x}, {y}). Рисование остановлено.",
+  "paintingFinalBatchFailed": "⚠️ Финальный пакет из {count} пикселей не удалось отправить после нескольких попыток.",
+  "paintingStoppedByUser": "⏹️ Рисование остановлено пользователем",
+  "fullChargeIn": "Полная зарядка через",
+  "batchSize": "Размер пакета"
 }
