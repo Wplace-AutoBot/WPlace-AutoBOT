@@ -96,9 +96,6 @@ Follow the exact same steps listed for Chrome above, using Kiwi Browser instead.
 </p>
 
 📋┃To-do
-- [ ] Making AutoFarm working
-
-- [ ] Merge both scripts into one
 
 - [x] Add Overlay system
 
