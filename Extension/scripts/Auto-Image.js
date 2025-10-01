@@ -73,6 +73,7 @@ function getText(key, params) {
       MIN: 3, // Random range minimum
       MAX: 20, // Random range maximum
     },
+    PAINTING_ORDER: 'sequential', // "sequential" or "color-by-color" - default to sequential
     PAINTING_SPEED_ENABLED: false, // Off by default
     AUTO_CAPTCHA_ENABLED: true, // Turnstile generator enabled by default
     TOKEN_SOURCE: 'generator', // "generator", "manual", or "hybrid" - default to generator
@@ -729,6 +730,11 @@ function getText(key, params) {
       pixels: 'Pixels',
       charges: 'Charges',
       batchSize: 'Batch Size',
+      paintingOrder: 'Painting Order',
+      paintingOrderSequential: 'Sequential (Top to Bottom)',
+      paintingOrderColorByColor: 'Color by Color',
+      currentlyPaintingColor: 'Currently painting: {colorName}',
+      colorProgress: '{painted} of {total} {colorName} pixels',
       cooldownSettings: 'Cooldown Settings',
       waitCharges: 'Wait for Charges',
       settings: 'Settings',
@@ -978,6 +984,8 @@ function getText(key, params) {
     language: 'en',
     paintingSpeed: CONFIG.PAINTING_SPEED.DEFAULT, // pixels batch size
     batchMode: CONFIG.BATCH_MODE, // "normal" or "random"
+    paintingOrder: CONFIG.PAINTING_ORDER, // "sequential" or "color-by-color"
+    currentPaintingColor: null, // Track current color being painted in color-by-color mode
     randomBatchMin: CONFIG.RANDOM_BATCH_RANGE.MIN, // Random range minimum
     randomBatchMax: CONFIG.RANDOM_BATCH_RANGE.MAX, // Random range maximum
     cooldownChargeThreshold: CONFIG.COOLDOWN_CHARGE_THRESHOLD,
@@ -2689,6 +2697,18 @@ function getText(key, params) {
             ${Utils.t('paintingSpeed')}
           </label>
           
+          <!-- Painting Order Selection -->
+          <div class="wplace-mode-selection">
+            <label class="wplace-mode-label">
+              <i class="fas fa-palette wplace-icon-palette"></i>
+              ${Utils.t('paintingOrder')}
+            </label>
+            <select id="paintingOrderSelect" class="wplace-settings-select">
+              <option value="sequential" class="wplace-settings-option">📐 Normal</option>
+              <option value="color-by-color" class="wplace-settings-option">🎨 Color By Color</option>
+            </select>
+          </div>
+
           <!-- Batch Mode Selection -->
           <div class="wplace-mode-selection">
             <label class="wplace-mode-label">
@@ -3574,6 +3594,24 @@ function getText(key, params) {
           };
           Utils.showAlert(
             Utils.t('tokenSourceSet', { source: sourceNames[state.tokenSource] }),
+            'success'
+          );
+        });
+      }
+
+      // Painting order controls
+      const paintingOrderSelect = settingsContainer.querySelector('#paintingOrderSelect');
+      if (paintingOrderSelect) {
+        paintingOrderSelect.addEventListener('change', (e) => {
+          state.paintingOrder = e.target.value;
+          saveBotSettings();
+          console.log(`🎨 Painting order changed to: ${state.paintingOrder}`);
+          const orderNames = {
+            sequential: Utils.t('paintingOrderSequential'),
+            'color-by-color': Utils.t('paintingOrderColorByColor'),
+          };
+          Utils.showAlert(
+            `Painting order set to: ${orderNames[state.paintingOrder]}`,
             'success'
           );
         });
@@ -7213,6 +7251,7 @@ function getText(key, params) {
             // Update state with new totals
             state.totalPixels = totalValidPixels;
             state.paintedPixels = 0; // Reset progress since this is a new template
+            state.currentPaintingColor = null; // Reset color tracking
             state.imageLoaded = true;
 
             // Update local processors
@@ -7336,6 +7375,7 @@ function getText(key, params) {
 
           state.totalPixels = totalValidPixels;
           state.paintedPixels = 0;
+          state.currentPaintingColor = null; // Reset color tracking
           state.imageLoaded = true;
 
           // Reset session-specific flags when a new image is loaded
@@ -7458,6 +7498,7 @@ function getText(key, params) {
 
             // For extracted files, force enable all necessary flags for full functionality
             state.colorsChecked = true;
+            state.currentPaintingColor = null; // Reset color tracking
             state.imageLoaded = true;
 
             // Ensure image processor is available for extracted files
@@ -7754,18 +7795,8 @@ function getText(key, params) {
       await ensureToken();
       if (!getTurnstileToken()) return;
 
-      // Only reset progress once per save file load session
-      if (!state.progressResetDone) {
-        const savedPaintedPixels = state.paintedPixels; // Store original value
-        state.paintedPixels = 0;
-        state.progressResetDone = true;
-        console.log(`🔄 Reset pixel progress for new save file session (was: ${savedPaintedPixels})`);
-        await updateStats(); // Update UI to show 0 progress
-      }
-
-      // Only reset painted pixels on first start of session (when pre-filtering hasn't been done)
+      // Only perform progressive pixel detection on first start of session
       if (!state.preFilteringDone) {
-
         // Perform progressive pixel detection from top-left to bottom-right
         console.log('🔍 Starting progressive pixel detection from top-left to bottom-right...');
         await performProgressivePixelDetection();
@@ -7774,7 +7805,7 @@ function getText(key, params) {
         state.preFilteringDone = true;
         console.log('✅ Pre-filtering marked as complete - will not scan again this session');
       } else {
-        console.log('🔄 Continuing session - pre-filtering already done, but progress reset');
+        console.log('🔄 Continuing session - pre-filtering already done');
       }
 
       state.running = true;
@@ -8439,6 +8470,7 @@ function getText(key, params) {
 
         if (paintingResult === 'completed') {
           console.log('🎉 Image painting completed!');
+          state.currentPaintingColor = null; // Reset color tracking
           break;
         }
 
@@ -8646,23 +8678,7 @@ function getText(key, params) {
         0  // Don't filter here
       );
 
-      // Find how many coordinates are skipped and set progress accordingly
-      let skippedCoordinates = 0;
-      if (state.lastPosition.x > 0 || state.lastPosition.y > 0) {
-        const startingCoordIndex = allCoords.findIndex(([x, y]) => x === state.lastPosition.x && y === state.lastPosition.y);
-        skippedCoordinates = startingCoordIndex >= 0 ? startingCoordIndex : 0;
-
-        if (skippedCoordinates > 0) {
-          // Set progress to exactly match skipped coordinates
-          state.paintedPixels = skippedCoordinates;
-          console.log(`📈 Progress set to match skipped coordinates: ${skippedCoordinates} pixels`);
-          console.log(`🔄 Resuming painting from position (${state.lastPosition.x}, ${state.lastPosition.y})`);
-          console.log(`📊 Current progress: ${state.paintedPixels} pixels painted`);
-          await updateStats(); // Update UI to show correct progress
-        }
-      }
-
-      // Now generate the actual filtered coordinates for painting
+      // Generate the actual filtered coordinates for painting (resuming from last position)
       const coords = generateCoordinates(
         width,
         height,
@@ -8768,8 +8784,78 @@ function getText(key, params) {
         }
       }
 
+      // Group pixels by color if color-by-color mode is enabled
+      let pixelsToProcess = eligibleCoords;
+      if (state.paintingOrder === 'color-by-color') {
+        console.log('🎨 Color-by-color mode enabled - grouping pixels by color');
+        
+        // Group pixels by color ID
+        const colorGroups = new Map();
+        for (const [x, y, targetPixelInfo] of eligibleCoords) {
+          const colorId = targetPixelInfo.mappedColorId;
+          if (!colorGroups.has(colorId)) {
+            colorGroups.set(colorId, []);
+          }
+          colorGroups.get(colorId).push([x, y, targetPixelInfo]);
+        }
+
+        // Log color groups
+        console.log(`📊 Found ${colorGroups.size} different colors to paint:`);
+        for (const [colorId, pixels] of colorGroups.entries()) {
+          const colorInfo = Object.values(CONFIG.COLOR_MAP).find(c => c.id === colorId);
+          const colorName = colorInfo ? colorInfo.name : `Color ${colorId}`;
+          console.log(`  🎨 ${colorName} (ID: ${colorId}): ${pixels.length} pixels`);
+        }
+
+        // Process colors one by one
+        const sortedColorGroups = Array.from(colorGroups.entries()).sort((a, b) => a[0] - b[0]);
+        
+        // If we have a current painting color, resume from that color
+        let startIndex = 0;
+        if (state.currentPaintingColor !== null) {
+          startIndex = sortedColorGroups.findIndex(([colorId]) => colorId === state.currentPaintingColor);
+          if (startIndex === -1) startIndex = 0;
+          console.log(`🔄 Resuming from color ID ${state.currentPaintingColor} (index ${startIndex})`);
+        }
+
+        // Flatten the groups starting from the current color
+        pixelsToProcess = [];
+        for (let i = startIndex; i < sortedColorGroups.length; i++) {
+          const [colorId, pixels] = sortedColorGroups[i];
+          pixelsToProcess.push(...pixels);
+        }
+
+        console.log(`✅ Prepared ${pixelsToProcess.length} pixels for color-by-color painting`);
+      }
+
       // Paint eligible pixels (already pre-filtered, no duplicate checks)
-      outerLoop: for (const [x, y, targetPixelInfo] of eligibleCoords) {
+      outerLoop: for (const [x, y, targetPixelInfo] of pixelsToProcess) {
+        // Track current color being painted in color-by-color mode
+        if (state.paintingOrder === 'color-by-color') {
+          if (state.currentPaintingColor !== targetPixelInfo.mappedColorId) {
+            state.currentPaintingColor = targetPixelInfo.mappedColorId;
+            const colorInfo = Object.values(CONFIG.COLOR_MAP).find(c => c.id === state.currentPaintingColor);
+            const colorName = colorInfo ? colorInfo.name : `Color ${state.currentPaintingColor}`;
+            console.log(`🎨 Now painting: ${colorName} (ID: ${state.currentPaintingColor})`);
+            
+            // Update UI to show current color
+            const statusDiv = document.getElementById('statusDiv');
+            if (statusDiv) {
+              const colorMessage = Utils.t('currentlyPaintingColor', { colorName });
+              const colorIndicator = document.getElementById('currentColorIndicator');
+              if (colorIndicator) {
+                colorIndicator.textContent = colorMessage;
+              } else {
+                const indicator = document.createElement('div');
+                indicator.id = 'currentColorIndicator';
+                indicator.textContent = colorMessage;
+                indicator.style.cssText = 'margin-top: 8px; padding: 8px; background: rgba(255,255,255,0.1); border-radius: 6px; font-weight: bold;';
+                statusDiv.appendChild(indicator);
+              }
+            }
+          }
+        }
+
         if (state.stopFlag) {
           if (pixelBatch && pixelBatch.pixels.length > 0) {
             console.log(`🎯 Sending last batch before stop with ${pixelBatch.pixels.length} pixels`);
@@ -9263,6 +9349,7 @@ function getText(key, params) {
         paintingSpeed: state.paintingSpeed,
         paintingSpeedEnabled: document.getElementById('enableSpeedToggle')?.checked,
         batchMode: state.batchMode, // "normal" or "random"
+        paintingOrder: state.paintingOrder, // "sequential" or "color-by-color"
         randomBatchMin: state.randomBatchMin,
         randomBatchMax: state.randomBatchMax,
         cooldownChargeThreshold: state.cooldownChargeThreshold,
@@ -9318,6 +9405,7 @@ function getText(key, params) {
 
       state.paintingSpeed = settings.paintingSpeed || CONFIG.PAINTING_SPEED.DEFAULT;
       state.batchMode = settings.batchMode || CONFIG.BATCH_MODE; // Default to "normal"
+      state.paintingOrder = settings.paintingOrder || CONFIG.PAINTING_ORDER; // Default to "sequential"
       state.randomBatchMin = settings.randomBatchMin || CONFIG.RANDOM_BATCH_RANGE.MIN;
       state.randomBatchMax = settings.randomBatchMax || CONFIG.RANDOM_BATCH_RANGE.MAX;
       state.cooldownChargeThreshold =
@@ -9419,6 +9507,10 @@ function getText(key, params) {
 
       const enableSpeedToggle = document.getElementById('enableSpeedToggle');
       if (enableSpeedToggle) enableSpeedToggle.checked = CONFIG.PAINTING_SPEED_ENABLED;
+
+      // Painting order UI initialization
+      const paintingOrderSelect = document.getElementById('paintingOrderSelect');
+      if (paintingOrderSelect) paintingOrderSelect.value = state.paintingOrder;
 
       // Batch mode UI initialization
       const batchModeSelect = document.getElementById('batchModeSelect');
