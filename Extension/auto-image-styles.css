@@ -2040,22 +2040,23 @@
 .wplace-account-item.current {
   background: var(--wplace-success)20;
   border-left: 3px solid var(--wplace-success);
-  box-shadow: 0 0 15px rgba(46, 204, 113, 0.6), 
-              0 0 25px rgba(46, 204, 113, 0.4), 
-              0 0 35px rgba(46, 204, 113, 0.2);
+  box-shadow: 0 0 15px rgba(46, 204, 113, 0.6),
+    0 0 25px rgba(46, 204, 113, 0.4),
+    0 0 35px rgba(46, 204, 113, 0.2);
   animation: currentAccountGlow 2s ease-in-out infinite alternate;
 }
 
 @keyframes currentAccountGlow {
   from {
-    box-shadow: 0 0 15px rgba(46, 204, 113, 0.6), 
-                0 0 25px rgba(46, 204, 113, 0.4), 
-                0 0 35px rgba(46, 204, 113, 0.2);
+    box-shadow: 0 0 15px rgba(46, 204, 113, 0.6),
+      0 0 25px rgba(46, 204, 113, 0.4),
+      0 0 35px rgba(46, 204, 113, 0.2);
   }
+
   to {
-    box-shadow: 0 0 20px rgba(46, 204, 113, 0.8), 
-                0 0 30px rgba(46, 204, 113, 0.6), 
-                0 0 40px rgba(46, 204, 113, 0.4);
+    box-shadow: 0 0 20px rgba(46, 204, 113, 0.8),
+      0 0 30px rgba(46, 204, 113, 0.6),
+      0 0 40px rgba(46, 204, 113, 0.4);
   }
 }
 
@@ -2064,6 +2065,7 @@
     box-shadow: 0 0 10px rgba(46, 204, 113, 0.8);
     transform: scale(1);
   }
+
   to {
     box-shadow: 0 0 15px rgba(46, 204, 113, 1.0);
     transform: scale(1.05);
@@ -2194,3 +2196,47 @@ input[type="number"] {
 .wplace-notification-interval-input {
   -moz-appearance: textfield;
   appearance: textfield;
+}
+
+.pill-container {
+  position: relative;
+  display: flex;
+  background: #2d1f40;
+  border-radius: 50px;
+  width: 100%;
+  max-width: 280px;
+  box-sizing: border-box;
+  padding: 9px;
+}
+
+.pill-highlight {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  height: calc(100% - 10px);
+  background: linear-gradient(135deg, #7b2ff7, #9f44d3);
+  border-radius: 50px;
+  transition: transform 0.4s ease;
+  z-index: 0;
+  width: calc((100% - 10px) / 3);
+  /* evenly divide space for 3 buttons */
+}
+
+
+.pill-btn {
+  flex: 1;
+  border: none;
+  border-radius: 50px;
+  padding: 8;
+  background: transparent;
+  color: #bfa9ff;
+  font-size: 16px;
+  cursor: pointer;
+  z-index: 1;
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.pill-btn.active {
+  color: white;
+}
