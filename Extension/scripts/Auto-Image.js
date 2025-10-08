@@ -1474,6 +1474,36 @@ function getText(key, params) {
           };
           console.log('✅ [DEBUG] ImageData restored successfully');
           console.log('🔍 [DEBUG] Converted pixels to Uint8ClampedArray, length:', window.state.imageData.pixels.length);
+        } else if (savedData.imageData && savedData.imageData.pixelsRef) {
+          console.warn('ℹ️ [DEBUG] Large image detected; loading pixels from IndexedDB via ref:', savedData.imageData.pixelsRef);
+          window.state.imageData = {
+            width: savedData.imageData.width,
+            height: savedData.imageData.height,
+            totalPixels: savedData.imageData.totalPixels,
+            pixels: null,
+          };
+          window.state.imageLoaded = false;
+
+          if (window.globalUtilsManager && typeof window.globalUtilsManager.loadPixelsFromIndexedDB === 'function') {
+            window.globalUtilsManager.loadPixelsFromIndexedDB(savedData.imageData.pixelsRef)
+              .then(payload => {
+                if (!payload || !payload.pixels) {
+                  console.warn('⚠️ [DEBUG] Pixels not found in IDB. Ask user to reload image.');
+                  return;
+                }
+                window.state.imageData.pixels = payload.pixels instanceof Uint8Array || payload.pixels instanceof Uint8ClampedArray
+                  ? new Uint8ClampedArray(payload.pixels)
+                  : new Uint8ClampedArray(payload.pixels);
+                window.state.imageLoaded = true;
+                console.log('✅ [DEBUG] Pixels loaded from IDB');
+
+                // Try to restore overlay immediately
+                if (typeof window.globalUtilsManager.restoreOverlayFromData === 'function') {
+                  window.globalUtilsManager.restoreOverlayFromData().catch(() => {});
+                }
+              })
+              .catch(err => console.warn('❌ [DEBUG] Failed to load pixels from IDB:', err));
+          }
         } else if (savedData.imageData && savedData.imageData.pixelsStripped) {
           console.warn('⚠️ [DEBUG] Saved progress did not include raw pixel data due to quota limits. Please reload the image file to resume.');
           // Preserve dimensions for UI, but mark image as not loaded
@@ -8269,7 +8299,7 @@ function getText(key, params) {
   }
 
   function generateCoordinates(width, height, mode, direction, snake, blockWidth, blockHeight, startFromX = 0, startFromY = 0) {
-    const coords = [];
+    let coords = [];
     console.log(
       'Generating coordinates with \n  mode:',
       mode,

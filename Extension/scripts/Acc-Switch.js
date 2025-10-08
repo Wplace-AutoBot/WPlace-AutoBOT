@@ -2526,6 +2526,26 @@
                     }
                 }
 
+                // Decide how to store image pixels (inline for small images, IndexedDB ref for large)
+                let imageDataForSave = null;
+                if (state.imageData) {
+                    const width = state.imageData.width;
+                    const height = state.imageData.height;
+                    const totalPixels = state.imageData.totalPixels;
+                    const pixels = state.imageData.pixels;
+                    const USE_IDB_THRESHOLD = 500000; // ~0.5 MB raw RGBA
+
+                    if (pixels && pixels.length > USE_IDB_THRESHOLD && window.globalUtilsManager && typeof window.globalUtilsManager.storePixelsInIndexedDB === 'function' && typeof window.globalUtilsManager.generatePixelsRef === 'function') {
+                        const ref = window.globalUtilsManager.generatePixelsRef(width, height);
+                        try { window.globalUtilsManager.storePixelsInIndexedDB(ref, { width, height, totalPixels, pixels }); } catch (e) { console.warn('IDB store failed:', e); }
+                        imageDataForSave = { width, height, totalPixels, pixelsRef: ref, pixelsBackend: 'idb' };
+                    } else if (pixels) {
+                        imageDataForSave = { width, height, pixels: Array.from(pixels), totalPixels };
+                    } else {
+                        imageDataForSave = { width, height, totalPixels, pixels: null };
+                    }
+                }
+
                 const progressData = {
                     timestamp: Date.now(),
                     version: "2.1",
@@ -2539,14 +2559,7 @@
                         colorsChecked: state.colorsChecked,
                         availableColors: state.availableColors,
                     },
-                    imageData: state.imageData
-                        ? {
-                            width: state.imageData.width,
-                            height: state.imageData.height,
-                            pixels: Array.from(state.imageData.pixels),
-                            totalPixels: state.imageData.totalPixels,
-                        }
-                        : null,
+                    imageData: imageDataForSave,
                     paintedMapPacked: paintedMapPacked,
                 }
 
@@ -2651,6 +2664,36 @@
                         state.imageData.processor = proc;
                     } catch (e) {
                         console.warn('Could not rebuild processor from saved image data:', e);
+                    }
+                }
+                else if (savedData.imageData && savedData.imageData.pixelsRef) {
+                    console.warn('ℹ️ Large image detected; loading pixels from IndexedDB via ref:', savedData.imageData.pixelsRef);
+                    state.imageData = {
+                        width: savedData.imageData.width,
+                        height: savedData.imageData.height,
+                        totalPixels: savedData.imageData.totalPixels,
+                        pixels: null,
+                    };
+                    state.imageLoaded = false;
+
+                    if (window.globalUtilsManager && typeof window.globalUtilsManager.loadPixelsFromIndexedDB === 'function') {
+                        window.globalUtilsManager.loadPixelsFromIndexedDB(savedData.imageData.pixelsRef)
+                          .then(payload => {
+                              if (!payload || !payload.pixels) {
+                                  console.warn('⚠️ Pixels not found in IDB. Ask user to reload image.');
+                                  return;
+                              }
+                              state.imageData.pixels = payload.pixels instanceof Uint8Array || payload.pixels instanceof Uint8ClampedArray
+                                ? new Uint8ClampedArray(payload.pixels)
+                                : new Uint8ClampedArray(payload.pixels);
+                              state.imageLoaded = true;
+
+                              // Optionally try to restore overlay here if available in this script context
+                              if (window.globalUtilsManager && typeof window.globalUtilsManager.restoreOverlayFromData === 'function') {
+                                  window.globalUtilsManager.restoreOverlayFromData().catch(() => {});
+                              }
+                          })
+                          .catch(err => console.warn('❌ Failed to load pixels from IDB:', err));
                     }
                 }
                 else if (savedData.imageData && savedData.imageData.pixelsStripped) {
