@@ -1375,8 +1375,39 @@ function getText(key, params) {
               window.globalUtilsManager.buildPaintedMapPacked() : null
           };
 
-        localStorage.setItem('wplace-bot-progress', JSON.stringify(data));
-        return true;
+        // Attempt to save; if payload is too large (QuotaExceeded), retry without heavy pixel data
+        try {
+          localStorage.setItem('wplace-bot-progress', JSON.stringify(data));
+          return true;
+        } catch (e) {
+          // Fallback: strip image pixels to reduce size and retry
+          if (data && data.imageData && data.imageData.pixels) {
+            const slimData = {
+              ...data,
+              imageData: {
+                width: data.imageData.width,
+                height: data.imageData.height,
+                totalPixels: data.imageData.totalPixels,
+                pixelsStripped: true,
+              }
+            };
+            try {
+              localStorage.setItem('wplace-bot-progress', JSON.stringify(slimData));
+              console.warn('Saved progress without raw pixel data due to storage quota limits.');
+              return true;
+            } catch (e2) {
+              try {
+                // Last resort: try sessionStorage
+                sessionStorage.setItem('wplace-bot-progress', JSON.stringify(slimData));
+                console.warn('Saved progress to sessionStorage without pixel data due to storage quota limits.');
+                return true;
+              } catch (e3) {
+                throw e2; // will be handled by outer catch
+              }
+            }
+          }
+          throw e;
+        }
       } catch (error) {
         console.error('Error saving progress:', error);
         return false;
@@ -1432,7 +1463,7 @@ function getText(key, params) {
           console.log('⚠️ [DEBUG] No availableColors found in savedData or not an array');
         }
 
-        if (savedData.imageData) {
+        if (savedData.imageData && Array.isArray(savedData.imageData.pixels)) {
           console.log('🔍 [DEBUG] Restoring imageData...');
           console.log('🔍 [DEBUG] ImageData type check - pixels is array:', Array.isArray(savedData.imageData.pixels));
           console.log('🔍 [DEBUG] ImageData pixels length:', savedData.imageData.pixels?.length);
@@ -1443,6 +1474,16 @@ function getText(key, params) {
           };
           console.log('✅ [DEBUG] ImageData restored successfully');
           console.log('🔍 [DEBUG] Converted pixels to Uint8ClampedArray, length:', window.state.imageData.pixels.length);
+        } else if (savedData.imageData && savedData.imageData.pixelsStripped) {
+          console.warn('⚠️ [DEBUG] Saved progress did not include raw pixel data due to quota limits. Please reload the image file to resume.');
+          // Preserve dimensions for UI, but mark image as not loaded
+          window.state.imageData = {
+            width: savedData.imageData.width,
+            height: savedData.imageData.height,
+            totalPixels: savedData.imageData.totalPixels,
+            pixels: null,
+          };
+          window.state.imageLoaded = false;
         } else {
           console.log('⚠️ [DEBUG] No imageData found in savedData');
         }
@@ -8366,9 +8407,9 @@ function getText(key, params) {
         }
       }
 
-      // Concatenate all blocks
+      // Concatenate all blocks (avoid spread on large arrays)
       for (const block of blocks) {
-        coords.push(...block);
+        coords = coords.concat(block);
       }
     } else {
       throw new Error(`Unknown mode: ${mode}`);
@@ -8822,7 +8863,8 @@ function getText(key, params) {
         pixelsToProcess = [];
         for (let i = startIndex; i < sortedColorGroups.length; i++) {
           const [colorId, pixels] = sortedColorGroups[i];
-          pixelsToProcess.push(...pixels);
+          // Avoid using spread with very large arrays to prevent call stack overflow
+          pixelsToProcess = pixelsToProcess.concat(pixels);
         }
 
         console.log(`✅ Prepared ${pixelsToProcess.length} pixels for color-by-color painting`);

@@ -727,8 +727,37 @@ class WPlaceUtilsManager {
   saveProgress() {
     try {
       const progressData = this.buildProgressData();
-      localStorage.setItem('wplace-bot-progress', JSON.stringify(progressData));
-      return true;
+      try {
+        localStorage.setItem('wplace-bot-progress', JSON.stringify(progressData));
+        return true;
+      } catch (e) {
+        // Strip heavy pixel data and retry if quota exceeded
+        if (progressData && progressData.imageData && progressData.imageData.pixels) {
+          const slim = {
+            ...progressData,
+            imageData: {
+              width: progressData.imageData.width,
+              height: progressData.imageData.height,
+              totalPixels: progressData.imageData.totalPixels,
+              pixelsStripped: true,
+            }
+          };
+          try {
+            localStorage.setItem('wplace-bot-progress', JSON.stringify(slim));
+            console.warn('Saved progress without raw pixel data due to storage quota limits.');
+            return true;
+          } catch (e2) {
+            try {
+              sessionStorage.setItem('wplace-bot-progress', JSON.stringify(slim));
+              console.warn('Saved progress to sessionStorage without pixel data due to storage quota limits.');
+              return true;
+            } catch (e3) {
+              throw e2;
+            }
+          }
+        }
+        throw e;
+      }
     } catch (error) {
       console.error('Error saving progress:', error);
       return false;
@@ -799,7 +828,7 @@ class WPlaceUtilsManager {
         window.state.colorsChecked = true; // Mark colors as checked
       }
 
-      if (savedData.imageData) {
+      if (savedData.imageData && Array.isArray(savedData.imageData.pixels)) {
         window.state.imageData = {
           width: savedData.imageData.width,
           height: savedData.imageData.height,
@@ -836,6 +865,15 @@ class WPlaceUtilsManager {
         } catch (e) {
           console.warn('Could not rebuild processor from saved image data:', e);
         }
+      } else if (savedData.imageData && savedData.imageData.pixelsStripped) {
+        console.warn('⚠️ Saved progress did not include raw pixel data due to quota limits. Please reload the image to resume.');
+        window.state.imageData = {
+          width: savedData.imageData.width,
+          height: savedData.imageData.height,
+          totalPixels: savedData.imageData.totalPixels,
+          pixels: null,
+        };
+        window.state.imageLoaded = false;
       }
 
       // Prefer packed form if available; fallback to legacy paintedMap array for backward compatibility

@@ -2550,8 +2550,37 @@
                     paintedMapPacked: paintedMapPacked,
                 }
 
-                localStorage.setItem("wplace-bot-progress", JSON.stringify(progressData))
-                return true
+                try {
+                    localStorage.setItem("wplace-bot-progress", JSON.stringify(progressData))
+                    return true
+                } catch (e) {
+                    // If quota exceeded, strip heavy pixel data and retry
+                    if (progressData && progressData.imageData && progressData.imageData.pixels) {
+                        const slim = {
+                            ...progressData,
+                            imageData: {
+                                width: progressData.imageData.width,
+                                height: progressData.imageData.height,
+                                totalPixels: progressData.imageData.totalPixels,
+                                pixelsStripped: true,
+                            }
+                        };
+                        try {
+                            localStorage.setItem("wplace-bot-progress", JSON.stringify(slim))
+                            console.warn('Saved progress without raw pixel data due to storage quota limits.');
+                            return true
+                        } catch (e2) {
+                            try {
+                                sessionStorage.setItem("wplace-bot-progress", JSON.stringify(slim))
+                                console.warn('Saved progress to sessionStorage without pixel data due to storage quota limits.');
+                                return true
+                            } catch (e3) {
+                                throw e2
+                            }
+                        }
+                    }
+                    throw e
+                }
             } catch (error) {
                 console.error("Error saving progress:", error)
                 return false
@@ -2602,7 +2631,7 @@
             try {
                 Object.assign(state, savedData.state)
 
-                if (savedData.imageData) {
+                if (savedData.imageData && Array.isArray(savedData.imageData.pixels)) {
                     state.imageData = {
                         ...savedData.imageData,
                         pixels: new Uint8ClampedArray(savedData.imageData.pixels),
@@ -2623,6 +2652,16 @@
                     } catch (e) {
                         console.warn('Could not rebuild processor from saved image data:', e);
                     }
+                }
+                else if (savedData.imageData && savedData.imageData.pixelsStripped) {
+                    console.warn('⚠️ Saved progress did not include raw pixel data due to quota limits. Please reload the image to resume.');
+                    state.imageData = {
+                        width: savedData.imageData.width,
+                        height: savedData.imageData.height,
+                        totalPixels: savedData.imageData.totalPixels,
+                        pixels: null,
+                    };
+                    state.imageLoaded = false;
                 }
 
                 // Prefer packed form if available; fallback to legacy paintedMap array for backward compatibility
