@@ -910,9 +910,7 @@ class WPlaceUtilsManager {
               return;
             }
             try {
-              window.state.imageData.pixels = payload.pixels instanceof Uint8Array || payload.pixels instanceof Uint8ClampedArray
-                ? new Uint8ClampedArray(payload.pixels)
-                : new Uint8ClampedArray(payload.pixels);
+              window.state.imageData.pixels = new Uint8ClampedArray(payload.pixels);
               window.state.imageLoaded = true;
 
               // Rebuild processor and notify modules/UI
