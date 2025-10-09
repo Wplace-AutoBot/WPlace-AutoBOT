@@ -8437,9 +8437,11 @@ function getText(key, params) {
         }
       }
 
-      // Concatenate all blocks (avoid spread on large arrays)
+      // Append all blocks without spread/concat to avoid large allocations and argument explosion
       for (const block of blocks) {
-        coords = coords.concat(block);
+        for (let i = 0; i < block.length; i++) {
+          coords.push(block[i]);
+        }
       }
     } else {
       throw new Error(`Unknown mode: ${mode}`);
@@ -10737,7 +10739,9 @@ async function generateCoordinatesAsync(
         }
       }
       for (const block of blocks) {
-        coords = coords.concat(block); // avoid spread on huge arrays
+        for (let i = 0; i < block.length; i++) {
+          coords.push(block[i]);
+        }
       }
     } else {
       throw new Error('Unknown mode: ' + mode);
