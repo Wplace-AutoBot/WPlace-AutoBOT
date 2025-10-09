@@ -8881,8 +8881,10 @@ function getText(key, params) {
         pixelsToProcess = [];
         for (let i = startIndex; i < sortedColorGroups.length; i++) {
           const [colorId, pixels] = sortedColorGroups[i];
-          // Avoid using spread with very large arrays to prevent call stack overflow
-          pixelsToProcess = pixelsToProcess.concat(pixels);
+          // Avoid using spread or concat with very large arrays to prevent call stack/alloc overhead
+          for (let j = 0; j < pixels.length; j++) {
+            pixelsToProcess.push(pixels[j]);
+          }
         }
 
         console.log(`✅ Prepared ${pixelsToProcess.length} pixels for color-by-color painting`);
