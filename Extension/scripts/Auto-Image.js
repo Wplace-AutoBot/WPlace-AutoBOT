@@ -1491,9 +1491,7 @@ function getText(key, params) {
                   console.warn('⚠️ [DEBUG] Pixels not found in IDB. Ask user to reload image.');
                   return;
                 }
-                window.state.imageData.pixels = payload.pixels instanceof Uint8Array || payload.pixels instanceof Uint8ClampedArray
-                  ? new Uint8ClampedArray(payload.pixels)
-                  : new Uint8ClampedArray(payload.pixels);
+                window.state.imageData.pixels = new Uint8ClampedArray(payload.pixels);
                 window.state.imageLoaded = true;
                 console.log('✅ [DEBUG] Pixels loaded from IDB');
 
