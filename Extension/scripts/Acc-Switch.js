@@ -2683,9 +2683,7 @@
                                   console.warn('⚠️ Pixels not found in IDB. Ask user to reload image.');
                                   return;
                               }
-                              state.imageData.pixels = payload.pixels instanceof Uint8Array || payload.pixels instanceof Uint8ClampedArray
-                                ? new Uint8ClampedArray(payload.pixels)
-                                : new Uint8ClampedArray(payload.pixels);
+                              state.imageData.pixels = new Uint8ClampedArray(payload.pixels);
                               state.imageLoaded = true;
 
                               // Optionally try to restore overlay here if available in this script context
