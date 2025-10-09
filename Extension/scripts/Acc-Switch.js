@@ -2526,26 +2526,6 @@
                     }
                 }
 
-                // Decide how to store image pixels (inline for small images, IndexedDB ref for large)
-                let imageDataForSave = null;
-                if (state.imageData) {
-                    const width = state.imageData.width;
-                    const height = state.imageData.height;
-                    const totalPixels = state.imageData.totalPixels;
-                    const pixels = state.imageData.pixels;
-                    const USE_IDB_THRESHOLD = 500000; // ~0.5 MB raw RGBA
-
-                    if (pixels && pixels.length > USE_IDB_THRESHOLD && window.globalUtilsManager && typeof window.globalUtilsManager.storePixelsInIndexedDB === 'function' && typeof window.globalUtilsManager.generatePixelsRef === 'function') {
-                        const ref = window.globalUtilsManager.generatePixelsRef(width, height);
-                        try { window.globalUtilsManager.storePixelsInIndexedDB(ref, { width, height, totalPixels, pixels }); } catch (e) { console.warn('IDB store failed:', e); }
-                        imageDataForSave = { width, height, totalPixels, pixelsRef: ref, pixelsBackend: 'idb' };
-                    } else if (pixels) {
-                        imageDataForSave = { width, height, pixels: Array.from(pixels), totalPixels };
-                    } else {
-                        imageDataForSave = { width, height, totalPixels, pixels: null };
-                    }
-                }
-
                 const progressData = {
                     timestamp: Date.now(),
                     version: "2.1",
@@ -2559,41 +2539,19 @@
                         colorsChecked: state.colorsChecked,
                         availableColors: state.availableColors,
                     },
-                    imageData: imageDataForSave,
+                    imageData: state.imageData
+                        ? {
+                            width: state.imageData.width,
+                            height: state.imageData.height,
+                            pixels: Array.from(state.imageData.pixels),
+                            totalPixels: state.imageData.totalPixels,
+                        }
+                        : null,
                     paintedMapPacked: paintedMapPacked,
                 }
 
-                try {
-                    localStorage.setItem("wplace-bot-progress", JSON.stringify(progressData))
-                    return true
-                } catch (e) {
-                    // If quota exceeded, strip heavy pixel data and retry
-                    if (progressData && progressData.imageData && progressData.imageData.pixels) {
-                        const slim = {
-                            ...progressData,
-                            imageData: {
-                                width: progressData.imageData.width,
-                                height: progressData.imageData.height,
-                                totalPixels: progressData.imageData.totalPixels,
-                                pixelsStripped: true,
-                            }
-                        };
-                        try {
-                            localStorage.setItem("wplace-bot-progress", JSON.stringify(slim))
-                            console.warn('Saved progress without raw pixel data due to storage quota limits.');
-                            return true
-                        } catch (e2) {
-                            try {
-                                sessionStorage.setItem("wplace-bot-progress", JSON.stringify(slim))
-                                console.warn('Saved progress to sessionStorage without pixel data due to storage quota limits.');
-                                return true
-                            } catch (e3) {
-                                throw e2
-                            }
-                        }
-                    }
-                    throw e
-                }
+                localStorage.setItem("wplace-bot-progress", JSON.stringify(progressData))
+                return true
             } catch (error) {
                 console.error("Error saving progress:", error)
                 return false
@@ -2644,7 +2602,7 @@
             try {
                 Object.assign(state, savedData.state)
 
-                if (savedData.imageData && Array.isArray(savedData.imageData.pixels)) {
+                if (savedData.imageData) {
                     state.imageData = {
                         ...savedData.imageData,
                         pixels: new Uint8ClampedArray(savedData.imageData.pixels),
@@ -2665,44 +2623,6 @@
                     } catch (e) {
                         console.warn('Could not rebuild processor from saved image data:', e);
                     }
-                }
-                else if (savedData.imageData && savedData.imageData.pixelsRef) {
-                    console.warn('ℹ️ Large image detected; loading pixels from IndexedDB via ref:', savedData.imageData.pixelsRef);
-                    state.imageData = {
-                        width: savedData.imageData.width,
-                        height: savedData.imageData.height,
-                        totalPixels: savedData.imageData.totalPixels,
-                        pixels: null,
-                    };
-                    state.imageLoaded = false;
-
-                    if (window.globalUtilsManager && typeof window.globalUtilsManager.loadPixelsFromIndexedDB === 'function') {
-                        window.globalUtilsManager.loadPixelsFromIndexedDB(savedData.imageData.pixelsRef)
-                          .then(payload => {
-                              if (!payload || !payload.pixels) {
-                                  console.warn('⚠️ Pixels not found in IDB. Ask user to reload image.');
-                                  return;
-                              }
-                              state.imageData.pixels = new Uint8ClampedArray(payload.pixels);
-                              state.imageLoaded = true;
-
-                              // Optionally try to restore overlay here if available in this script context
-                              if (window.globalUtilsManager && typeof window.globalUtilsManager.restoreOverlayFromData === 'function') {
-                                  window.globalUtilsManager.restoreOverlayFromData().catch(() => {});
-                              }
-                          })
-                          .catch(err => console.warn('❌ Failed to load pixels from IDB:', err));
-                    }
-                }
-                else if (savedData.imageData && savedData.imageData.pixelsStripped) {
-                    console.warn('⚠️ Saved progress did not include raw pixel data due to quota limits. Please reload the image to resume.');
-                    state.imageData = {
-                        width: savedData.imageData.width,
-                        height: savedData.imageData.height,
-                        totalPixels: savedData.imageData.totalPixels,
-                        pixels: null,
-                    };
-                    state.imageLoaded = false;
                 }
 
                 // Prefer packed form if available; fallback to legacy paintedMap array for backward compatibility
