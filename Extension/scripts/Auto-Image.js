@@ -8299,7 +8299,7 @@ function getText(key, params) {
   }
 
   function generateCoordinates(width, height, mode, direction, snake, blockWidth, blockHeight, startFromX = 0, startFromY = 0) {
-    let coords = [];
+    const coords = [];
     console.log(
       'Generating coordinates with \n  mode:',
       mode,
