@@ -1396,9 +1396,7 @@ WPlaceUtilsManager.prototype.storePixelsInIndexedDB = async function(ref, payloa
         width: payload.width,
         height: payload.height,
         totalPixels: payload.totalPixels,
-        pixels: payload.pixels instanceof Uint8Array || payload.pixels instanceof Uint8ClampedArray
-          ? new Uint8Array(payload.pixels)
-          : new Uint8Array(payload.pixels),
+        pixels: new Uint8Array(payload.pixels),
         createdAt: Date.now(),
       };
       const req = store.put(data);
