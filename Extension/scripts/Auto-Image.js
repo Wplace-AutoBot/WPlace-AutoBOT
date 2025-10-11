@@ -1375,8 +1375,39 @@ function getText(key, params) {
               window.globalUtilsManager.buildPaintedMapPacked() : null
           };
 
-        localStorage.setItem('wplace-bot-progress', JSON.stringify(data));
-        return true;
+        // Attempt to save; if payload is too large (QuotaExceeded), retry without heavy pixel data
+        try {
+          localStorage.setItem('wplace-bot-progress', JSON.stringify(data));
+          return true;
+        } catch (e) {
+          // Fallback: strip image pixels to reduce size and retry
+          if (data && data.imageData && data.imageData.pixels) {
+            const slimData = {
+              ...data,
+              imageData: {
+                width: data.imageData.width,
+                height: data.imageData.height,
+                totalPixels: data.imageData.totalPixels,
+                pixelsStripped: true,
+              }
+            };
+            try {
+              localStorage.setItem('wplace-bot-progress', JSON.stringify(slimData));
+              console.warn('Saved progress without raw pixel data due to storage quota limits.');
+              return true;
+            } catch (e2) {
+              try {
+                // Last resort: try sessionStorage
+                sessionStorage.setItem('wplace-bot-progress', JSON.stringify(slimData));
+                console.warn('Saved progress to sessionStorage without pixel data due to storage quota limits.');
+                return true;
+              } catch (e3) {
+                throw e2; // will be handled by outer catch
+              }
+            }
+          }
+          throw e;
+        }
       } catch (error) {
         console.error('Error saving progress:', error);
         return false;
@@ -1432,7 +1463,7 @@ function getText(key, params) {
           console.log('⚠️ [DEBUG] No availableColors found in savedData or not an array');
         }
 
-        if (savedData.imageData) {
+        if (savedData.imageData && Array.isArray(savedData.imageData.pixels)) {
           console.log('🔍 [DEBUG] Restoring imageData...');
           console.log('🔍 [DEBUG] ImageData type check - pixels is array:', Array.isArray(savedData.imageData.pixels));
           console.log('🔍 [DEBUG] ImageData pixels length:', savedData.imageData.pixels?.length);
@@ -1443,6 +1474,44 @@ function getText(key, params) {
           };
           console.log('✅ [DEBUG] ImageData restored successfully');
           console.log('🔍 [DEBUG] Converted pixels to Uint8ClampedArray, length:', window.state.imageData.pixels.length);
+        } else if (savedData.imageData && savedData.imageData.pixelsRef) {
+          console.warn('ℹ️ [DEBUG] Large image detected; loading pixels from IndexedDB via ref:', savedData.imageData.pixelsRef);
+          window.state.imageData = {
+            width: savedData.imageData.width,
+            height: savedData.imageData.height,
+            totalPixels: savedData.imageData.totalPixels,
+            pixels: null,
+          };
+          window.state.imageLoaded = false;
+
+          if (window.globalUtilsManager && typeof window.globalUtilsManager.loadPixelsFromIndexedDB === 'function') {
+            window.globalUtilsManager.loadPixelsFromIndexedDB(savedData.imageData.pixelsRef)
+              .then(payload => {
+                if (!payload || !payload.pixels) {
+                  console.warn('⚠️ [DEBUG] Pixels not found in IDB. Ask user to reload image.');
+                  return;
+                }
+                window.state.imageData.pixels = new Uint8ClampedArray(payload.pixels);
+                window.state.imageLoaded = true;
+                console.log('✅ [DEBUG] Pixels loaded from IDB');
+
+                // Try to restore overlay immediately
+                if (typeof window.globalUtilsManager.restoreOverlayFromData === 'function') {
+                  window.globalUtilsManager.restoreOverlayFromData().catch(() => {});
+                }
+              })
+              .catch(err => console.warn('❌ [DEBUG] Failed to load pixels from IDB:', err));
+          }
+        } else if (savedData.imageData && savedData.imageData.pixelsStripped) {
+          console.warn('⚠️ [DEBUG] Saved progress did not include raw pixel data due to quota limits. Please reload the image file to resume.');
+          // Preserve dimensions for UI, but mark image as not loaded
+          window.state.imageData = {
+            width: savedData.imageData.width,
+            height: savedData.imageData.height,
+            totalPixels: savedData.imageData.totalPixels,
+            pixels: null,
+          };
+          window.state.imageLoaded = false;
         } else {
           console.log('⚠️ [DEBUG] No imageData found in savedData');
         }
@@ -8366,9 +8435,11 @@ function getText(key, params) {
         }
       }
 
-      // Concatenate all blocks
+      // Append all blocks without spread/concat to avoid large allocations and argument explosion
       for (const block of blocks) {
-        coords.push(...block);
+        for (let i = 0; i < block.length; i++) {
+          coords.push(block[i]);
+        }
       }
     } else {
       throw new Error(`Unknown mode: ${mode}`);
@@ -8665,21 +8736,9 @@ function getText(key, params) {
 
     // Paint pixels until we run out of charges or complete the image
     try {
-      // First generate coordinates without filtering to count skipped ones
-      const allCoords = generateCoordinates(
-        width,
-        height,
-        state.coordinateMode,
-        state.coordinateDirection,
-        state.coordinateSnake,
-        state.blockWidth,
-        state.blockHeight,
-        0, // Don't filter here
-        0  // Don't filter here
-      );
 
       // Generate the actual filtered coordinates for painting (resuming from last position)
-      const coords = generateCoordinates(
+      const coords = await generateCoordinatesAsync(
         width,
         height,
         state.coordinateMode,
@@ -8822,7 +8881,10 @@ function getText(key, params) {
         pixelsToProcess = [];
         for (let i = startIndex; i < sortedColorGroups.length; i++) {
           const [colorId, pixels] = sortedColorGroups[i];
-          pixelsToProcess.push(...pixels);
+          // Avoid using spread or concat with very large arrays to prevent call stack/alloc overhead
+          for (let j = 0; j < pixels.length; j++) {
+            pixelsToProcess.push(pixels[j]);
+          }
         }
 
         console.log(`✅ Prepared ${pixelsToProcess.length} pixels for color-by-color painting`);
@@ -10540,3 +10602,252 @@ function getText(key, params) {
     });
   });
 })();
+
+// === Async coordinate generation (off-main-thread) ===
+async function generateCoordinatesAsync(
+  width,
+  height,
+  mode,
+  direction,
+  snake,
+  blockWidth,
+  blockHeight,
+  startFromX = 0,
+  startFromY = 0
+) {
+  try {
+    if (typeof Worker === 'undefined') {
+      // Environment does not support Web Workers – fall back
+      return generateCoordinates(
+        width,
+        height,
+        mode,
+        direction,
+        snake,
+        blockWidth,
+        blockHeight,
+        startFromX,
+        startFromY
+      );
+    }
+
+    const workerCode = `self.onmessage = function(e) {
+  const { width, height, mode, direction, snake, blockWidth, blockHeight, startFromX, startFromY } = e.data || {};
+
+  function generate() {
+    let coords = [];
+
+    // Determine traversal direction
+    let xStart, xEnd, xStep;
+    let yStart, yEnd, yStep;
+    switch (direction) {
+      case 'top-left':
+        xStart = 0; xEnd = width; xStep = 1;
+        yStart = 0; yEnd = height; yStep = 1;
+        break;
+      case 'top-right':
+        xStart = width - 1; xEnd = -1; xStep = -1;
+        yStart = 0; yEnd = height; yStep = 1;
+        break;
+      case 'bottom-left':
+        xStart = 0; xEnd = width; xStep = 1;
+        yStart = height - 1; yEnd = -1; yStep = -1;
+        break;
+      case 'bottom-right':
+        xStart = width - 1; xEnd = -1; xStep = -1;
+        yStart = height - 1; yEnd = -1; yStep = -1;
+        break;
+      default:
+        throw new Error('Unknown direction: ' + direction);
+    }
+
+    if (mode === 'rows') {
+      let rowIndex = 0;
+      for (let y = yStart; y !== yEnd; y += yStep) {
+        if (snake && rowIndex % 2 !== 0) {
+          for (let x = xEnd - xStep; x !== xStart - xStep; x -= xStep) {
+            coords.push([x, y]);
+          }
+        } else {
+          for (let x = xStart; x !== xEnd; x += xStep) {
+            coords.push([x, y]);
+          }
+        }
+        rowIndex++;
+      }
+    } else if (mode === 'columns') {
+      let colIndex = 0;
+      for (let x = xStart; x !== xEnd; x += xStep) {
+        if (snake && colIndex % 2 !== 0) {
+          for (let y = yEnd - yStep; y !== yStart - yStep; y -= yStep) {
+            coords.push([x, y]);
+          }
+        } else {
+          for (let y = yStart; y !== yEnd; y += yStep) {
+            coords.push([x, y]);
+          }
+        }
+        colIndex++;
+      }
+    } else if (mode === 'circle-out') {
+      const cx = Math.floor(width / 2);
+      const cy = Math.floor(height / 2);
+      const maxRadius = Math.ceil(Math.sqrt(cx * cx + cy * cy));
+      for (let r = 0; r <= maxRadius; r++) {
+        for (let y = cy - r; y <= cy + r; y++) {
+          for (let x = cx - r; x <= cx + r; x++) {
+            if (x >= 0 && x < width && y >= 0 && y < height) {
+              const dist = Math.max(Math.abs(x - cx), Math.abs(y - cy));
+              if (dist === r) coords.push([x, y]);
+            }
+          }
+        }
+      }
+    } else if (mode === 'circle-in') {
+      const cx = Math.floor(width / 2);
+      const cy = Math.floor(height / 2);
+      const maxRadius = Math.ceil(Math.sqrt(cx * cx + cy * cy));
+      for (let r = maxRadius; r >= 0; r--) {
+        for (let y = cy - r; y <= cy + r; y++) {
+          for (let x = cx - r; x <= cx + r; x++) {
+            if (x >= 0 && x < width && y >= 0 && y < height) {
+              const dist = Math.max(Math.abs(x - cx), Math.abs(y - cy));
+              if (dist === r) coords.push([x, y]);
+            }
+          }
+        }
+      }
+    } else if (mode === 'blocks' || mode === 'shuffle-blocks') {
+      const blocks = [];
+      for (let by = 0; by < height; by += blockHeight) {
+        for (let bx = 0; bx < width; bx += blockWidth) {
+          const block = [];
+          for (let y = by; y < Math.min(by + blockHeight, height); y++) {
+            for (let x = bx; x < Math.min(bx + blockWidth, width); x++) {
+              block.push([x, y]);
+            }
+          }
+          blocks.push(block);
+        }
+      }
+      if (mode === 'shuffle-blocks') {
+        for (let i = blocks.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          const tmp = blocks[i];
+          blocks[i] = blocks[j];
+          blocks[j] = tmp;
+        }
+      }
+      for (const block of blocks) {
+        for (let i = 0; i < block.length; i++) {
+          coords.push(block[i]);
+        }
+      }
+    } else {
+      throw new Error('Unknown mode: ' + mode);
+    }
+
+    // Resume from specified position if provided
+    if (startFromX > 0 || startFromY > 0) {
+      let startIndex = -1;
+      for (let i = 0; i < coords.length; i++) {
+        const c = coords[i];
+        if (c[0] === startFromX && c[1] === startFromY) {
+          startIndex = i;
+          break;
+        }
+      }
+      if (startIndex >= 0) {
+        coords = coords.slice(startIndex);
+      }
+    }
+
+    return coords;
+  }
+
+  try {
+    const coords = generate();
+    self.postMessage({ ok: true, coords });
+  } catch (err) {
+    self.postMessage({ ok: false, error: err && (err.message || String(err)) });
+  }
+};`;
+
+    const blob = new Blob([workerCode], { type: 'application/javascript' });
+    const url = URL.createObjectURL(blob);
+
+    return await new Promise((resolve) => {
+      const worker = new Worker(url);
+      const cleanup = () => {
+        URL.revokeObjectURL(url);
+        try { worker.terminate(); } catch (e) { }
+      };
+
+      worker.onmessage = (e) => {
+        const { ok, coords, error } = e.data || {};
+        cleanup();
+        if (ok && Array.isArray(coords)) {
+          resolve(coords);
+        } else {
+          console.warn('Coordinate worker failed, falling back to sync:', error);
+          resolve(
+            generateCoordinates(
+              width,
+              height,
+              mode,
+              direction,
+              snake,
+              blockWidth,
+              blockHeight,
+              startFromX,
+              startFromY
+            )
+          );
+        }
+      };
+
+      worker.onerror = (err) => {
+        console.warn('Coordinate worker error, falling back to sync:', err && (err.message || err));
+        cleanup();
+        resolve(
+          generateCoordinates(
+            width,
+            height,
+            mode,
+            direction,
+            snake,
+            blockWidth,
+            blockHeight,
+            startFromX,
+            startFromY
+          )
+        );
+      };
+
+      worker.postMessage({
+        width,
+        height,
+        mode,
+        direction,
+        snake,
+        blockWidth,
+        blockHeight,
+        startFromX,
+        startFromY,
+      });
+    });
+  } catch (e) {
+    console.warn('Failed to start coordinate worker, using sync generation:', e);
+    return generateCoordinates(
+      width,
+      height,
+      mode,
+      direction,
+      snake,
+      blockWidth,
+      blockHeight,
+      startFromX,
+      startFromY
+    );
+  }
+}

@@ -673,7 +673,7 @@ class WPlaceUtilsManager {
   }
 
   buildProgressData() {
-    return {
+    const result = {
       timestamp: Date.now(),
       version: '2.2',
       state: {
@@ -691,16 +691,42 @@ class WPlaceUtilsManager {
         blockHeight: window.state.blockHeight,
         availableColors: window.state.availableColors,
       },
-      imageData: window.state.imageData
-        ? {
-          width: window.state.imageData.width,
-          height: window.state.imageData.height,
-          pixels: Array.from(window.state.imageData.pixels),
-          totalPixels: window.state.imageData.totalPixels,
-        }
-        : null,
-      paintedMapPacked: this.buildPaintedMapPacked(),
+      imageData: null,
+      paintedMapPacked: null,
     };
+
+    // Decide how to store image pixels
+    if (window.state.imageData) {
+      const img = window.state.imageData;
+      const width = img.width;
+      const height = img.height;
+      const totalPixels = img.totalPixels;
+      const pixels = img.pixels;
+
+      const USE_IDB_THRESHOLD = 500000; // ~0.5 MB raw RGBA (before JSON expansion)
+
+      if (pixels && pixels.length) {
+        const bytes = pixels.length; // Uint8ClampedArray length equals byte size
+        if (bytes > USE_IDB_THRESHOLD) {
+          // Store pixels in IndexedDB and keep only the reference in save payload
+          const ref = this.generatePixelsRef(width, height);
+          try {
+            // Fire-and-forget async persist
+            this.storePixelsInIndexedDB(ref, { width, height, totalPixels, pixels });
+          } catch (e) {
+            console.warn('Failed to schedule IDB pixel store:', e);
+          }
+          result.imageData = { width, height, totalPixels, pixelsRef: ref, pixelsBackend: 'idb' };
+        } else {
+          result.imageData = { width, height, pixels: Array.from(pixels), totalPixels };
+        }
+      } else {
+        result.imageData = { width, height, totalPixels, pixels: null };
+      }
+    }
+
+    result.paintedMapPacked = this.buildPaintedMapPacked();
+    return result;
   }
 
   migrateProgress(saved) {
@@ -727,8 +753,37 @@ class WPlaceUtilsManager {
   saveProgress() {
     try {
       const progressData = this.buildProgressData();
-      localStorage.setItem('wplace-bot-progress', JSON.stringify(progressData));
-      return true;
+      try {
+        localStorage.setItem('wplace-bot-progress', JSON.stringify(progressData));
+        return true;
+      } catch (e) {
+        // Strip heavy pixel data and retry if quota exceeded
+        if (progressData && progressData.imageData && progressData.imageData.pixels) {
+          const slim = {
+            ...progressData,
+            imageData: {
+              width: progressData.imageData.width,
+              height: progressData.imageData.height,
+              totalPixels: progressData.imageData.totalPixels,
+              pixelsStripped: true,
+            }
+          };
+          try {
+            localStorage.setItem('wplace-bot-progress', JSON.stringify(slim));
+            console.warn('Saved progress without raw pixel data due to storage quota limits.');
+            return true;
+          } catch (e2) {
+            try {
+              sessionStorage.setItem('wplace-bot-progress', JSON.stringify(slim));
+              console.warn('Saved progress to sessionStorage without pixel data due to storage quota limits.');
+              return true;
+            } catch (e3) {
+              throw e2;
+            }
+          }
+        }
+        throw e;
+      }
     } catch (error) {
       console.error('Error saving progress:', error);
       return false;
@@ -799,7 +854,7 @@ class WPlaceUtilsManager {
         window.state.colorsChecked = true; // Mark colors as checked
       }
 
-      if (savedData.imageData) {
+      if (savedData.imageData && Array.isArray(savedData.imageData.pixels)) {
         window.state.imageData = {
           width: savedData.imageData.width,
           height: savedData.imageData.height,
@@ -836,6 +891,52 @@ class WPlaceUtilsManager {
         } catch (e) {
           console.warn('Could not rebuild processor from saved image data:', e);
         }
+      } else if (savedData.imageData && savedData.imageData.pixelsRef) {
+        // Asynchronously load large pixel data from IndexedDB using the stored reference
+        console.log('🔄 Loading large image pixels from IndexedDB via ref:', savedData.imageData.pixelsRef);
+        window.state.imageData = {
+          width: savedData.imageData.width,
+          height: savedData.imageData.height,
+          totalPixels: savedData.imageData.totalPixels,
+          pixels: null,
+        };
+        window.state.imageLoaded = false;
+
+        this.loadPixelsFromIndexedDB(savedData.imageData.pixelsRef)
+          .then((payload) => {
+            if (!payload || !payload.pixels) {
+              console.warn('⚠️ No pixel payload found in IndexedDB for ref:', savedData.imageData.pixelsRef);
+              this.showAlert?.('⚠️ Saved image pixels not found in local database. Please reload the image file.', 'warning');
+              return;
+            }
+            try {
+              window.state.imageData.pixels = new Uint8ClampedArray(payload.pixels);
+              window.state.imageLoaded = true;
+
+              // Rebuild processor and notify modules/UI
+              this._syncModulesAfterStateRestore();
+              this.showAlert?.('✅ Large image restored from local database.', 'success');
+
+              // Attempt overlay restoration if available
+              if (typeof this.restoreOverlayFromData === 'function') {
+                this.restoreOverlayFromData().catch(() => {});
+              }
+            } catch (err) {
+              console.warn('Failed to apply pixels from IndexedDB:', err);
+            }
+          })
+          .catch((err) => {
+            console.warn('Failed to load pixels from IndexedDB:', err);
+          });
+      } else if (savedData.imageData && savedData.imageData.pixelsStripped) {
+        console.warn('⚠️ Saved progress did not include raw pixel data due to quota limits. Please reload the image to resume.');
+        window.state.imageData = {
+          width: savedData.imageData.width,
+          height: savedData.imageData.height,
+          totalPixels: savedData.imageData.totalPixels,
+          pixels: null,
+        };
+        window.state.imageLoaded = false;
       }
 
       // Prefer packed form if available; fallback to legacy paintedMap array for backward compatibility
@@ -1256,3 +1357,68 @@ if (!window.globalUtilsManager) {
     }
   }, 100);
 }
+
+// === IndexedDB helpers for large pixel storage ===
+WPlaceUtilsManager.prototype._openPixelDB = function() {
+  return new Promise((resolve, reject) => {
+    try {
+      const request = indexedDB.open('wplace-bot-db', 1);
+      request.onupgradeneeded = () => {
+        const db = request.result;
+        if (!db.objectStoreNames.contains('pixels')) {
+          const store = db.createObjectStore('pixels', { keyPath: 'ref' });
+          try { store.createIndex('createdAt', 'createdAt', { unique: false }); } catch {}
+        }
+      };
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+WPlaceUtilsManager.prototype.generatePixelsRef = function(width, height) {
+  const rand = Math.random().toString(36).slice(2, 8);
+  return `img_${width}x${height}_${Date.now().toString(36)}_${rand}`;
+};
+
+WPlaceUtilsManager.prototype.storePixelsInIndexedDB = async function(ref, payload) {
+  try {
+    const db = await this._openPixelDB();
+    return await new Promise((resolve, reject) => {
+      const tx = db.transaction('pixels', 'readwrite');
+      const store = tx.objectStore('pixels');
+      const data = {
+        ref,
+        width: payload.width,
+        height: payload.height,
+        totalPixels: payload.totalPixels,
+        pixels: payload.pixels,
+        createdAt: Date.now(),
+      };
+      const req = store.put(data);
+      req.onsuccess = () => resolve(true);
+      req.onerror = () => reject(req.error);
+    });
+  } catch (e) {
+    console.warn('IDB storePixels failed:', e);
+    return false;
+  }
+};
+
+WPlaceUtilsManager.prototype.loadPixelsFromIndexedDB = async function(ref) {
+  try {
+    const db = await this._openPixelDB();
+    return await new Promise((resolve, reject) => {
+      const tx = db.transaction('pixels', 'readonly');
+      const store = tx.objectStore('pixels');
+      const req = store.get(ref);
+      req.onsuccess = () => resolve(req.result || null);
+      req.onerror = () => reject(req.error);
+    });
+  } catch (e) {
+    console.warn('IDB loadPixels failed:', e);
+    return null;
+  }
+};
