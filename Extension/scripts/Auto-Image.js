@@ -10134,20 +10134,20 @@ function getText(key, params) {
 
     try {
       // Always trust backend /me and then map by ID to avoid mixing data between tokens
-      const me = await WPlaceService.getCharges();
-      state.displayCharges = Math.floor(me.charges);
-      state.preciseCurrentCharges = me.charges;
+      const currentAccountData = await WPlaceService.getCharges();
+      state.displayCharges = Math.floor(currentAccountData.charges);
+      state.preciseCurrentCharges = currentAccountData.charges;
       await updateStats();
 
       const accounts = accountManager.getAllAccounts();
-      const idx = accounts.findIndex(acc => acc.ID === me.id);
+      const idx = accounts.findIndex(acc => acc.ID === currentAccountData.id);
       const targetToken = idx !== -1 ? accounts[idx].token : accountManager.getCurrentAccount()?.token;
 
       if (targetToken) {
         accountManager.updateAccountData(targetToken, {
           Charges: Math.floor(state.displayCharges || 0),
-          Max: Math.floor(me.max || state.maxCharges || 0),
-          Droplets: Math.floor(me.droplets)
+          Max: Math.floor(currentAccountData.max || state.maxCharges || 0),
+          Droplets: Math.floor(currentAccountData.droplets)
         });
 
         // Keep manager index in sync with reality when possible
@@ -10168,16 +10168,16 @@ function getText(key, params) {
   async function updateCurrentAccountSpotlight() {
     if (accountManager.getAccountCount() === 0) return;
     try {
-      const me = await WPlaceService.getCharges();
-      console.log("Current account after switch:", me);
-      console.log(`🔍 Switched to account with ID: ${me.id}`);
+      const currentAccountData = await WPlaceService.getCharges();
+      console.log("Current account after switch:", currentAccountData);
+      console.log(`🔍 Switched to account with ID: ${currentAccountData.id}`);
 
       const accounts = accountManager.getAllAccounts();
-      const idx = accounts.findIndex(acc => acc.ID === me.id);
+      const idx = accounts.findIndex(acc => acc.ID === currentAccountData.id);
 
       if (idx !== -1) {
         const currentAccount = accounts[idx];
-        const info = await WPlaceService.fetchCheck();
+        const currentAccountInfo = await WPlaceService.fetchCheck();
 
         // Sync manager index and flags to actual account
         if (typeof accountManager.setCurrentIndex === 'function') {
@@ -10188,22 +10188,22 @@ function getText(key, params) {
 
         accountManager.updateAccountData(currentAccount.token, {
           isCurrent: true,
-          Charges: Math.floor(me.charges),
-          Max: Math.floor(me.max),
-          Droplets: Math.floor(me.droplets),
-          displayName: info.Username || info.name || currentAccount.displayName
+          Charges: Math.floor(currentAccountData.charges),
+          Max: Math.floor(currentAccountData.max),
+          Droplets: Math.floor(currentAccountData.droplets),
+          displayName: currentAccountInfo.Username || currentAccountInfo.name || currentAccount.displayName
         });
 
         // Mirror to UI state for consistency
-        state.displayCharges = Math.floor(me.charges);
-        state.preciseCurrentCharges = me.charges;
-        state.cooldown = me.cooldown;
+        state.displayCharges = Math.floor(currentAccountData.charges);
+        state.preciseCurrentCharges = currentAccountData.charges;
+        state.cooldown = currentAccountData.cooldown;
         state.accountIndex = idx;
 
         renderAccountsList();
         console.log(`🎯 Updated current account spotlight: ${currentAccount.displayName}`);
       } else {
-        console.warn(`⚠️ Could not find switched account with ID ${me.id} in account list`);
+        console.warn(`⚠️ Could not find switched account with ID ${currentAccountData.id} in account list`);
       }
 
       // Re-render the account list to show new current account
@@ -10363,8 +10363,8 @@ function getText(key, params) {
       let verifiedId = null;
       for (let attempt = 1; attempt <= 8 && !verifiedId; attempt++) {
         try {
-          const me = await WPlaceService.getCharges();
-          const curId = me?.id;
+          const currentAccountData = await WPlaceService.getCharges();
+          const curId = currentAccountData?.id;
           if (!curId) {
             await Utils.sleep(500);
             continue;
@@ -10434,8 +10434,8 @@ function getText(key, params) {
     let verifiedId = null;
     for (let attempt = 1; attempt <= 8 && !verifiedId; attempt++) {
       try {
-        const me = await WPlaceService.getCharges();
-        const curId = me?.id;
+        const currentAccountData = await WPlaceService.getCharges();
+        const curId = currentAccountData?.id;
         if (!curId) {
           await Utils.sleep(500);
           continue;
@@ -10546,9 +10546,9 @@ function getText(key, params) {
           continue;
         }
 
-        const me = await WPlaceService.getCharges();
-        const charges = Math.floor(me?.charges || 0);
-        const cooldown = Math.max(0, Number(me?.cooldown || 0));
+        const currentAccountData = await WPlaceService.getCharges();
+        const charges = Math.floor(currentAccountData?.charges || 0);
+        const cooldown = Math.max(0, Number(currentAccountData?.cooldown || 0));
         if (charges >= minRequired) {
           console.log(`✅ [SEARCH] Found account with sufficient charges: ${acc.displayName} (⚡${charges})`);
           return true;
