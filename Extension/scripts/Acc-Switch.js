@@ -7517,38 +7517,16 @@
                                 return;
                             }
 
-                            swapAccountTrigger(nextToken);
-
-                            let maxRetries = 20;
-                            let retryCount = 0;
-                            let swapSuccess = false;
-
-                            while (!swapSuccess && retryCount < maxRetries) {
-                                console.log(`⏳ Waiting for account swap... (Attempt ${retryCount + 1}/${maxRetries})`);
-
-                                // Wait for a short period before checking.
-                                await new Promise(resolve => setTimeout(resolve, 1000));
-
-                                try {
-                                    await fetchAccount();
-
-                                    console.log("✅ Account swap confirmed.");
-                                    swapSuccess = true;
-                                } catch (error) {
-                                    console.warn("❌ Account swap not yet successful. Retrying...", error);
-                                    retryCount++;
-                                }
-                            }
+                            const swapSuccess = await swapAccountTrigger(nextToken);
 
                             if (swapSuccess) {
-
                                 const { charges, cooldown } = await WPlaceService.getCharges();
                                 state.currentCharges = Math.floor(charges);
                                 state.cooldown = cooldown;
                                 Utils.performSmartSave();
                                 updateStats();
                             } else {
-                                console.error("❌ Failed to swap account after multiple retries. Stopping loop.");
+                                console.error("❌ Failed to swap account after confirmation timeout. Stopping loop.");
                                 state.stopFlag = true;
                             }
                         }
@@ -7800,7 +7778,7 @@
                 const token = accountsTokens[i];
                 
                 console.log(`🔄 Refreshing account ${i + 1}/${accountsTokens.length} for data collection only...`);
-                swapAccountTrigger(token);
+                await swapAccountTrigger(token);
 
                 let retries = 0;
                 let swapped = false;
@@ -7834,7 +7812,7 @@
             
             if (originalToken) {
                 console.log("🔄 Switching back to original account after data collection...");
-                swapAccountTrigger(originalToken);
+                await swapAccountTrigger(originalToken);
             }
             await Utils.sleep(1000);
 
@@ -8486,15 +8464,44 @@
             console.error("An error occurred during the purchase:", e);
         }
     }
-    function swapAccountTrigger(token) {
+    async function waitForCookieSet(timeout = 10000) {
+        return new Promise((resolve, reject) => {
+            const onMessage = (event) => {
+                if (event.source !== window) return;
+                const data = event.data || {};
+                if (data.type === 'cookieSet') {
+                    window.removeEventListener('message', onMessage);
+                    clearTimeout(timer);
+                    resolve(true);
+                }
+            };
+            const timer = setTimeout(() => {
+                window.removeEventListener('message', onMessage);
+                reject(new Error('cookieSet timeout'));
+            }, timeout);
+            window.addEventListener('message', onMessage);
+        });
+    }
+    async function swapAccountTrigger(token) {
         localStorage.removeItem("lp");
-        if (!token) return;
+        if (!token) {
+            console.error('❌ Cannot swap account: token is null or undefined');
+            return false;
+        }
         console.log("Sending token to extension...");
         window.postMessage({
             source: 'my-userscript',
             type: 'setCookie',
             value: token
         }, '*');
+        try {
+            await waitForCookieSet(10000);
+            console.log('✅ Cookie set confirmed');
+            return true;
+        } catch (e) {
+            console.warn('⚠️ No cookieSet confirmation:', e.message);
+            return false;
+        }
     }
     async function getAccounts() {
         return new Promise((resolve, reject) => {

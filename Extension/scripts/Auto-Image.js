@@ -1777,8 +1777,9 @@ function getText(key, params) {
 
     async getCharges() {
       try {
-        const res = await fetch("https://backend.wplace.live/me", {
+        const res = await fetch(`https://backend.wplace.live/me?_=${Date.now()}` , {
           credentials: "include",
+          cache: 'no-store'
         })
         const data = await res.json()
         return {
@@ -1802,8 +1803,9 @@ function getText(key, params) {
 
     async fetchCheck() {
       try {
-        const res = await fetch("https://backend.wplace.live/me", {
+        const res = await fetch(`https://backend.wplace.live/me?_=${Date.now()}` , {
           credentials: "include",
+          cache: 'no-store'
         })
         const data = await res.json()
         return {
@@ -8606,72 +8608,19 @@ function getText(key, params) {
                 break;
               }
             } else {
-              // Debug current state
-              const totalAccounts = accountManager.getAccountCount();
-              console.log(`📊 Account Status - Current index: ${accountManager.currentIndex}, Total accounts: ${totalAccounts}`);
-
-              // Check if we're at the last account in the sequence
-              const isLastAccount = accountManager.currentIndex >= totalAccounts - 1;
-              console.log(`🔍 Is last account? ${isLastAccount} (index ${accountManager.currentIndex} of ${totalAccounts})`);
-
-              if (!isLastAccount && totalAccounts > 1) {
-                // Update current account status before switching
-                console.log('📊 Updating current account status before switch...');
-                await updateCurrentAccountInList();
-
-                // Switch to next account immediately (no cooldown) - only if we have multiple accounts
-                const nextAccount = accountManager.getNextAccount();
-                console.log(`🔄 Switching to next account: ${nextAccount?.displayName} (${accountManager.currentIndex + 2}/${totalAccounts})`);
-                const switchResult = await switchToNextAccount(accounts);
-                if (!switchResult) {
-                  console.log('❌ Account switch failed, stopping');
-                  state.stopFlag = true;
-                  break;
-                }
-                // Continue painting with new account immediately
-                continue;
-              } else if (totalAccounts === 1) {
-                // Only one account available - use cooldown and continue with same account
-                console.log('ℹ️ Only one account available, entering cooldown period');
-                const cooldownResult = await executeCooldownPeriod();
-                if (cooldownResult === 'stopped') break;
-                console.log('✅ Cooldown complete, continuing with same account');
-                continue;
-              } else {
-                // Last account reached - use cooldown then switch to first account
-                console.log('⏱️ Last account reached, entering cooldown period');
-                console.log(`📊 Current account: index ${accountManager.currentIndex}, Last account: index ${totalAccounts - 1}`);
-
-                const cooldownResult = await executeCooldownPeriod();
-                if (cooldownResult === 'stopped') break;
-
-                // After cooldown, switch to first account
-                console.log('🔁 Cooldown complete, switching to first account');
-                console.log(`🔄 Before switch - Current index: ${accountManager.currentIndex}, Target: index 0`);
-
-                const firstAccountInfo = accountManager.getAccountByIndex(0);
-                const firstAccountToken = firstAccountInfo?.token;
-
-                if (!firstAccountToken) {
-                  console.log('❌ First account token not found, stopping');
-                  state.stopFlag = true;
-                  break;
-                }
-
-                // Reset to first position
-                accountManager.setCurrentIndex(0);
-
-                const switchResult = await switchToSpecificAccount(firstAccountToken, firstAccountInfo.displayName);
-                if (!switchResult) {
-                  console.log('❌ Switch to ID 1 failed, stopping');
-                  state.stopFlag = true;
-                  break;
-                }
-
-                console.log(`✅ Successfully switched to ID 1 (${firstAccountInfo.displayName}). Cycle restarted.`);
-                // Continue painting with first account
+              // Try to find an account with enough charges to continue painting
+              const minRequired = Math.max(1, state.cooldownChargeThreshold || 1);
+              console.log(`🔎 Searching for account with ≥${minRequired} charges...`);
+              const switched = await selectAndSwitchToAccountWithCharges(minRequired);
+              if (switched) {
+                console.log('✅ Switched to an account with sufficient charges, continuing painting immediately');
                 continue;
               }
+              // If none had enough charges, enter cooldown on the best available account
+              console.log('🕒 No accounts have enough charges. Entering cooldown on the account with the soonest recharge...');
+              const cooldownResult = await executeCooldownPeriod();
+              if (cooldownResult === 'stopped') break;
+              continue;
             }
           }
         }
@@ -9976,13 +9925,43 @@ function getText(key, params) {
         type: 'setCookie',
         value: token
       }, '*');
-
       console.log('✅ setCookie message sent successfully');
-      return true;
     } catch (error) {
       console.error('❌ Failed to send setCookie message:', error);
       return false;
     }
+
+    // Wait for background confirmation that cookie was set
+    const confirmed = await new Promise((resolve) => {
+      let settled = false;
+      const timer = setTimeout(() => {
+        if (!settled) {
+          settled = true;
+          console.warn('⚠️ cookieSet confirmation timeout');
+          resolve(false);
+        }
+      }, 10000);
+      function onMessage(event) {
+        if (event.source !== window) return;
+        const data = event.data || {};
+        if (data.type === 'cookieSet') {
+          if (!settled) {
+            settled = true;
+            clearTimeout(timer);
+            window.removeEventListener('message', onMessage);
+            resolve(true);
+          }
+        }
+      }
+      window.addEventListener('message', onMessage);
+    });
+
+    if (confirmed) {
+      console.log('✅ Cookie set confirmed');
+    } else {
+      console.warn('⚠️ Proceeding without cookie confirmation');
+    }
+    return true;
   }
   async function getAccounts() {
     return new Promise((resolve, reject) => {
@@ -10114,10 +10093,16 @@ function getText(key, params) {
             await switchToSpecificAccount(originalCurrentAccount.token, originalCurrentAccount.displayName);
             //await Utils.sleep(300);
 
-            // Mark it as current again
+            // Mark it as current again and sync index
             accountManager.updateAccountData(originalCurrentAccount.token, {
               isCurrent: true
             });
+            const list = accountManager.getAllAccounts();
+            const idxOriginal = list.findIndex(acc => acc.token === originalCurrentAccount.token);
+            if (idxOriginal !== -1 && typeof accountManager.setCurrentIndex === 'function') {
+              accountManager.setCurrentIndex(idxOriginal);
+              state.accountIndex = idxOriginal;
+            }
           } catch (error) {
             console.warn(`⚠️ [FETCH] Failed to switch back to original account:`, error);
           }
@@ -10147,95 +10132,78 @@ function getText(key, params) {
   async function updateCurrentAccountInList() {
     if (accountManager.getAccountCount() === 0) return;
 
-    // Find current account in the list and update its charges
-    const currentAccount = accountManager.getCurrentAccount();
-    if (currentAccount) {
-      const { charges, cooldown, droplets } = await WPlaceService.getCharges();
-      state.displayCharges = Math.floor(charges);
-      state.preciseCurrentCharges = charges;
+    try {
+      // Always trust backend /me and then map by ID to avoid mixing data between tokens
+      const me = await WPlaceService.getCharges();
+      state.displayCharges = Math.floor(me.charges);
+      state.preciseCurrentCharges = me.charges;
       await updateStats();
 
-      // Update the current account data in AccountManager
-      accountManager.updateAccountData(currentAccount.token, {
-        Charges: Math.floor(state.displayCharges || state.preciseCurrentCharges || 0),
-        Max: state.maxCharges,
-        Droplets: Math.floor(droplets)
-      });
+      const accounts = accountManager.getAllAccounts();
+      const idx = accounts.findIndex(acc => acc.ID === me.id);
+      const targetToken = idx !== -1 ? accounts[idx].token : accountManager.getCurrentAccount()?.token;
 
-      // Re-render the account list to show updated charges
-      renderAccountsList();
+      if (targetToken) {
+        accountManager.updateAccountData(targetToken, {
+          Charges: Math.floor(state.displayCharges || 0),
+          Max: Math.floor(me.max || state.maxCharges || 0),
+          Droplets: Math.floor(me.droplets)
+        });
+
+        // Keep manager index in sync with reality when possible
+        if (idx !== -1 && typeof accountManager.setCurrentIndex === 'function') {
+          accountManager.setCurrentIndex(idx);
+          state.accountIndex = idx;
+        }
+
+        // Re-render the account list to show updated charges
+        renderAccountsList();
+      }
+    } catch (e) {
+      console.warn('⚠️ updateCurrentAccountInList failed:', e);
     }
   }
 
   // Function to update current account spotlight when switching during painting
   async function updateCurrentAccountSpotlight() {
     if (accountManager.getAccountCount() === 0) return;
-    // await Utils.sleep(500); // Wait a bit for the switch to take effect
     try {
-      const currentAccountData = await WPlaceService.getCharges();
-      console.log("Current account after switch:", currentAccountData);
-      console.log(`🔍 Switched to account with ID: ${currentAccountData.id}`);
+      const me = await WPlaceService.getCharges();
+      console.log("Current account after switch:", me);
+      console.log(`🔍 Switched to account with ID: ${me.id}`);
 
-      // Find the current account in AccountManager and update it
       const accounts = accountManager.getAllAccounts();
-      const currentAccount = accounts.find(acc => acc.ID === currentAccountData.id);
+      const idx = accounts.findIndex(acc => acc.ID === me.id);
 
-      if (currentAccount) {
-        const currentAccountInfo = await WPlaceService.fetchCheck();
+      if (idx !== -1) {
+        const currentAccount = accounts[idx];
+        const info = await WPlaceService.fetchCheck();
 
-        // Update account data in AccountManager
+        // Sync manager index and flags to actual account
+        if (typeof accountManager.setCurrentIndex === 'function') {
+          accountManager.setCurrentIndex(idx);
+        } else {
+          accounts.forEach((acc, i) => (acc.isCurrent = i === idx));
+        }
+
         accountManager.updateAccountData(currentAccount.token, {
           isCurrent: true,
-          Charges: Math.floor(currentAccountData.charges),
-          Max: Math.floor(currentAccountData.max),
-          Droplets: Math.floor(currentAccountData.droplets),
-          displayName: currentAccountInfo.Username || currentAccountInfo.name || currentAccount.displayName
+          Charges: Math.floor(me.charges),
+          Max: Math.floor(me.max),
+          Droplets: Math.floor(me.droplets),
+          displayName: info.Username || info.name || currentAccount.displayName
         });
 
-        console.log(`🎯 Updated current account spotlight: ${currentAccount.displayName}`);
+        // Mirror to UI state for consistency
+        state.displayCharges = Math.floor(me.charges);
+        state.preciseCurrentCharges = me.charges;
+        state.cooldown = me.cooldown;
+        state.accountIndex = idx;
 
-        // Check for autobuy after account is loaded
-        if (CONFIG.autoBuyToggle && Math.floor(currentAccountData.droplets) > 500) {
-          console.log(`💰 Account has ${Math.floor(currentAccountData.droplets)} droplets (>500), triggering autobuy...`);
-          try {
-            const purchaseResult = await purchase(CONFIG.autoBuy);
-            if (purchaseResult == 2) {
-              console.log('✅ Autobuy successful after account switch');
-              // Update charges after purchase
-              const updatedCharges = await WPlaceService.getCharges();
-              accountManager.updateAccountData(currentAccount.token, {
-                Charges: Math.floor(updatedCharges.charges),
-                Droplets: Math.floor(updatedCharges.droplets)
-              });
-              // Re-render account list to show updated status after purchase
-              renderAccountsList();
-            } else {
-              console.log('❌ Autobuy failed after account switch');
-            }
-          } catch (error) {
-            console.error('❌ Error during autobuy after account switch:', error);
-          }
-        } else if (CONFIG.autoBuyToggle) {
-          console.log(`💰 Account has ${Math.floor(currentAccountData.droplets)} droplets (≤500), skipping autobuy`);
-        }
-
-        // Re-render the account list to show new current account
         renderAccountsList();
-
-        console.log(`🔒 PRESERVING currentActiveIndex: ${state.currentActiveIndex} (do not recalculate from isCurrent flag)`);
-        console.log(`� Account at currentActiveIndex ${state.currentActiveIndex}: ${state.originalAccountOrder[state.currentActiveIndex]?.displayName} (ID ${state.originalAccountOrder[state.currentActiveIndex]?.orderId})`);
-
-        // Update accountIndex to match original array position
-        const originalArrayIndex = state.allAccountsInfo.findIndex(acc => acc.isCurrent);
-        if (originalArrayIndex !== -1) {
-          state.accountIndex = originalArrayIndex;
-        }
-
-        console.log(`📊 Final state: activeIndex=${state.currentActiveIndex}, accountIndex=${state.accountIndex}, orderId=${newCurrentAccount.orderId}`);
-
-        console.warn(`⚠️ Could not find account ID ${newCurrentAccount.orderId} in switching order`);
-
-        console.warn(`⚠️ Could not find switched account with ID ${currentAccountData.id} in account list`);
+        console.log(`🎯 Updated current account spotlight: ${currentAccount.displayName}`);
+      } else {
+        console.warn(`⚠️ Could not find switched account with ID ${me.id} in account list`);
       }
 
       // Re-render the account list to show new current account
@@ -10359,6 +10327,10 @@ function getText(key, params) {
       return false;
     }
 
+    // Capture the pre-switch (current) account to detect stale reads
+    const preSwitchAccount = accountManager.getCurrentAccount();
+    const previousKnownId = preSwitchAccount?.ID || null;
+
     // Get next account using simplified manager
     const nextAccount = accountManager.switchToNext();
     if (!nextAccount) {
@@ -10385,8 +10357,46 @@ function getText(key, params) {
 
       console.log(`✅ [SWITCH] Successfully switched to ${nextAccount.displayName}`);
 
-      // Wait a moment for the switch to fully complete
-      // await new Promise(resolve => setTimeout(resolve, 1000));
+      // Verify backend reflects the new account to avoid stale reads
+      // Strategy: poll /me until we see an ID different from the pre-switch account's ID
+      // Only then accept and (if needed) assign the next account's ID.
+      let verifiedId = null;
+      for (let attempt = 1; attempt <= 8 && !verifiedId; attempt++) {
+        try {
+          const me = await WPlaceService.getCharges();
+          const curId = me?.id;
+          if (!curId) {
+            await Utils.sleep(500);
+            continue;
+          }
+
+          if (previousKnownId && curId === previousKnownId) {
+            console.log(`⏳ [SWITCH] Still seeing previous ID ${curId} (attempt ${attempt}/8), waiting...`);
+            await Utils.sleep(500);
+            continue;
+          }
+
+          // If we had a stored ID for the target and it's different from what we see now,
+          // prefer the live value (curId) and update the stored ID.
+          if (nextAccount.ID && nextAccount.ID !== curId) {
+            console.log(`🔁 [SWITCH] Updating stored ID for ${nextAccount.displayName}: ${nextAccount.ID} → ${curId}`);
+          }
+
+          verifiedId = curId;
+          break;
+        } catch (e) {
+          await Utils.sleep(500);
+        }
+      }
+
+      if (!verifiedId) {
+        console.warn('⚠️ [SWITCH] Could not verify account change via /me after cookie set; skipping ID update but proceeding cautiously.');
+      } else {
+        // Persist verified ID for the next account
+        if (nextAccount.ID !== verifiedId) {
+          accountManager.updateAccountData(nextAccount.token, { ID: verifiedId });
+        }
+      }
 
       // Update the account status and UI after successful switch
       await updateCurrentAccountInList();
@@ -10401,54 +10411,77 @@ function getText(key, params) {
   // SIMPLIFIED helper function for specific account switching
   async function switchToSpecificAccount(token, accountName) {
     console.log(`🔄 [SPECIFIC SWITCH] Attempting to switch to account: ${accountName}`);
+    if (!token) {
+      console.error('❌ [SPECIFIC SWITCH] Missing token');
+      return false;
+    }
     console.log(`🔑 [SPECIFIC SWITCH] Using token: ${token.substring(0, 20)}...`);
 
-    await swapAccountTrigger(token);
+    // Capture previous account ID to detect stale responses
+    let previousId = null;
+    try {
+      const prev = await WPlaceService.getCharges();
+      previousId = prev?.id || null;
+    } catch {}
 
-    let maxRetries = 20;
-    let retryCount = 0;
-    let swapSuccess = false;
+    const ok = await swapAccountTrigger(token);
+    if (!ok) {
+      console.error('❌ [SPECIFIC SWITCH] Cookie confirmation failed');
+      return false;
+    }
 
-    while (!swapSuccess && retryCount < maxRetries) {
-      console.log(`⏳ [SPECIFIC SWITCH] Waiting for account swap... (Attempt ${retryCount + 1}/${maxRetries})`);
-      //await new Promise(resolve => setTimeout(resolve, 1000));
-
+    // Poll /me until it reflects a different ID than the previous account
+    let verifiedId = null;
+    for (let attempt = 1; attempt <= 8 && !verifiedId; attempt++) {
       try {
-        // await fetchAccount();
-        console.log('✅ [SPECIFIC SWITCH] Account swap confirmed.');
-        swapSuccess = true;
-      } catch (error) {
-        console.warn('❌ [SPECIFIC SWITCH] Account swap not yet successful. Retrying...', error);
-        retryCount++;
-
-        if (retryCount % 5 === 0) {
-          console.log('🔄 [SPECIFIC SWITCH] Re-triggering account swap...');
-          await swapAccountTrigger(token);
-          await new Promise(resolve => setTimeout(resolve, 2000));
+        const me = await WPlaceService.getCharges();
+        const curId = me?.id;
+        if (!curId) {
+          await Utils.sleep(500);
+          continue;
         }
+        if (previousId && curId === previousId) {
+          console.log(`⏳ [SPECIFIC SWITCH] Still seeing previous ID ${curId} (attempt ${attempt}/8), waiting...`);
+          await Utils.sleep(500);
+          continue;
+        }
+        verifiedId = curId;
+        break;
+      } catch {
+        await Utils.sleep(500);
       }
     }
 
-    if (swapSuccess) {
-      const { charges, cooldown } = await WPlaceService.getCharges();
-      state.displayCharges = Math.floor(charges);
-      state.preciseCurrentCharges = charges;
-      state.cooldown = cooldown;
-      Utils.performSmartSave();
-      await updateStats();
-
-      // Update account data in manager
-      accountManager.updateAccountData({ charges, cooldown });
-
-      // Update the account status and UI after successful switch
-      await updateCurrentAccountSpotlight();
-
-      console.log(`✅ [SPECIFIC SWITCH] Successfully switched to ${accountName} with ${Math.floor(charges)} charges`);
-      return true;
+    if (!verifiedId) {
+      console.warn('⚠️ [SPECIFIC SWITCH] Could not verify account change via /me; proceeding.');
     } else {
-      console.error(`❌ [SPECIFIC SWITCH] Failed to swap to ${accountName} after multiple retries.`);
-      return false;
+      // Persist ID and mark as current in AccountManager
+      accountManager.updateAccountData(token, { ID: verifiedId, isCurrent: true });
     }
+
+    // Sync manager index to the token we explicitly switched to
+    try {
+      const list = accountManager.getAllAccounts();
+      const idxByToken = list.findIndex(acc => acc.token === token);
+      if (idxByToken !== -1 && typeof accountManager.setCurrentIndex === 'function') {
+        accountManager.setCurrentIndex(idxByToken);
+        state.accountIndex = idxByToken;
+      }
+    } catch {}
+
+    // Fetch fresh stats for UI/state
+    const { charges, cooldown, droplets, max } = await WPlaceService.getCharges();
+    state.displayCharges = Math.floor(charges);
+    state.preciseCurrentCharges = charges;
+    state.cooldown = cooldown;
+    Utils.performSmartSave();
+    await updateStats();
+
+    // Update the account status and UI after successful switch
+    await updateCurrentAccountSpotlight();
+
+    console.log(`✅ [SPECIFIC SWITCH] Switched to ${accountName} with ${Math.floor(charges)} charges`);
+    return true;
   }
 
   // Wait for dependencies before initializing UI
@@ -10490,6 +10523,55 @@ function getText(key, params) {
     }
 
     return createUI();
+  }
+
+  // Helper: iterate over accounts to find one with enough charges; otherwise pick best cooldown
+  async function selectAndSwitchToAccountWithCharges(minRequired = 1) {
+    try {
+      const total = accountManager.getAccountCount();
+      if (total <= 1) return false;
+
+      const startIdx = accountManager.currentIndex;
+      let best = { cooldown: Infinity, token: null, name: null, idx: -1 };
+
+      for (let step = 1; step <= total - 1; step++) {
+        const idx = (startIdx + step) % total;
+        const acc = accountManager.getAccountByIndex(idx);
+        if (!acc || !acc.token) continue;
+
+        console.log(`🔄 [SEARCH] Switching temporarily to ${acc.displayName} (${idx + 1}/${total}) to check charges...`);
+        const ok = await switchToSpecificAccount(acc.token, acc.displayName);
+        if (!ok) {
+          console.warn(`⚠️ [SEARCH] Failed to switch to ${acc.displayName}, trying next...`);
+          continue;
+        }
+
+        const me = await WPlaceService.getCharges();
+        const charges = Math.floor(me?.charges || 0);
+        const cooldown = Math.max(0, Number(me?.cooldown || 0));
+        if (charges >= minRequired) {
+          console.log(`✅ [SEARCH] Found account with sufficient charges: ${acc.displayName} (⚡${charges})`);
+          return true;
+        }
+
+        console.log(`⏳ [SEARCH] ${acc.displayName} has no charges (⚡${charges}), cooldown ${cooldown}ms`);
+        if (cooldown < best.cooldown) {
+          best = { cooldown, token: acc.token, name: acc.displayName, idx };
+        }
+      }
+
+      // None had enough charges: switch to the one with the soonest recharge and return false
+      if (best.token && best.idx !== accountManager.currentIndex) {
+        console.log(`🎯 [SEARCH] Switching to account with soonest recharge: ${best.name} (~${Utils.msToTimeText(best.cooldown)})`);
+        await switchToSpecificAccount(best.token, best.name);
+      } else {
+        console.log('🎯 [SEARCH] Staying on current account for cooldown.');
+      }
+      return false;
+    } catch (e) {
+      console.warn('⚠️ selectAndSwitchToAccountWithCharges failed:', e);
+      return false;
+    }
   }
 
   waitForDependenciesAndInitialize().then(() => {
