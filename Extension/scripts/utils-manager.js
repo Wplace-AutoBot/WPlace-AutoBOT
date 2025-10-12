@@ -1165,6 +1165,13 @@ class WPlaceUtilsManager {
 
     try {
       console.log('🔄 Restoring overlay from saved data...');
+      console.log('📊 Pixel data info:', {
+        width: window.state.imageData.width,
+        height: window.state.imageData.height,
+        pixelCount: window.state.imageData.pixels?.length,
+        firstPixels: window.state.imageData.pixels?.slice(0, 12), // First 3 pixels (RGBA)
+        isProcessed: '⚠️ These should be PROCESSED pixels if saved after processing'
+      });
       
       // Recreate ImageBitmap from loaded pixel data (match old version exactly)
       const imageData = new ImageData(

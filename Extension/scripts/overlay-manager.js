@@ -149,6 +149,7 @@ class OverlayManager {
       
       // Method 2: Force browser to bypass cache by adding cache-busting parameter
       // We need to intercept and modify tile requests to add cache-busting
+      // IMPORTANT: Preserve any existing fetch override (e.g., from Auto-Image assist mode)
       const originalFetch = window.fetch;
       let fetchOverrideActive = true;
       
@@ -167,6 +168,7 @@ class OverlayManager {
           }
         }
         
+        // Chain to previous fetch (which may have assist mode logic)
         return originalFetch.apply(this, args);
       };
       

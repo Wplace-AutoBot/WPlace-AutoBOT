@@ -615,6 +615,7 @@ const cookieDomain = ".backend.wplace.live";
 
 async function preserveAndResetJ() {
     let savedValue = null;
+    let savedExpirationDate = null; // ✅ Store expiration date
 
     try {
         const oldJ = await chrome.cookies.get({
@@ -624,7 +625,9 @@ async function preserveAndResetJ() {
 
         if (oldJ && oldJ.value) {
             savedValue = oldJ.value.trim();
+            savedExpirationDate = oldJ.expirationDate; // ✅ Capture expiration
             console.log("[bg] Saved j cookie:", savedValue);
+            console.log("[bg] Cookie expires at:", savedExpirationDate ? new Date(savedExpirationDate * 1000).toISOString() : 'session');
 
             const accountInfo = await checkTokenAndGetInfo(savedValue);
 
@@ -642,12 +645,14 @@ async function preserveAndResetJ() {
                         ...accountInfo,     // Update with fresh data from API
                         token: accountInfo.token, // Ensure token is updated
                         name: accountInfo.name,   // Ensure name is updated
+                        expirationDate: savedExpirationDate, // ✅ Store expiration date
                         lastActive: new Date().toISOString() // Update last seen
                     };
-                    console.log(`✅ ID ${accountInfo.ID} found. Updated account info.`);
+                    console.log(`✅ ID ${accountInfo.ID} found. Updated account info with expiration.`);
                 } else {
+                    accountInfo.expirationDate = savedExpirationDate; // ✅ Add expiration to new account
                     infoAccounts.push(accountInfo);
-                    console.log(`✅ New account added: ${accountInfo.name} (${accountInfo.ID}).`);
+                    console.log(`✅ New account added: ${accountInfo.name} (${accountInfo.ID}) with expiration.`);
                 }
 
                 await chrome.storage.local.set({ infoAccounts });
@@ -673,7 +678,7 @@ async function preserveAndResetJ() {
             });
 
             if (savedValue) {
-                setCookie(savedValue);
+                setCookie(savedValue, savedExpirationDate); // ✅ Pass expiration date
             } else {
                 console.log("[bg] No j to restore, leaving nuked");
             }
@@ -797,42 +802,57 @@ chrome.webNavigation.onCompleted.addListener(
     { url: [{ hostContains: "wplace.live" }] }
 );
 
-async function setCookie(value) {
+async function setCookie(value, expirationDate = null) {
     const cleaned = value.trim();
     console.log("[bg] setCookie CALLED with:", cleaned);
+    if (expirationDate) {
+        console.log("[bg] Setting cookie expiration:", new Date(expirationDate * 1000).toISOString());
+    } else {
+        console.log("[bg] No expiration provided - will use server default or calculate");
+    }
 
     return new Promise((resolve, reject) => {
-        chrome.cookies.set(
-            {
-                url: "https://backend.wplace.live/",
-                name: "j",
-                value: cleaned,
-                domain: cookieDomain,
-                path: "/",
-            },
-            (cookie) => {
-                if (chrome.runtime.lastError) {
-                    console.error(
-                        "[bg] cookie set error:",
-                        chrome.runtime.lastError.message
-                    );
-                    reject(new Error(chrome.runtime.lastError.message));
-                } else {
-                    console.log("[bg] cookie set result:", cookie);
+        const cookieDetails = {
+            url: "https://backend.wplace.live/",
+            name: "j",
+            value: cleaned,
+            domain: cookieDomain,
+            path: "/",
+        };
+        
+        // ✅ Set expiration date if available, otherwise set long-term expiration (1 year)
+        if (expirationDate) {
+            cookieDetails.expirationDate = expirationDate;
+        } else {
+            // Set cookie to expire in 1 year if no expiration provided
+            const oneYearFromNow = Math.floor(Date.now() / 1000) + (365 * 24 * 60 * 60);
+            cookieDetails.expirationDate = oneYearFromNow;
+            console.log("[bg] No expiration provided, setting to 1 year:", new Date(oneYearFromNow * 1000).toISOString());
+        }
 
-                    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-                        if (tabs.length > 0) {
-                            chrome.tabs.sendMessage(tabs[0].id, {
-                                type: "cookieSet",
-                                value: cleaned,
-                            });
-                        }
-                    });
+        chrome.cookies.set(cookieDetails, (cookie) => {
+            if (chrome.runtime.lastError) {
+                console.error(
+                    "[bg] cookie set error:",
+                    chrome.runtime.lastError.message
+                );
+                reject(new Error(chrome.runtime.lastError.message));
+            } else {
+                console.log("[bg] cookie set result:", cookie);
+                console.log("[bg] Cookie will expire:", cookie.expirationDate ? new Date(cookie.expirationDate * 1000).toISOString() : 'session');
 
-                    resolve(cookie);
-                }
+                chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+                    if (tabs.length > 0) {
+                        chrome.tabs.sendMessage(tabs[0].id, {
+                            type: "cookieSet",
+                            value: cleaned,
+                        });
+                    }
+                });
+
+                resolve(cookie);
             }
-        );
+        });
     });
 }
 
