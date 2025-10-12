@@ -94,7 +94,7 @@ Follow the exact same steps listed for Chrome above, using Kiwi Browser instead.
 - [x] Works on mobile (via browsers like Kiwi) :P
 
 <p align="center">
-<img src="https://imgur.com/D6KsXQT" alt="Script Demonstration"/>
+<img src="https://i.imgur.com/D6KsXQT.png" alt="Script Demonstration"/>
 </p>
 
 📋┃To-do
