@@ -3,7 +3,7 @@
   "toggleOverlay": "Alternar superposición",
   "scanColors": "Escanear colores",
   "uploadImage": "Subir imagen",
-  "resizeImage": "Cambiar tamaño de imagen",
+  "resizeImage": "Procesar/Editar imagen",
   "selectPosition": "Seleccionar posición",
   "startPainting": "Iniciar pintado",
   "stopPainting": "Detener pintado",
@@ -11,7 +11,8 @@
   "noColorsFound": "❌ ¡Abre la paleta de colores en el sitio e inténtalo de nuevo!",
   "colorsFound": "✅ Se encontraron {count} colores disponibles. Listo para subir.",
   "loadingImage": "🖼️ Cargando imagen...",
-  "imageLoaded": "✅ Imagen cargada con {count} píxeles válidos",
+  "imageLoaded": "✅ Imagen cargada con {count} píxeles válidos ⚠️ ¡Procesa la imagen primero mediante \"Procesar/Editar imagen\" antes de colocarla!",
+  "imageNeedsProcessing": "La imagen necesita procesamiento ⚠️",
   "imageError": "❌ Error al cargar la imagen",
   "selectPositionAlert": "¡Pinta el primer píxel en la ubicación donde quieres que comience el arte!",
   "waitingPosition": "👆 Esperando que pintes el píxel de referencia...",
@@ -140,5 +141,13 @@
   "hideStats": "Ocultar estadísticas",
   "paintOptions": "Opciones de pintado",
   "paintWhitePixels": "Pintar píxeles blancos",
-  "paintTransparentPixels": "Pintar píxeles transparentes"
+  "paintWhitePixelsDescription": "Si está activado, se pintarán los píxeles blancos de la plantilla.",
+  "paintTransparentPixels": "Pintar píxeles transparentes",
+  "paintTransparentPixelsDescription": "Si está activado, se pintarán los píxeles transparentes de la plantilla",
+  "paintUnavailablePixels": "Pintar píxeles no disponibles",
+  "paintUnavailablePixelsDescription": "Si está activado, los colores de plantilla no disponibles se pintarán usando el color disponible más cercano",
+  "paintingModeAuto": "Automático",
+  "paintingModeAssist": "Asistir",
+  "paintingModeAutoDesc": "El bot pintará píxeles automáticamente",
+  "paintingModeAssistDesc": "La superposición guiará tu colocación manual de píxeles"
 }

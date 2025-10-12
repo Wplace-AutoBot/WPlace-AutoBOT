@@ -3,7 +3,7 @@
   "toggleOverlay": "Toggle Overlay",
   "scanColors": "Scan Colors",
   "uploadImage": "Upload",
-  "resizeImage": "Resize",
+  "resizeImage": "Process/Edit Image",
   "selectPosition": "Select Position",
   "startPainting": "Start",
   "stopPainting": "Stop",
@@ -158,5 +158,9 @@
   "paintTransparentPixels": "Paint Transparent",
   "paintTransparentPixelsDescription": "If enabled, template transparent pixels will be painted",
   "paintUnavailablePixels": "Paint Unavailable",
-  "paintUnavailablePixelsDescription": "If enabled, template colors that are unavailable will be painted using the closest available color"
+  "paintUnavailablePixelsDescription": "If enabled, template colors that are unavailable will be painted using the closest available color",
+  "paintingModeAuto": "Auto",
+  "paintingModeAssist": "Assist",
+  "paintingModeAutoDesc": "Bot will automatically paint pixels",
+  "paintingModeAssistDesc": "Overlay will guide your manual pixel placement"
 }
