@@ -4410,7 +4410,7 @@ localStorage.removeItem("lp");
       const timeText = Utils.msToTimeText(remainingMs);
 
       if (currentChargesEl) {
-        currentChargesEl.innerHTML = `${state.displayCharges} / ${state.maxCharges}`;
+        currentChargesEl.innerHTML = `${state.displayCharges} / ${max}`;
       }
 
       if (
@@ -4608,7 +4608,7 @@ localStorage.removeItem("lp");
         totalMaxCharges = accounts.reduce((sum, acc) => {
           if (currentAccount && acc.token === currentAccount.token) {
             // Use real-time max charges for current account
-            return sum + Math.floor(state.maxCharges || acc.Max || 0);
+            return sum + Math.floor((state.fullChargeData?.max ?? state.maxCharges ?? acc.Max ?? 0));
           } else {
             // Use stored data for other accounts
             return sum + Math.floor(acc.Max || 0);
@@ -4633,7 +4633,7 @@ localStorage.removeItem("lp");
                 <i class="fas fa-bolt"></i> ${Utils.t('charges')}
               </div>
               <div class="wplace-stat-value" id="wplace-stat-charges-value">
-                ${state.displayCharges} / ${state.maxCharges}
+                ${state.displayCharges} / ${state.fullChargeData?.max ?? state.maxCharges}
               </div>
             </div>
             <div class="wplace-stat-item">
