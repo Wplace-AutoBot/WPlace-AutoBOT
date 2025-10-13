@@ -315,6 +315,17 @@ async function switchToAccount(index) {
 
             console.log('✅ Account switched successfully');
 
+            // Auto-refresh the page after account switch
+            const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+            if (tab && tab.url.includes('wplace.live')) {
+                console.log('🔄 Auto-refreshing page after account switch');
+                await chrome.tabs.reload(tab.id);
+                
+                // Close popup after a short delay
+                setTimeout(() => {
+                    window.close();
+                }, 500);
+            }
 
         } else {
             throw new Error(response?.error || 'Failed to switch account');
