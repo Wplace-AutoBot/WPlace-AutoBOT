@@ -4899,25 +4899,18 @@ localStorage.removeItem("lp");
       let totalMaxCharges = 0;
       const accounts = accountManager.getAllAccounts();
       if (accounts.length > 0) {
-        // Use real-time charges for current account, stored data for others
-        const currentAccount = accountManager.getCurrentAccount();
+        // Use ChargeModel (real-time) when available for consistent totals
         totalAllCharges = accounts.reduce((sum, acc) => {
-          if (currentAccount && acc.token === currentAccount.token) {
-            // Use real-time data for current account
-            return sum + Math.floor(state.displayCharges || state.preciseCurrentCharges || 0);
-          } else {
-            // Use stored data for other accounts
-            return sum + Math.floor(acc.Charges || 0);
-          }
+          const node = ChargeModel.get(acc.token);
+          const charges = Number.isFinite(node?.charges) ? Math.floor(node.charges) : Math.floor(acc.Charges || 0);
+          const max = Number.isFinite(node?.max) ? Math.floor(node.max) : Math.floor(acc.Max || 0);
+          const safeCharges = Math.max(0, Math.min(charges, max));
+          return sum + safeCharges;
         }, 0);
         totalMaxCharges = accounts.reduce((sum, acc) => {
-          if (currentAccount && acc.token === currentAccount.token) {
-            // Use real-time max charges for current account
-            return sum + Math.floor((state.fullChargeData?.max ?? state.maxCharges ?? acc.Max ?? 0));
-          } else {
-            // Use stored data for other accounts
-            return sum + Math.floor(acc.Max || 0);
-          }
+          const node = ChargeModel.get(acc.token);
+          const max = Number.isFinite(node?.max) ? Math.floor(node.max) : Math.floor(acc.Max || 0);
+          return sum + Math.max(0, max);
         }, 0);
       }
 
@@ -10641,10 +10634,15 @@ localStorage.removeItem("lp");
       state.displayCharges = Math.floor(node.charges || 0);
       state.preciseCurrentCharges = node.charges || 0;
       await updateStats();
-      accountManager.updateAccountData(current.token, {
-        Charges: Math.floor(node.charges || 0),
-        Max: Math.floor(node.max || current.Max || 0)
-      });
+      // Refresh server-backed fields (droplets/max) to avoid stale/incorrect UI
+      try {
+        const live = await WPlaceService.getCharges();
+        accountManager.updateAccountData(current.token, {
+          Charges: Math.floor(node.charges || 0),
+          Max: Math.floor(live.max || node.max || current.Max || 0),
+          Droplets: Math.floor(live.droplets || 0)
+        });
+      } catch {}
       renderAccountsList();
     } catch (e) {
       console.warn('⚠️ updateCurrentAccountInList failed:', e);
