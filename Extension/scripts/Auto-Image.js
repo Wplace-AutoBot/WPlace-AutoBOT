@@ -8736,11 +8736,11 @@ localStorage.removeItem("lp");
     };
 
     // IMPORTANT: Check charges once at start, then paint until depleted
-    console.log('🔋 Checking initial charges for painting session');
     // Use local charge model to avoid extra API calls
+    console.log('🔋 Checking initial charges for painting session');
     const currentToken = accountManager.getCurrentAccount()?.token;
     let node = ChargeModel.get(currentToken);
-    // One-time sync for current account if never synced (safety)
+    // One-time sync for current account if never synced
     if (node && !node.lastSyncAt) {
       try {
         const sync = await WPlaceService.getCharges();
@@ -8755,6 +8755,22 @@ localStorage.removeItem("lp");
     if (state.displayCharges <= 0) {
       console.log('⚡ No charges available (local), skipping painting session');
       return 'charges_depleted';
+    }
+
+    // If current account has less than threshold charges but another account
+    // has reached the threshold, switch BEFORE painting anything on the under-threshold account
+    try {
+      const threshold = Math.max(1, state.cooldownChargeThreshold || 1);
+      if (CONFIG.autoSwap && state.displayCharges < threshold) {
+        console.log(`🛑 Current charges (${state.displayCharges}) < threshold (${threshold}). Checking other accounts before painting...`);
+        const switched = await selectAndSwitchToAccountWithCharges(threshold);
+        if (switched) {
+          console.log('🔀 Switched to an account that met the threshold before painting. Restarting cycle...');
+          return 'charges_depleted';
+        }
+      }
+    } catch (e) {
+      console.warn('⚠️ Pre-paint switch guard failed:', e);
     }
 
     console.log(`🔋 Starting with ${state.displayCharges} charges - painting until depleted`);
