@@ -595,9 +595,10 @@
           console.log('✅ Found wasm Module...');
           return url.split('/').pop();
         }
-      } catch { }
+      } catch (e) { /* ignore individual fetch errors */ }
     }
-    console.error(`❌ Could not find Pawtect chunk with string: ${str}`);
+    console.error('❌ Could not find Pawtect chunk among preloaded modules');
+    return null;
   }
 
   // Audio notification system

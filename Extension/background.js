@@ -13,29 +13,6 @@ chrome.runtime.onInstalled.addListener(async () => {
     console.log('📦 Installation resource test:', resources);
 });
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === 'executeScript') {
-        // Get tabId from sender or requests
-        const tabId = request.tabId || sender.tab?.id;
-
-        if (!tabId) {
-            sendResponse({ success: false, error: 'Could not determine target tab' });
-            return;
-        }
-
-        // Use IIFE for async handlings
-        (async () => {
-            try {
-                await executeLocalScript(request.scriptName, tabId);
-                sendResponse({ success: true });
-            } catch (error) {
-                sendResponse({ success: false, error: error.message });
-            }
-        })();
-
-        return true; // Important: indicates async response
-    }
-});
 
 async function executeLocalScript(scriptName, tabId) {
     try {
