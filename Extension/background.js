@@ -418,10 +418,12 @@ async function loadExtensionResources() {
             'auto-image-styles.css',
             'themes/acrylic.css',
             'themes/classic-light.css',
+            'themes/classic-teal.css',
             'themes/classic.css',
             'themes/neon.css',
             'themes/neon-cyan.css',
-            'themes/neon-light.css'
+            'themes/neon-light.css',
+            'themes/neon-purple.css'
         ];
 
         for (const themeFile of themeFiles) {
@@ -962,4 +964,5 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         return true; // Important: indicates async response
     }
 });
+
 

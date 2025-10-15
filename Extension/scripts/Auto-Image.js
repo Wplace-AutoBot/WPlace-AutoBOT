@@ -224,6 +224,27 @@ function getText(key, params) {
           'pixel-blink': false,
         },
       },
+      'Classic Teal': {
+        primary: '#2BCAB0',
+        secondary: '#41726D',
+        accent: '#046A79',
+        text: '#0B483C',
+        highlight: '#0B483C',
+        success: '#28a745',
+        error: '#dc3545',
+        warning: '#ffc107',
+        fontFamily: "'Segoe UI', Roboto, sans-serif",
+        borderRadius: '12px',
+        borderStyle: 'solid',
+        borderWidth: '1px',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.08)',
+        backdropFilter: 'none',
+        animations: {
+          glow: false,
+          scanline: false,
+          'pixel-blink': false,
+        },
+      },
       'Neon Retro': {
         primary: '#1a1a2e',
         secondary: '#16213e',
@@ -282,6 +303,30 @@ function getText(key, params) {
         error: '#ff073a',
         warning: '#ffff00',
         neon: '#203C5D',
+        purple: '#bf00ff',
+        pink: '#ff1493',
+        fontFamily: "'Press Start 2P', monospace",
+        borderRadius: '0',
+        borderStyle: 'solid',
+        borderWidth: '3px',
+        boxShadow: '0 0 20px rgba(234 156 0, 0.3), inset 0 0 20px rgba(234 156 0, 0.1)',
+        backdropFilter: 'none',
+        animations: {
+          glow: true,
+          scanline: true,
+          'pixel-blink': true,
+        },
+      },
+      'Neon Retro Purple': {
+        primary: '#1A172A',
+        secondary: '#34315E',
+        accent: '#1A172A',
+        text: '#F8A9FD',
+        highlight: '#F8A9FD',
+        success: '#39ff14',
+        error: '#ff073a',
+        warning: '#ffff00',
+        neon: '#F8A9FD',
         purple: '#bf00ff',
         pink: '#ff1493',
         fontFamily: "'Press Start 2P', monospace",
@@ -360,10 +405,12 @@ function getText(key, params) {
     document.documentElement.classList.remove(
       'wplace-theme-classic',
       'wplace-theme-classic-light',
+      'wplace-theme-classic-teal',
       'wplace-theme-acrylic',
       'wplace-theme-neon',
       'wplace-theme-neon-cyan',
-      'wplace-theme-neon-light'
+      'wplace-theme-neon-light',
+      'wplace-theme-neon-purple'
     );
 
     let themeClass = 'wplace-theme-classic'; // default
@@ -375,12 +422,18 @@ function getText(key, params) {
     } else if (CONFIG.currentTheme === 'Classic Light') {
       themeClass = 'wplace-theme-classic-light';
       themeFileName = 'classic-light';
+    } else if (CONFIG.currentTheme === 'Classic Teal') {
+      themeClass = 'wplace-theme-classic-teal';
+      themeFileName = 'classic-teal';
     } else if (CONFIG.currentTheme === 'Neon Retro Cyan') {
       themeClass = 'wplace-theme-neon-cyan';
       themeFileName = 'neon-cyan';
     } else if (CONFIG.currentTheme === 'Neon Retro Light') {
       themeClass = 'wplace-theme-neon-light';
       themeFileName = 'neon-light';
+    } else if (CONFIG.currentTheme === 'Neon Retro Purple') {
+      themeClass = 'wplace-theme-neon-purple';
+      themeFileName = 'neon-purple';
     } else if (CONFIG.currentTheme === 'Acrylic') {
       themeClass = 'wplace-theme-acrylic';
       themeFileName = 'acrylic';
@@ -997,7 +1050,9 @@ function getText(key, params) {
     initialSetupComplete: false, // Track if initial startup setup is complete (only happens once)
     overlayOpacity: CONFIG.OVERLAY.OPACITY_DEFAULT,
     blueMarbleEnabled: CONFIG.OVERLAY.BLUE_MARBLE_DEFAULT,
-    ditheringEnabled: false,
+    ditheringEnabled: true,
+	  invertColorEnabled: false,
+    ditheringEnabled: true,
     // Advanced color matching settings
     colorMatchingAlgorithm: 'lab',
     enableChromaPenalty: true,
@@ -2521,14 +2576,18 @@ function getText(key, params) {
       let defaultTheme = 'classic'; // fallback
       if (CONFIG.currentTheme === 'Neon Retro') {
         defaultTheme = 'neon';
+      } else if (CONFIG.currentTheme === 'Acrylic') {
+        defaultTheme = 'acrylic';
+      } else if (CONFIG.currentTheme === 'Classic Light') {
+        defaultTheme = 'classic-light';
+      } else if (CONFIG.currentTheme === 'Classic Teal') {
+        defaultTheme = 'classic-teal';
       } else if (CONFIG.currentTheme === 'Neon Retro Cyan') {
         defaultTheme = 'neon-cyan';
       } else if (CONFIG.currentTheme === 'Neon Retro Light') {
         defaultTheme = 'neon-light';
-      } else if (CONFIG.currentTheme === 'Classic Light') {
-        defaultTheme = 'classic-light';
-      } else if (CONFIG.currentTheme === 'Acrylic') {
-        defaultTheme = 'acrylic';
+      } else if (CONFIG.currentTheme === 'Neon Retro Purple') {
+        defaultTheme = 'neon-purple';
       }
 
       console.log(`%c🎯 Loading theme: ${defaultTheme} (${CONFIG.currentTheme})`, 'color: #8b5cf6;');
@@ -3586,16 +3645,22 @@ function getText(key, params) {
               <span>${Utils.t('chromaWeight')}</span>
               <span id="chromaWeightValue" class="resize-chroma-weight-value">${state.chromaPenaltyWeight}</span>
             </div>
-            <input type="range" id="chromaPenaltyWeightSlider" min="0" max="0.5" step="0.01" value="${state.chromaPenaltyWeight}" class="resize-chroma-weight-slider" />
+            <input type="range" id="chromaPenaltyWeightSlider" min="-2" max="2" step="0.1" value="${state.chromaPenaltyWeight}" class="resize-chroma-weight-slider" />
           </div>
-          <label class="resize-advanced-toggle">
-            <div class="resize-advanced-toggle-content">
+		  </label>
+		   <div class="resize-advanced-toggle-content">
+		     <span class="resize-advanced-label-text">Invert Colors</span>
+             <div class="resize-advanced-description">(not working)The result is the corresponding "negative" image</div>
+		   </div>
+		   <input type="checkbox" id="invertColorToggle" ${state.invertColorEnabled ? 'checked' : ''
+		} <label class="resize-advanced-toggle">
+			<div class="resize-advanced-toggle-content">
               <span class="resize-advanced-label-text">Enable Dithering</span>
-              <div class="resize-advanced-description">Floyd–Steinberg error diffusion in preview and applied output</div>
+              <div class="resize-advanced-description">Floyd–Steinberg error diffusion in preview, applied output</div>
             </div>
-            <input type="checkbox" id="enableDitheringToggle" ${state.ditheringEnabled ? 'checked' : ''
+			<input type="checkbox" id="enableDitheringToggle" ${state.ditheringEnabled ? 'checked' : ''	
       } class="resize-advanced-checkbox" />
-          </label>
+          <label class="resize-advanced-toggle">
           <div class="resize-threshold-controls">
             <label class="resize-threshold-label">
               <span class="resize-advanced-label-text">Transparency</span>
@@ -3912,6 +3977,9 @@ function getText(key, params) {
         // Sync advanced settings before save
         const colorAlgorithmSelect = document.getElementById('colorAlgorithmSelect');
         if (colorAlgorithmSelect) state.colorMatchingAlgorithm = colorAlgorithmSelect.value;
+	    const invertColorToggle = document.getElementById('invertColorToggle');
+        if (invertColorToggle)
+          state.enableInvertColor = invertColorToggle.checked;
         const enableChromaPenaltyToggle = document.getElementById('enableChromaPenaltyToggle');
         if (enableChromaPenaltyToggle)
           state.enableChromaPenalty = enableChromaPenaltyToggle.checked;
@@ -9821,6 +9889,7 @@ function getText(key, params) {
         blueMarbleEnabled: document.getElementById('enableBlueMarbleToggle')?.checked,
         ditheringEnabled: state.ditheringEnabled,
         colorMatchingAlgorithm: state.colorMatchingAlgorithm,
+		invertColorEnabled: state.invertColorEnabled,
         enableChromaPenalty: state.enableChromaPenalty,
         chromaPenaltyWeight: state.chromaPenaltyWeight,
         customTransparencyThreshold: state.customTransparencyThreshold,
@@ -9909,6 +9978,7 @@ function getText(key, params) {
       }
       
       state.colorMatchingAlgorithm = settings.colorMatchingAlgorithm || 'lab';
+	  state.invertColorEnabled = setting.invertColorEnabled ?? false;
       state.enableChromaPenalty = settings.enableChromaPenalty ?? true;
       state.chromaPenaltyWeight = settings.chromaPenaltyWeight ?? 0.15;
       state.customTransparencyThreshold =
@@ -10969,13 +11039,7 @@ function getText(key, params) {
       const transInput = document.getElementById('transparencyThresholdInput');
       const whiteInput = document.getElementById('whiteThresholdInput');
       const ditherToggle = document.getElementById('enableDitheringToggle');
-      
-      // Ensure dithering checkbox matches state (explicit sync on init)
-      if (ditherToggle) {
-        ditherToggle.checked = state.ditheringEnabled;
-        console.log(`🎨 Dithering initialized: ${state.ditheringEnabled ? 'ON' : 'OFF'}`);
-      }
-      
+	  const invertColorBtn = document.getElementById('enableInvertColor');
       if (algoSelect)
         algoSelect.addEventListener('change', (e) => {
           state.colorMatchingAlgorithm = e.target.value;
@@ -11021,6 +11085,11 @@ function getText(key, params) {
           saveBotSettings();
           _updateResizePreview();
         });
+      if (invertColorBtn)
+		invertColorBtn.addEventListener('click', () => {
+          state.invertColorEnabled = e.target.checked;
+		  state.enableChromaPenalty = true;
+	    });
       if (resetBtn)
         resetBtn.addEventListener('click', () => {
           state.colorMatchingAlgorithm = 'lab';
@@ -11039,7 +11108,7 @@ function getText(key, params) {
           if (whiteInput) whiteInput.value = 250;
           _updateResizePreview();
           Utils.showAlert(Utils.t('advancedColorSettingsReset'), 'success');
-        });
+		});
     };
     // Delay to ensure resize UI built
     setTimeout(advancedInit, 500);
