@@ -1,4 +1,4 @@
-﻿// ==UserScript==
+// ==UserScript==
 // @name         WPlaceBot
 // @namespace    http://tampermonkey.net/
 // @version      2025-08-08.3
@@ -10,36 +10,6 @@
 // ==/UserScript==
 localStorage.removeItem("lp");
 
-// Fallback translation function for when utils manager isn't loaded
-function getText(key, params) {
-  // Try to get translation from loadedTranslations
-  try {
-    if (window.loadedTranslations && window.loadedTranslations[key]) {
-      let text = window.loadedTranslations[key];
-      if (params) {
-        Object.keys(params).forEach(paramKey => {
-          text = text.replace(new RegExp(`{{${paramKey}}}`, 'g'), params[paramKey]);
-        });
-      }
-      return text;
-    }
-
-    // Try with state.language if available
-    if (window.state && window.state.language && window.loadedTranslations && window.loadedTranslations[window.state.language] && window.loadedTranslations[window.state.language][key]) {
-      let text = window.loadedTranslations[window.state.language][key];
-      if (params) {
-        Object.keys(params).forEach(paramKey => {
-          text = text.replace(new RegExp(`{{${paramKey}}}`, 'g'), params[paramKey]);
-        });
-      }
-      return text;
-    }
-  } catch (error) {
-    console.warn('Error in getText fallback:', error);
-  }
-
-  return key; // Fallback to key if no translation found
-}
 
 ; (async () => {
   // Prevent multiple instances of this script from running
@@ -954,6 +924,94 @@ function getText(key, params) {
   // Create global account manager instance
   const accountManager = new AccountManager();
 
+  // Local Charge Model to minimize API calls and drive account switching
+  const ChargeModel = (() => {
+    class Model {
+      constructor() {
+        this.map = new Map(); // token -> {charges,max,lastTickAt,lastSyncAt}
+        this.tickIntervalMs = 30_000; // +1 charge per 30s
+        this.timer = null;
+        this.startedAt = Date.now();
+      }
+      seedFromAccounts(accounts) {
+        const now = Date.now();
+        (accounts || []).forEach(acc => {
+          if (!acc || !acc.token) return;
+          const existing = this.map.get(acc.token) || {};
+          const charges = Number.isFinite(acc.Charges) ? Math.floor(acc.Charges) : (existing.charges || 0);
+          const max = Number.isFinite(acc.Max) ? Math.floor(acc.Max) : (existing.max || 1);
+          this.map.set(acc.token, {
+            charges: Math.max(0, Math.min(charges, max)),
+            max: Math.max(1, max),
+            lastTickAt: existing.lastTickAt || now,
+            lastSyncAt: existing.lastSyncAt || now,
+          });
+        });
+      }
+      ensureToken(token) {
+        if (!token) return null;
+        if (!this.map.has(token)) {
+          this.map.set(token, { charges: 0, max: Math.max(1, state.maxCharges || 1), lastTickAt: Date.now(), lastSyncAt: 0 });
+        }
+        return this.map.get(token);
+      }
+      get(token) { return this.ensureToken(token); }
+      getForCurrent() { return this.get(accountManager.getCurrentAccount()?.token); }
+      setFromServer(token, charges, max) {
+        const node = this.ensureToken(token);
+        if (!node) return;
+        node.charges = Math.max(0, Math.min(Math.floor(charges || 0), Math.max(1, Math.floor(max || node.max || 1))));
+        node.max = Math.max(1, Math.floor(max || node.max || 1));
+        node.lastSyncAt = Date.now();
+      }
+      decrement(token, amount) {
+        const node = this.ensureToken(token);
+        if (!node) return 0;
+        const n = Math.max(0, Math.floor(amount || 0));
+        node.charges = Math.max(0, node.charges - n);
+        return node.charges;
+      }
+      incrementTickAll() {
+        const now = Date.now();
+        accountManager.getAllAccounts().forEach(acc => {
+          if (!acc?.token) return;
+          const node = this.ensureToken(acc.token);
+          if (!node) return;
+          // catch-up ticks if tab was inactive
+          const elapsed = now - (node.lastTickAt || now);
+          const ticks = Math.floor(elapsed / this.tickIntervalMs);
+          if (ticks > 0) {
+            node.charges = Math.min(node.max, node.charges + ticks);
+            node.lastTickAt = (node.lastTickAt || now) + ticks * this.tickIntervalMs;
+          }
+        });
+        // Mirror values into AccountManager and UI state
+        this.syncToAccountManager();
+      }
+      start() {
+        if (this.timer) return;
+        this.timer = setInterval(() => this.incrementTickAll(), this.tickIntervalMs);
+      }
+      stop() { if (this.timer) { clearInterval(this.timer); this.timer = null; } }
+      predictTimeToReach(token, target) {
+        const node = this.get(token);
+        if (!node) return Infinity;
+        if (node.charges >= target) return 0;
+        return (target - node.charges) * this.tickIntervalMs;
+      }
+      syncToAccountManager() {
+        const list = accountManager.getAllAccounts();
+        list.forEach(acc => {
+          const node = this.map.get(acc.token);
+          if (!node) return;
+          accountManager.updateAccountData(acc.token, { Charges: node.charges, Max: node.max });
+        });
+        renderAccountsList();
+      }
+    }
+    return new Model();
+  })();
+
   // GLOBAL STATE
   const state = {
     running: false,
@@ -1020,6 +1078,10 @@ function getText(key, params) {
     notificationIntervalMinutes: CONFIG.NOTIFICATIONS.REPEAT_MINUTES,
     _lastChargesNotifyAt: 0,
     _lastChargesBelow: true,
+    // Switch debouncing state
+    lastSwitchAt: 0,
+    paintedSinceSwitch: 0,
+    minMsBetweenSwitches: 3000,
     // Smart save tracking
     _lastSavePixelCount: 0,
     _lastSaveTime: 0,
@@ -1119,35 +1181,35 @@ function getText(key, params) {
     function findClosestColorId(r, g, b) {
       let minDistance = Infinity;
       let closestColorId = null;
-      
+
       for (const colorData of Object.values(CONFIG.COLOR_MAP)) {
         if (!colorData.rgb) continue;
-        
+
         const distance = Math.sqrt(
           Math.pow(r - colorData.rgb.r, 2) +
           Math.pow(g - colorData.rgb.g, 2) +
           Math.pow(b - colorData.rgb.b, 2)
         );
-        
+
         if (distance < minDistance) {
           minDistance = distance;
           closestColorId = colorData.id;
         }
       }
-      
+
       return closestColorId;
     }
 
     const originalFetch = window.fetch;
     // Setup fetch interceptions
     console.log('🚀 [Auto-Image] Fetch interception initialized');
-    
+
     // Expose state for debugging
     window.__WPLACE_AUTOBOT_STATE__ = state;
 
     window.fetch = async function (...args) {
       let url = args[0] instanceof Request ? args[0].url : args[0];
-      
+
       // Parse URL if it's a string
       let urlObj = null;
       if (typeof url === 'string') {
@@ -1157,12 +1219,12 @@ function getText(key, params) {
           // Invalid URL, proceed normally
         }
       }
-      
+
       // ASSIST MODE: Intercept pixel placement requests
       if (state.paintingMode === 'assist' && urlObj !== null && urlObj.pathname.startsWith('/s0/pixel')) {
         console.log(`🎯 [Assist Mode] Intercepting pixel placement:`, urlObj.pathname);
         console.log(`🔍 [Assist Mode] Check state - imageData:`, !!state.imageData, 'startPosition:', !!state.startPosition, 'body:', !!args[1]?.body);
-        
+
         // Check if we have overlay data
         if (state.imageData && state.startPosition && args[1]?.body) {
           try {
@@ -1170,31 +1232,31 @@ function getText(key, params) {
             const pathParts = urlObj.pathname.split('/');
             const regionX = parseInt(pathParts[3]);
             const regionY = parseInt(pathParts[4]);
-            
+
             console.log(`📦 [Assist Mode] Region coords: (${regionX}, ${regionY})`);
-            
+
             // Parse request body
             const payload = typeof args[1].body === 'string' ? JSON.parse(args[1].body) : args[1].body;
             console.log(`📝 [Assist Mode] Original payload:`, JSON.stringify(payload));
-            
+
             // Debug: Check what's in state.region
             console.log(`🔍 [Assist Mode] state.region:`, state.region);
             console.log(`🔍 [Assist Mode] state.startPosition:`, state.startPosition);
-            
+
             // CRITICAL FIX: The issue is that startPosition is in TILE-LOCAL coordinates (0-999)
             // but we're clicking on a tile at (1732, 1014). We need to find which tile
             // our image overlay is on by checking all loaded tiles.
-            
+
             // For now, let's use the REQUEST's tile coordinates as a reference
             // If the user is clicking within this tile, check if our LOCAL startPosition
             // would overlap with the click position
             let startX, startY;
-            
+
             // COORDINATE RECONSTRUCTION
             // state.startPosition = LOCAL coords within a 1000x1000 tile (0-999)
             // state.region = TILE coordinates {x, y} (e.g., {x: 1732, y: 1014})
             // Absolute canvas coords = region.x * 1000 + startPosition.x
-            
+
             if (state.region && state.region.x !== undefined && state.region.y !== undefined) {
               // Use saved region to reconstruct absolute coordinates
               startX = state.region.x * 1000 + state.startPosition.x;
@@ -1210,41 +1272,41 @@ function getText(key, params) {
               console.log(`[Assist Mode] No saved region - assuming image on clicked tile (${regionX},${regionY}): absolute = (${startX},${startY})`);
             }
             console.log(`� [Assist Mode] Assuming image is on clicked tile: absolute coords = (${startX},${startY})`);
-            
+
             const { width, height } = state.imageData;
-            
+
             console.log(`🖼️ [Assist Mode] Image bounds: start=(${startX},${startY}), size=${width}x${height}`);
-            
+
             // Calculate which tiles the image spans
             // Note: startX/startY are ABSOLUTE canvas coordinates (e.g., 1732432 means tile 1732, pixel 432)
             const imageStartTileX = Math.floor(startX / 1000);
             const imageStartTileY = Math.floor(startY / 1000);
             const imageEndTileX = Math.floor((startX + width - 1) / 1000);
             const imageEndTileY = Math.floor((startY + height - 1) / 1000);
-            
+
             console.log(`🗺️ [Assist Mode] Image tiles: X[${imageStartTileX}-${imageEndTileX}], Y[${imageStartTileY}-${imageEndTileY}]`);
             console.log(`🎯 [Assist Mode] Checking if region (${regionX},${regionY}) overlaps...`);
-            
+
             if (regionX >= imageStartTileX && regionX <= imageEndTileX &&
                 regionY >= imageStartTileY && regionY <= imageEndTileY) {
-              
+
               console.log(`✅ [Assist Mode] Region (${regionX},${regionY}) overlaps with image - modifying pixels`);
-              
+
               // Modify the colors array based on overlay data
               if (payload.coords && payload.colors) {
                 let modifiedCount = 0;
-                
+
                 for (let i = 0; i < payload.coords.length; i += 2) {
                   // Calculate absolute pixel position
                   const absoluteX = regionX * 1000 + payload.coords[i];
                   const absoluteY = regionY * 1000 + payload.coords[i + 1];
-                  
+
                   // Calculate position relative to our image
                   const imgX = absoluteX - startX;
                   const imgY = absoluteY - startY;
-                  
+
                   console.log(`🎨 [Assist Mode] Pixel ${i/2}: absolute=(${absoluteX},${absoluteY}), relative=(${imgX},${imgY})`);
-                  
+
                   // Check if pixel is within our image bounds
                   if (imgX >= 0 && imgX < width && imgY >= 0 && imgY < height) {
                     // Get color from processed image data
@@ -1254,21 +1316,21 @@ function getText(key, params) {
                       console.error(`❌ [Assist Mode] No pixel data available in state.imageData`);
                       continue;
                     }
-                    
+
                     const pixelIndex = (imgY * width + imgX) * 4;
                     const r = pixelData[pixelIndex];
                     const g = pixelData[pixelIndex + 1];
                     const b = pixelData[pixelIndex + 2];
                     const a = pixelData[pixelIndex + 3];
-                    
+
                     console.log(`🎨 [Assist Mode] Color at (${imgX},${imgY}): rgba(${r},${g},${b},${a}), original colorId: ${payload.colors[i/2]}`);
-                    
+
                     // Skip transparent pixels
                     if (a < CONFIG.TRANSPARENCY_THRESHOLD) {
                       console.log(`⏭️ [Assist Mode] Skipping transparent pixel`);
                       continue;
                     }
-                    
+
                     // Find matching color from palette
                     const colorId = findClosestColorId(r, g, b);
                     console.log(`🔍 [Assist Mode] Found closest colorId: ${colorId}`);
@@ -1282,13 +1344,13 @@ function getText(key, params) {
                     console.log(`❌ [Assist Mode] Pixel out of bounds`);
                   }
                 }
-                
+
                 // Update request body with modified payload
                 args[1] = {
                   ...args[1],
                   body: JSON.stringify(payload)
                 };
-                
+
                 console.log(`✅ [Assist Mode] Modified ${modifiedCount} pixel color(s)`);
                 console.log(`📝 [Assist Mode] Modified payload:`, JSON.stringify(payload));
               } else {
@@ -1305,7 +1367,7 @@ function getText(key, params) {
           console.warn('⚠️ [Assist Mode] No overlay data available - imageData:', !!state.imageData, 'startPosition:', !!state.startPosition);
         }
       }
-      
+
       const response = await originalFetch.apply(this, args);
 
       // TILE REQUEST logging removed to reduce console spam
@@ -1432,7 +1494,7 @@ function getText(key, params) {
       }
       return getText(key, params);
     },
-    
+
     // Open website color palette if not already open
     openColorPalette: () => {
       try {
@@ -1442,19 +1504,19 @@ function getText(key, params) {
           console.log('✅ Color palette already open');
           return true;
         }
-        
+
         // Search for Paint/Pintar button (like Auto-Farm does)
         const allButtons = Array.from(document.querySelectorAll('button'));
-        const paletteButton = allButtons.find(btn => 
+        const paletteButton = allButtons.find(btn =>
           /(Pintar|Paint)/i.test(btn.textContent.trim())
         );
-        
+
         if (paletteButton) {
           console.log('🎨 Opening color palette automatically...');
           paletteButton.click();
           return true;
         }
-        
+
         console.warn('⚠️ Color palette button not found');
         return false;
       } catch (error) {
@@ -1462,7 +1524,7 @@ function getText(key, params) {
         return false;
       }
     },
-    
+
     showAlert: (message, type) => {
       if (window.globalUtilsManager) {
         window.globalUtilsManager.showAlert(message, type);
@@ -1998,8 +2060,9 @@ function getText(key, params) {
 
     async getCharges() {
       try {
-        const res = await fetch("https://backend.wplace.live/me", {
+        const res = await fetch(`https://backend.wplace.live/me?_=${Date.now()}` , {
           credentials: "include",
+          cache: 'no-store'
         })
         const data = await res.json()
         return {
@@ -2023,8 +2086,9 @@ function getText(key, params) {
 
     async fetchCheck() {
       try {
-        const res = await fetch("https://backend.wplace.live/me", {
+        const res = await fetch(`https://backend.wplace.live/me?_=${Date.now()}` , {
           credentials: "include",
+          cache: 'no-store'
         })
         const data = await res.json()
         return {
@@ -4413,7 +4477,7 @@ function getText(key, params) {
       loadBtn.addEventListener('click', async () => {
         // Auto-open color palette if not already open
         Utils.openColorPalette();
-        
+
         const savedData = Utils.loadProgress();
         if (!savedData) {
           updateUI('noSavedData', 'warning');
@@ -4651,7 +4715,7 @@ function getText(key, params) {
       const timeText = Utils.msToTimeText(remainingMs);
 
       if (currentChargesEl) {
-        currentChargesEl.innerHTML = `${state.displayCharges} / ${state.maxCharges}`;
+        currentChargesEl.innerHTML = `${state.displayCharges} / ${max}`;
       }
 
       if (
@@ -4835,25 +4899,18 @@ function getText(key, params) {
       let totalMaxCharges = 0;
       const accounts = accountManager.getAllAccounts();
       if (accounts.length > 0) {
-        // Use real-time charges for current account, stored data for others
-        const currentAccount = accountManager.getCurrentAccount();
+        // Use ChargeModel (real-time) when available for consistent totals
         totalAllCharges = accounts.reduce((sum, acc) => {
-          if (currentAccount && acc.token === currentAccount.token) {
-            // Use real-time data for current account
-            return sum + Math.floor(state.displayCharges || state.preciseCurrentCharges || 0);
-          } else {
-            // Use stored data for other accounts
-            return sum + Math.floor(acc.Charges || 0);
-          }
+          const node = ChargeModel.get(acc.token);
+          const charges = Number.isFinite(node?.charges) ? Math.floor(node.charges) : Math.floor(acc.Charges || 0);
+          const max = Number.isFinite(node?.max) ? Math.floor(node.max) : Math.floor(acc.Max || 0);
+          const safeCharges = Math.max(0, Math.min(charges, max));
+          return sum + safeCharges;
         }, 0);
         totalMaxCharges = accounts.reduce((sum, acc) => {
-          if (currentAccount && acc.token === currentAccount.token) {
-            // Use real-time max charges for current account
-            return sum + Math.floor(state.maxCharges || acc.Max || 0);
-          } else {
-            // Use stored data for other accounts
-            return sum + Math.floor(acc.Max || 0);
-          }
+          const node = ChargeModel.get(acc.token);
+          const max = Number.isFinite(node?.max) ? Math.floor(node.max) : Math.floor(acc.Max || 0);
+          return sum + Math.max(0, max);
         }, 0);
       }
 
@@ -4874,7 +4931,7 @@ function getText(key, params) {
                 <i class="fas fa-bolt"></i> ${Utils.t('charges')}
               </div>
               <div class="wplace-stat-value" id="wplace-stat-charges-value">
-                ${state.displayCharges} / ${state.maxCharges}
+                ${state.displayCharges} / ${state.fullChargeData?.max ?? state.maxCharges}
               </div>
             </div>
             <div class="wplace-stat-item">
@@ -6043,17 +6100,17 @@ function getText(key, params) {
           width: newWidth,
           height: newHeight,
         });
-        
+
         // ✅ Mark image as processed and enable position selection
         state.imageProcessed = true;
         selectPosBtn.disabled = false;
         selectPosBtn.title = Utils.t('selectPosition') || 'Select starting position on canvas';
-        
+
         // Enable start button if position is already set
         if (state.startPosition) {
           startBtn.disabled = false;
         }
-        
+
         closeResizeDialog();
       };
 
@@ -7707,7 +7764,7 @@ function getText(key, params) {
       uploadBtn.addEventListener('click', async () => {
         // Auto-open color palette if not already open
         Utils.openColorPalette();
-        
+
         const availableColors = Utils.extractAvailableColors();
         if (availableColors === null || availableColors.length < 10) {
           updateUI('noColorsFound', 'error');
@@ -7814,7 +7871,7 @@ function getText(key, params) {
 
           await updateStats();
           updateDataButtons();
-          
+
           // Show warning alert to process image first
           Utils.showAlert(Utils.t('processImageFirst'), 'warning');
           updateUI('imageLoaded', 'success', { count: totalValidPixels });
@@ -7831,7 +7888,7 @@ function getText(key, params) {
         try {
           // Auto-open color palette if not already open
           Utils.openColorPalette();
-          
+
           updateUI('loadingImage', 'default');
           const fileData = await Utils.loadExtractedFileData();
 
@@ -7951,7 +8008,7 @@ function getText(key, params) {
                   isUint8ClampedArray: state.imageData.pixels instanceof Uint8ClampedArray,
                   isArray: Array.isArray(state.imageData.pixels)
                 });
-                
+
                 // Create image bitmap from the restored image data
                 const canvas = new OffscreenCanvas(state.imageData.width, state.imageData.height);
                 const ctx = canvas.getContext('2d');
@@ -7966,11 +8023,11 @@ function getText(key, params) {
                 await overlayManager.setImage(imageBitmap);
                 overlayManager.enable();
                 console.log('✅ Overlay enabled for extracted artwork - should show PROCESSED pixels');
-                
+
                 // ✅ Loaded files already contain processed pixels - no need to reprocess
                 // Mark as processed since the overlay is showing the correct processed data
                 state.imageProcessed = true;
-                
+
                 // Enable position selection immediately
                 selectPosBtn.disabled = false;
                 selectPosBtn.title = Utils.t('selectPosition') || 'Select starting position on canvas';
@@ -8268,7 +8325,7 @@ function getText(key, params) {
     // Helper function to update start button state
     function updateStartButtonState() {
       if (!startBtn) return;
-      
+
       if (state.paintingMode === 'assist') {
         startBtn.disabled = true;
         startBtn.title = 'Start button is disabled in Assist mode. Manually place pixels with overlay guidance.';
@@ -8288,25 +8345,25 @@ function getText(key, params) {
       // Initialize toggle state - MUST be unchecked for auto mode (default)
       paintingModeToggle.checked = state.paintingMode === 'assist';
       console.log(`🎨 [Painting Mode] Initial state: ${state.paintingMode}, Toggle checked: ${paintingModeToggle.checked}`);
-      
+
       paintingModeToggle.addEventListener('change', () => {
         state.paintingMode = paintingModeToggle.checked ? 'assist' : 'auto';
-        
+
         // Update start button state
         updateStartButtonState();
-        
+
         // NOTE: We don't save paintingMode - it always resets to 'auto' on page load
-        
+
         // Show notification
         const modeName = state.paintingMode === 'assist' ? 'Assist' : 'Auto';
-        const modeDesc = state.paintingMode === 'assist' 
-          ? 'Overlay will guide your manual pixel placement' 
+        const modeDesc = state.paintingMode === 'assist'
+          ? 'Overlay will guide your manual pixel placement'
           : 'Bot will automatically paint pixels';
         Utils.showAlert(`Painting Mode: ${modeName}\n${modeDesc}`, 'info');
-        
+
         console.log(`🎨 [Painting Mode] Switched to ${modeName.toUpperCase()} mode`);
       });
-      
+
       // Initial state update
       updateStartButtonState();
     }
@@ -8443,7 +8500,7 @@ function getText(key, params) {
     loadBotSettings();
     // Ensure notification poller reflects current settings
     NotificationManager.syncFromState();
-    
+
     // Sync painting mode toggle with loaded state
     if (paintingModeToggle) {
       paintingModeToggle.checked = state.paintingMode === 'assist';
@@ -8901,9 +8958,20 @@ function getText(key, params) {
         state.lastPaintedPosition = { x: lastPixel.localX, y: lastPixel.localY };
       }
 
+      // Track painted pixels since last account switch to avoid flip-flop
+      state.paintedSinceSwitch = (state.paintedSinceSwitch || 0) + actuallyPaintedCount;
+
       // IMPORTANT: Decrement charges locally to match Acc-Switch.js behavior
       state.displayCharges = Math.max(0, state.displayCharges - batchSize);
       state.preciseCurrentCharges = Math.max(0, state.preciseCurrentCharges - batchSize);
+      // Also update the global local charge model per account with bonus logic
+      try {
+        const tok = accountManager.getCurrentAccount()?.token;
+        const after = ChargeModel.decrement(tok, batchSize);
+        state.displayCharges = Math.floor(after);
+        state.preciseCurrentCharges = after;
+        if (tok) accountManager.updateAccountData(tok, { Charges: state.displayCharges });
+      } catch {}
 
       state.fullChargeData = {
         ...state.fullChargeData,
@@ -9006,72 +9074,19 @@ function getText(key, params) {
                 break;
               }
             } else {
-              // Debug current state
-              const totalAccounts = accountManager.getAccountCount();
-              console.log(`📊 Account Status - Current index: ${accountManager.currentIndex}, Total accounts: ${totalAccounts}`);
-
-              // Check if we're at the last account in the sequence
-              const isLastAccount = accountManager.currentIndex >= totalAccounts - 1;
-              console.log(`🔍 Is last account? ${isLastAccount} (index ${accountManager.currentIndex} of ${totalAccounts})`);
-
-              if (!isLastAccount && totalAccounts > 1) {
-                // Update current account status before switching
-                console.log('📊 Updating current account status before switch...');
-                await updateCurrentAccountInList();
-
-                // Switch to next account immediately (no cooldown) - only if we have multiple accounts
-                const nextAccount = accountManager.getNextAccount();
-                console.log(`🔄 Switching to next account: ${nextAccount?.displayName} (${accountManager.currentIndex + 2}/${totalAccounts})`);
-                const switchResult = await switchToNextAccount(accounts);
-                if (!switchResult) {
-                  console.log('❌ Account switch failed, stopping');
-                  state.stopFlag = true;
-                  break;
-                }
-                // Continue painting with new account immediately
-                continue;
-              } else if (totalAccounts === 1) {
-                // Only one account available - use cooldown and continue with same account
-                console.log('ℹ️ Only one account available, entering cooldown period');
-                const cooldownResult = await executeCooldownPeriod();
-                if (cooldownResult === 'stopped') break;
-                console.log('✅ Cooldown complete, continuing with same account');
-                continue;
-              } else {
-                // Last account reached - use cooldown then switch to first account
-                console.log('⏱️ Last account reached, entering cooldown period');
-                console.log(`📊 Current account: index ${accountManager.currentIndex}, Last account: index ${totalAccounts - 1}`);
-
-                const cooldownResult = await executeCooldownPeriod();
-                if (cooldownResult === 'stopped') break;
-
-                // After cooldown, switch to first account
-                console.log('🔁 Cooldown complete, switching to first account');
-                console.log(`🔄 Before switch - Current index: ${accountManager.currentIndex}, Target: index 0`);
-
-                const firstAccountInfo = accountManager.getAccountByIndex(0);
-                const firstAccountToken = firstAccountInfo?.token;
-
-                if (!firstAccountToken) {
-                  console.log('❌ First account token not found, stopping');
-                  state.stopFlag = true;
-                  break;
-                }
-
-                // Reset to first position
-                accountManager.setCurrentIndex(0);
-
-                const switchResult = await switchToSpecificAccount(firstAccountToken, firstAccountInfo.displayName);
-                if (!switchResult) {
-                  console.log('❌ Switch to ID 1 failed, stopping');
-                  state.stopFlag = true;
-                  break;
-                }
-
-                console.log(`✅ Successfully switched to ID 1 (${firstAccountInfo.displayName}). Cycle restarted.`);
-                // Continue painting with first account
+              // Try to find an account with enough charges to continue painting
+              const minRequired = Math.max(1, state.cooldownChargeThreshold || 1);
+              console.log(`🔎 Searching for account with ≥${minRequired} charges...`);
+              const switched = await selectAndSwitchToAccountWithCharges(minRequired);
+              if (switched) {
+                console.log('✅ Switched to an account with sufficient charges, continuing painting immediately');
                 continue;
               }
+              // If none had enough charges, enter cooldown on the best available account
+              console.log('🕒 No accounts have enough charges. Entering cooldown on the account with the soonest recharge...');
+              const cooldownResult = await executeCooldownPeriod();
+              if (cooldownResult === 'stopped') break;
+              continue;
             }
           }
         }
@@ -9121,15 +9136,41 @@ function getText(key, params) {
     };
 
     // IMPORTANT: Check charges once at start, then paint until depleted
+    // Use local charge model to avoid extra API calls
     console.log('🔋 Checking initial charges for painting session');
-    const initialChargeCheck = await WPlaceService.getCharges();
-    state.displayCharges = Math.floor(initialChargeCheck.charges);
-    state.preciseCurrentCharges = initialChargeCheck.charges;
-    state.cooldown = initialChargeCheck.cooldown;
+    const currentToken = accountManager.getCurrentAccount()?.token;
+    let node = ChargeModel.get(currentToken);
+    // One-time sync for current account if never synced
+    if (node && !node.lastSyncAt) {
+      try {
+        const sync = await WPlaceService.getCharges();
+        ChargeModel.setFromServer(currentToken, sync.charges, sync.max);
+        node = ChargeModel.get(currentToken);
+      } catch {}
+    }
+    state.displayCharges = Math.floor(node?.charges || 0);
+    state.preciseCurrentCharges = node?.charges || 0;
+    state.cooldown = CONFIG.COOLDOWN_DEFAULT;
     await updateStats();
     if (state.displayCharges <= 0) {
-      console.log('⚡ No charges available, skipping painting session');
+      console.log('⚡ No charges available (local), skipping painting session');
       return 'charges_depleted';
+    }
+
+    // If current account has less than threshold charges but another account
+    // has reached the threshold, switch BEFORE painting anything on the under-threshold account
+    try {
+      const threshold = Math.max(1, state.cooldownChargeThreshold || 1);
+      if (CONFIG.autoSwap && state.displayCharges < threshold) {
+        console.log(`🛑 Current charges (${state.displayCharges}) < threshold (${threshold}). Checking other accounts before painting...`);
+        const switched = await selectAndSwitchToAccountWithCharges(threshold);
+        if (switched) {
+          console.log('🔀 Switched to an account that met the threshold before painting. Restarting cycle...');
+          return 'charges_depleted';
+        }
+      }
+    } catch (e) {
+      console.warn('⚠️ Pre-paint switch guard failed:', e);
     }
 
     console.log(`🔋 Starting with ${state.displayCharges} charges - painting until depleted`);
@@ -9481,55 +9522,38 @@ function getText(key, params) {
     // const maxChargeChecks = 10; // REMOVED: No limit on API calls during cooldown
 
     while (!state.stopFlag) {
-      chargeCheckCount++;
+      const threshold = Math.max(1, state.cooldownChargeThreshold || 1);
+      const accounts = accountManager.getAllAccounts();
+      let anyReady = false;
+      let bestMs = Infinity;
+      let currentCharges = ChargeModel.getForCurrent()?.charges || 0;
 
-      const { charges, cooldown } = await WPlaceService.getCharges();
-      state.displayCharges = Math.floor(charges);
-      state.preciseCurrentCharges = charges;
-      state.cooldown = cooldown;
+      for (const acc of accounts) {
+        const node = ChargeModel.get(acc.token);
+        if (!node) continue;
+        if (node.charges >= threshold) {
+          anyReady = true;
+          break;
+        }
+        const ms = ChargeModel.predictTimeToReach(acc.token, threshold);
+        if (ms < bestMs) bestMs = ms;
+      }
 
-      if (state.displayCharges >= state.cooldownChargeThreshold) {
-        console.log(`✅ Cooldown target reached: ${state.displayCharges}/${state.cooldownChargeThreshold}`);
+      if (anyReady) {
+        console.log(`✅ Cooldown target reached locally (≥${threshold})`);
         NotificationManager.maybeNotifyChargesReached(true);
         await updateStats();
         return 'target_reached';
       }
 
+      const waitMs = Number.isFinite(bestMs) ? Math.max(1000, Math.min(bestMs, 10000)) : 10000;
       updateUI('noChargesThreshold', 'warning', {
-        time: Utils.msToTimeText(state.cooldown),
-        threshold: state.cooldownChargeThreshold,
-        current: state.displayCharges,
+        time: Utils.msToTimeText(waitMs),
+        threshold,
+        current: currentCharges,
       });
       await updateStats();
-
-      // Smart delay calculation to reduce API calls
-      const chargesNeeded = state.cooldownChargeThreshold - state.displayCharges;
-      const estimatedWaitTime = chargesNeeded * state.cooldown;
-
-      // Use longer delays during cooldown to prevent rate limiting
-      let delayTime;
-      if (chargeCheckCount < 3) {
-        // First few checks - shorter delay
-        delayTime = Math.max(3000, state.cooldown); // 3 seconds minimum
-      } else if (estimatedWaitTime > 60000) {
-        // Long wait expected - check every 15 seconds
-        delayTime = 10000;
-      } else if (estimatedWaitTime > 30000) {
-        // Medium wait - check every 15 seconds
-        delayTime = 15000;
-      } else {
-        // Close to target - check every 5 seconds
-        delayTime = 5000;
-      }
-
-      console.log(`⏱️ Cooldown check ${chargeCheckCount}: ${state.displayCharges}/${state.cooldownChargeThreshold} charges, waiting 10s before next check`);
-      await Utils.sleep(10000);
-
-      // REMOVED: No limit on charge checks - bot will wait infinitely until charges are available
-      // if (chargeCheckCount >= maxChargeChecks) {
-      //   console.warn('⚠️ Max charge checks reached during cooldown, continuing anyway');
-      //   break;
-      // }
+      await Utils.sleep(waitMs);
     }
 
     return 'stopped';
@@ -9883,7 +9907,7 @@ function getText(key, params) {
       CONFIG.PAINTING_SPEED_ENABLED = settings.paintingSpeedEnabled ?? false;
       CONFIG.AUTO_CAPTCHA_ENABLED = settings.autoCaptchaEnabled ?? false;
       state.overlayOpacity = settings.overlayOpacity ?? CONFIG.OVERLAY.OPACITY_DEFAULT;
-      
+
       // MIGRATION: Force enable blue marble for existing users if not explicitly set
       // This ensures the new default (blue marble ON) is applied to existing users
       if (settings.blueMarbleMigrated !== true) {
@@ -9895,7 +9919,7 @@ function getText(key, params) {
       } else {
         state.blueMarbleEnabled = settings.blueMarbleEnabled ?? CONFIG.OVERLAY.BLUE_MARBLE_DEFAULT;
       }
-      
+
       // MIGRATION: Force reset dithering to false if not explicitly set in saved settings
       // This ensures the new default (dithering OFF) is applied to existing users
       if (settings.ditheringMigrated !== true) {
@@ -9907,7 +9931,7 @@ function getText(key, params) {
       } else {
         state.ditheringEnabled = settings.ditheringEnabled ?? false;
       }
-      
+
       state.colorMatchingAlgorithm = settings.colorMatchingAlgorithm || 'lab';
       state.enableChromaPenalty = settings.enableChromaPenalty ?? true;
       state.chromaPenaltyWeight = settings.chromaPenaltyWeight ?? 0.15;
@@ -9933,7 +9957,7 @@ function getText(key, params) {
       state.notificationIntervalMinutes =
         settings.notificationIntervalMinutes ?? CONFIG.NOTIFICATIONS.REPEAT_MINUTES;
       // NOTE: paintingMode is NOT restored - always defaults to 'auto' on page load
-      
+
       // Restore region and startPosition for assist mode coordinate calculations
       if (settings.region) {
         state.region = settings.region;
@@ -9943,7 +9967,7 @@ function getText(key, params) {
         state.startPosition = settings.startPosition;
         console.log('✅ Restored startPosition from save file:', state.startPosition);
       }
-      
+
       // Restore ignore mask if dims match current resizeSettings
       if (
         settings.resizeIgnoreMask &&
@@ -10339,9 +10363,10 @@ function getText(key, params) {
           console.log('✅ Found wasm Module...');
           return url.split('/').pop();
         }
-      } catch { }
+      } catch (e) { /* ignore individual fetch errors */ }
     }
-    console.error(`❌ Could not find Pawtect chunk: `, error);
+    console.error('❌ Could not find Pawtect chunk among preloaded modules');
+    return null;
   }
 
   async function purchase(type) {
@@ -10417,13 +10442,43 @@ function getText(key, params) {
         type: 'setCookie',
         value: token
       }, '*');
-
       console.log('✅ setCookie message sent successfully');
-      return true;
     } catch (error) {
       console.error('❌ Failed to send setCookie message:', error);
       return false;
     }
+
+    // Wait for background confirmation that cookie was set
+    const confirmed = await new Promise((resolve) => {
+      let settled = false;
+      const timer = setTimeout(() => {
+        if (!settled) {
+          settled = true;
+          console.warn('⚠️ cookieSet confirmation timeout');
+          resolve(false);
+        }
+      }, 10000);
+      function onMessage(event) {
+        if (event.source !== window) return;
+        const data = event.data || {};
+        if (data.type === 'cookieSet') {
+          if (!settled) {
+            settled = true;
+            clearTimeout(timer);
+            window.removeEventListener('message', onMessage);
+            resolve(true);
+          }
+        }
+      }
+      window.addEventListener('message', onMessage);
+    });
+
+    if (confirmed) {
+      console.log('✅ Cookie set confirmed');
+    } else {
+      console.warn('⚠️ Proceeding without cookie confirmation');
+    }
+    return true;
   }
   async function getAccounts() {
     return new Promise((resolve, reject) => {
@@ -10455,12 +10510,6 @@ function getText(key, params) {
     });
   }
 
-  async function fetchAccount() {
-    const { ID, Charges, Max, Droplets } = await WPlaceService.fetchCheck();
-    console.log("User's ID :", ID);
-    console.log("User's Charges :", Charges, "/", Max);
-    console.log("User's Droplets :", Droplets);
-  }
 
   async function fetchAllAccountDetails() {
     if (state.isFetchingAllAccounts) {
@@ -10555,16 +10604,23 @@ function getText(key, params) {
             await switchToSpecificAccount(originalCurrentAccount.token, originalCurrentAccount.displayName);
             //await Utils.sleep(300);
 
-            // Mark it as current again
+            // Mark it as current again and sync index
             accountManager.updateAccountData(originalCurrentAccount.token, {
               isCurrent: true
             });
+            const list = accountManager.getAllAccounts();
+            const idxOriginal = list.findIndex(acc => acc.token === originalCurrentAccount.token);
+            if (idxOriginal !== -1 && typeof accountManager.setCurrentIndex === 'function') {
+              accountManager.setCurrentIndex(idxOriginal);
+              state.accountIndex = idxOriginal;
+            }
           } catch (error) {
             console.warn(`⚠️ [FETCH] Failed to switch back to original account:`, error);
           }
         }
 
         console.log(`🎯 [FETCH] Completed fetching fresh data for all accounts`);
+        try { ChargeModel.seedFromAccounts(accountManager.getAllAccounts()); } catch {}
       }
 
       // Render the accounts list with fresh data
@@ -10587,44 +10643,50 @@ function getText(key, params) {
   // Function to update current account charges in the account list
   async function updateCurrentAccountInList() {
     if (accountManager.getAccountCount() === 0) return;
-
-    // Find current account in the list and update its charges
-    const currentAccount = accountManager.getCurrentAccount();
-    if (currentAccount) {
-      const { charges, cooldown, droplets } = await WPlaceService.getCharges();
-      state.displayCharges = Math.floor(charges);
-      state.preciseCurrentCharges = charges;
+    try {
+      const current = accountManager.getCurrentAccount();
+      const node = ChargeModel.get(current?.token);
+      if (!current || !node) return;
+      state.displayCharges = Math.floor(node.charges || 0);
+      state.preciseCurrentCharges = node.charges || 0;
       await updateStats();
-
-      // Update the current account data in AccountManager
-      accountManager.updateAccountData(currentAccount.token, {
-        Charges: Math.floor(state.displayCharges || state.preciseCurrentCharges || 0),
-        Max: state.maxCharges,
-        Droplets: Math.floor(droplets)
-      });
-
-      // Re-render the account list to show updated charges
+      // Refresh server-backed fields (droplets/max) to avoid stale/incorrect UI
+      try {
+        const live = await WPlaceService.getCharges();
+        accountManager.updateAccountData(current.token, {
+          Charges: Math.floor(node.charges || 0),
+          Max: Math.floor(live.max || node.max || current.Max || 0),
+          Droplets: Math.floor(live.droplets || 0)
+        });
+      } catch {}
       renderAccountsList();
+    } catch (e) {
+      console.warn('⚠️ updateCurrentAccountInList failed:', e);
     }
   }
 
   // Function to update current account spotlight when switching during painting
   async function updateCurrentAccountSpotlight() {
     if (accountManager.getAccountCount() === 0) return;
-    // await Utils.sleep(500); // Wait a bit for the switch to take effect
     try {
       const currentAccountData = await WPlaceService.getCharges();
       console.log("Current account after switch:", currentAccountData);
       console.log(`🔍 Switched to account with ID: ${currentAccountData.id}`);
 
-      // Find the current account in AccountManager and update it
       const accounts = accountManager.getAllAccounts();
-      const currentAccount = accounts.find(acc => acc.ID === currentAccountData.id);
+      const idx = accounts.findIndex(acc => acc.ID === currentAccountData.id);
 
-      if (currentAccount) {
+      if (idx !== -1) {
+        const currentAccount = accounts[idx];
         const currentAccountInfo = await WPlaceService.fetchCheck();
 
-        // Update account data in AccountManager
+        // Sync manager index and flags to actual account
+        if (typeof accountManager.setCurrentIndex === 'function') {
+          accountManager.setCurrentIndex(idx);
+        } else {
+          accounts.forEach((acc, i) => (acc.isCurrent = i === idx));
+        }
+
         accountManager.updateAccountData(currentAccount.token, {
           isCurrent: true,
           Charges: Math.floor(currentAccountData.charges),
@@ -10633,49 +10695,15 @@ function getText(key, params) {
           displayName: currentAccountInfo.Username || currentAccountInfo.name || currentAccount.displayName
         });
 
-        console.log(`🎯 Updated current account spotlight: ${currentAccount.displayName}`);
+        // Mirror to UI state for consistency
+        state.displayCharges = Math.floor(currentAccountData.charges);
+        state.preciseCurrentCharges = currentAccountData.charges;
+        state.cooldown = currentAccountData.cooldown;
+        state.accountIndex = idx;
 
-        // Check for autobuy after account is loaded
-        if (CONFIG.autoBuyToggle && Math.floor(currentAccountData.droplets) > 500) {
-          console.log(`💰 Account has ${Math.floor(currentAccountData.droplets)} droplets (>500), triggering autobuy...`);
-          try {
-            const purchaseResult = await purchase(CONFIG.autoBuy);
-            if (purchaseResult == 2) {
-              console.log('✅ Autobuy successful after account switch');
-              // Update charges after purchase
-              const updatedCharges = await WPlaceService.getCharges();
-              accountManager.updateAccountData(currentAccount.token, {
-                Charges: Math.floor(updatedCharges.charges),
-                Droplets: Math.floor(updatedCharges.droplets)
-              });
-              // Re-render account list to show updated status after purchase
-              renderAccountsList();
-            } else {
-              console.log('❌ Autobuy failed after account switch');
-            }
-          } catch (error) {
-            console.error('❌ Error during autobuy after account switch:', error);
-          }
-        } else if (CONFIG.autoBuyToggle) {
-          console.log(`💰 Account has ${Math.floor(currentAccountData.droplets)} droplets (≤500), skipping autobuy`);
-        }
-
-        // Re-render the account list to show new current account
         renderAccountsList();
-
-        console.log(`🔒 PRESERVING currentActiveIndex: ${state.currentActiveIndex} (do not recalculate from isCurrent flag)`);
-        console.log(`� Account at currentActiveIndex ${state.currentActiveIndex}: ${state.originalAccountOrder[state.currentActiveIndex]?.displayName} (ID ${state.originalAccountOrder[state.currentActiveIndex]?.orderId})`);
-
-        // Update accountIndex to match original array position
-        const originalArrayIndex = state.allAccountsInfo.findIndex(acc => acc.isCurrent);
-        if (originalArrayIndex !== -1) {
-          state.accountIndex = originalArrayIndex;
-        }
-
-        console.log(`📊 Final state: activeIndex=${state.currentActiveIndex}, accountIndex=${state.accountIndex}, orderId=${newCurrentAccount.orderId}`);
-
-        console.warn(`⚠️ Could not find account ID ${newCurrentAccount.orderId} in switching order`);
-
+        console.log(`🎯 Updated current account spotlight: ${currentAccount.displayName}`);
+      } else {
         console.warn(`⚠️ Could not find switched account with ID ${currentAccountData.id} in account list`);
       }
 
@@ -10794,11 +10822,27 @@ function getText(key, params) {
   async function switchToNextAccount(accounts) {
     console.log(`🔄 [SWITCH] Starting account switch`);
 
+    // Debounce rapid consecutive switches when no painting happened
+    try {
+      const now = Date.now();
+      const last = state.lastSwitchAt || 0;
+      const minGap = state.minMsBetweenSwitches || 3000;
+      const painted = state.paintedSinceSwitch || 0;
+      if (now - last < minGap && painted === 0) {
+        console.log(`⏳ [SWITCH] Debounced rapid switch (Δ${now - last}ms < ${minGap}ms and paintedSinceSwitch=${painted}).`);
+        return false;
+      }
+    } catch {}
+
     // Validate we have accounts
     if (accountManager.getAccountCount() === 0) {
       console.error('❌ No accounts available for switching');
       return false;
     }
+
+    // Capture the pre-switch (current) account to detect stale reads
+    const preSwitchAccount = accountManager.getCurrentAccount();
+    const previousKnownId = preSwitchAccount?.ID || null;
 
     // Get next account using simplified manager
     const nextAccount = accountManager.switchToNext();
@@ -10826,11 +10870,53 @@ function getText(key, params) {
 
       console.log(`✅ [SWITCH] Successfully switched to ${nextAccount.displayName}`);
 
-      // Wait a moment for the switch to fully complete
-      // await new Promise(resolve => setTimeout(resolve, 1000));
+      // Verify backend reflects the new account to avoid stale reads
+      // Strategy: poll /me until we see an ID different from the pre-switch account's ID
+      // Only then accept and (if needed) assign the next account's ID.
+      let verifiedId = null;
+      for (let attempt = 1; attempt <= 8 && !verifiedId; attempt++) {
+        try {
+          const currentAccountData = await WPlaceService.getCharges();
+          const curId = currentAccountData?.id;
+          if (!curId) {
+            await Utils.sleep(500);
+            continue;
+          }
+
+          if (previousKnownId && curId === previousKnownId) {
+            console.log(`⏳ [SWITCH] Still seeing previous ID ${curId} (attempt ${attempt}/8), waiting...`);
+            await Utils.sleep(500);
+            continue;
+          }
+
+          // If we had a stored ID for the target and it's different from what we see now,
+          // prefer the live value (curId) and update the stored ID.
+          if (nextAccount.ID && nextAccount.ID !== curId) {
+            console.log(`🔁 [SWITCH] Updating stored ID for ${nextAccount.displayName}: ${nextAccount.ID} → ${curId}`);
+          }
+
+          verifiedId = curId;
+          break;
+        } catch (e) {
+          await Utils.sleep(500);
+        }
+      }
+
+      if (!verifiedId) {
+        console.warn('⚠️ [SWITCH] Could not verify account change via /me after cookie set; skipping ID update but proceeding cautiously.');
+      } else {
+        // Persist verified ID for the next account
+        if (nextAccount.ID !== verifiedId) {
+          accountManager.updateAccountData(nextAccount.token, { ID: verifiedId });
+        }
+      }
 
       // Update the account status and UI after successful switch
       await updateCurrentAccountInList();
+
+      // Record switch time and reset painted counter to prevent rapid bouncing
+      state.lastSwitchAt = Date.now();
+      state.paintedSinceSwitch = 0;
 
       return true;
     } catch (error) {
@@ -10842,54 +10928,91 @@ function getText(key, params) {
   // SIMPLIFIED helper function for specific account switching
   async function switchToSpecificAccount(token, accountName) {
     console.log(`🔄 [SPECIFIC SWITCH] Attempting to switch to account: ${accountName}`);
+
+    // Debounce rapid consecutive switches when no painting happened
+    try {
+      const now = Date.now();
+      const last = state.lastSwitchAt || 0;
+      const minGap = state.minMsBetweenSwitches || 3000;
+      const painted = state.paintedSinceSwitch || 0;
+      if (now - last < minGap && painted === 0) {
+        console.log(`⏳ [SPECIFIC SWITCH] Debounced rapid switch (Δ${now - last}ms < ${minGap}ms and paintedSinceSwitch=${painted}).`);
+        return false;
+      }
+    } catch {}
+
+    if (!token) {
+      console.error('❌ [SPECIFIC SWITCH] Missing token');
+      return false;
+    }
     console.log(`🔑 [SPECIFIC SWITCH] Using token: ${token.substring(0, 20)}...`);
 
-    await swapAccountTrigger(token);
+    // Capture previous account ID to detect stale responses
+    let previousId = null;
+    try {
+      const prev = await WPlaceService.getCharges();
+      previousId = prev?.id || null;
+    } catch {}
 
-    let maxRetries = 20;
-    let retryCount = 0;
-    let swapSuccess = false;
+    const ok = await swapAccountTrigger(token);
+    if (!ok) {
+      console.error('❌ [SPECIFIC SWITCH] Cookie confirmation failed');
+      return false;
+    }
 
-    while (!swapSuccess && retryCount < maxRetries) {
-      console.log(`⏳ [SPECIFIC SWITCH] Waiting for account swap... (Attempt ${retryCount + 1}/${maxRetries})`);
-      //await new Promise(resolve => setTimeout(resolve, 1000));
-
+    // Poll /me until it reflects a different ID than the previous account
+    let verifiedId = null;
+    for (let attempt = 1; attempt <= 8 && !verifiedId; attempt++) {
       try {
-        // await fetchAccount();
-        console.log('✅ [SPECIFIC SWITCH] Account swap confirmed.');
-        swapSuccess = true;
-      } catch (error) {
-        console.warn('❌ [SPECIFIC SWITCH] Account swap not yet successful. Retrying...', error);
-        retryCount++;
-
-        if (retryCount % 5 === 0) {
-          console.log('🔄 [SPECIFIC SWITCH] Re-triggering account swap...');
-          await swapAccountTrigger(token);
-          await new Promise(resolve => setTimeout(resolve, 2000));
+        const currentAccountData = await WPlaceService.getCharges();
+        const curId = currentAccountData?.id;
+        if (!curId) {
+          await Utils.sleep(500);
+          continue;
         }
+        if (previousId && curId === previousId) {
+          console.log(`⏳ [SPECIFIC SWITCH] Still seeing previous ID ${curId} (attempt ${attempt}/8), waiting...`);
+          await Utils.sleep(500);
+          continue;
+        }
+        verifiedId = curId;
+        break;
+      } catch {
+        await Utils.sleep(500);
       }
     }
 
-    if (swapSuccess) {
-      const { charges, cooldown } = await WPlaceService.getCharges();
-      state.displayCharges = Math.floor(charges);
-      state.preciseCurrentCharges = charges;
-      state.cooldown = cooldown;
-      Utils.performSmartSave();
-      await updateStats();
-
-      // Update account data in manager
-      accountManager.updateAccountData({ charges, cooldown });
-
-      // Update the account status and UI after successful switch
-      await updateCurrentAccountSpotlight();
-
-      console.log(`✅ [SPECIFIC SWITCH] Successfully switched to ${accountName} with ${Math.floor(charges)} charges`);
-      return true;
+    if (!verifiedId) {
+      console.warn('⚠️ [SPECIFIC SWITCH] Could not verify account change via /me; proceeding.');
     } else {
-      console.error(`❌ [SPECIFIC SWITCH] Failed to swap to ${accountName} after multiple retries.`);
-      return false;
+      // Persist ID and mark as current in AccountManager
+      accountManager.updateAccountData(token, { ID: verifiedId, isCurrent: true });
     }
+
+    // Sync manager index to the token we explicitly switched to
+    try {
+      const list = accountManager.getAllAccounts();
+      const idxByToken = list.findIndex(acc => acc.token === token);
+      if (idxByToken !== -1 && typeof accountManager.setCurrentIndex === 'function') {
+        accountManager.setCurrentIndex(idxByToken);
+        state.accountIndex = idxByToken;
+      }
+    } catch {}
+
+    // Fetch fresh stats for UI/state
+    const { charges, cooldown, droplets, max } = await WPlaceService.getCharges();
+    try { ChargeModel.setFromServer(token, charges, max); } catch {}
+    state.displayCharges = Math.floor(charges);
+    state.preciseCurrentCharges = charges;
+    state.cooldown = cooldown;
+    Utils.performSmartSave();
+    await updateStats();
+
+    // Update the account status and UI after successful switch
+    await updateCurrentAccountSpotlight();
+
+    console.log(`✅ [SPECIFIC SWITCH] Switched to ${accountName} with ${Math.floor(charges)} charges`);
+    return true;
   }
 
   // Wait for dependencies before initializing UI
@@ -10933,6 +11056,56 @@ function getText(key, params) {
     return createUI();
   }
 
+  // Helper: iterate over accounts to find one with enough charges; otherwise pick best cooldown
+  async function selectAndSwitchToAccountWithCharges(minRequired = 1) {
+    try {
+      const total = accountManager.getAccountCount();
+      if (total <= 1) return false;
+      const threshold = Math.max(1, minRequired || 1);
+
+      const startIdx = accountManager.currentIndex;
+      let candidate = null; // {token,name,idx}
+      let bestWait = Infinity; // ms to reach threshold
+
+      for (let step = 1; step <= total - 1; step++) {
+        const idx = (startIdx + step) % total;
+        const acc = accountManager.getAccountByIndex(idx);
+        if (!acc || !acc.token) continue;
+        const node = ChargeModel.get(acc.token);
+        const localCharges = Math.floor(node?.charges || 0);
+
+        console.log(`🔍 [SEARCH] Checking locally ${acc.displayName}: ⚡${localCharges}/${node?.max ?? 0}`);
+        if (localCharges >= threshold) {
+          candidate = { token: acc.token, name: acc.displayName, idx };
+          break;
+        } else {
+          const eta = ChargeModel.predictTimeToReach(acc.token, threshold);
+          if (eta < bestWait) {
+            bestWait = eta;
+            candidate = { token: acc.token, name: acc.displayName, idx };
+          }
+        }
+      }
+
+      if (candidate && ChargeModel.get(candidate.token)?.charges >= threshold) {
+        console.log(`✅ [SEARCH] Local model found eligible account: ${candidate.name}`);
+        const ok = await switchToSpecificAccount(candidate.token, candidate.name);
+        return !!ok;
+      }
+
+      // None eligible yet – do not switch now. Caller may enter cooldown.
+      if (candidate) {
+        console.log(`🕒 [SEARCH] No accounts meet threshold. Best candidate: ${candidate.name} in ~${Utils.msToTimeText(bestWait)}`);
+      } else {
+        console.log('🕒 [SEARCH] No candidate accounts available.');
+      }
+      return false;
+    } catch (e) {
+      console.warn('⚠️ selectAndSwitchToAccountWithCharges failed:', e);
+      return false;
+    }
+  }
+
   waitForDependenciesAndInitialize().then(() => {
     // Generate token automatically after UI is ready
     setTimeout(initializeTokenGenerator, 1000);
@@ -10942,6 +11115,14 @@ function getText(key, params) {
       console.log('🔄 Initial account load from cache...');
       try {
         await accountManager.loadAccounts();
+        // Seed and start local charge model regardless of count
+        try {
+          state.chargeModel = ChargeModel;
+          ChargeModel.seedFromAccounts(accountManager.getAllAccounts());
+          ChargeModel.start();
+          console.log('⚡ Local ChargeModel started (tick +1 per 30s for all accounts)');
+        } catch (e) { console.warn('ChargeModel init failed:', e); }
+
         if (accountManager.getAccountCount() > 0) {
           console.log(`✅ Loaded ${accountManager.getAccountCount()} cached accounts`);
           renderAccountsList();
@@ -10969,13 +11150,13 @@ function getText(key, params) {
       const transInput = document.getElementById('transparencyThresholdInput');
       const whiteInput = document.getElementById('whiteThresholdInput');
       const ditherToggle = document.getElementById('enableDitheringToggle');
-      
+
       // Ensure dithering checkbox matches state (explicit sync on init)
       if (ditherToggle) {
         ditherToggle.checked = state.ditheringEnabled;
         console.log(`🎨 Dithering initialized: ${state.ditheringEnabled ? 'ON' : 'OFF'}`);
       }
-      
+
       if (algoSelect)
         algoSelect.addEventListener('change', (e) => {
           state.colorMatchingAlgorithm = e.target.value;
