@@ -1,4 +1,4 @@
-// ==UserScript==
+﻿// ==UserScript==
 // @name         WPlaceBot
 // @namespace    http://tampermonkey.net/
 // @version      2025-08-08.3
@@ -87,8 +87,8 @@ function getText(key, params) {
     },
     OVERLAY: {
       OPACITY_DEFAULT: 0.6,
-      BLUE_MARBLE_DEFAULT: false,
-      ditheringEnabled: true,
+      BLUE_MARBLE_DEFAULT: true, // Enable blue marble effect by default
+      ditheringEnabled: false, // Default dithering OFF
     }, // --- START: Color data from colour-converter.js ---
     // New color structure with proper ID mapping
     COLOR_MAP: {
@@ -775,7 +775,9 @@ function getText(key, params) {
       toggleOverlay: 'Toggle Overlay',
       scanColors: 'Scan Colors',
       uploadImage: 'Upload Image',
-      resizeImage: 'Resize Image',
+      resizeImage: 'Process/Edit Image',
+      processImageFirst: '⚠️ Process the image first via "Process/Edit Image" before placing!',
+      imageNeedsProcessing: 'Image needs processing',
       selectPosition: 'Select Position',
       startPainting: 'Start Painting',
       stopPainting: 'Stop Painting',
@@ -1009,6 +1011,7 @@ function getText(key, params) {
   const state = {
     running: false,
     imageLoaded: false,
+    imageProcessed: false, // Track if image has been processed through resize panel
     processing: false,
     totalPixels: 0,
     paintedPixels: 0,
@@ -1080,6 +1083,7 @@ function getText(key, params) {
     accountIndex: 0, // Keep for backward compatibility with existing logic
     // Legacy state removed - now using accountManager instead
     isFetchingAllAccounts: false,
+    paintingMode: 'auto', // 'auto' or 'assist' - default to auto
   };
 
   // Expose state globally for the utils manager and other modules
@@ -1166,12 +1170,198 @@ function getText(key, params) {
       }
     });
 
+    // Helper function to find closest color ID for assist mode
+    function findClosestColorId(r, g, b) {
+      let minDistance = Infinity;
+      let closestColorId = null;
+      
+      for (const colorData of Object.values(CONFIG.COLOR_MAP)) {
+        if (!colorData.rgb) continue;
+        
+        const distance = Math.sqrt(
+          Math.pow(r - colorData.rgb.r, 2) +
+          Math.pow(g - colorData.rgb.g, 2) +
+          Math.pow(b - colorData.rgb.b, 2)
+        );
+        
+        if (distance < minDistance) {
+          minDistance = distance;
+          closestColorId = colorData.id;
+        }
+      }
+      
+      return closestColorId;
+    }
+
     const originalFetch = window.fetch;
     // Setup fetch interceptions
+    console.log('🚀 [Auto-Image] Fetch interception initialized');
+    
+    // Expose state for debugging
+    window.__WPLACE_AUTOBOT_STATE__ = state;
 
     window.fetch = async function (...args) {
+      let url = args[0] instanceof Request ? args[0].url : args[0];
+      
+      // Parse URL if it's a string
+      let urlObj = null;
+      if (typeof url === 'string') {
+        try {
+          urlObj = new URL(url);
+        } catch (e) {
+          // Invalid URL, proceed normally
+        }
+      }
+      
+      // ASSIST MODE: Intercept pixel placement requests
+      if (state.paintingMode === 'assist' && urlObj !== null && urlObj.pathname.startsWith('/s0/pixel')) {
+        console.log(`🎯 [Assist Mode] Intercepting pixel placement:`, urlObj.pathname);
+        console.log(`🔍 [Assist Mode] Check state - imageData:`, !!state.imageData, 'startPosition:', !!state.startPosition, 'body:', !!args[1]?.body);
+        
+        // Check if we have overlay data
+        if (state.imageData && state.startPosition && args[1]?.body) {
+          try {
+            // Parse region coordinates from URL path: /s0/pixel/{tileX}/{tileY}
+            const pathParts = urlObj.pathname.split('/');
+            const regionX = parseInt(pathParts[3]);
+            const regionY = parseInt(pathParts[4]);
+            
+            console.log(`📦 [Assist Mode] Region coords: (${regionX}, ${regionY})`);
+            
+            // Parse request body
+            const payload = typeof args[1].body === 'string' ? JSON.parse(args[1].body) : args[1].body;
+            console.log(`📝 [Assist Mode] Original payload:`, JSON.stringify(payload));
+            
+            // Debug: Check what's in state.region
+            console.log(`🔍 [Assist Mode] state.region:`, state.region);
+            console.log(`🔍 [Assist Mode] state.startPosition:`, state.startPosition);
+            
+            // CRITICAL FIX: The issue is that startPosition is in TILE-LOCAL coordinates (0-999)
+            // but we're clicking on a tile at (1732, 1014). We need to find which tile
+            // our image overlay is on by checking all loaded tiles.
+            
+            // For now, let's use the REQUEST's tile coordinates as a reference
+            // If the user is clicking within this tile, check if our LOCAL startPosition
+            // would overlap with the click position
+            let startX, startY;
+            
+            // COORDINATE RECONSTRUCTION
+            // state.startPosition = LOCAL coords within a 1000x1000 tile (0-999)
+            // state.region = TILE coordinates {x, y} (e.g., {x: 1732, y: 1014})
+            // Absolute canvas coords = region.x * 1000 + startPosition.x
+            
+            if (state.region && state.region.x !== undefined && state.region.y !== undefined) {
+              // Use saved region to reconstruct absolute coordinates
+              startX = state.region.x * 1000 + state.startPosition.x;
+              startY = state.region.y * 1000 + state.startPosition.y;
+              console.log(`[Assist Mode] Using saved region: tile=(${state.region.x},${state.region.y}) + local=(${state.startPosition.x},${state.startPosition.y}) = absolute (${startX},${startY})`);
+            } else {
+              // Fallback: assume image is on the clicked tile (may be wrong!)
+              // Since startPosition appears to be LOCAL coords within a tile,
+              // we need to convert them to absolute by finding which tile they're on.
+              // The simplest approach: assume the image is on the tile being clicked!
+              startX = regionX * 1000 + state.startPosition.x;
+              startY = regionY * 1000 + state.startPosition.y;
+              console.log(`[Assist Mode] No saved region - assuming image on clicked tile (${regionX},${regionY}): absolute = (${startX},${startY})`);
+            }
+            console.log(`� [Assist Mode] Assuming image is on clicked tile: absolute coords = (${startX},${startY})`);
+            
+            const { width, height } = state.imageData;
+            
+            console.log(`🖼️ [Assist Mode] Image bounds: start=(${startX},${startY}), size=${width}x${height}`);
+            
+            // Calculate which tiles the image spans
+            // Note: startX/startY are ABSOLUTE canvas coordinates (e.g., 1732432 means tile 1732, pixel 432)
+            const imageStartTileX = Math.floor(startX / 1000);
+            const imageStartTileY = Math.floor(startY / 1000);
+            const imageEndTileX = Math.floor((startX + width - 1) / 1000);
+            const imageEndTileY = Math.floor((startY + height - 1) / 1000);
+            
+            console.log(`🗺️ [Assist Mode] Image tiles: X[${imageStartTileX}-${imageEndTileX}], Y[${imageStartTileY}-${imageEndTileY}]`);
+            console.log(`🎯 [Assist Mode] Checking if region (${regionX},${regionY}) overlaps...`);
+            
+            if (regionX >= imageStartTileX && regionX <= imageEndTileX &&
+                regionY >= imageStartTileY && regionY <= imageEndTileY) {
+              
+              console.log(`✅ [Assist Mode] Region (${regionX},${regionY}) overlaps with image - modifying pixels`);
+              
+              // Modify the colors array based on overlay data
+              if (payload.coords && payload.colors) {
+                let modifiedCount = 0;
+                
+                for (let i = 0; i < payload.coords.length; i += 2) {
+                  // Calculate absolute pixel position
+                  const absoluteX = regionX * 1000 + payload.coords[i];
+                  const absoluteY = regionY * 1000 + payload.coords[i + 1];
+                  
+                  // Calculate position relative to our image
+                  const imgX = absoluteX - startX;
+                  const imgY = absoluteY - startY;
+                  
+                  console.log(`🎨 [Assist Mode] Pixel ${i/2}: absolute=(${absoluteX},${absoluteY}), relative=(${imgX},${imgY})`);
+                  
+                  // Check if pixel is within our image bounds
+                  if (imgX >= 0 && imgX < width && imgY >= 0 && imgY < height) {
+                    // Get color from processed image data
+                    // Note: state.imageData uses 'pixels' property, not 'data'
+                    const pixelData = state.imageData.pixels || state.imageData.data;
+                    if (!pixelData) {
+                      console.error(`❌ [Assist Mode] No pixel data available in state.imageData`);
+                      continue;
+                    }
+                    
+                    const pixelIndex = (imgY * width + imgX) * 4;
+                    const r = pixelData[pixelIndex];
+                    const g = pixelData[pixelIndex + 1];
+                    const b = pixelData[pixelIndex + 2];
+                    const a = pixelData[pixelIndex + 3];
+                    
+                    console.log(`🎨 [Assist Mode] Color at (${imgX},${imgY}): rgba(${r},${g},${b},${a}), original colorId: ${payload.colors[i/2]}`);
+                    
+                    // Skip transparent pixels
+                    if (a < CONFIG.TRANSPARENCY_THRESHOLD) {
+                      console.log(`⏭️ [Assist Mode] Skipping transparent pixel`);
+                      continue;
+                    }
+                    
+                    // Find matching color from palette
+                    const colorId = findClosestColorId(r, g, b);
+                    console.log(`🔍 [Assist Mode] Found closest colorId: ${colorId}`);
+                    if (colorId) {
+                      const oldColorId = payload.colors[i / 2];
+                      payload.colors[i / 2] = colorId;
+                      console.log(`✏️ [Assist Mode] Changed colorId from ${oldColorId} to ${colorId}`);
+                      modifiedCount++;
+                    }
+                  } else {
+                    console.log(`❌ [Assist Mode] Pixel out of bounds`);
+                  }
+                }
+                
+                // Update request body with modified payload
+                args[1] = {
+                  ...args[1],
+                  body: JSON.stringify(payload)
+                };
+                
+                console.log(`✅ [Assist Mode] Modified ${modifiedCount} pixel color(s)`);
+                console.log(`📝 [Assist Mode] Modified payload:`, JSON.stringify(payload));
+              } else {
+                console.warn(`⚠️ [Assist Mode] Payload missing coords or colors`);
+              }
+            } else {
+              console.log(`⏭️ [Assist Mode] Region (${regionX},${regionY}) does NOT overlap with image`);
+            }
+          } catch (error) {
+            console.error('❌ [Assist Mode] Error intercepting pixel placement:', error);
+            console.error(error.stack);
+          }
+        } else {
+          console.warn('⚠️ [Assist Mode] No overlay data available - imageData:', !!state.imageData, 'startPosition:', !!state.startPosition);
+        }
+      }
+      
       const response = await originalFetch.apply(this, args);
-      const url = args[0] instanceof Request ? args[0].url : args[0];
 
       // TILE REQUEST logging removed to reduce console spam
 
@@ -1297,6 +1487,37 @@ function getText(key, params) {
       }
       return getText(key, params);
     },
+    
+    // Open website color palette if not already open
+    openColorPalette: () => {
+      try {
+        // Check if color palette modal is already open
+        const paletteModal = document.querySelector('dialog[open]');
+        if (paletteModal) {
+          console.log('✅ Color palette already open');
+          return true;
+        }
+        
+        // Search for Paint/Pintar button (like Auto-Farm does)
+        const allButtons = Array.from(document.querySelectorAll('button'));
+        const paletteButton = allButtons.find(btn => 
+          /(Pintar|Paint)/i.test(btn.textContent.trim())
+        );
+        
+        if (paletteButton) {
+          console.log('🎨 Opening color palette automatically...');
+          paletteButton.click();
+          return true;
+        }
+        
+        console.warn('⚠️ Color palette button not found');
+        return false;
+      } catch (error) {
+        console.error('❌ Error opening color palette:', error);
+        return false;
+      }
+    },
+    
     showAlert: (message, type) => {
       if (window.globalUtilsManager) {
         window.globalUtilsManager.showAlert(message, type);
@@ -1430,8 +1651,39 @@ function getText(key, params) {
               window.globalUtilsManager.buildPaintedMapPacked() : null
           };
 
-        localStorage.setItem('wplace-bot-progress', JSON.stringify(data));
-        return true;
+        // Attempt to save; if payload is too large (QuotaExceeded), retry without heavy pixel data
+        try {
+          localStorage.setItem('wplace-bot-progress', JSON.stringify(data));
+          return true;
+        } catch (e) {
+          // Fallback: strip image pixels to reduce size and retry
+          if (data && data.imageData && data.imageData.pixels) {
+            const slimData = {
+              ...data,
+              imageData: {
+                width: data.imageData.width,
+                height: data.imageData.height,
+                totalPixels: data.imageData.totalPixels,
+                pixelsStripped: true,
+              }
+            };
+            try {
+              localStorage.setItem('wplace-bot-progress', JSON.stringify(slimData));
+              console.warn('Saved progress without raw pixel data due to storage quota limits.');
+              return true;
+            } catch (e2) {
+              try {
+                // Last resort: try sessionStorage
+                sessionStorage.setItem('wplace-bot-progress', JSON.stringify(slimData));
+                console.warn('Saved progress to sessionStorage without pixel data due to storage quota limits.');
+                return true;
+              } catch (e3) {
+                throw e2; // will be handled by outer catch
+              }
+            }
+          }
+          throw e;
+        }
       } catch (error) {
         console.error('Error saving progress:', error);
         return false;
@@ -1487,7 +1739,7 @@ function getText(key, params) {
           console.log('⚠️ [DEBUG] No availableColors found in savedData or not an array');
         }
 
-        if (savedData.imageData) {
+        if (savedData.imageData && Array.isArray(savedData.imageData.pixels)) {
           console.log('🔍 [DEBUG] Restoring imageData...');
           console.log('🔍 [DEBUG] ImageData type check - pixels is array:', Array.isArray(savedData.imageData.pixels));
           console.log('🔍 [DEBUG] ImageData pixels length:', savedData.imageData.pixels?.length);
@@ -1498,6 +1750,44 @@ function getText(key, params) {
           };
           console.log('✅ [DEBUG] ImageData restored successfully');
           console.log('🔍 [DEBUG] Converted pixels to Uint8ClampedArray, length:', window.state.imageData.pixels.length);
+        } else if (savedData.imageData && savedData.imageData.pixelsRef) {
+          console.warn('ℹ️ [DEBUG] Large image detected; loading pixels from IndexedDB via ref:', savedData.imageData.pixelsRef);
+          window.state.imageData = {
+            width: savedData.imageData.width,
+            height: savedData.imageData.height,
+            totalPixels: savedData.imageData.totalPixels,
+            pixels: null,
+          };
+          window.state.imageLoaded = false;
+
+          if (window.globalUtilsManager && typeof window.globalUtilsManager.loadPixelsFromIndexedDB === 'function') {
+            window.globalUtilsManager.loadPixelsFromIndexedDB(savedData.imageData.pixelsRef)
+              .then(payload => {
+                if (!payload || !payload.pixels) {
+                  console.warn('⚠️ [DEBUG] Pixels not found in IDB. Ask user to reload image.');
+                  return;
+                }
+                window.state.imageData.pixels = new Uint8ClampedArray(payload.pixels);
+                window.state.imageLoaded = true;
+                console.log('✅ [DEBUG] Pixels loaded from IDB');
+
+                // Try to restore overlay immediately
+                if (typeof window.globalUtilsManager.restoreOverlayFromData === 'function') {
+                  window.globalUtilsManager.restoreOverlayFromData().catch(() => {});
+                }
+              })
+              .catch(err => console.warn('❌ [DEBUG] Failed to load pixels from IDB:', err));
+          }
+        } else if (savedData.imageData && savedData.imageData.pixelsStripped) {
+          console.warn('⚠️ [DEBUG] Saved progress did not include raw pixel data due to quota limits. Please reload the image file to resume.');
+          // Preserve dimensions for UI, but mark image as not loaded
+          window.state.imageData = {
+            width: savedData.imageData.width,
+            height: savedData.imageData.height,
+            totalPixels: savedData.imageData.totalPixels,
+            pixels: null,
+          };
+          window.state.imageLoaded = false;
         } else {
           console.log('⚠️ [DEBUG] No imageData found in savedData');
         }
@@ -2402,12 +2692,19 @@ function getText(key, params) {
                 <span>${Utils.t('stopPainting')}</span>
               </button>
             </div>
-            <div class="wplace-row single">
-                <button id="toggleOverlayBtn" class="wplace-btn wplace-btn-overlay" disabled>
-                    <i class="fas fa-eye"></i>
-                    <span>${Utils.t('toggleOverlay')}</span>
-                </button>
-            </div>
+      <div class="wplace-row" style="display: flex; gap: 8px; align-items: center;">
+        <button id="toggleOverlayBtn" class="wplace-btn wplace-btn-overlay" disabled style="flex: 1;">
+          <i class="fas fa-eye"></i>
+          <span>${Utils.t('toggleOverlay')}</span>
+        </button>
+        <label class="wplace-mode-toggle">
+          <input type="checkbox" id="paintingModeToggle" aria-label="Toggle painting mode">
+          <div class="wplace-mode-toggle-inner">
+            <span class="wplace-mode-option wplace-mode-option-auto">Auto</span>
+            <span class="wplace-mode-option wplace-mode-option-assist">Assist</span>
+          </div>
+        </label>
+      </div>
           </div>
         </div>
 
@@ -3111,6 +3408,80 @@ function getText(key, params) {
 
         .wplace-content::-webkit-scrollbar-thumb:hover {
           background: rgba(255,255,255,0.5);
+        }
+
+        /* Painting Mode segmented control */
+        .wplace-mode-toggle {
+          position: relative;
+          display: inline-block;
+          cursor: pointer;
+          flex-shrink: 0;
+          border-radius: 999px;
+        }
+
+        .wplace-mode-toggle input {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          margin: 0;
+          opacity: 0;
+          cursor: pointer;
+          z-index: 2;
+        }
+
+        .wplace-mode-toggle-inner {
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          min-width: 140px;
+          border-radius: 999px;
+          background: var(--surface-variant, #2a2a2a);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          padding: 2px;
+          overflow: hidden;
+        }
+
+        .wplace-mode-toggle-inner::before {
+          content: "";
+          position: absolute;
+          top: 2px;
+          left: 2px;
+          width: calc(50% - 2px);
+          height: calc(100% - 4px);
+          background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+          box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+          border-radius: inherit;
+          transition: transform 0.25s ease;
+        }
+
+        .wplace-mode-toggle input:checked + .wplace-mode-toggle-inner::before {
+          transform: translateX(100%);
+        }
+
+        .wplace-mode-option {
+          flex: 1;
+          text-align: center;
+          font-size: 11px;
+          font-weight: 600;
+          line-height: 1;
+          padding: 8px 0;
+          color: var(--text-secondary, #909090);
+          position: relative;
+          z-index: 1;
+          transition: color 0.25s ease;
+          user-select: none;
+        }
+
+        .wplace-mode-toggle input:not(:checked) + .wplace-mode-toggle-inner .wplace-mode-option-auto,
+        .wplace-mode-toggle input:checked + .wplace-mode-toggle-inner .wplace-mode-option-assist {
+          color: var(--text-primary, #ffffff);
+        }
+
+        .wplace-mode-toggle:focus-within .wplace-mode-toggle-inner {
+          outline: 2px solid rgba(79, 172, 254, 0.4);
+          outline-offset: 2px;
         }
       </style>
     `;
@@ -4108,6 +4479,9 @@ function getText(key, params) {
 
     if (loadBtn) {
       loadBtn.addEventListener('click', async () => {
+        // Auto-open color palette if not already open
+        Utils.openColorPalette();
+        
         const savedData = Utils.loadProgress();
         if (!savedData) {
           updateUI('noSavedData', 'warning');
@@ -4933,9 +5307,12 @@ function getText(key, params) {
         };
 
         // Skip expensive dithering while user is dragging sliders
+        console.log(`🎨 Preview render - ditheringEnabled: ${state.ditheringEnabled}, _isDraggingSize: ${_isDraggingSize}`);
         if (state.ditheringEnabled && !_isDraggingSize) {
+          console.log('✅ Applying dithering to preview');
           applyFSDither();
         } else {
+          console.log('⛔ Skipping dithering - applying direct color conversion');
           for (let i = 0; i < data.length; i += 4) {
             const r = data[i],
               g = data[i + 1],
@@ -5734,6 +6111,17 @@ function getText(key, params) {
           width: newWidth,
           height: newHeight,
         });
+        
+        // ✅ Mark image as processed and enable position selection
+        state.imageProcessed = true;
+        selectPosBtn.disabled = false;
+        selectPosBtn.title = Utils.t('selectPosition') || 'Select starting position on canvas';
+        
+        // Enable start button if position is already set
+        if (state.startPosition) {
+          startBtn.disabled = false;
+        }
+        
         closeResizeDialog();
       };
 
@@ -7385,6 +7773,9 @@ function getText(key, params) {
 
     if (uploadBtn) {
       uploadBtn.addEventListener('click', async () => {
+        // Auto-open color palette if not already open
+        Utils.openColorPalette();
+        
         const availableColors = Utils.extractAvailableColors();
         if (availableColors === null || availableColors.length < 10) {
           updateUI('noColorsFound', 'error');
@@ -7445,6 +7836,7 @@ function getText(key, params) {
           state.paintedPixels = 0;
           state.currentPaintingColor = null; // Reset color tracking
           state.imageLoaded = true;
+          state.imageProcessed = false; // New upload - not processed yet
 
           // Reset session-specific flags when a new image is loaded
           state.preFilteringDone = false;
@@ -7465,7 +7857,7 @@ function getText(key, params) {
           state.originalImage = { dataUrl: imageSrc, width, height };
           saveBotSettings();
 
-          // Use the original image for the overlay initially
+          // ⚠️ Use the ORIGINAL image for the overlay initially (will be replaced after processing)
           const imageBitmap = await createImageBitmap(processor.img);
           await overlayManager.setImage(imageBitmap);
           overlayManager.enable();
@@ -7479,12 +7871,20 @@ function getText(key, params) {
           }
           saveBtn.disabled = false;
 
+          // ⚠️ IMPORTANT: Disable position selection until image is processed
+          selectPosBtn.disabled = true;
+          selectPosBtn.title = Utils.t('imageNeedsProcessing');
+
+          // Disable start button since position can't be set yet
           if (state.startPosition) {
-            startBtn.disabled = false;
+            startBtn.disabled = true; // Disable even if position was set before
           }
 
           await updateStats();
           updateDataButtons();
+          
+          // Show warning alert to process image first
+          Utils.showAlert(Utils.t('processImageFirst'), 'warning');
           updateUI('imageLoaded', 'success', { count: totalValidPixels });
         } catch {
           updateUI('imageError', 'error');
@@ -7497,6 +7897,9 @@ function getText(key, params) {
     if (loadExtractedBtn) {
       loadExtractedBtn.addEventListener('click', async () => {
         try {
+          // Auto-open color palette if not already open
+          Utils.openColorPalette();
+          
           updateUI('loadingImage', 'default');
           const fileData = await Utils.loadExtractedFileData();
 
@@ -7608,6 +8011,15 @@ function getText(key, params) {
             // For extracted images, ensure overlay is enabled but don't set position yet
             try {
               if (overlayManager && state.imageData) {
+                console.log('🖼️ Creating overlay from loaded pixel data:', {
+                  width: state.imageData.width,
+                  height: state.imageData.height,
+                  pixelCount: state.imageData.pixels?.length,
+                  firstPixels: state.imageData.pixels?.slice(0, 12), // First 3 pixels (RGBA)
+                  isUint8ClampedArray: state.imageData.pixels instanceof Uint8ClampedArray,
+                  isArray: Array.isArray(state.imageData.pixels)
+                });
+                
                 // Create image bitmap from the restored image data
                 const canvas = new OffscreenCanvas(state.imageData.width, state.imageData.height);
                 const ctx = canvas.getContext('2d');
@@ -7621,7 +8033,15 @@ function getText(key, params) {
 
                 await overlayManager.setImage(imageBitmap);
                 overlayManager.enable();
-                console.log('✅ Overlay enabled for extracted artwork');
+                console.log('✅ Overlay enabled for extracted artwork - should show PROCESSED pixels');
+                
+                // ✅ Loaded files already contain processed pixels - no need to reprocess
+                // Mark as processed since the overlay is showing the correct processed data
+                state.imageProcessed = true;
+                
+                // Enable position selection immediately
+                selectPosBtn.disabled = false;
+                selectPosBtn.title = Utils.t('selectPosition') || 'Select starting position on canvas';
               }
             } catch (overlayError) {
               console.warn('⚠️ Could not set overlay for extracted artwork:', overlayError);
@@ -7913,8 +8333,50 @@ function getText(key, params) {
       }
     }
 
+    // Helper function to update start button state
+    function updateStartButtonState() {
+      if (!startBtn) return;
+      
+      if (state.paintingMode === 'assist') {
+        startBtn.disabled = true;
+        startBtn.title = 'Start button is disabled in Assist mode. Manually place pixels with overlay guidance.';
+      } else {
+        startBtn.disabled = !state.imageLoaded || state.running || !state.startPosition;
+        startBtn.title = '';
+      }
+    }
+
     if (startBtn) {
       startBtn.addEventListener('click', startPainting);
+    }
+
+    // Painting Mode Toggle
+    const paintingModeToggle = container.querySelector('#paintingModeToggle');
+    if (paintingModeToggle) {
+      // Initialize toggle state - MUST be unchecked for auto mode (default)
+      paintingModeToggle.checked = state.paintingMode === 'assist';
+      console.log(`🎨 [Painting Mode] Initial state: ${state.paintingMode}, Toggle checked: ${paintingModeToggle.checked}`);
+      
+      paintingModeToggle.addEventListener('change', () => {
+        state.paintingMode = paintingModeToggle.checked ? 'assist' : 'auto';
+        
+        // Update start button state
+        updateStartButtonState();
+        
+        // NOTE: We don't save paintingMode - it always resets to 'auto' on page load
+        
+        // Show notification
+        const modeName = state.paintingMode === 'assist' ? 'Assist' : 'Auto';
+        const modeDesc = state.paintingMode === 'assist' 
+          ? 'Overlay will guide your manual pixel placement' 
+          : 'Bot will automatically paint pixels';
+        Utils.showAlert(`Painting Mode: ${modeName}\n${modeDesc}`, 'info');
+        
+        console.log(`🎨 [Painting Mode] Switched to ${modeName.toUpperCase()} mode`);
+      });
+      
+      // Initial state update
+      updateStartButtonState();
     }
 
     if (stopBtn) {
@@ -8049,6 +8511,13 @@ function getText(key, params) {
     loadBotSettings();
     // Ensure notification poller reflects current settings
     NotificationManager.syncFromState();
+    
+    // Sync painting mode toggle with loaded state
+    if (paintingModeToggle) {
+      paintingModeToggle.checked = state.paintingMode === 'assist';
+      updateStartButtonState();
+      console.log(`🔄 [Painting Mode] Synced after load: ${state.paintingMode}, Toggle checked: ${paintingModeToggle.checked}`);
+    }
   }
 
   function getMsToTargetCharges(current, target, cooldown, intervalMs = 0) {
@@ -8434,9 +8903,11 @@ function getText(key, params) {
         }
       }
 
-      // Concatenate all blocks
+      // Append all blocks without spread/concat to avoid large allocations and argument explosion
       for (const block of blocks) {
-        coords.push(...block);
+        for (let i = 0; i < block.length; i++) {
+          coords.push(block[i]);
+        }
       }
     } else {
       throw new Error(`Unknown mode: ${mode}`);
@@ -8733,21 +9204,9 @@ function getText(key, params) {
 
     // Paint pixels until we run out of charges or complete the image
     try {
-      // First generate coordinates without filtering to count skipped ones
-      const allCoords = generateCoordinates(
-        width,
-        height,
-        state.coordinateMode,
-        state.coordinateDirection,
-        state.coordinateSnake,
-        state.blockWidth,
-        state.blockHeight,
-        0, // Don't filter here
-        0  // Don't filter here
-      );
 
       // Generate the actual filtered coordinates for painting (resuming from last position)
-      const coords = generateCoordinates(
+      const coords = await generateCoordinatesAsync(
         width,
         height,
         state.coordinateMode,
@@ -8890,7 +9349,10 @@ function getText(key, params) {
         pixelsToProcess = [];
         for (let i = startIndex; i < sortedColorGroups.length; i++) {
           const [colorId, pixels] = sortedColorGroups[i];
-          pixelsToProcess.push(...pixels);
+          // Avoid using spread or concat with very large arrays to prevent call stack/alloc overhead
+          for (let j = 0; j < pixels.length; j++) {
+            pixelsToProcess.push(pixels[j]);
+          }
         }
 
         console.log(`✅ Prepared ${pixelsToProcess.length} pixels for color-by-color painting`);
@@ -9456,6 +9918,12 @@ function getText(key, params) {
         notifyOnlyWhenUnfocused: state.notifyOnlyWhenUnfocused,
         notificationIntervalMinutes: state.notificationIntervalMinutes,
         originalImage: state.originalImage,
+        ditheringMigrated: true, // Migration flag for dithering default change
+        blueMarbleMigrated: true, // Migration flag for blue marble default change
+        // NOTE: paintingMode is intentionally NOT saved - always defaults to 'auto' on page load
+        // Save region and startPosition for assist mode coordinate calculations
+        region: state.region,
+        startPosition: state.startPosition,
       };
       CONFIG.PAINTING_SPEED_ENABLED = settings.paintingSpeedEnabled;
       // AUTO_CAPTCHA_ENABLED is always true - no need to save/load
@@ -9484,8 +9952,31 @@ function getText(key, params) {
       CONFIG.PAINTING_SPEED_ENABLED = settings.paintingSpeedEnabled ?? false;
       CONFIG.AUTO_CAPTCHA_ENABLED = settings.autoCaptchaEnabled ?? false;
       state.overlayOpacity = settings.overlayOpacity ?? CONFIG.OVERLAY.OPACITY_DEFAULT;
-      state.blueMarbleEnabled = settings.blueMarbleEnabled ?? CONFIG.OVERLAY.BLUE_MARBLE_DEFAULT;
-      state.ditheringEnabled = settings.ditheringEnabled ?? false;
+      
+      // MIGRATION: Force enable blue marble for existing users if not explicitly set
+      // This ensures the new default (blue marble ON) is applied to existing users
+      if (settings.blueMarbleMigrated !== true) {
+        state.blueMarbleEnabled = true;
+        console.log('🔄 Migrated: Blue Marble enabled (new default)');
+        // Save the migration flag
+        settings.blueMarbleMigrated = true;
+        localStorage.setItem('wplace-bot-settings', JSON.stringify(settings));
+      } else {
+        state.blueMarbleEnabled = settings.blueMarbleEnabled ?? CONFIG.OVERLAY.BLUE_MARBLE_DEFAULT;
+      }
+      
+      // MIGRATION: Force reset dithering to false if not explicitly set in saved settings
+      // This ensures the new default (dithering OFF) is applied to existing users
+      if (settings.ditheringMigrated !== true) {
+        state.ditheringEnabled = false;
+        console.log('🔄 Migrated: Dithering reset to OFF (new default)');
+        // Save the migration flag
+        settings.ditheringMigrated = true;
+        localStorage.setItem('wplace-bot-settings', JSON.stringify(settings));
+      } else {
+        state.ditheringEnabled = settings.ditheringEnabled ?? false;
+      }
+      
       state.colorMatchingAlgorithm = settings.colorMatchingAlgorithm || 'lab';
 	  state.invertColorEnabled = setting.invertColorEnabled ?? false;
       state.enableChromaPenalty = settings.enableChromaPenalty ?? true;
@@ -9511,6 +10002,18 @@ function getText(key, params) {
         settings.notifyOnlyWhenUnfocused ?? CONFIG.NOTIFICATIONS.ONLY_WHEN_UNFOCUSED;
       state.notificationIntervalMinutes =
         settings.notificationIntervalMinutes ?? CONFIG.NOTIFICATIONS.REPEAT_MINUTES;
+      // NOTE: paintingMode is NOT restored - always defaults to 'auto' on page load
+      
+      // Restore region and startPosition for assist mode coordinate calculations
+      if (settings.region) {
+        state.region = settings.region;
+        console.log('✅ Restored region from save file:', state.region);
+      }
+      if (settings.startPosition) {
+        state.startPosition = settings.startPosition;
+        console.log('✅ Restored startPosition from save file:', state.startPosition);
+      }
+      
       // Restore ignore mask if dims match current resizeSettings
       if (
         settings.resizeIgnoreMask &&
@@ -10616,3 +11119,252 @@ function getText(key, params) {
     });
   });
 })();
+
+// === Async coordinate generation (off-main-thread) ===
+async function generateCoordinatesAsync(
+  width,
+  height,
+  mode,
+  direction,
+  snake,
+  blockWidth,
+  blockHeight,
+  startFromX = 0,
+  startFromY = 0
+) {
+  try {
+    if (typeof Worker === 'undefined') {
+      // Environment does not support Web Workers – fall back
+      return generateCoordinates(
+        width,
+        height,
+        mode,
+        direction,
+        snake,
+        blockWidth,
+        blockHeight,
+        startFromX,
+        startFromY
+      );
+    }
+
+    const workerCode = `self.onmessage = function(e) {
+  const { width, height, mode, direction, snake, blockWidth, blockHeight, startFromX, startFromY } = e.data || {};
+
+  function generate() {
+    let coords = [];
+
+    // Determine traversal direction
+    let xStart, xEnd, xStep;
+    let yStart, yEnd, yStep;
+    switch (direction) {
+      case 'top-left':
+        xStart = 0; xEnd = width; xStep = 1;
+        yStart = 0; yEnd = height; yStep = 1;
+        break;
+      case 'top-right':
+        xStart = width - 1; xEnd = -1; xStep = -1;
+        yStart = 0; yEnd = height; yStep = 1;
+        break;
+      case 'bottom-left':
+        xStart = 0; xEnd = width; xStep = 1;
+        yStart = height - 1; yEnd = -1; yStep = -1;
+        break;
+      case 'bottom-right':
+        xStart = width - 1; xEnd = -1; xStep = -1;
+        yStart = height - 1; yEnd = -1; yStep = -1;
+        break;
+      default:
+        throw new Error('Unknown direction: ' + direction);
+    }
+
+    if (mode === 'rows') {
+      let rowIndex = 0;
+      for (let y = yStart; y !== yEnd; y += yStep) {
+        if (snake && rowIndex % 2 !== 0) {
+          for (let x = xEnd - xStep; x !== xStart - xStep; x -= xStep) {
+            coords.push([x, y]);
+          }
+        } else {
+          for (let x = xStart; x !== xEnd; x += xStep) {
+            coords.push([x, y]);
+          }
+        }
+        rowIndex++;
+      }
+    } else if (mode === 'columns') {
+      let colIndex = 0;
+      for (let x = xStart; x !== xEnd; x += xStep) {
+        if (snake && colIndex % 2 !== 0) {
+          for (let y = yEnd - yStep; y !== yStart - yStep; y -= yStep) {
+            coords.push([x, y]);
+          }
+        } else {
+          for (let y = yStart; y !== yEnd; y += yStep) {
+            coords.push([x, y]);
+          }
+        }
+        colIndex++;
+      }
+    } else if (mode === 'circle-out') {
+      const cx = Math.floor(width / 2);
+      const cy = Math.floor(height / 2);
+      const maxRadius = Math.ceil(Math.sqrt(cx * cx + cy * cy));
+      for (let r = 0; r <= maxRadius; r++) {
+        for (let y = cy - r; y <= cy + r; y++) {
+          for (let x = cx - r; x <= cx + r; x++) {
+            if (x >= 0 && x < width && y >= 0 && y < height) {
+              const dist = Math.max(Math.abs(x - cx), Math.abs(y - cy));
+              if (dist === r) coords.push([x, y]);
+            }
+          }
+        }
+      }
+    } else if (mode === 'circle-in') {
+      const cx = Math.floor(width / 2);
+      const cy = Math.floor(height / 2);
+      const maxRadius = Math.ceil(Math.sqrt(cx * cx + cy * cy));
+      for (let r = maxRadius; r >= 0; r--) {
+        for (let y = cy - r; y <= cy + r; y++) {
+          for (let x = cx - r; x <= cx + r; x++) {
+            if (x >= 0 && x < width && y >= 0 && y < height) {
+              const dist = Math.max(Math.abs(x - cx), Math.abs(y - cy));
+              if (dist === r) coords.push([x, y]);
+            }
+          }
+        }
+      }
+    } else if (mode === 'blocks' || mode === 'shuffle-blocks') {
+      const blocks = [];
+      for (let by = 0; by < height; by += blockHeight) {
+        for (let bx = 0; bx < width; bx += blockWidth) {
+          const block = [];
+          for (let y = by; y < Math.min(by + blockHeight, height); y++) {
+            for (let x = bx; x < Math.min(bx + blockWidth, width); x++) {
+              block.push([x, y]);
+            }
+          }
+          blocks.push(block);
+        }
+      }
+      if (mode === 'shuffle-blocks') {
+        for (let i = blocks.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          const tmp = blocks[i];
+          blocks[i] = blocks[j];
+          blocks[j] = tmp;
+        }
+      }
+      for (const block of blocks) {
+        for (let i = 0; i < block.length; i++) {
+          coords.push(block[i]);
+        }
+      }
+    } else {
+      throw new Error('Unknown mode: ' + mode);
+    }
+
+    // Resume from specified position if provided
+    if (startFromX > 0 || startFromY > 0) {
+      let startIndex = -1;
+      for (let i = 0; i < coords.length; i++) {
+        const c = coords[i];
+        if (c[0] === startFromX && c[1] === startFromY) {
+          startIndex = i;
+          break;
+        }
+      }
+      if (startIndex >= 0) {
+        coords = coords.slice(startIndex);
+      }
+    }
+
+    return coords;
+  }
+
+  try {
+    const coords = generate();
+    self.postMessage({ ok: true, coords });
+  } catch (err) {
+    self.postMessage({ ok: false, error: err && (err.message || String(err)) });
+  }
+};`;
+
+    const blob = new Blob([workerCode], { type: 'application/javascript' });
+    const url = URL.createObjectURL(blob);
+
+    return await new Promise((resolve) => {
+      const worker = new Worker(url);
+      const cleanup = () => {
+        URL.revokeObjectURL(url);
+        try { worker.terminate(); } catch (e) { }
+      };
+
+      worker.onmessage = (e) => {
+        const { ok, coords, error } = e.data || {};
+        cleanup();
+        if (ok && Array.isArray(coords)) {
+          resolve(coords);
+        } else {
+          console.warn('Coordinate worker failed, falling back to sync:', error);
+          resolve(
+            generateCoordinates(
+              width,
+              height,
+              mode,
+              direction,
+              snake,
+              blockWidth,
+              blockHeight,
+              startFromX,
+              startFromY
+            )
+          );
+        }
+      };
+
+      worker.onerror = (err) => {
+        console.warn('Coordinate worker error, falling back to sync:', err && (err.message || err));
+        cleanup();
+        resolve(
+          generateCoordinates(
+            width,
+            height,
+            mode,
+            direction,
+            snake,
+            blockWidth,
+            blockHeight,
+            startFromX,
+            startFromY
+          )
+        );
+      };
+
+      worker.postMessage({
+        width,
+        height,
+        mode,
+        direction,
+        snake,
+        blockWidth,
+        blockHeight,
+        startFromX,
+        startFromY,
+      });
+    });
+  } catch (e) {
+    console.warn('Failed to start coordinate worker, using sync generation:', e);
+    return generateCoordinates(
+      width,
+      height,
+      mode,
+      direction,
+      snake,
+      blockWidth,
+      blockHeight,
+      startFromX,
+      startFromY
+    );
+  }
+}

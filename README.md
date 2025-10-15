@@ -68,6 +68,8 @@ Follow the exact same steps listed for Chrome above, using Kiwi Browser instead.
 - [x] Automatically farms droplets/levels
       
 - [X] Artwork Extractor(copy-paste artworks)
+      
+- [x] Painting Assist
 
 - [X] Quick Art mover feature 
 
@@ -92,7 +94,7 @@ Follow the exact same steps listed for Chrome above, using Kiwi Browser instead.
 - [x] Works on mobile (via browsers like Kiwi) :P
 
 <p align="center">
-<img src="https://i.imgur.com/5QYvb4w.png" alt="Script Demonstration"/>
+<img src="https://i.imgur.com/D6KsXQT.png" alt="Script Demonstration"/>
 </p>
 
 📋┃To-do

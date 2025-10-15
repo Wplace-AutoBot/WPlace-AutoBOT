@@ -3,7 +3,7 @@
   "toggleOverlay": "Toggle Overlay",
   "scanColors": "Scan Colors",
   "uploadImage": "Upload",
-  "resizeImage": "Resize",
+  "resizeImage": "Process/Edit Image",
   "selectPosition": "Select Position",
   "startPainting": "Start",
   "stopPainting": "Stop",
@@ -12,7 +12,8 @@
   "colorsUpdated": "✅ Available colors increased {oldCount} -> {newCount}, {diffCount} new colors found",
   "colorsFound": "✅ {count} available colors found. Ready to upload.",
   "loadingImage": "🖼️ Loading image...",
-  "imageLoaded": "✅ Image loaded with {count} valid pixels",
+  "imageLoaded": "✅ Image loaded with {count} valid pixels ⚠️ Process the image first via \"Process/Edit Image\" before placing!",
+  "imageNeedsProcessing": "Image needs processing ⚠️",
   "imageError": "❌ Error loading image",
   "selectPositionAlert": "Paint the first pixel at the location where you want the art to start!",
   "waitingPosition": "👆 Waiting for you to paint the reference pixel...",
@@ -157,5 +158,9 @@
   "paintTransparentPixels": "Paint Transparent",
   "paintTransparentPixelsDescription": "If enabled, template transparent pixels will be painted",
   "paintUnavailablePixels": "Paint Unavailable",
-  "paintUnavailablePixelsDescription": "If enabled, template colors that are unavailable will be painted using the closest available color"
+  "paintUnavailablePixelsDescription": "If enabled, template colors that are unavailable will be painted using the closest available color",
+  "paintingModeAuto": "Auto",
+  "paintingModeAssist": "Assist",
+  "paintingModeAutoDesc": "Bot will automatically paint pixels",
+  "paintingModeAssistDesc": "Overlay will guide your manual pixel placement"
 }

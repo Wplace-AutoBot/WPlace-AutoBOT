@@ -149,6 +149,7 @@ class OverlayManager {
       
       // Method 2: Force browser to bypass cache by adding cache-busting parameter
       // We need to intercept and modify tile requests to add cache-busting
+      // IMPORTANT: Preserve any existing fetch override (e.g., from Auto-Image assist mode)
       const originalFetch = window.fetch;
       let fetchOverrideActive = true;
       
@@ -167,6 +168,7 @@ class OverlayManager {
           }
         }
         
+        // Chain to previous fetch (which may have assist mode logic)
         return originalFetch.apply(this, args);
       };
       
@@ -435,26 +437,44 @@ class OverlayManager {
     const chunkCtx = chunkCanvas.getContext('2d');
     chunkCtx.imageSmoothingEnabled = false;
 
-    chunkCtx.drawImage(this.imageBitmap, sX, sY, sW, sH, dX, dY, sW, sH);
-
-    // Blue marble effect with faster pixel manipulation
     const blueMarbleEnabled = window.state?.blueMarbleEnabled || false;
+
     if (blueMarbleEnabled) {
-      const imageData = chunkCtx.getImageData(dX, dY, sW, sH);
+      // Blue marble effect: scale canvas 3x and show only center pixels of each 3x3 block
+      const shreadSize = 3;
+      const scaledWidth = sW * shreadSize;
+      const scaledHeight = sH * shreadSize;
+      const scaledDX = dX * shreadSize;
+      const scaledDY = dY * shreadSize;
+
+      // Resize chunk canvas to be 3x larger
+      const scaledCanvas = new OffscreenCanvas(this.tileSize * shreadSize, this.tileSize * shreadSize);
+      const scaledCtx = scaledCanvas.getContext('2d');
+      scaledCtx.imageSmoothingEnabled = false;
+
+      // Draw scaled image
+      scaledCtx.drawImage(this.imageBitmap, sX, sY, sW, sH, scaledDX, scaledDY, scaledWidth, scaledHeight);
+
+      // Get image data and make non-center pixels transparent
+      const imageData = scaledCtx.getImageData(scaledDX, scaledDY, scaledWidth, scaledHeight);
       const data = imageData.data;
 
-      // Faster pixel manipulation using typed arrays
-      for (let i = 0; i < data.length; i += 4) {
-        const pixelIndex = i / 4;
-        const pixelY = Math.floor(pixelIndex / sW);
-        const pixelX = pixelIndex % sW;
-
-        if ((pixelX + pixelY) % 2 === 0 && data[i + 3] > 0) {
-          data[i + 3] = 0; // Set alpha to 0
+      for (let y = 0; y < scaledHeight; y++) {
+        for (let x = 0; x < scaledWidth; x++) {
+          const i = (y * scaledWidth + x) * 4;
+          // Keep only center pixel of each 3x3 block (x % 3 === 1 && y % 3 === 1)
+          if (x % shreadSize !== 1 || y % shreadSize !== 1) {
+            data[i + 3] = 0; // Set alpha to 0
+          }
         }
       }
 
-      chunkCtx.putImageData(imageData, dX, dY);
+      scaledCtx.putImageData(imageData, scaledDX, scaledDY);
+
+      // Return the 3x scaled canvas
+      return await scaledCanvas.transferToImageBitmap();
+    } else {
+      chunkCtx.drawImage(this.imageBitmap, sX, sY, sW, sH, dX, dY, sW, sH);
     }
 
     return await chunkCanvas.transferToImageBitmap();
@@ -632,14 +652,22 @@ class OverlayManager {
    */
   async _compositeTileOptimized(originalBlob, overlayBitmap) {
     const originalBitmap = await createImageBitmap(originalBlob);
-    const canvas = new OffscreenCanvas(originalBitmap.width, originalBitmap.height);
+    const blueMarbleEnabled = window.state?.blueMarbleEnabled || false;
+
+    // Blue marble mode uses 3x scaled canvas
+    const scale = blueMarbleEnabled ? 3 : 1;
+    const canvasWidth = originalBitmap.width * scale;
+    const canvasHeight = originalBitmap.height * scale;
+
+    const canvas = new OffscreenCanvas(canvasWidth, canvasHeight);
     const ctx = canvas.getContext('2d');
 
     // Disable antialiasing for pixel-perfect rendering
     ctx.imageSmoothingEnabled = false;
 
-    // Draw original tile first
-    ctx.drawImage(originalBitmap, 0, 0);
+    // Draw original tile first (scaled if blue marble mode)
+    ctx.drawImage(originalBitmap, 0, 0, originalBitmap.width, originalBitmap.height,
+                  0, 0, canvasWidth, canvasHeight);
 
     // Set opacity and draw overlay with optimized blend mode
     const overlayOpacity = window.state?.overlayOpacity || 0.6;
