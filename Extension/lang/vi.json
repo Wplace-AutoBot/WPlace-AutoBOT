@@ -163,6 +163,8 @@
   "paintingFinalBatchFailed": "⚠️ Lô cuối cùng gồm {count} pixel thất bại sau nhiều lần thử.",
   "paintingStoppedByUser": "⏹️ Người dùng đã dừng vẽ",
   "fullChargeIn": "Sạc đầy trong",
-  "batchSize": "Kích thước lô"
+  "batchSize": "Kích thước lô",
+  "autoLoadProgress": "Tự động tải tiến trình đã lưu",
+  "autoLoadProgressDesc": "Nếu bật, sẽ tự động tải tiến trình đã lưu sau khi bộ tạo token được khởi tạo khi tải trang."
 }
 

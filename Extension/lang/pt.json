@@ -162,5 +162,7 @@
   "paintingFinalBatchFailed": "⚠️ Lote final de {count} pixels falhou após várias tentativas.",
   "paintingStoppedByUser": "⏹️ Pintura interrompida pelo usuário",
   "fullChargeIn": "Carga completa em",
-  "batchSize": "Tamanho do lote"
+  "batchSize": "Tamanho do lote",
+  "autoLoadProgress": "Auto-carregar progresso salvo",
+  "autoLoadProgressDesc": "Se ativado, carregará automaticamente o progresso salvo após a inicialização do gerador de tokens ao carregar a página."
 }

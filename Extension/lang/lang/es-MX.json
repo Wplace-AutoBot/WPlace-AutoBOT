@@ -149,5 +149,7 @@
   "paintingModeAuto": "Automático",
   "paintingModeAssist": "Asistir",
   "paintingModeAutoDesc": "El bot pintará píxeles automáticamente",
-  "paintingModeAssistDesc": "La superposición guiará tu colocación manual de píxeles"
+  "paintingModeAssistDesc": "La superposición guiará tu colocación manual de píxeles",
+  "autoLoadProgress": "Cargar progreso guardado automáticamente",
+  "autoLoadProgressDesc": "Si está activado, cargará automáticamente el progreso guardado después de que el generador de tokens se inicialice al cargar la página."
 }

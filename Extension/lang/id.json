@@ -163,6 +163,8 @@
   "paintingFinalBatchFailed": "⚠️ Batch akhir {count} piksel gagal setelah beberapa percobaan.",
   "paintingStoppedByUser": "⏹️ Melukis dihentikan oleh pengguna",
   "fullChargeIn": "Muatan penuh dalam",
-  "batchSize": "Ukuran batch"
+  "batchSize": "Ukuran batch",
+  "autoLoadProgress": "Muat otomatis progres tersimpan",
+  "autoLoadProgressDesc": "Jika diaktifkan, akan otomatis memuat progres tersimpan setelah generator token diinisialisasi saat halaman dimuat."
 }
 

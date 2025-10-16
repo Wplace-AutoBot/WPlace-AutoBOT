@@ -1053,6 +1053,8 @@ localStorage.removeItem("lp");
     chargesThresholdInterval: null,
     tokenSource: CONFIG.TOKEN_SOURCE, // "generator" or "manual"
     initialSetupComplete: false, // Track if initial startup setup is complete (only happens once)
+    autoLoadProgress: false, // New: automatically load saved progress after Turnstile init
+    _autoLoadAttempted: false, // Internal: ensure auto-load runs at most once
     overlayOpacity: CONFIG.OVERLAY.OPACITY_DEFAULT,
     blueMarbleEnabled: CONFIG.OVERLAY.BLUE_MARBLE_DEFAULT,
     ditheringEnabled: false,
@@ -2940,6 +2942,19 @@ localStorage.removeItem("lp");
             ${Utils.t('automation')}
           </label>
           <!-- Token generator is always enabled - settings moved to Token Source above -->
+          <div class="wplace-settings-section-wrapper">
+            <label for="autoLoadProgressToggle" class="wplace-settings-toggle">
+              <div>
+                <span class="wplace-settings-toggle-title" style="color: ${theme.text || 'white'};">
+                  ${Utils.t('autoLoadProgress')}
+                </span>
+                <p class="wplace-settings-toggle-description" style="color: ${theme.text ? `${theme.text}BB` : 'rgba(255,255,255,0.7)'};">
+                  ${Utils.t('autoLoadProgressDesc')}
+                </p>
+              </div>
+              <input type="checkbox" id="autoLoadProgressToggle" ${state.autoLoadProgress ? 'checked' : ''} class="wplace-settings-checkbox" style="accent-color: ${theme.highlight || '#48dbfb'};"/>
+            </label>
+          </div>
         </div>
 
         <!-- Overlay Settings Section -->
@@ -4148,6 +4163,7 @@ localStorage.removeItem("lp");
       const settingsPaintTransparentToggle = settingsContainer.querySelector(
         '#settingsPaintTransparentToggle'
       );
+      const autoLoadProgressToggle = settingsContainer.querySelector('#autoLoadProgressToggle');
 
       if (overlayOpacitySlider && overlayOpacityValue) {
         const updateOpacity = (newValue) => {
@@ -4190,6 +4206,15 @@ localStorage.removeItem("lp");
             ? 'Transparent pixels in the template will be painted with the closest available color'
             : 'Transparent pixels will be skipped';
           Utils.showAlert(statusText, 'success');
+        });
+      }
+
+      if (autoLoadProgressToggle) {
+        autoLoadProgressToggle.checked = state.autoLoadProgress;
+        autoLoadProgressToggle.addEventListener('change', (e) => {
+          state.autoLoadProgress = !!e.target.checked;
+          saveBotSettings();
+          console.log(`🔄 Auto-load progress ${state.autoLoadProgress ? 'enabled' : 'disabled'}`);
         });
       }
 
@@ -9837,6 +9862,7 @@ localStorage.removeItem("lp");
         randomBatchMax: state.randomBatchMax,
         cooldownChargeThreshold: state.cooldownChargeThreshold,
         tokenSource: state.tokenSource, // "generator", "hybrid", or "manual"
+        autoLoadProgress: state.autoLoadProgress,
         minimized: state.minimized,
         overlayOpacity: state.overlayOpacity,
         blueMarbleEnabled: document.getElementById('enableBlueMarbleToggle')?.checked,
@@ -9901,6 +9927,7 @@ localStorage.removeItem("lp");
         settings.cooldownChargeThreshold || CONFIG.COOLDOWN_CHARGE_THRESHOLD;
       state.tokenSource = settings.tokenSource || CONFIG.TOKEN_SOURCE; // Default to "generator"
       state.minimized = settings.minimized ?? false;
+      state.autoLoadProgress = settings.autoLoadProgress ?? false;
       CONFIG.PAINTING_SPEED_ENABLED = settings.paintingSpeedEnabled ?? false;
       CONFIG.AUTO_CAPTCHA_ENABLED = settings.autoCaptchaEnabled ?? false;
       state.overlayOpacity = settings.overlayOpacity ?? CONFIG.OVERLAY.OPACITY_DEFAULT;
@@ -10123,6 +10150,61 @@ localStorage.removeItem("lp");
   const fpStr32 = tokenManager._randStr(32);
   console.log('🔑 Generated fingerprint string for API requests');
 
+  // Function to auto-load saved progress after init if enabled
+  async function attemptAutoLoadProgress() {
+    if (state._autoLoadAttempted) return;
+    state._autoLoadAttempted = true;
+    try {
+      const savedData = Utils.loadProgress();
+      if (!savedData) return;
+
+      const hasCompleteData = savedData.state && savedData.imageData &&
+        savedData.state.availableColors &&
+        savedData.state.availableColors.length > 0;
+
+      const success = Utils.restoreProgress(savedData);
+      if (success) {
+        if (hasCompleteData) {
+          state.initialSetupComplete = true;
+        }
+
+        updateUI('dataLoaded', 'success');
+        Utils.showAlert(Utils.t('dataLoaded'), 'success');
+        updateDataButtons();
+        await updateStats();
+
+        const statsContainer = document.getElementById('wplace-stats-container');
+        if (statsContainer && typeof updateStats === 'function') {
+          setTimeout(async () => { await updateStats(); }, 100);
+        }
+
+        Utils.restoreOverlayFromData().catch((error) => {
+          console.error('Failed to restore overlay from localStorage:', error);
+        });
+
+        const uploadBtn = document.getElementById('uploadBtn');
+        const selectPosBtn = document.getElementById('selectPosBtn');
+        const loadExtractedBtn = document.getElementById('loadExtractedBtn');
+
+        if (!state.colorsChecked) {
+          if (uploadBtn) uploadBtn.disabled = false;
+          if (loadExtractedBtn) loadExtractedBtn.disabled = false;
+        } else {
+          if (uploadBtn) uploadBtn.disabled = false;
+          if (loadExtractedBtn) loadExtractedBtn.disabled = false;
+          if (selectPosBtn) selectPosBtn.disabled = false;
+        }
+
+        const startBtn = document.getElementById('startBtn');
+        if (state.imageLoaded && state.startPosition && state.region && state.colorsChecked) {
+          if (startBtn) startBtn.disabled = false;
+        }
+      }
+    } catch (e) {
+      console.error('Auto-load progress failed:', e);
+    }
+  }
+
   // Function to enable file operations after initial startup setup is complete
   function enableFileOperations() {
     state.initialSetupComplete = true;
@@ -10174,6 +10256,11 @@ localStorage.removeItem("lp");
 
     // Show a notification that file operations are now available
     Utils.showAlert(Utils.t('fileOperationsAvailable'), 'success');
+
+    // Auto-load saved progress on init if enabled
+    if (state.autoLoadProgress) {
+      attemptAutoLoadProgress();
+    }
   }
 
   // Optimized token initialization with better timing and error handling
