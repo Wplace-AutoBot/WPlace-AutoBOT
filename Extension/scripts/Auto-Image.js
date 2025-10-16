@@ -10413,6 +10413,21 @@ localStorage.removeItem("lp");
       // POST request completed
       if (res.ok) {
         console.log("Successfully bought", amounts * chargeMultiplier, type.replace('_', ' '), ".");
+        // Update AccountManager to reflect new limits/charges after successful purchase
+        try {
+          const acc = (typeof accountManager !== 'undefined' && accountManager?.getCurrentAccount) ? accountManager.getCurrentAccount() : null;
+          if (acc) {
+            if (type === "max_charges") {
+              const newMax = Math.floor((typeof acc.Max === 'number' ? acc.Max : 0) + (amounts * chargeMultiplier));
+              accountManager.updateAccountData({ Max: newMax });
+            } else if (type === "paint_charges") {
+              const newCharges = Math.floor((typeof acc.Charges === 'number' ? acc.Charges : 0) + (amounts * chargeMultiplier));
+              accountManager.updateAccountData({ Charges: newCharges });
+            }
+          }
+        } catch (e) {
+          console.warn('⚠️ Failed to update account manager after purchase', e);
+        }
         return 2;
       } else {
         console.log("Failed to buy charges");
