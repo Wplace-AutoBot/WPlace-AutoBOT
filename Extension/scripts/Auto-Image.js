@@ -4475,9 +4475,6 @@ localStorage.removeItem("lp");
 
     if (loadBtn) {
       loadBtn.addEventListener('click', async () => {
-        // Auto-open color palette if not already open
-        Utils.openColorPalette();
-
         const savedData = Utils.loadProgress();
         if (!savedData) {
           updateUI('noSavedData', 'warning');
