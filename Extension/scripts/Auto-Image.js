@@ -10500,20 +10500,46 @@ localStorage.removeItem("lp");
       // POST request completed
       if (res.ok) {
         console.log("Successfully bought", amounts * chargeMultiplier, type.replace('_', ' '), ".");
-        // Update AccountManager to reflect new limits/charges after successful purchase
+        // Update AccountManager and ChargeModel to reflect new limits/charges after successful purchase
         try {
           const acc = (typeof accountManager !== 'undefined' && accountManager?.getCurrentAccount) ? accountManager.getCurrentAccount() : null;
+          const token = acc?.token;
           if (acc) {
             if (type === "max_charges") {
-              const newMax = Math.floor((typeof acc.Max === 'number' ? acc.Max : 0) + (amounts * chargeMultiplier));
+              const add = (amounts * chargeMultiplier);
+              const newMax = Math.floor((typeof acc.Max === 'number' ? acc.Max : 0) + add);
               accountManager.updateAccountData({ Max: newMax });
+              // Keep local model in sync to avoid rollback by ChargeModel
+              try {
+                const node = ChargeModel?.get(token);
+                if (node) {
+                  node.max = Math.max(1, newMax);
+                  // Ensure charges do not exceed the new max
+                  node.charges = Math.min(node.max, Math.max(0, Math.floor(node.charges || 0)));
+                  node.lastSyncAt = Date.now();
+                }
+              } catch {}
             } else if (type === "paint_charges") {
-              const newCharges = Math.floor((typeof acc.Charges === 'number' ? acc.Charges : 0) + (amounts * chargeMultiplier));
+              const add = (amounts * chargeMultiplier);
+              const currentCharges = (typeof acc.Charges === 'number' ? acc.Charges : 0);
+              const currentMax = (typeof acc.Max === 'number' ? acc.Max : 1);
+              const newCharges = Math.min(currentMax, Math.floor(currentCharges + add));
               accountManager.updateAccountData({ Charges: newCharges });
+              // Keep local model in sync to avoid rollback by ChargeModel
+              try {
+                const node = ChargeModel?.get(token);
+                if (node) {
+                  node.max = Math.max(1, node.max || currentMax);
+                  node.charges = Math.min(node.max, Math.floor((node.charges || 0) + add));
+                  node.lastSyncAt = Date.now();
+                }
+              } catch {}
             }
+            // Mirror to UI and other accounts via ChargeModel when available
+            try { ChargeModel?.syncToAccountManager?.(); } catch {}
           }
         } catch (e) {
-          console.warn('⚠️ Failed to update account manager after purchase', e);
+          console.warn('⚠️ Failed to update account manager/charge model after purchase', e);
         }
         return 2;
       } else {
