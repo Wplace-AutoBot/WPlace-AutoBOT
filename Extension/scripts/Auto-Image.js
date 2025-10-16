@@ -10380,13 +10380,21 @@ localStorage.removeItem("lp");
       console.error("Error: Invalid purchase type provided.");
       return;
     }
-    const { droplets } = await WPlaceService.getCharges();
+    // Refresh and update full account data, then use it for purchasing
+    const accountData = await WPlaceService.getCharges();
+    // Update the current account with the latest fetched info
+    if (accountData) {
+      try { accountManager.updateAccountData(accountData); } catch (e) { console.warn('⚠️ Failed to update account manager from getCharges()', e); }
+    }
+    // Prefer droplets from the AccountManager (updated), fallback to fetched value
+    const current = typeof accountManager !== 'undefined' ? accountManager.getCurrentAccount() : null;
+    const droplets = (current && typeof current.Droplets === 'number') ? current.Droplets : (accountData?.droplets || 0);
     console.log("There are currently : ", droplets, "droplets.");
     try {
       const amounts = Math.floor(droplets / 500);
       if (amounts < 1) {
         console.log("Not enough droplets to purchase.");
-        return;
+        return 1;
       }
       const payload = {
         "product": {
@@ -10403,8 +10411,7 @@ localStorage.removeItem("lp");
         credentials: "include"
       });
       // POST request completed
-      const { droplets: newDroplets } = await WPlaceService.getCharges();
-      if (droplets != newDroplets) {
+      if (res.ok) {
         console.log("Successfully bought", amounts * chargeMultiplier, type.replace('_', ' '), ".");
         return 2;
       } else {
