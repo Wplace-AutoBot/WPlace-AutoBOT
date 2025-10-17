@@ -163,6 +163,8 @@
   "paintingFinalBatchFailed": "⚠️ {count} 個像素的最終批次在多次嘗試後失敗。",
   "paintingStoppedByUser": "⏹️ 已被使用者停止",
   "fullChargeIn": "完全充電時間",
-  "batchSize": "批次大小"
+  "batchSize": "批次大小",
+  "autoLoadProgress": "自動載入已儲存的進度",
+  "autoLoadProgressDesc": "若啟用，將在頁面載入時於權杖產生器初始化後自動載入已儲存的進度。"
 }
 

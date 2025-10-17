@@ -162,5 +162,7 @@
   "paintingModeAuto": "Auto",
   "paintingModeAssist": "Assist",
   "paintingModeAutoDesc": "Bot will automatically paint pixels",
-  "paintingModeAssistDesc": "Overlay will guide your manual pixel placement"
+  "paintingModeAssistDesc": "Overlay will guide your manual pixel placement",
+  "autoLoadProgress": "Auto-load saved progress",
+  "autoLoadProgressDesc": "If enabled, will automatically load saved progress after the token generator initializes on page load."
 }

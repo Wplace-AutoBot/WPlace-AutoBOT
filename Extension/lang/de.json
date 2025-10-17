@@ -163,4 +163,7 @@
   "batchSize": "Batch-Größe",
   "speedOn": "An",
   "speedOff": "Aus"
+,
+  "autoLoadProgress": "Gespeicherten Fortschritt automatisch laden",
+  "autoLoadProgressDesc": "Wenn aktiviert, wird der gespeicherte Fortschritt automatisch geladen, nachdem der Token-Generator beim Laden der Seite initialisiert wurde."
 }

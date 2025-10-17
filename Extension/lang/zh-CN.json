@@ -163,6 +163,8 @@
   "paintingFinalBatchFailed": "⚠️ {count} 个像素的最终批次在多次尝试后失败。",
   "paintingStoppedByUser": "⏹️ 已被用户停止",
   "fullChargeIn": "完全充电时间",
-  "batchSize": "批次大小"
+  "batchSize": "批次大小",
+  "autoLoadProgress": "自动加载已保存的进度",
+  "autoLoadProgressDesc": "如果启用，将在页面加载时令牌生成器初始化后自动加载已保存的进度。"
 }
 

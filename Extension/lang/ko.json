@@ -163,6 +163,8 @@
   "paintingFinalBatchFailed": "⚠️ {count}개 픽셀의 최종 배치가 여러 번 시도 후 실패했습니다.",
   "paintingStoppedByUser": "⏹️ 사용자에 의해 중지됨",
   "fullChargeIn": "완전 충전까지",
-  "batchSize": "배치 크기"
+  "batchSize": "배치 크기",
+  "autoLoadProgress": "저장된 진행 상황 자동 불러오기",
+  "autoLoadProgressDesc": "활성화하면 페이지 로드 시 토큰 생성기가 초기화된 후 저장된 진행 상황을 자동으로 불러옵니다."
 }
 
