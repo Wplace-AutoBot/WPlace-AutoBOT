@@ -1748,6 +1748,9 @@ localStorage.removeItem("lp");
           console.log('⚠️ [DEBUG] No availableColors found in savedData or not an array');
         }
 
+        // Track if we successfully restored image data
+        let imageDataRestored = false;
+
         if (savedData.imageData && Array.isArray(savedData.imageData.pixels)) {
           console.log('🔍 [DEBUG] Restoring imageData...');
           console.log('🔍 [DEBUG] ImageData type check - pixels is array:', Array.isArray(savedData.imageData.pixels));
@@ -1757,6 +1760,7 @@ localStorage.removeItem("lp");
             ...savedData.imageData,
             pixels: new Uint8ClampedArray(savedData.imageData.pixels),
           };
+          imageDataRestored = true; // ✅ Mark that we restored image data
           console.log('✅ [DEBUG] ImageData restored successfully');
           console.log('🔍 [DEBUG] Converted pixels to Uint8ClampedArray, length:', window.state.imageData.pixels.length);
         } else if (savedData.imageData && savedData.imageData.pixelsRef) {
@@ -1779,6 +1783,11 @@ localStorage.removeItem("lp");
                 window.state.imageData.pixels = new Uint8ClampedArray(payload.pixels);
                 window.state.imageLoaded = true;
                 console.log('✅ [DEBUG] Pixels loaded from IDB');
+
+                // ✅ CRITICAL FIX: Update data buttons after async IDB load completes
+                if (typeof window.updateDataButtons === 'function') {
+                  window.updateDataButtons();
+                }
 
                 // Try to restore overlay immediately
                 if (typeof window.globalUtilsManager.restoreOverlayFromData === 'function') {
@@ -1809,6 +1818,19 @@ localStorage.removeItem("lp");
           console.log('🔍 [DEBUG] No paintedMap found in savedData (this is normal for extracted data)');
         }
 
+        // ✅ CRITICAL FIX: Set imageLoaded based on whether we actually have pixel data
+        // This must be done AFTER Object.assign to override any stale value from savedData.state
+        if (imageDataRestored) {
+          window.state.imageLoaded = true;
+          console.log('✅ [DEBUG] Set window.state.imageLoaded = true (image data was successfully restored)');
+        } else if (window.state.imageData && window.state.imageData.pixels) {
+          window.state.imageLoaded = true;
+          console.log('✅ [DEBUG] Set window.state.imageLoaded = true (image data exists with pixels)');
+        } else {
+          window.state.imageLoaded = false;
+          console.log('⚠️ [DEBUG] Set window.state.imageLoaded = false (no valid image data)');
+        }
+
         console.log('✅ [DEBUG] RestoreProgress completed successfully');
         console.log('🔍 [DEBUG] Final window.state.imageLoaded:', window.state.imageLoaded);
         console.log('🔍 [DEBUG] Final window.state.totalPixels:', window.state.totalPixels);
@@ -1824,36 +1846,35 @@ localStorage.removeItem("lp");
 
     saveProgressToFile: () => {
       try {
-        // Use utils manager to build proper save structure like old version
-        const progressData = window.globalUtilsManager ?
-          window.globalUtilsManager.buildProgressData() :
-          {
-            timestamp: Date.now(),
-            version: '2.2',
-            state: {
-              totalPixels: window.state.totalPixels,
-              paintedPixels: window.state.paintedPixels,
-              lastPosition: window.state.lastPosition,
-              startPosition: window.state.startPosition,
-              region: window.state.region,
-              imageLoaded: window.state.imageLoaded,
-              colorsChecked: window.state.colorsChecked,
-              coordinateMode: window.state.coordinateMode,
-              coordinateDirection: window.state.coordinateDirection,
-              coordinateSnake: window.state.coordinateSnake,
-              blockWidth: window.state.blockWidth,
-              blockHeight: window.state.blockHeight,
-              availableColors: window.state.availableColors,
-            },
-            imageData: window.state.imageData ? {
-              width: window.state.imageData.width,
-              height: window.state.imageData.height,
-              pixels: Array.from(window.state.imageData.pixels),
-              totalPixels: window.state.imageData.totalPixels,
-            } : null,
-            paintedMapPacked: window.globalUtilsManager ?
-              window.globalUtilsManager.buildPaintedMapPacked() : null
-          };
+        // ✅ CRITICAL: When saving to FILE, ALWAYS include pixels directly (not IndexedDB reference)
+        // Files are portable and don't have access to IndexedDB
+        const progressData = {
+          timestamp: Date.now(),
+          version: '2.2',
+          state: {
+            totalPixels: window.state.totalPixels,
+            paintedPixels: window.state.paintedPixels,
+            lastPosition: window.state.lastPosition,
+            startPosition: window.state.startPosition,
+            region: window.state.region,
+            imageLoaded: window.state.imageLoaded,
+            colorsChecked: window.state.colorsChecked,
+            coordinateMode: window.state.coordinateMode,
+            coordinateDirection: window.state.coordinateDirection,
+            coordinateSnake: window.state.coordinateSnake,
+            blockWidth: window.state.blockWidth,
+            blockHeight: window.state.blockHeight,
+            availableColors: window.state.availableColors,
+          },
+          imageData: window.state.imageData && window.state.imageData.pixels ? {
+            width: window.state.imageData.width,
+            height: window.state.imageData.height,
+            pixels: Array.from(window.state.imageData.pixels),
+            totalPixels: window.state.imageData.totalPixels,
+          } : null,
+          paintedMapPacked: window.globalUtilsManager ?
+            window.globalUtilsManager.buildPaintedMapPacked() : null
+        };
 
         const filename = `wplace-bot-progress-${new Date()
           .toISOString()
@@ -4507,6 +4528,9 @@ localStorage.removeItem("lp");
           return;
         }
 
+        // ✅ CRITICAL FIX: Migrate old save data before restoring
+        savedData = Utils.migrateProgress(savedData);
+
         // CRITICAL FIX: If save file contains complete data, bypass initial setup check
         // This matches old version behavior where save files could be loaded immediately
         const hasCompleteData = savedData.state && savedData.imageData &&
@@ -4987,6 +5011,9 @@ localStorage.removeItem("lp");
       saveBtn.disabled = !hasImageData;
       saveToFileBtn.disabled = !hasImageData;
     };
+
+    // Expose globally for async callbacks (IDB pixel loading)
+    window.updateDataButtons = updateDataButtons;
 
     updateDataButtons();
 
@@ -6132,6 +6159,9 @@ localStorage.removeItem("lp");
         if (state.startPosition) {
           startBtn.disabled = false;
         }
+
+        // Update data buttons (Save/Load/SaveToFile/LoadFromFile) after processing
+        updateDataButtons();
 
         closeResizeDialog();
       };
@@ -8053,6 +8083,9 @@ localStorage.removeItem("lp");
                 // Enable position selection immediately
                 selectPosBtn.disabled = false;
                 selectPosBtn.title = Utils.t('selectPosition') || 'Select starting position on canvas';
+
+                // Update data buttons (Save/Load/SaveToFile/LoadFromFile) after loading extracted artwork
+                updateDataButtons();
               }
             } catch (overlayError) {
               console.warn('⚠️ Could not set overlay for extracted artwork:', overlayError);
