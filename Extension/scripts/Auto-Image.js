@@ -4521,7 +4521,7 @@ localStorage.removeItem("lp");
 
     if (loadBtn) {
       loadBtn.addEventListener('click', async () => {
-        const savedData = Utils.loadProgress();
+        let savedData = Utils.loadProgress();
         if (!savedData) {
           updateUI('noSavedData', 'warning');
           Utils.showAlert(Utils.t('noSavedData'), 'warning');
