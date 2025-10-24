@@ -163,6 +163,8 @@
   "paintingFinalBatchFailed": "⚠️ {count} ピクセルの最終バッチが複数回の試行後に失敗しました。",
   "paintingStoppedByUser": "⏹️ ユーザーにより停止されました",
   "fullChargeIn": "フル充電まで",
-  "batchSize": "バッチサイズ"
+  "batchSize": "バッチサイズ",
+  "autoLoadProgress": "保存された進行状況を自動読み込み",
+  "autoLoadProgressDesc": "有効にすると、ページ読み込み時にトークンジェネレーターが初期化された後、保存された進行状況を自動的に読み込みます。"
 }
 

@@ -163,6 +163,8 @@
   "paintingFinalBatchFailed": "⚠️ {count} pikselden oluşan son topluluk birkaç denemeden sonra başarısız oldu.",
   "paintingStoppedByUser": "⏹️ Boyama kullanıcı tarafından durduruldu",
   "fullChargeIn": "Tam dolum süresi",
-  "batchSize": "Topluluk boyutu"
+  "batchSize": "Topluluk boyutu",
+  "autoLoadProgress": "Kaydedilen ilerlemeyi otomatik yükle",
+  "autoLoadProgressDesc": "Etkinleştirildiğinde, sayfa yüklenirken jeton oluşturucu başlatıldıktan sonra kaydedilen ilerleme otomatik olarak yüklenir."
 }
 

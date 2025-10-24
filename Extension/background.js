@@ -14,6 +14,38 @@ chrome.runtime.onInstalled.addListener(async () => {
 });
 
 
+// Helper to load and inject a local script file into the page (MAIN world)
+async function injectPlainScriptFromExtension(tabId, relativePath, friendlyName, color, emoji) {
+    const url = chrome.runtime.getURL(relativePath);
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            console.warn(`⚠️ Could not load ${relativePath}, proceeding without it`);
+            return false;
+        }
+        const code = await response.text();
+        console.log(`${emoji} ${friendlyName} loaded, injecting...`);
+        await chrome.scripting.executeScript({
+            target: { tabId: tabId },
+            world: "MAIN",
+            func: (code, friendlyName, color, emoji) => {
+                console.log(`%c${emoji} Loading ${friendlyName}...`, `color: ${color}; font-weight: bold;`);
+                const script = document.createElement('script');
+                script.textContent = code;
+                document.head.appendChild(script);
+                script.remove();
+                console.log(`%c✅ ${friendlyName} loaded successfully`, `color: ${color}; font-weight: bold;`);
+            },
+            args: [code, friendlyName, color, emoji]
+        });
+        console.log(`✅ ${friendlyName} injected successfully`);
+        return true;
+    } catch (e) {
+        console.warn(`⚠️ Error injecting ${friendlyName}:`, e);
+        return false;
+    }
+}
+
 async function executeLocalScript(scriptName, tabId) {
     try {
         console.log(`Loading script: ${scriptName}`);
@@ -23,118 +55,10 @@ async function executeLocalScript(scriptName, tabId) {
             console.log(`🔑 ${scriptName} detected, ensuring dependencies are loaded first...`);
 
             try {
-                // First inject token-manager.js
-                const tokenManagerUrl = chrome.runtime.getURL('scripts/token-manager.js');
-                const tokenManagerResponse = await fetch(tokenManagerUrl);
-
-                if (tokenManagerResponse.ok) {
-                    const tokenManagerCode = await tokenManagerResponse.text();
-                    console.log('🔑 Token manager loaded, injecting first...');
-
-                    // Execute token manager first
-                    await chrome.scripting.executeScript({
-                        target: { tabId: tabId },
-                        world: "MAIN",
-                        func: (code) => {
-                            console.log('%c🔑 Loading WPlace Token Manager...', 'color: #4ade80; font-weight: bold;');
-                            const script = document.createElement('script');
-                            script.textContent = code;
-                            document.head.appendChild(script);
-                            script.remove();
-                            console.log('%c✅ Token Manager loaded successfully', 'color: #4ade80; font-weight: bold;');
-                        },
-                        args: [tokenManagerCode]
-                    });
-
-                    console.log('✅ Token manager injected successfully');
-                } else {
-                    console.warn('⚠️ Could not load token-manager.js, proceeding without it');
-                }
-
-                // Then inject image-processor.js
-                const imageProcessorUrl = chrome.runtime.getURL('scripts/image-processor.js');
-                const imageProcessorResponse = await fetch(imageProcessorUrl);
-
-                if (imageProcessorResponse.ok) {
-                    const imageProcessorCode = await imageProcessorResponse.text();
-                    console.log('🖼️ Image processor loaded, injecting second...');
-
-                    // Execute image processor second
-                    await chrome.scripting.executeScript({
-                        target: { tabId: tabId },
-                        world: "MAIN",
-                        func: (code) => {
-                            console.log('%c🖼️ Loading WPlace Image Processor...', 'color: #3b82f6; font-weight: bold;');
-                            const script = document.createElement('script');
-                            script.textContent = code;
-                            document.head.appendChild(script);
-                            script.remove();
-                            console.log('%c✅ Image Processor loaded successfully', 'color: #3b82f6; font-weight: bold;');
-                        },
-                        args: [imageProcessorCode]
-                    });
-
-                    console.log('✅ Image processor injected successfully');
-                } else {
-                    console.warn('⚠️ Could not load image-processor.js, proceeding without it');
-                }
-
-                // Then inject overlay-manager.js
-                const overlayManagerUrl = chrome.runtime.getURL('scripts/overlay-manager.js');
-                const overlayManagerResponse = await fetch(overlayManagerUrl);
-
-                if (overlayManagerResponse.ok) {
-                    const overlayManagerCode = await overlayManagerResponse.text();
-                    console.log('🎨 Overlay manager loaded, injecting third...');
-
-                    // Execute overlay manager thirds
-                    await chrome.scripting.executeScript({
-                        target: { tabId: tabId },
-                        world: "MAIN",
-                        func: (code) => {
-                            console.log('%c🎨 Loading WPlace Overlay Manager...', 'color: #8b5cf6; font-weight: bold;');
-                            const script = document.createElement('script');
-                            script.textContent = code;
-                            document.head.appendChild(script);
-                            script.remove();
-                            console.log('%c✅ Overlay Manager loaded successfully', 'color: #8b5cf6; font-weight: bold;');
-                        },
-                        args: [overlayManagerCode]
-                    });
-
-                    console.log('✅ Overlay manager injected successfully');
-                } else {
-                    console.warn('⚠️ Could not load overlay-manager.js, proceeding without it');
-                }
-
-                // Finally inject utils-manager.js
-                const utilsManagerUrl = chrome.runtime.getURL('scripts/utils-manager.js');
-                const utilsManagerResponse = await fetch(utilsManagerUrl);
-
-                if (utilsManagerResponse.ok) {
-                    const utilsManagerCode = await utilsManagerResponse.text();
-                    console.log('🛠️ Utils manager loaded, injecting fourth...');
-
-                    // Execute utils manager fourth
-                    await chrome.scripting.executeScript({
-                        target: { tabId: tabId },
-                        world: "MAIN",
-                        func: (code) => {
-                            console.log('%c🛠️ Loading WPlace Utils Manager...', 'color: #f59e0b; font-weight: bold;');
-                            const script = document.createElement('script');
-                            script.textContent = code;
-                            document.head.appendChild(script);
-                            script.remove();
-                            console.log('%c✅ Utils Manager loaded successfully', 'color: #f59e0b; font-weight: bold;');
-                        },
-                        args: [utilsManagerCode]
-                    });
-
-                    console.log('✅ Utils manager injected successfully');
-                } else {
-                    console.warn('⚠️ Could not load utils-manager.js, proceeding without it');
-                }
-
+                await injectPlainScriptFromExtension(tabId, 'scripts/token-manager.js', 'WPlace Token Manager', '#4ade80', '🔑');
+                await injectPlainScriptFromExtension(tabId, 'scripts/image-processor.js', 'WPlace Image Processor', '#3b82f6', '🖼️');
+                await injectPlainScriptFromExtension(tabId, 'scripts/overlay-manager.js', 'WPlace Overlay Manager', '#8b5cf6', '🎨');
+                await injectPlainScriptFromExtension(tabId, 'scripts/utils-manager.js', 'WPlace Utils Manager', '#f59e0b', '🛠️');
                 // Small delay to ensure dependencies are fully initialized
                 await new Promise(resolve => setTimeout(resolve, 200));
             } catch (error) {

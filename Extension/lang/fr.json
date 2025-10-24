@@ -163,6 +163,8 @@
   "paintingFinalBatchFailed": "⚠️ Lot final de {count} pixels échoué après plusieurs tentatives.",
   "paintingStoppedByUser": "⏹️ Peinture arrêtée par l'utilisateur",
   "fullChargeIn": "Pleine charge dans",
-  "batchSize": "Taille du lot"
+  "batchSize": "Taille du lot",
+  "autoLoadProgress": "Charger automatiquement la progression sauvegardée",
+  "autoLoadProgressDesc": "Si activé, chargera automatiquement la progression sauvegardée après l’initialisation du générateur de jetons lors du chargement de la page."
 }
 
