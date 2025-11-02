@@ -1,5 +1,8 @@
-<p align="center">
-<img width="379" height="376" alt="image" src="https://github.com/user-attachments/assets/c14ef2b5-e104-4526-9b17-23cb2abc9efe" />
+![ezgif-62447388b69b12](https://github.com/user-attachments/assets/84a33ffb-d513-46ba-b4f3-62bb541fa1dc)<p align="center">
+
+![Untitled-ezgif com-optimize](https://github.com/user-attachments/assets/9b492f18-a15f-4d57-b605-1168d8a42d1c)
+
+
 </p>
 
 <p align="center"><strong>WPlace AutoBOT</strong></p>
