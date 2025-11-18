@@ -10350,36 +10350,61 @@ localStorage.removeItem("lp");
   //find module if pawtect_chunk is null
   pawtect_chunk ??= await findTokenModule("pawtect_wasm_bg.wasm");
 
-  async function createWasmToken(regionX, regionY, payload) {
+async function createWasmToken(regionX, regionY, payload) {
     try {
       // Load the Pawtect module and WASM
-      const mod = await import(new URL('/_app/immutable/chunks/' + pawtect_chunk, location.origin).href);
+      // NOTE: Ensure 'pawtect_chunk' variable is updated to the new filename (e.g., 'CEH629mT.js')
+      const mod = await import(new URL('/_app/immutable/chunks/'+pawtect_chunk, location.origin).href);
       let wasm;
+      
       try {
-        wasm = await mod._();
+        // [FIX] Adapted for new module structure: 'mod._()' is no longer valid.
+        // We attempt to locate the WASM instance containing 'get_pawtected_endpoint_payload'.
+        // Based on analysis, it is likely located in 'mod.h'.
+        if (mod.h && typeof mod.h.get_pawtected_endpoint_payload === 'function') {
+            wasm = mod.h;
+        } else if (typeof mod.get_pawtected_endpoint_payload === 'function') {
+            wasm = mod; // The module itself might be the instance
+        } else if (mod.exports && typeof mod.exports.get_pawtected_endpoint_payload === 'function') {
+            wasm = mod.exports;
+        } else {
+            // Fallback: Search all exports for the target function
+            const foundKey = Object.keys(mod).find(k => mod[k] && typeof mod[k].get_pawtected_endpoint_payload === 'function');
+            if (foundKey) wasm = mod[foundKey];
+        }
+
+        if (!wasm) throw new Error("Function 'get_pawtected_endpoint_payload' not found in module exports");
         console.log('✅ WASM initialized successfully');
       } catch (wasmError) {
         console.error('❌ WASM initialization failed:', wasmError);
         return null;
       }
+
       try {
         try {
           const me = await fetch(`https://backend.wplace.live/me`, { credentials: 'include' }).then(r => r.ok ? r.json() : null);
           if (me?.id) {
-            mod.i(me.id);
-            console.log('✅ user ID set:', me.id);
+            // Check if mod.i exists before calling (it might have been renamed or removed)
+            if (typeof mod.i === 'function') {
+                mod.i(me.id);
+                console.log('✅ user ID set:', me.id);
+            } else {
+                console.log('⚠️ Warning: mod.i function not found (User ID not set)');
+            }
           }
         } catch { }
       } catch (userIdError) {
         console.log('⚠️ Error setting user ID:', userIdError.message);
       }
+
       try {
         const testUrl = `https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`;
-        if (mod.r) {
+        // Check if mod.r exists before calling
+        if (typeof mod.r === 'function') {
           mod.r(testUrl);
           console.log('✅ Request URL set:', testUrl);
         } else {
-          console.log('⚠️ request_url function (mod.r) not available');
+          console.log('⚠️ request_url function (mod.r) not available - skipping');
         }
       } catch (urlError) {
         console.log('⚠️ Error setting request URL:', urlError.message);
@@ -10421,6 +10446,7 @@ localStorage.removeItem("lp");
       console.log('🚀 Calling get_pawtected_endpoint_payload...');
       let outPtr, outLen, token;
       try {
+        // [FIX] Calling the new function name identified in analysis
         const result = wasm.get_pawtected_endpoint_payload(inPtr, bytes.length);
         console.log('✅ Function called, result type:', typeof result, result);
 
