@@ -140,6 +140,26 @@ async function executeLocalScript(scriptName, tabId) {
                     } else {
                         console.warn(`%c⚠️ auto-image-styles.css not found in loaded themes`, 'color: #f59e0b; font-weight: bold;');
                     }
+
+                    // Inject edit-panel.css if available (THEME-INDEPENDENT)
+                    // This ensures edit panel has its own styling regardless of bot theme
+                    if (themeCSS['edit-panel.css']) {
+                        const editPanelContent = themeCSS['edit-panel.css'];
+                        const styleElement = document.createElement('style');
+                        styleElement.id = 'edit-panel-stylesheet';
+                        styleElement.textContent = editPanelContent;
+                        document.head.appendChild(styleElement);
+
+                        console.log(`%c✨ AUTO-INJECTED: edit-panel.css (THEME-INDEPENDENT)`, 'color: #10b981; font-weight: bold;');
+                        console.log(`  📏 Injected size: ${editPanelContent.length.toLocaleString()} characters`);
+                        console.log(`  📍 Source: Extension local file`);
+                        console.log(`  🎯 Target: <head> as <style> element`);
+                        console.log(`  🆔 Element ID: edit-panel-stylesheet`);
+                        console.log(`  🎨 Independence: Will override any theme-specific edit panel styles`);
+                    } else {
+                        console.warn(`%c⚠️ edit-panel.css not found in loaded themes`, 'color: #f59e0b; font-weight: bold;');
+                    }
+
                     console.groupEnd();
                 } else {
                     console.warn(`%c⚠️ No themes received from extension`, 'color: #f59e0b; font-weight: bold;');
@@ -249,6 +269,22 @@ async function executeLocalScript(scriptName, tabId) {
                         styleElement.textContent = themeContent;
                         document.head.appendChild(styleElement);
 
+                        // CRITICAL: Re-inject edit-panel.css AFTER theme to ensure it always wins
+                        // This makes edit panel styling independent from bot themes
+                        if (window.AUTOBOT_THEMES['edit-panel.css']) {
+                            const existingEditPanel = document.getElementById('edit-panel-stylesheet');
+                            if (existingEditPanel) {
+                                existingEditPanel.remove();
+                            }
+                            
+                            const editPanelStyle = document.createElement('style');
+                            editPanelStyle.id = 'edit-panel-stylesheet';
+                            editPanelStyle.textContent = window.AUTOBOT_THEMES['edit-panel.css'];
+                            document.head.appendChild(editPanelStyle);
+                            
+                            console.log(`  🎨 Edit panel CSS re-injected after theme (ensures independence)`);
+                        }
+
                         console.log(`%c✅ Theme applied successfully: ${themeName}`, 'color: #10b981; font-weight: bold;');
                         console.log(`  📏 Content size: ${themeContent.length.toLocaleString()} characters`);
                         console.log(`  📍 Source: Extension local file`);
@@ -317,6 +353,7 @@ async function loadExtensionResources() {
         console.group('%c🎨 Theme Files Loading', 'color: #8b5cf6; font-weight: bold;');
         const themeFiles = [
             'auto-image-styles.css',
+            'edit-panel.css',
             'themes/acrylic.css',
             'themes/classic-light.css',
             'themes/classic.css',

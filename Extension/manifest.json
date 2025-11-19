@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "WPlace AutoBOT Script Launcher",
-  "version": "2.0.7",
+  "version": "2.1.0",
   "description": "Launch and manage automation scripts for WPlace",
   "icons": {
     "16": "icons/icon16.png",
@@ -55,6 +55,7 @@
         "Script-manager.js",
         "Script-manager-fixed.js",
         "auto-image-styles.css",
+        "edit-panel.css",
         "themes/*.css",
         "lang/*.json",
         "lang/lang/*.json",

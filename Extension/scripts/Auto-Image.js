@@ -1058,12 +1058,43 @@ localStorage.removeItem("lp");
     overlayOpacity: CONFIG.OVERLAY.OPACITY_DEFAULT,
     blueMarbleEnabled: CONFIG.OVERLAY.BLUE_MARBLE_DEFAULT,
     ditheringEnabled: false,
+    ditheringMethod: 'floyd', // Dithering algorithm: floyd, bayer2, bayer4, bayer8, atkinson, etc.
+    ditheringStrength: 0.5, // Dithering strength (0-1) for ordered dithering methods
+    posterizeLevels: 0, // Posterize levels (0 = disabled, 2-10 = quantize colors)
+    resamplingMethod: 'nearest', // 'nearest' | 'bilinear' | 'box' | 'median' | 'dominant'
+    // Pre-processing filters (before downscale)
+    preBlurMode: 'none', // 'none' | 'box' | 'gaussian' | 'kuwahara'
+    preBlurRadius: 0, // 0-20
+    sharpenAmount: 0, // 0-300 (percentage)
+    sharpenRadius: 0, // 0-20
+    sharpenThreshold: 0, // 0-64
     // Advanced color matching settings
-    colorMatchingAlgorithm: 'lab',
-    enableChromaPenalty: true,
+    colorMatchingAlgorithm: 'rgb', // Default to Legacy (RGB)
+    enableChromaPenalty: false, // Chroma penalty OFF by default
     chromaPenaltyWeight: 0.15,
     customTransparencyThreshold: CONFIG.TRANSPARENCY_THRESHOLD,
     customWhiteThreshold: CONFIG.WHITE_THRESHOLD,
+    // Post-processing settings
+    enableEdgeOverlay: false,
+    edgeDetectionAlgorithm: 'sobel', // 'sobel' | 'prewitt' | 'roberts' | 'laplacian'
+    edgeThreshold: 60,        // 0-255 (edge detection sensitivity)
+    edgeThickness: 1,         // 1-6 (edge line width in pixels)
+    edgeThin: false,          // boolean (thin edges to 1 pixel)
+    enableOutline: false,             // Toggle for outline effect
+    outlineThickness: 0,      // 0-10 pixels
+    enableSimplify: false,            // Toggle for simplify regions
+    simplifyArea: 0,          // 0-1000 pixels
+    enableErode: false,               // Toggle for erode edges
+    erodeAmount: 0,           // 0-20 pixels
+    enableModeFilter: false,          // Toggle for mode filter
+    modeFilterSize: 0,        // 0-21 (0 = off)
+    // Color Correction settings
+    enableColorCorrection: false,
+    brightness: 0,            // -100 to 100
+    contrast: 0,              // -100 to 100
+    saturation: 0,            // -100 to 100
+    hue: 0,                   // -180 to 180
+    gamma: 1.0,               // 0.5 to 3.0
     resizeSettings: null,
     originalImage: null,
     resizeIgnoreMask: null,
@@ -2963,19 +2994,6 @@ localStorage.removeItem("lp");
             ${Utils.t('automation')}
           </label>
           <!-- Token generator is always enabled - settings moved to Token Source above -->
-          <div class="wplace-settings-section-wrapper">
-            <label for="autoLoadProgressToggle" class="wplace-settings-toggle">
-              <div>
-                <span class="wplace-settings-toggle-title" style="color: ${theme.text || 'white'};">
-                  ${Utils.t('autoLoadProgress')}
-                </span>
-                <p class="wplace-settings-toggle-description" style="color: ${theme.text ? `${theme.text}BB` : 'rgba(255,255,255,0.7)'};">
-                  ${Utils.t('autoLoadProgressDesc')}
-                </p>
-              </div>
-              <input type="checkbox" id="autoLoadProgressToggle" ${state.autoLoadProgress ? 'checked' : ''} class="wplace-settings-checkbox" style="accent-color: ${theme.highlight || '#48dbfb'};"/>
-            </label>
-          </div>
         </div>
 
         <!-- Overlay Settings Section -->
@@ -3057,21 +3075,8 @@ localStorage.removeItem("lp");
                 style="accent-color: ${theme.highlight || '#48dbfb'};"/>
             </label>
             
-            <!-- Paint Transparent Pixels -->
-            <label class="wplace-settings-toggle">
-              <div>
-                <span class="wplace-settings-toggle-title" style="color: ${theme.text || 'white'};">
-                  ${Utils.t('paintTransparentPixels')}
-                </span>
-                <p class="wplace-settings-toggle-description" style="color: ${theme.text ? `${theme.text}BB` : 'rgba(255,255,255,0.7)'
-      };">
-                  ${Utils.t('paintTransparentPixelsDescription')}
-                </p>
-              </div>
-              <input type="checkbox" id="settingsPaintTransparentToggle" ${state.paintTransparentPixels ? 'checked' : ''} 
-                class="wplace-settings-checkbox"
-                style="accent-color: ${theme.highlight || '#48dbfb'};"/>
-            </label>
+            <!-- Paint Transparent toggle removed - use the one in Processing panel instead -->
+            
             <label class="wplace-settings-toggle">
               <div>
                 <span class="wplace-settings-toggle-title" style="color: ${theme.text || 'white'
@@ -3087,91 +3092,25 @@ localStorage.removeItem("lp");
           </div>
         </div>
 
-        <!-- Speed Control Section -->
+        <!-- Painting Order Section -->
         <div class="wplace-settings-section">
           <label class="wplace-settings-section-label">
-            <i class="fas fa-tachometer-alt wplace-icon-speed"></i>
-            ${Utils.t('paintingSpeed')}
+            <i class="fas fa-palette wplace-icon-palette"></i>
+            ${Utils.t('paintingOrder')}
           </label>
           
           <!-- Painting Order Selection -->
           <div class="wplace-mode-selection">
-            <label class="wplace-mode-label">
-              <i class="fas fa-palette wplace-icon-palette"></i>
-              ${Utils.t('paintingOrder')}
-            </label>
             <select id="paintingOrderSelect" class="wplace-settings-select">
               <option value="sequential" class="wplace-settings-option">📐 Normal</option>
               <option value="color-by-color" class="wplace-settings-option">🎨 Color By Color</option>
             </select>
           </div>
-
-          <!-- Batch Mode Selection -->
-          <div class="wplace-mode-selection">
-            <label class="wplace-mode-label">
-              <i class="fas fa-dice wplace-icon-dice"></i>
-              Batch Mode
-            </label>
-            <select id="batchModeSelect" class="wplace-settings-select">
-              <option value="normal" class="wplace-settings-option">📦 Normal (Fixed Size)</option>
-              <option value="random" class="wplace-settings-option">🎲 Random (Range)</option>
-            </select>
-          </div>
           
-          <!-- Normal Mode: Fixed Size Controls -->
-          <div id="normalBatchControls" class="wplace-batch-controls wplace-normal-batch-controls">
-            <div class="wplace-batch-size-header">
-              <span class="wplace-batch-size-label">${Utils.t('batchSize')}</span>
-            </div>
-            <div class="wplace-dual-control-compact">
-                <div class="wplace-speed-slider-container-compact">
-                  <input type="range" id="speedSlider" min="${CONFIG.PAINTING_SPEED.MIN}" max="${CONFIG.PAINTING_SPEED.MAX}" value="${state.paintingSpeed}" class="wplace-overlay-opacity-slider">
-                </div>
-                <div class="wplace-speed-input-container-compact">
-                  <div class="wplace-input-group-compact">
-                    <button id="speedDecrease" class="wplace-input-btn-compact" type="button">-</button>
-                    <input type="number" id="speedInput" class="wplace-number-input-compact" min="${CONFIG.PAINTING_SPEED.MIN}" max="${CONFIG.PAINTING_SPEED.MAX}" value="${state.paintingSpeed}">
-                    <button id="speedIncrease" class="wplace-input-btn-compact" type="button">+</button>
-                    <span id="speedValue" class="wplace-input-label-compact">pixels</span>
-                  </div>
-                </div>
-            </div>
-            <div class="wplace-speed-labels">
-              <span class="wplace-speed-min"><i class="fas fa-turtle"></i> ${CONFIG.PAINTING_SPEED.MIN}</span>
-              <span class="wplace-speed-max"><i class="fas fa-rabbit"></i> ${CONFIG.PAINTING_SPEED.MAX}</span>
-            </div>
-          </div>
-          
-          <!-- Random Mode: Range Controls -->
-          <div id="randomBatchControls" class="wplace-batch-controls wplace-random-batch-controls">
-            <div class="wplace-random-batch-grid">
-              <div>
-                <label class="wplace-random-batch-label">
-                  <i class="fas fa-arrow-down wplace-icon-min"></i>
-                  Minimum Batch Size
-                </label>
-                <input type="number" id="randomBatchMin" min="1" max="1000" value="${CONFIG.RANDOM_BATCH_RANGE.MIN}" class="wplace-settings-number-input">
-              </div>
-              <div>
-                <label class="wplace-random-batch-label">
-                  <i class="fas fa-arrow-up wplace-icon-max"></i>
-                  Maximum Batch Size
-                </label>
-                <input type="number" id="randomBatchMax" min="1" max="1000" value="${CONFIG.RANDOM_BATCH_RANGE.MAX}" class="wplace-settings-number-input">
-              </div>
-            </div>
-            <p class="wplace-random-batch-description">
-              🎲 Random batch size between min and max values
-            </p>
-          </div>
-          
-          <!-- Speed Control Toggle -->
-          <label class="wplace-speed-control-toggle">
-            <input type="checkbox" id="enableSpeedToggle" ${CONFIG.PAINTING_SPEED_ENABLED ? 'checked' : ''
-      } class="wplace-speed-checkbox"/>
-            <span>${Utils.t('enablePaintingSpeedLimit')}</span>
-            <div class="wplace-speed-toggle-description">When disabled, bot uses all available charges immediately for maximum speed</div>
-          </label>
+          <p class="wplace-settings-description">
+            <i class="fas fa-info-circle"></i> 
+            Bot now sends all available pixels at once for maximum speed
+          </p>
         </div>
         
         <!-- Coordinate Generation Section -->
@@ -3528,201 +3467,588 @@ localStorage.removeItem("lp");
     `;
 
     const resizeContainer = document.createElement('div');
-    resizeContainer.className = 'resize-container';
+    resizeContainer.className = 'resize-container resize-container-v2';
     resizeContainer.innerHTML = `
       <h3 class="resize-dialog-title" style="color: ${theme.text}">${Utils.t('resizeImage')}</h3>
-      <div class="resize-controls">
-        <label class="resize-control-label">
-          Width: <span id="widthValue">0</span>px
-          <input type="range" id="widthSlider" class="resize-slider" min="10" max="500" value="100">
-        </label>
-        <label class="resize-control-label">
-          Height: <span id="heightValue">0</span>px
-          <input type="range" id="heightSlider" class="resize-slider" min="10" max="500" value="100">
-        </label>
+      
+      <!-- Two-column layout: Left = Configurations (scrollable), Right = Preview (fixed) -->
+      <div class="resize-two-column-layout">
         
-        <!-- Edit button moved here after height slider -->
-        <div class="edit-button-container" style="margin: 15px 0; text-align: center;">
-          <button id="editImageBtn" class="wplace-btn wplace-btn-select">
-            <i class="fas fa-paint-brush"></i>
-            <span>Edit</span>
-          </button>
-        </div>
-        
-        <label class="resize-checkbox-label">
-          <input type="checkbox" id="keepAspect" checked>
-          ${Utils.t('keepAspectRatio')}
-        </label>
-        <label class="resize-checkbox-label">
-            <input type="checkbox" id="paintWhiteToggle" checked>
-            ${Utils.t('paintWhitePixels')}
-        </label>
-        <label class="resize-checkbox-label">
-            <input type="checkbox" id="paintTransparentToggle" checked>
-            ${Utils.t('paintTransparentPixels')}
-        </label>
-        <div class="resize-zoom-controls">
-          <button id="zoomOutBtn" class="wplace-btn resize-zoom-btn" title="${Utils.t(
-      'zoomOut'
-    )}"><i class="fas fa-search-minus"></i></button>
-          <input type="range" id="zoomSlider" class="resize-slider resize-zoom-slider" min="0.1" max="20" value="1" step="0.05">
-          <button id="zoomInBtn" class="wplace-btn resize-zoom-btn" title="${Utils.t(
-      'zoomIn'
-    )}"><i class="fas fa-search-plus"></i></button>
-          <button id="zoomFitBtn" class="wplace-btn resize-zoom-btn" title="${Utils.t(
-      'fitToView'
-    )}">${Utils.t('fit')}</button>
-          <button id="zoomActualBtn" class="wplace-btn resize-zoom-btn" title="${Utils.t(
-      'actualSize'
-    )}">${Utils.t('hundred')}</button>
-          <button id="panModeBtn" class="wplace-btn resize-zoom-btn" title="${Utils.t('panMode')}">
-            <i class="fas fa-hand-paper"></i>
-          </button>
-          <span id="zoomValue" class="resize-zoom-value">100%</span>
-          <div id="cameraHelp" class="resize-camera-help">
-            Drag to pan • Pinch to zoom • Double‑tap to zoom
-          </div>
-        </div>
-      </div>
-
-      <div class="resize-preview-wrapper">
-          <div id="resizePanStage" class="resize-pan-stage">
-            <div id="resizeCanvasStack" class="resize-canvas-stack resize-canvas-positioned">
-              <canvas id="resizeCanvas" class="resize-base-canvas"></canvas>
-              <canvas id="maskCanvas" class="resize-mask-canvas"></canvas>
-            </div>
-          </div>
-      </div>
-      <div class="resize-tools">
-        <div class="resize-tools-container">
-          <div class="resize-brush-controls">
-              <div class="resize-brush-control">
-                <label class="resize-tool-label">Brush</label>
-                <div class="resize-tool-input-group">
-                  <input id="maskBrushSize" type="range" min="1" max="255" step="1" value="1" class="resize-tool-slider">
-                  <span id="maskBrushSizeValue" class="resize-tool-value">1</span>
+        <!-- LEFT COLUMN: Scrollable Configuration Panel -->
+        <div class="resize-config-column">
+          <div class="resize-config-scroll">
+            
+            <!-- Size Controls -->
+            <div class="resize-controls">
+              <label class="resize-control-label">
+                Width: <span id="widthValue">0</span>px
+                <input type="range" id="widthSlider" class="resize-slider" min="10" max="500" value="100">
+              </label>
+              <label class="resize-control-label">
+                Height: <span id="heightValue">0</span>px
+                <input type="range" id="heightSlider" class="resize-slider" min="10" max="500" value="100">
+              </label>
+              
+              <!-- Downscale Method Selection -->
+              <div class="resize-method-container" style="margin: 15px 0;">
+                <label class="resize-control-label" style="margin-bottom: 8px; display: block;">
+                  <strong>Downscale Method</strong>
+                </label>
+                <select id="resamplingMethodSelect" class="resize-method-select" style="
+                  width: 100%;
+                  padding: 8px 12px;
+                  background: var(--wplace-bg-secondary);
+                  color: var(--wplace-text-primary);
+                  border: 1px solid rgba(255, 255, 255, 0.1);
+                  border-radius: 6px;
+                  font-size: 13px;
+                  cursor: pointer;
+                  transition: all 0.2s ease;
+                ">
+                  <option value="nearest">Nearest Neighbor - Ultra-sharp pixel art</option>
+                  <option value="bilinear">Bilinear - Smooth gradients</option>
+                  <option value="box">Box Average - Balanced quality (recommended)</option>
+                  <option value="median">Median Filter - Noise reduction</option>
+                  <option value="dominant">Dominant Color - Pixel art style</option>
+                </select>
+                <div class="resize-method-hint" style="
+                  font-size: 11px;
+                  color: rgba(255, 255, 255, 0.6);
+                  margin-top: 6px;
+                  line-height: 1.4;
+                ">
+                  Choose how the image is downscaled to target size
                 </div>
               </div>
-            <div class="resize-brush-control">
-              <label class="resize-tool-label">Row/col size</label>
-              <div class="resize-tool-input-group">
-                <input id="rowColSize" type="range" min="1" max="255" step="1" value="1" class="resize-tool-slider">
-                <span id="rowColSizeValue" class="resize-tool-value">1</span>
+              
+              <label class="resize-checkbox-label">
+                <input type="checkbox" id="keepAspect" checked>
+                ${Utils.t('keepAspectRatio')}
+              </label>
+              <label class="resize-checkbox-label">
+                  <input type="checkbox" id="paintWhiteToggle" checked>
+                  ${Utils.t('paintWhitePixels')}
+              </label>
+              <label class="resize-checkbox-label">
+                  <input type="checkbox" id="paintTransparentToggle" checked>
+                  ${Utils.t('paintTransparentPixels')}
+              </label>
+            </div>
+
+            <!-- Mask Tools Section -->
+            <div class="resize-tools">
+              <div class="resize-tools-container">
+                <div class="resize-brush-controls">
+                    <div class="resize-brush-control">
+                      <label class="resize-tool-label">Brush</label>
+                      <div class="resize-tool-input-group">
+                        <input id="maskBrushSize" type="range" min="1" max="255" step="1" value="1" class="resize-tool-slider">
+                        <span id="maskBrushSizeValue" class="resize-tool-value">1</span>
+                      </div>
+                    </div>
+                  <div class="resize-brush-control">
+                    <label class="resize-tool-label">Row/col size</label>
+                    <div class="resize-tool-input-group">
+                      <input id="rowColSize" type="range" min="1" max="255" step="1" value="1" class="resize-tool-slider">
+                      <span id="rowColSizeValue" class="resize-tool-value">1</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="resize-mode-controls">
+                  <label class="resize-tool-label">Mode</label>
+                  <div class="mask-mode-group resize-mode-group">
+                    <button id="maskModeIgnore" class="wplace-btn resize-mode-btn">Ignore</button>
+                    <button id="maskModeUnignore" class="wplace-btn resize-mode-btn">Unignore</button>
+                    <button id="maskModeToggle" class="wplace-btn wplace-btn-primary resize-mode-btn">Toggle</button>
+                  </div>
+                </div>
+                <button id="clearIgnoredBtn" class="wplace-btn resize-clear-btn" title="Clear all ignored pixels">Clear</button>
+                <button id="invertMaskBtn" class="wplace-btn resize-invert-btn" title="Invert mask">Invert</button>
+                <span class="resize-shortcut-help">Select a mode to start painting • Shift = Row • Alt = Column</span>
               </div>
             </div>
-          </div>
-          <div class="resize-mode-controls">
-            <label class="resize-tool-label">Mode</label>
-            <div class="mask-mode-group resize-mode-group">
-              <button id="maskModeIgnore" class="wplace-btn resize-mode-btn">Ignore</button>
-              <button id="maskModeUnignore" class="wplace-btn resize-mode-btn">Unignore</button>
-              <button id="maskModeToggle" class="wplace-btn wplace-btn-primary resize-mode-btn">Toggle</button>
-            </div>
-          </div>
-          <button id="clearIgnoredBtn" class="wplace-btn resize-clear-btn" title="Clear all ignored pixels">Clear</button>
-          <button id="invertMaskBtn" class="wplace-btn resize-invert-btn" title="Invert mask">Invert</button>
-          <span class="resize-shortcut-help">Shift = Row • Alt = Column</span>
-        </div>
-      </div>
 
-      <div class="wplace-section resize-color-palette-section" id="color-palette-section">
-          <div class="wplace-section-title">
-              <i class="fas fa-palette"></i>&nbsp;Color Palette
-          </div>
-          <div class="wplace-controls">
-              <div class="wplace-row single">
-                  <label class="resize-color-toggle-label">
-                      <input type="checkbox" id="showAllColorsToggle" class="resize-color-checkbox">
-                      <span>${Utils.t('showAllColorsIncluding')}</span>
+            <!-- Color Palette Section -->
+            <div class="wplace-section resize-color-palette-section" id="color-palette-section">
+                <div class="wplace-section-title">
+                    <i class="fas fa-palette"></i>&nbsp;Color Palette
+                </div>
+                <div class="wplace-controls">
+                    <div class="wplace-row single">
+                        <label class="resize-color-toggle-label">
+                            <input type="checkbox" id="showAllColorsToggle" class="resize-color-checkbox">
+                            <span>${Utils.t('showAllColorsIncluding')}</span>
+                        </label>
+                    </div>
+                    <div class="wplace-row" style="display: flex;">
+                        <button id="selectAllBtn" class="wplace-btn" style="flex: 1;">Select All</button>
+                        <button id="unselectAllBtn" class="wplace-btn" style="flex: 1;">Unselect All</button>
+                        <button id="unselectPaidBtn" class="wplace-btn">Unselect Paid</button>
+                    </div>
+                    <div id="colors-container" class="wplace-color-grid"></div>
+                </div>
+            </div>
+
+            <!-- IMAGE PREPROCESSING SECTION (Dedicated) -->
+            <div class="wplace-section resize-preprocessing-section" id="preprocessing-section">
+              <div class="wplace-section-title">
+                <i class="fas fa-magic"></i>&nbsp;Pre Processing
+              </div>
+              <div class="wplace-controls" style="padding: 15px;">
+                <!-- Pre-Blur (Before Downscale) -->
+                <div class="preprocessing-group" style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                  <label class="resize-advanced-label" style="margin-bottom: 10px; display: block;">
+                    <span class="resize-advanced-label-text" style="font-size: 14px;">
+                      <i class="fas fa-droplet"></i> Pre-Blur (Anti-Aliasing)
+                    </span>
+                    <div class="resize-advanced-description" style="margin-top: 4px;">
+                      Apply blur before downscaling to reduce moiré patterns and aliasing
+                    </div>
                   </label>
-              </div>
-              <div class="wplace-row" style="display: flex;">
-                  <button id="selectAllBtn" class="wplace-btn" style="flex: 1;">Select All</button>
-                  <button id="unselectAllBtn" class="wplace-btn" style="flex: 1;">Unselect All</button>
-                  <button id="unselectPaidBtn" class="wplace-btn">Unselect Paid</button>
-              </div>
-              <div id="colors-container" class="wplace-color-grid"></div>
-          </div>
-      </div>
+                  <select id="preBlurModeSelect" class="resize-advanced-select" style="margin-bottom: 10px;">
+                    <option value="none">None - No pre-blur</option>
+                    <option value="box">Box Blur - Fast separable filter</option>
+                    <option value="gaussian">Gaussian Blur - Smooth natural blur</option>
+                    <option value="kuwahara">Kuwahara - Edge-preserving smoothing</option>
+                  </select>
+                  <div id="blurRadiusControl" style="display: none;">
+                    <label class="resize-slider-label" style="font-size: 13px; margin-bottom: 5px; display: flex; justify-content: space-between;">
+                      <span>Blur Radius</span>
+                      <span id="blurRadiusValue" class="resize-slider-value">1</span>
+                    </label>
+                    <input type="range" id="preBlurRadiusSlider" class="resize-slider" min="1" max="20" value="1" step="1">
+                    <div class="resize-advanced-description" style="font-size: 11px; margin-top: 4px;">
+                      Larger radius = stronger blur (1-20 pixels)
+                    </div>
+                  </div>
+                </div>
 
-      <div class="wplace-section resize-advanced-color-section" id="advanced-color-section">
-        <div class="wplace-section-title">
-          <i class="fas fa-flask"></i>&nbsp;Advanced Color Matching
-        </div>
-        <div class="resize-advanced-controls">
-          <label class="resize-advanced-label">
-            <span class="resize-advanced-label-text">Algorithm</span>
-            <select id="colorAlgorithmSelect" class="resize-advanced-select">
-              <option value="lab" ${state.colorMatchingAlgorithm === 'lab' ? 'selected' : ''
+                <!-- Sharpening (After Processing) -->
+                <div class="preprocessing-group">
+                  <label class="resize-advanced-label" style="margin-bottom: 10px; display: block;">
+                    <span class="resize-advanced-label-text" style="font-size: 14px;">
+                      <i class="fas fa-adjust"></i> Sharpening (Unsharp Mask)
+                    </span>
+                    <div class="resize-advanced-description" style="margin-top: 4px;">
+                      Enhance edges and details after processing
+                    </div>
+                  </label>
+                  
+                  <label class="resize-slider-label" style="font-size: 13px; margin-bottom: 5px; display: flex; justify-content: space-between;">
+                    <span>Amount</span>
+                    <span id="sharpenAmountValue" class="resize-slider-value">0%</span>
+                  </label>
+                  <input type="range" id="sharpenAmountSlider" class="resize-slider" min="0" max="300" value="0" step="5" style="margin-bottom: 10px;">
+                  
+                  <div id="sharpenRadiusControl" style="display: none; margin-bottom: 10px;">
+                    <label class="resize-slider-label" style="font-size: 13px; margin-bottom: 5px; display: flex; justify-content: space-between;">
+                      <span>Radius</span>
+                      <span id="sharpenRadiusValue" class="resize-slider-value">1</span>
+                    </label>
+                    <input type="range" id="sharpenRadiusSlider" class="resize-slider" min="1" max="20" value="1" step="1">
+                  </div>
+                  
+                  <div id="sharpenThresholdControl" style="display: none;">
+                    <label class="resize-slider-label" style="font-size: 13px; margin-bottom: 5px; display: flex; justify-content: space-between;">
+                      <span>Threshold</span>
+                      <span id="sharpenThresholdValue" class="resize-slider-value">0</span>
+                    </label>
+                    <input type="range" id="sharpenThresholdSlider" class="resize-slider" min="0" max="64" value="0" step="1">
+                    <div class="resize-advanced-description" style="font-size: 11px; margin-top: 4px;">
+                      Higher threshold = sharpen only strong edges (reduces noise amplification)
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- DITHERING SECTION (Dedicated) -->
+            <div class="wplace-section resize-dithering-section" id="dithering-section">
+              <div class="wplace-section-title">
+                <i class="fas fa-th"></i>&nbsp;Dithering
+              </div>
+              <div class="wplace-controls" style="padding: 15px;">
+                <!-- Enable Dithering Toggle -->
+                <label class="resize-advanced-toggle" style="margin-bottom: 15px;">
+                  <div class="resize-advanced-toggle-content">
+                    <span class="resize-advanced-label-text" style="font-size: 14px;">
+                      <i class="fas fa-square-check"></i> Enable Dithering
+                    </span>
+                    <div class="resize-advanced-description">
+                      Apply error diffusion or ordered dithering to smooth color transitions
+                    </div>
+                  </div>
+                  <input type="checkbox" id="enableDitheringToggle" ${state.ditheringEnabled ? 'checked' : ''} class="resize-advanced-checkbox" />
+                </label>
+                
+                <!-- Dithering Method -->
+                <div id="ditheringMethodControl" style="display: ${state.ditheringEnabled ? 'block' : 'none'}; margin-bottom: 15px;">
+                  <label class="resize-advanced-label" style="margin-bottom: 8px; display: block;">
+                    <span class="resize-advanced-label-text" style="font-size: 13px;">Dithering Method</span>
+                  </label>
+                  <select id="ditheringMethodSelect" class="resize-advanced-select">
+                    <optgroup label="❯ Error Diffusion (High Quality)">
+                      <option value="floyd">Floyd-Steinberg - Classic balanced</option>
+                      <option value="atkinson">Atkinson - Soft, preserves highlights</option>
+                      <option value="jarvis">Jarvis - Wide diffusion, smooth</option>
+                      <option value="stucki">Stucki - Similar to Jarvis</option>
+                      <option value="burkes">Burkes - Fast quality</option>
+                      <option value="sierra">Sierra - High detail</option>
+                      <option value="twosierra">Two-Row Sierra - Faster</option>
+                      <option value="sierralite">Sierra Lite - Minimal, fastest</option>
+                      <option value="falsefloydsteinberg">False Floyd-Steinberg - Simple fast</option>
+                    </optgroup>
+                    <optgroup label="❯ Ordered Dithering (Patterned)">
+                      <option value="bayer2">Bayer 2×2 - Coarse checkerboard</option>
+                      <option value="bayer4">Bayer 4×4 - Medium halftone</option>
+                      <option value="bayer8">Bayer 8×8 - Fine halftone</option>
+                      <option value="random">Random Noise - Stochastic</option>
+                    </optgroup>
+                  </select>
+                  <div class="resize-advanced-description" style="margin-top: 6px; font-size: 11px;">
+                    <strong>Error Diffusion:</strong> Natural, no visible patterns<br>
+                    <strong>Ordered:</strong> Faster, visible patterns (adjustable strength)
+                  </div>
+                </div>
+                
+                <!-- Dithering Strength (Ordered methods only) -->
+                <div id="ditheringStrengthControl" style="display: none; margin-bottom: 15px;">
+                  <label class="resize-slider-label" style="font-size: 13px; margin-bottom: 5px; display: flex; justify-content: space-between;">
+                    <span><i class="fas fa-sliders"></i> Dithering Strength</span>
+                    <span id="ditheringStrengthValue" class="resize-slider-value">50%</span>
+                  </label>
+                  <input type="range" id="ditheringStrengthSlider" class="resize-slider" min="0" max="100" value="50" step="1">
+                  <div class="resize-advanced-description" style="font-size: 11px; margin-top: 4px;">
+                    Controls pattern intensity (ordered methods only)
+                  </div>
+                </div>
+                
+                <!-- Posterize Levels -->
+                <div id="posterizeLevelsControl" style="display: ${state.ditheringEnabled ? 'block' : 'none'}; margin-bottom: 15px;">
+                  <label class="resize-slider-label" style="font-size: 13px; margin-bottom: 5px; display: flex; justify-content: space-between;">
+                    <span><i class="fas fa-layer-group"></i> Posterize Levels</span>
+                    <span id="posterizeLevelsValue" class="resize-slider-value">Disabled</span>
+                  </label>
+                  <input type="range" id="posterizeLevelsSlider" class="resize-slider" min="0" max="10" value="0" step="1">
+                  <div class="resize-advanced-description" style="font-size: 11px; margin-top: 4px;">
+                    <strong>0:</strong> Disabled (full colors)<br>
+                    <strong>2-4:</strong> Artistic posterization<br>
+                    <strong>5-10:</strong> Subtle color reduction
+                  </div>
+                </div>
+
+                <!-- Dithering Info -->
+                <div class="resize-advanced-description" style="background: rgba(79, 172, 254, 0.1); padding: 10px; border-radius: 6px; border-left: 3px solid #4facfe; margin-top: 10px;">
+                  <i class="fas fa-info-circle"></i> <strong>Tip:</strong> Dithering smooths gradients and reduces color banding. Error diffusion is best for photos, ordered dithering for retro/artistic effects.
+                </div>
+              </div>
+            </div>
+
+            <!-- Post-Processing Section -->
+            <div class="wplace-section resize-advanced-color-section" id="postprocessing-section">
+              <div class="wplace-section-title">
+                <i class="fas fa-sliders-h"></i>&nbsp;Post-Processing
+              </div>
+              <div class="resize-advanced-controls">
+                
+                <!-- Edge Overlay -->
+                <label class="resize-advanced-toggle">
+                  <div class="resize-advanced-toggle-content">
+                    <span class="resize-advanced-label-text">Edge Overlay</span>
+                    <div class="resize-advanced-description">Highlight edges with black outlines</div>
+                  </div>
+                  <input type="checkbox" id="enableEdgeOverlayToggle" class="resize-advanced-checkbox" />
+                </label>
+
+                <!-- Edge Detection Algorithm (shown when Edge Overlay is enabled) -->
+                <div id="edgeAlgorithmControl" style="margin-bottom: 12px; display: none;">
+                  <label class="resize-slider-label" style="font-size: 13px; margin-bottom: 5px;">
+                    <span>Edge Detection Algorithm</span>
+                  </label>
+                  <select id="edgeDetectionAlgorithmSelect" class="resize-slider" style="width: 100%; padding: 6px 8px; border-radius: 4px; border: 1px solid #aaa; background: #f5f5f5; cursor: pointer;">
+                    <option value="sobel">Sobel (Sensitive to Edges)</option>
+                    <option value="prewitt">Prewitt (Balanced)</option>
+                    <option value="roberts">Roberts (Fast)</option>
+                    <option value="laplacian">Laplacian (Zero Crossing)</option>
+                  </select>
+                  <div class="resize-advanced-description" style="font-size: 11px; margin-top: 4px;">
+                    Choose edge detection method: Sobel (best), Prewitt (balanced), Roberts (fast), Laplacian (zerocross)
+                  </div>
+                </div>
+
+                <!-- Edge Threshold (shown when Edge Overlay is enabled) -->
+                <div id="edgeThresholdControl" style="margin-bottom: 12px; display: none;">
+                  <label class="resize-slider-label" style="font-size: 13px; margin-bottom: 5px; display: flex; justify-content: space-between;">
+                    <span>Edge Threshold</span>
+                    <span id="edgeThresholdValue" class="resize-slider-value">60</span>
+                  </label>
+                  <input type="range" id="edgeThresholdSlider" class="resize-slider" min="0" max="255" value="60" step="1">
+                  <div class="resize-advanced-description" style="font-size: 11px; margin-top: 4px;">
+                    Edge detection sensitivity (0=subtle, 255=strong)
+                  </div>
+                </div>
+
+                <!-- Edge Thickness (shown when Edge Overlay is enabled) -->
+                <div id="edgeThicknessControl" style="margin-bottom: 12px; display: none;">
+                  <label class="resize-slider-label" style="font-size: 13px; margin-bottom: 5px; display: flex; justify-content: space-between;">
+                    <span>Edge Thickness</span>
+                    <span id="edgeThicknessValue" class="resize-slider-value">1</span>
+                  </label>
+                  <input type="range" id="edgeThicknessSlider" class="resize-slider" min="1" max="6" value="1" step="1">
+                  <div class="resize-advanced-description" style="font-size: 11px; margin-top: 4px;">
+                    Edge line width in pixels (1-6)
+                  </div>
+                </div>
+
+                <!-- Edge Thin Toggle (shown when Edge Overlay is enabled) -->
+                <div id="edgeThinControl" style="margin-bottom: 12px; display: none;">
+                  <label class="resize-slider-label" style="font-size: 13px;">
+                    <input type="checkbox" id="edgeThinToggle" class="resize-advanced-checkbox" />
+                    <span>Thin Edges</span>
+                  </label>
+                  <div class="resize-advanced-description" style="font-size: 11px; margin-top: 4px;">
+                    Post-process to make edges exactly 1 pixel thin
+                  </div>
+                </div>
+
+                <!-- Increase Outline -->
+                <div style="margin-bottom: 12px;">
+                  <label class="resize-slider-label" style="font-size: 13px; margin-bottom: 5px; display: flex; justify-content: space-between;">
+                    <span>Increase Outline</span>
+                    <span id="outlineThicknessValue" class="resize-slider-value">0</span>
+                  </label>
+                  <input type="range" id="outlineThicknessSlider" class="resize-slider" min="0" max="8" value="0" step="1">
+                  <div class="resize-advanced-description" style="font-size: 11px; margin-top: 4px;">
+                    Thickness of black outline around edges (0-8 pixels)
+                  </div>
+                </div>
+
+                <!-- Simplify Regions -->
+                <div style="margin-bottom: 12px;">
+                  <label class="resize-slider-label" style="font-size: 13px; margin-bottom: 5px; display: flex; justify-content: space-between;">
+                    <span>Simplify Regions (px)</span>
+                    <span id="simplifyAreaValue" class="resize-slider-value">0</span>
+                  </label>
+                  <input type="range" id="simplifyAreaSlider" class="resize-slider" min="0" max="500" value="0" step="10">
+                  <div class="resize-advanced-description" style="font-size: 11px; margin-top: 4px;">
+                    Merge small regions to reduce complexity (0-500 pixels)
+                  </div>
+                </div>
+
+                <!-- Erode Edges -->
+                <div style="margin-bottom: 12px;">
+                  <label class="resize-slider-label" style="font-size: 13px; margin-bottom: 5px; display: flex; justify-content: space-between;">
+                    <span>Erode Edges</span>
+                    <span id="erodeAmountValue" class="resize-slider-value">0</span>
+                  </label>
+                  <input type="range" id="erodeAmountSlider" class="resize-slider" min="0" max="8" value="0" step="1">
+                  <div class="resize-advanced-description" style="font-size: 11px; margin-top: 4px;">
+                    Shrink edges inward to reduce noise (0-8 pixels)
+                  </div>
+                </div>
+
+                <!-- Mode Filter Size -->
+                <div style="margin-bottom: 12px;">
+                  <label class="resize-slider-label" style="font-size: 13px; margin-bottom: 5px; display: flex; justify-content: space-between;">
+                    <span>Mode Filter (N×N)</span>
+                    <span id="modeFilterValue" class="resize-slider-value">0</span>
+                  </label>
+                  <input type="range" id="modeFilterSlider" class="resize-slider" min="0" max="10" value="0" step="1">
+                  <div class="resize-advanced-description" style="font-size: 11px; margin-top: 4px;">
+                    Median filter to smooth regions (0 = off, 1-10 = filter radius)
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Color Correction Section -->
+            <div class="wplace-section resize-advanced-color-section" id="colorcorrection-section">
+              <div class="wplace-section-title">
+                <i class="fas fa-palette"></i>&nbsp;Color Correction
+              </div>
+              <div class="resize-advanced-controls">
+                
+                <!-- Color Correction Toggle -->
+                <label class="resize-advanced-toggle">
+                  <div class="resize-advanced-toggle-content">
+                    <span class="resize-advanced-label-text">Enable Color Correction</span>
+                    <div class="resize-advanced-description">Adjust brightness, contrast, saturation, hue, gamma</div>
+                  </div>
+                  <input type="checkbox" id="enableColorCorrectionToggle" class="resize-advanced-checkbox" />
+                </label>
+
+                <!-- Color Correction Controls (hidden by default) -->
+                <div id="colorCorrectionControls" style="display: none;">
+                  <!-- Brightness -->
+                  <div style="margin-bottom: 12px;">
+                    <label class="resize-slider-label" style="font-size: 13px; margin-bottom: 5px; display: flex; justify-content: space-between;">
+                      <span>Brightness (-100 to 100)</span>
+                      <span id="brightnessValue" class="resize-slider-value">0</span>
+                    </label>
+                    <input type="range" id="brightnessSlider" class="resize-slider" min="-100" max="100" value="0" step="1">
+                  </div>
+
+                  <!-- Contrast -->
+                  <div style="margin-bottom: 12px;">
+                    <label class="resize-slider-label" style="font-size: 13px; margin-bottom: 5px; display: flex; justify-content: space-between;">
+                      <span>Contrast (-100 to 100)</span>
+                      <span id="contrastValue" class="resize-slider-value">0</span>
+                    </label>
+                    <input type="range" id="contrastSlider" class="resize-slider" min="-100" max="100" value="0" step="1">
+                  </div>
+
+                  <!-- Saturation -->
+                  <div style="margin-bottom: 12px;">
+                    <label class="resize-slider-label" style="font-size: 13px; margin-bottom: 5px; display: flex; justify-content: space-between;">
+                      <span>Saturation (-100 to 100)</span>
+                      <span id="saturationValue" class="resize-slider-value">0</span>
+                    </label>
+                    <input type="range" id="saturationSlider" class="resize-slider" min="-100" max="100" value="0" step="1">
+                  </div>
+
+                  <!-- Hue -->
+                  <div style="margin-bottom: 12px;">
+                    <label class="resize-slider-label" style="font-size: 13px; margin-bottom: 5px; display: flex; justify-content: space-between;">
+                      <span>Hue Shift (-180 to 180°)</span>
+                      <span id="hueValue" class="resize-slider-value">0°</span>
+                    </label>
+                    <input type="range" id="hueSlider" class="resize-slider" min="-180" max="180" value="0" step="1">
+                  </div>
+
+                  <!-- Gamma -->
+                  <div style="margin-bottom: 12px;">
+                    <label class="resize-slider-label" style="font-size: 13px; margin-bottom: 5px; display: flex; justify-content: space-between;">
+                      <span>Gamma (0.5 to 3.0)</span>
+                      <span id="gammaValue" class="resize-slider-value">1.0</span>
+                    </label>
+                    <input type="range" id="gammaSlider" class="resize-slider" min="0.5" max="3.0" value="1.0" step="0.1">
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Advanced Color Matching Section -->
+            <div class="wplace-section resize-advanced-color-section" id="advanced-color-section">
+              <div class="wplace-section-title">
+                <i class="fas fa-flask"></i>&nbsp;Advanced Color Matching
+              </div>
+              <div class="resize-advanced-controls">
+                <label class="resize-advanced-label">
+                  <span class="resize-advanced-label-text">Algorithm</span>
+                  <select id="colorAlgorithmSelect" class="resize-advanced-select">
+                    <option value="lab" ${state.colorMatchingAlgorithm === 'lab' ? 'selected' : ''
       }>Perceptual (Lab)</option>
-            <option value="legacy" ${state.colorMatchingAlgorithm === 'legacy' ? 'selected' : ''
+                  <option value="legacy" ${state.colorMatchingAlgorithm === 'legacy' ? 'selected' : ''
       }>Legacy (RGB)</option>
-            <option value="hsv" ${state.colorMatchingAlgorithm === 'hsv' ? 'selected' : ''
+                  <option value="hsv" ${state.colorMatchingAlgorithm === 'hsv' ? 'selected' : ''
       }>HSV (Hue-Saturation-Value)</option>
-            <option value="hsl" ${state.colorMatchingAlgorithm === 'hsl' ? 'selected' : ''
+                  <option value="hsl" ${state.colorMatchingAlgorithm === 'hsl' ? 'selected' : ''
       }>HSL (Hue-Saturation-Lightness)</option>
-            <option value="xyz" ${state.colorMatchingAlgorithm === 'xyz' ? 'selected' : ''
+                  <option value="xyz" ${state.colorMatchingAlgorithm === 'xyz' ? 'selected' : ''
       }>XYZ (CIE Color Space)</option>
-            <option value="luv" ${state.colorMatchingAlgorithm === 'luv' ? 'selected' : ''
+                  <option value="luv" ${state.colorMatchingAlgorithm === 'luv' ? 'selected' : ''
       }>LUV (CIE L*u*v*)</option>
-            <option value="yuv" ${state.colorMatchingAlgorithm === 'yuv' ? 'selected' : ''
+                  <option value="yuv" ${state.colorMatchingAlgorithm === 'yuv' ? 'selected' : ''
       }>YUV (Luma-Chroma)</option>
-            <option value="oklab" ${state.colorMatchingAlgorithm === 'oklab' ? 'selected' : ''
+                  <option value="oklab" ${state.colorMatchingAlgorithm === 'oklab' ? 'selected' : ''
       }>Oklab (Perceptual Uniform)</option>
-            <option value="lch" ${state.colorMatchingAlgorithm === 'lch' ? 'selected' : ''
+                  <option value="lch" ${state.colorMatchingAlgorithm === 'lch' ? 'selected' : ''
       }>LCH (Lightness-Chroma-Hue)</option>
-            </select>
-          </label>
-          <label class="resize-advanced-toggle">
-            <div class="resize-advanced-toggle-content">
-              <span class="resize-advanced-label-text">Chroma Penalty</span>
-              <div class="resize-advanced-description">Preserve vivid colors (Lab only)</div>
-            </div>
-            <input type="checkbox" id="enableChromaPenaltyToggle" ${state.enableChromaPenalty ? 'checked' : ''
+                  </select>
+                </label>
+                <label class="resize-advanced-toggle">
+                  <div class="resize-advanced-toggle-content">
+                    <span class="resize-advanced-label-text">Chroma Penalty</span>
+                    <div class="resize-advanced-description">Preserve vivid colors (Lab only)</div>
+                  </div>
+                  <input type="checkbox" id="enableChromaPenaltyToggle" ${state.enableChromaPenalty ? 'checked' : ''
       } class="resize-advanced-checkbox" />
-          </label>
-          <div class="resize-chroma-weight-control">
-            <div class="resize-chroma-weight-header">
-              <span>${Utils.t('chromaWeight')}</span>
-              <span id="chromaWeightValue" class="resize-chroma-weight-value">${state.chromaPenaltyWeight}</span>
+                </label>
+                <div class="resize-chroma-weight-control">
+                  <div class="resize-chroma-weight-header">
+                    <span>${Utils.t('chromaWeight')}</span>
+                    <span id="chromaWeightValue" class="resize-chroma-weight-value">${state.chromaPenaltyWeight}</span>
+                  </div>
+                  <input type="range" id="chromaPenaltyWeightSlider" min="0" max="0.5" step="0.01" value="${state.chromaPenaltyWeight}" class="resize-chroma-weight-slider" />
+                </div>
+                
+                <div class="resize-threshold-controls">
+                  <label class="resize-threshold-label">
+                    <span class="resize-advanced-label-text">Transparency</span>
+                    <input type="number" id="transparencyThresholdInput" min="0" max="255" value="${state.customTransparencyThreshold}" class="resize-threshold-input" />
+                  </label>
+                  <label class="resize-threshold-label">
+                    <span class="resize-advanced-label-text">White Thresh</span>
+                    <input type="number" id="whiteThresholdInput" min="200" max="255" value="${state.customWhiteThreshold}" class="resize-threshold-input" />
+                  </label>
+                </div>
+                <button id="resetAdvancedColorBtn" class="wplace-btn resize-reset-advanced-btn">Reset Advanced</button>
+              </div>
             </div>
-            <input type="range" id="chromaPenaltyWeightSlider" min="0" max="0.5" step="0.01" value="${state.chromaPenaltyWeight}" class="resize-chroma-weight-slider" />
-          </div>
-          <label class="resize-advanced-toggle">
-            <div class="resize-advanced-toggle-content">
-              <span class="resize-advanced-label-text">Enable Dithering</span>
-              <div class="resize-advanced-description">Floyd–Steinberg error diffusion in preview and applied output</div>
-            </div>
-            <input type="checkbox" id="enableDitheringToggle" ${state.ditheringEnabled ? 'checked' : ''
-      } class="resize-advanced-checkbox" />
-          </label>
-          <div class="resize-threshold-controls">
-            <label class="resize-threshold-label">
-              <span class="resize-advanced-label-text">Transparency</span>
-              <input type="number" id="transparencyThresholdInput" min="0" max="255" value="${state.customTransparencyThreshold}" class="resize-threshold-input" />
-            </label>
-            <label class="resize-threshold-label">
-              <span class="resize-advanced-label-text">White Thresh</span>
-              <input type="number" id="whiteThresholdInput" min="200" max="255" value="${state.customWhiteThreshold}" class="resize-threshold-input" />
-            </label>
-          </div>
-          <button id="resetAdvancedColorBtn" class="wplace-btn resize-reset-advanced-btn">Reset Advanced</button>
-        </div>
-      </div>
 
-      <div class="resize-buttons">
-        <button id="downloadPreviewBtn" class="wplace-btn wplace-btn-primary">
-          <i class="fas fa-download"></i>
-          <span>${Utils.t('downloadPreview')}</span>
-        </button>
-        <button id="confirmResize" class="wplace-btn wplace-btn-start">
-          <i class="fas fa-check"></i>
-          <span>${Utils.t('apply')}</span>
-        </button>
-        <button id="cancelResize" class="wplace-btn wplace-btn-stop">
-          <i class="fas fa-times"></i>
-          <span>${Utils.t('cancel')}</span>
-        </button>
+            <!-- Action Buttons -->
+            <div class="resize-buttons">
+              <button id="downloadPreviewBtn" class="wplace-btn wplace-btn-primary">
+                <i class="fas fa-download"></i>
+                <span>${Utils.t('downloadPreview')}</span>
+              </button>
+              <button id="confirmResize" class="wplace-btn wplace-btn-start">
+                <i class="fas fa-check"></i>
+                <span>${Utils.t('apply')}</span>
+              </button>
+              <button id="cancelResize" class="wplace-btn wplace-btn-stop">
+                <i class="fas fa-times"></i>
+                <span>${Utils.t('cancel')}</span>
+              </button>
+            </div>
+            
+          </div>
+        </div>
+        
+        <!-- RIGHT COLUMN: Fixed Preview Panel with Zoom Controls -->
+        <div class="resize-preview-column">
+          <!-- Zoom Controls (fixed at top) -->
+          <div class="resize-preview-zoom-controls">
+            <button id="editImageBtn" class="wplace-btn resize-zoom-btn" title="Edit Artwork" style="margin-right: 10px; font-weight: bold;">
+              <i class="fas fa-paint-brush"></i> Edit Artwork✨🎨
+            </button>
+            <button id="zoomOutBtn" class="wplace-btn resize-zoom-btn" title="${Utils.t(
+      'zoomOut'
+    )}"><i class="fas fa-search-minus"></i></button>
+            <input type="range" id="zoomSlider" class="resize-slider resize-zoom-slider" min="0.1" max="20" value="1" step="0.05">
+            <button id="zoomInBtn" class="wplace-btn resize-zoom-btn" title="${Utils.t(
+      'zoomIn'
+    )}"><i class="fas fa-search-plus"></i></button>
+            <button id="zoomFitBtn" class="wplace-btn resize-zoom-btn" title="${Utils.t(
+      'fitToView'
+    )}">${Utils.t('fit')}</button>
+            <button id="zoomActualBtn" class="wplace-btn resize-zoom-btn" title="${Utils.t(
+      'actualSize'
+    )}">${Utils.t('hundred')}</button>
+            <button id="panModeBtn" class="wplace-btn resize-zoom-btn" title="${Utils.t('panMode')}">
+              <i class="fas fa-hand-paper"></i>
+            </button>
+            <span id="zoomValue" class="resize-zoom-value">100%</span>
+          </div>
+          
+          <!-- Preview Canvas (fills remaining space) -->
+          <div class="resize-preview-wrapper">
+            <div id="resizePanStage" class="resize-pan-stage">
+              <div id="resizeCanvasStack" class="resize-canvas-stack resize-canvas-positioned">
+                <canvas id="resizeCanvas" class="resize-base-canvas"></canvas>
+                <canvas id="maskCanvas" class="resize-mask-canvas"></canvas>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Help text (fixed at bottom) -->
+          <div id="cameraHelp" class="resize-camera-help">
+            WASD to pan • Mouse wheel to zoom • Drag to pan
+          </div>
+        </div>
+        
       </div>
     `;
 
@@ -4088,69 +4414,7 @@ localStorage.removeItem("lp");
         });
       }
 
-      // Batch mode controls
-      const batchModeSelect = settingsContainer.querySelector('#batchModeSelect');
-      const normalBatchControls = settingsContainer.querySelector('#normalBatchControls');
-      const randomBatchControls = settingsContainer.querySelector('#randomBatchControls');
-      const randomBatchMin = settingsContainer.querySelector('#randomBatchMin');
-      const randomBatchMax = settingsContainer.querySelector('#randomBatchMax');
-
-      if (batchModeSelect) {
-        batchModeSelect.addEventListener('change', (e) => {
-          state.batchMode = e.target.value;
-
-          // Switch between normal and random controls
-          if (normalBatchControls && randomBatchControls) {
-            if (e.target.value === 'random') {
-              normalBatchControls.style.display = 'none';
-              randomBatchControls.style.display = 'block';
-            } else {
-              normalBatchControls.style.display = 'block';
-              randomBatchControls.style.display = 'none';
-            }
-          }
-
-          saveBotSettings();
-          console.log(`📦 Batch mode changed to: ${state.batchMode}`);
-          Utils.showAlert(
-            Utils.t('batchModeSet', {
-              mode:
-                state.batchMode === 'random' ? Utils.t('randomRange') : Utils.t('normalFixedSize'),
-            }),
-            'success'
-          );
-        });
-      }
-
-      if (randomBatchMin) {
-        randomBatchMin.addEventListener('input', (e) => {
-          const min = parseInt(e.target.value);
-          if (min >= 1 && min <= 1000) {
-            state.randomBatchMin = min;
-            // Ensure min doesn't exceed max
-            if (randomBatchMax && min > state.randomBatchMax) {
-              state.randomBatchMax = min;
-              randomBatchMax.value = min;
-            }
-            saveBotSettings();
-          }
-        });
-      }
-
-      if (randomBatchMax) {
-        randomBatchMax.addEventListener('input', (e) => {
-          const max = parseInt(e.target.value);
-          if (max >= 1 && max <= 1000) {
-            state.randomBatchMax = max;
-            // Ensure max doesn't go below min
-            if (randomBatchMin && max < state.randomBatchMin) {
-              state.randomBatchMin = max;
-              randomBatchMin.value = max;
-            }
-            saveBotSettings();
-          }
-        });
-      }
+      // Batch controls removed - bot now uses all available charges automatically
 
       const languageSelect = settingsContainer.querySelector('#languageSelect');
       if (languageSelect) {
@@ -4181,10 +4445,7 @@ localStorage.removeItem("lp");
       const overlayOpacityValue = settingsContainer.querySelector('#overlayOpacityValue');
       const enableBlueMarbleToggle = settingsContainer.querySelector('#enableBlueMarbleToggle');
       const settingsPaintWhiteToggle = settingsContainer.querySelector('#settingsPaintWhiteToggle');
-      const settingsPaintTransparentToggle = settingsContainer.querySelector(
-        '#settingsPaintTransparentToggle'
-      );
-      const autoLoadProgressToggle = settingsContainer.querySelector('#autoLoadProgressToggle');
+      // settingsPaintTransparentToggle removed - use the one in Processing panel instead
 
       if (overlayOpacitySlider && overlayOpacityValue) {
         const updateOpacity = (newValue) => {
@@ -4215,73 +4476,10 @@ localStorage.removeItem("lp");
         });
       }
 
-      if (settingsPaintTransparentToggle) {
-        settingsPaintTransparentToggle.checked = state.paintTransparentPixels;
-        settingsPaintTransparentToggle.addEventListener('change', (e) => {
-          state.paintTransparentPixels = e.target.checked;
-          saveBotSettings();
-          console.log(
-            `🎨 Paint transparent pixels: ${state.paintTransparentPixels ? 'ON' : 'OFF'}`
-          );
-          const statusText = state.paintTransparentPixels
-            ? 'Transparent pixels in the template will be painted with the closest available color'
-            : 'Transparent pixels will be skipped';
-          Utils.showAlert(statusText, 'success');
-        });
-      }
+      // settingsPaintTransparentToggle removed - use the one in Processing panel instead
+      // autoLoadProgressToggle removed - auto-load feature disabled
 
-      if (autoLoadProgressToggle) {
-        autoLoadProgressToggle.checked = state.autoLoadProgress;
-        autoLoadProgressToggle.addEventListener('change', (e) => {
-          state.autoLoadProgress = !!e.target.checked;
-          saveBotSettings();
-          console.log(`🔄 Auto-load progress ${state.autoLoadProgress ? 'enabled' : 'disabled'}`);
-        });
-      }
-
-      // Speed controls - both slider and input
-      const speedSlider = settingsContainer.querySelector('#speedSlider');
-      const speedInput = settingsContainer.querySelector('#speedInput');
-      const speedDecrease = settingsContainer.querySelector('#speedDecrease');
-      const speedIncrease = settingsContainer.querySelector('#speedIncrease');
-      const speedValue = settingsContainer.querySelector('#speedValue');
-
-      if (speedSlider && speedInput && speedValue && speedDecrease && speedIncrease) {
-        const updateSpeed = (newValue) => {
-          const speed = Math.max(CONFIG.PAINTING_SPEED.MIN, Math.min(CONFIG.PAINTING_SPEED.MAX, parseInt(newValue)));
-          state.paintingSpeed = speed;
-
-          // Update both controls (value shows in input, label shows unit only)
-          speedSlider.value = speed;
-          speedInput.value = speed;
-          speedValue.textContent = `pixels`;
-
-          saveBotSettings();
-        };
-
-        // Slider event listener
-        speedSlider.addEventListener('input', (e) => {
-          updateSpeed(e.target.value);
-        });
-
-        // Number input event listener
-        speedInput.addEventListener('input', (e) => {
-          updateSpeed(e.target.value);
-        });
-
-        // Decrease button
-        speedDecrease.addEventListener('click', () => {
-          updateSpeed(parseInt(speedInput.value) - 1);
-        });
-
-        // Increase button
-        speedIncrease.addEventListener('click', () => {
-          updateSpeed(parseInt(speedInput.value) + 1);
-        });
-
-        // Add scroll-to-adjust for speed slider
-        Utils.createScrollToAdjust(speedSlider, updateSpeed, CONFIG.PAINTING_SPEED.MIN, CONFIG.PAINTING_SPEED.MAX, 1);
-      }
+      // Speed controls removed - bot now uses all available charges automatically
 
       if (enableBlueMarbleToggle) {
         enableBlueMarbleToggle.addEventListener('click', async () => {
@@ -4294,19 +4492,7 @@ localStorage.removeItem("lp");
         });
       }
 
-      // Speed control toggle
-      const enableSpeedToggle = settingsContainer.querySelector('#enableSpeedToggle');
-      if (enableSpeedToggle) {
-        enableSpeedToggle.addEventListener('change', (e) => {
-          CONFIG.PAINTING_SPEED_ENABLED = e.target.checked;
-          saveBotSettings();
-          console.log(`⚡ Batch speed control: ${CONFIG.PAINTING_SPEED_ENABLED ? 'ON' : 'OFF'}`);
-          const statusText = CONFIG.PAINTING_SPEED_ENABLED
-            ? 'Batch speed control enabled - will use configured batch size'
-            : 'Batch speed control disabled - will use all available charges immediately';
-          Utils.showAlert(statusText, 'success');
-        });
-      }
+      // Speed control toggle removed - bot now uses all available charges automatically
 
       // (Advanced color listeners moved outside to work with resize dialog)
       // (Advanced color listeners moved outside to work with resize dialog)
@@ -4339,6 +4525,7 @@ localStorage.removeItem("lp");
     const keepAspect = resizeContainer.querySelector('#keepAspect');
     const paintWhiteToggle = resizeContainer.querySelector('#paintWhiteToggle');
     const paintTransparentToggle = resizeContainer.querySelector('#paintTransparentToggle');
+    const resamplingMethodSelect = resizeContainer.querySelector('#resamplingMethodSelect');
     const zoomSlider = resizeContainer.querySelector('#zoomSlider');
     const zoomValue = resizeContainer.querySelector('#zoomValue');
     const zoomInBtn = resizeContainer.querySelector('#zoomInBtn');
@@ -4357,6 +4544,53 @@ localStorage.removeItem("lp");
     const editImageBtn = resizeContainer.querySelector('#editImageBtn');
     const downloadPreviewBtn = resizeContainer.querySelector('#downloadPreviewBtn');
     const clearIgnoredBtn = resizeContainer.querySelector('#clearIgnoredBtn');
+    
+    // Pre-processing controls
+    const preBlurModeSelect = resizeContainer.querySelector('#preBlurModeSelect');
+    const preBlurRadiusSlider = resizeContainer.querySelector('#preBlurRadiusSlider');
+    const blurRadiusValue = resizeContainer.querySelector('#blurRadiusValue');
+    const blurRadiusControl = resizeContainer.querySelector('#blurRadiusControl');
+    const sharpenAmountSlider = resizeContainer.querySelector('#sharpenAmountSlider');
+    const sharpenAmountValue = resizeContainer.querySelector('#sharpenAmountValue');
+    const sharpenRadiusSlider = resizeContainer.querySelector('#sharpenRadiusSlider');
+    const sharpenRadiusValue = resizeContainer.querySelector('#sharpenRadiusValue');
+    const sharpenRadiusControl = resizeContainer.querySelector('#sharpenRadiusControl');
+    const sharpenThresholdSlider = resizeContainer.querySelector('#sharpenThresholdSlider');
+    const sharpenThresholdValue = resizeContainer.querySelector('#sharpenThresholdValue');
+    const sharpenThresholdControl = resizeContainer.querySelector('#sharpenThresholdControl');
+    
+    // Set initial resampling method value
+    if (resamplingMethodSelect) {
+      resamplingMethodSelect.value = state.resamplingMethod;
+    }
+    
+    // Set initial pre-processing values
+    if (preBlurModeSelect) {
+      preBlurModeSelect.value = state.preBlurMode;
+      if (state.preBlurMode !== 'none' && blurRadiusControl) {
+        blurRadiusControl.style.display = 'block';
+      }
+    }
+    if (preBlurRadiusSlider && blurRadiusValue) {
+      preBlurRadiusSlider.value = state.preBlurRadius;
+      blurRadiusValue.textContent = state.preBlurRadius;
+    }
+    if (sharpenAmountSlider && sharpenAmountValue) {
+      sharpenAmountSlider.value = state.sharpenAmount;
+      sharpenAmountValue.textContent = state.sharpenAmount;
+      if (state.sharpenAmount > 0) {
+        if (sharpenRadiusControl) sharpenRadiusControl.style.display = 'block';
+        if (sharpenThresholdControl) sharpenThresholdControl.style.display = 'block';
+      }
+    }
+    if (sharpenRadiusSlider && sharpenRadiusValue) {
+      sharpenRadiusSlider.value = state.sharpenRadius;
+      sharpenRadiusValue.textContent = state.sharpenRadius;
+    }
+    if (sharpenThresholdSlider && sharpenThresholdValue) {
+      sharpenThresholdSlider.value = state.sharpenThreshold;
+      sharpenThresholdValue.textContent = state.sharpenThreshold;
+    }
 
     // Coordinate generation controls with smart visibility
     const coordinateModeSelect = settingsContainer.querySelector('#coordinateModeSelect');
@@ -4840,12 +5074,12 @@ localStorage.removeItem("lp");
         // Updated estimation calculation for new cooldown logic
         // Now we wait for cooldownChargeThreshold before processing pixels
 
-        // Calculate batch size (with fallback if function not yet defined)
+        // Calculate batch size - bot now uses all available charges
         let batchSize;
         try {
-          batchSize = typeof calculateBatchSize === 'function' ? calculateBatchSize() : state.paintingSpeed || 5;
+          batchSize = typeof calculateBatchSize === 'function' ? calculateBatchSize() : state.displayCharges || 1;
         } catch (e) {
-          batchSize = state.paintingSpeed || 5;
+          batchSize = state.displayCharges || 1;
         }
 
         // Ensure batchSize is valid and not zero
@@ -4876,11 +5110,7 @@ localStorage.removeItem("lp");
             estimatedMs += regenerationTime;
           }
 
-          // Add painting speed delay if enabled
-          if (CONFIG.PAINTING_SPEED_ENABLED && state.paintingSpeed > 0) {
-            const paintingDelay = remainingPixels * (1000 / state.paintingSpeed);
-            estimatedMs += paintingDelay;
-          }
+          // Painting speed delay removed - bot now uses all available charges immediately
         }
 
         // Safety check to prevent infinity or invalid values
@@ -5121,11 +5351,58 @@ localStorage.removeItem("lp");
       document.getElementById('closeMovePanel').addEventListener('click', closeMovePanel);
     }
 
-    function showResizeDialog(processor) {
+    function showResizeDialog(processor, isNewImage = false) {
+      // ========================================
+      // RESET ALL PROCESSING SETTINGS TO DEFAULT
+      // (Only when a NEW image is uploaded)
+      // ========================================
+      if (isNewImage) {
+        console.log('🔄 Resetting ALL processing settings to default (new template uploaded)...');
+        
+        // Dithering settings
+        state.ditheringEnabled = false;
+        state.ditheringMethod = 'floyd';
+        state.ditheringStrength = 0.5;
+        state.posterizeLevels = 0;
+        
+        // Pre-processing settings
+        state.preBlurMode = 'none';
+        state.preBlurRadius = 0;
+        state.sharpenAmount = 0;
+        state.sharpenRadius = 0;
+        state.sharpenThreshold = 0;
+        
+        // Resampling and color matching
+        state.resamplingMethod = 'nearest';
+        state.colorMatchingAlgorithm = 'rgb';  // Default to Legacy (RGB)
+        state.enableChromaPenalty = false;      // Chroma penalty OFF by default
+        state.chromaPenaltyWeight = 0.15;
+        
+        // Post-processing settings
+        state.enableEdgeOverlay = false;
+        state.outlineThickness = 0;
+        state.simplifyArea = 0;
+        state.erodeAmount = 0;
+        state.modeFilterSize = 0;
+        
+        // Color correction settings
+        state.enableColorCorrection = false;
+        state.brightness = 0;
+        state.contrast = 0;
+        state.saturation = 0;
+        state.hue = 0;
+        state.gamma = 1.0;
+        
+        console.log('✅ Processing settings reset - All OFF, Color Algorithm: RGB');
+      } else {
+        console.log('📂 Reopening processing panel - preserving existing settings');
+      }
+      
       let baseProcessor = processor;
       let width, height;
       if (state.originalImage?.dataUrl) {
-        baseProcessor = new ImageProcessor(state.originalImage.dataUrl);
+        // Use global WPlaceImageProcessor which has resampleImage method
+        baseProcessor = new window.WPlaceImageProcessor(state.originalImage.dataUrl);
         width = state.originalImage.width;
         height = state.originalImage.height;
       } else {
@@ -5167,6 +5444,277 @@ localStorage.removeItem("lp");
       if (zoomValue) zoomValue.textContent = '100%';
       paintWhiteToggle.checked = state.paintWhitePixels;
       paintTransparentToggle.checked = state.paintTransparentPixels;
+
+      // Reset UI elements to match default processing settings (only on new image)
+      if (isNewImage) {
+        setTimeout(() => {
+          // Dithering controls
+          const ditherToggle = document.getElementById('enableDitheringToggle');
+          if (ditherToggle) {
+            ditherToggle.checked = false;
+            const methodControl = document.getElementById('ditheringMethodControl');
+            const posterizeControl = document.getElementById('posterizeLevelsControl');
+            const strengthControl = document.getElementById('ditheringStrengthControl');
+            if (methodControl) methodControl.style.display = 'none';
+            if (posterizeControl) posterizeControl.style.display = 'none';
+            if (strengthControl) strengthControl.style.display = 'none';
+          }
+          
+          const ditheringMethodSelect = document.getElementById('ditheringMethodSelect');
+          if (ditheringMethodSelect) ditheringMethodSelect.value = 'floyd';
+          
+          const ditheringStrengthSlider = document.getElementById('ditheringStrengthSlider');
+          const ditheringStrengthValue = document.getElementById('ditheringStrengthValue');
+          if (ditheringStrengthSlider && ditheringStrengthValue) {
+            ditheringStrengthSlider.value = 50;
+            ditheringStrengthValue.textContent = '50%';
+          }
+          
+          const posterizeLevelsSlider = document.getElementById('posterizeLevelsSlider');
+          const posterizeLevelsValue = document.getElementById('posterizeLevelsValue');
+          if (posterizeLevelsSlider && posterizeLevelsValue) {
+            posterizeLevelsSlider.value = 0;
+            posterizeLevelsValue.textContent = 'Disabled';
+          }
+          
+          // Pre-processing controls
+          const preBlurModeSelect = document.getElementById('preBlurModeSelect');
+          const blurRadiusControl = document.getElementById('blurRadiusControl');
+          if (preBlurModeSelect) {
+            preBlurModeSelect.value = 'none';
+            if (blurRadiusControl) blurRadiusControl.style.display = 'none';
+          }
+          
+          const preBlurRadiusSlider = document.getElementById('preBlurRadiusSlider');
+          const blurRadiusValue = document.getElementById('blurRadiusValue');
+          if (preBlurRadiusSlider && blurRadiusValue) {
+            preBlurRadiusSlider.value = 0;
+            blurRadiusValue.textContent = '0';
+          }
+          
+          const sharpenAmountSlider = document.getElementById('sharpenAmountSlider');
+          const sharpenAmountValue = document.getElementById('sharpenAmountValue');
+          const sharpenRadiusControl = document.getElementById('sharpenRadiusControl');
+          const sharpenThresholdControl = document.getElementById('sharpenThresholdControl');
+          if (sharpenAmountSlider && sharpenAmountValue) {
+            sharpenAmountSlider.value = 0;
+            sharpenAmountValue.textContent = '0';
+            if (sharpenRadiusControl) sharpenRadiusControl.style.display = 'none';
+            if (sharpenThresholdControl) sharpenThresholdControl.style.display = 'none';
+          }
+          
+          const sharpenRadiusSlider = document.getElementById('sharpenRadiusSlider');
+          const sharpenRadiusValue = document.getElementById('sharpenRadiusValue');
+          if (sharpenRadiusSlider && sharpenRadiusValue) {
+            sharpenRadiusSlider.value = 0;
+            sharpenRadiusValue.textContent = '0';
+          }
+          
+          const sharpenThresholdSlider = document.getElementById('sharpenThresholdSlider');
+          const sharpenThresholdValue = document.getElementById('sharpenThresholdValue');
+          if (sharpenThresholdSlider && sharpenThresholdValue) {
+            sharpenThresholdSlider.value = 0;
+            sharpenThresholdValue.textContent = '0';
+          }
+          
+          // Resampling method
+          const resamplingMethodSelect = document.getElementById('resamplingMethodSelect');
+          if (resamplingMethodSelect) resamplingMethodSelect.value = 'nearest';
+          
+          // Advanced color matching - RESET TO DEFAULT (RGB, no chroma)
+          const colorAlgorithmSelect = document.getElementById('colorAlgorithmSelect');
+          if (colorAlgorithmSelect) colorAlgorithmSelect.value = 'rgb';
+          
+          const chromaPenaltyToggle = document.getElementById('enableChromaPenaltyToggle');
+          if (chromaPenaltyToggle) chromaPenaltyToggle.checked = false;
+          
+          const chromaPenaltyWeightSlider = document.getElementById('chromaPenaltyWeightSlider');
+          const chromaWeightValue = document.getElementById('chromaWeightValue');
+          if (chromaPenaltyWeightSlider && chromaWeightValue) {
+            chromaPenaltyWeightSlider.value = 0.15;
+            chromaWeightValue.textContent = '0.15';
+          }
+          
+          // Post-processing controls
+          const enableEdgeOverlayToggle = document.getElementById('enableEdgeOverlayToggle');
+          if (enableEdgeOverlayToggle) enableEdgeOverlayToggle.checked = false;
+          
+          const edgeAlgorithmControl = document.getElementById('edgeAlgorithmControl');
+          if (edgeAlgorithmControl) edgeAlgorithmControl.style.display = 'none';
+          
+          const edgeDetectionAlgorithmSelect = document.getElementById('edgeDetectionAlgorithmSelect');
+          if (edgeDetectionAlgorithmSelect) edgeDetectionAlgorithmSelect.value = 'sobel';
+          
+          const outlineThicknessSlider = document.getElementById('outlineThicknessSlider');
+          const outlineThicknessValue = document.getElementById('outlineThicknessValue');
+          if (outlineThicknessSlider && outlineThicknessValue) {
+            outlineThicknessSlider.value = 0;
+            outlineThicknessValue.textContent = '0';
+          }
+          
+          const simplifyAreaSlider = document.getElementById('simplifyAreaSlider');
+          const simplifyAreaValue = document.getElementById('simplifyAreaValue');
+          if (simplifyAreaSlider && simplifyAreaValue) {
+            simplifyAreaSlider.value = 0;
+            simplifyAreaValue.textContent = '0';
+          }
+          
+          const erodeAmountSlider = document.getElementById('erodeAmountSlider');
+          const erodeAmountValue = document.getElementById('erodeAmountValue');
+          if (erodeAmountSlider && erodeAmountValue) {
+            erodeAmountSlider.value = 0;
+            erodeAmountValue.textContent = '0';
+          }
+          
+          const modeFilterSlider = document.getElementById('modeFilterSlider');
+          const modeFilterValue = document.getElementById('modeFilterValue');
+          if (modeFilterSlider && modeFilterValue) {
+            modeFilterSlider.value = 0;
+            modeFilterValue.textContent = '0';
+          }
+          
+          // Color correction controls
+          const enableColorCorrectionToggle = document.getElementById('enableColorCorrectionToggle');
+          if (enableColorCorrectionToggle) enableColorCorrectionToggle.checked = false;
+          
+          const colorCorrectionControls = document.getElementById('colorCorrectionControls');
+          if (colorCorrectionControls) colorCorrectionControls.style.display = 'none';
+          
+          const brightnessSlider = document.getElementById('brightnessSlider');
+          const brightnessValue = document.getElementById('brightnessValue');
+          if (brightnessSlider && brightnessValue) {
+            brightnessSlider.value = 0;
+            brightnessValue.textContent = '0';
+          }
+          
+          const contrastSlider = document.getElementById('contrastSlider');
+          const contrastValue = document.getElementById('contrastValue');
+          if (contrastSlider && contrastValue) {
+            contrastSlider.value = 0;
+            contrastValue.textContent = '0';
+          }
+          
+          const saturationSlider = document.getElementById('saturationSlider');
+          const saturationValue = document.getElementById('saturationValue');
+          if (saturationSlider && saturationValue) {
+            saturationSlider.value = 0;
+            saturationValue.textContent = '0';
+          }
+          
+          const hueSlider = document.getElementById('hueSlider');
+          const hueValue = document.getElementById('hueValue');
+          if (hueSlider && hueValue) {
+            hueSlider.value = 0;
+            hueValue.textContent = '0°';
+          }
+          
+          const gammaSlider = document.getElementById('gammaSlider');
+          const gammaValue = document.getElementById('gammaValue');
+          if (gammaSlider && gammaValue) {
+            gammaSlider.value = 1.0;
+            gammaValue.textContent = '1.0';
+          }
+          
+          console.log('✅ UI elements reset - All controls to default, Color Algorithm: RGB, Chroma OFF, Post-Processing OFF, Color Correction OFF');
+        }, 100);
+      } else {
+        // Panel reopened - just sync UI with current state
+        setTimeout(() => {
+          // Update all sliders to match current state values
+          const ditheringStrengthSlider = document.getElementById('ditheringStrengthSlider');
+          const ditheringStrengthValue = document.getElementById('ditheringStrengthValue');
+          if (ditheringStrengthSlider && ditheringStrengthValue) {
+            ditheringStrengthSlider.value = Math.round(state.ditheringStrength * 100);
+            ditheringStrengthValue.textContent = `${Math.round(state.ditheringStrength * 100)}%`;
+          }
+          
+          const posterizeLevelsSlider = document.getElementById('posterizeLevelsSlider');
+          const posterizeLevelsValue = document.getElementById('posterizeLevelsValue');
+          if (posterizeLevelsSlider && posterizeLevelsValue) {
+            posterizeLevelsSlider.value = state.posterizeLevels;
+            posterizeLevelsValue.textContent = state.posterizeLevels === 0 ? 'Disabled' : state.posterizeLevels;
+          }
+          
+          const preBlurRadiusSlider = document.getElementById('preBlurRadiusSlider');
+          const blurRadiusValue = document.getElementById('blurRadiusValue');
+          if (preBlurRadiusSlider && blurRadiusValue) {
+            preBlurRadiusSlider.value = state.preBlurRadius;
+            blurRadiusValue.textContent = state.preBlurRadius;
+          }
+          
+          const sharpenAmountSlider = document.getElementById('sharpenAmountSlider');
+          const sharpenAmountValue = document.getElementById('sharpenAmountValue');
+          if (sharpenAmountSlider && sharpenAmountValue) {
+            sharpenAmountSlider.value = state.sharpenAmount;
+            sharpenAmountValue.textContent = state.sharpenAmount;
+          }
+          
+          const outlineThicknessSlider = document.getElementById('outlineThicknessSlider');
+          const outlineThicknessValue = document.getElementById('outlineThicknessValue');
+          if (outlineThicknessSlider && outlineThicknessValue) {
+            outlineThicknessSlider.value = state.outlineThickness;
+            outlineThicknessValue.textContent = state.outlineThickness;
+          }
+          
+          const simplifyAreaSlider = document.getElementById('simplifyAreaSlider');
+          const simplifyAreaValue = document.getElementById('simplifyAreaValue');
+          if (simplifyAreaSlider && simplifyAreaValue) {
+            simplifyAreaSlider.value = state.simplifyArea;
+            simplifyAreaValue.textContent = state.simplifyArea;
+          }
+          
+          const erodeAmountSlider = document.getElementById('erodeAmountSlider');
+          const erodeAmountValue = document.getElementById('erodeAmountValue');
+          if (erodeAmountSlider && erodeAmountValue) {
+            erodeAmountSlider.value = state.erodeAmount;
+            erodeAmountValue.textContent = state.erodeAmount;
+          }
+          
+          const modeFilterSlider = document.getElementById('modeFilterSlider');
+          const modeFilterValue = document.getElementById('modeFilterValue');
+          if (modeFilterSlider && modeFilterValue) {
+            modeFilterSlider.value = state.modeFilterSize;
+            modeFilterValue.textContent = state.modeFilterSize;
+          }
+          
+          const brightnessSlider = document.getElementById('brightnessSlider');
+          const brightnessValue = document.getElementById('brightnessValue');
+          if (brightnessSlider && brightnessValue) {
+            brightnessSlider.value = state.brightness;
+            brightnessValue.textContent = state.brightness;
+          }
+          
+          const contrastSlider = document.getElementById('contrastSlider');
+          const contrastValue = document.getElementById('contrastValue');
+          if (contrastSlider && contrastValue) {
+            contrastSlider.value = state.contrast;
+            contrastValue.textContent = state.contrast;
+          }
+          
+          const saturationSlider = document.getElementById('saturationSlider');
+          const saturationValue = document.getElementById('saturationValue');
+          if (saturationSlider && saturationValue) {
+            saturationSlider.value = state.saturation;
+            saturationValue.textContent = state.saturation;
+          }
+          
+          const hueSlider = document.getElementById('hueSlider');
+          const hueValue = document.getElementById('hueValue');
+          if (hueSlider && hueValue) {
+            hueSlider.value = state.hue;
+            hueValue.textContent = state.hue + '°';
+          }
+          
+          const gammaSlider = document.getElementById('gammaSlider');
+          const gammaValue = document.getElementById('gammaValue');
+          if (gammaSlider && gammaValue) {
+            gammaSlider.value = state.gamma;
+            gammaValue.textContent = state.gamma.toFixed(1);
+          }
+          
+          console.log('📂 UI synced with current state - settings preserved');
+        }, 100);
+      }
 
       let _previewTimer = null;
       let _previewJobId = 0;
@@ -5239,6 +5787,60 @@ localStorage.removeItem("lp");
         // Ensure overlay buffers exist and rebuild from mask when dimensions change
         _ensureMaskOverlayBuffers(w, h, true);
       };
+      
+      // Helper function to resample an image source using the global WPlaceImageProcessor
+      const performResampling = (imageSource, targetWidth, targetHeight, method) => {
+        // Get the source canvas/image
+        let source = imageSource.canvas || imageSource.img;
+        
+        // Apply pre-blur if enabled
+        if (state.preBlurMode && state.preBlurMode !== 'none' && state.preBlurRadius > 0) {
+          const preBlurCanvas = document.createElement('canvas');
+          preBlurCanvas.width = source.width;
+          preBlurCanvas.height = source.height;
+          const preBlurCtx = preBlurCanvas.getContext('2d');
+          preBlurCtx.drawImage(source, 0, 0);
+          
+          // Apply blur using global image processor
+          if (globalImageProcessor && typeof globalImageProcessor.applyPreBlur === 'function') {
+            source = globalImageProcessor.applyPreBlur(preBlurCanvas, state.preBlurMode, state.preBlurRadius);
+            console.log(`✨ Applied ${state.preBlurMode} blur with radius ${state.preBlurRadius}`);
+          }
+        }
+        
+        // Perform resampling
+        let resampledCanvas;
+        if (typeof imageSource.resampleImage === 'function') {
+          resampledCanvas = imageSource.resampleImage(source, targetWidth, targetHeight, method);
+        } else if (window.WPlaceImageProcessor && globalImageProcessor && typeof globalImageProcessor.resampleImage === 'function') {
+          resampledCanvas = globalImageProcessor.resampleImage(source, targetWidth, targetHeight, method);
+        } else {
+          // Final fallback: simple canvas drawing
+          const fallbackCanvas = document.createElement('canvas');
+          const fallbackCtx = fallbackCanvas.getContext('2d');
+          fallbackCanvas.width = targetWidth;
+          fallbackCanvas.height = targetHeight;
+          fallbackCtx.imageSmoothingEnabled = (method === 'bilinear');
+          fallbackCtx.drawImage(source, 0, 0, targetWidth, targetHeight);
+          resampledCanvas = fallbackCanvas;
+        }
+        
+        // Apply sharpening if enabled
+        if (state.sharpenAmount > 0 && state.sharpenRadius > 0) {
+          if (globalImageProcessor && typeof globalImageProcessor.applyUnsharpMask === 'function') {
+            resampledCanvas = globalImageProcessor.applyUnsharpMask(
+              resampledCanvas,
+              state.sharpenAmount,
+              state.sharpenRadius,
+              state.sharpenThreshold
+            );
+            console.log(`✨ Applied unsharp mask: amount=${state.sharpenAmount}, radius=${state.sharpenRadius}, threshold=${state.sharpenThreshold}`);
+          }
+        }
+        
+        return resampledCanvas;
+      };
+      
       _updateResizePreview = async () => {
         const jobId = ++_previewJobId;
         const newWidth = parseInt(widthSlider.value, 10);
@@ -5257,8 +5859,18 @@ localStorage.removeItem("lp");
           if (baseProcessor !== processor && (!baseProcessor.img || !baseProcessor.canvas)) {
             await baseProcessor.load();
           }
+          
+          // Use the resampling helper function
+          const resampledCanvas = performResampling(
+            baseProcessor,
+            newWidth,
+            newHeight,
+            state.resamplingMethod
+          );
+          
           baseCtx.clearRect(0, 0, newWidth, newHeight);
-          baseCtx.drawImage(baseProcessor.img, 0, 0, newWidth, newHeight);
+          baseCtx.drawImage(resampledCanvas, 0, 0);
+          
           // Draw existing mask overlay buffer
           maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
           if (_maskImageData) maskCtx.putImageData(_maskImageData, 0, 0);
@@ -5269,105 +5881,167 @@ localStorage.removeItem("lp");
         if (baseProcessor !== processor && (!baseProcessor.img || !baseProcessor.canvas)) {
           await baseProcessor.load();
         }
+        
+        // Use the resampling helper function
+        const resampledCanvas = performResampling(
+          baseProcessor,
+          newWidth,
+          newHeight,
+          state.resamplingMethod
+        );
+        
         baseCtx.clearRect(0, 0, newWidth, newHeight);
-        baseCtx.drawImage(baseProcessor.img, 0, 0, newWidth, newHeight);
+        baseCtx.drawImage(resampledCanvas, 0, 0);
         const imgData = baseCtx.getImageData(0, 0, newWidth, newHeight);
         const data = imgData.data;
 
         const tThresh = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
 
-        const applyFSDither = () => {
-          const w = newWidth,
-            h = newHeight;
-          const n = w * h;
-          const { work, eligible } = ensureDitherBuffers(n);
-          for (let y = 0; y < h; y++) {
-            for (let x = 0; x < w; x++) {
-              const idx = y * w + x;
-              const i4 = idx * 4;
-              const r = data[i4],
-                g = data[i4 + 1],
-                b = data[i4 + 2],
-                a = data[i4 + 3];
-              const isEligible =
-                (state.paintTransparentPixels || a >= tThresh) &&
-                (state.paintWhitePixels || !Utils.isWhitePixel(r, g, b));
-              eligible[idx] = isEligible ? 1 : 0;
-              work[idx * 3] = r;
-              work[idx * 3 + 1] = g;
-              work[idx * 3 + 2] = b;
-              if (!isEligible) {
-                data[i4 + 3] = 0; // transparent in preview overlay
-              }
-            }
+        // Apply color correction BEFORE palette conversion (if enabled)
+        // This ensures color adjustments happen before snapping to palette
+        if (state.enableColorCorrection && (
+          state.brightness !== 0 ||
+          state.contrast !== 0 ||
+          state.saturation !== 0 ||
+          state.hue !== 0 ||
+          state.gamma !== 1.0
+        )) {
+          const processedData = globalImageProcessor.applyColorCorrection(
+            data,
+            state.brightness || 0,
+            state.contrast || 0,
+            state.saturation || 0,
+            state.hue || 0,
+            state.gamma || 1.0
+          );
+          for (let i = 0; i < processedData.length; i++) {
+            data[i] = processedData[i];
           }
+        }
 
-          const diffuse = (nx, ny, er, eg, eb, factor) => {
-            if (nx < 0 || nx >= w || ny < 0 || ny >= h) return;
-            const nidx = ny * w + nx;
-            if (!eligible[nidx]) return;
-            const base = nidx * 3;
-            work[base] = Math.min(255, Math.max(0, work[base] + er * factor));
-            work[base + 1] = Math.min(255, Math.max(0, work[base + 1] + eg * factor));
-            work[base + 2] = Math.min(255, Math.max(0, work[base + 2] + eb * factor));
-          };
-
-          for (let y = 0; y < h; y++) {
-            for (let x = 0; x < w; x++) {
-              const idx = y * w + x;
-              if (!eligible[idx]) continue;
-              const base = idx * 3;
-              const r0 = work[base],
-                g0 = work[base + 1],
-                b0 = work[base + 2];
-              const [nr, ng, nb] = Utils.findClosestPaletteColor(
-                r0,
-                g0,
-                b0,
-                state.activeColorPalette
-              );
-              const i4 = idx * 4;
-              data[i4] = nr;
-              data[i4 + 1] = ng;
-              data[i4 + 2] = nb;
-              data[i4 + 3] = 255;
-
-              const er = r0 - nr;
-              const eg = g0 - ng;
-              const eb = b0 - nb;
-
-              diffuse(x + 1, y, er, eg, eb, 7 / 16);
-              diffuse(x - 1, y + 1, er, eg, eb, 3 / 16);
-              diffuse(x, y + 1, er, eg, eb, 5 / 16);
-              diffuse(x + 1, y + 1, er, eg, eb, 1 / 16);
-            }
-          }
-        };
-
-        // Skip expensive dithering while user is dragging sliders
+        // Apply multi-algorithm dithering if enabled
         console.log(`🎨 Preview render - ditheringEnabled: ${state.ditheringEnabled}, _isDraggingSize: ${_isDraggingSize}`);
         if (state.ditheringEnabled && !_isDraggingSize) {
-          console.log('✅ Applying dithering to preview');
-          applyFSDither();
+          const ditherResult = globalImageProcessor.applyDithering(
+            data,
+            newWidth,
+            newHeight,
+            state.activeColorPalette,
+            {
+              method: state.ditheringMethod || 'floyd',
+              strength: state.ditheringStrength || 0.5,
+              posterizeLevels: state.posterizeLevels || 0,
+              paintTransparentPixels: state.paintTransparentPixels,
+              paintWhitePixels: state.paintWhitePixels,
+              transparencyThreshold: tThresh,
+              whiteThreshold: state.customWhiteThreshold || CONFIG.WHITE_THRESHOLD,
+              algorithm: state.colorMatchingAlgorithm || 'lab',
+              enableChromaPenalty: state.enableChromaPenalty,
+              chromaPenaltyWeight: state.chromaPenaltyWeight,
+              mask: state.resizeIgnoreMask
+            }
+          );
+          
+          // Copy dithered data back
+          for (let i = 0; i < ditherResult.data.length; i++) {
+            data[i] = ditherResult.data[i];
+          }
         } else {
-          console.log('⛔ Skipping dithering - applying direct color conversion');
+          // No dithering - simple color quantization
+          console.log('⛔ Dithering disabled - applying direct color quantization');
           for (let i = 0; i < data.length; i += 4) {
             const r = data[i],
               g = data[i + 1],
               b = data[i + 2],
               a = data[i + 3];
+            
+            const isTransparent = a < tThresh;
+            
             if (
-              (!state.paintTransparentPixels && a < tThresh) ||
+              (!state.paintTransparentPixels && isTransparent) ||
               (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b))
             ) {
               data[i + 3] = 0;
               continue;
             }
+            
+            // If painting transparent pixels and this pixel is transparent, keep it transparent
+            if (state.paintTransparentPixels && isTransparent) {
+              data[i] = 0;
+              data[i + 1] = 0;
+              data[i + 2] = 0;
+              data[i + 3] = 0;
+              continue;
+            }
+            
             const [nr, ng, nb] = Utils.findClosestPaletteColor(r, g, b, state.activeColorPalette);
             data[i] = nr;
             data[i + 1] = ng;
             data[i + 2] = nb;
             data[i + 3] = 255;
+          }
+        }
+        // Apply post-processing effects if enabled
+        if (state.enableEdgeOverlay) {
+          const processedData = globalImageProcessor.applyEdgeOverlay(
+            data,
+            newWidth,
+            newHeight,
+            state.edgeDetectionAlgorithm || 'sobel',
+            state.edgeThreshold || 60,
+            state.edgeThickness || 1,
+            state.edgeThin || false
+          );
+          for (let i = 0; i < processedData.length; i++) {
+            data[i] = processedData[i];
+          }
+        }
+
+        if (state.outlineThickness > 0) {
+          const processedData = globalImageProcessor.applyOutline(
+            data,
+            newWidth,
+            newHeight,
+            state.outlineThickness
+          );
+          for (let i = 0; i < processedData.length; i++) {
+            data[i] = processedData[i];
+          }
+        }
+
+        if (state.simplifyArea > 0) {
+          const processedData = globalImageProcessor.simplifyRegions(
+            data,
+            newWidth,
+            newHeight,
+            state.simplifyArea
+          );
+          for (let i = 0; i < processedData.length; i++) {
+            data[i] = processedData[i];
+          }
+        }
+
+        if (state.erodeAmount > 0) {
+          const processedData = globalImageProcessor.erodeEdges(
+            data,
+            newWidth,
+            newHeight,
+            state.erodeAmount
+          );
+          for (let i = 0; i < processedData.length; i++) {
+            data[i] = processedData[i];
+          }
+        }
+
+        if (state.modeFilterSize > 0) {
+          const processedData = globalImageProcessor.applyModeFilter(
+            data,
+            newWidth,
+            newHeight,
+            state.modeFilterSize
+          );
+          for (let i = 0; i < processedData.length; i++) {
+            data[i] = processedData[i];
           }
         }
 
@@ -5376,6 +6050,34 @@ localStorage.removeItem("lp");
         maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
         if (_maskImageData) maskCtx.putImageData(_maskImageData, 0, 0);
         updateZoomLayout();
+
+        // 🔥 AUTO-COMMIT: Update overlay in real-time when processing settings change
+        // This ensures changes to processing panel immediately affect the placed template
+        if (state.imageData && state.imageData.processor) {
+          try {
+            // Save the processed pixels to state so they're used for painting
+            const processedPixels = new Uint8ClampedArray(data);
+            state.imageData.pixels = processedPixels;
+            state.imageData.width = newWidth;
+            state.imageData.height = newHeight;
+            
+            // Update overlay with processed image
+            const overlayCanvas = document.createElement('canvas');
+            overlayCanvas.width = newWidth;
+            overlayCanvas.height = newHeight;
+            const overlayCtx = overlayCanvas.getContext('2d');
+            overlayCtx.putImageData(imgData, 0, 0);
+            
+            createImageBitmap(overlayCanvas).then(bitmap => {
+              overlayManager.setImage(bitmap);
+              console.log('✅ Overlay auto-updated with processing changes');
+            }).catch(err => {
+              console.warn('Failed to auto-update overlay:', err);
+            });
+          } catch (err) {
+            console.warn('Failed to auto-commit processing changes:', err);
+          }
+        }
       };
 
       const onWidthInput = () => {
@@ -5671,6 +6373,60 @@ localStorage.removeItem("lp");
           lastTouchDist = null;
           setCursor(panMode || allowPan ? 'grab' : '');
         });
+        
+        // WASD keyboard panning support (like edit panel)
+        const wasdKeys = new Set();
+        const wasdPanSpeed = 15; // Base speed in pixels
+        let wasdAnimationFrame = null;
+        
+        const updateWASDPan = () => {
+          if (wasdKeys.size === 0) {
+            wasdAnimationFrame = null;
+            return;
+          }
+          
+          const speed = wasdPanSpeed * _zoomLevel; // Speed scales with zoom
+          
+          if (wasdKeys.has('w') || wasdKeys.has('arrowup')) {
+            panY += speed;
+          }
+          if (wasdKeys.has('s') || wasdKeys.has('arrowdown')) {
+            panY -= speed;
+          }
+          if (wasdKeys.has('a') || wasdKeys.has('arrowleft')) {
+            panX += speed;
+          }
+          if (wasdKeys.has('d') || wasdKeys.has('arrowright')) {
+            panX -= speed;
+          }
+          
+          applyPan();
+          wasdAnimationFrame = requestAnimationFrame(updateWASDPan);
+        };
+        
+        window.addEventListener('keydown', (e) => {
+          const key = e.key.toLowerCase();
+          if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) {
+            // Only handle if focus is not in an input/textarea
+            if (document.activeElement.tagName === 'INPUT' || 
+                document.activeElement.tagName === 'TEXTAREA' ||
+                document.activeElement.tagName === 'SELECT') {
+              return;
+            }
+            
+            e.preventDefault();
+            wasdKeys.add(key);
+            
+            if (!wasdAnimationFrame) {
+              wasdAnimationFrame = requestAnimationFrame(updateWASDPan);
+            }
+          }
+        });
+        
+        window.addEventListener('keyup', (e) => {
+          const key = e.key.toLowerCase();
+          wasdKeys.delete(key);
+        });
       }
       const schedulePreview = () => {
         if (_previewTimer) clearTimeout(_previewTimer);
@@ -5704,6 +6460,82 @@ localStorage.removeItem("lp");
         onHeightInput();
         schedulePreview();
       });
+      
+      // Resampling method change listener
+      if (resamplingMethodSelect) {
+        resamplingMethodSelect.addEventListener('change', (e) => {
+          state.resamplingMethod = e.target.value;
+          console.log(`🎨 Resampling method changed to: ${state.resamplingMethod}`);
+          saveBotSettings(); // Save the new method
+          schedulePreview(); // Trigger preview update with new method
+        });
+      }
+      
+      // Pre-blur controls
+      if (preBlurModeSelect) {
+        preBlurModeSelect.addEventListener('change', (e) => {
+          state.preBlurMode = e.target.value;
+          console.log(`🎨 Pre-blur mode changed to: ${state.preBlurMode}`);
+          
+          // Auto-enable pre-blur if a method is selected
+          if (state.preBlurMode !== 'none' && state.preBlurRadius === 0) {
+            state.preBlurRadius = 5; // Set to visible default value
+            if (preBlurRadiusSlider) preBlurRadiusSlider.value = 5;
+            if (blurRadiusValue) blurRadiusValue.textContent = 5;
+            console.log('✨ Pre-blur AUTO-ENABLED with radius: 5');
+          }
+          
+          // Show/hide blur radius control
+          if (blurRadiusControl) {
+            blurRadiusControl.style.display = (state.preBlurMode !== 'none') ? 'block' : 'none';
+          }
+          saveBotSettings();
+          schedulePreview();
+        });
+      }
+      
+      if (preBlurRadiusSlider && blurRadiusValue) {
+        preBlurRadiusSlider.addEventListener('change', (e) => {
+          state.preBlurRadius = parseInt(e.target.value, 10);
+          blurRadiusValue.textContent = state.preBlurRadius;
+          saveBotSettings();
+          schedulePreview();
+        });
+      }
+      
+      // Sharpen controls
+      if (sharpenAmountSlider && sharpenAmountValue) {
+        sharpenAmountSlider.addEventListener('change', (e) => {
+          state.sharpenAmount = parseInt(e.target.value, 10);
+          sharpenAmountValue.textContent = state.sharpenAmount;
+          // Show/hide additional sharpen controls
+          if (sharpenRadiusControl && sharpenThresholdControl) {
+            const showControls = state.sharpenAmount > 0;
+            sharpenRadiusControl.style.display = showControls ? 'block' : 'none';
+            sharpenThresholdControl.style.display = showControls ? 'block' : 'none';
+          }
+          saveBotSettings();
+          schedulePreview();
+        });
+      }
+      
+      if (sharpenRadiusSlider && sharpenRadiusValue) {
+        sharpenRadiusSlider.addEventListener('change', (e) => {
+          state.sharpenRadius = parseInt(e.target.value, 10);
+          sharpenRadiusValue.textContent = state.sharpenRadius;
+          saveBotSettings();
+          schedulePreview();
+        });
+      }
+      
+      if (sharpenThresholdSlider && sharpenThresholdValue) {
+        sharpenThresholdSlider.addEventListener('change', (e) => {
+          state.sharpenThreshold = parseInt(e.target.value, 10);
+          sharpenThresholdValue.textContent = state.sharpenThreshold;
+          saveBotSettings();
+          schedulePreview();
+        });
+      }
 
       // Mask painting UX: brush size, modes, row/column fills, and precise coords
       let draggingMask = false;
@@ -5711,7 +6543,7 @@ localStorage.removeItem("lp");
         lastPaintY = -1;
       let brushSize = 1;
       let rowColSize = 1;
-      let maskMode = 'ignore'; // 'ignore' | 'unignore' | 'toggle'
+      let maskMode = null; // null (inactive) | 'ignore' | 'unignore' | 'toggle'
       const brushEl = resizeContainer.querySelector('#maskBrushSize');
       const brushValEl = resizeContainer.querySelector('#maskBrushSizeValue');
       const btnIgnore = resizeContainer.querySelector('#maskModeIgnore');
@@ -5758,7 +6590,7 @@ localStorage.removeItem("lp");
       if (btnIgnore) btnIgnore.addEventListener('click', () => setMode('ignore'));
       if (btnUnignore) btnUnignore.addEventListener('click', () => setMode('unignore'));
       if (btnToggle) btnToggle.addEventListener('click', () => setMode('toggle'));
-      // Initialize button state (default to toggle mode)
+      // Initialize button state (no mode selected by default)
       updateModeButtons();
 
       const mapClientToPixel = (clientX, clientY) => {
@@ -5780,6 +6612,7 @@ localStorage.removeItem("lp");
       };
 
       const paintCircle = (cx, cy, radius, value) => {
+        if (!maskMode) return; // Don't paint if no mode selected
         const w = baseCanvas.width,
           h = baseCanvas.height;
         ensureMask(w, h);
@@ -5822,6 +6655,7 @@ localStorage.removeItem("lp");
       };
 
       const paintRow = (y, value) => {
+        if (!maskMode) return; // Don't paint if no mode selected
         const w = baseCanvas.width,
           h = baseCanvas.height;
         ensureMask(w, h);
@@ -5867,6 +6701,7 @@ localStorage.removeItem("lp");
       };
 
       const paintColumn = (x, value) => {
+        if (!maskMode) return; // Don't paint if no mode selected
         const w = baseCanvas.width,
           h = baseCanvas.height;
         ensureMask(w, h);
@@ -6018,83 +6853,33 @@ localStorage.removeItem("lp");
             ? state.resizeIgnoreMask
             : null;
 
-        const applyFSDitherFinal = async () => {
-          const w = newWidth,
-            h = newHeight;
-          const n = w * h;
-          const { work, eligible } = ensureDitherBuffers(n);
-          for (let y = 0; y < h; y++) {
-            for (let x = 0; x < w; x++) {
-              const idx = y * w + x;
-              const i4 = idx * 4;
-              const r = data[i4],
-                g = data[i4 + 1],
-                b = data[i4 + 2],
-                a = data[i4 + 3];
-              const masked = mask && mask[idx];
-              const isEligible =
-                !masked &&
-                (state.paintTransparentPixels || a >= tThresh2) &&
-                (state.paintWhitePixels || !Utils.isWhitePixel(r, g, b));
-              eligible[idx] = isEligible ? 1 : 0;
-              work[idx * 3] = r;
-              work[idx * 3 + 1] = g;
-              work[idx * 3 + 2] = b;
-              if (!isEligible) {
-                data[i4 + 3] = 0;
-              }
-            }
-            // Yield to keep UI responsive
-            if ((y & 15) === 0) await Promise.resolve();
-          }
-
-          const diffuse = (nx, ny, er, eg, eb, factor) => {
-            if (nx < 0 || nx >= w || ny < 0 || ny >= h) return;
-            const nidx = ny * w + nx;
-            if (!eligible[nidx]) return;
-            const base = nidx * 3;
-            work[base] = Math.min(255, Math.max(0, work[base] + er * factor));
-            work[base + 1] = Math.min(255, Math.max(0, work[base + 1] + eg * factor));
-            work[base + 2] = Math.min(255, Math.max(0, work[base + 2] + eb * factor));
-          };
-
-          for (let y = 0; y < h; y++) {
-            for (let x = 0; x < w; x++) {
-              const idx = y * w + x;
-              if (!eligible[idx]) continue;
-              const base = idx * 3;
-              const r0 = work[base],
-                g0 = work[base + 1],
-                b0 = work[base + 2];
-              const [nr, ng, nb] = Utils.findClosestPaletteColor(
-                r0,
-                g0,
-                b0,
-                state.activeColorPalette
-              );
-              const i4 = idx * 4;
-              data[i4] = nr;
-              data[i4 + 1] = ng;
-              data[i4 + 2] = nb;
-              data[i4 + 3] = 255;
-              totalValidPixels++;
-
-              const er = r0 - nr;
-              const eg = g0 - ng;
-              const eb = b0 - nb;
-
-              diffuse(x + 1, y, er, eg, eb, 7 / 16);
-              diffuse(x - 1, y + 1, er, eg, eb, 3 / 16);
-              diffuse(x, y + 1, er, eg, eb, 5 / 16);
-              diffuse(x + 1, y + 1, er, eg, eb, 1 / 16);
-            }
-            // Yield every row to reduce jank
-            await Promise.resolve();
-          }
-        };
-
+        // Apply multi-algorithm dithering if enabled
         if (state.ditheringEnabled) {
-          await applyFSDitherFinal();
+          const ditherResult = globalImageProcessor.applyDithering(
+            data,
+            newWidth,
+            newHeight,
+            state.activeColorPalette,
+            {
+              method: state.ditheringMethod || 'floyd',
+              strength: state.ditheringStrength || 0.5,
+              posterizeLevels: state.posterizeLevels || 0,
+              paintTransparentPixels: state.paintTransparentPixels,
+              paintWhitePixels: state.paintWhitePixels,
+              transparencyThreshold: tThresh2,
+              whiteThreshold: state.customWhiteThreshold || CONFIG.WHITE_THRESHOLD,
+              algorithm: state.colorMatchingAlgorithm || 'lab',
+              enableChromaPenalty: state.enableChromaPenalty,
+              chromaPenaltyWeight: state.chromaPenaltyWeight,
+              mask: mask
+            }
+          );
+          
+          // Copy dithered data and count valid pixels
+          for (let i = 0; i < ditherResult.data.length; i++) {
+            data[i] = ditherResult.data[i];
+          }
+          totalValidPixels = ditherResult.totalValidPixels;
         } else {
           for (let i = 0; i < data.length; i += 4) {
             const r = data[i],
@@ -6102,12 +6887,24 @@ localStorage.removeItem("lp");
               b = data[i + 2],
               a = data[i + 3];
             const masked = mask && mask[i >> 2];
-            const isTransparent = (!state.paintTransparentPixels && a < tThresh2) || masked;
-            const isWhiteAndSkipped = !state.paintWhitePixels && Utils.isWhitePixel(r, g, b);
-            if (isTransparent || isWhiteAndSkipped) {
+            
+            const isTransparent = a < tThresh2;
+            
+            if (masked || (!state.paintTransparentPixels && isTransparent) || (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b))) {
               data[i + 3] = 0; // overlay transparency
               continue;
             }
+            
+            // If painting transparent AND this pixel is transparent, keep it transparent
+            if (state.paintTransparentPixels && isTransparent) {
+              data[i] = 0;
+              data[i + 1] = 0;
+              data[i + 2] = 0;
+              data[i + 3] = 0;
+              totalValidPixels++;
+              continue;
+            }
+            
             totalValidPixels++;
             const [nr, ng, nb] = Utils.findClosestPaletteColor(r, g, b, state.activeColorPalette);
             data[i] = nr;
@@ -6275,8 +7072,11 @@ localStorage.removeItem("lp");
         // Initialize edit panel with current image
         initializeEditPanel(imageData);
 
-        // Show edit panel
+        // Show edit panel (use flex to center content)
         editOverlay.style.display = 'block';
+
+        // Show helpful tooltip
+        showEditPanelTip();
 
         console.log('✨ Pixel Art Editor opened successfully');
       } catch (error) {
@@ -6286,116 +7086,191 @@ localStorage.removeItem("lp");
     }
 
     function createEditPanel() {
+      // CSS is already injected globally by background.js
+      // Modern App Layout with 3-column design
+      
       const editOverlay = document.createElement('div');
       editOverlay.id = 'editOverlay';
       editOverlay.className = 'edit-overlay';
 
       editOverlay.innerHTML = `
-        <div class="edit-container">
+        <div class="edit-panel-container">
+          <!-- HEADER -->
           <div class="edit-header">
-            <div class="edit-header-left">
-              <h3>Manual Pixel Art Editor</h3>
-              <div class="edit-instructions">
-                <small>🖱️ Left click: Draw | Right click/Ctrl+drag: Pan | Mouse wheel: Zoom</small>
-              </div>
+            <div class="edit-title-section">
+              <span class="edit-title-icon">🎨</span>
+              <h3 class="edit-title-text">Pixel Art Editor</h3>
+              <span class="edit-title-info" id="editImageInfo">Loading...</span>
             </div>
-            <div class="edit-nav-controls">
-              <div class="zoom-controls">
-                <button id="editZoomOut" class="zoom-btn" title="Zoom Out (Ctrl + -)">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19 13H5v-2h14v2z"/>
-                  </svg>
-                </button>
-                <select id="zoomSelect" class="zoom-select" title="Zoom Level">
-                  <option value="0.1">10%</option>
-                  <option value="0.25">25%</option>
-                  <option value="0.5">50%</option>
-                  <option value="0.75">75%</option>
-                  <option value="1" selected>100%</option>
-                  <option value="1.5">150%</option>
-                  <option value="2">200%</option>
-                  <option value="3">300%</option>
-                  <option value="4">400%</option>
-                  <option value="6">600%</option>
-                  <option value="8">800%</option>
-                  <option value="12">1200%</option>
-                  <option value="16">1600%</option>
-                  <option value="24">2400%</option>
-                  <option value="32">3200%</option>
-                </select>
-                <button id="editZoomIn" class="zoom-btn" title="Zoom In (Ctrl + +)">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-                  </svg>
-                </button>
-                <button id="zoomFit" class="zoom-btn" title="Fit to Window (Ctrl + 0)">📰</button>
-                <button id="zoom100" class="zoom-btn" title="Actual Size (Ctrl + 1)">1:1</button>
-              </div>
-              <div class="edit-controls">
-                <button id="editBackBtn" class="wplace-btn wplace-btn-secondary">← Back</button>
-                <button id="editApplyBtn" class="wplace-btn wplace-btn-confirm">Apply Changes</button>
-              </div>
+            <div class="edit-header-actions">
+              <button id="editBackBtn" class="edit-header-btn" title="Back to Resize" data-tooltip="Back">−</button>
+              <button id="editApplyBtn" class="edit-header-btn" title="Apply Changes" data-tooltip="Apply">✓</button>
+              <button class="edit-close-btn edit-header-btn" title="Close Editor" data-tooltip="Close">×</button>
             </div>
           </div>
-          
-          <div class="edit-content">
-            <div class="edit-main-area">
-              <div class="edit-toolbar">
-                <div class="edit-tool-group">
-                  <label>Tools:</label>
-                  <button id="paintBrush" class="edit-tool active" data-tool="paint" title="Brush (B)">🖌</button>
-                  <button id="eraseTool" class="edit-tool" data-tool="erase" title="Eraser (E)">🗑</button>
-                  <button id="eyedropperTool" class="edit-tool" data-tool="eyedropper" title="Eyedropper (I)">💉</button>
-                  <button id="fillTool" class="edit-tool" data-tool="fill" title="Fill (F)">🪣</button>
-                </div>
-                
-                <div class="edit-tool-group">
-                  <label>Brush Size:</label>
-                  <input type="range" id="brushSize" min="1" max="20" value="1" class="edit-slider" title="Use [ ] keys">
-                  <span id="brushSizeValue">1</span>
-                  <button id="showGrid" class="edit-toggle" title="Toggle Grid (G)">⊞</button>
-                </div>
-                
-                <div class="edit-tool-group">
-                  <button id="undoBtn" class="wplace-btn wplace-btn-secondary" title="Undo (Ctrl+Z)">↶</button>
-                  <button id="redoBtn" class="wplace-btn wplace-btn-secondary" title="Redo (Ctrl+Shift+Z)">↷</button>
-                  <button id="resetViewBtn" class="wplace-btn wplace-btn-secondary" title="Reset View">🔄</button>
+
+          <!-- WORKSPACE (3-COLUMN) -->
+          <div class="edit-workspace">
+            
+            <!-- LEFT SIDEBAR: TOOLS -->
+            <div class="edit-toolbar-sidebar">
+              <div class="edit-tool-section">
+                <button id="paintBrush" class="edit-tool-btn active" data-tool="paint" title="Brush (B)" data-tooltip="Brush (B)">
+                  <span class="edit-tool-icon">🖌️</span>
+                  <span class="edit-tool-label">Brush</span>
+                </button>
+                <button id="eraseTool" class="edit-tool-btn" data-tool="erase" title="Eraser (E)" data-tooltip="Eraser (E)">
+                  <span class="edit-tool-icon">🧹</span>
+                  <span class="edit-tool-label">Erase</span>
+                </button>
+                <button id="eyedropperTool" class="edit-tool-btn" data-tool="eyedropper" title="Eyedropper (I)" data-tooltip="Eyedropper (I)">
+                  <span class="edit-tool-icon">💧</span>
+                  <span class="edit-tool-label">Pick</span>
+                </button>
+                <button id="fillTool" class="edit-tool-btn" data-tool="fill" title="Fill (F)" data-tooltip="Fill (F)">
+                  <span class="edit-tool-icon">🪣</span>
+                  <span class="edit-tool-label">Fill</span>
+                </button>
+              </div>
+              
+              <div class="edit-tool-section-divider"></div>
+              
+              <div class="edit-tool-section">
+                <button id="undoBtn" class="edit-tool-btn" title="Undo (Ctrl+Z)" data-tooltip="Undo (Ctrl+Z)">
+                  <span class="edit-tool-icon">↩️</span>
+                  <span class="edit-tool-label">Undo</span>
+                </button>
+                <button id="redoBtn" class="edit-tool-btn" title="Redo (Ctrl+Y)" data-tooltip="Redo (Ctrl+Y)">
+                  <span class="edit-tool-icon">↪️</span>
+                  <span class="edit-tool-label">Redo</span>
+                </button>
+                <button id="resetViewBtn" class="edit-tool-btn" title="Reset View" data-tooltip="Reset View">
+                  <span class="edit-tool-icon">🔄</span>
+                  <span class="edit-tool-label">Reset</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- CENTER: CANVAS AREA -->
+            <div class="edit-canvas-area">
+              <div class="edit-canvas-header">
+                <div class="edit-zoom-controls">
+                  <button id="editZoomOut" class="edit-zoom-btn" title="Zoom Out (Ctrl + -)" data-tooltip="Zoom Out">−</button>
+                  <select id="zoomSelect" class="edit-zoom-display" title="Zoom Level">
+                    <option value="0.1">10%</option>
+                    <option value="0.25">25%</option>
+                    <option value="0.5">50%</option>
+                    <option value="0.75">75%</option>
+                    <option value="1" selected>100%</option>
+                    <option value="1.5">150%</option>
+                    <option value="2">200%</option>
+                    <option value="3">300%</option>
+                    <option value="4">400%</option>
+                    <option value="6">600%</option>
+                    <option value="8">800%</option>
+                    <option value="12">1200%</option>
+                    <option value="16">1600%</option>
+                  </select>
+                  <button id="editZoomIn" class="edit-zoom-btn" title="Zoom In (Ctrl + +)" data-tooltip="Zoom In">+</button>
+                  <button id="zoomFit" class="edit-zoom-btn" title="Fit to Window (Ctrl + 0)" data-tooltip="Fit">⊡</button>
+                  <button id="zoom100" class="edit-zoom-btn" title="Actual Size (Ctrl + 1)" data-tooltip="1:1">1:1</button>
                 </div>
               </div>
               
-              <div class="edit-canvas-area">
-                <div class="edit-canvas-container" id="editCanvasContainer">
-                  <div class="edit-canvas-wrapper" id="editCanvasWrapper">
-                    <canvas id="editCanvas" class="edit-canvas"></canvas>
-                  </div>
-                  <div class="minimap-container" id="minimapContainer">
-                    <div class="minimap-header">Navigator</div>
-                    <div class="minimap-content">
-                      <canvas id="minimapCanvas" class="minimap-canvas"></canvas>
-                      <div id="minimapViewport" class="minimap-viewport"></div>
-                    </div>
+              <div class="edit-canvas-viewport" id="editCanvasContainer">
+                <div class="edit-canvas-wrapper" id="editCanvasWrapper">
+                  <canvas id="editCanvas" class="edit-canvas"></canvas>
+                </div>
+                
+                <!-- NAVIGATOR/MINIMAP -->
+                <div class="edit-navigator" id="minimapContainer">
+                  <div class="edit-navigator-title">Navigator</div>
+                  <div class="edit-navigator-content">
+                    <canvas id="minimapCanvas" class="edit-navigator-canvas"></canvas>
+                    <div id="minimapViewport" class="edit-navigator-viewport"></div>
                   </div>
                 </div>
               </div>
             </div>
-            
-            <div class="edit-bottom-bar">
-              <div class="edit-info-section">
-                <span id="editStatusBar">Position: (0, 0) | Color: #000000 | Zoom: 100%</span>
+
+            <!-- RIGHT SIDEBAR: PROPERTIES -->
+            <div class="edit-properties-panel">
+              
+              <!-- POSITION SECTION -->
+              <div class="edit-prop-section">
+                <div class="edit-prop-section-title">
+                  Position
+                </div>
+                <div class="edit-position-grid">
+                  <div class="edit-input-group">
+                    <label class="edit-input-label">X</label>
+                    <input type="number" class="edit-input-field" id="posX" value="0" readonly>
+                  </div>
+                  <div class="edit-input-group">
+                    <label class="edit-input-label">Y</label>
+                    <input type="number" class="edit-input-field" id="posY" value="0" readonly>
+                  </div>
+                </div>
               </div>
-              <div class="edit-current-color">
-                <label>Current:</label>
-                <div id="currentColorDisplay" class="color-display"></div>
+
+              <!-- COLOR SECTION -->
+              <div class="edit-prop-section">
+                <div class="edit-prop-section-title">
+                  Current Color
+                </div>
+                <div class="edit-color-display">
+                  <div class="edit-color-preview">
+                    <div class="edit-color-preview-fill" id="currentColorDisplay" style="background: #000000;"></div>
+                  </div>
+                  <div class="edit-color-info">
+                    <div class="edit-color-hex" id="colorHex">#000000</div>
+                    <div class="edit-color-rgb" id="colorRgb">RGB(0, 0, 0)</div>
+                  </div>
+                </div>
               </div>
-              <div class="edit-available-colors">
-                <label>Available Colors (<span id="editColorCount">0</span>):</label>
-                <div id="editColorGrid" class="edit-color-grid">
+
+              <!-- BRUSH SECTION -->
+              <div class="edit-prop-section">
+                <div class="edit-prop-section-title">
+                  Brush Settings
+                </div>
+                <div class="edit-slider-group">
+                  <div class="edit-input-label">Size: <span id="brushSizeValue">1</span>px</div>
+                  <input type="range" id="brushSize" min="1" max="20" value="1" class="edit-slider">
+                  <div class="edit-slider-value">Use [ ] keys to adjust</div>
+                </div>
+              </div>
+
+              <!-- AVAILABLE COLORS -->
+              <div class="edit-prop-section">
+                <div class="edit-prop-section-title">
+                  Available Colors (<span id="editColorCount">0</span>)
+                </div>
+                <div class="edit-color-swatches" id="editColorGrid">
                   <!-- Colors will be populated here -->
                 </div>
               </div>
-              </div>
+
             </div>
           </div>
+
+          <!-- BOTTOM STATUS BAR -->
+          <div class="edit-bottom-bar">
+            <div class="edit-status-left">
+              <div class="edit-status-item">
+                <span class="edit-status-icon">ℹ️</span>
+                <span id="editStatusBar">Click to paint</span>
+              </div>
+            </div>
+            <div class="edit-status-right">
+              <div class="edit-undo-redo">
+                <button id="undoBtn2" class="edit-history-btn" title="Undo (Ctrl+Z)">↶</button>
+                <button id="redoBtn2" class="edit-history-btn" title="Redo (Ctrl+Y)">↷</button>
+              </div>
+              <span id="editZoomStatus">Zoom: 100%</span>
+            </div>
+          </div>
+
         </div>
       `;
 
@@ -6414,7 +7289,6 @@ localStorage.removeItem("lp");
       const fillTool = document.getElementById('fillTool');
       const brushSize = document.getElementById('brushSize');
       const brushSizeValue = document.getElementById('brushSizeValue');
-      const showGrid = document.getElementById('showGrid');
       const undoBtn = document.getElementById('undoBtn');
       const redoBtn = document.getElementById('redoBtn');
       const resetViewBtn = document.getElementById('resetViewBtn');
@@ -6427,6 +7301,13 @@ localStorage.removeItem("lp");
 
       // Back to resize panel
       editBackBtn.onclick = () => {
+        // Stop WASD animation
+        if (editState.wasdAnimationFrame) {
+          cancelAnimationFrame(editState.wasdAnimationFrame);
+          editState.wasdAnimationFrame = null;
+        }
+        editState.wasdKeys = { w: false, a: false, s: false, d: false };
+        
         document.getElementById('editOverlay').style.display = 'none';
         resizeContainer.style.display = 'block';
       };
@@ -6434,6 +7315,14 @@ localStorage.removeItem("lp");
       // Apply changes
       editApplyBtn.onclick = () => {
         applyEditChanges();
+        
+        // Stop WASD animation
+        if (editState.wasdAnimationFrame) {
+          cancelAnimationFrame(editState.wasdAnimationFrame);
+          editState.wasdAnimationFrame = null;
+        }
+        editState.wasdKeys = { w: false, a: false, s: false, d: false };
+        
         document.getElementById('editOverlay').style.display = 'none';
         resizeContainer.style.display = 'block';
       };
@@ -6455,13 +7344,6 @@ localStorage.removeItem("lp");
         selectTool('fill');
       };
 
-      // Grid toggle
-      showGrid.onclick = () => {
-        editState.showGrid = !editState.showGrid;
-        showGrid.classList.toggle('active', editState.showGrid);
-        redrawCanvas();
-      };
-
       // Brush size
       brushSize.oninput = () => {
         brushSizeValue.textContent = brushSize.value;
@@ -6471,6 +7353,12 @@ localStorage.removeItem("lp");
       // Undo/Redo
       undoBtn.onclick = () => undoEdit();
       redoBtn.onclick = () => redoEdit();
+      
+      // Duplicate undo/redo in status bar
+      const undoBtn2 = document.getElementById('undoBtn2');
+      const redoBtn2 = document.getElementById('redoBtn2');
+      if (undoBtn2) undoBtn2.onclick = () => undoEdit();
+      if (redoBtn2) redoBtn2.onclick = () => redoEdit();
 
       // Reset view
       resetViewBtn.onclick = () => resetEditView();
@@ -6507,7 +7395,6 @@ localStorage.removeItem("lp");
       redoStack: [],
       isDrawing: false,
       isPanning: false,
-      showGrid: false,
 
       mouseX: 0,
       mouseY: 0,
@@ -6517,7 +7404,11 @@ localStorage.removeItem("lp");
       lastPaintPos: null,
       touchStart: null,
       lastTouchDistance: 0,
-      lastTouchCenter: { x: 0, y: 0 }
+      lastTouchCenter: { x: 0, y: 0 },
+      
+      // WASD movement
+      wasdKeys: { w: false, a: false, s: false, d: false },
+      wasdAnimationFrame: null
     };
 
     function calculateOptimalPanelSize(imageWidth, imageHeight) {
@@ -6561,16 +7452,134 @@ localStorage.removeItem("lp");
       editState.redoStack = [];
       editState.currentTool = 'paint';
       editState.brushSize = 1;
-      editState.showGrid = false;
       editState.isPanning = false;
       editState.isDrawing = false;
       editState.lastPaintPos = null;
+      editState.wasdKeys = { w: false, a: false, s: false, d: false };
+      if (editState.wasdAnimationFrame) {
+        cancelAnimationFrame(editState.wasdAnimationFrame);
+        editState.wasdAnimationFrame = null;
+      }
+
+      // Reset processing settings to default (everything OFF)
+      console.log('🔄 Resetting processing settings to default...');
+      state.ditheringEnabled = false;
+      state.ditheringMethod = 'floyd';
+      state.ditheringStrength = 0.5;
+      state.posterizeLevels = 0;
+      state.preBlurMode = 'none';
+      state.preBlurRadius = 0;
+      state.sharpenAmount = 0;
+      state.sharpenRadius = 0;
+      state.sharpenThreshold = 0;
+      state.resamplingMethod = 'nearest';
+      state.colorMatchingAlgorithm = 'rgb'; // Default to Legacy (RGB)
+      state.enableChromaPenalty = false;     // Chroma penalty OFF by default
+      state.chromaPenaltyWeight = 0.15;
+      console.log('✅ Processing settings reset - All OFF, Color Algorithm: RGB');
+
+      // Reset UI elements to match the default state
+      // This will be called after the resize panel is created
+      setTimeout(() => {
+        // Dithering controls
+        const ditherToggle = document.getElementById('enableDitheringToggle');
+        if (ditherToggle) {
+          ditherToggle.checked = false;
+          const methodControl = document.getElementById('ditheringMethodControl');
+          const posterizeControl = document.getElementById('posterizeLevelsControl');
+          if (methodControl) methodControl.style.display = 'none';
+          if (posterizeControl) posterizeControl.style.display = 'none';
+        }
+        
+        const ditheringMethodSelect = document.getElementById('ditheringMethodSelect');
+        if (ditheringMethodSelect) ditheringMethodSelect.value = 'floyd';
+        
+        const ditheringStrengthSlider = document.getElementById('ditheringStrengthSlider');
+        const ditheringStrengthValue = document.getElementById('ditheringStrengthValue');
+        if (ditheringStrengthSlider && ditheringStrengthValue) {
+          ditheringStrengthSlider.value = 50;
+          ditheringStrengthValue.textContent = '50%';
+        }
+        
+        const posterizeLevelsSlider = document.getElementById('posterizeLevelsSlider');
+        const posterizeLevelsValue = document.getElementById('posterizeLevelsValue');
+        if (posterizeLevelsSlider && posterizeLevelsValue) {
+          posterizeLevelsSlider.value = 0;
+          posterizeLevelsValue.textContent = 'Disabled';
+        }
+        
+        // Pre-processing controls
+        const preBlurModeSelect = document.getElementById('preBlurModeSelect');
+        const blurRadiusControl = document.getElementById('blurRadiusControl');
+        if (preBlurModeSelect) {
+          preBlurModeSelect.value = 'none';
+          if (blurRadiusControl) blurRadiusControl.style.display = 'none';
+        }
+        
+        const preBlurRadiusSlider = document.getElementById('preBlurRadiusSlider');
+        const blurRadiusValue = document.getElementById('blurRadiusValue');
+        if (preBlurRadiusSlider && blurRadiusValue) {
+          preBlurRadiusSlider.value = 0;
+          blurRadiusValue.textContent = '0';
+        }
+        
+        const sharpenAmountSlider = document.getElementById('sharpenAmountSlider');
+        const sharpenAmountValue = document.getElementById('sharpenAmountValue');
+        const sharpenRadiusControl = document.getElementById('sharpenRadiusControl');
+        const sharpenThresholdControl = document.getElementById('sharpenThresholdControl');
+        if (sharpenAmountSlider && sharpenAmountValue) {
+          sharpenAmountSlider.value = 0;
+          sharpenAmountValue.textContent = '0';
+          if (sharpenRadiusControl) sharpenRadiusControl.style.display = 'none';
+          if (sharpenThresholdControl) sharpenThresholdControl.style.display = 'none';
+        }
+        
+        const sharpenRadiusSlider = document.getElementById('sharpenRadiusSlider');
+        const sharpenRadiusValue = document.getElementById('sharpenRadiusValue');
+        if (sharpenRadiusSlider && sharpenRadiusValue) {
+          sharpenRadiusSlider.value = 0;
+          sharpenRadiusValue.textContent = '0';
+        }
+        
+        const sharpenThresholdSlider = document.getElementById('sharpenThresholdSlider');
+        const sharpenThresholdValue = document.getElementById('sharpenThresholdValue');
+        if (sharpenThresholdSlider && sharpenThresholdValue) {
+          sharpenThresholdSlider.value = 0;
+          sharpenThresholdValue.textContent = '0';
+        }
+        
+        // Resampling method
+        const resamplingMethodSelect = document.getElementById('resamplingMethodSelect');
+        if (resamplingMethodSelect) resamplingMethodSelect.value = 'nearest';
+        
+        // Advanced color matching - RESET TO DEFAULT (RGB, no chroma)
+        const colorAlgorithmSelect = document.getElementById('colorAlgorithmSelect');
+        if (colorAlgorithmSelect) colorAlgorithmSelect.value = 'rgb';
+        
+        const chromaPenaltyToggle = document.getElementById('enableChromaPenaltyToggle');
+        if (chromaPenaltyToggle) chromaPenaltyToggle.checked = false;
+        
+        const chromaPenaltyWeightSlider = document.getElementById('chromaPenaltyWeightSlider');
+        const chromaWeightValue = document.getElementById('chromaWeightValue');
+        if (chromaPenaltyWeightSlider && chromaWeightValue) {
+          chromaPenaltyWeightSlider.value = 0.15;
+          chromaWeightValue.textContent = '0.15';
+        }
+        
+        console.log('✅ UI elements reset to default values - All OFF, Color Algorithm: RGB, Chroma OFF');
+      }, 100);
 
       // Set canvas size to match baseCanvas
       editCanvas.width = baseCanvas.width;
       editCanvas.height = baseCanvas.height;
       editState.canvasWidth = editCanvas.width;
       editState.canvasHeight = editCanvas.height;
+      
+      // Update header info
+      const editImageInfo = document.getElementById('editImageInfo');
+      if (editImageInfo) {
+        editImageInfo.textContent = `${editCanvas.width}×${editCanvas.height}`;
+      }
 
       // Configure canvas context for pixel art
       ctx.imageSmoothingEnabled = false;
@@ -6578,13 +7587,9 @@ localStorage.removeItem("lp");
       ctx.mozImageSmoothingEnabled = false;
       ctx.msImageSmoothingEnabled = false;
 
-      // Calculate optimal panel size
-      const panelSize = calculateOptimalPanelSize(editCanvas.width, editCanvas.height);
-      const editContainer = document.querySelector('.edit-container');
-      if (editContainer) {
-        editContainer.style.width = panelSize.panelWidth + 'px';
-        editContainer.style.height = panelSize.panelHeight + 'px';
-      }
+      // REMOVED: Dynamic panel sizing - panel now has fixed size in CSS
+      // This ensures consistent UI regardless of image dimensions
+      // The canvas area is scrollable/pannable to accommodate any image size
 
       // Setup canvas container
       setupCanvasContainer();
@@ -6921,10 +7926,52 @@ localStorage.removeItem("lp");
       }
     }
 
+    function showEditPanelTip() {
+      // Create tip overlay
+      const tipOverlay = document.createElement('div');
+      tipOverlay.className = 'edit-tip-overlay';
+      tipOverlay.innerHTML = `
+        <div class="edit-tip-box">
+          <div class="edit-tip-icon">💡</div>
+          <div class="edit-tip-content">
+            <h3>Navigation Tips</h3>
+            <p><strong>🎮 WASD</strong> - Move canvas smoothly</p>
+            <p><strong>🖱️ Click Navigator</strong> - Jump to location</p>
+            <p><strong>🔍 Mouse Wheel</strong> - Zoom in/out</p>
+          </div>
+          <button class="edit-tip-close">Got it!</button>
+        </div>
+      `;
+      
+      document.body.appendChild(tipOverlay);
+      
+      // Auto-close after 5 seconds
+      const autoCloseTimer = setTimeout(() => {
+        closeTip();
+      }, 5000);
+      
+      // Close button
+      const closeBtn = tipOverlay.querySelector('.edit-tip-close');
+      closeBtn.onclick = () => {
+        clearTimeout(autoCloseTimer);
+        closeTip();
+      };
+      
+      function closeTip() {
+        tipOverlay.style.opacity = '0';
+        setTimeout(() => {
+          if (tipOverlay.parentNode) {
+            tipOverlay.parentNode.removeChild(tipOverlay);
+          }
+        }, 300);
+      }
+    }
+
     function selectTool(tool) {
       editState.currentTool = tool;
 
-      document.querySelectorAll('.edit-tool').forEach(btn => {
+      // Remove active class from all tool buttons
+      document.querySelectorAll('.edit-tool-btn').forEach(btn => {
         btn.classList.remove('active');
       });
 
@@ -7000,28 +8047,38 @@ localStorage.removeItem("lp");
       }
 
       availableColors.forEach(color => {
-        const colorBtn = document.createElement('button');
-        colorBtn.className = 'color-btn';
-        colorBtn.style.backgroundColor = color.hex;
-        colorBtn.title = `${color.name} (${color.hex})`;
-        colorBtn.dataset.colorId = color.id;
-        colorBtn.dataset.colorHex = color.hex;
+        const colorSwatch = document.createElement('div');
+        colorSwatch.className = 'edit-swatch';
+        colorSwatch.title = `${color.name} (${color.hex})`;
+        colorSwatch.dataset.colorId = color.id;
+        colorSwatch.dataset.colorHex = color.hex;
+        
+        const swatchFill = document.createElement('div');
+        swatchFill.className = 'edit-swatch-fill';
+        swatchFill.style.backgroundColor = color.hex;
+        colorSwatch.appendChild(swatchFill);
 
-        colorBtn.onclick = () => {
+        colorSwatch.onclick = () => {
           editState.currentColor = color.hex;
           editState.currentColorId = color.id;
           currentColorDisplay.style.backgroundColor = color.hex;
+          
+          // Update color info
+          const colorHex = document.getElementById('colorHex');
+          const colorRgb = document.getElementById('colorRgb');
+          if (colorHex) colorHex.textContent = color.hex.toUpperCase();
+          if (colorRgb) colorRgb.textContent = `RGB(${color.rgb.join(', ')})`;
 
           // Update active color
-          document.querySelectorAll('.color-btn').forEach(btn => {
-            btn.classList.remove('selected');
+          document.querySelectorAll('.edit-swatch').forEach(btn => {
+            btn.classList.remove('active');
           });
-          colorBtn.classList.add('selected');
+          colorSwatch.classList.add('active');
 
           updateStatusBar(editState.mouseX, editState.mouseY);
         };
 
-        colorGrid.appendChild(colorBtn);
+        colorGrid.appendChild(colorSwatch);
       });
 
       // Set first color as default
@@ -7029,7 +8086,13 @@ localStorage.removeItem("lp");
         editState.currentColor = availableColors[0].hex;
         editState.currentColorId = availableColors[0].id;
         currentColorDisplay.style.backgroundColor = availableColors[0].hex;
-        colorGrid.firstChild.classList.add('selected');
+        
+        const colorHex = document.getElementById('colorHex');
+        const colorRgb = document.getElementById('colorRgb');
+        if (colorHex) colorHex.textContent = availableColors[0].hex.toUpperCase();
+        if (colorRgb) colorRgb.textContent = `RGB(${availableColors[0].rgb.join(', ')})`;
+        
+        colorGrid.firstChild.classList.add('active');
       }
     }
 
@@ -7114,6 +8177,9 @@ localStorage.removeItem("lp");
         // Also update status bar zoom text
         updateStatusBar(editState.mouseX || 0, editState.mouseY || 0);
       }
+      
+      // Update navigator viewport indicator
+      updateMinimap();
     }
 
     function setupCanvasContainer() {
@@ -7273,8 +8339,11 @@ localStorage.removeItem("lp");
         return;
       }
 
-      // Calculate minimap size
-      const maxSize = 150;
+      // Make minimap visible
+      if (minimapContainer) minimapContainer.style.display = 'block';
+
+      // Calculate minimap size - fit within the navigator container
+      const maxSize = 164; // 180px container - 16px padding
       const scale = Math.min(maxSize / editCanvas.width, maxSize / editCanvas.height);
 
       minimapCanvas.width = editCanvas.width * scale;
@@ -7283,7 +8352,10 @@ localStorage.removeItem("lp");
       // Draw thumbnail
       const minimapCtx = minimapCanvas.getContext('2d');
       minimapCtx.imageSmoothingEnabled = false;
-      // REMOVED: drawCheckerboardBackground - prevents checkerboard from being saved with template
+      minimapCtx.webkitImageSmoothingEnabled = false;
+      minimapCtx.mozImageSmoothingEnabled = false;
+      
+      // Draw the image
       minimapCtx.drawImage(editCanvas, 0, 0, minimapCanvas.width, minimapCanvas.height);
 
       // Update viewport indicator
@@ -7295,23 +8367,63 @@ localStorage.removeItem("lp");
       const minimapCanvas = document.getElementById('minimapCanvas');
       const container = document.getElementById('editCanvasContainer');
       const editCanvas = document.getElementById('editCanvas');
+      const wrapper = document.getElementById('editCanvasWrapper');
 
-      if (!viewport || !minimapCanvas || !container || !editCanvas) return;
+      if (!viewport || !minimapCanvas || !container || !editCanvas || !wrapper) return;
+      if (minimapCanvas.width === 0 || minimapCanvas.height === 0) return;
+      if (editCanvas.width === 0 || editCanvas.height === 0) return;
 
       const containerRect = container.getBoundingClientRect();
+      const wrapperRect = wrapper.getBoundingClientRect();
       const scale = minimapCanvas.width / editCanvas.width;
 
-      // Calculate visible area in minimap coordinates
-      const visibleWidth = Math.min(containerRect.width / editState.zoom * scale, minimapCanvas.width);
-      const visibleHeight = Math.min(containerRect.height / editState.zoom * scale, minimapCanvas.height);
+      // Calculate how much of the canvas is visible
+      const visibleCanvasWidth = containerRect.width / editState.zoom;
+      const visibleCanvasHeight = containerRect.height / editState.zoom;
 
-      const viewportX = (minimapCanvas.width / 2) - (editState.panX / editState.zoom * scale) - (visibleWidth / 2);
-      const viewportY = (minimapCanvas.height / 2) - (editState.panY / editState.zoom * scale) - (visibleHeight / 2);
+      // Clamp visible area to actual canvas dimensions
+      const clampedVisibleWidth = Math.min(visibleCanvasWidth, editCanvas.width);
+      const clampedVisibleHeight = Math.min(visibleCanvasHeight, editCanvas.height);
 
-      viewport.style.width = `${visibleWidth}px`;
-      viewport.style.height = `${visibleHeight}px`;
-      viewport.style.left = `${Math.max(0, Math.min(minimapCanvas.width - visibleWidth, viewportX))}px`;
-      viewport.style.top = `${Math.max(0, Math.min(minimapCanvas.height - visibleHeight, viewportY))}px`;
+      // Convert visible area to minimap pixels and clamp to minimap size
+      const viewportWidth = Math.min(clampedVisibleWidth * scale, minimapCanvas.width);
+      const viewportHeight = Math.min(clampedVisibleHeight * scale, minimapCanvas.height);
+
+      // Calculate the offset of the wrapper from the container center
+      const containerCenterX = containerRect.left + containerRect.width / 2;
+      const containerCenterY = containerRect.top + containerRect.height / 2;
+      const wrapperCenterX = wrapperRect.left + wrapperRect.width / 2;
+      const wrapperCenterY = wrapperRect.top + wrapperRect.height / 2;
+      
+      // Calculate how much we've panned in canvas coordinates
+      const panOffsetX = (containerCenterX - wrapperCenterX) / editState.zoom;
+      const panOffsetY = (containerCenterY - wrapperCenterY) / editState.zoom;
+      
+      // Calculate the top-left corner of the visible area in canvas coordinates
+      const visibleLeft = (editCanvas.width / 2) + panOffsetX - (clampedVisibleWidth / 2);
+      const visibleTop = (editCanvas.height / 2) + panOffsetY - (clampedVisibleHeight / 2);
+      
+      // Clamp visible position to canvas bounds
+      const clampedLeft = Math.max(0, Math.min(editCanvas.width - clampedVisibleWidth, visibleLeft));
+      const clampedTop = Math.max(0, Math.min(editCanvas.height - clampedVisibleHeight, visibleTop));
+      
+      // Convert to minimap coordinates
+      const viewportX = clampedLeft * scale;
+      const viewportY = clampedTop * scale;
+
+      // Apply strict bounds to ensure viewport stays within minimap
+      const boundedX = Math.max(0, Math.min(minimapCanvas.width - viewportWidth, viewportX));
+      const boundedY = Math.max(0, Math.min(minimapCanvas.height - viewportHeight, viewportY));
+
+      // Ensure dimensions are valid
+      const finalWidth = Math.max(1, Math.min(viewportWidth, minimapCanvas.width));
+      const finalHeight = Math.max(1, Math.min(viewportHeight, minimapCanvas.height));
+
+      viewport.style.width = `${finalWidth}px`;
+      viewport.style.height = `${finalHeight}px`;
+      viewport.style.left = `${boundedX}px`;
+      viewport.style.top = `${boundedY}px`;
+      viewport.style.display = 'block';
     }
 
     function navigateToMinimapPosition(e) {
@@ -7338,9 +8450,20 @@ localStorage.removeItem("lp");
 
     function updateStatusBar(x, y) {
       const statusBar = document.getElementById('editStatusBar');
+      const posX = document.getElementById('posX');
+      const posY = document.getElementById('posY');
+      const zoomStatus = document.getElementById('editZoomStatus');
+      
       if (statusBar) {
+        statusBar.textContent = `Position: (${x}, ${y}) | Color: ${editState.currentColor || '#000000'}`;
+      }
+      
+      if (posX) posX.value = x;
+      if (posY) posY.value = y;
+      
+      if (zoomStatus) {
         const zoomPercent = Math.round(editState.zoom * 100);
-        statusBar.textContent = `Position: (${x}, ${y}) | Color: ${editState.currentColor || '#000000'} | Zoom: ${zoomPercent}%`;
+        zoomStatus.textContent = `Zoom: ${zoomPercent}%`;
       }
     }
 
@@ -7358,11 +8481,18 @@ localStorage.removeItem("lp");
         if (currentColorDisplay) {
           currentColorDisplay.style.backgroundColor = pickedColor;
         }
+        
+        // Update color info
+        const colorHex = document.getElementById('colorHex');
+        const colorRgb = document.getElementById('colorRgb');
+        if (colorHex) colorHex.textContent = pickedColor.toUpperCase();
+        if (colorRgb) colorRgb.textContent = `RGB(${r}, ${g}, ${b})`;
 
         // Try to find matching color in palette
-        document.querySelectorAll('.edit-color-btn').forEach(btn => {
+        document.querySelectorAll('.edit-swatch').forEach(btn => {
           btn.classList.remove('active');
-          if (btn.dataset.colorHex === pickedColor) {
+          const swatchHex = btn.dataset.colorHex;
+          if (swatchHex === pickedColor) {
             btn.classList.add('active');
             editState.currentColorId = parseInt(btn.dataset.colorId);
           }
@@ -7434,27 +8564,8 @@ localStorage.removeItem("lp");
     }
 
     function drawGrid(ctx, width, height) {
-      if (!editState.showGrid || editState.zoom < 4) return;
-
-      ctx.save();
-      ctx.strokeStyle = 'rgba(128, 128, 128, 0.3)';
-      ctx.lineWidth = 1 / editState.zoom;
-
-      for (let x = 0; x <= width; x++) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, height);
-        ctx.stroke();
-      }
-
-      for (let y = 0; y <= height; y++) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(width, y);
-        ctx.stroke();
-      }
-
-      ctx.restore();
+      // Grid feature removed - function kept for compatibility
+      return;
     }
 
     function drawCheckerboardBackground(ctx, width, height) {
@@ -7485,6 +8596,9 @@ localStorage.removeItem("lp");
         // REMOVED: drawCheckerboardBackground - prevents checkerboard from being saved with template
         ctx.drawImage(img, 0, 0);
         drawGrid(ctx, editCanvas.width, editCanvas.height);
+        
+        // Update minimap to reflect changes
+        setupMinimap();
       };
       img.src = currentState;
     }
@@ -7590,18 +8704,69 @@ localStorage.removeItem("lp");
     }
 
     function setupKeyboardShortcuts() {
+      // WASD smooth movement function
+      function updateWASDMovement() {
+        const baseSpeed = 5; // pixels per frame at 100% zoom
+        // Multiply by zoom so it moves faster when zoomed in (feels more natural)
+        const scaledSpeed = baseSpeed * editState.zoom;
+        let moved = false;
+        
+        if (editState.wasdKeys.w) {
+          editState.panY += scaledSpeed;
+          moved = true;
+        }
+        if (editState.wasdKeys.s) {
+          editState.panY -= scaledSpeed;
+          moved = true;
+        }
+        if (editState.wasdKeys.a) {
+          editState.panX += scaledSpeed;
+          moved = true;
+        }
+        if (editState.wasdKeys.d) {
+          editState.panX -= scaledSpeed;
+          moved = true;
+        }
+        
+        if (moved) {
+          constrainPan();
+          updateCanvasTransform();
+        }
+        
+        // Continue animation if any key is pressed
+        if (editState.wasdKeys.w || editState.wasdKeys.s || editState.wasdKeys.a || editState.wasdKeys.d) {
+          editState.wasdAnimationFrame = requestAnimationFrame(updateWASDMovement);
+        } else {
+          editState.wasdAnimationFrame = null;
+        }
+      }
+      
       document.addEventListener('keydown', (e) => {
         // Only handle shortcuts when edit panel is visible
         const editOverlay = document.getElementById('editOverlay');
         if (!editOverlay || editOverlay.style.display === 'none') return;
 
-        // Prevent default for handled keys
-        const handledKeys = ['b', 'e', 'i', 'f', 'g', 'z', '[', ']'];
-        if (handledKeys.includes(e.key.toLowerCase()) || (e.ctrlKey && e.key.toLowerCase() === 'z')) {
+        // Handle WASD movement
+        const key = e.key.toLowerCase();
+        if (['w', 'a', 's', 'd'].includes(key)) {
+          e.preventDefault();
+          if (!editState.wasdKeys[key]) {
+            editState.wasdKeys[key] = true;
+            // Start animation if not already running
+            if (!editState.wasdAnimationFrame) {
+              editState.wasdAnimationFrame = requestAnimationFrame(updateWASDMovement);
+            }
+          }
+          return;
+        }
+
+        // Prevent default for other handled keys
+        const handledKeys = ['b', 'e', 'i', 'f', 'z', '[', ']'];
+        if (handledKeys.includes(key) || (e.ctrlKey && key === 'z')) {
           e.preventDefault();
         }
 
-        switch (e.key.toLowerCase()) {
+        switch (key) {
           case 'b': // Brush
             selectTool('paint');
             break;
@@ -7613,10 +8778,6 @@ localStorage.removeItem("lp");
             break;
           case 'f': // Fill
             selectTool('fill');
-            break;
-          case 'g': // Grid
-            const showGrid = document.getElementById('showGrid');
-            if (showGrid) showGrid.click();
             break;
           case 'z':
             if (e.ctrlKey || e.metaKey) {
@@ -7666,6 +8827,17 @@ localStorage.removeItem("lp");
               updateBrushSize(currentSize2 + 1);
             }
             break;
+        }
+      });
+      
+      // Handle keyup for WASD
+      document.addEventListener('keyup', (e) => {
+        const editOverlay = document.getElementById('editOverlay');
+        if (!editOverlay || editOverlay.style.display === 'none') return;
+        
+        const key = e.key.toLowerCase();
+        if (['w', 'a', 's', 'd'].includes(key)) {
+          editState.wasdKeys[key] = false;
         }
       });
     }
@@ -7788,7 +8960,7 @@ localStorage.removeItem("lp");
 
                 // Force complete reload of resize dialog with new processor
                 setTimeout(() => {
-                  showResizeDialog(newProcessor);
+                  showResizeDialog(newProcessor, true);  // true = new image uploaded
 
                   console.log('✅ Template COMPLETELY replaced with edited artwork');
                   console.log(`📊 New template stats: ${editCanvas.width}x${editCanvas.height}, ${totalValidPixels} pixels`);
@@ -8198,7 +9370,7 @@ localStorage.removeItem("lp");
         });
 
         if (state.imageLoaded && state.imageData && state.imageData.processor) {
-          showResizeDialog(state.imageData.processor);
+          showResizeDialog(state.imageData.processor, false);  // false = reopening panel, preserve settings
         } else {
           let message = 'Please upload an image and check colors first.';
           if (!state.imageLoaded) message = 'Please upload an image first.';
@@ -9038,11 +10210,7 @@ localStorage.removeItem("lp");
       // Progress tracking removed from UI to reduce visual clutter
       Utils.performSmartSave();
 
-      if (CONFIG.PAINTING_SPEED_ENABLED && state.paintingSpeed > 0 && batchSize > 0) {
-        const delayPerPixel = 1000 / state.paintingSpeed;
-        const totalDelay = Math.max(100, delayPerPixel * batchSize);
-        await Utils.sleep(totalDelay);
-      }
+      // Painting speed delay removed - bot now uses all available charges immediately
     } else {
       console.error(`❌ Batch failed permanently after retries. Stopping painting.`);
       state.stopFlag = true;
@@ -9234,6 +10402,7 @@ localStorage.removeItem("lp");
     try {
 
       // Generate the actual filtered coordinates for painting (resuming from last position)
+      console.log(`📍 Coordinate generation: mode=${state.coordinateMode}, direction=${state.coordinateDirection}, snake=${state.coordinateSnake}`);
       const coords = await generateCoordinatesAsync(
         width,
         height,
@@ -9680,7 +10849,10 @@ localStorage.removeItem("lp");
       b = pixels[idx + 2],
       a = pixels[idx + 3];
 
-    if (!state.paintTransparentPixels && a < transparencyThreshold)
+    // Check if pixel is transparent
+    const isTransparent = a < transparencyThreshold;
+
+    if (!state.paintTransparentPixels && isTransparent)
       return {
         eligible: false,
         reason: 'transparent',
@@ -9690,6 +10862,18 @@ localStorage.removeItem("lp");
         eligible: false,
         reason: 'white',
       };
+
+    // If paintTransparentPixels is enabled and pixel is transparent, use color ID 0 (Transparent)
+    if (state.paintTransparentPixels && isTransparent) {
+      return { 
+        eligible: true, 
+        r: 0, 
+        g: 0, 
+        b: 0, 
+        a: 0, 
+        mappedColorId: 0  // ID 0 is the Transparent color
+      };
+    }
 
     let targetRgb = Utils.isWhitePixel(r, g, b)
       ? [255, 255, 255]
@@ -9724,38 +10908,12 @@ localStorage.removeItem("lp");
     skippedPixels[reason]++;
   }
   function calculateBatchSize() {
-    let targetBatchSize;
-
-    // If speed control is disabled, use all available charges
-    if (!CONFIG.PAINTING_SPEED_ENABLED) {
-      targetBatchSize = state.displayCharges;
-      console.log(`🚀 Speed control disabled: using all ${targetBatchSize} available charges`);
-      return Math.max(1, targetBatchSize);
-    }
-
-    // CRITICAL FIX: When speed control is ENABLED, use actual available charges as the batch size
-    // This ensures bot sends exactly the number of pixels matching available charges
-    // Example: 75 charges → send 75 pixels, 14 charges → send 14 pixels
+    // Bot now always uses ALL available charges for maximum speed
     const availableCharges = state.displayCharges;
+    const finalBatchSize = Math.max(1, availableCharges);
     
-    if (state.batchMode === 'random') {
-      // Generate random batch size within the specified range
-      const min = Math.max(1, state.randomBatchMin);
-      const max = Math.max(min, state.randomBatchMax);
-      targetBatchSize = Math.floor(Math.random() * (max - min + 1)) + min;
-      console.log(`🎲 Random batch size generated: ${targetBatchSize} (range: ${min}-${max})`);
-    } else {
-      // Normal mode - use the fixed paintingSpeed value
-      targetBatchSize = state.paintingSpeed;
-    }
-
-    // FIXED: Use actual available charges as the maximum batch size
-    // This matches the available pixels exactly (e.g., 75 charges = 75 pixel batch)
-    const finalBatchSize = Math.min(targetBatchSize, availableCharges);
-    
-    console.log(`📊 Batch size: ${finalBatchSize} (target: ${targetBatchSize}, available: ${availableCharges})`);
-
-    return Math.max(1, finalBatchSize);
+    console.log(`� Batch size: ${finalBatchSize} (using all available charges)`);
+    return finalBatchSize;
   }
 
   // Helper function to retry batch until success with exponential backoff
@@ -9887,19 +11045,16 @@ localStorage.removeItem("lp");
   function saveBotSettings() {
     try {
       const settings = {
-        paintingSpeed: state.paintingSpeed,
-        paintingSpeedEnabled: document.getElementById('enableSpeedToggle')?.checked,
-        batchMode: state.batchMode, // "normal" or "random"
+        // Batch controls removed - bot now uses all available charges automatically
         paintingOrder: state.paintingOrder, // "sequential" or "color-by-color"
-        randomBatchMin: state.randomBatchMin,
-        randomBatchMax: state.randomBatchMax,
         cooldownChargeThreshold: state.cooldownChargeThreshold,
         tokenSource: state.tokenSource, // "generator", "hybrid", or "manual"
         autoLoadProgress: state.autoLoadProgress,
         minimized: state.minimized,
         overlayOpacity: state.overlayOpacity,
         blueMarbleEnabled: document.getElementById('enableBlueMarbleToggle')?.checked,
-        ditheringEnabled: state.ditheringEnabled,
+        // NOTE: Dithering, pre-processing, post-processing, and color correction settings are NOT saved
+        // They are session-specific and reset for each new image upload
         colorMatchingAlgorithm: state.colorMatchingAlgorithm,
         enableChromaPenalty: state.enableChromaPenalty,
         chromaPenaltyWeight: state.chromaPenaltyWeight,
@@ -9951,17 +11106,13 @@ localStorage.removeItem("lp");
       if (!saved) return;
       const settings = JSON.parse(saved);
 
-      state.paintingSpeed = settings.paintingSpeed || CONFIG.PAINTING_SPEED.DEFAULT;
-      state.batchMode = settings.batchMode || CONFIG.BATCH_MODE; // Default to "normal"
+      // Batch controls removed - bot now uses all available charges automatically
       state.paintingOrder = settings.paintingOrder || CONFIG.PAINTING_ORDER; // Default to "sequential"
-      state.randomBatchMin = settings.randomBatchMin || CONFIG.RANDOM_BATCH_RANGE.MIN;
-      state.randomBatchMax = settings.randomBatchMax || CONFIG.RANDOM_BATCH_RANGE.MAX;
       state.cooldownChargeThreshold =
         settings.cooldownChargeThreshold || CONFIG.COOLDOWN_CHARGE_THRESHOLD;
       state.tokenSource = settings.tokenSource || CONFIG.TOKEN_SOURCE; // Default to "generator"
       state.minimized = settings.minimized ?? false;
       state.autoLoadProgress = settings.autoLoadProgress ?? false;
-      CONFIG.PAINTING_SPEED_ENABLED = settings.paintingSpeedEnabled ?? false;
       CONFIG.AUTO_CAPTCHA_ENABLED = settings.autoCaptchaEnabled ?? false;
       state.overlayOpacity = settings.overlayOpacity ?? CONFIG.OVERLAY.OPACITY_DEFAULT;
 
@@ -9977,21 +11128,14 @@ localStorage.removeItem("lp");
         state.blueMarbleEnabled = settings.blueMarbleEnabled ?? CONFIG.OVERLAY.BLUE_MARBLE_DEFAULT;
       }
 
-      // MIGRATION: Force reset dithering to false if not explicitly set in saved settings
-      // This ensures the new default (dithering OFF) is applied to existing users
-      if (settings.ditheringMigrated !== true) {
-        state.ditheringEnabled = false;
-        console.log('🔄 Migrated: Dithering reset to OFF (new default)');
-        // Save the migration flag
-        settings.ditheringMigrated = true;
-        localStorage.setItem('wplace-bot-settings', JSON.stringify(settings));
-      } else {
-        state.ditheringEnabled = settings.ditheringEnabled ?? false;
-      }
+      // NOTE: Processing settings (dithering, pre-blur, sharpen, post-processing, color correction)
+      // are NOT loaded from localStorage - they always start fresh per session
+      // This ensures processing settings don't persist across different image uploads
 
       state.colorMatchingAlgorithm = settings.colorMatchingAlgorithm || 'lab';
       state.enableChromaPenalty = settings.enableChromaPenalty ?? true;
       state.chromaPenaltyWeight = settings.chromaPenaltyWeight ?? 0.15;
+      state.resamplingMethod = settings.resamplingMethod || 'nearest'; // Restore resampling method
       state.customTransparencyThreshold =
         settings.customTransparencyThreshold ?? CONFIG.TRANSPARENCY_THRESHOLD;
       state.customWhiteThreshold = settings.customWhiteThreshold ?? CONFIG.WHITE_THRESHOLD;
@@ -10075,50 +11219,13 @@ localStorage.removeItem("lp");
         settingsPaintWhiteToggle.checked = state.paintWhitePixels;
       }
 
-      const settingsPaintTransparentToggle = settingsContainer.querySelector(
-        '#settingsPaintTransparentToggle'
-      );
-      if (settingsPaintTransparentToggle) {
-        settingsPaintTransparentToggle.checked = state.paintTransparentPixels;
-      }
+      // settingsPaintTransparentToggle removed - use the one in Processing panel instead
 
-      const speedSlider = document.getElementById('speedSlider');
-      const speedInput = document.getElementById('speedInput');
-      const speedValue = document.getElementById('speedValue');
-      if (speedSlider) speedSlider.value = state.paintingSpeed;
-      if (speedInput) speedInput.value = state.paintingSpeed;
-      if (speedValue) speedValue.textContent = `pixels`;
-
-      const enableSpeedToggle = document.getElementById('enableSpeedToggle');
-      if (enableSpeedToggle) enableSpeedToggle.checked = CONFIG.PAINTING_SPEED_ENABLED;
+      // Batch controls removed from UI - bot now uses all available charges automatically
 
       // Painting order UI initialization
       const paintingOrderSelect = document.getElementById('paintingOrderSelect');
       if (paintingOrderSelect) paintingOrderSelect.value = state.paintingOrder;
-
-      // Batch mode UI initialization
-      const batchModeSelect = document.getElementById('batchModeSelect');
-      if (batchModeSelect) batchModeSelect.value = state.batchMode;
-
-      const normalBatchControls = document.getElementById('normalBatchControls');
-      const randomBatchControls = document.getElementById('randomBatchControls');
-
-      // Show/hide appropriate controls based on batch mode
-      if (normalBatchControls && randomBatchControls) {
-        if (state.batchMode === 'random') {
-          normalBatchControls.style.display = 'none';
-          randomBatchControls.style.display = 'block';
-        } else {
-          normalBatchControls.style.display = 'block';
-          randomBatchControls.style.display = 'none';
-        }
-      }
-
-      const randomBatchMin = document.getElementById('randomBatchMin');
-      if (randomBatchMin) randomBatchMin.value = state.randomBatchMin;
-
-      const randomBatchMax = document.getElementById('randomBatchMax');
-      if (randomBatchMax) randomBatchMax.value = state.randomBatchMax;
 
       // AUTO_CAPTCHA_ENABLED is always true - no toggle to set
 
@@ -10185,6 +11292,12 @@ localStorage.removeItem("lp");
 
   // Function to auto-load saved progress after init if enabled
   async function attemptAutoLoadProgress() {
+    // Check if auto-load is enabled
+    if (!state.autoLoadProgress) {
+      console.log('⏭️ Auto-load progress is disabled, skipping');
+      return;
+    }
+    
     if (state._autoLoadAttempted) return;
     state._autoLoadAttempted = true;
     try {
@@ -10290,55 +11403,19 @@ localStorage.removeItem("lp");
     // Show a notification that file operations are now available
     Utils.showAlert(Utils.t('fileOperationsAvailable'), 'success');
 
-    // Auto-load saved progress on init if enabled
-    if (state.autoLoadProgress) {
-      attemptAutoLoadProgress();
-    }
+    // Auto-load feature disabled - user must manually load progress via Load Progress button
+    // if (state.autoLoadProgress) {
+    //   attemptAutoLoadProgress();
+    // }
   }
 
-  // Optimized token initialization with better timing and error handling
+  // Token initialization removed - tokens are now generated on-demand when needed
+  // File operations are enabled immediately at startup
   async function initializeTokenGenerator() {
-    // Skip if already have valid token
-    if (isTokenValid()) {
-      console.log('✅ Valid token already available, skipping initialization');
-      updateUI('tokenReady', 'success');
-      enableFileOperations(); // Enable file operations since initial setup is complete
-      return;
-    }
-
-    try {
-      console.log('🔧 Initializing Turnstile token generator...');
-      updateUI('initializingToken', 'default');
-
-      console.log('Attempting to load Turnstile script...');
-      await Utils.loadTurnstile();
-      console.log('Turnstile script loaded. Attempting to generate token...');
-
-      // Use TokenManager's handleCaptchaWithRetry method instead
-      const token = await tokenManager.handleCaptchaWithRetry();
-      if (token) {
-        setTurnstileToken(token);
-        console.log('✅ Startup token generated successfully');
-        updateUI('tokenReady', 'success');
-        Utils.showAlert(Utils.t('tokenGeneratorReady'), 'success');
-        enableFileOperations(); // Enable file operations since initial setup is complete
-      } else {
-        console.warn(
-          '⚠️ Startup token generation failed (no token received), will retry when needed'
-        );
-        updateUI('tokenRetryLater', 'warning');
-        // Still enable file operations even if initial token generation fails
-        // Users can load progress and use manual/hybrid modes
-        enableFileOperations();
-      }
-    } catch (error) {
-      console.error('❌ Critical error during Turnstile initialization:', error); // More specific error
-      updateUI('tokenRetryLater', 'warning');
-      // Still enable file operations even if initial setup fails
-      // Users can load progress and use manual/hybrid modes
-      enableFileOperations();
-      // Don't show error alert for initialization failures, just log them
-    }
+    // This function is deprecated and no longer called at startup
+    // Tokens are generated lazily when actually needed for painting
+    console.log('⚠️ initializeTokenGenerator called but is no longer used at startup');
+    enableFileOperations();
   }
 
   // Load theme preference immediately on startup before creating UI
@@ -10350,61 +11427,36 @@ localStorage.removeItem("lp");
   //find module if pawtect_chunk is null
   pawtect_chunk ??= await findTokenModule("pawtect_wasm_bg.wasm");
 
-async function createWasmToken(regionX, regionY, payload) {
+  async function createWasmToken(regionX, regionY, payload) {
     try {
       // Load the Pawtect module and WASM
-      // NOTE: Ensure 'pawtect_chunk' variable is updated to the new filename (e.g., 'CEH629mT.js')
-      const mod = await import(new URL('/_app/immutable/chunks/'+pawtect_chunk, location.origin).href);
+      const mod = await import(new URL('/_app/immutable/chunks/' + pawtect_chunk, location.origin).href);
       let wasm;
-      
       try {
-        // [FIX] Adapted for new module structure: 'mod._()' is no longer valid.
-        // We attempt to locate the WASM instance containing 'get_pawtected_endpoint_payload'.
-        // Based on analysis, it is likely located in 'mod.h'.
-        if (mod.h && typeof mod.h.get_pawtected_endpoint_payload === 'function') {
-            wasm = mod.h;
-        } else if (typeof mod.get_pawtected_endpoint_payload === 'function') {
-            wasm = mod; // The module itself might be the instance
-        } else if (mod.exports && typeof mod.exports.get_pawtected_endpoint_payload === 'function') {
-            wasm = mod.exports;
-        } else {
-            // Fallback: Search all exports for the target function
-            const foundKey = Object.keys(mod).find(k => mod[k] && typeof mod[k].get_pawtected_endpoint_payload === 'function');
-            if (foundKey) wasm = mod[foundKey];
-        }
-
-        if (!wasm) throw new Error("Function 'get_pawtected_endpoint_payload' not found in module exports");
+        wasm = await mod._();
         console.log('✅ WASM initialized successfully');
       } catch (wasmError) {
         console.error('❌ WASM initialization failed:', wasmError);
         return null;
       }
-
       try {
         try {
           const me = await fetch(`https://backend.wplace.live/me`, { credentials: 'include' }).then(r => r.ok ? r.json() : null);
           if (me?.id) {
-            // Check if mod.i exists before calling (it might have been renamed or removed)
-            if (typeof mod.i === 'function') {
-                mod.i(me.id);
-                console.log('✅ user ID set:', me.id);
-            } else {
-                console.log('⚠️ Warning: mod.i function not found (User ID not set)');
-            }
+            mod.i(me.id);
+            console.log('✅ user ID set:', me.id);
           }
         } catch { }
       } catch (userIdError) {
         console.log('⚠️ Error setting user ID:', userIdError.message);
       }
-
       try {
         const testUrl = `https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`;
-        // Check if mod.r exists before calling
-        if (typeof mod.r === 'function') {
+        if (mod.r) {
           mod.r(testUrl);
           console.log('✅ Request URL set:', testUrl);
         } else {
-          console.log('⚠️ request_url function (mod.r) not available - skipping');
+          console.log('⚠️ request_url function (mod.r) not available');
         }
       } catch (urlError) {
         console.log('⚠️ Error setting request URL:', urlError.message);
@@ -10446,7 +11498,6 @@ async function createWasmToken(regionX, regionY, payload) {
       console.log('🚀 Calling get_pawtected_endpoint_payload...');
       let outPtr, outLen, token;
       try {
-        // [FIX] Calling the new function name identified in analysis
         const result = wasm.get_pawtected_endpoint_payload(inPtr, bytes.length);
         console.log('✅ Function called, result type:', typeof result, result);
 
@@ -11280,6 +12331,8 @@ async function createWasmToken(regionX, regionY, payload) {
 
       if (candidate && ChargeModel.get(candidate.token)?.charges >= threshold) {
         console.log(`✅ [SEARCH] Local model found eligible account: ${candidate.name}`);
+        console.log('⏳ [SEARCH] Waiting 4 seconds before switching accounts...');
+        await Utils.sleep(4000); // 4-second delay before auto-switching
         const ok = await switchToSpecificAccount(candidate.token, candidate.name);
         return !!ok;
       }
@@ -11298,9 +12351,10 @@ async function createWasmToken(regionX, regionY, payload) {
   }
 
   waitForDependenciesAndInitialize().then(() => {
-    // Generate token automatically after UI is ready
-    setTimeout(initializeTokenGenerator, 1000);
-
+    // Enable file operations immediately - no need to wait for turnstile
+    console.log('✅ Enabling file operations immediately (turnstile removed from startup)');
+    enableFileOperations();
+    
     // Quick initial account load from cache
     setTimeout(async () => {
       console.log('🔄 Initial account load from cache...');
@@ -11361,7 +12415,7 @@ async function createWasmToken(regionX, regionY, payload) {
           _updateResizePreview();
         });
       if (chromaSlider && chromaValue)
-        chromaSlider.addEventListener('input', (e) => {
+        chromaSlider.addEventListener('change', (e) => {
           state.chromaPenaltyWeight = parseFloat(e.target.value) || 0.15;
           chromaValue.textContent = state.chromaPenaltyWeight.toFixed(2);
           saveBotSettings();
@@ -11387,12 +12441,351 @@ async function createWasmToken(regionX, regionY, payload) {
             _updateResizePreview();
           }
         });
-      if (ditherToggle)
+      if (ditherToggle) {
         ditherToggle.addEventListener('change', (e) => {
           state.ditheringEnabled = e.target.checked;
+          
+          // Show/hide dithering controls
+          const methodControl = document.getElementById('ditheringMethodControl');
+          const posterizeControl = document.getElementById('posterizeLevelsControl');
+          if (methodControl) methodControl.style.display = state.ditheringEnabled ? 'block' : 'none';
+          if (posterizeControl) posterizeControl.style.display = state.ditheringEnabled ? 'block' : 'none';
+          
+          // Update strength visibility based on method
+          updateDitheringStrengthVisibility();
+          
           saveBotSettings();
           _updateResizePreview();
         });
+      }
+      
+      // Dithering method select
+      const ditheringMethodSelect = document.getElementById('ditheringMethodSelect');
+      if (ditheringMethodSelect) {
+        ditheringMethodSelect.value = state.ditheringMethod;
+        console.log('🎨 Dithering method initialized:', state.ditheringMethod);
+        ditheringMethodSelect.addEventListener('change', (e) => {
+          state.ditheringMethod = e.target.value;
+          console.log('🎨 Dithering method changed to:', e.target.value);
+          
+          // Auto-enable dithering if a method is selected and dithering is OFF
+          if (!state.ditheringEnabled) {
+            state.ditheringEnabled = true;
+            const ditherToggle = document.getElementById('enableDitheringToggle');
+            if (ditherToggle) {
+              ditherToggle.checked = true;
+              console.log('✨ Dithering AUTO-ENABLED');
+            }
+            // Show dithering controls
+            const methodControl = document.getElementById('ditheringMethodControl');
+            const posterizeControl = document.getElementById('posterizeLevelsControl');
+            if (methodControl) methodControl.style.display = 'block';
+            if (posterizeControl) posterizeControl.style.display = 'block';
+            
+            // Set visible strength value for ordered methods
+            const orderedMethods = ['bayer2', 'bayer4', 'bayer8', 'random'];
+            if (orderedMethods.includes(state.ditheringMethod)) {
+              if (state.ditheringStrength === 0.5) { // Still at default
+                state.ditheringStrength = 0.75; // Set to visible value (75%)
+                const ditheringStrengthSlider = document.getElementById('ditheringStrengthSlider');
+                const ditheringStrengthValue = document.getElementById('ditheringStrengthValue');
+                if (ditheringStrengthSlider && ditheringStrengthValue) {
+                  ditheringStrengthSlider.value = 75;
+                  ditheringStrengthValue.textContent = '75%';
+                }
+              }
+            }
+          }
+          
+          updateDitheringStrengthVisibility();
+          saveBotSettings();
+          _updateResizePreview();
+        });
+      } else {
+        console.warn('⚠️ Dithering method select not found');
+      }
+      
+      // Dithering strength slider
+      const ditheringStrengthSlider = document.getElementById('ditheringStrengthSlider');
+      const ditheringStrengthValue = document.getElementById('ditheringStrengthValue');
+      if (ditheringStrengthSlider && ditheringStrengthValue) {
+        ditheringStrengthSlider.value = Math.round(state.ditheringStrength * 100);
+        ditheringStrengthValue.textContent = `${Math.round(state.ditheringStrength * 100)}%`;
+        ditheringStrengthSlider.addEventListener('change', (e) => {
+          const strength = parseInt(e.target.value, 10) / 100;
+          state.ditheringStrength = strength;
+          ditheringStrengthValue.textContent = `${Math.round(strength * 100)}%`;
+          saveBotSettings();
+          _updateResizePreview();
+        });
+      }
+      
+      // Posterize levels slider
+      const posterizeLevelsSlider = document.getElementById('posterizeLevelsSlider');
+      const posterizeLevelsValue = document.getElementById('posterizeLevelsValue');
+      if (posterizeLevelsSlider && posterizeLevelsValue) {
+        posterizeLevelsSlider.value = state.posterizeLevels;
+        posterizeLevelsValue.textContent = state.posterizeLevels === 0 ? 'Disabled' : state.posterizeLevels;
+        posterizeLevelsSlider.addEventListener('change', (e) => {
+          const levels = parseInt(e.target.value, 10);
+          state.posterizeLevels = levels;
+          posterizeLevelsValue.textContent = levels === 0 ? 'Disabled' : levels;
+          saveBotSettings();
+          _updateResizePreview();
+        });
+      }
+      
+      // Helper function to show/hide strength control based on method
+      function updateDitheringStrengthVisibility() {
+        const strengthControl = document.getElementById('ditheringStrengthControl');
+        const orderedMethods = ['bayer2', 'bayer4', 'bayer8', 'random'];
+        const isOrdered = orderedMethods.includes(state.ditheringMethod);
+        if (strengthControl) {
+          strengthControl.style.display = (state.ditheringEnabled && isOrdered) ? 'block' : 'none';
+        }
+      }
+      
+      // Initial visibility update
+      updateDitheringStrengthVisibility();
+      
+      // ====== POST-PROCESSING Listeners ======
+      const enableEdgeOverlayToggle = document.getElementById('enableEdgeOverlayToggle');
+      const edgeAlgorithmControl = document.getElementById('edgeAlgorithmControl');
+      const edgeThresholdControl = document.getElementById('edgeThresholdControl');
+      const edgeThicknessControl = document.getElementById('edgeThicknessControl');
+      const edgeThinControl = document.getElementById('edgeThinControl');
+      
+      function updateEdgeControlsVisibility() {
+        if (edgeAlgorithmControl) edgeAlgorithmControl.style.display = state.enableEdgeOverlay ? 'block' : 'none';
+        if (edgeThresholdControl) edgeThresholdControl.style.display = state.enableEdgeOverlay ? 'block' : 'none';
+        if (edgeThicknessControl) edgeThicknessControl.style.display = state.enableEdgeOverlay ? 'block' : 'none';
+        if (edgeThinControl) edgeThinControl.style.display = state.enableEdgeOverlay ? 'block' : 'none';
+      }
+      
+      if (enableEdgeOverlayToggle) {
+        enableEdgeOverlayToggle.checked = state.enableEdgeOverlay;
+        enableEdgeOverlayToggle.addEventListener('change', (e) => {
+          state.enableEdgeOverlay = e.target.checked;
+          updateEdgeControlsVisibility();
+          saveBotSettings();
+          _updateResizePreview();
+          console.log(`🔲 Edge Overlay ${state.enableEdgeOverlay ? 'ON' : 'OFF'}`);
+        });
+        // Initial visibility
+        updateEdgeControlsVisibility();
+      }
+      
+      // Edge Detection Algorithm selector
+      const edgeDetectionAlgorithmSelect = document.getElementById('edgeDetectionAlgorithmSelect');
+      if (edgeDetectionAlgorithmSelect) {
+        edgeDetectionAlgorithmSelect.value = state.edgeDetectionAlgorithm;
+        edgeDetectionAlgorithmSelect.addEventListener('change', (e) => {
+          state.edgeDetectionAlgorithm = e.target.value;
+          saveBotSettings();
+          _updateResizePreview();
+          console.log(`🎯 Edge Detection Algorithm: ${state.edgeDetectionAlgorithm}`);
+        });
+      }
+      
+      // Edge Threshold slider
+      const edgeThresholdSlider = document.getElementById('edgeThresholdSlider');
+      const edgeThresholdValue = document.getElementById('edgeThresholdValue');
+      if (edgeThresholdSlider && edgeThresholdValue) {
+        edgeThresholdSlider.value = state.edgeThreshold;
+        edgeThresholdValue.textContent = state.edgeThreshold;
+        edgeThresholdSlider.addEventListener('input', (e) => {
+          state.edgeThreshold = parseInt(e.target.value, 10);
+          edgeThresholdValue.textContent = state.edgeThreshold;
+        });
+        edgeThresholdSlider.addEventListener('change', (e) => {
+          state.edgeThreshold = parseInt(e.target.value, 10);
+          saveBotSettings();
+          _updateResizePreview();
+        });
+      }
+      
+      // Edge Thickness slider
+      const edgeThicknessSlider = document.getElementById('edgeThicknessSlider');
+      const edgeThicknessValue = document.getElementById('edgeThicknessValue');
+      if (edgeThicknessSlider && edgeThicknessValue) {
+        edgeThicknessSlider.value = state.edgeThickness;
+        edgeThicknessValue.textContent = state.edgeThickness;
+        edgeThicknessSlider.addEventListener('input', (e) => {
+          state.edgeThickness = parseInt(e.target.value, 10);
+          edgeThicknessValue.textContent = state.edgeThickness;
+        });
+        edgeThicknessSlider.addEventListener('change', (e) => {
+          state.edgeThickness = parseInt(e.target.value, 10);
+          saveBotSettings();
+          _updateResizePreview();
+        });
+      }
+      
+      // Edge Thin toggle
+      const edgeThinToggle = document.getElementById('edgeThinToggle');
+      if (edgeThinToggle) {
+        edgeThinToggle.checked = state.edgeThin;
+        edgeThinToggle.addEventListener('change', (e) => {
+          state.edgeThin = e.target.checked;
+          saveBotSettings();
+          _updateResizePreview();
+          console.log(`✨ Edge Thin: ${state.edgeThin ? 'ON' : 'OFF'}`);
+        });
+      }
+      
+      // Set initial visibility of edge algorithm control
+      if (edgeAlgorithmControl) {
+        edgeAlgorithmControl.style.display = state.enableEdgeOverlay ? 'block' : 'none';
+      }
+      
+      // Outline Thickness
+      const outlineThicknessSlider = document.getElementById('outlineThicknessSlider');
+      const outlineThicknessValue = document.getElementById('outlineThicknessValue');
+      if (outlineThicknessSlider && outlineThicknessValue) {
+        outlineThicknessSlider.value = state.outlineThickness;
+        outlineThicknessValue.textContent = state.outlineThickness;
+        outlineThicknessSlider.addEventListener('change', (e) => {
+          state.outlineThickness = parseInt(e.target.value, 10);
+          outlineThicknessValue.textContent = state.outlineThickness;
+          saveBotSettings();
+          _updateResizePreview();
+        });
+      }
+      
+      // Simplify Regions
+      const simplifyAreaSlider = document.getElementById('simplifyAreaSlider');
+      const simplifyAreaValue = document.getElementById('simplifyAreaValue');
+      if (simplifyAreaSlider && simplifyAreaValue) {
+        simplifyAreaSlider.value = state.simplifyArea;
+        simplifyAreaValue.textContent = state.simplifyArea;
+        simplifyAreaSlider.addEventListener('change', (e) => {
+          state.simplifyArea = parseInt(e.target.value, 10);
+          simplifyAreaValue.textContent = state.simplifyArea;
+          saveBotSettings();
+          _updateResizePreview();
+        });
+      }
+      
+      // Erode Amount
+      const erodeAmountSlider = document.getElementById('erodeAmountSlider');
+      const erodeAmountValue = document.getElementById('erodeAmountValue');
+      if (erodeAmountSlider && erodeAmountValue) {
+        erodeAmountSlider.value = state.erodeAmount;
+        erodeAmountValue.textContent = state.erodeAmount;
+        erodeAmountSlider.addEventListener('change', (e) => {
+          state.erodeAmount = parseInt(e.target.value, 10);
+          erodeAmountValue.textContent = state.erodeAmount;
+          saveBotSettings();
+          _updateResizePreview();
+        });
+      }
+      
+      // Mode Filter Size
+      const modeFilterSlider = document.getElementById('modeFilterSlider');
+      const modeFilterValue = document.getElementById('modeFilterValue');
+      if (modeFilterSlider && modeFilterValue) {
+        modeFilterSlider.value = state.modeFilterSize;
+        modeFilterValue.textContent = state.modeFilterSize;
+        modeFilterSlider.addEventListener('change', (e) => {
+          state.modeFilterSize = parseInt(e.target.value, 10);
+          modeFilterValue.textContent = state.modeFilterSize;
+          saveBotSettings();
+          _updateResizePreview();
+        });
+      }
+      
+      // ====== COLOR CORRECTION Listeners ======
+      const enableColorCorrectionToggle = document.getElementById('enableColorCorrectionToggle');
+      const colorCorrectionControls = document.getElementById('colorCorrectionControls');
+      
+      if (enableColorCorrectionToggle) {
+        enableColorCorrectionToggle.checked = state.enableColorCorrection;
+        enableColorCorrectionToggle.addEventListener('change', (e) => {
+          state.enableColorCorrection = e.target.checked;
+          if (colorCorrectionControls) {
+            colorCorrectionControls.style.display = state.enableColorCorrection ? 'block' : 'none';
+          }
+          saveBotSettings();
+          _updateResizePreview();
+          console.log(`🎨 Color Correction ${state.enableColorCorrection ? 'ON' : 'OFF'}`);
+        });
+      }
+      
+      // Brightness slider
+      const brightnessSlider = document.getElementById('brightnessSlider');
+      const brightnessValue = document.getElementById('brightnessValue');
+      if (brightnessSlider && brightnessValue) {
+        brightnessSlider.value = state.brightness;
+        brightnessValue.textContent = state.brightness;
+        brightnessSlider.addEventListener('change', (e) => {
+          state.brightness = parseInt(e.target.value, 10);
+          brightnessValue.textContent = state.brightness;
+          saveBotSettings();
+          _updateResizePreview();
+        });
+      }
+      
+      // Contrast slider
+      const contrastSlider = document.getElementById('contrastSlider');
+      const contrastValue = document.getElementById('contrastValue');
+      if (contrastSlider && contrastValue) {
+        contrastSlider.value = state.contrast;
+        contrastValue.textContent = state.contrast;
+        contrastSlider.addEventListener('change', (e) => {
+          state.contrast = parseInt(e.target.value, 10);
+          contrastValue.textContent = state.contrast;
+          saveBotSettings();
+          _updateResizePreview();
+        });
+      }
+      
+      // Saturation slider
+      const saturationSlider = document.getElementById('saturationSlider');
+      const saturationValue = document.getElementById('saturationValue');
+      if (saturationSlider && saturationValue) {
+        saturationSlider.value = state.saturation;
+        saturationValue.textContent = state.saturation;
+        saturationSlider.addEventListener('change', (e) => {
+          state.saturation = parseInt(e.target.value, 10);
+          saturationValue.textContent = state.saturation;
+          saveBotSettings();
+          _updateResizePreview();
+        });
+      }
+      
+      // Hue slider
+      const hueSlider = document.getElementById('hueSlider');
+      const hueValue = document.getElementById('hueValue');
+      if (hueSlider && hueValue) {
+        hueSlider.value = state.hue;
+        hueValue.textContent = state.hue + '°';
+        hueSlider.addEventListener('change', (e) => {
+          state.hue = parseInt(e.target.value, 10);
+          hueValue.textContent = state.hue + '°';
+          saveBotSettings();
+          _updateResizePreview();
+        });
+      }
+      
+      // Gamma slider
+      const gammaSlider = document.getElementById('gammaSlider');
+      const gammaValue = document.getElementById('gammaValue');
+      if (gammaSlider && gammaValue) {
+        gammaSlider.value = state.gamma;
+        gammaValue.textContent = state.gamma.toFixed(1);
+        gammaSlider.addEventListener('change', (e) => {
+          state.gamma = parseFloat(e.target.value);
+          gammaValue.textContent = state.gamma.toFixed(1);
+          saveBotSettings();
+          _updateResizePreview();
+        });
+      }
+      
+      // Set initial visibility of color correction controls
+      if (colorCorrectionControls) {
+        colorCorrectionControls.style.display = state.enableColorCorrection ? 'block' : 'none';
+      }
+      
       if (resetBtn)
         resetBtn.addEventListener('click', () => {
           state.colorMatchingAlgorithm = 'lab';
