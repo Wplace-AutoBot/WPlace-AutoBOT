@@ -470,7 +470,7 @@
   // Find module if pawtect_chunk is null
   pawtect_chunk ??= await findTokenModule("pawtect_wasm_bg.wasm");
 
-async function createWasmToken(regionX, regionY, payload) {
+  async function createWasmToken(regionX, regionY, payload) {
     try {
       // Load the Pawtect module
       // Fallback to D1pWKeJi.js if pawtect_chunk is undefined, ensuring stability
