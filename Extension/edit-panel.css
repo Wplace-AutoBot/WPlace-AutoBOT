@@ -1,0 +1,1297 @@
+/* ================================================
+   MODERN APP LAYOUT - EDIT PANEL
+   Professional 3-Column Design
+   ================================================ */
+
+/* ================================================
+   1. GLOBAL PANEL CONTAINER
+   ================================================ */
+
+.edit-panel-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 92vw;
+    height: 92vh;
+    min-width: 1000px;
+    min-height: 700px;
+    max-width: 1920px;
+    max-height: 1200px;
+    background: #1e1e1e;
+    border: 1px solid #3e3e3e;
+    border-radius: 8px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    z-index: 999999;
+    display: flex;
+    flex-direction: column;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: #cccccc;
+    overflow: hidden;
+}
+
+/* ================================================
+   2. HEADER BAR
+   ================================================ */
+
+.edit-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 48px;
+    background: linear-gradient(180deg, #2d2d2d 0%, #252525 100%);
+    border-bottom: 1px solid #3e3e3e;
+    padding: 0 16px;
+    flex-shrink: 0;
+}
+
+.edit-title-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.edit-title-icon {
+    font-size: 20px;
+}
+
+.edit-title-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 0;
+}
+
+.edit-title-info {
+    font-size: 12px;
+    color: #888888;
+    margin-left: 8px;
+}
+
+.edit-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.edit-header-btn {
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: 1px solid #3e3e3e;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #cccccc;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.edit-header-btn:hover {
+    background: #3e3e3e;
+    border-color: #4a9eff;
+    color: #ffffff;
+}
+
+.edit-close-btn {
+    background: #e74c3c;
+    border-color: #c0392b;
+    color: #ffffff;
+}
+
+.edit-close-btn:hover {
+    background: #c0392b;
+}
+
+/* ================================================
+   3. MAIN WORKSPACE (3-COLUMN LAYOUT)
+   ================================================ */
+
+.edit-workspace {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* ================================================
+   4. LEFT SIDEBAR - TOOLS
+   ================================================ */
+
+.edit-toolbar-sidebar {
+    width: 70px;
+    background: #252525;
+    border-right: 1px solid #3e3e3e;
+    display: flex;
+    flex-direction: column;
+    padding: 12px 0;
+    gap: 4px;
+    overflow-y: auto;
+    flex-shrink: 0;
+}
+
+.edit-tool-section {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 0 8px;
+    margin-bottom: 8px;
+}
+
+.edit-tool-section-divider {
+    height: 1px;
+    background: #3e3e3e;
+    margin: 8px 0;
+}
+
+.edit-tool-btn {
+    width: 54px;
+    height: 54px;
+    background: #2d2d2d;
+    border: 1px solid #3e3e3e;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.edit-tool-btn:hover {
+    background: #3e3e3e;
+    border-color: #4a9eff;
+    transform: translateY(-1px);
+}
+
+.edit-tool-btn.active {
+    background: #4a9eff;
+    border-color: #4a9eff;
+    box-shadow: 0 0 10px rgba(74, 158, 255, 0.3);
+}
+
+.edit-tool-icon {
+    font-size: 24px;
+}
+
+.edit-tool-label {
+    font-size: 9px;
+    color: #888888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.edit-tool-btn.active .edit-tool-label {
+    color: #ffffff;
+}
+
+/* ================================================
+   5. CENTER - CANVAS AREA
+   ================================================ */
+
+.edit-canvas-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #1a1a1a;
+    overflow: hidden;
+}
+
+.edit-canvas-header {
+    height: 40px;
+    background: #252525;
+    border-bottom: 1px solid #3e3e3e;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+    flex-shrink: 0;
+}
+
+.edit-zoom-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.edit-zoom-btn {
+    width: 28px;
+    height: 28px;
+    background: #2d2d2d;
+    border: 1px solid #3e3e3e;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #cccccc;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.edit-zoom-btn:hover {
+    background: #3e3e3e;
+    border-color: #4a9eff;
+}
+
+.edit-zoom-display {
+    font-size: 12px;
+    color: #888888;
+    min-width: 60px;
+    text-align: center;
+}
+
+.edit-view-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.edit-view-toggle {
+    padding: 4px 10px;
+    background: #2d2d2d;
+    border: 1px solid #3e3e3e;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+    color: #cccccc;
+    transition: all 0.2s;
+}
+
+.edit-view-toggle:hover {
+    background: #3e3e3e;
+    border-color: #4a9eff;
+}
+
+.edit-view-toggle.active {
+    background: #4a9eff;
+    border-color: #4a9eff;
+    color: #ffffff;
+}
+
+.edit-canvas-viewport {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: auto;
+    position: relative;
+    background: 
+        linear-gradient(45deg, #0f0f0f 25%, transparent 25%),
+        linear-gradient(-45deg, #0f0f0f 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #0f0f0f 75%),
+        linear-gradient(-45deg, transparent 75%, #0f0f0f 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}
+
+.edit-canvas-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.edit-canvas {
+    display: block;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    cursor: crosshair;
+}
+
+.edit-canvas-grid-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    opacity: 0.3;
+}
+
+/* NAVIGATOR/MINIMAP */
+.edit-navigator {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    width: 180px;
+    background: #252525;
+    border: 1px solid #3e3e3e;
+    border-radius: 6px;
+    padding: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    z-index: 100;
+}
+
+.edit-navigator-title {
+    font-size: 10px;
+    color: #888888;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.edit-navigator-content {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    background: #1a1a1a;
+    border: 1px solid #3e3e3e;
+    border-radius: 3px;
+}
+
+.edit-navigator-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    cursor: pointer;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+}
+
+.edit-navigator-viewport {
+    position: absolute;
+    border: 2px solid #ff4444;
+    background: rgba(255, 68, 68, 0.15);
+    pointer-events: none;
+    box-shadow: 
+        0 0 0 1px rgba(0, 0, 0, 0.5),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+    z-index: 10;
+}
+
+/* ================================================
+   6. RIGHT SIDEBAR - PROPERTIES PANEL
+   ================================================ */
+
+.edit-properties-panel {
+    width: 280px;
+    background: #252525;
+    border-left: 1px solid #3e3e3e;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    flex-shrink: 0;
+}
+
+.edit-prop-section {
+    border-bottom: 1px solid #3e3e3e;
+    padding: 16px;
+}
+
+.edit-prop-section-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: #888888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.edit-prop-toggle {
+    cursor: pointer;
+    color: #4a9eff;
+    font-size: 12px;
+}
+
+/* POSITION PROPERTIES */
+.edit-position-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.edit-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.edit-input-label {
+    font-size: 10px;
+    color: #888888;
+    text-transform: uppercase;
+}
+
+.edit-input-field {
+    background: #1e1e1e;
+    border: 1px solid #3e3e3e;
+    border-radius: 4px;
+    padding: 6px 8px;
+    color: #cccccc;
+    font-size: 12px;
+    width: 100%;
+    transition: all 0.2s;
+}
+
+.edit-input-field:focus {
+    outline: none;
+    border-color: #4a9eff;
+    background: #252525;
+}
+
+/* COLOR PICKER */
+.edit-color-display {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.edit-color-preview {
+    width: 48px;
+    height: 48px;
+    border: 2px solid #3e3e3e;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    background: 
+        linear-gradient(45deg, #2d2d2d 25%, transparent 25%),
+        linear-gradient(-45deg, #2d2d2d 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #2d2d2d 75%),
+        linear-gradient(-45deg, transparent 75%, #2d2d2d 75%);
+    background-size: 8px 8px;
+    background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
+}
+
+.edit-color-preview-fill {
+    width: 100%;
+    height: 100%;
+    border-radius: 4px;
+}
+
+.edit-color-info {
+    flex: 1;
+}
+
+.edit-color-hex {
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 4px;
+}
+
+.edit-color-rgb {
+    font-size: 11px;
+    color: #888888;
+}
+
+.edit-color-picker-input {
+    width: 100%;
+    height: 32px;
+    border: 1px solid #3e3e3e;
+    border-radius: 4px;
+    cursor: pointer;
+    background: #1e1e1e;
+}
+
+/* COLOR SWATCHES */
+.edit-color-swatches {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
+    margin-top: 12px;
+}
+
+.edit-swatch {
+    width: 100%;
+    aspect-ratio: 1;
+    border: 2px solid #3e3e3e;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    background: 
+        linear-gradient(45deg, #2d2d2d 25%, transparent 25%),
+        linear-gradient(-45deg, #2d2d2d 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #2d2d2d 75%),
+        linear-gradient(-45deg, transparent 75%, #2d2d2d 75%);
+    background-size: 4px 4px;
+    background-position: 0 0, 0 2px, 2px -2px, -2px 0px;
+}
+
+.edit-swatch-fill {
+    width: 100%;
+    height: 100%;
+    border-radius: 2px;
+}
+
+.edit-swatch:hover {
+    border-color: #4a9eff;
+    transform: scale(1.1);
+}
+
+.edit-swatch.active {
+    border-color: #4a9eff;
+    box-shadow: 0 0 8px rgba(74, 158, 255, 0.5);
+}
+
+/* GRID PROPERTIES */
+.edit-checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.edit-checkbox {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: #4a9eff;
+}
+
+.edit-checkbox-label {
+    font-size: 12px;
+    color: #cccccc;
+    cursor: pointer;
+}
+
+.edit-slider-group {
+    margin-top: 12px;
+}
+
+.edit-slider {
+    width: 100%;
+    height: 4px;
+    background: #1e1e1e;
+    border-radius: 2px;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 8px 0;
+}
+
+.edit-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    background: #4a9eff;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.edit-slider::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    background: #4a9eff;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.edit-slider-value {
+    font-size: 11px;
+    color: #888888;
+    text-align: right;
+}
+
+/* LAYERS */
+.edit-layers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.edit-layer-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    background: #1e1e1e;
+    border: 1px solid #3e3e3e;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.edit-layer-item:hover {
+    background: #2d2d2d;
+    border-color: #4a9eff;
+}
+
+.edit-layer-item.active {
+    background: #4a9eff;
+    border-color: #4a9eff;
+}
+
+.edit-layer-visibility {
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.edit-layer-thumbnail {
+    width: 32px;
+    height: 32px;
+    background: #252525;
+    border: 1px solid #3e3e3e;
+    border-radius: 3px;
+    image-rendering: pixelated;
+}
+
+.edit-layer-name {
+    flex: 1;
+    font-size: 12px;
+    color: #cccccc;
+}
+
+.edit-layer-item.active .edit-layer-name {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+/* ================================================
+   7. BOTTOM STATUS BAR
+   ================================================ */
+
+.edit-bottom-bar {
+    height: 32px;
+    background: #252525;
+    border-top: 1px solid #3e3e3e;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    font-size: 11px;
+    color: #888888;
+    flex-shrink: 0;
+}
+
+.edit-status-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.edit-status-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.edit-status-icon {
+    font-size: 12px;
+}
+
+.edit-status-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.edit-undo-redo {
+    display: flex;
+    gap: 4px;
+}
+
+.edit-history-btn {
+    width: 24px;
+    height: 24px;
+    background: transparent;
+    border: 1px solid #3e3e3e;
+    border-radius: 3px;
+    cursor: pointer;
+    color: #cccccc;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.edit-history-btn:hover {
+    background: #3e3e3e;
+    border-color: #4a9eff;
+}
+
+.edit-history-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* ================================================
+   8. CUSTOM SCROLLBARS
+   ================================================ */
+
+.edit-toolbar-sidebar::-webkit-scrollbar,
+.edit-properties-panel::-webkit-scrollbar,
+.edit-canvas-viewport::-webkit-scrollbar,
+.edit-layers-list::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.edit-toolbar-sidebar::-webkit-scrollbar-track,
+.edit-properties-panel::-webkit-scrollbar-track,
+.edit-canvas-viewport::-webkit-scrollbar-track,
+.edit-layers-list::-webkit-scrollbar-track {
+    background: #1e1e1e;
+}
+
+.edit-toolbar-sidebar::-webkit-scrollbar-thumb,
+.edit-properties-panel::-webkit-scrollbar-thumb,
+.edit-canvas-viewport::-webkit-scrollbar-thumb,
+.edit-layers-list::-webkit-scrollbar-thumb {
+    background: #3e3e3e;
+    border-radius: 4px;
+}
+
+.edit-toolbar-sidebar::-webkit-scrollbar-thumb:hover,
+.edit-properties-panel::-webkit-scrollbar-thumb:hover,
+.edit-canvas-viewport::-webkit-scrollbar-thumb:hover,
+.edit-layers-list::-webkit-scrollbar-thumb:hover {
+    background: #4a9eff;
+}
+
+/* ================================================
+   9. TOOLTIPS
+   ================================================ */
+
+[data-tooltip] {
+    position: relative;
+}
+
+[data-tooltip]::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-4px);
+    padding: 6px 10px;
+    background: #2d2d2d;
+    border: 1px solid #3e3e3e;
+    border-radius: 4px;
+    font-size: 11px;
+    color: #cccccc;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    z-index: 1000;
+}
+
+[data-tooltip]:hover::before {
+    opacity: 1;
+}
+
+/* ================================================
+   10. ANIMATIONS
+   ================================================ */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+.edit-panel-container {
+    animation: fadeIn 0.2s ease-out;
+}
+
+/* ================================================
+   11. MODALS & DIALOGS
+   ================================================ */
+
+.edit-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000000;
+}
+
+.edit-modal {
+    background: #252525;
+    border: 1px solid #3e3e3e;
+    border-radius: 8px;
+    padding: 24px;
+    max-width: 500px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.edit-modal-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 16px;
+}
+
+.edit-modal-content {
+    font-size: 13px;
+    color: #cccccc;
+    margin-bottom: 20px;
+}
+
+.edit-modal-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.edit-modal-btn {
+    padding: 8px 16px;
+    background: #2d2d2d;
+    border: 1px solid #3e3e3e;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    color: #cccccc;
+    transition: all 0.2s;
+}
+
+.edit-modal-btn:hover {
+    background: #3e3e3e;
+    border-color: #4a9eff;
+}
+
+.edit-modal-btn.primary {
+    background: #4a9eff;
+    border-color: #4a9eff;
+    color: #ffffff;
+}
+
+.edit-modal-btn.primary:hover {
+    background: #3a8eef;
+}
+
+/* ================================================
+   12. LOADING STATES
+   ================================================ */
+
+.edit-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.edit-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #3e3e3e;
+    border-top-color: #4a9eff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.edit-loading-text {
+    font-size: 12px;
+    color: #888888;
+}
+
+/* ================================================
+   13. RESPONSIVE ADJUSTMENTS
+   ================================================ */
+
+@media (max-width: 1200px) {
+    .edit-properties-panel {
+        width: 240px;
+    }
+    
+    .edit-toolbar-sidebar {
+        width: 60px;
+    }
+    
+    .edit-tool-btn {
+        width: 44px;
+        height: 44px;
+    }
+}
+
+@media (max-height: 800px) {
+    .edit-header {
+        height: 40px;
+    }
+    
+    .edit-bottom-bar {
+        height: 28px;
+    }
+    
+    .edit-navigator {
+        width: 120px;
+        height: 120px;
+    }
+}
+
+/* ================================================
+   14. UTILITY CLASSES
+   ================================================ */
+
+.edit-hidden {
+    display: none !important;
+}
+
+.edit-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+.edit-highlight {
+    border-color: #4a9eff !important;
+    box-shadow: 0 0 8px rgba(74, 158, 255, 0.5) !important;
+}
+
+/* ================================================
+   15. CONTEXT MENUS
+   ================================================ */
+
+.edit-context-menu {
+    position: fixed;
+    background: #252525;
+    border: 1px solid #3e3e3e;
+    border-radius: 6px;
+    padding: 4px;
+    min-width: 180px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    z-index: 1000001;
+}
+
+.edit-context-item {
+    padding: 8px 12px;
+    font-size: 12px;
+    color: #cccccc;
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.15s;
+}
+
+.edit-context-item:hover {
+    background: #3e3e3e;
+    color: #ffffff;
+}
+
+.edit-context-item.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.edit-context-item.disabled:hover {
+    background: transparent;
+}
+
+.edit-context-divider {
+    height: 1px;
+    background: #3e3e3e;
+    margin: 4px 0;
+}
+
+.edit-context-shortcut {
+    margin-left: auto;
+    font-size: 10px;
+    color: #666666;
+}
+
+/* ================================================
+   16. ADVANCED TOOL OPTIONS
+   ================================================ */
+
+.edit-tool-options {
+    position: absolute;
+    left: 100%;
+    top: 0;
+    margin-left: 8px;
+    background: #252525;
+    border: 1px solid #3e3e3e;
+    border-radius: 6px;
+    padding: 12px;
+    min-width: 200px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.edit-tool-options-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: #888888;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+.edit-option-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.edit-option-label {
+    font-size: 11px;
+    color: #cccccc;
+}
+
+.edit-option-value {
+    font-size: 11px;
+    color: #4a9eff;
+    font-weight: 600;
+}
+
+/* ================================================
+   17. BRUSH/TOOL CURSOR
+   ================================================ */
+
+.edit-canvas-viewport.cursor-brush {
+    cursor: none;
+}
+
+.edit-brush-cursor {
+    position: absolute;
+    border: 2px solid #4a9eff;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 1000;
+    box-shadow: 0 0 4px rgba(74, 158, 255, 0.5);
+}
+
+/* ================================================
+   18. SELECTION OVERLAY
+   ================================================ */
+
+.edit-selection-overlay {
+    position: absolute;
+    border: 2px dashed #4a9eff;
+    background: rgba(74, 158, 255, 0.1);
+    pointer-events: none;
+    animation: dashAnimation 0.5s linear infinite;
+}
+
+@keyframes dashAnimation {
+    to {
+        stroke-dashoffset: -20;
+    }
+}
+
+/* ================================================
+   19. COLOR PALETTE PRESETS
+   ================================================ */
+
+.edit-palette-presets {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.edit-palette-preset {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    background: #1e1e1e;
+    border: 1px solid #3e3e3e;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.edit-palette-preset:hover {
+    background: #2d2d2d;
+    border-color: #4a9eff;
+}
+
+.edit-palette-preview {
+    display: flex;
+    gap: 2px;
+}
+
+.edit-palette-color {
+    width: 14px;
+    height: 14px;
+    border-radius: 2px;
+}
+
+.edit-palette-name {
+    font-size: 11px;
+    color: #cccccc;
+}
+
+/* ================================================
+   20. EXPORT OPTIONS PANEL
+   ================================================ */
+
+.edit-export-options {
+    padding: 16px;
+    background: #252525;
+    border-top: 1px solid #3e3e3e;
+}
+
+.edit-export-format {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.edit-format-btn {
+    flex: 1;
+    padding: 8px;
+    background: #2d2d2d;
+    border: 1px solid #3e3e3e;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+    color: #cccccc;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.edit-format-btn:hover {
+    background: #3e3e3e;
+    border-color: #4a9eff;
+}
+
+.edit-format-btn.active {
+    background: #4a9eff;
+    border-color: #4a9eff;
+    color: #ffffff;
+}
+
+.edit-export-btn {
+    width: 100%;
+    padding: 10px;
+    background: linear-gradient(180deg, #5aafff 0%, #4a9eff 100%);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: #ffffff;
+    transition: all 0.2s;
+}
+
+.edit-export-btn:hover {
+    background: linear-gradient(180deg, #6abfff 0%, #5aafff 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(74, 158, 255, 0.4);
+}
+
+.edit-export-btn:active {
+    transform: translateY(0);
+}
+
+/* ================================================
+   21. TIP OVERLAY (NAVIGATION HELP)
+   ================================================ */
+
+.edit-tip-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000000;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.edit-tip-box {
+    background: linear-gradient(135deg, #2d2d2d 0%, #252525 100%);
+    border: 2px solid #4a9eff;
+    border-radius: 12px;
+    padding: 24px 32px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7), 0 0 20px rgba(74, 158, 255, 0.3);
+    max-width: 400px;
+    text-align: center;
+    animation: tipSlideIn 0.3s ease-out;
+}
+
+@keyframes tipSlideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.edit-tip-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    animation: tipPulse 2s ease-in-out infinite;
+}
+
+@keyframes tipPulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+.edit-tip-content h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 0 0 16px 0;
+}
+
+.edit-tip-content p {
+    font-size: 14px;
+    color: #cccccc;
+    margin: 8px 0;
+    text-align: left;
+}
+
+.edit-tip-content strong {
+    color: #4a9eff;
+    font-weight: 600;
+}
+
+.edit-tip-close {
+    margin-top: 20px;
+    padding: 10px 32px;
+    background: linear-gradient(180deg, #5aafff 0%, #4a9eff 100%);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+    transition: all 0.2s;
+}
+
+.edit-tip-close:hover {
+    background: linear-gradient(180deg, #6abfff 0%, #5aafff 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(74, 158, 255, 0.5);
+}
+
+.edit-tip-close:active {
+    transform: translateY(0);
+}
